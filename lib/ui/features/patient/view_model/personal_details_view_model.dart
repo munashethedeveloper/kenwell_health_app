@@ -24,6 +24,30 @@ class PersonalDetailsViewModel extends ChangeNotifier {
   String? firstTimeTested;
   String? employmentStatus;
 
+  void setMaritalStatus(String? value) {
+    if (maritalStatus == value) return;
+    maritalStatus = value;
+    notifyListeners();
+  }
+
+  void setGender(String? value) {
+    if (gender == value) return;
+    gender = value;
+    notifyListeners();
+  }
+
+  void setFirstTimeTested(String? value) {
+    if (firstTimeTested == value) return;
+    firstTimeTested = value;
+    notifyListeners();
+  }
+
+  void setEmploymentStatus(String? value) {
+    if (employmentStatus == value) return;
+    employmentStatus = value;
+    notifyListeners();
+  }
+
   final List<String> maritalStatusOptions = [
     'Single',
     'Widowed',

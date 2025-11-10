@@ -129,18 +129,35 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
   }
 
   Widget _buildRadioOptions(String groupValue, Function(String) onChanged) {
-    return Row(
-      children: ['N/A', 'Yes', 'No']
-          .map((e) => Row(
-                children: [
-                  Radio<String>(
-                      value: e,
-                      groupValue: groupValue,
-                      onChanged: (val) => onChanged(val!)),
-                  Text(e),
-                ],
-              ))
-          .toList(),
+    return RadioGroup<String>(
+      groupValue: groupValue,
+      onChanged: (value) {
+        if (value != null) {
+          onChanged(value);
+        }
+      },
+      child: const Row(
+        children: [
+          Expanded(
+            child: RadioListTile<String>(
+              title: Text('N/A'),
+              value: 'N/A',
+            ),
+          ),
+          Expanded(
+            child: RadioListTile<String>(
+              title: Text('Yes'),
+              value: 'Yes',
+            ),
+          ),
+          Expanded(
+            child: RadioListTile<String>(
+              title: Text('No'),
+              value: 'No',
+            ),
+          ),
+        ],
+      ),
     );
   }
 

@@ -79,6 +79,10 @@ class WellnessFlowViewModel extends ChangeNotifier {
 
     await Future.delayed(const Duration(seconds: 2));
 
+    if (!context.mounted) {
+      return;
+    }
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('All data submitted successfully!')),
     );

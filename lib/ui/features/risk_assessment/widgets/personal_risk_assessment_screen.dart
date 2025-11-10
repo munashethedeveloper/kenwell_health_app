@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../shared/widgets/question_radio_group.dart';
 import '../view_model/personal_risk_assessment_view_model.dart';
 
 class PersonalRiskAssessmentScreen extends StatelessWidget {
@@ -74,17 +75,18 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                     '2. Over the past month, how many days per week have you exercised for 30 minutes or longer?',
                     style: TextStyle(fontSize: 16),
                   ),
-                  _buildRadio(vm, 'Never', vm.exerciseFrequency,
-                      (val) => vm.exerciseFrequency = val),
-                  _buildRadio(vm, 'Once/week', vm.exerciseFrequency,
-                      (val) => vm.exerciseFrequency = val),
-                  _buildRadio(vm, 'Twice/week', vm.exerciseFrequency,
-                      (val) => vm.exerciseFrequency = val),
-                  _buildRadio(
-                      vm,
+                  _buildStringRadioGroup(
+                    selected: vm.exerciseFrequency.isEmpty
+                        ? null
+                        : vm.exerciseFrequency,
+                    options: const [
+                      'Never',
+                      'Once/week',
+                      'Twice/week',
                       'Three times/week or more',
-                      vm.exerciseFrequency,
-                      (val) => vm.exerciseFrequency = val),
+                    ],
+                    onChanged: vm.setExerciseFrequency,
+                  ),
                   const SizedBox(height: 16),
 
                   // Section 3: Smoking
@@ -103,12 +105,11 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   const Text('3.1 What do you smoke?',
                       style: TextStyle(fontSize: 16)),
-                  _buildRadio(vm, 'Cigarette', vm.smokeType,
-                      (val) => vm.smokeType = val),
-                  _buildRadio(
-                      vm, 'Pipe', vm.smokeType, (val) => vm.smokeType = val),
-                  _buildRadio(
-                      vm, 'Dagga', vm.smokeType, (val) => vm.smokeType = val),
+                  _buildStringRadioGroup(
+                    selected: vm.smokeType.isEmpty ? null : vm.smokeType,
+                    options: const ['Cigarette', 'Pipe', 'Dagga'],
+                    onChanged: vm.setSmokeType,
+                  ),
                   const SizedBox(height: 16),
 
                   // Section 4: Alcohol
@@ -116,16 +117,19 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                     '4. How often do you use alcoholic beverages?',
                     style: TextStyle(fontSize: 16),
                   ),
-                  _buildRadio(vm, 'Never', vm.alcoholFrequency,
-                      (val) => vm.alcoholFrequency = val),
-                  _buildRadio(vm, 'On occasion', vm.alcoholFrequency,
-                      (val) => vm.alcoholFrequency = val),
-                  _buildRadio(vm, 'Two-three drinks per day',
-                      vm.alcoholFrequency, (val) => vm.alcoholFrequency = val),
-                  _buildRadio(vm, 'More than 3 drinks per day',
-                      vm.alcoholFrequency, (val) => vm.alcoholFrequency = val),
-                  _buildRadio(vm, 'I often drink too much', vm.alcoholFrequency,
-                      (val) => vm.alcoholFrequency = val),
+                  _buildStringRadioGroup(
+                    selected: vm.alcoholFrequency.isEmpty
+                        ? null
+                        : vm.alcoholFrequency,
+                    options: const [
+                      'Never',
+                      'On occasion',
+                      'Two-three drinks per day',
+                      'More than 3 drinks per day',
+                      'I often drink too much',
+                    ],
+                    onChanged: vm.setAlcoholFrequency,
+                  ),
                   const SizedBox(height: 16),
 
                   // Women only
@@ -133,16 +137,25 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                     const Text(
                         '5. Have you had a pap smear in the last 24 months?',
                         style: TextStyle(fontSize: 16)),
-                    _buildYesNoRadio(vm, 'papSmear'),
+                    _buildBoolRadioGroup(
+                      selected: vm.papSmear,
+                      onChanged: vm.setPapSmear,
+                    ),
                     const SizedBox(height: 12),
                     const Text('6. Do you examine your breasts regularly?',
                         style: TextStyle(fontSize: 16)),
-                    _buildYesNoRadio(vm, 'breastExam'),
+                    _buildBoolRadioGroup(
+                      selected: vm.breastExam,
+                      onChanged: vm.setBreastExam,
+                    ),
                     const SizedBox(height: 12),
                     const Text(
                         '7. If older than 40, have you had a mammogram done?',
                         style: TextStyle(fontSize: 16)),
-                    _buildYesNoRadio(vm, 'mammogram'),
+                    _buildBoolRadioGroup(
+                      selected: vm.mammogram,
+                      onChanged: vm.setMammogram,
+                    ),
                   ],
 
                   // Men only
@@ -150,11 +163,17 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                     const Text(
                         '8. If > than 40, have you had your prostate checked?',
                         style: TextStyle(fontSize: 16)),
-                    _buildYesNoRadio(vm, 'prostateCheck'),
+                    _buildBoolRadioGroup(
+                      selected: vm.prostateCheck,
+                      onChanged: vm.setProstateCheck,
+                    ),
                     const SizedBox(height: 12),
                     const Text('9. Have you been tested for prostate cancer?',
                         style: TextStyle(fontSize: 16)),
-                    _buildYesNoRadio(vm, 'prostateTested'),
+                    _buildBoolRadioGroup(
+                      selected: vm.prostateTested,
+                      onChanged: vm.setProstateTested,
+                    ),
                   ],
 
                   const SizedBox(height: 24),
@@ -210,71 +229,40 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRadio(PersonalRiskAssessmentViewModel vm, String value,
-      String groupValue, Function(String) onChanged) {
-    return RadioListTile<String>(
-      title: Text(value),
-      value: value,
-      groupValue: groupValue,
-      onChanged: (val) {
-        if (val != null) onChanged(val);
-        vm.notifyListeners();
+  Widget _buildStringRadioGroup({
+    required String? selected,
+    required List<String> options,
+    required ValueChanged<String> onChanged,
+  }) {
+    return QuestionRadioGroup<String>(
+      value: selected,
+      onChanged: (value) {
+        if (value != null) {
+          onChanged(value);
+        }
       },
+      direction: Axis.vertical,
+      options: options
+          .map(
+            (option) => RadioOption<String>(
+              value: option,
+              label: option,
+            ),
+          )
+          .toList(),
     );
   }
 
-  Widget _buildYesNoRadio(
-      PersonalRiskAssessmentViewModel vm, String fieldName) {
-    bool? currentValue;
-    void Function(bool?)? onChanged;
-
-    switch (fieldName) {
-      case 'papSmear':
-        currentValue = vm.papSmear;
-        onChanged = (val) => vm.papSmear = val;
-        break;
-      case 'breastExam':
-        currentValue = vm.breastExam;
-        onChanged = (val) => vm.breastExam = val;
-        break;
-      case 'mammogram':
-        currentValue = vm.mammogram;
-        onChanged = (val) => vm.mammogram = val;
-        break;
-      case 'prostateCheck':
-        currentValue = vm.prostateCheck;
-        onChanged = (val) => vm.prostateCheck = val;
-        break;
-      case 'prostateTested':
-        currentValue = vm.prostateTested;
-        onChanged = (val) => vm.prostateTested = val;
-        break;
-    }
-
-    return Row(
-      children: [
-        Expanded(
-          child: RadioListTile<bool>(
-            title: const Text('Yes'),
-            value: true,
-            groupValue: currentValue,
-            onChanged: (val) {
-              onChanged?.call(val);
-              vm.notifyListeners();
-            },
-          ),
-        ),
-        Expanded(
-          child: RadioListTile<bool>(
-            title: const Text('No'),
-            value: false,
-            groupValue: currentValue,
-            onChanged: (val) {
-              onChanged?.call(val);
-              vm.notifyListeners();
-            },
-          ),
-        ),
+  Widget _buildBoolRadioGroup({
+    required bool? selected,
+    required ValueChanged<bool?> onChanged,
+  }) {
+    return QuestionRadioGroup<bool>(
+      value: selected,
+      onChanged: onChanged,
+      options: const [
+        RadioOption(value: true, label: 'Yes'),
+        RadioOption(value: false, label: 'No'),
       ],
     );
   }

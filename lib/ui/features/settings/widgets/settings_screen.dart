@@ -68,6 +68,7 @@ class SettingsScreen extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () async {
                     await viewModel.saveSettings();
+                    if (!context.mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Settings saved!')),
                     );

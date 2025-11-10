@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../shared/widgets/labeled_dropdown.dart';
 import '../view_model/personal_details_view_model.dart';
 
 class PersonalDetailsScreen extends StatelessWidget {
@@ -76,40 +77,28 @@ class PersonalDetailsScreen extends StatelessWidget {
                     'Marital Status',
                     vm.maritalStatus,
                     vm.maritalStatusOptions,
-                    (val) {
-                      vm.maritalStatus = val;
-                      vm.notifyListeners();
-                    },
+                    vm.setMaritalStatus,
                   ),
                   const SizedBox(height: 12),
                   _buildDropdown(
                     'Gender',
                     vm.gender,
                     vm.genderOptions,
-                    (val) {
-                      vm.gender = val;
-                      vm.notifyListeners();
-                    },
+                    vm.setGender,
                   ),
                   const SizedBox(height: 12),
                   _buildDropdown(
                     'First Time Tested',
                     vm.firstTimeTested,
                     vm.firstTimeTestedOptions,
-                    (val) {
-                      vm.firstTimeTested = val;
-                      vm.notifyListeners();
-                    },
+                    vm.setFirstTimeTested,
                   ),
                   const SizedBox(height: 12),
                   _buildDropdown(
                     'Employment Status',
                     vm.employmentStatus,
                     vm.employmentStatusOptions,
-                    (val) {
-                      vm.employmentStatus = val;
-                      vm.notifyListeners();
-                    },
+                    vm.setEmploymentStatus,
                   ),
                   const SizedBox(height: 24),
 
@@ -207,23 +196,14 @@ class PersonalDetailsScreen extends StatelessWidget {
     String label,
     String? value,
     List<String> options,
-    Function(String?) onChanged,
+    ValueChanged<String?> onChanged,
   ) {
-    return DropdownButtonFormField<String>(
-      initialValue: value,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-      ),
-      items: options
-          .map(
-            (option) => DropdownMenuItem(
-              value: option,
-              child: Text(option),
-            ),
-          )
-          .toList(),
+    return LabeledDropdown<String>(
+      label: label,
+      value: value,
+      options: options,
       onChanged: onChanged,
+      padding: EdgeInsets.zero,
     );
   }
 }

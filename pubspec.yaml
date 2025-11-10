@@ -31,5 +31,5 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/kenwell_logo.png
+    - assets/kenwell_logo.PNG
     - assets/app_logo.jpg

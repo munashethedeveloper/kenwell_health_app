@@ -82,11 +82,9 @@ class EventViewModel extends ChangeNotifier {
     );
 
     if (picked != null) {
-      // Only use context if the widget is still mounted
-      if (controller != null) {
-        controller.text = picked.format(context);
-        notifyListeners();
-      }
+      if (!context.mounted) return;
+      controller.text = picked.format(context);
+      notifyListeners();
     }
   }
 

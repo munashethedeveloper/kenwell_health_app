@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:signature/signature.dart';
+import '../../../shared/widgets/date_picker_field.dart';
+import '../../../shared/widgets/labeled_dropdown.dart';
+import '../../../shared/widgets/signature_field.dart';
 import '../view_model/nurse_intervention_view_model.dart';
 
 class NurseInterventionScreen extends StatelessWidget {
@@ -41,35 +43,35 @@ class NurseInterventionScreen extends StatelessWidget {
                     'Window period risk assessment',
                     viewModel.windowPeriod,
                     viewModel.windowPeriodOptions,
-                    (val) => viewModel.windowPeriod = val,
+                    viewModel.setWindowPeriod,
                   ),
                   const SizedBox(height: 12),
                   _buildDropdown(
                     'Did patient expect HIV (+) result?',
                     viewModel.expectedResult,
                     viewModel.expectedResultOptions,
-                    (val) => viewModel.expectedResult = val,
+                    viewModel.setExpectedResult,
                   ),
                   const SizedBox(height: 12),
                   _buildDropdown(
                     'Difficulty in dealing with result?',
                     viewModel.difficultyDealingResult,
                     viewModel.difficultyOptions,
-                    (val) => viewModel.difficultyDealingResult = val,
+                    viewModel.setDifficultyDealingResult,
                   ),
                   const SizedBox(height: 12),
                   _buildDropdown(
                     'Urgent psychosocial follow-up needed?',
                     viewModel.urgentPsychosocial,
                     viewModel.urgentOptions,
-                    (val) => viewModel.urgentPsychosocial = val,
+                    viewModel.setUrgentPsychosocial,
                   ),
                   const SizedBox(height: 12),
                   _buildDropdown(
                     'Committed to change behavior?',
                     viewModel.committedToChange,
                     viewModel.committedOptions,
-                    (val) => viewModel.committedToChange = val,
+                    viewModel.setCommittedToChange,
                   ),
                   const SizedBox(height: 12),
 
@@ -82,10 +84,8 @@ class NurseInterventionScreen extends StatelessWidget {
                   CheckboxListTile(
                     title: const Text('Patient not referred'),
                     value: viewModel.patientNotReferred,
-                    onChanged: (val) {
-                      viewModel.patientNotReferred = val ?? false;
-                      viewModel.notifyListeners();
-                    },
+                    onChanged: (val) =>
+                        viewModel.setPatientNotReferred(val ?? false),
                   ),
                   if (viewModel.patientNotReferred)
                     _buildTextField(
@@ -95,18 +95,13 @@ class NurseInterventionScreen extends StatelessWidget {
                   CheckboxListTile(
                     title: const Text('Patient referred to GP'),
                     value: viewModel.referredToGP,
-                    onChanged: (val) {
-                      viewModel.referredToGP = val ?? false;
-                      viewModel.notifyListeners();
-                    },
+                    onChanged: (val) => viewModel.setReferredToGP(val ?? false),
                   ),
                   CheckboxListTile(
                     title: const Text('Patient referred to State HIV clinic'),
                     value: viewModel.referredToStateClinic,
-                    onChanged: (val) {
-                      viewModel.referredToStateClinic = val ?? false;
-                      viewModel.notifyListeners();
-                    },
+                    onChanged: (val) =>
+                        viewModel.setReferredToStateClinic(val ?? false),
                   ),
 
                   // --- Follow-up Location & Date ---
@@ -116,7 +111,7 @@ class NurseInterventionScreen extends StatelessWidget {
                       'Follow-up location',
                       viewModel.followUpLocation,
                       viewModel.followUpLocationOptions,
-                      (val) => viewModel.followUpLocation = val,
+                      viewModel.setFollowUpLocation,
                     ),
                     if (viewModel.followUpLocation == 'Other')
                       _buildTextField(
@@ -146,28 +141,10 @@ class NurseInterventionScreen extends StatelessWidget {
                   const SizedBox(height: 12),
 
                   // --- Signature ---
-                  const Text('Signature',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  Container(
-                    decoration:
-                        BoxDecoration(border: Border.all(color: Colors.grey)),
-                    height: 150,
-                    child: Signature(
-                      controller: viewModel.signatureController,
-                      backgroundColor: Colors.white,
-                    ),
+                  SignatureField(
+                    controller: viewModel.signatureController,
+                    onClear: viewModel.signatureController.clear,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: () => viewModel.signatureController.clear(),
-                        child: const Text('Clear'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
 
                   _buildTextField('SANC No', viewModel.sancNumberController),
                   const SizedBox(height: 12),
@@ -220,16 +197,11 @@ class NurseInterventionScreen extends StatelessWidget {
   }
 
   Widget _buildDropdown(String label, String? value, List<String> options,
-      Function(String?) onChanged) {
-    return DropdownButtonFormField<String>(
-      initialValue: value,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-      ),
-      items: options
-          .map((opt) => DropdownMenuItem(value: opt, child: Text(opt)))
-          .toList(),
+      ValueChanged<String?> onChanged) {
+    return LabeledDropdown<String>(
+      label: label,
+      value: value,
+      options: options,
       onChanged: onChanged,
     );
   }
@@ -249,29 +221,9 @@ class NurseInterventionScreen extends StatelessWidget {
 
   Widget _buildDateField(
       BuildContext context, String label, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: TextField(
-        controller: controller,
-        readOnly: true,
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-        ),
-        onTap: () async {
-          FocusScope.of(context).requestFocus(FocusNode());
-          final pickedDate = await showDatePicker(
-            context: context,
-            initialDate: DateTime.now(),
-            firstDate: DateTime(2000),
-            lastDate: DateTime(2100),
-          );
-          if (pickedDate != null) {
-            controller.text =
-                '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
-          }
-        },
-      ),
+    return DatePickerField(
+      label: label,
+      controller: controller,
     );
   }
 }

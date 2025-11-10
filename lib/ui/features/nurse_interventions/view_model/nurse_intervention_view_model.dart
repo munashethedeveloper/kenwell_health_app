@@ -6,6 +6,12 @@ class NurseInterventionViewModel extends ChangeNotifier {
   String? windowPeriod; // 'N/A', 'Yes', 'No'
   final List<String> windowPeriodOptions = ['N/A', 'Yes', 'No'];
 
+  void setWindowPeriod(String? value) {
+    if (windowPeriod == value) return;
+    windowPeriod = value;
+    notifyListeners();
+  }
+
   // 2. Follow-up location
   String? followUpLocation; // 'State clinic', 'Private doctor', 'Other'
   final List<String> followUpLocationOptions = [
@@ -15,6 +21,15 @@ class NurseInterventionViewModel extends ChangeNotifier {
   ];
   final TextEditingController followUpOtherController = TextEditingController();
 
+  void setFollowUpLocation(String? value) {
+    if (followUpLocation == value) return;
+    followUpLocation = value;
+    if (value != 'Other') {
+      followUpOtherController.clear();
+    }
+    notifyListeners();
+  }
+
   // 3. Follow-up test date
   final TextEditingController followUpDateController = TextEditingController();
 
@@ -22,17 +37,41 @@ class NurseInterventionViewModel extends ChangeNotifier {
   String? expectedResult; // 'N/A', 'Yes', 'No'
   final List<String> expectedResultOptions = ['N/A', 'Yes', 'No'];
 
+  void setExpectedResult(String? value) {
+    if (expectedResult == value) return;
+    expectedResult = value;
+    notifyListeners();
+  }
+
   // 5. Difficulty in dealing with result
   String? difficultyDealingResult; // 'N/A', 'Yes', 'No'
   final List<String> difficultyOptions = ['N/A', 'Yes', 'No'];
+
+  void setDifficultyDealingResult(String? value) {
+    if (difficultyDealingResult == value) return;
+    difficultyDealingResult = value;
+    notifyListeners();
+  }
 
   // 6. Urgent psychosocial follow-up
   String? urgentPsychosocial; // 'N/A', 'Yes', 'No'
   final List<String> urgentOptions = ['N/A', 'Yes', 'No'];
 
+  void setUrgentPsychosocial(String? value) {
+    if (urgentPsychosocial == value) return;
+    urgentPsychosocial = value;
+    notifyListeners();
+  }
+
   // 7. Commitment to behavior change
   String? committedToChange; // 'N/A', 'Yes', 'No'
   final List<String> committedOptions = ['N/A', 'Yes', 'No'];
+
+  void setCommittedToChange(String? value) {
+    if (committedToChange == value) return;
+    committedToChange = value;
+    notifyListeners();
+  }
 
   // Referral Nursing Interventions
   bool patientNotReferred = false;
@@ -40,6 +79,27 @@ class NurseInterventionViewModel extends ChangeNotifier {
       TextEditingController();
   bool referredToGP = false;
   bool referredToStateClinic = false;
+
+  void setPatientNotReferred(bool value) {
+    if (patientNotReferred == value) return;
+    patientNotReferred = value;
+    if (!value) {
+      notReferredReasonController.clear();
+    }
+    notifyListeners();
+  }
+
+  void setReferredToGP(bool value) {
+    if (referredToGP == value) return;
+    referredToGP = value;
+    notifyListeners();
+  }
+
+  void setReferredToStateClinic(bool value) {
+    if (referredToStateClinic == value) return;
+    referredToStateClinic = value;
+    notifyListeners();
+  }
 
   // Nurse Details
   final TextEditingController hivTestingNurseController =
@@ -125,15 +185,21 @@ class NurseInterventionViewModel extends ChangeNotifier {
       await toMap(); // Ensure signature bytes are included
       await Future.delayed(const Duration(seconds: 1));
 
+      if (!context.mounted) {
+        return;
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Intervention saved successfully!')),
       );
 
       onNext?.call();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error saving interventions: $e')),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error saving interventions: $e')),
+        );
+      }
     } finally {
       _isSubmitting = false;
       notifyListeners();

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../shared/widgets/date_picker_field.dart';
+import '../../../shared/widgets/question_radio_group.dart';
 import '../view_model/tb_testing_view_model.dart';
 
 class TBTestingScreen extends StatelessWidget {
@@ -37,68 +39,79 @@ class TBTestingScreen extends StatelessWidget {
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   _buildYesNo(
-                      context,
-                      'Have you been coughing for two weeks or more?',
-                      viewModel.coughTwoWeeks,
-                      (val) => viewModel.coughTwoWeeks = val),
+                    context,
+                    'Have you been coughing for two weeks or more?',
+                    viewModel.coughTwoWeeks,
+                    viewModel.setCoughTwoWeeks,
+                  ),
                   _buildYesNo(
-                      context,
-                      'Is your sputum coloured when coughing?',
-                      viewModel.sputumColour,
-                      (val) => viewModel.sputumColour = val),
+                    context,
+                    'Is your sputum coloured when coughing?',
+                    viewModel.sputumColour,
+                    viewModel.setSputumColour,
+                  ),
                   _buildYesNo(
-                      context,
-                      'Is there blood in your sputum when you cough?',
-                      viewModel.bloodInSputum,
-                      (val) => viewModel.bloodInSputum = val),
+                    context,
+                    'Is there blood in your sputum when you cough?',
+                    viewModel.bloodInSputum,
+                    viewModel.setBloodInSputum,
+                  ),
                   _buildYesNo(
-                      context,
-                      'Have you lost more than 3kg in the past 4 weeks?',
-                      viewModel.weightLoss,
-                      (val) => viewModel.weightLoss = val),
+                    context,
+                    'Have you lost more than 3kg in the past 4 weeks?',
+                    viewModel.weightLoss,
+                    viewModel.setWeightLoss,
+                  ),
                   _buildYesNo(
-                      context,
-                      'Are you sweating unusually at night?',
-                      viewModel.nightSweats,
-                      (val) => viewModel.nightSweats = val),
+                    context,
+                    'Are you sweating unusually at night?',
+                    viewModel.nightSweats,
+                    viewModel.setNightSweats,
+                  ),
                   _buildYesNo(
-                      context,
-                      'Have you had recurrent fever/chills lasting more than three days?',
-                      viewModel.feverChills,
-                      (val) => viewModel.feverChills = val),
+                    context,
+                    'Have you had recurrent fever/chills lasting more than three days?',
+                    viewModel.feverChills,
+                    viewModel.setFeverChills,
+                  ),
                   _buildYesNo(
-                      context,
-                      'Have you experienced chest pains or difficulty breathing?',
-                      viewModel.chestPain,
-                      (val) => viewModel.chestPain = val),
+                    context,
+                    'Have you experienced chest pains or difficulty breathing?',
+                    viewModel.chestPain,
+                    viewModel.setChestPain,
+                  ),
                   _buildYesNo(
-                      context,
-                      'Do you have swellings in the neck or armpits?',
-                      viewModel.swellings,
-                      (val) => viewModel.swellings = val),
+                    context,
+                    'Do you have swellings in the neck or armpits?',
+                    viewModel.swellings,
+                    viewModel.setSwellings,
+                  ),
                   const Divider(height: 32),
                   const Text('History of TB Treatment',
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   _buildYesNo(
-                      context,
-                      'Were you ever treated for Tuberculosis?',
-                      viewModel.treatedBefore,
-                      (val) => viewModel.treatedBefore = val),
+                    context,
+                    'Were you ever treated for Tuberculosis?',
+                    viewModel.treatedBefore,
+                    viewModel.setTreatedBefore,
+                  ),
                   if (viewModel.treatedBefore == 'Yes')
                     _buildDateField(context, 'When were you treated?',
                         viewModel.treatedDateController),
                   _buildYesNo(
-                      context,
-                      'Did you complete the treatment?',
-                      viewModel.completedTreatment,
-                      (val) => viewModel.completedTreatment = val),
+                    context,
+                    'Did you complete the treatment?',
+                    viewModel.completedTreatment,
+                    viewModel.setCompletedTreatment,
+                  ),
                   _buildYesNo(
-                      context,
-                      'Were you in contact with someone diagnosed with Tuberculosis in the past year?',
-                      viewModel.contactWithTB,
-                      (val) => viewModel.contactWithTB = val),
+                    context,
+                    'Were you in contact with someone diagnosed with Tuberculosis in the past year?',
+                    viewModel.contactWithTB,
+                    viewModel.setContactWithTB,
+                  ),
                   const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -133,71 +146,24 @@ class TBTestingScreen extends StatelessWidget {
   }
 
   Widget _buildYesNo(BuildContext context, String question, String? value,
-      Function(String?) onChanged) {
-    return Padding(
+      ValueChanged<String?> onChanged) {
+    return QuestionRadioGroup<String>(
+      question: question,
+      value: value,
+      onChanged: onChanged,
       padding: const EdgeInsets.only(bottom: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(question),
-          Row(
-            children: [
-              Expanded(
-                child: RadioListTile<String>(
-                  title: const Text('Yes'),
-                  value: 'Yes',
-                  groupValue: value,
-                  onChanged: (val) {
-                    onChanged(val);
-                    Provider.of<TBTestingViewModel>(context, listen: false)
-                        .notifyListeners();
-                  },
-                ),
-              ),
-              Expanded(
-                child: RadioListTile<String>(
-                  title: const Text('No'),
-                  value: 'No',
-                  groupValue: value,
-                  onChanged: (val) {
-                    onChanged(val);
-                    Provider.of<TBTestingViewModel>(context, listen: false)
-                        .notifyListeners();
-                  },
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+      options: const [
+        RadioOption(value: 'Yes', label: 'Yes'),
+        RadioOption(value: 'No', label: 'No'),
+      ],
     );
   }
 
   Widget _buildDateField(
       BuildContext context, String label, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: TextField(
-        controller: controller,
-        readOnly: true,
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-        ),
-        onTap: () async {
-          FocusScope.of(context).requestFocus(FocusNode());
-          final pickedDate = await showDatePicker(
-            context: context,
-            initialDate: DateTime.now(),
-            firstDate: DateTime(2000),
-            lastDate: DateTime(2100),
-          );
-          if (pickedDate != null) {
-            controller.text =
-                '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
-          }
-        },
-      ),
+    return DatePickerField(
+      label: label,
+      controller: controller,
     );
   }
 }
