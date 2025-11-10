@@ -44,10 +44,11 @@ class WellnessFlowViewModel extends ChangeNotifier {
     }
   }
 
-  void cancelFlow(BuildContext context) {
+  void cancelFlow() {
     _currentStep = 0;
     notifyListeners();
-    Navigator.popUntil(context, (route) => route.settings.name == '/calendar');
+    //Navigator.popUntil(context, (route) => route.isFirst);
+    //Navigator.popUntil(context, (route) => route.settings.name == '/calendar');
   }
 
   Future<void> submitAll(BuildContext context) async {
