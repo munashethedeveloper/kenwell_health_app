@@ -88,15 +88,21 @@ class WellnessFlowScreen extends StatelessWidget {
         );
         break;
       case 8:
-        currentScreen = TBTestingScreen(
-          onNext: flowVM.nextStep,
-          onPrevious: flowVM.previousStep,
+        currentScreen = ChangeNotifierProvider.value(
+          value: flowVM.tbTestVM,
+          child: TBTestingScreen(
+            onNext: flowVM.nextStep,
+            onPrevious: flowVM.previousStep,
+          ),
         );
         break;
       case 9:
-        currentScreen = TBNursingInterventionScreen(
-          onNext: flowVM.nextStep,
-          onPrevious: flowVM.previousStep,
+        currentScreen = ChangeNotifierProvider.value(
+          value: flowVM.tbNurseVM,
+          child: TBNursingInterventionScreen(
+            onNext: flowVM.nextStep,
+            onPrevious: flowVM.previousStep,
+          ),
         );
         break;
       case 10:
