@@ -82,17 +82,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     // Wrap WellnessFlowScreen with its ViewModel
     return ChangeNotifierProvider(
       create: (_) => WellnessFlowViewModel(),
-      child: Consumer<WellnessFlowViewModel>(
-        builder: (context, flowVM, _) {
-          return WellnessFlowScreen(
-            // Use ViewModel’s currentStep for internal step tracking
-            viewModel: flowVM,
-            onNext: flowVM.nextStep,
-            onPrevious: flowVM.previousStep,
-            onCancel: flowVM.cancelFlow,
-          );
-        },
-      ),
+      child: const WellnessFlowScreen(),
     );
   }
 }
