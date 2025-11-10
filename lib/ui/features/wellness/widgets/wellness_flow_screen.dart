@@ -64,27 +64,39 @@ class WellnessFlowScreen extends StatelessWidget {
         );
         break;
       case 4:
-        currentScreen = NurseInterventionScreen(
-          onNext: flowVM.nextStep,
-          onPrevious: flowVM.previousStep,
+        currentScreen = ChangeNotifierProvider.value(
+          value: flowVM.nurseVM,
+          child: NurseInterventionScreen(
+            onNext: flowVM.nextStep,
+            onPrevious: flowVM.previousStep,
+          ),
         );
         break;
       case 5:
-        currentScreen = HIVTestScreen(
-          onNext: flowVM.nextStep,
-          onPrevious: flowVM.previousStep,
+        currentScreen = ChangeNotifierProvider.value(
+          value: flowVM.hivTestVM,
+          child: HIVTestScreen(
+            onNext: flowVM.nextStep,
+            onPrevious: flowVM.previousStep,
+          ),
         );
         break;
       case 6:
-        currentScreen = HIVTestResultScreen(
-          onNext: flowVM.nextStep,
-          onPrevious: flowVM.previousStep,
+        currentScreen = ChangeNotifierProvider.value(
+          value: flowVM.hivResultsVM,
+          child: HIVTestResultScreen(
+            onNext: flowVM.nextStep,
+            onPrevious: flowVM.previousStep,
+          ),
         );
         break;
       case 7:
-        currentScreen = HIVTestNursingInterventionScreen(
-          onNext: flowVM.nextStep,
-          onPrevious: flowVM.previousStep,
+        currentScreen = ChangeNotifierProvider.value(
+          value: flowVM.hivNurseVM,
+          child: HIVTestNursingInterventionScreen(
+            onNext: flowVM.nextStep,
+            onPrevious: flowVM.previousStep,
+          ),
         );
         break;
       case 8:
@@ -106,9 +118,12 @@ class WellnessFlowScreen extends StatelessWidget {
         );
         break;
       case 10:
-        currentScreen = SurveyScreen(
-          onPrevious: flowVM.previousStep,
-          onSubmit: () => flowVM.submitAll(context),
+        currentScreen = ChangeNotifierProvider.value(
+          value: flowVM.surveyVM,
+          child: SurveyScreen(
+            onPrevious: flowVM.previousStep,
+            onSubmit: () => flowVM.submitAll(context),
+          ),
         );
         break;
       default:
