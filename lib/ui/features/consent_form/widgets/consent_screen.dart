@@ -5,12 +5,14 @@ import '../view_model/consent_screen_view_model.dart';
 
 class ConsentScreen extends StatelessWidget {
   final VoidCallback onNext;
-  final VoidCallback onCancel; // replaces onPrevious
+  final VoidCallback onCancel;
+  //final ConsentScreenViewModel viewModel;
 
   const ConsentScreen({
     super.key,
     required this.onNext,
     required this.onCancel,
+    //required this.viewModel
   });
 
   @override
@@ -63,7 +65,7 @@ class ConsentScreen extends StatelessWidget {
                 vm.practitionerController, 'Name of Healthcare Practitioner'),
             const SizedBox(height: 24),
 
-            // Information bullets and checkboxes
+            // Information bullets
             const Text(
               'I hereby declare that I have read and understood the information below. By signing, I confirm my understanding of:',
               style: TextStyle(fontSize: 16),
@@ -154,7 +156,8 @@ class ConsentScreen extends StatelessWidget {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text(
-                                      'Please complete all fields and sign before proceeding.'),
+                                    'Please complete all fields and sign before proceeding.',
+                                  ),
                                 ),
                               );
                             }

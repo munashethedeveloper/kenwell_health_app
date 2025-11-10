@@ -44,9 +44,10 @@ class WellnessFlowViewModel extends ChangeNotifier {
     }
   }
 
-  void cancelFlow() {
+  void cancelFlow(BuildContext context) {
     _currentStep = 0;
     notifyListeners();
+    Navigator.popUntil(context, (route) => route.settings.name == '/calendar');
   }
 
   Future<void> submitAll(BuildContext context) async {
@@ -78,6 +79,10 @@ class WellnessFlowViewModel extends ChangeNotifier {
     debugPrint('Survey: $surveyData');
 
     await Future.delayed(const Duration(seconds: 2));
+
+    if (!context.mounted) {
+      return;
+    }
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('All data submitted successfully!')),

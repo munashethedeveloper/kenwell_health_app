@@ -6,6 +6,9 @@ import '../../event/view_model/event_view_model.dart';
 class SplashViewModel extends ChangeNotifier {
   Future<void> initializeApp(BuildContext context) async {
     await Future.delayed(const Duration(seconds: 3));
+    if (!context.mounted) {
+      return;
+    }
     navigateToCalendar(context); // call public method
   }
 

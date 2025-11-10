@@ -76,15 +76,20 @@ class WellnessScreeningResultsViewModel extends ChangeNotifier {
     try {
       await Future.delayed(const Duration(seconds: 1));
 
+      if (!context.mounted) {
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Screening Results Saved!')),
       );
 
       onNext(); // ✅ Move to Nurse Intervention Screen
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error saving results: $e')),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error saving results: $e')),
+        );
+      }
     } finally {
       _isSubmitting = false;
       notifyListeners();

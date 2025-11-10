@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../domain/models/user_model.dart';
+import 'package:flutter/foundation.dart';
 
 class FirebaseAuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -15,7 +16,9 @@ class FirebaseAuthService {
       );
 
       final user = userCredential.user;
-      if (user == null) return null;
+      if (user == null) {
+        return null;
+      }
 
       // Fetch additional user data from Firestore
       final doc = await _firestore.collection('users').doc(user.uid).get();
@@ -32,9 +35,10 @@ class FirebaseAuthService {
       }
 
       return UserModel.fromMap(doc.data()!);
-    } catch (e) {
+    } catch (e, stackTrace) {
       // Handle errors (FirebaseAuthException, network issues, etc.)
-      print('Login error: $e');
+      debugPrint('Login error: $e');
+      debugPrintStack(stackTrace: stackTrace);
       return null;
     }
   }
@@ -56,7 +60,9 @@ class FirebaseAuthService {
       );
 
       final user = userCredential.user;
-      if (user == null) return null;
+      if (user == null) {
+        return null;
+      }
 
       // Create UserModel
       final userModel = UserModel(
@@ -73,8 +79,9 @@ class FirebaseAuthService {
       await _firestore.collection('users').doc(user.uid).set(userModel.toMap());
 
       return userModel;
-    } catch (e) {
-      print('Registration error: $e');
+    } catch (e, stackTrace) {
+      debugPrint('Registration error: $e');
+      debugPrintStack(stackTrace: stackTrace);
       return null;
     }
   }

@@ -6,6 +6,17 @@ class HIVTestViewModel extends ChangeNotifier {
   TextEditingController lastTestMonthController = TextEditingController();
   TextEditingController lastTestYearController = TextEditingController();
   String? lastTestResult; // Positive/Negative
+  void setFirstHIVTest(String? value) {
+    if (firstHIVTest == value) return;
+    firstHIVTest = value;
+    notifyListeners();
+  }
+
+  void setLastTestResult(String? value) {
+    if (lastTestResult == value) return;
+    lastTestResult = value;
+    notifyListeners();
+  }
 
   String? sharedNeedles; // Yes/No
   String? unprotectedSex; // Yes/No
@@ -13,8 +24,46 @@ class HIVTestViewModel extends ChangeNotifier {
   String? treatedTB; // Yes/No
   String? noCondomUse; // Yes/No
   TextEditingController noCondomReasonController = TextEditingController();
+  void setSharedNeedles(String? value) {
+    if (sharedNeedles == value) return;
+    sharedNeedles = value;
+    notifyListeners();
+  }
+
+  void setUnprotectedSex(String? value) {
+    if (unprotectedSex == value) return;
+    unprotectedSex = value;
+    notifyListeners();
+  }
+
+  void setTreatedSTI(String? value) {
+    if (treatedSTI == value) return;
+    treatedSTI = value;
+    notifyListeners();
+  }
+
+  void setTreatedTB(String? value) {
+    if (treatedTB == value) return;
+    treatedTB = value;
+    notifyListeners();
+  }
+
+  void setNoCondomUse(String? value) {
+    if (noCondomUse == value) return;
+    noCondomUse = value;
+    if (value != 'Yes') {
+      noCondomReasonController.clear();
+    }
+    notifyListeners();
+  }
 
   String? knowPartnerStatus; // Yes/No
+  void setKnowPartnerStatus(String? value) {
+    if (knowPartnerStatus == value) return;
+    knowPartnerStatus = value;
+    notifyListeners();
+  }
+
   List<String> riskReasons = [];
   TextEditingController otherRiskReasonController = TextEditingController();
 

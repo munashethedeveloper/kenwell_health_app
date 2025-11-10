@@ -35,10 +35,11 @@ class WellnessFlowScreen extends StatelessWidget {
 
           switch (flowVM.currentStep) {
             case 0:
-              currentScreen = ConsentScreen(
-                onNext: flowVM.nextStep,
-                onCancel: flowVM.cancelFlow,
-              );
+              currentScreen = ChangeNotifierProvider.value(
+                  value: flowVM.consentVM,
+                  child: ConsentScreen(
+                      onNext: flowVM.nextStep,
+                      onCancel: () => flowVM.cancelFlow(context)));
               break;
             case 1:
               currentScreen = PersonalDetailsScreen(

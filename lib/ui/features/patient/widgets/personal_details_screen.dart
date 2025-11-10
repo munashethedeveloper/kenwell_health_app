@@ -76,40 +76,28 @@ class PersonalDetailsScreen extends StatelessWidget {
                     'Marital Status',
                     vm.maritalStatus,
                     vm.maritalStatusOptions,
-                    (val) {
-                      vm.maritalStatus = val;
-                      vm.notifyListeners();
-                    },
+                    vm.setMaritalStatus,
                   ),
                   const SizedBox(height: 12),
                   _buildDropdown(
                     'Gender',
                     vm.gender,
                     vm.genderOptions,
-                    (val) {
-                      vm.gender = val;
-                      vm.notifyListeners();
-                    },
+                    vm.setGender,
                   ),
                   const SizedBox(height: 12),
                   _buildDropdown(
                     'First Time Tested',
                     vm.firstTimeTested,
                     vm.firstTimeTestedOptions,
-                    (val) {
-                      vm.firstTimeTested = val;
-                      vm.notifyListeners();
-                    },
+                    vm.setFirstTimeTested,
                   ),
                   const SizedBox(height: 12),
                   _buildDropdown(
                     'Employment Status',
                     vm.employmentStatus,
                     vm.employmentStatusOptions,
-                    (val) {
-                      vm.employmentStatus = val;
-                      vm.notifyListeners();
-                    },
+                    vm.setEmploymentStatus,
                   ),
                   const SizedBox(height: 24),
 
