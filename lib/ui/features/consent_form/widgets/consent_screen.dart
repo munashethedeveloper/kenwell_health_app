@@ -28,6 +28,7 @@ class ConsentScreen extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
+        automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFF90C048),
         centerTitle: true,
       ),
