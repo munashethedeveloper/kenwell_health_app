@@ -18,7 +18,9 @@ import '../../tb_test_nursing_intervention/widgets/tb_nursing_intervention_scree
 import '../view_model/wellness_flow_view_model.dart';
 
 class WellnessFlowScreen extends StatelessWidget {
-  const WellnessFlowScreen({super.key});
+  final VoidCallback onExitFlow;
+
+  const WellnessFlowScreen({super.key, required this.onExitFlow});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +34,10 @@ class WellnessFlowScreen extends StatelessWidget {
           value: flowVM.consentVM,
           child: ConsentScreen(
             onNext: flowVM.nextStep,
-            onCancel: flowVM.cancelFlow,
+            onCancel: () {
+              flowVM.cancelFlow();
+              onExitFlow();
+            },
           ),
         );
         break;

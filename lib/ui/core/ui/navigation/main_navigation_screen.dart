@@ -36,7 +36,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     ];
 
     return Scaffold(
-      body: tabs[_currentIndex],
+      body: IndexedStack(
+        index: _currentIndex,
+        children: tabs,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         type: BottomNavigationBarType.fixed,
@@ -82,7 +85,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     // Wrap WellnessFlowScreen with its ViewModel
     return ChangeNotifierProvider(
       create: (_) => WellnessFlowViewModel(),
-      child: const WellnessFlowScreen(),
+      child: WellnessFlowScreen(
+        onExitFlow: _switchToCalendarTab,
+      ),
     );
+  }
+
+  void _switchToCalendarTab() {
+    setState(() {
+      _currentIndex = 0;
+    });
   }
 }
