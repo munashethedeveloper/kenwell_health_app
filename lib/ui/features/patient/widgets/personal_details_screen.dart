@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../shared/widgets/labeled_dropdown.dart';
 import '../view_model/personal_details_view_model.dart';
 
 class PersonalDetailsScreen extends StatelessWidget {
@@ -195,23 +196,14 @@ class PersonalDetailsScreen extends StatelessWidget {
     String label,
     String? value,
     List<String> options,
-    Function(String?) onChanged,
+    ValueChanged<String?> onChanged,
   ) {
-    return DropdownButtonFormField<String>(
-      initialValue: value,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-      ),
-      items: options
-          .map(
-            (option) => DropdownMenuItem(
-              value: option,
-              child: Text(option),
-            ),
-          )
-          .toList(),
+    return LabeledDropdown<String>(
+      label: label,
+      value: value,
+      options: options,
       onChanged: onChanged,
+      padding: EdgeInsets.zero,
     );
   }
 }

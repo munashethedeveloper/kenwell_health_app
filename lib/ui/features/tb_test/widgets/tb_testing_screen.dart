@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../shared/widgets/date_picker_field.dart';
+import '../../../shared/widgets/question_radio_group.dart';
 import '../view_model/tb_testing_view_model.dart';
 
 class TBTestingScreen extends StatelessWidget {
@@ -145,62 +147,23 @@ class TBTestingScreen extends StatelessWidget {
 
   Widget _buildYesNo(BuildContext context, String question, String? value,
       ValueChanged<String?> onChanged) {
-    return Padding(
+    return QuestionRadioGroup<String>(
+      question: question,
+      value: value,
+      onChanged: onChanged,
       padding: const EdgeInsets.only(bottom: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(question),
-          RadioGroup<String>(
-            groupValue: value,
-            onChanged: onChanged,
-            child: const Row(
-              children: <Widget>[
-                Expanded(
-                  child: RadioListTile<String>(
-                    title: Text('Yes'),
-                    value: 'Yes',
-                  ),
-                ),
-                Expanded(
-                  child: RadioListTile<String>(
-                    title: Text('No'),
-                    value: 'No',
-                  ),
-                ),
-              ],
-            ),
-          )
-        ],
-      ),
+      options: const [
+        RadioOption(value: 'Yes', label: 'Yes'),
+        RadioOption(value: 'No', label: 'No'),
+      ],
     );
   }
 
   Widget _buildDateField(
       BuildContext context, String label, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: TextField(
-        controller: controller,
-        readOnly: true,
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-        ),
-        onTap: () async {
-          FocusScope.of(context).requestFocus(FocusNode());
-          final pickedDate = await showDatePicker(
-            context: context,
-            initialDate: DateTime.now(),
-            firstDate: DateTime(2000),
-            lastDate: DateTime(2100),
-          );
-          if (pickedDate != null) {
-            controller.text =
-                '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
-          }
-        },
-      ),
+    return DatePickerField(
+      label: label,
+      controller: controller,
     );
   }
 }

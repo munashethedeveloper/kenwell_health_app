@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../shared/widgets/labeled_dropdown.dart';
+import '../../../shared/widgets/question_radio_group.dart';
+import '../../../shared/widgets/rating_scale_row.dart';
 import '../view_model/survey_view_model.dart';
 
 class SurveyScreen extends StatelessWidget {
@@ -114,27 +117,16 @@ class SurveyScreen extends StatelessWidget {
                     '9. Would you like Kenwell Consulting to contact you regarding your experience?',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                  RadioGroup<String>(
-                    groupValue: vm.contactConsent,
+                  QuestionRadioGroup<String>(
+                    value: vm.contactConsent,
                     onChanged: (val) {
                       if (val != null) vm.updateContactConsent(val);
                     },
-                    child: const Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: RadioListTile<String>(
-                            title: Text('Yes'),
-                            value: 'Yes',
-                          ),
-                        ),
-                        Expanded(
-                          child: RadioListTile<String>(
-                            title: Text('No'),
-                            value: 'No',
-                          ),
-                        ),
-                      ],
-                    ),
+                    padding: EdgeInsets.zero,
+                    options: const [
+                      RadioOption(value: 'Yes', label: 'Yes'),
+                      RadioOption(value: 'No', label: 'No'),
+                    ],
                   ),
                   const SizedBox(height: 20),
 
@@ -180,75 +172,38 @@ class SurveyScreen extends StatelessWidget {
 
   // --- Helpers ---
   Widget _buildRadioGroup(SurveyViewModel vm, String _, List<String> options) {
-    String? groupValue = vm.heardAbout;
-    return RadioGroup<String>(
-      groupValue: groupValue,
+    return QuestionRadioGroup<String>(
+      value: vm.heardAbout,
       onChanged: (val) {
         if (val != null) {
           vm.updateHeardAbout(val);
         }
       },
-      child: Column(
-        children: options
-            .map(
-              (option) => RadioListTile<String>(
-                title: Text(option),
-                value: option,
-              ),
-            )
-            .toList(),
-      ),
+      direction: Axis.vertical,
+      padding: const EdgeInsets.only(top: 8),
+      options: options
+          .map((option) => RadioOption<String>(value: option, label: option))
+          .toList(),
     );
   }
 
   Widget _buildDropdown(String label, List<String> items, String? value,
-      Function(String?) onChanged) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
-      child: DropdownButtonFormField<String>(
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-        ),
-        initialValue: value,
-        items: items
-            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-            .toList(),
-        onChanged: onChanged,
-      ),
+      ValueChanged<String?> onChanged) {
+    return LabeledDropdown<String>(
+      label: label,
+      value: value,
+      options: items,
+      onChanged: onChanged,
+      padding: const EdgeInsets.only(top: 8),
     );
   }
 
   Widget _buildRatingRow(SurveyViewModel vm, String question, String key) {
-    return Padding(
+    return RatingScaleRow(
+      question: question,
+      value: vm.ratings[key],
+      onChanged: (score) => vm.updateRating(key, score),
       padding: const EdgeInsets.only(bottom: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(question),
-          RadioGroup<int>(
-            groupValue: vm.ratings[key],
-            onChanged: (val) {
-              if (val != null) {
-                vm.updateRating(key, val);
-              }
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(
-                6,
-                (index) => Expanded(
-                  child: RadioListTile<int>(
-                    dense: true,
-                    title: Text('$index'),
-                    value: index,
-                  ),
-                ),
-              ),
-            ),
-          )
-        ],
-      ),
     );
   }
 }

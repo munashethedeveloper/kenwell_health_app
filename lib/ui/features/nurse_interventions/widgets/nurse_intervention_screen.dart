@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:signature/signature.dart';
+import '../../../shared/widgets/date_picker_field.dart';
+import '../../../shared/widgets/labeled_dropdown.dart';
+import '../../../shared/widgets/signature_field.dart';
 import '../view_model/nurse_intervention_view_model.dart';
 
 class NurseInterventionScreen extends StatelessWidget {
@@ -139,28 +141,10 @@ class NurseInterventionScreen extends StatelessWidget {
                   const SizedBox(height: 12),
 
                   // --- Signature ---
-                  const Text('Signature',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  Container(
-                    decoration:
-                        BoxDecoration(border: Border.all(color: Colors.grey)),
-                    height: 150,
-                    child: Signature(
-                      controller: viewModel.signatureController,
-                      backgroundColor: Colors.white,
-                    ),
+                  SignatureField(
+                    controller: viewModel.signatureController,
+                    onClear: viewModel.signatureController.clear,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: () => viewModel.signatureController.clear(),
-                        child: const Text('Clear'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
 
                   _buildTextField('SANC No', viewModel.sancNumberController),
                   const SizedBox(height: 12),
@@ -213,16 +197,11 @@ class NurseInterventionScreen extends StatelessWidget {
   }
 
   Widget _buildDropdown(String label, String? value, List<String> options,
-      Function(String?) onChanged) {
-    return DropdownButtonFormField<String>(
-      initialValue: value,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-      ),
-      items: options
-          .map((opt) => DropdownMenuItem(value: opt, child: Text(opt)))
-          .toList(),
+      ValueChanged<String?> onChanged) {
+    return LabeledDropdown<String>(
+      label: label,
+      value: value,
+      options: options,
       onChanged: onChanged,
     );
   }
@@ -242,29 +221,9 @@ class NurseInterventionScreen extends StatelessWidget {
 
   Widget _buildDateField(
       BuildContext context, String label, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: TextField(
-        controller: controller,
-        readOnly: true,
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-        ),
-        onTap: () async {
-          FocusScope.of(context).requestFocus(FocusNode());
-          final pickedDate = await showDatePicker(
-            context: context,
-            initialDate: DateTime.now(),
-            firstDate: DateTime(2000),
-            lastDate: DateTime(2100),
-          );
-          if (pickedDate != null) {
-            controller.text =
-                '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
-          }
-        },
-      ),
+    return DatePickerField(
+      label: label,
+      controller: controller,
     );
   }
 }

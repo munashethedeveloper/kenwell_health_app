@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../shared/widgets/question_radio_group.dart';
 import '../view_model/hiv_test_view_model.dart';
 
 class HIVTestScreen extends StatelessWidget {
@@ -149,34 +150,14 @@ class HIVTestScreen extends StatelessWidget {
 
   Widget _buildYesNo(BuildContext context, String question, String? value,
       ValueChanged<String?> onChanged) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(question),
-          RadioGroup<String>(
-            groupValue: value,
-            onChanged: onChanged,
-            child: const Row(
-              children: <Widget>[
-                Expanded(
-                  child: RadioListTile<String>(
-                    title: Text('Yes'),
-                    value: 'Yes',
-                  ),
-                ),
-                Expanded(
-                  child: RadioListTile<String>(
-                    title: Text('No'),
-                    value: 'No',
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+    return QuestionRadioGroup<String>(
+      question: question,
+      value: value,
+      onChanged: onChanged,
+      options: const [
+        RadioOption(value: 'Yes', label: 'Yes'),
+        RadioOption(value: 'No', label: 'No'),
+      ],
     );
   }
 

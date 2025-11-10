@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../shared/widgets/question_radio_group.dart';
 import '../view_model/personal_risk_assessment_view_model.dart';
 
 class PersonalRiskAssessmentScreen extends StatelessWidget {
@@ -233,23 +234,22 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
     required List<String> options,
     required ValueChanged<String> onChanged,
   }) {
-    return RadioGroup<String>(
-      groupValue: selected,
+    return QuestionRadioGroup<String>(
+      value: selected,
       onChanged: (value) {
         if (value != null) {
           onChanged(value);
         }
       },
-      child: Column(
-        children: options
-            .map(
-              (option) => RadioListTile<String>(
-                title: Text(option),
-                value: option,
-              ),
-            )
-            .toList(),
-      ),
+      direction: Axis.vertical,
+      options: options
+          .map(
+            (option) => RadioOption<String>(
+              value: option,
+              label: option,
+            ),
+          )
+          .toList(),
     );
   }
 
@@ -257,25 +257,13 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
     required bool? selected,
     required ValueChanged<bool?> onChanged,
   }) {
-    return RadioGroup<bool>(
-      groupValue: selected,
+    return QuestionRadioGroup<bool>(
+      value: selected,
       onChanged: onChanged,
-      child: const Row(
-        children: <Widget>[
-          Expanded(
-            child: RadioListTile<bool>(
-              title: Text('Yes'),
-              value: true,
-            ),
-          ),
-          Expanded(
-            child: RadioListTile<bool>(
-              title: Text('No'),
-              value: false,
-            ),
-          ),
-        ],
-      ),
+      options: const [
+        RadioOption(value: true, label: 'Yes'),
+        RadioOption(value: false, label: 'No'),
+      ],
     );
   }
 }
