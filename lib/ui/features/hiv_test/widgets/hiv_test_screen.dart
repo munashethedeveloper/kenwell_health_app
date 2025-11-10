@@ -35,7 +35,7 @@ class HIVTestScreen extends StatelessWidget {
                     context,
                     'Is this your first HIV test?',
                     viewModel.firstHIVTest,
-                    (val) => viewModel.firstHIVTest = val,
+                    viewModel.setFirstHIVTest,
                   ),
                   if (viewModel.firstHIVTest == 'No') ...[
                     const SizedBox(height: 12),
@@ -48,7 +48,7 @@ class HIVTestScreen extends StatelessWidget {
                       'What was the result of your last test?',
                       ['Positive', 'Negative'],
                       viewModel.lastTestResult,
-                      (val) => viewModel.lastTestResult = val,
+                      viewModel.setLastTestResult,
                     ),
                   ],
                   const Divider(height: 32),
@@ -56,27 +56,24 @@ class HIVTestScreen extends StatelessWidget {
                       context,
                       'Have you ever shared used needles or syringes with someone?',
                       viewModel.sharedNeedles,
-                      (val) => viewModel.sharedNeedles = val),
+                      viewModel.setSharedNeedles),
                   _buildYesNo(
                       context,
                       'Have you had unprotected sexual intercourse with more than one partner in the last 12 months?',
                       viewModel.unprotectedSex,
-                      (val) => viewModel.unprotectedSex = val),
+                      viewModel.setUnprotectedSex),
                   _buildYesNo(
                       context,
                       'Have you been diagnosed and/or treated for a sexually transmitted infection during the last 12 months?',
                       viewModel.treatedSTI,
-                      (val) => viewModel.treatedSTI = val),
+                      viewModel.setTreatedSTI),
                   _buildYesNo(
                       context,
                       'Have you been diagnosed and/or treated for TB during the last 12 months?',
                       viewModel.treatedTB,
-                      (val) => viewModel.treatedTB = val),
-                  _buildYesNo(
-                      context,
-                      'Do you sometimes not use a condom?',
-                      viewModel.noCondomUse,
-                      (val) => viewModel.noCondomUse = val),
+                      viewModel.setTreatedTB),
+                  _buildYesNo(context, 'Do you sometimes not use a condom?',
+                      viewModel.noCondomUse, viewModel.setNoCondomUse),
                   if (viewModel.noCondomUse == 'Yes') ...[
                     _buildTextField(
                         'If yes, why do you sometimes not use a condom?',
@@ -87,7 +84,7 @@ class HIVTestScreen extends StatelessWidget {
                       context,
                       'Do you know the HIV status of your regular sex partner/s?',
                       viewModel.knowPartnerStatus,
-                      (val) => viewModel.knowPartnerStatus = val),
+                      viewModel.setKnowPartnerStatus),
                   const SizedBox(height: 12),
                   const Text(
                     'Reasons that may have put you at risk:',
@@ -158,25 +155,25 @@ class HIVTestScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(question),
-          Row(
-            children: [
-              Expanded(
-                child: RadioListTile<String>(
-                  title: const Text('Yes'),
-                  value: 'Yes',
-                  groupValue: value,
-                  onChanged: onChanged,
+          RadioGroup<String>(
+            groupValue: value,
+            onChanged: onChanged,
+            child: const Row(
+              children: <Widget>[
+                Expanded(
+                  child: RadioListTile<String>(
+                    title: Text('Yes'),
+                    value: 'Yes',
+                  ),
                 ),
-              ),
-              Expanded(
-                child: RadioListTile<String>(
-                  title: const Text('No'),
-                  value: 'No',
-                  groupValue: value,
-                  onChanged: onChanged,
+                Expanded(
+                  child: RadioListTile<String>(
+                    title: Text('No'),
+                    value: 'No',
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

@@ -114,29 +114,27 @@ class SurveyScreen extends StatelessWidget {
                     '9. Would you like Kenwell Consulting to contact you regarding your experience?',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: RadioListTile<String>(
-                          title: const Text('Yes'),
-                          value: 'Yes',
-                          groupValue: vm.contactConsent,
-                          onChanged: (val) {
-                            if (val != null) vm.updateContactConsent(val);
-                          },
+                  RadioGroup<String>(
+                    groupValue: vm.contactConsent,
+                    onChanged: (val) {
+                      if (val != null) vm.updateContactConsent(val);
+                    },
+                    child: const Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: RadioListTile<String>(
+                            title: Text('Yes'),
+                            value: 'Yes',
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        child: RadioListTile<String>(
-                          title: const Text('No'),
-                          value: 'No',
-                          groupValue: vm.contactConsent,
-                          onChanged: (val) {
-                            if (val != null) vm.updateContactConsent(val);
-                          },
+                        Expanded(
+                          child: RadioListTile<String>(
+                            title: Text('No'),
+                            value: 'No',
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 20),
 
@@ -181,20 +179,25 @@ class SurveyScreen extends StatelessWidget {
   }
 
   // --- Helpers ---
-  Widget _buildRadioGroup(
-      SurveyViewModel vm, String key, List<String> options) {
+  Widget _buildRadioGroup(SurveyViewModel vm, String _, List<String> options) {
     String? groupValue = vm.heardAbout;
-    return Column(
-      children: options
-          .map((option) => RadioListTile<String>(
+    return RadioGroup<String>(
+      groupValue: groupValue,
+      onChanged: (val) {
+        if (val != null) {
+          vm.updateHeardAbout(val);
+        }
+      },
+      child: Column(
+        children: options
+            .map(
+              (option) => RadioListTile<String>(
                 title: Text(option),
                 value: option,
-                groupValue: groupValue,
-                onChanged: (val) {
-                  if (val != null) vm.updateHeardAbout(val);
-                },
-              ))
-          .toList(),
+              ),
+            )
+            .toList(),
+      ),
     );
   }
 
@@ -207,7 +210,7 @@ class SurveyScreen extends StatelessWidget {
           labelText: label,
           border: const OutlineInputBorder(),
         ),
-        value: value,
+        initialValue: value,
         items: items
             .map((e) => DropdownMenuItem(value: e, child: Text(e)))
             .toList(),
@@ -223,23 +226,27 @@ class SurveyScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(question),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(
-              6,
-              (index) => Expanded(
-                child: RadioListTile<int>(
-                  dense: true,
-                  title: Text('$index'),
-                  value: index,
-                  groupValue: vm.ratings[key],
-                  onChanged: (val) {
-                    if (val != null) vm.updateRating(key, val);
-                  },
+          RadioGroup<int>(
+            groupValue: vm.ratings[key],
+            onChanged: (val) {
+              if (val != null) {
+                vm.updateRating(key, val);
+              }
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: List.generate(
+                6,
+                (index) => Expanded(
+                  child: RadioListTile<int>(
+                    dense: true,
+                    title: Text('$index'),
+                    value: index,
+                  ),
                 ),
               ),
             ),
-          ),
+          )
         ],
       ),
     );

@@ -10,10 +10,10 @@ class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  _SplashScreenState createState() => _SplashScreenState();
+  SplashScreenState createState() => SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
+class SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _animation;
@@ -40,6 +40,8 @@ class _SplashScreenState extends State<SplashScreen>
 
     final authVM = Provider.of<AuthViewModel>(context, listen: false);
     await authVM.checkLoginStatus(); // checks if user is logged in
+
+    if (!mounted) return;
 
     final isLoggedIn = authVM.isLoggedIn;
 

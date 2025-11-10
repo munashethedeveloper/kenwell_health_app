@@ -41,35 +41,35 @@ class NurseInterventionScreen extends StatelessWidget {
                     'Window period risk assessment',
                     viewModel.windowPeriod,
                     viewModel.windowPeriodOptions,
-                    (val) => viewModel.windowPeriod = val,
+                    viewModel.setWindowPeriod,
                   ),
                   const SizedBox(height: 12),
                   _buildDropdown(
                     'Did patient expect HIV (+) result?',
                     viewModel.expectedResult,
                     viewModel.expectedResultOptions,
-                    (val) => viewModel.expectedResult = val,
+                    viewModel.setExpectedResult,
                   ),
                   const SizedBox(height: 12),
                   _buildDropdown(
                     'Difficulty in dealing with result?',
                     viewModel.difficultyDealingResult,
                     viewModel.difficultyOptions,
-                    (val) => viewModel.difficultyDealingResult = val,
+                    viewModel.setDifficultyDealingResult,
                   ),
                   const SizedBox(height: 12),
                   _buildDropdown(
                     'Urgent psychosocial follow-up needed?',
                     viewModel.urgentPsychosocial,
                     viewModel.urgentOptions,
-                    (val) => viewModel.urgentPsychosocial = val,
+                    viewModel.setUrgentPsychosocial,
                   ),
                   const SizedBox(height: 12),
                   _buildDropdown(
                     'Committed to change behavior?',
                     viewModel.committedToChange,
                     viewModel.committedOptions,
-                    (val) => viewModel.committedToChange = val,
+                    viewModel.setCommittedToChange,
                   ),
                   const SizedBox(height: 12),
 
@@ -82,10 +82,8 @@ class NurseInterventionScreen extends StatelessWidget {
                   CheckboxListTile(
                     title: const Text('Patient not referred'),
                     value: viewModel.patientNotReferred,
-                    onChanged: (val) {
-                      viewModel.patientNotReferred = val ?? false;
-                      viewModel.notifyListeners();
-                    },
+                    onChanged: (val) =>
+                        viewModel.setPatientNotReferred(val ?? false),
                   ),
                   if (viewModel.patientNotReferred)
                     _buildTextField(
@@ -95,18 +93,13 @@ class NurseInterventionScreen extends StatelessWidget {
                   CheckboxListTile(
                     title: const Text('Patient referred to GP'),
                     value: viewModel.referredToGP,
-                    onChanged: (val) {
-                      viewModel.referredToGP = val ?? false;
-                      viewModel.notifyListeners();
-                    },
+                    onChanged: (val) => viewModel.setReferredToGP(val ?? false),
                   ),
                   CheckboxListTile(
                     title: const Text('Patient referred to State HIV clinic'),
                     value: viewModel.referredToStateClinic,
-                    onChanged: (val) {
-                      viewModel.referredToStateClinic = val ?? false;
-                      viewModel.notifyListeners();
-                    },
+                    onChanged: (val) =>
+                        viewModel.setReferredToStateClinic(val ?? false),
                   ),
 
                   // --- Follow-up Location & Date ---
@@ -116,7 +109,7 @@ class NurseInterventionScreen extends StatelessWidget {
                       'Follow-up location',
                       viewModel.followUpLocation,
                       viewModel.followUpLocationOptions,
-                      (val) => viewModel.followUpLocation = val,
+                      viewModel.setFollowUpLocation,
                     ),
                     if (viewModel.followUpLocation == 'Other')
                       _buildTextField(

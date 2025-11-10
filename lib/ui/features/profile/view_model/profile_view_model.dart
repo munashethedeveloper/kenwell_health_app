@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../../data/repositories_dcl/auth_repository_dcl.dart';
 import '../../../../domain/models/user_model.dart';
 
 class ProfileViewModel extends ChangeNotifier {
-  final AuthRepository _authRepository = AuthRepository();
-
   // User fields
   String email = '';
   String password = '';
