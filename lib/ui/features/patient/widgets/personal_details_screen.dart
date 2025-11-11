@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/form/custom_dropdown_field.dart';
+import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/personal_details_view_model.dart';
 
@@ -30,64 +32,101 @@ class PersonalDetailsScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  _buildTextField('Screening Site', vm.screeningSiteController),
-                  const SizedBox(height: 12),
-                  _buildDateField(context, 'Date', vm.dateController),
-                  const SizedBox(height: 12),
-                  _buildTextField('Name', vm.nameController),
-                  const SizedBox(height: 12),
-                  _buildTextField('Surname', vm.surnameController),
-                  const SizedBox(height: 12),
-                  _buildTextField('Initials', vm.initialsController),
-                  const SizedBox(height: 12),
-                  _buildTextField('ID Number', vm.idNumberController),
-                  const SizedBox(height: 12),
-                  _buildTextField('Nationality', vm.nationalityController),
-                  const SizedBox(height: 12),
-                  _buildTextField(
-                      'Medical Aid Name', vm.medicalAidNameController),
-                  const SizedBox(height: 12),
-                  _buildTextField(
-                      'Medical Aid Number', vm.medicalAidNumberController),
-                  const SizedBox(height: 12),
-                  _buildTextField('Email Address', vm.emailController,
-                      keyboardType: TextInputType.emailAddress),
-                  const SizedBox(height: 12),
-                  _buildTextField('Cell Number', vm.cellNumberController,
-                      keyboardType: TextInputType.phone),
-                  const SizedBox(height: 12),
-                  _buildTextField(
-                      'Personal Number', vm.personalNumberController),
-                  const SizedBox(height: 12),
-                  _buildTextField('Division', vm.divisionController),
-                  const SizedBox(height: 12),
-                  _buildTextField('Position / Rank', vm.positionController),
-                  const SizedBox(height: 12),
-                  _buildTextField('Region / Province', vm.regionController),
-                  const SizedBox(height: 12),
-
-                  _buildDropdown(
-                    'Marital Status',
-                    vm.maritalStatus,
-                    vm.maritalStatusOptions,
-                    vm.setMaritalStatus,
+                  KenwellTextField(
+                    label: 'Screening Site',
+                    controller: vm.screeningSiteController,
                   ),
-                  const SizedBox(height: 12),
-                  _buildDropdown(
-                    'Gender',
-                    vm.gender,
-                    vm.genderOptions,
-                    vm.setGender,
+                  KenwellTextField(
+                    label: 'Date',
+                    controller: vm.dateController,
+                    readOnly: true,
+                    onTap: () async {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                      final pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2100),
+                      );
+                      if (pickedDate != null) {
+                        vm.dateController.text =
+                            '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
+                      }
+                    },
                   ),
-                  const SizedBox(height: 12),
-                  _buildDropdown(
-                    'Employment Status',
-                    vm.employmentStatus,
-                    vm.employmentStatusOptions,
-                    vm.setEmploymentStatus,
+                  KenwellTextField(
+                    label: 'Name',
+                    controller: vm.nameController,
+                  ),
+                  KenwellTextField(
+                    label: 'Surname',
+                    controller: vm.surnameController,
+                  ),
+                  KenwellTextField(
+                    label: 'Initials',
+                    controller: vm.initialsController,
+                  ),
+                  KenwellTextField(
+                    label: 'ID Number',
+                    controller: vm.idNumberController,
+                  ),
+                  KenwellTextField(
+                    label: 'Nationality',
+                    controller: vm.nationalityController,
+                  ),
+                  KenwellTextField(
+                    label: 'Medical Aid Name',
+                    controller: vm.medicalAidNameController,
+                  ),
+                  KenwellTextField(
+                    label: 'Medical Aid Number',
+                    controller: vm.medicalAidNumberController,
+                  ),
+                  KenwellTextField(
+                    label: 'Email Address',
+                    controller: vm.emailController,
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  KenwellTextField(
+                    label: 'Cell Number',
+                    controller: vm.cellNumberController,
+                    keyboardType: TextInputType.phone,
+                  ),
+                  KenwellTextField(
+                    label: 'Personal Number',
+                    controller: vm.personalNumberController,
+                  ),
+                  KenwellTextField(
+                    label: 'Division',
+                    controller: vm.divisionController,
+                  ),
+                  KenwellTextField(
+                    label: 'Position / Rank',
+                    controller: vm.positionController,
+                  ),
+                  KenwellTextField(
+                    label: 'Region / Province',
+                    controller: vm.regionController,
+                  ),
+                  KenwellDropdownField<String>(
+                    label: 'Marital Status',
+                    value: vm.maritalStatus,
+                    items: vm.maritalStatusOptions,
+                    onChanged: vm.setMaritalStatus,
+                  ),
+                  KenwellDropdownField<String>(
+                    label: 'Gender',
+                    value: vm.gender,
+                    items: vm.genderOptions,
+                    onChanged: vm.setGender,
+                  ),
+                  KenwellDropdownField<String>(
+                    label: 'Employment Status',
+                    value: vm.employmentStatus,
+                    items: vm.employmentStatusOptions,
+                    onChanged: vm.setEmploymentStatus,
                   ),
                   const SizedBox(height: 24),
-
                   // --- Navigation Buttons ---
                   KenwellFormNavigation(
                     onPrevious: onPrevious,
@@ -114,67 +153,6 @@ class PersonalDetailsScreen extends StatelessWidget {
           );
         },
       ),
-    );
-  }
-
-  Widget _buildTextField(String label, TextEditingController controller,
-      {TextInputType keyboardType = TextInputType.text}) {
-    return TextField(
-      controller: controller,
-      keyboardType: keyboardType,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-      ),
-    );
-  }
-
-  Widget _buildDateField(
-      BuildContext context, String label, TextEditingController controller) {
-    return TextField(
-      controller: controller,
-      readOnly: true,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-      ),
-      onTap: () async {
-        FocusScope.of(context).requestFocus(FocusNode());
-        final pickedDate = await showDatePicker(
-          context: context,
-          initialDate: DateTime.now(),
-          firstDate: DateTime(2000),
-          lastDate: DateTime(2100),
-        );
-        if (pickedDate != null) {
-          controller.text =
-              '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
-        }
-      },
-    );
-  }
-
-  Widget _buildDropdown(
-    String label,
-    String? value,
-    List<String> options,
-    Function(String?) onChanged,
-  ) {
-    return DropdownButtonFormField<String>(
-      initialValue: value,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-      ),
-      items: options
-          .map(
-            (option) => DropdownMenuItem(
-              value: option,
-              child: Text(option),
-            ),
-          )
-          .toList(),
-      onChanged: onChanged,
     );
   }
 }

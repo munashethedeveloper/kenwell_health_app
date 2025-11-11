@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/form/custom_text_field.dart';
+import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/hiv_test_nursing_intervention_view_model.dart';
 
 class HIVTestNursingInterventionScreen extends StatelessWidget {
@@ -44,49 +46,26 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
             _buildCheckbox('Other (give detail)', viewModel.followUpOther,
                 viewModel.setFollowUpOther),
             if (viewModel.followUpOther)
-              _buildTextField('Specify other location',
-                  viewModel.followUpOtherDetailsController),
+              KenwellTextField(
+                label: 'Specify other location',
+                controller: viewModel.followUpOtherDetailsController,
+              ),
 
             const SizedBox(height: 16),
             _buildSectionTitle('3. Follow-up test date'),
-            _buildTextField('YYYY-MM-DD', viewModel.followUpDateController,
-                readOnly: true,
-                onTap: () => viewModel.pickFollowUpDate(context)),
+            KenwellTextField(
+              label: 'YYYY-MM-DD',
+              controller: viewModel.followUpDateController,
+              readOnly: true,
+              onTap: () => viewModel.pickFollowUpDate(context),
+            ),
 
             const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: onPrevious,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14.0),
-                    ),
-                    child: const Text('Previous'),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: viewModel.isFormValid && !viewModel.isSubmitting
-                        ? () => viewModel.submitIntervention(onNext)
-                        : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF90C048),
-                      padding: const EdgeInsets.symmetric(vertical: 14.0),
-                    ),
-                    child: viewModel.isSubmitting
-                        ? const CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation(Colors.white),
-                          )
-                        : const Text(
-                            'Next',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                  ),
-                ),
-              ],
+            KenwellFormNavigation(
+              onPrevious: onPrevious,
+              onNext: () => viewModel.submitIntervention(onNext),
+              isNextEnabled: viewModel.isFormValid && !viewModel.isSubmitting,
+              isNextBusy: viewModel.isSubmitting,
             ),
           ],
         ),
@@ -98,53 +77,26 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
   Widget _buildSectionTitle(String text) =>
       Text(text, style: const TextStyle(fontWeight: FontWeight.bold));
 
-  Widget _buildTextField(String label, TextEditingController controller,
-      {bool readOnly = false, VoidCallback? onTap, int maxLines = 1}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: TextField(
-        controller: controller,
-        readOnly: readOnly,
-        onTap: onTap,
-        maxLines: maxLines,
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRadioOptions(String groupValue, Function(String) onChanged) {
-    return RadioGroup<String>(
-      groupValue: groupValue,
-      onChanged: (value) {
-        if (value != null) {
-          onChanged(value);
-        }
-      },
-      child: const Row(
-        children: [
-          Expanded(
-            child: RadioListTile<String>(
-              title: Text('N/A'),
-              value: 'N/A',
+  Widget _buildRadioOptions(String groupValue, ValueChanged<String> onChanged) {
+    const options = ['N/A', 'Yes', 'No'];
+    return Row(
+      children: options
+          .map(
+            (option) => Expanded(
+              child: RadioListTile<String>(
+                title: Text(option),
+                value: option,
+                dense: true,
+                groupValue: groupValue,
+                onChanged: (value) {
+                  if (value != null) {
+                    onChanged(value);
+                  }
+                },
+              ),
             ),
-          ),
-          Expanded(
-            child: RadioListTile<String>(
-              title: Text('Yes'),
-              value: 'Yes',
-            ),
-          ),
-          Expanded(
-            child: RadioListTile<String>(
-              title: Text('No'),
-              value: 'No',
-            ),
-          ),
-        ],
-      ),
+          )
+          .toList(),
     );
   }
 
