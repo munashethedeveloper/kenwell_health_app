@@ -171,12 +171,15 @@ class EventScreen extends StatelessWidget {
               decoration: const InputDecoration(labelText: 'Nurses'),
               keyboardType: TextInputType.number,
             ),
+
             const SizedBox(height: 16),
 
             // Dropdown Options
             const Text('Options',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 8),
+            buildDropdown('Medical Aid', viewModel.medicalAid, ['Yes', 'No'],
+                (val) => viewModel.medicalAid = val),
             buildDropdown('Non-Members', viewModel.nonMembers, ['Yes', 'No'],
                 (val) => viewModel.nonMembers = val),
             buildDropdown('Coordinators', viewModel.coordinators, ['Yes', 'No'],
@@ -198,11 +201,6 @@ class EventScreen extends StatelessWidget {
             buildTimeField('End Time', viewModel.endTimeController),
             buildTimeField(
                 'Strike Down Time', viewModel.strikeDownTimeController),
-            TextFormField(
-              controller: viewModel.medicalAidController,
-              decoration:
-                  const InputDecoration(labelText: 'Medical Aid Option'),
-            ),
 
             const SizedBox(height: 20),
             Center(

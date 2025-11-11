@@ -18,7 +18,7 @@ class EventViewModel extends ChangeNotifier {
   final startTimeController = TextEditingController();
   final endTimeController = TextEditingController();
   final strikeDownTimeController = TextEditingController();
-  final medicalAidController = TextEditingController();
+  //final medicalAidController = TextEditingController();
   final dateController = TextEditingController();
 
   // Dropdowns
@@ -27,6 +27,7 @@ class EventViewModel extends ChangeNotifier {
   String multiplyPromoters = 'No';
   String mobileBooths = 'No';
   String servicesRequested = 'HRA';
+  String medicalAid = "No";
 
   // Events
   final List<WellnessEvent> _events = [];
@@ -53,7 +54,7 @@ class EventViewModel extends ChangeNotifier {
     startTimeController.text = e.startTime;
     endTimeController.text = e.endTime;
     strikeDownTimeController.text = e.strikeDownTime;
-    medicalAidController.text = e.medicalAidOption;
+    //medicalAidController.text = e.medicalAidOption;
 
     dateController.text =
         "${e.date.year}-${e.date.month.toString().padLeft(2, '0')}-${e.date.day.toString().padLeft(2, '0')}";
@@ -63,6 +64,7 @@ class EventViewModel extends ChangeNotifier {
     multiplyPromoters = e.multiplyPromoters == 1 ? 'Yes' : 'No';
     mobileBooths = e.mobileBooths;
     servicesRequested = e.servicesRequested;
+    medicalAid = e.medicalAid;
 
     notifyListeners();
   }
@@ -113,8 +115,9 @@ class EventViewModel extends ChangeNotifier {
       startTime: startTimeController.text,
       endTime: endTimeController.text,
       strikeDownTime: strikeDownTimeController.text,
-      medicalAidOption: medicalAidController.text,
+      //medicalAidOption: medicalAidController.text,
       mobileBooths: mobileBooths,
+      medicalAid: medicalAid,
     );
   }
 
@@ -148,7 +151,7 @@ class EventViewModel extends ChangeNotifier {
     startTimeController.clear();
     endTimeController.clear();
     strikeDownTimeController.clear();
-    medicalAidController.clear();
+    //medicalAidController.clear();
     dateController.clear();
   }
 
@@ -169,7 +172,7 @@ class EventViewModel extends ChangeNotifier {
     startTimeController.dispose();
     endTimeController.dispose();
     strikeDownTimeController.dispose();
-    medicalAidController.dispose();
+    //medicalAidController.dispose();
     dateController.dispose();
     super.dispose();
   }

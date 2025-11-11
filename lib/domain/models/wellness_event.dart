@@ -22,7 +22,8 @@ class WellnessEvent {
   final String startTime;
   final String endTime;
   final String strikeDownTime;
-  final String medicalAidOption;
+  //final String medicalAidOption;
+  final String medicalAid;
   final String mobileBooths;
   final String? description; // optional
 
@@ -48,8 +49,9 @@ class WellnessEvent {
     required this.startTime,
     required this.endTime,
     required this.strikeDownTime,
-    required this.medicalAidOption,
+    //required this.medicalAidOption,
     required this.mobileBooths,
     this.description,
+    required this.medicalAid,
   }) : id = id ?? const Uuid().v4(); // <-- auto-generate unique ID
 }

@@ -48,7 +48,7 @@ class EventDetailsScreen extends StatelessWidget {
             _detailRow(
                 'Multiply Promoters', event.multiplyPromoters.toString()),
             _detailRow('Mobile Booths', event.mobileBooths),
-            _detailRow('Medical Aid Option', event.medicalAidOption),
+            _detailRow('Medical Aid Option', event.medicalAid),
             if (event.description != null && event.description!.isNotEmpty)
               _detailRow('Description', event.description!),
           ],
