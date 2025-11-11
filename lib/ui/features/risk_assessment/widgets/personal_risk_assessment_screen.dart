@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/forms/kenwell_form_fields.dart';
+import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/personal_risk_assessment_view_model.dart';
 
 class PersonalRiskAssessmentScreen extends StatelessWidget {
@@ -51,15 +53,12 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                       onChanged: (val) => vm.toggleCondition(condition, val),
                     );
                   }).toList(),
-                  if (vm.chronicConditions['Other'] == true)
-                    TextField(
-                      controller: vm.otherConditionController,
-                      decoration: const InputDecoration(
-                        labelText:
+                    if (vm.chronicConditions['Other'] == true)
+                      KenwellTextField(
+                        label:
                             'If Other, please specify condition and treatment',
-                        border: OutlineInputBorder(),
+                        controller: vm.otherConditionController,
                       ),
-                    ),
                   const SizedBox(height: 16),
 
                   // Section 2: Exercise
@@ -86,14 +85,11 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                     '3. How much do you smoke per day?',
                     style: TextStyle(fontSize: 16),
                   ),
-                  TextField(
-                    controller: vm.dailySmokeController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Number per day',
-                      border: OutlineInputBorder(),
+                    KenwellTextField(
+                      label: 'Number per day',
+                      controller: vm.dailySmokeController,
+                      keyboardType: TextInputType.number,
                     ),
-                  ),
                   const SizedBox(height: 8),
                   const Text('3.1 What do you smoke?',
                       style: TextStyle(fontSize: 16)),
@@ -125,98 +121,70 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   // Women only
-                  if (isFemale) ...[
-                    const Text(
-                        '5. Have you had a pap smear in the last 24 months?',
-                        style: TextStyle(fontSize: 16)),
-                    _buildBoolRadioGroup(
-                      selected: vm.papSmear,
-                      onChanged: vm.setPapSmear,
-                    ),
-                    const SizedBox(height: 12),
-                    const Text('6. Do you examine your breasts regularly?',
-                        style: TextStyle(fontSize: 16)),
-                    _buildBoolRadioGroup(
-                      selected: vm.breastExam,
-                      onChanged: vm.setBreastExam,
-                    ),
-                    const SizedBox(height: 12),
-                    const Text(
-                        '7. If older than 40, have you had a mammogram done?',
-                        style: TextStyle(fontSize: 16)),
-                    _buildBoolRadioGroup(
-                      selected: vm.mammogram,
-                      onChanged: vm.setMammogram,
-                    ),
-                  ],
+                    if (isFemale) ...[
+                      KenwellYesNoQuestion<bool>(
+                        question:
+                            '5. Have you had a pap smear in the last 24 months?',
+                        value: vm.papSmear,
+                        onChanged: vm.setPapSmear,
+                        yesValue: true,
+                        noValue: false,
+                      ),
+                      KenwellYesNoQuestion<bool>(
+                        question: '6. Do you examine your breasts regularly?',
+                        value: vm.breastExam,
+                        onChanged: vm.setBreastExam,
+                        yesValue: true,
+                        noValue: false,
+                      ),
+                      KenwellYesNoQuestion<bool>(
+                        question:
+                            '7. If older than 40, have you had a mammogram done?',
+                        value: vm.mammogram,
+                        onChanged: vm.setMammogram,
+                        yesValue: true,
+                        noValue: false,
+                      ),
+                    ],
 
                   // Men only
-                  if (!isFemale) ...[
-                    const Text(
-                        '8. If > than 40, have you had your prostate checked?',
-                        style: TextStyle(fontSize: 16)),
-                    _buildBoolRadioGroup(
-                      selected: vm.prostateCheck,
-                      onChanged: vm.setProstateCheck,
-                    ),
-                    const SizedBox(height: 12),
-                    const Text('9. Have you been tested for prostate cancer?',
-                        style: TextStyle(fontSize: 16)),
-                    _buildBoolRadioGroup(
-                      selected: vm.prostateTested,
-                      onChanged: vm.setProstateTested,
-                    ),
-                  ],
+                    if (!isFemale) ...[
+                      KenwellYesNoQuestion<bool>(
+                        question:
+                            '8. If > than 40, have you had your prostate checked?',
+                        value: vm.prostateCheck,
+                        onChanged: vm.setProstateCheck,
+                        yesValue: true,
+                        noValue: false,
+                      ),
+                      KenwellYesNoQuestion<bool>(
+                        question:
+                            '9. Have you been tested for prostate cancer?',
+                        value: vm.prostateTested,
+                        onChanged: vm.setProstateTested,
+                        yesValue: true,
+                        noValue: false,
+                      ),
+                    ],
 
 //buttons
                   const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      if (onPrevious != null)
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: onPrevious,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 14.0),
+                    KenwellFormNavigation(
+                      onPrevious: onPrevious,
+                      onNext: () {
+                        if (!vm.isFormValid) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please complete all fields'),
                             ),
-                            child: const Text('Previous'),
-                          ),
-                        ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: vm.isSubmitting
-                              ? null
-                              : () {
-                                  if (!vm.isFormValid) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text(
-                                              'Please complete all fields')),
-                                    );
-                                    return;
-                                  }
-                                  if (onNext != null) onNext!();
-                                },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF90C048),
-                            padding: const EdgeInsets.symmetric(vertical: 14.0),
-                          ),
-                          child: vm.isSubmitting
-                              ? const CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white),
-                                )
-                              : const Text(
-                                  'Next',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                        ),
-                      ),
-                    ],
-                  ),
+                          );
+                          return;
+                        }
+                        if (onNext != null) onNext!();
+                      },
+                      isNextBusy: vm.isSubmitting,
+                      isNextEnabled: !vm.isSubmitting,
+                    ),
                 ],
               ),
             ),
@@ -231,49 +199,21 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
     required List<String> options,
     required ValueChanged<String> onChanged,
   }) {
-    return RadioGroup<String>(
-      groupValue: selected,
-      onChanged: (value) {
-        if (value != null) {
-          onChanged(value);
-        }
-      },
-      child: Column(
-        children: options
-            .map(
-              (option) => RadioListTile<String>(
-                title: Text(option),
-                value: option,
-              ),
-            )
-            .toList(),
-      ),
-    );
-  }
-
-  Widget _buildBoolRadioGroup({
-    required bool? selected,
-    required ValueChanged<bool?> onChanged,
-  }) {
-    return RadioGroup<bool>(
-      groupValue: selected,
-      onChanged: onChanged,
-      child: const Row(
-        children: <Widget>[
-          Expanded(
-            child: RadioListTile<bool>(
-              title: Text('Yes'),
-              value: true,
+    return Column(
+      children: options
+          .map(
+            (option) => RadioListTile<String>(
+              title: Text(option),
+              value: option,
+              groupValue: selected,
+              onChanged: (value) {
+                if (value != null) {
+                  onChanged(value);
+                }
+              },
             ),
-          ),
-          Expanded(
-            child: RadioListTile<bool>(
-              title: Text('No'),
-              value: false,
-            ),
-          ),
-        ],
-      ),
+          )
+          .toList(),
     );
   }
 }
