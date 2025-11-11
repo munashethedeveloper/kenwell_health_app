@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../view_model/hiv_test_result_view_model.dart';
+import '../../../core/ui/shared/shared.dart';
 
 class HIVTestResultScreen extends StatelessWidget {
   final VoidCallback onNext;
@@ -16,19 +17,11 @@ class HIVTestResultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<HIVTestResultViewModel>();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'HIV Test Result',
-          style: TextStyle(
-            color: Color(0xFF201C58),
-            fontWeight: FontWeight.bold,
-          ),
+      return Scaffold(
+        appBar: const KenwellAppBar(
+          title: 'HIV Test Result',
+          automaticallyImplyLeading: false,
         ),
-        automaticallyImplyLeading: false,
-        backgroundColor: const Color(0xFF90C048),
-        centerTitle: true,
-      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -84,41 +77,13 @@ class HIVTestResultScreen extends StatelessWidget {
               viewModel.setFinalResult,
             ),
             const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: onPrevious,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14.0),
-                    ),
-                    child: const Text('Previous'),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: viewModel.isFormValid && !viewModel.isSubmitting
-                        ? () => viewModel.submitTestResult(onNext)
-                        : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF90C048),
-                      padding: const EdgeInsets.symmetric(vertical: 14.0),
-                    ),
-                    child: viewModel.isSubmitting
-                        ? const CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation(Colors.white),
-                          )
-                        : const Text(
-                            'Next',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                  ),
-                ),
-              ],
-            ),
+              KenwellFormNavigation(
+                onPrevious: onPrevious,
+                onNext: () => viewModel.submitTestResult(onNext),
+                isNextBusy: viewModel.isSubmitting,
+                isNextEnabled:
+                    viewModel.isFormValid && !viewModel.isSubmitting,
+              ),
           ],
         ),
       ),
