@@ -21,7 +21,6 @@ class PersonalDetailsViewModel extends ChangeNotifier {
   // Dropdown values
   String? maritalStatus;
   String? gender;
-  String? firstTimeTested;
   String? employmentStatus;
 
   void setMaritalStatus(String? value) {
@@ -33,12 +32,6 @@ class PersonalDetailsViewModel extends ChangeNotifier {
   void setGender(String? value) {
     if (gender == value) return;
     gender = value;
-    notifyListeners();
-  }
-
-  void setFirstTimeTested(String? value) {
-    if (firstTimeTested == value) return;
-    firstTimeTested = value;
     notifyListeners();
   }
 
@@ -83,7 +76,6 @@ class PersonalDetailsViewModel extends ChangeNotifier {
       regionController.text.isNotEmpty &&
       maritalStatus != null &&
       gender != null &&
-      firstTimeTested != null &&
       employmentStatus != null;
 
   /// Convert personal details to a Map for submission
@@ -106,7 +98,6 @@ class PersonalDetailsViewModel extends ChangeNotifier {
       'region': regionController.text,
       'maritalStatus': maritalStatus,
       'gender': gender,
-      'firstTimeTested': firstTimeTested,
       'employmentStatus': employmentStatus,
     };
   }

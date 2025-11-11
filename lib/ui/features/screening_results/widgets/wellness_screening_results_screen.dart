@@ -65,15 +65,16 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: OutlinedButton(
+                        child: ElevatedButton(
                           onPressed: vm.isSubmitting ? null : onPrevious,
-                          style: OutlinedButton.styleFrom(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: const Text('Back'),
+                          child: const Text('Previous'),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 16),
                       Expanded(
                         child: ElevatedButton(
                           onPressed: vm.isSubmitting
@@ -90,7 +91,7 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
                                 )
                               : const Text(
                                   'Next',
-                                  style: TextStyle(fontSize: 16),
+                                  style: TextStyle(color: Colors.white),
                                 ),
                         ),
                       ),

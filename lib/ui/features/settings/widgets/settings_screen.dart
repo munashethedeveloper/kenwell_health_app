@@ -74,6 +74,11 @@ class SettingsScreen extends StatelessWidget {
                       const SnackBar(content: Text('Settings saved!')),
                     );
                   },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF201C58),
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size.fromHeight(50),
+                  ),
                   child: const Text('Save Settings'),
                 ),
               ],

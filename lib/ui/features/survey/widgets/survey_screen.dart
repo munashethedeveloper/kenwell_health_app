@@ -133,7 +133,7 @@ class SurveyScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
             // Buttons
             Row(
@@ -141,18 +141,27 @@ class SurveyScreen extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: onPrevious,
-                    style:
-                        ElevatedButton.styleFrom(backgroundColor: Colors.grey),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14.0),
+                    ),
                     child: const Text('Previous'),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 16),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: vm.isFormValid
                         ? () => vm.submitSurvey(context, onNext: onSubmit)
                         : null,
-                    child: const Text('Submit Survey'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF90C048),
+                      padding: const EdgeInsets.symmetric(vertical: 14.0),
+                    ),
+                    child: const Text(
+                      'Submit Survey',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
               ],

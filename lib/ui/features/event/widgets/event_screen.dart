@@ -216,6 +216,11 @@ class EventScreen extends StatelessWidget {
                   viewModel.clearControllers();
                   Navigator.pop(context);
                 },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF201C58),
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size.fromHeight(50),
+                ),
                 child: const Text('Save Event'),
               ),
             ),

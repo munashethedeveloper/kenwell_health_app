@@ -95,34 +95,38 @@ class HIVTestScreen extends StatelessWidget {
             _buildRiskReason(viewModel, 'Other (specify below)'),
             _buildTextField(
                 'If other, specify', viewModel.otherRiskReasonController),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 if (onPrevious != null)
-                  ElevatedButton(
-                    onPressed: onPrevious,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey,
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: onPrevious,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14.0),
+                      ),
+                      child: const Text('Previous'),
                     ),
-                    child: const Text('Back'),
                   ),
+                const SizedBox(width: 16),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: viewModel.isFormValid && !viewModel.isSubmitting
                         ? () => viewModel.submitHIVTest(onNext)
                         : null,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF201C58),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      backgroundColor: const Color(0xFF90C048),
+                      padding: const EdgeInsets.symmetric(vertical: 14.0),
                     ),
                     child: viewModel.isSubmitting
                         ? const CircularProgressIndicator(
                             valueColor: AlwaysStoppedAnimation(Colors.white),
                           )
                         : const Text(
-                            'Submit & Continue',
-                            style: TextStyle(color: Colors.white, fontSize: 16),
+                            'Next',
+                            style: TextStyle(color: Colors.white),
                           ),
                   ),
                 ),

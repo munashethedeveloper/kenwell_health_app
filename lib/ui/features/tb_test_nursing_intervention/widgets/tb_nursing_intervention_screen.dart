@@ -90,22 +90,29 @@ class TBNursingInterventionScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ElevatedButton(
-                  onPressed: onPrevious,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: onPrevious,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14.0),
+                    ),
+                    child: const Text('Previous'),
                   ),
-                  child: const Text('Previous'),
                 ),
-                ElevatedButton.icon(
-                  onPressed: () => viewModel.saveIntervention(onNext: onNext),
-                  icon: const Icon(Icons.save),
-                  label: const Text('Save & Continue'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 12),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => viewModel.saveIntervention(onNext: onNext),
+                    icon: const Icon(Icons.save),
+                    label: const Text(
+                      'Save and Submit',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF90C048),
+                      padding: const EdgeInsets.symmetric(vertical: 14.0),
+                    ),
                   ),
                 ),
               ],

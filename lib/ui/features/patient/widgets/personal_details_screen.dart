@@ -88,13 +88,6 @@ class PersonalDetailsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   _buildDropdown(
-                    'First Time Tested',
-                    vm.firstTimeTested,
-                    vm.firstTimeTestedOptions,
-                    vm.setFirstTimeTested,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildDropdown(
                     'Employment Status',
                     vm.employmentStatus,
                     vm.employmentStatusOptions,
@@ -106,12 +99,16 @@ class PersonalDetailsScreen extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: OutlinedButton(
+                        child: ElevatedButton(
                           onPressed: onPrevious,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
                           child: const Text('Previous'),
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: ElevatedButton(
                           onPressed: vm.isSubmitting

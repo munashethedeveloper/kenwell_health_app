@@ -169,13 +169,17 @@ class NurseInterventionScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 if (onPrevious != null)
-                  ElevatedButton(
-                    onPressed: onPrevious,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey,
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: onPrevious,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14.0),
+                      ),
+                      child: const Text('Previous'),
                     ),
-                    child: const Text('Back'),
                   ),
+                const SizedBox(width: 16),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: viewModel.isSubmitting
@@ -183,15 +187,15 @@ class NurseInterventionScreen extends StatelessWidget {
                         : () => viewModel.submitIntervention(context, onNext),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF90C048),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      padding: const EdgeInsets.symmetric(vertical: 14.0),
                     ),
                     child: viewModel.isSubmitting
                         ? const CircularProgressIndicator(
                             valueColor: AlwaysStoppedAnimation(Colors.white),
                           )
                         : const Text(
-                            'Submit Interventions',
-                            style: TextStyle(fontSize: 16),
+                            'Next',
+                            style: TextStyle(color: Colors.white),
                           ),
                   ),
                 ),

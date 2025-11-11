@@ -111,19 +111,32 @@ class TBTestingScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ElevatedButton(
-                  onPressed: onPrevious,
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.grey),
-                  child: const Text('Back'),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: onPrevious,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14.0),
+                    ),
+                    child: const Text('Previous'),
+                  ),
                 ),
+                const SizedBox(width: 16),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: viewModel.isFormValid && !viewModel.isSubmitting
                         ? () => viewModel.submitTBTest(context, onNext: onNext)
                         : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF90C048),
+                      padding: const EdgeInsets.symmetric(vertical: 14.0),
+                    ),
                     child: viewModel.isSubmitting
                         ? const CircularProgressIndicator()
-                        : const Text('Submit & Continue'),
+                        : const Text(
+                            'Next',
+                            style: TextStyle(color: Colors.white),
+                          ),
                   ),
                 ),
               ],

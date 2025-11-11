@@ -176,7 +176,8 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                     ),
                   ],
 
-                  const SizedBox(height: 24),
+//buttons
+                  const SizedBox(height: 20),
                   Row(
                     children: [
                       if (onPrevious != null)
@@ -184,13 +185,14 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                           child: ElevatedButton(
                             onPressed: onPrevious,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.grey,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              backgroundColor: Colors.white,
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 14.0),
                             ),
                             child: const Text('Previous'),
                           ),
                         ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 16),
                       Expanded(
                         child: ElevatedButton(
                           onPressed: vm.isSubmitting
@@ -208,14 +210,17 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                                 },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF90C048),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            padding: const EdgeInsets.symmetric(vertical: 14.0),
                           ),
                           child: vm.isSubmitting
                               ? const CircularProgressIndicator(
                                   valueColor: AlwaysStoppedAnimation<Color>(
                                       Colors.white),
                                 )
-                              : const Text('Next'),
+                              : const Text(
+                                  'Next',
+                                  style: TextStyle(color: Colors.white),
+                                ),
                         ),
                       ),
                     ],
