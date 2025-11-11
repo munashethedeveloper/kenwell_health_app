@@ -18,6 +18,7 @@ class HelpScreen extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
+          automaticallyImplyLeading: true,
           backgroundColor: const Color(0xFF90C048),
           centerTitle: true,
         ),

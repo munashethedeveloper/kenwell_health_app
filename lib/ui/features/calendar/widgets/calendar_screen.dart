@@ -75,6 +75,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               fontWeight: FontWeight.bold,
             ),
           ),
+          automaticallyImplyLeading: false,
           backgroundColor: const Color(0xFF90C048),
           centerTitle: true,
           actions: [

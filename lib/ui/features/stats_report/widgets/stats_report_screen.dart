@@ -20,6 +20,7 @@ class StatsReportScreen extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
+            automaticallyImplyLeading: true,
             centerTitle: true,
             backgroundColor: const Color(0xFF90C048),
           ),

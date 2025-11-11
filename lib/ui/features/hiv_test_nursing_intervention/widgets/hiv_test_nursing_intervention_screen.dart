@@ -14,95 +14,83 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => HIVTestNursingInterventionViewModel(),
-      child: Consumer<HIVTestNursingInterventionViewModel>(
-        builder: (context, viewModel, _) {
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text(
-                'HIV Test Nursing Intervention',
-                style: TextStyle(
-                  color: Color(0xFF201C58),
-                  fontWeight: FontWeight.bold,
+    final viewModel = context.watch<HIVTestNursingInterventionViewModel>();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'HIV Test Nursing Intervention',
+          style: TextStyle(
+            color: Color(0xFF201C58),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        automaticallyImplyLeading: false,
+        centerTitle: true,
+        backgroundColor: const Color(0xFF90C048),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('HCT Nursing Interventions',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+
+            // Example sections
+            _buildSectionTitle(
+                '1. Did the risk assessment indicate window period?'),
+            _buildRadioOptions(
+                viewModel.windowPeriod, viewModel.setWindowPeriod),
+
+            _buildSectionTitle('2. Follow-up test location'),
+            _buildCheckbox('State Clinic', viewModel.followUpClinic,
+                viewModel.setFollowUpClinic),
+            _buildCheckbox('Private Doctor', viewModel.followUpPrivateDoctor,
+                viewModel.setFollowUpPrivateDoctor),
+            _buildCheckbox('Other (give detail)', viewModel.followUpOther,
+                viewModel.setFollowUpOther),
+            if (viewModel.followUpOther)
+              _buildTextField('Specify other location',
+                  viewModel.followUpOtherDetailsController),
+
+            const SizedBox(height: 16),
+            _buildSectionTitle('3. Follow-up test date'),
+            _buildTextField('YYYY-MM-DD', viewModel.followUpDateController,
+                readOnly: true,
+                onTap: () => viewModel.pickFollowUpDate(context)),
+
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                  onPressed: onPrevious,
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.grey),
+                  child: const Text('Back'),
                 ),
-              ),
-              centerTitle: true,
-              backgroundColor: const Color(0xFF90C048),
-            ),
-            body: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('HCT Nursing Interventions',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 16),
-
-                  // Example sections
-                  _buildSectionTitle(
-                      '1. Did the risk assessment indicate window period?'),
-                  _buildRadioOptions(
-                      viewModel.windowPeriod, viewModel.setWindowPeriod),
-
-                  _buildSectionTitle('2. Follow-up test location'),
-                  _buildCheckbox('State Clinic', viewModel.followUpClinic,
-                      viewModel.setFollowUpClinic),
-                  _buildCheckbox(
-                      'Private Doctor',
-                      viewModel.followUpPrivateDoctor,
-                      viewModel.setFollowUpPrivateDoctor),
-                  _buildCheckbox('Other (give detail)', viewModel.followUpOther,
-                      viewModel.setFollowUpOther),
-                  if (viewModel.followUpOther)
-                    _buildTextField('Specify other location',
-                        viewModel.followUpOtherDetailsController),
-
-                  const SizedBox(height: 16),
-                  _buildSectionTitle('3. Follow-up test date'),
-                  _buildTextField(
-                      'YYYY-MM-DD', viewModel.followUpDateController,
-                      readOnly: true,
-                      onTap: () => viewModel.pickFollowUpDate(context)),
-
-                  const SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      ElevatedButton(
-                        onPressed: onPrevious,
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.grey),
-                        child: const Text('Back'),
-                      ),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed:
-                              viewModel.isFormValid && !viewModel.isSubmitting
-                                  ? () => viewModel.submitIntervention(onNext)
-                                  : null,
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF201C58),
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 14)),
-                          child: viewModel.isSubmitting
-                              ? const CircularProgressIndicator(
-                                  valueColor:
-                                      AlwaysStoppedAnimation(Colors.white),
-                                )
-                              : const Text('Save & Continue',
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 16)),
-                        ),
-                      ),
-                    ],
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: viewModel.isFormValid && !viewModel.isSubmitting
+                        ? () => viewModel.submitIntervention(onNext)
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF201C58),
+                        padding: const EdgeInsets.symmetric(vertical: 14)),
+                    child: viewModel.isSubmitting
+                        ? const CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation(Colors.white),
+                          )
+                        : const Text('Save & Continue',
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 16)),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          );
-        },
+          ],
+        ),
       ),
     );
   }

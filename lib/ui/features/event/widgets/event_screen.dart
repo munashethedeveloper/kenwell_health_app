@@ -57,7 +57,18 @@ class EventScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Add / Edit Event')),
+      appBar: AppBar(
+        title: const Text(
+          'Add new event',
+          style: TextStyle(
+            color: Color(0xFF201C58),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        automaticallyImplyLeading: true,
+        backgroundColor: const Color(0xFF90C048),
+        centerTitle: true,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(

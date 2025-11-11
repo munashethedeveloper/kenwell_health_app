@@ -18,6 +18,7 @@ class EventDetailsScreen extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
+        automaticallyImplyLeading: true,
         backgroundColor: const Color(0xFF201C58),
         iconTheme: const IconThemeData(color: Colors.white),
       ),

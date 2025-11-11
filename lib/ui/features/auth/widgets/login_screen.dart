@@ -68,6 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        automaticallyImplyLeading: false,
         centerTitle: true,
         backgroundColor: const Color(0xFF90C048),
       ),
