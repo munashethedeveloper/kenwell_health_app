@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../domain/models/wellness_event.dart';
 
 // Navigation & Auth
-import '../ui/core/ui/navigation/main_navigation_screen.dart';
+import '../ui/shared/ui/navigation/main_navigation_screen.dart';
 import '../ui/features/auth/widgets/forgot_password_screen.dart';
 import '../ui/features/auth/widgets/login_screen.dart';
 import '../ui/features/auth/widgets/register_screen.dart';

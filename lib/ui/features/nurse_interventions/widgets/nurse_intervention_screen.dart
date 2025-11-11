@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:signature/signature.dart';
+import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/nurse_intervention_view_model.dart';
 
 class NurseInterventionScreen extends StatelessWidget {
@@ -18,18 +19,9 @@ class NurseInterventionScreen extends StatelessWidget {
     final viewModel = context.watch<NurseInterventionViewModel>();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Personal Health Risk Assessment Nurse Intervention',
-          style: TextStyle(
-            color: Color(0xFF201C58),
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        automaticallyImplyLeading: false,
-        backgroundColor: const Color(0xFF90C048),
-        centerTitle: true,
-      ),
+      appBar: const KenwellAppBar(
+          title: 'Health Risk Asessessment Nurse Intervention',
+          automaticallyImplyLeading: false),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(

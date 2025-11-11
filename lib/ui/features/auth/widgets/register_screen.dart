@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/features/auth/widgets/login_screen.dart';
+import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import '../../../../data/services/auth_service.dart';
-import '../../../core/ui/app_logo.dart';
+import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/logo/app_logo.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -88,18 +90,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Register',
-          style: TextStyle(
-            color: Color(0xFF201C58),
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        backgroundColor: const Color(0xFF90C048),
-      ),
+      appBar: const KenwellAppBar(
+          title: 'Register', automaticallyImplyLeading: false),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -166,17 +158,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     val!.isEmpty ? 'Confirm your password' : null,
               ),
               const SizedBox(height: 20),
-              _isLoading
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: _register,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF201C58),
-                        foregroundColor: Colors.white,
-                        minimumSize: const Size.fromHeight(50),
-                      ),
-                      child: const Text('Register'),
-                    ),
+              CustomPrimaryButton(
+                label: 'Register',
+                onPressed: _register,
+                isBusy: _isLoading,
+              ),
               const SizedBox(height: 10),
               TextButton(
                 onPressed: () {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/survey_view_model.dart';
 
 class SurveyScreen extends StatelessWidget {
@@ -14,18 +15,8 @@ class SurveyScreen extends StatelessWidget {
     final vm = context.watch<SurveyViewModel>();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Wellness Day Client Satisfaction Survey',
-          style: TextStyle(
-            color: Color(0xFF201C58),
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        automaticallyImplyLeading: false,
-        backgroundColor: const Color(0xFF90C048),
-        centerTitle: true,
-      ),
+      appBar: const KenwellAppBar(
+          title: 'Survey', automaticallyImplyLeading: false),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/stats_report_view_model.dart';
 
 class StatsReportScreen extends StatelessWidget {
@@ -12,18 +13,8 @@ class StatsReportScreen extends StatelessWidget {
       create: (_) => StatsReportViewModel(),
       child: Consumer<StatsReportViewModel>(
         builder: (context, vm, _) => Scaffold(
-          appBar: AppBar(
-            title: const Text(
-              'Stats Report',
-              style: TextStyle(
-                color: Color(0xFF201C58),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            automaticallyImplyLeading: true,
-            centerTitle: true,
-            backgroundColor: const Color(0xFF90C048),
-          ),
+          appBar: const KenwellAppBar(
+              title: 'Stats & Report', automaticallyImplyLeading: false),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(

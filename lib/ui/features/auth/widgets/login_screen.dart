@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import '../../../../data/services/auth_service.dart';
-import '../../../core/ui/app_logo.dart';
+import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/colours/kenwell_colours.dart';
+import '../../../shared/ui/logo/app_logo.dart';
 import '../../../../routing/route_names.dart';
 import '../../../../domain/models/user_model.dart';
-import '../../../core/ui/navigation/main_navigation_screen.dart';
+import '../../../shared/ui/navigation/main_navigation_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -60,18 +63,8 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Login',
-          style: TextStyle(
-            color: Color(0xFF201C58),
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        backgroundColor: const Color(0xFF90C048),
-      ),
+      appBar:
+          const KenwellAppBar(title: 'Login', automaticallyImplyLeading: false),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -108,17 +101,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              _isLoading
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: _login,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF90C048),
-                        foregroundColor: Colors.white,
-                        minimumSize: const Size.fromHeight(50),
-                      ),
-                      child: const Text('Login'),
-                    ),
+              CustomPrimaryButton(
+                label: 'Login',
+                onPressed: _login,
+                isBusy: _isLoading,
+                backgroundColor: KenwellColors.primaryGreen,
+              ),
               const SizedBox(height: 10),
               TextButton(
                 onPressed: () {

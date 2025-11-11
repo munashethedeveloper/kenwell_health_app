@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/wellness_screening_results_view_model.dart';
 
 class WellnessScreeningResultsScreen extends StatelessWidget {
@@ -21,18 +22,9 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
       child: Consumer<WellnessScreeningResultsViewModel>(
         builder: (context, vm, _) {
           return Scaffold(
-            appBar: AppBar(
-              title: const Text(
-                'Wellness Screening Results',
-                style: TextStyle(
-                  color: Color(0xFF201C58),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              automaticallyImplyLeading: false,
-              backgroundColor: const Color(0xFF90C048),
-              centerTitle: true,
-            ),
+            appBar: const KenwellAppBar(
+                title: 'Wellness Screening Results',
+                automaticallyImplyLeading: false),
             body: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(

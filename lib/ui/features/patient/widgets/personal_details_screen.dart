@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/personal_details_view_model.dart';
 
 class PersonalDetailsScreen extends StatelessWidget {
@@ -21,18 +23,9 @@ class PersonalDetailsScreen extends StatelessWidget {
       child: Consumer<PersonalDetailsViewModel>(
         builder: (context, vm, _) {
           return Scaffold(
-            appBar: AppBar(
-              title: const Text(
-                'Patient Personal Details',
-                style: TextStyle(
-                  color: Color(0xFF201C58),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              automaticallyImplyLeading: false,
-              backgroundColor: const Color(0xFF90C048),
-              centerTitle: true,
-            ),
+            appBar: const KenwellAppBar(
+                title: 'Patient Personal Details',
+                automaticallyImplyLeading: false),
             body: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -96,52 +89,24 @@ class PersonalDetailsScreen extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   // --- Navigation Buttons ---
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: onPrevious,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                  KenwellFormNavigation(
+                    onPrevious: onPrevious,
+                    onNext: () async {
+                      if (vm.isFormValid) {
+                        await vm.saveLocally();
+                        onNext();
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Please complete all required fields before proceeding.',
+                            ),
                           ),
-                          child: const Text('Previous'),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: vm.isSubmitting
-                              ? null
-                              : () async {
-                                  if (vm.isFormValid) {
-                                    await vm.saveLocally();
-                                    onNext();
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                            'Please complete all required fields before proceeding.'),
-                                      ),
-                                    );
-                                  }
-                                },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF90C048),
-                            padding: const EdgeInsets.symmetric(vertical: 14.0),
-                          ),
-                          child: vm.isSubmitting
-                              ? const CircularProgressIndicator(
-                                  valueColor:
-                                      AlwaysStoppedAnimation(Colors.white),
-                                )
-                              : const Text(
-                                  'Next',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                        ),
-                      ),
-                    ],
+                        );
+                      }
+                    },
+                    isNextBusy: vm.isSubmitting,
+                    isNextEnabled: !vm.isSubmitting,
                   ),
                 ],
               ),

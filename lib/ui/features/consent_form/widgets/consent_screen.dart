@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:signature/signature.dart';
+import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/consent_screen_view_model.dart';
 
 class ConsentScreen extends StatelessWidget {
@@ -20,18 +21,8 @@ class ConsentScreen extends StatelessWidget {
     final vm = Provider.of<ConsentScreenViewModel>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Consent Form',
-          style: TextStyle(
-            color: Color(0xFF201C58),
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        automaticallyImplyLeading: false,
-        backgroundColor: const Color(0xFF90C048),
-        centerTitle: true,
-      ),
+      appBar: const KenwellAppBar(
+          title: 'Consent Form', automaticallyImplyLeading: false),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/event_view_model.dart';
 import '../../../../domain/models/wellness_event.dart';
 
@@ -57,18 +58,7 @@ class EventScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Add new event',
-          style: TextStyle(
-            color: Color(0xFF201C58),
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        automaticallyImplyLeading: true,
-        backgroundColor: const Color(0xFF90C048),
-        centerTitle: true,
-      ),
+      appBar: const KenwellAppBar(title: 'Add Event'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(

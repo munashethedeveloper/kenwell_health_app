@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/hiv_test_nursing_intervention_view_model.dart';
 
 class HIVTestNursingInterventionScreen extends StatelessWidget {
@@ -17,18 +18,9 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
     final viewModel = context.watch<HIVTestNursingInterventionViewModel>();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'HIV Test Nursing Intervention',
-          style: TextStyle(
-            color: Color(0xFF201C58),
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        backgroundColor: const Color(0xFF90C048),
-      ),
+      appBar: const KenwellAppBar(
+          title: 'HIV Test Nursing Intervention',
+          automaticallyImplyLeading: false),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(

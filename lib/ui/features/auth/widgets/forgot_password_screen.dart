@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
+import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import '../../../../data/services/auth_service.dart';
-import '../../../core/ui/app_logo.dart';
+import '../../../shared/ui/colours/kenwell_colours.dart';
+import '../../../shared/ui/logo/app_logo.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -59,16 +62,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Forgot Password',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: const Color(0xFF90C048),
+      appBar: const KenwellAppBar(
+        title: 'Forgot Password',
+        automaticallyImplyLeading: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -86,17 +82,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     val!.isEmpty ? 'Please enter your email' : null,
               ),
               const SizedBox(height: 20),
-              _isLoading
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: _resetPassword,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF90C048),
-                        foregroundColor: Colors.white,
-                        minimumSize: const Size.fromHeight(50),
-                      ),
-                      child: const Text('Send Reset Link'),
-                    ),
+              CustomPrimaryButton(
+                label: 'Send Reset Link',
+                onPressed: _resetPassword,
+                isBusy: _isLoading,
+                backgroundColor: KenwellColors.primaryGreen,
+              ),
             ],
           ),
         ),

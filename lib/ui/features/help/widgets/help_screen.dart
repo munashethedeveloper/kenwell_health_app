@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/help_screen_view_model.dart';
 
 class HelpScreen extends StatelessWidget {
@@ -10,18 +11,8 @@ class HelpScreen extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => HelpScreenViewModel(),
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'Help & Support',
-            style: TextStyle(
-              color: Color(0xFF201C58),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          automaticallyImplyLeading: true,
-          backgroundColor: const Color(0xFF90C048),
-          centerTitle: true,
-        ),
+        appBar: const KenwellAppBar(
+            title: 'Help & Support', automaticallyImplyLeading: false),
         body: Consumer<HelpScreenViewModel>(
           builder: (context, viewModel, _) {
             return ListView(

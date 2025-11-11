@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../core/ui/app_logo.dart';
+import '../../../shared/ui/logo/app_logo.dart';
 import '../../auth/widgets/auth_wrapper.dart';
 import '../../auth/view_models/auth_view_model.dart';
 import '../../event/view_model/event_view_model.dart';

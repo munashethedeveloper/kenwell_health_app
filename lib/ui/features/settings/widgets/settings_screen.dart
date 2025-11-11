@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:provider/provider.dart';
+import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/settings_view_model.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -10,17 +12,9 @@ class SettingsScreen extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => SettingsViewModel(),
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'Settings',
-            style: TextStyle(
-              color: Color(0xFF201C58),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          automaticallyImplyLeading: true,
-          backgroundColor: const Color(0xFF90C048),
-          centerTitle: true,
+        appBar: const KenwellAppBar(
+          title: 'Settings',
+          automaticallyImplyLeading: false,
         ),
         body: Consumer<SettingsViewModel>(
           builder: (context, viewModel, _) {
@@ -66,7 +60,8 @@ class SettingsScreen extends StatelessWidget {
                 const SizedBox(height: 20),
 
                 // Save Button
-                ElevatedButton(
+                CustomPrimaryButton(
+                  label: 'Save Settings',
                   onPressed: () async {
                     await viewModel.saveSettings();
                     if (!context.mounted) return;
@@ -74,12 +69,6 @@ class SettingsScreen extends StatelessWidget {
                       const SnackBar(content: Text('Settings saved!')),
                     );
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF201C58),
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size.fromHeight(50),
-                  ),
-                  child: const Text('Save Settings'),
                 ),
               ],
             );

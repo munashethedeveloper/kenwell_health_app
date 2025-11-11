@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/profile_view_model.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -11,18 +12,8 @@ class ProfileScreen extends StatelessWidget {
       create: (_) => ProfileViewModel(),
       child: Consumer<ProfileViewModel>(
         builder: (context, vm, _) => Scaffold(
-          appBar: AppBar(
-            title: const Text(
-              'Profile',
-              style: TextStyle(
-                color: Color(0xFF201C58),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            automaticallyImplyLeading: true,
-            centerTitle: true,
-            backgroundColor: const Color(0xFF90C048),
-          ),
+          appBar: const KenwellAppBar(
+              title: 'User Profile', automaticallyImplyLeading: false),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Form(

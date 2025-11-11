@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/personal_risk_assessment_view_model.dart';
 
 class PersonalRiskAssessmentScreen extends StatelessWidget {
@@ -23,18 +24,9 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
       child: Consumer<PersonalRiskAssessmentViewModel>(
         builder: (context, vm, _) {
           return Scaffold(
-            appBar: AppBar(
-              title: const Text(
-                'Personal Health Risk Assessment',
-                style: TextStyle(
-                  color: Color(0xFF201C58),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              automaticallyImplyLeading: false,
-              backgroundColor: const Color(0xFF90C048),
-              centerTitle: true,
-            ),
+            appBar: const KenwellAppBar(
+                title: 'Personal Risk Assessment',
+                automaticallyImplyLeading: false),
             body: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(

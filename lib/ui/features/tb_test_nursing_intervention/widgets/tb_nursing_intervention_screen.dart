@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/tb_nursing_intervention_view_model.dart';
 
 class TBNursingInterventionScreen extends StatelessWidget {
@@ -17,18 +18,9 @@ class TBNursingInterventionScreen extends StatelessWidget {
     final viewModel = Provider.of<TBNursingInterventionViewModel>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'TB: Nurse Intervention',
-          style: TextStyle(
-            color: Color(0xFF201C58),
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        automaticallyImplyLeading: false,
-        backgroundColor: const Color(0xFF90C048),
-        centerTitle: true,
-      ),
+      appBar: const KenwellAppBar(
+          title: 'TB Test Nursing Intervention',
+          automaticallyImplyLeading: false),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
