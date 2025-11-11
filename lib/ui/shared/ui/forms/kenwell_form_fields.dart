@@ -166,56 +166,85 @@ class KenwellYesNoQuestion<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveOnChanged = enabled ? onChanged : null;
+
     return Padding(
       padding: padding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(question, style: textStyle),
-          if (axis == Axis.horizontal)
-            Row(
-              children: [
-                Expanded(
-                  child: RadioListTile<T>(
-                    title: Text(yesLabel),
-                    value: yesValue,
-                    groupValue: value,
-                    onChanged: enabled ? onChanged : null,
-                    dense: true,
-                  ),
-                ),
-                Expanded(
-                  child: RadioListTile<T>(
-                    title: Text(noLabel),
-                    value: noValue,
-                    groupValue: value,
-                    onChanged: enabled ? onChanged : null,
-                    dense: true,
-                  ),
-                ),
-              ],
-            )
-          else
-            Column(
-              children: [
-                RadioListTile<T>(
-                  title: Text(yesLabel),
+          RadioGroup<T>(
+            groupValue: value,
+            onChanged: effectiveOnChanged,
+            builder: (groupValue, handler) {
+              final tiles = [
+                _KenwellRadioTile<T>(
+                  label: yesLabel,
                   value: yesValue,
-                  groupValue: value,
-                  onChanged: enabled ? onChanged : null,
-                  dense: true,
+                  groupValue: groupValue,
+                  onChanged: handler,
                 ),
-                RadioListTile<T>(
-                  title: Text(noLabel),
+                _KenwellRadioTile<T>(
+                  label: noLabel,
                   value: noValue,
-                  groupValue: value,
-                  onChanged: enabled ? onChanged : null,
-                  dense: true,
+                  groupValue: groupValue,
+                  onChanged: handler,
                 ),
-              ],
-            ),
+              ];
+
+              return axis == Axis.horizontal
+                  ? Row(
+                      children: tiles
+                          .map((tile) => Expanded(child: tile))
+                          .toList(growable: false),
+                    )
+                  : Column(children: tiles);
+            },
+          ),
         ],
       ),
     );
   }
+}
+
+class _KenwellRadioTile<T> extends StatelessWidget {
+  const _KenwellRadioTile({
+    required this.label,
+    required this.value,
+    required this.groupValue,
+    required this.onChanged,
+  });
+
+  final String label;
+  final T value;
+  final T? groupValue;
+  final ValueChanged<T?>? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return RadioListTile<T>(
+      title: Text(label),
+      value: value,
+      groupValue: groupValue,
+      onChanged: onChanged,
+      dense: true,
+    );
+  }
+}
+
+class RadioGroup<T> extends StatelessWidget {
+  const RadioGroup({
+    super.key,
+    required this.groupValue,
+    required this.onChanged,
+    required this.builder,
+  });
+
+  final T? groupValue;
+  final ValueChanged<T?>? onChanged;
+  final Widget Function(T? groupValue, ValueChanged<T?>? onChanged) builder;
+
+  @override
+  Widget build(BuildContext context) => builder(groupValue, onChanged);
 }
