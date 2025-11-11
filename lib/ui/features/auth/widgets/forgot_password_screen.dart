@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../data/services/auth_service.dart';
 import '../../../core/ui/app_logo.dart';
+import '../../../core/ui/shared/shared.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -59,48 +60,36 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Forgot Password',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
+      appBar: const KenwellAppBar(
+        title: 'Forgot Password',
+        titleColor: KenwellColors.neutralWhite,
+      ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                const SizedBox(height: 40),
+                const AppLogo(size: 250),
+                const SizedBox(height: 30),
+                TextFormField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(labelText: 'Email'),
+                  validator: (val) =>
+                      val!.isEmpty ? 'Please enter your email' : null,
+                ),
+                const SizedBox(height: 20),
+                KenwellFilledButton(
+                  label: 'Send Reset Link',
+                  onPressed: _resetPassword,
+                  isBusy: _isLoading,
+                  backgroundColor: KenwellColors.primaryGreen,
+                ),
+              ],
+            ),
           ),
         ),
-        centerTitle: true,
-        backgroundColor: const Color(0xFF90C048),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              const SizedBox(height: 40),
-              const AppLogo(size: 250),
-              const SizedBox(height: 30),
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
-                validator: (val) =>
-                    val!.isEmpty ? 'Please enter your email' : null,
-              ),
-              const SizedBox(height: 20),
-              _isLoading
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: _resetPassword,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF90C048),
-                        foregroundColor: Colors.white,
-                        minimumSize: const Size.fromHeight(50),
-                      ),
-                      child: const Text('Send Reset Link'),
-                    ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+      );
+    }
 }

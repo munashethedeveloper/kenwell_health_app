@@ -1,32 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../view_model/settings_view_model.dart';
+import '../../../core/ui/shared/shared.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => SettingsViewModel(),
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'Settings',
-            style: TextStyle(
-              color: Color(0xFF201C58),
-              fontWeight: FontWeight.bold,
-            ),
+      return ChangeNotifierProvider(
+        create: (_) => SettingsViewModel(),
+        child: Scaffold(
+          appBar: const KenwellAppBar(
+            title: 'Settings',
           ),
-          automaticallyImplyLeading: true,
-          backgroundColor: const Color(0xFF90C048),
-          centerTitle: true,
-        ),
-        body: Consumer<SettingsViewModel>(
-          builder: (context, viewModel, _) {
-            return ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
+          body: Consumer<SettingsViewModel>(
+            builder: (context, viewModel, _) {
+              return ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
                 // Dark Mode Toggle
                 SwitchListTile(
                   title: const Text('Dark Mode'),
@@ -65,22 +57,17 @@ class SettingsScreen extends StatelessWidget {
 
                 const SizedBox(height: 20),
 
-                // Save Button
-                ElevatedButton(
-                  onPressed: () async {
-                    await viewModel.saveSettings();
-                    if (!context.mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Settings saved!')),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF201C58),
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size.fromHeight(50),
+                  // Save Button
+                  KenwellFilledButton(
+                    label: 'Save Settings',
+                    onPressed: () async {
+                      await viewModel.saveSettings();
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Settings saved!')),
+                      );
+                    },
                   ),
-                  child: const Text('Save Settings'),
-                ),
               ],
             );
           },

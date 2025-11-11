@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../view_model/personal_details_view_model.dart';
+import '../../../core/ui/shared/shared.dart';
 
 class PersonalDetailsScreen extends StatelessWidget {
   final PersonalDetailsViewModel viewModel;
@@ -20,23 +21,15 @@ class PersonalDetailsScreen extends StatelessWidget {
       value: viewModel,
       child: Consumer<PersonalDetailsViewModel>(
         builder: (context, vm, _) {
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text(
-                'Patient Personal Details',
-                style: TextStyle(
-                  color: Color(0xFF201C58),
-                  fontWeight: FontWeight.bold,
-                ),
+            return Scaffold(
+              appBar: const KenwellAppBar(
+                title: 'Patient Personal Details',
+                automaticallyImplyLeading: false,
               ),
-              automaticallyImplyLeading: false,
-              backgroundColor: const Color(0xFF90C048),
-              centerTitle: true,
-            ),
-            body: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
+              body: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
                   _buildTextField('Screening Site', vm.screeningSiteController),
                   const SizedBox(height: 12),
                   _buildDateField(context, 'Date', vm.dateController),
@@ -95,58 +88,30 @@ class PersonalDetailsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
 
-                  // --- Navigation Buttons ---
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: onPrevious,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                          ),
-                          child: const Text('Previous'),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: vm.isSubmitting
-                              ? null
-                              : () async {
-                                  if (vm.isFormValid) {
-                                    await vm.saveLocally();
-                                    onNext();
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                            'Please complete all required fields before proceeding.'),
-                                      ),
-                                    );
-                                  }
-                                },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF90C048),
-                            padding: const EdgeInsets.symmetric(vertical: 14.0),
-                          ),
-                          child: vm.isSubmitting
-                              ? const CircularProgressIndicator(
-                                  valueColor:
-                                      AlwaysStoppedAnimation(Colors.white),
-                                )
-                              : const Text(
-                                  'Next',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                    // --- Navigation Buttons ---
+                    KenwellFormNavigation(
+                      onPrevious: onPrevious,
+                      onNext: () async {
+                        if (vm.isFormValid) {
+                          await vm.saveLocally();
+                          onNext();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Please complete all required fields before proceeding.',
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      isNextBusy: vm.isSubmitting,
+                      isNextEnabled: !vm.isSubmitting,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
+            );
         },
       ),
     );

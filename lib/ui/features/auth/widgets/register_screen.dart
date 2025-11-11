@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/features/auth/widgets/login_screen.dart';
 import '../../../../data/services/auth_service.dart';
 import '../../../core/ui/app_logo.dart';
+import '../../../core/ui/shared/shared.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -88,17 +89,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Register',
-          style: TextStyle(
-            color: Color(0xFF201C58),
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+      appBar: const KenwellAppBar(
+        title: 'Register',
         automaticallyImplyLeading: false,
-        centerTitle: true,
-        backgroundColor: const Color(0xFF90C048),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -122,11 +115,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 validator: (val) => val!.isEmpty ? 'Enter last name' : null,
               ),
               const SizedBox(height: 10),
-              TextFormField(
-                controller: _usernameController,
-                decoration: const InputDecoration(labelText: 'Username'),
-                validator: (val) => val!.isEmpty ? 'Enter username' : null,
-              ),
+                TextFormField(
+                  controller: _usernameController,
+                  decoration: const InputDecoration(labelText: 'Username'),
+                  validator: (val) => val!.isEmpty ? 'Enter username' : null,
+                ),
               const SizedBox(height: 10),
               TextFormField(
                 controller: _roleController,
@@ -164,36 +157,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     const InputDecoration(labelText: 'Confirm Password'),
                 validator: (val) =>
                     val!.isEmpty ? 'Confirm your password' : null,
-              ),
-              const SizedBox(height: 20),
-              _isLoading
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: _register,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF201C58),
-                        foregroundColor: Colors.white,
-                        minimumSize: const Size.fromHeight(50),
-                      ),
-                      child: const Text('Register'),
-                    ),
-              const SizedBox(height: 10),
-              TextButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const LoginScreen()),
-                  );
-                },
-                child: const Text(
-                  'Already have an account? Log in',
-                  style: TextStyle(decoration: TextDecoration.underline),
                 ),
-              ),
-            ],
+                const SizedBox(height: 20),
+                KenwellFilledButton(
+                  label: 'Register',
+                  onPressed: _register,
+                  isBusy: _isLoading,
+                ),
+                const SizedBox(height: 10),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    );
+                  },
+                  child: const Text(
+                    'Already have an account? Log in',
+                    style: TextStyle(decoration: TextDecoration.underline),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
-}
