@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/forms/kenwell_form_fields.dart';
+import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/survey_view_model.dart';
 
 class SurveyScreen extends StatelessWidget {
@@ -34,7 +36,7 @@ class SurveyScreen extends StatelessWidget {
               '1. How did you hear about this Wellness Day?',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            _buildRadioGroup(vm, 'heardAbout', [
+              _buildRadioGroup(vm, [
               'Intranet',
               'Flyer',
               'Wellness Team',
@@ -49,24 +51,24 @@ class SurveyScreen extends StatelessWidget {
               '2. In which province did you attend the Wellness Day?',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            _buildDropdown(
-              'Province',
-              [
-                'Gauteng',
-                'Western Cape',
-                'KwaZulu-Natal',
-                'Eastern Cape',
-                'Limpopo',
-                'Mpumalanga',
-                'North West',
-                'Free State',
-                'Northern Cape'
-              ],
-              vm.province,
-              (val) {
-                if (val != null) vm.updateProvince(val);
-              },
-            ),
+              KenwellDropdownField<String>(
+                label: 'Province',
+                value: vm.province,
+                items: const [
+                  'Gauteng',
+                  'Western Cape',
+                  'KwaZulu-Natal',
+                  'Eastern Cape',
+                  'Limpopo',
+                  'Mpumalanga',
+                  'North West',
+                  'Free State',
+                  'Northern Cape'
+                ],
+                onChanged: (val) {
+                  if (val != null) vm.updateProvince(val);
+                },
+              ),
             const Divider(height: 32),
 
             // 3–8. Ratings
@@ -102,61 +104,27 @@ class SurveyScreen extends StatelessWidget {
               '9. Would you like Kenwell Consulting to contact you regarding your experience?',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            RadioGroup<String>(
-              groupValue: vm.contactConsent,
-              onChanged: (val) {
-                if (val != null) vm.updateContactConsent(val);
-              },
-              child: const Row(
-                children: <Widget>[
-                  Expanded(
-                    child: RadioListTile<String>(
-                      title: Text('Yes'),
-                      value: 'Yes',
-                    ),
-                  ),
-                  Expanded(
-                    child: RadioListTile<String>(
-                      title: Text('No'),
-                      value: 'No',
-                    ),
-                  ),
-                ],
+              KenwellYesNoQuestion<String>(
+                question:
+                    'Would you like Kenwell Consulting to contact you regarding your experience?',
+                value: vm.contactConsent,
+                onChanged: (value) {
+                  if (value != null) {
+                    vm.updateContactConsent(value);
+                  }
+                },
+                yesValue: 'Yes',
+                noValue: 'No',
               ),
-            ),
             const SizedBox(height: 24),
 
-            // Buttons
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: onPrevious,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14.0),
-                    ),
-                    child: const Text('Previous'),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: vm.isFormValid
-                        ? () => vm.submitSurvey(context, onNext: onSubmit)
-                        : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF90C048),
-                      padding: const EdgeInsets.symmetric(vertical: 14.0),
-                    ),
-                    child: const Text(
-                      'Submit Survey',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              // Buttons
+              KenwellFormNavigation(
+                onPrevious: onPrevious,
+                onNext: () => vm.submitSurvey(context, onNext: onSubmit),
+                isNextEnabled: vm.isFormValid,
+                nextLabel: 'Submit Survey',
+              ),
             const SizedBox(height: 20),
             const Center(
               child: Text(
@@ -172,42 +140,23 @@ class SurveyScreen extends StatelessWidget {
   }
 
   // --- Helpers ---
-  Widget _buildRadioGroup(SurveyViewModel vm, String _, List<String> options) {
-    String? groupValue = vm.heardAbout;
-    return RadioGroup<String>(
-        groupValue: groupValue,
-        onChanged: (val) {
-          if (val != null) {
-            vm.updateHeardAbout(val);
-          }
-        },
-        child: Column(
-          children: options
-              .map(
-                (option) => RadioListTile<String>(
-                  title: Text(option),
-                  value: option,
-                ),
-              )
-              .toList(),
-        ));
-  }
-
-  Widget _buildDropdown(String label, List<String> items, String? value,
-      Function(String?) onChanged) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
-      child: DropdownButtonFormField<String>(
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-        ),
-        initialValue: value,
-        items: items
-            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-            .toList(),
-        onChanged: onChanged,
-      ),
+  Widget _buildRadioGroup(SurveyViewModel vm, List<String> options) {
+    final groupValue = vm.heardAbout;
+    return Column(
+      children: options
+          .map(
+            (option) => RadioListTile<String>(
+              title: Text(option),
+              value: option,
+              groupValue: groupValue,
+              onChanged: (val) {
+                if (val != null) {
+                  vm.updateHeardAbout(val);
+                }
+              },
+            ),
+          )
+          .toList(),
     );
   }
 
@@ -218,23 +167,21 @@ class SurveyScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(question),
-          RadioGroup<int>(
-            groupValue: vm.ratings[key],
-            onChanged: (val) {
-              if (val != null) {
-                vm.updateRating(key, val);
-              }
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(
-                6,
-                (index) => Expanded(
-                  child: RadioListTile<int>(
-                    dense: true,
-                    title: Text('$index'),
-                    value: index,
-                  ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: List.generate(
+              6,
+              (index) => Expanded(
+                child: RadioListTile<int>(
+                  dense: true,
+                  title: Text('$index'),
+                  value: index,
+                  groupValue: vm.ratings[key],
+                  onChanged: (val) {
+                    if (val != null) {
+                      vm.updateRating(key, val);
+                    }
+                  },
                 ),
               ),
             ),

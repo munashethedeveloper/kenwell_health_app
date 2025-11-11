@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/forms/kenwell_form_fields.dart';
+import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/tb_testing_view_model.dart';
 
 class TBTestingScreen extends StatelessWidget {
@@ -22,179 +24,137 @@ class TBTestingScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('TB Symptom Screening',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            _buildYesNo(
-              context,
-              'Have you been coughing for two weeks or more?',
-              viewModel.coughTwoWeeks,
-              viewModel.setCoughTwoWeeks,
-            ),
-            _buildYesNo(
-              context,
-              'Is your sputum coloured when coughing?',
-              viewModel.sputumColour,
-              viewModel.setSputumColour,
-            ),
-            _buildYesNo(
-              context,
-              'Is there blood in your sputum when you cough?',
-              viewModel.bloodInSputum,
-              viewModel.setBloodInSputum,
-            ),
-            _buildYesNo(
-              context,
-              'Have you lost more than 3kg in the past 4 weeks?',
-              viewModel.weightLoss,
-              viewModel.setWeightLoss,
-            ),
-            _buildYesNo(
-              context,
-              'Are you sweating unusually at night?',
-              viewModel.nightSweats,
-              viewModel.setNightSweats,
-            ),
-            _buildYesNo(
-              context,
-              'Have you had recurrent fever/chills lasting more than three days?',
-              viewModel.feverChills,
-              viewModel.setFeverChills,
-            ),
-            _buildYesNo(
-              context,
-              'Have you experienced chest pains or difficulty breathing?',
-              viewModel.chestPain,
-              viewModel.setChestPain,
-            ),
-            _buildYesNo(
-              context,
-              'Do you have swellings in the neck or armpits?',
-              viewModel.swellings,
-              viewModel.setSwellings,
-            ),
+              const Text(
+                'TB Symptom Screening',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              KenwellYesNoQuestion<String>(
+                question: 'Have you been coughing for two weeks or more?',
+                value: viewModel.coughTwoWeeks,
+                onChanged: viewModel.setCoughTwoWeeks,
+                yesValue: 'Yes',
+                noValue: 'No',
+                padding: const EdgeInsets.only(bottom: 10),
+              ),
+              KenwellYesNoQuestion<String>(
+                question: 'Is your sputum coloured when coughing?',
+                value: viewModel.sputumColour,
+                onChanged: viewModel.setSputumColour,
+                yesValue: 'Yes',
+                noValue: 'No',
+                padding: const EdgeInsets.only(bottom: 10),
+              ),
+              KenwellYesNoQuestion<String>(
+                question: 'Is there blood in your sputum when you cough?',
+                value: viewModel.bloodInSputum,
+                onChanged: viewModel.setBloodInSputum,
+                yesValue: 'Yes',
+                noValue: 'No',
+                padding: const EdgeInsets.only(bottom: 10),
+              ),
+              KenwellYesNoQuestion<String>(
+                question: 'Have you lost more than 3kg in the past 4 weeks?',
+                value: viewModel.weightLoss,
+                onChanged: viewModel.setWeightLoss,
+                yesValue: 'Yes',
+                noValue: 'No',
+                padding: const EdgeInsets.only(bottom: 10),
+              ),
+              KenwellYesNoQuestion<String>(
+                question: 'Are you sweating unusually at night?',
+                value: viewModel.nightSweats,
+                onChanged: viewModel.setNightSweats,
+                yesValue: 'Yes',
+                noValue: 'No',
+                padding: const EdgeInsets.only(bottom: 10),
+              ),
+              KenwellYesNoQuestion<String>(
+                question:
+                    'Have you had recurrent fever/chills lasting more than three days?',
+                value: viewModel.feverChills,
+                onChanged: viewModel.setFeverChills,
+                yesValue: 'Yes',
+                noValue: 'No',
+                padding: const EdgeInsets.only(bottom: 10),
+              ),
+              KenwellYesNoQuestion<String>(
+                question:
+                    'Have you experienced chest pains or difficulty breathing?',
+                value: viewModel.chestPain,
+                onChanged: viewModel.setChestPain,
+                yesValue: 'Yes',
+                noValue: 'No',
+                padding: const EdgeInsets.only(bottom: 10),
+              ),
+              KenwellYesNoQuestion<String>(
+                question: 'Do you have swellings in the neck or armpits?',
+                value: viewModel.swellings,
+                onChanged: viewModel.setSwellings,
+                yesValue: 'Yes',
+                noValue: 'No',
+                padding: const EdgeInsets.only(bottom: 10),
+              ),
             const Divider(height: 32),
-            const Text('History of TB Treatment',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            _buildYesNo(
-              context,
-              'Were you ever treated for Tuberculosis?',
-              viewModel.treatedBefore,
-              viewModel.setTreatedBefore,
-            ),
-            if (viewModel.treatedBefore == 'Yes')
-              _buildDateField(context, 'When were you treated?',
-                  viewModel.treatedDateController),
-            _buildYesNo(
-              context,
-              'Did you complete the treatment?',
-              viewModel.completedTreatment,
-              viewModel.setCompletedTreatment,
-            ),
-            _buildYesNo(
-              context,
-              'Were you in contact with someone diagnosed with Tuberculosis in the past year?',
-              viewModel.contactWithTB,
-              viewModel.setContactWithTB,
-            ),
+              const Text(
+                'History of TB Treatment',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              KenwellYesNoQuestion<String>(
+                question: 'Were you ever treated for Tuberculosis?',
+                value: viewModel.treatedBefore,
+                onChanged: viewModel.setTreatedBefore,
+                yesValue: 'Yes',
+                noValue: 'No',
+                padding: const EdgeInsets.only(bottom: 10),
+              ),
+              if (viewModel.treatedBefore == 'Yes')
+                KenwellTextField(
+                  label: 'When were you treated?',
+                  controller: viewModel.treatedDateController,
+                  readOnly: true,
+                  onTap: () async {
+                    FocusScope.of(context).requestFocus(FocusNode());
+                    final pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2100),
+                    );
+                    if (pickedDate != null) {
+                      viewModel.treatedDateController.text =
+                          '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
+                    }
+                  },
+                ),
+              KenwellYesNoQuestion<String>(
+                question: 'Did you complete the treatment?',
+                value: viewModel.completedTreatment,
+                onChanged: viewModel.setCompletedTreatment,
+                yesValue: 'Yes',
+                noValue: 'No',
+                padding: const EdgeInsets.only(bottom: 10),
+              ),
+              KenwellYesNoQuestion<String>(
+                question:
+                    'Were you in contact with someone diagnosed with Tuberculosis in the past year?',
+                value: viewModel.contactWithTB,
+                onChanged: viewModel.setContactWithTB,
+                yesValue: 'Yes',
+                noValue: 'No',
+                padding: const EdgeInsets.only(bottom: 10),
+              ),
             const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: onPrevious,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14.0),
-                    ),
-                    child: const Text('Previous'),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: viewModel.isFormValid && !viewModel.isSubmitting
-                        ? () => viewModel.submitTBTest(context, onNext: onNext)
-                        : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF90C048),
-                      padding: const EdgeInsets.symmetric(vertical: 14.0),
-                    ),
-                    child: viewModel.isSubmitting
-                        ? const CircularProgressIndicator()
-                        : const Text(
-                            'Next',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                  ),
-                ),
-              ],
-            ),
+              KenwellFormNavigation(
+                onPrevious: onPrevious,
+                onNext: () =>
+                    viewModel.submitTBTest(context, onNext: onNext),
+                isNextEnabled: viewModel.isFormValid && !viewModel.isSubmitting,
+                isNextBusy: viewModel.isSubmitting,
+              ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildYesNo(BuildContext context, String question, String? value,
-      ValueChanged<String?> onChanged) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(question),
-          RadioGroup<String>(
-            groupValue: value,
-            onChanged: onChanged,
-            child: const Row(
-              children: <Widget>[
-                Expanded(
-                  child: RadioListTile<String>(
-                    title: Text('Yes'),
-                    value: 'Yes',
-                  ),
-                ),
-                Expanded(
-                  child: RadioListTile<String>(
-                    title: Text('No'),
-                    value: 'No',
-                  ),
-                ),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDateField(
-      BuildContext context, String label, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: TextField(
-        controller: controller,
-        readOnly: true,
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-        ),
-        onTap: () async {
-          FocusScope.of(context).requestFocus(FocusNode());
-          final pickedDate = await showDatePicker(
-            context: context,
-            initialDate: DateTime.now(),
-            firstDate: DateTime(2000),
-            lastDate: DateTime(2100),
-          );
-          if (pickedDate != null) {
-            controller.text =
-                '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
-          }
-        },
       ),
     );
   }
