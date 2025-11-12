@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:signature/signature.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/form/date_picker_field.dart';
+import '../../../shared/ui/form/signature_pad.dart';
 import '../view_model/nurse_intervention_view_model.dart';
 
 class NurseInterventionScreen extends StatelessWidget {
@@ -34,85 +35,25 @@ class NurseInterventionScreen extends StatelessWidget {
               viewModel.windowPeriodOptions,
               viewModel.setWindowPeriod,
             ),
-            const SizedBox(height: 12),
-            _buildDropdown(
-              'Did patient expect HIV (+) result?',
-              viewModel.expectedResult,
-              viewModel.expectedResultOptions,
-              viewModel.setExpectedResult,
-            ),
-            const SizedBox(height: 12),
-            _buildDropdown(
-              'Difficulty in dealing with result?',
-              viewModel.difficultyDealingResult,
-              viewModel.difficultyOptions,
-              viewModel.setDifficultyDealingResult,
-            ),
-            const SizedBox(height: 12),
-            _buildDropdown(
-              'Urgent psychosocial follow-up needed?',
-              viewModel.urgentPsychosocial,
-              viewModel.urgentOptions,
-              viewModel.setUrgentPsychosocial,
-            ),
-            const SizedBox(height: 12),
-            _buildDropdown(
-              'Committed to change behavior?',
-              viewModel.committedToChange,
-              viewModel.committedOptions,
-              viewModel.setCommittedToChange,
-            ),
-            const SizedBox(height: 12),
 
-            // --- Referral Nursing Interventions ---
-            const Text(
-              'Referral Nursing Interventions',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            const SizedBox(height: 12),
+            _buildDropdown(
+              'Follow-up test location',
+              viewModel.followUpLocation,
+              viewModel.followUpLocationOptions,
+              viewModel.setFollowUpLocation,
             ),
-            const SizedBox(height: 8),
-            CheckboxListTile(
-              title: const Text('Patient not referred'),
-              value: viewModel.patientNotReferred,
-              onChanged: (val) => viewModel.setPatientNotReferred(val ?? false),
-            ),
-            if (viewModel.patientNotReferred)
+            if (viewModel.followUpLocation == 'Other')
               _buildTextField(
-                'Reason patient not referred',
-                viewModel.notReferredReasonController,
+                'Other location detail',
+                viewModel.followUpOtherController,
               ),
-            CheckboxListTile(
-              title: const Text('Patient referred to GP'),
-              value: viewModel.referredToGP,
-              onChanged: (val) => viewModel.setReferredToGP(val ?? false),
+            const SizedBox(height: 12),
+            DatePickerField(
+              controller: viewModel.followUpDateController,
+              label: 'Follow-up test date',
+              displayFormat: DateFormat('dd/MM/yyyy'),
             ),
-            CheckboxListTile(
-              title: const Text('Patient referred to State HIV clinic'),
-              value: viewModel.referredToStateClinic,
-              onChanged: (val) =>
-                  viewModel.setReferredToStateClinic(val ?? false),
-            ),
-
-            // --- Follow-up Location & Date ---
-            if (viewModel.windowPeriod == 'Yes') ...[
-              const SizedBox(height: 12),
-              _buildDropdown(
-                'Follow-up location',
-                viewModel.followUpLocation,
-                viewModel.followUpLocationOptions,
-                viewModel.setFollowUpLocation,
-              ),
-              if (viewModel.followUpLocation == 'Other')
-                _buildTextField(
-                  'Other location detail',
-                  viewModel.followUpOtherController,
-                ),
-              const SizedBox(height: 12),
-              _buildDateField(
-                context,
-                'Follow-up test date',
-                viewModel.followUpDateController,
-              ),
-            ],
 
             const SizedBox(height: 24),
 
@@ -132,65 +73,23 @@ class NurseInterventionScreen extends StatelessWidget {
             const Text('Signature',
                 style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
+            SignaturePad(
+              // If you later add a SignatureController to the view model,
+              // pass it here as controller: viewModel.signatureController
               height: 150,
-              child: Signature(
-                controller: viewModel.signatureController,
-                backgroundColor: Colors.white,
-              ),
+              onSave: (bytes) async {
+                // optionally forward saved bytes to viewModel
+              },
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () => viewModel.signatureController.clear(),
-                  child: const Text('Clear'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
 
-            _buildTextField('SANC No', viewModel.sancNumberController),
-            const SizedBox(height: 12),
-            _buildDateField(context, 'Date', viewModel.nurseDateController),
-            const SizedBox(height: 24),
-
-            // --- Buttons ---
+            const SizedBox(height: 16),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                if (onPrevious != null)
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: onPrevious,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14.0),
-                      ),
-                      child: const Text('Previous'),
-                    ),
-                  ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: viewModel.isSubmitting
-                        ? null
-                        : () => viewModel.submitIntervention(context, onNext),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF90C048),
-                      padding: const EdgeInsets.symmetric(vertical: 14.0),
-                    ),
-                    child: viewModel.isSubmitting
-                        ? const CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation(Colors.white),
-                          )
-                        : const Text(
-                            'Next',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                  ),
-                ),
+                if (onPrevious != null) ...[
+                  ElevatedButton(onPressed: onPrevious, child: const Text('Previous')), 
+                  const SizedBox(width: 12),
+                ],
+                ElevatedButton(onPressed: onNext, child: const Text('Next')), 
               ],
             ),
           ],
@@ -198,60 +97,29 @@ class NurseInterventionScreen extends StatelessWidget {
       ),
     );
   }
-}
 
-Widget _buildDropdown(String label, String? value, List<String> options,
-    Function(String?) onChanged) {
-  return DropdownButtonFormField<String>(
-    initialValue: value,
-    decoration: InputDecoration(
-      labelText: label,
-      border: const OutlineInputBorder(),
-    ),
-    items: options
-        .map((opt) => DropdownMenuItem(value: opt, child: Text(opt)))
-        .toList(),
-    onChanged: onChanged,
-  );
-}
-
-Widget _buildTextField(String label, TextEditingController controller) {
-  return Padding(
-    padding: const EdgeInsets.only(bottom: 12),
-    child: TextField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
+  Widget _buildTextField(String label, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-Widget _buildDateField(
-    BuildContext context, String label, TextEditingController controller) {
-  return Padding(
-    padding: const EdgeInsets.only(bottom: 12),
-    child: TextField(
-      controller: controller,
-      readOnly: true,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-      ),
-      onTap: () async {
-        FocusScope.of(context).requestFocus(FocusNode());
-        final pickedDate = await showDatePicker(
-          context: context,
-          initialDate: DateTime.now(),
-          firstDate: DateTime(2000),
-          lastDate: DateTime(2100),
-        );
-        if (pickedDate != null) {
-          controller.text =
-              '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
-        }
+  Widget _buildDropdown(String label, String value, List<String> options,
+      void Function(String) onChanged) {
+    return DropdownButtonFormField<String>(
+      value: value,
+      decoration: InputDecoration(labelText: label),
+      items: options.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+      onChanged: (val) {
+        if (val != null) onChanged(val);
       },
-    ),
-  );
+    );
+  }
 }
