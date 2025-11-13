@@ -7,6 +7,7 @@ class EventScreen extends StatelessWidget {
   final EventViewModel viewModel;
   final DateTime date;
   final List<WellnessEvent>? existingEvents;
+  final WellnessEvent? eventToEdit; // Optional event to edit
   final void Function(WellnessEvent) onSave;
 
   const EventScreen({
@@ -14,13 +15,18 @@ class EventScreen extends StatelessWidget {
     required this.viewModel,
     required this.date,
     this.existingEvents,
+    this.eventToEdit, // Accept event to edit
     required this.onSave,
   });
 
   @override
   Widget build(BuildContext context) {
+    final bool isEditMode = eventToEdit != null;
+    
     // Load existing event if editing
-    if (existingEvents != null && existingEvents!.isNotEmpty) {
+    if (eventToEdit != null) {
+      viewModel.loadExistingEvent(eventToEdit);
+    } else if (existingEvents != null && existingEvents!.isNotEmpty) {
       viewModel.loadExistingEvent(existingEvents!.first);
     } else {
       // Initialize the dateController with the calendar-selected date
@@ -58,7 +64,7 @@ class EventScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: const KenwellAppBar(title: 'Add Event'),
+      appBar: KenwellAppBar(title: isEditMode ? 'Edit Event' : 'Add Event'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -199,17 +205,45 @@ class EventScreen extends StatelessWidget {
                   // Use date from the dateController if available
                   final eventDate =
                       DateTime.tryParse(viewModel.dateController.text) ?? date;
-                  final newEvent = viewModel.buildEvent(eventDate);
-                  onSave(newEvent);
-                  viewModel.clearControllers();
-                  Navigator.pop(context);
+                  
+                  if (isEditMode) {
+                    // Edit mode: update event and show undo option
+                    final updatedEvent = viewModel.buildEvent(eventDate, existingId: eventToEdit!.id);
+                    final previousEvent = viewModel.updateEvent(updatedEvent);
+                    
+                    viewModel.clearControllers();
+                    
+                    // Show SnackBar with undo option before navigating back
+                    if (previousEvent != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text('Event updated'),
+                          action: SnackBarAction(
+                            label: 'UNDO',
+                            onPressed: () {
+                              viewModel.updateEvent(previousEvent);
+                            },
+                          ),
+                          duration: const Duration(seconds: 5),
+                        ),
+                      );
+                    }
+                    
+                    Navigator.pop(context);
+                  } else {
+                    // Add mode: create new event
+                    final newEvent = viewModel.buildEvent(eventDate);
+                    onSave(newEvent);
+                    viewModel.clearControllers();
+                    Navigator.pop(context);
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF201C58),
                   foregroundColor: Colors.white,
                   minimumSize: const Size.fromHeight(50),
                 ),
-                child: const Text('Save Event'),
+                child: Text(isEditMode ? 'Update Event' : 'Save Event'),
               ),
             ),
           ],

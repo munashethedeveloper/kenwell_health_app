@@ -30,6 +30,12 @@ class EventDetailsScreen extends StatelessWidget {
         actions: [
           if (viewModel != null)
             IconButton(
+              icon: const Icon(Icons.edit, color: Colors.white),
+              tooltip: 'Edit Event',
+              onPressed: () => _navigateToEdit(context),
+            ),
+          if (viewModel != null)
+            IconButton(
               icon: const Icon(Icons.delete, color: Colors.white),
               tooltip: 'Delete Event',
               onPressed: () => _showDeleteConfirmation(context),
@@ -90,6 +96,21 @@ class EventDetailsScreen extends StatelessWidget {
           const Divider(),
         ],
       ),
+    );
+  }
+
+  /// Navigates to the edit form with the current event prefilled
+  void _navigateToEdit(BuildContext context) {
+    Navigator.pushNamed(
+      context,
+      '/event',
+      arguments: {
+        'date': event.date,
+        'eventToEdit': event,
+        'onSave': (WellnessEvent updatedEvent) {
+          // onSave is not needed in edit mode as the update is handled in EventScreen
+        },
+      },
     );
   }
 

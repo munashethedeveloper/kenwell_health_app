@@ -188,6 +188,7 @@ class AppRouter {
             (args?['existingEvents'] as List<dynamic>?)
                 ?.map((e) => e as WellnessEvent)
                 .toList();
+        final WellnessEvent? eventToEdit = args?['eventToEdit'] as WellnessEvent?;
 
         return MaterialPageRoute(
           builder: (context) {
@@ -196,6 +197,7 @@ class AppRouter {
               date: date,
               onSave: onSave,
               existingEvents: existingEvents,
+              eventToEdit: eventToEdit,
               viewModel: eventVM,
             );
           },

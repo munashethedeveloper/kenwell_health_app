@@ -189,4 +189,112 @@ void main() {
       expect(viewModel.events.first.title, 'Test Wellness Event');
     });
   });
+
+  group('EventDetailsScreen Edit Functionality', () {
+    late EventViewModel viewModel;
+    late WellnessEvent testEvent;
+
+    setUp(() {
+      viewModel = EventViewModel();
+      testEvent = WellnessEvent(
+        id: 'test-event-2',
+        title: 'Test Event for Editing',
+        date: DateTime(2024, 9, 20),
+        venue: 'Test Venue',
+        address: '456 Test St',
+        onsiteContactPerson: 'Alice Brown',
+        onsiteContactNumber: '555-1111',
+        onsiteContactEmail: 'alice@example.com',
+        aeContactPerson: 'Bob White',
+        aeContactNumber: '555-2222',
+        servicesRequested: 'HRA',
+        expectedParticipation: 75,
+        nonMembers: 15,
+        passports: 8,
+        nurses: 2,
+        coordinators: 1,
+        multiplyPromoters: 4,
+        setUpTime: '08:00 AM',
+        startTime: '09:00 AM',
+        endTime: '04:00 PM',
+        strikeDownTime: '05:00 PM',
+        mobileBooths: 'No',
+        medicalAid: 'Yes',
+        description: 'A test event for editing',
+      );
+      viewModel.addEvent(testEvent);
+    });
+
+    tearDown(() {
+      viewModel.dispose();
+    });
+
+    testWidgets('Edit button is visible when viewModel is provided',
+        (WidgetTester tester) async {
+      // Arrange: Build the widget with viewModel
+      await tester.pumpWidget(
+        MaterialApp(
+          home: EventDetailsScreen(
+            event: testEvent,
+            viewModel: viewModel,
+          ),
+        ),
+      );
+
+      // Assert: Edit button should be visible
+      expect(find.byIcon(Icons.edit), findsOneWidget);
+      expect(find.byTooltip('Edit Event'), findsOneWidget);
+    });
+
+    testWidgets('Edit button is not visible when viewModel is null',
+        (WidgetTester tester) async {
+      // Arrange: Build the widget without viewModel
+      await tester.pumpWidget(
+        MaterialApp(
+          home: EventDetailsScreen(
+            event: testEvent,
+            viewModel: null,
+          ),
+        ),
+      );
+
+      // Assert: Edit button should not be visible
+      expect(find.byIcon(Icons.edit), findsNothing);
+    });
+
+    testWidgets('Tapping edit button navigates to edit form',
+        (WidgetTester tester) async {
+      // Arrange: Build the widget with navigation
+      await tester.pumpWidget(
+        MaterialApp(
+          home: EventDetailsScreen(
+            event: testEvent,
+            viewModel: viewModel,
+          ),
+          routes: {
+            '/event': (context) {
+              final args = ModalRoute.of(context)?.settings.arguments
+                  as Map<String, dynamic>?;
+              final eventToEdit = args?['eventToEdit'] as WellnessEvent?;
+              
+              // Verify the event is passed for editing
+              expect(eventToEdit, isNotNull);
+              expect(eventToEdit?.id, 'test-event-2');
+              
+              return const Scaffold(
+                body: Text('Edit Form'),
+              );
+            },
+          },
+        ),
+      );
+
+      // Act: Tap the edit button
+      await tester.tap(find.byIcon(Icons.edit));
+      await tester.pumpAndSettle();
+
+      // Assert: Should navigate to edit form
+      expect(find.text('Edit Form'), findsOneWidget);
+    });
+  });
 }
