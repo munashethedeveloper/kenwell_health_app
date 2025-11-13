@@ -17,5 +17,14 @@ class EventRepository {
     _mockEvents.removeWhere((e) => e.id == id);
   }
 
+  /// Updates an existing event in the repository
+  Future<void> updateEvent(WellnessEvent updatedEvent) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    final index = _mockEvents.indexWhere((e) => e.id == updatedEvent.id);
+    if (index != -1) {
+      _mockEvents[index] = updatedEvent;
+    }
+  }
+
   void addEvent(WellnessEvent e) => _mockEvents.add(e);
 }

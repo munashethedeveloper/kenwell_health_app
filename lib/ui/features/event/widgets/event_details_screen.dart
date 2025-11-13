@@ -30,6 +30,12 @@ class EventDetailsScreen extends StatelessWidget {
         actions: [
           if (viewModel != null)
             IconButton(
+              icon: const Icon(Icons.edit, color: Colors.white),
+              tooltip: 'Edit Event',
+              onPressed: () => _navigateToEditEvent(context),
+            ),
+          if (viewModel != null)
+            IconButton(
               icon: const Icon(Icons.delete, color: Colors.white),
               tooltip: 'Delete Event',
               onPressed: () => _showDeleteConfirmation(context),
@@ -120,6 +126,45 @@ class EventDetailsScreen extends StatelessWidget {
         );
       },
     );
+  }
+
+  /// Navigates to the event form screen for editing
+  void _navigateToEditEvent(BuildContext context) {
+    Navigator.pushNamed(
+      context,
+      '/event',
+      arguments: {
+        'date': event.date,
+        'existingEvent': event,
+        'onSave': (WellnessEvent updatedEvent) {
+          _updateEvent(context, updatedEvent);
+        },
+      },
+    );
+  }
+
+  /// Updates the event and shows a Snackbar with undo option
+  void _updateEvent(BuildContext context, WellnessEvent updatedEvent) {
+    final previousEvent = viewModel?.updateEvent(updatedEvent);
+
+    if (previousEvent != null) {
+      // Navigate back after update
+      Navigator.of(context).pop();
+
+      // Show Snackbar with undo option
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Event updated'),
+          action: SnackBarAction(
+            label: 'UNDO',
+            onPressed: () {
+              viewModel?.updateEvent(previousEvent);
+            },
+          ),
+          duration: const Duration(seconds: 5),
+        ),
+      );
+    }
   }
 
   /// Deletes the event and shows a Snackbar with undo option
