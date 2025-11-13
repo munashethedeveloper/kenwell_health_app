@@ -96,5 +96,134 @@ void main() {
       final fetchedAfter = await repository.fetchEventById('test-id-2');
       expect(fetchedAfter, isNull);
     });
+
+    test('updateEvent updates event in repository', () async {
+      // Arrange: Add an event to the repository
+      final event = WellnessEvent(
+        id: 'test-id-3',
+        title: 'Original Title',
+        date: DateTime(2024, 3, 15),
+        venue: 'Original Venue',
+        address: 'Original Address',
+        onsiteContactPerson: 'John Doe',
+        onsiteContactNumber: '1234567890',
+        onsiteContactEmail: 'john@example.com',
+        aeContactPerson: 'Jane Doe',
+        aeContactNumber: '0987654321',
+        servicesRequested: 'HRA',
+        expectedParticipation: 50,
+        nonMembers: 10,
+        passports: 5,
+        nurses: 2,
+        coordinators: 1,
+        multiplyPromoters: 3,
+        setUpTime: '08:00 AM',
+        startTime: '09:00 AM',
+        endTime: '05:00 PM',
+        strikeDownTime: '06:00 PM',
+        mobileBooths: 'Yes',
+        medicalAid: 'Yes',
+      );
+      repository.addEvent(event);
+
+      // Act: Update the event with new title and venue
+      final updatedEvent = event.copyWith(
+        title: 'Updated Title',
+        venue: 'Updated Venue',
+      );
+      await repository.updateEvent(updatedEvent);
+
+      // Assert: Fetched event should have updated values
+      final fetchedEvent = await repository.fetchEventById('test-id-3');
+      expect(fetchedEvent, isNotNull);
+      expect(fetchedEvent?.title, 'Updated Title');
+      expect(fetchedEvent?.venue, 'Updated Venue');
+      expect(fetchedEvent?.address, 'Original Address'); // unchanged
+    });
+
+    test('updateEvent with non-existent id completes without error', () async {
+      // Arrange: Create an event that doesn't exist in repository
+      final event = WellnessEvent(
+        id: 'non-existent-id',
+        title: 'Test Event',
+        date: DateTime(2024, 4, 20),
+        venue: 'Test Venue',
+        address: 'Test Address',
+        onsiteContactPerson: 'John Doe',
+        onsiteContactNumber: '1234567890',
+        onsiteContactEmail: 'john@example.com',
+        aeContactPerson: 'Jane Doe',
+        aeContactNumber: '0987654321',
+        servicesRequested: 'HRA',
+        expectedParticipation: 50,
+        nonMembers: 10,
+        passports: 5,
+        nurses: 2,
+        coordinators: 1,
+        multiplyPromoters: 3,
+        setUpTime: '08:00 AM',
+        startTime: '09:00 AM',
+        endTime: '05:00 PM',
+        strikeDownTime: '06:00 PM',
+        mobileBooths: 'Yes',
+        medicalAid: 'Yes',
+      );
+
+      // Act: Update a non-existent event
+      await repository.updateEvent(event);
+
+      // Assert: No exception should be thrown
+      expect(true, isTrue);
+    });
+
+    test('updateEvent persists all field changes', () async {
+      // Arrange: Add an event
+      final event = WellnessEvent(
+        id: 'test-id-4',
+        title: 'Original',
+        date: DateTime(2024, 5, 10),
+        venue: 'Venue A',
+        address: 'Address A',
+        onsiteContactPerson: 'Contact A',
+        onsiteContactNumber: '1111111111',
+        onsiteContactEmail: 'a@example.com',
+        aeContactPerson: 'AE A',
+        aeContactNumber: '2222222222',
+        servicesRequested: 'HRA',
+        expectedParticipation: 30,
+        nonMembers: 5,
+        passports: 3,
+        nurses: 2,
+        coordinators: 1,
+        multiplyPromoters: 2,
+        setUpTime: '08:00 AM',
+        startTime: '09:00 AM',
+        endTime: '05:00 PM',
+        strikeDownTime: '06:00 PM',
+        mobileBooths: 'Yes',
+        medicalAid: 'Yes',
+      );
+      repository.addEvent(event);
+
+      // Act: Update multiple fields
+      final updatedEvent = event.copyWith(
+        title: 'Updated',
+        venue: 'Venue B',
+        expectedParticipation: 100,
+        nurses: 5,
+      );
+      await repository.updateEvent(updatedEvent);
+
+      // Assert: All updated fields should persist
+      final fetchedEvent = await repository.fetchEventById('test-id-4');
+      expect(fetchedEvent, isNotNull);
+      expect(fetchedEvent?.title, 'Updated');
+      expect(fetchedEvent?.venue, 'Venue B');
+      expect(fetchedEvent?.expectedParticipation, 100);
+      expect(fetchedEvent?.nurses, 5);
+      // Verify unchanged fields
+      expect(fetchedEvent?.address, 'Address A');
+      expect(fetchedEvent?.onsiteContactPerson, 'Contact A');
+    });
   });
 }
