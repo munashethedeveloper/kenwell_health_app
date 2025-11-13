@@ -138,6 +138,19 @@ class EventViewModel extends ChangeNotifier {
     return null;
   }
 
+  /// Updates an existing event in the list
+  /// Returns the previous version of the event for potential undo operation
+  WellnessEvent? updateEvent(WellnessEvent updatedEvent) {
+    final index = _events.indexWhere((e) => e.id == updatedEvent.id);
+    if (index != -1) {
+      final previousEvent = _events[index];
+      _events[index] = updatedEvent;
+      notifyListeners();
+      return previousEvent;
+    }
+    return null;
+  }
+
   /// Restores a previously deleted event (undo functionality)
   void restoreEvent(WellnessEvent event) {
     _events.add(event);

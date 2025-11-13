@@ -7,6 +7,7 @@ class EventScreen extends StatelessWidget {
   final EventViewModel viewModel;
   final DateTime date;
   final List<WellnessEvent>? existingEvents;
+  final WellnessEvent? existingEvent;
   final void Function(WellnessEvent) onSave;
 
   const EventScreen({
@@ -14,14 +15,22 @@ class EventScreen extends StatelessWidget {
     required this.viewModel,
     required this.date,
     this.existingEvents,
+    this.existingEvent,
     required this.onSave,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Determine if we're editing an event
+    final WellnessEvent? eventToEdit = existingEvent ?? 
+        (existingEvents != null && existingEvents!.isNotEmpty 
+            ? existingEvents!.first 
+            : null);
+    final bool isEditMode = eventToEdit != null;
+
     // Load existing event if editing
-    if (existingEvents != null && existingEvents!.isNotEmpty) {
-      viewModel.loadExistingEvent(existingEvents!.first);
+    if (eventToEdit != null) {
+      viewModel.loadExistingEvent(eventToEdit);
     } else {
       // Initialize the dateController with the calendar-selected date
       viewModel.dateController.text =
@@ -58,7 +67,7 @@ class EventScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: const KenwellAppBar(title: 'Add Event'),
+      appBar: KenwellAppBar(title: isEditMode ? 'Edit Event' : 'Add Event'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -199,8 +208,19 @@ class EventScreen extends StatelessWidget {
                   // Use date from the dateController if available
                   final eventDate =
                       DateTime.tryParse(viewModel.dateController.text) ?? date;
-                  final newEvent = viewModel.buildEvent(eventDate);
-                  onSave(newEvent);
+                  
+                  WellnessEvent eventToSave;
+                  if (isEditMode) {
+                    // Create updated event with existing ID
+                    eventToSave = viewModel.buildEvent(eventDate).copyWith(
+                      id: eventToEdit!.id,
+                    );
+                  } else {
+                    // Create new event
+                    eventToSave = viewModel.buildEvent(eventDate);
+                  }
+                  
+                  onSave(eventToSave);
                   viewModel.clearControllers();
                   Navigator.pop(context);
                 },
