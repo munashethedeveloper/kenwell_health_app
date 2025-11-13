@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../domain/models/wellness_event.dart';
+import '../view_model/event_view_model.dart';
 
 class EventDetailsScreen extends StatelessWidget {
   final WellnessEvent event;
+  final EventViewModel? viewModel;
 
-  const EventDetailsScreen({super.key, required this.event});
+  const EventDetailsScreen({
+    super.key,
+    required this.event,
+    this.viewModel,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +27,14 @@ class EventDetailsScreen extends StatelessWidget {
         automaticallyImplyLeading: true,
         backgroundColor: const Color(0xFF201C58),
         iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          if (viewModel != null)
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.white),
+              tooltip: 'Delete Event',
+              onPressed: () => _showDeleteConfirmation(context),
+            ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -77,5 +91,58 @@ class EventDetailsScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  /// Shows a confirmation dialog before deleting the event
+  void _showDeleteConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Delete Event'),
+          content: const Text(
+            'Are you sure you want to delete this event? You can undo this action.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                _deleteEvent(context);
+              },
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// Deletes the event and shows a Snackbar with undo option
+  void _deleteEvent(BuildContext context) {
+    final deletedEvent = viewModel?.deleteEvent(event.id);
+
+    if (deletedEvent != null) {
+      // Navigate back after deletion
+      Navigator.of(context).pop();
+
+      // Show Snackbar with undo option
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Event deleted'),
+          action: SnackBarAction(
+            label: 'UNDO',
+            onPressed: () {
+              viewModel?.restoreEvent(deletedEvent);
+            },
+          ),
+          duration: const Duration(seconds: 5),
+        ),
+      );
+    }
   }
 }

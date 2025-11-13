@@ -208,41 +208,107 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 ),
                               ),
                               ...events.map(
-                                (event) => Card(
-                                  margin: const EdgeInsets.symmetric(
-                                      vertical: 6, horizontal: 12),
-                                  child: ListTile(
-                                    leading: CircleAvatar(
-                                      backgroundColor: _categoryColor(
-                                          event.servicesRequested),
-                                    ),
-                                    title: Text(
-                                      event.title,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    subtitle: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        if (event.address.isNotEmpty)
-                                          Text('Address: ${event.address}'),
-                                        if (event.venue.isNotEmpty)
-                                          Text('Venue: ${event.venue}'),
-                                        if (event.startTime.isNotEmpty)
-                                          Text('Start: ${event.startTime}'),
-                                        if (event.endTime.isNotEmpty)
-                                          Text('End: ${event.endTime}'),
-                                      ],
-                                    ),
-                                    onTap: () {
-                                      // Navigate to EventDetailsScreen with the actual event
-                                      Navigator.pushNamed(
-                                        context,
-                                        RouteNames.eventDetails,
-                                        arguments: {'event': event},
+                                (event) => Dismissible(
+                                  key: Key(event.id),
+                                  direction: DismissDirection.endToStart,
+                                  confirmDismiss: (direction) async {
+                                    return await showDialog(
+                                      context: context,
+                                      builder: (BuildContext dialogContext) {
+                                        return AlertDialog(
+                                          title: const Text('Delete Event'),
+                                          content: const Text(
+                                            'Are you sure you want to delete this event?',
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.of(dialogContext)
+                                                      .pop(false),
+                                              child: const Text('Cancel'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.of(dialogContext)
+                                                      .pop(true),
+                                              style: TextButton.styleFrom(
+                                                  foregroundColor: Colors.red),
+                                              child: const Text('Delete'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                  onDismissed: (direction) {
+                                    final deletedEvent =
+                                        widget.eventVM.deleteEvent(event.id);
+                                    if (deletedEvent != null) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content:
+                                              const Text('Event deleted'),
+                                          action: SnackBarAction(
+                                            label: 'UNDO',
+                                            onPressed: () {
+                                              widget.eventVM
+                                                  .restoreEvent(deletedEvent);
+                                            },
+                                          ),
+                                          duration: const Duration(seconds: 5),
+                                        ),
                                       );
-                                    },
+                                    }
+                                  },
+                                  background: Container(
+                                    alignment: Alignment.centerRight,
+                                    padding: const EdgeInsets.only(right: 20),
+                                    color: Colors.red,
+                                    child: const Icon(
+                                      Icons.delete,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  child: Card(
+                                    margin: const EdgeInsets.symmetric(
+                                        vertical: 6, horizontal: 12),
+                                    child: ListTile(
+                                      leading: CircleAvatar(
+                                        backgroundColor: _categoryColor(
+                                            event.servicesRequested),
+                                      ),
+                                      title: Text(
+                                        event.title,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      subtitle: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          if (event.address.isNotEmpty)
+                                            Text('Address: ${event.address}'),
+                                          if (event.venue.isNotEmpty)
+                                            Text('Venue: ${event.venue}'),
+                                          if (event.startTime.isNotEmpty)
+                                            Text('Start: ${event.startTime}'),
+                                          if (event.endTime.isNotEmpty)
+                                            Text('End: ${event.endTime}'),
+                                        ],
+                                      ),
+                                      onTap: () {
+                                        // Navigate to EventDetailsScreen with the actual event
+                                        Navigator.pushNamed(
+                                          context,
+                                          RouteNames.eventDetails,
+                                          arguments: {
+                                            'event': event,
+                                            'viewModel': widget.eventVM,
+                                          },
+                                        );
+                                      },
+                                    ),
                                   ),
                                 ),
                               ),

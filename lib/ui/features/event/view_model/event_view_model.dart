@@ -126,6 +126,24 @@ class EventViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Deletes an event by removing it from the list
+  /// Returns the deleted event for potential undo operation
+  WellnessEvent? deleteEvent(String eventId) {
+    final index = _events.indexWhere((e) => e.id == eventId);
+    if (index != -1) {
+      final deletedEvent = _events.removeAt(index);
+      notifyListeners();
+      return deletedEvent;
+    }
+    return null;
+  }
+
+  /// Restores a previously deleted event (undo functionality)
+  void restoreEvent(WellnessEvent event) {
+    _events.add(event);
+    notifyListeners();
+  }
+
   List<WellnessEvent> getEventsForDate(DateTime date) {
     return _events
         .where((e) =>
