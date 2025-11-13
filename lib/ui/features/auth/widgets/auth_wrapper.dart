@@ -13,7 +13,7 @@ class AuthWrapper extends StatelessWidget {
 
     if (authVM.isLoggedIn) {
       // ✅ After login, show main navigation screen
-      return const MainNavigationScreen();
+      return const KenwellMainNavigationScreen();
     } else {
       return const LoginScreen();
     }

@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../data/services/auth_service.dart';
-import '../../../../domain/models/user_model.dart';
 
-class LoginViewModel extends ChangeNotifier {
+class ForgotPasswordViewModel extends ChangeNotifier {
   final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
@@ -14,16 +11,15 @@ class LoginViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<UserModel?> login() async {
+  /// Returns true if reset link was sent successfully
+  Future<bool> sendResetLink() async {
     setLoading(true);
     try {
-      final user = await AuthService().login(
-        emailController.text.trim(),
-        passwordController.text.trim(),
-      );
-      return user;
+      final success =
+          await AuthService().forgotPassword(emailController.text.trim());
+      return success;
     } catch (_) {
-      return null;
+      return false;
     } finally {
       setLoading(false);
     }
@@ -32,7 +28,6 @@ class LoginViewModel extends ChangeNotifier {
   @override
   void dispose() {
     emailController.dispose();
-    passwordController.dispose();
     super.dispose();
   }
 }

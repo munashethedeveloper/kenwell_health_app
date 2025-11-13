@@ -41,39 +41,10 @@ class HIVTestNursingInterventionViewModel extends ChangeNotifier {
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
 
-  // --- Setters ---
+  // --- Setters for Yes/No Questions ---
   void setWindowPeriod(String value) {
     windowPeriod = value;
     notifyListeners();
-  }
-
-  void setFollowUpClinic(bool value) {
-    followUpClinic = value;
-    notifyListeners();
-  }
-
-  void setFollowUpPrivateDoctor(bool value) {
-    followUpPrivateDoctor = value;
-    notifyListeners();
-  }
-
-  void setFollowUpOther(bool value) {
-    followUpOther = value;
-    if (!value) followUpOtherDetailsController.clear();
-    notifyListeners();
-  }
-
-  Future<void> pickFollowUpDate(BuildContext context) async {
-    DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2030),
-    );
-    if (picked != null) {
-      followUpDateController.text = DateFormat('yyyy-MM-dd').format(picked);
-      notifyListeners();
-    }
   }
 
   void setExpectedResult(String value) {
@@ -96,6 +67,23 @@ class HIVTestNursingInterventionViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // --- Setters for Checkboxes ---
+  void setFollowUpClinic(bool value) {
+    followUpClinic = value;
+    notifyListeners();
+  }
+
+  void setFollowUpPrivateDoctor(bool value) {
+    followUpPrivateDoctor = value;
+    notifyListeners();
+  }
+
+  void setFollowUpOther(bool value) {
+    followUpOther = value;
+    if (!value) followUpOtherDetailsController.clear();
+    notifyListeners();
+  }
+
   void setNotReferred(bool value) {
     notReferred = value;
     if (!value) notReferredReasonController.clear();
@@ -112,6 +100,13 @@ class HIVTestNursingInterventionViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // --- Follow-up date handler ---
+  void handleFollowUpDate(DateTime? date) {
+    if (date == null) return; // ignore if no date selected
+    followUpDateController.text = DateFormat('yyyy-MM-dd').format(date);
+    notifyListeners();
+  }
+
   // --- Form validation ---
   bool get isFormValid {
     if (windowPeriod.isEmpty) return false;
@@ -124,7 +119,7 @@ class HIVTestNursingInterventionViewModel extends ChangeNotifier {
     return true;
   }
 
-  /// ✅ Converts all HIV Test Nursing Intervention data to a Map
+  /// Converts all HIV Test Nursing Intervention data to a Map
   Map<String, dynamic> toMap() {
     return {
       'windowPeriod': windowPeriod,

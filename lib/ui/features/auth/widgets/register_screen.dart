@@ -1,61 +1,47 @@
 import 'package:flutter/material.dart';
-import 'package:kenwell_health_app/ui/features/auth/widgets/login_screen.dart';
+import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
-import '../../../../data/services/auth_service.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/logo/app_logo.dart';
+import '../../../shared/ui/form/custom_text_field.dart';
+import '../view_models/register_view_model.dart';
+import 'login_screen.dart';
 
-class RegisterScreen extends StatefulWidget {
+class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => RegisterViewModel(),
+      child: const _RegisterScreenBody(),
+    );
+  }
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
-  final _formKey = GlobalKey<FormState>();
+class _RegisterScreenBody extends StatelessWidget {
+  const _RegisterScreenBody({super.key});
 
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
-  final _roleController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _usernameController = TextEditingController();
-  final _firstNameController = TextEditingController();
-  final _lastNameController = TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    final vm = context.watch<RegisterViewModel>();
+    final formKey = GlobalKey<FormState>();
 
-  bool _isLoading = false;
+    void _onRegister() async {
+      if (!vm.validateForm(formKey)) return;
+      if (!vm.validatePasswords()) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Passwords do not match')),
+        );
+        return;
+      }
 
-  void _register() async {
-    if (!_formKey.currentState!.validate()) return;
-    if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Passwords do not match')),
-      );
-      return;
-    }
-
-    setState(() => _isLoading = true);
-
-    try {
-      final user = await AuthService().register(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-        role: _roleController.text.trim(),
-        phoneNumber: _phoneController.text.trim(),
-        username: _usernameController.text.trim(),
-        firstName: _firstNameController.text.trim(),
-        lastName: _lastNameController.text.trim(),
-      );
-
-      if (!mounted) return;
-
-      if (user != null) {
+      final success = await vm.register();
+      if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
               content: Text('Registration successful! Please log in.')),
         );
-
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -66,102 +52,62 @@ class _RegisterScreenState extends State<RegisterScreen> {
               content: Text('Registration failed. Email may already exist.')),
         );
       }
-    } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Registration error: $e')));
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
     }
-  }
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
-    _roleController.dispose();
-    _phoneController.dispose();
-    _usernameController.dispose();
-    _firstNameController.dispose();
-    _lastNameController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: const KenwellAppBar(
           title: 'Register', automaticallyImplyLeading: false),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
-          key: _formKey,
+          key: formKey,
           child: Column(
             children: [
               const SizedBox(height: 40),
-              const AppLogo(size: 250),
+              const KenwellAppLogo(size: 250),
               const SizedBox(height: 30),
-              // ===== New Fields =====
-              TextFormField(
-                controller: _firstNameController,
-                decoration: const InputDecoration(labelText: 'First Name'),
-                validator: (val) => val!.isEmpty ? 'Enter first name' : null,
+              // ===== Form Fields =====
+              KenwellTextField(
+                label: 'First Name',
+                controller: vm.firstNameController,
               ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _lastNameController,
-                decoration: const InputDecoration(labelText: 'Last Name'),
-                validator: (val) => val!.isEmpty ? 'Enter last name' : null,
+              KenwellTextField(
+                label: 'Last Name',
+                controller: vm.lastNameController,
               ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _usernameController,
-                decoration: const InputDecoration(labelText: 'Username'),
-                validator: (val) => val!.isEmpty ? 'Enter username' : null,
+              KenwellTextField(
+                label: 'Username',
+                controller: vm.usernameController,
               ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _roleController,
-                decoration: const InputDecoration(labelText: 'Role'),
-                validator: (val) => val!.isEmpty ? 'Enter role' : null,
+              KenwellTextField(
+                label: 'Role',
+                controller: vm.roleController,
               ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _phoneController,
-                decoration: const InputDecoration(labelText: 'Phone Number'),
+              KenwellTextField(
+                label: 'Phone Number',
+                controller: vm.phoneController,
                 keyboardType: TextInputType.phone,
-                validator: (val) => val!.isEmpty ? 'Enter phone number' : null,
               ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
+              KenwellTextField(
+                label: 'Email',
+                controller: vm.emailController,
                 keyboardType: TextInputType.emailAddress,
-                validator: (val) => val!.isEmpty ? 'Enter email' : null,
               ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _passwordController,
+              KenwellTextField(
+                label: 'Password',
+                controller: vm.passwordController,
                 obscureText: true,
-                decoration: const InputDecoration(labelText: 'Password'),
-                validator: (val) => val!.length < 6
-                    ? 'Password must be at least 6 characters'
-                    : null,
               ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _confirmPasswordController,
+              KenwellTextField(
+                label: 'Confirm Password',
+                controller: vm.confirmPasswordController,
                 obscureText: true,
-                decoration:
-                    const InputDecoration(labelText: 'Confirm Password'),
-                validator: (val) =>
-                    val!.isEmpty ? 'Confirm your password' : null,
               ),
               const SizedBox(height: 20),
               CustomPrimaryButton(
                 label: 'Register',
-                onPressed: _register,
-                isBusy: _isLoading,
+                onPressed: _onRegister,
+                isBusy: vm.isLoading,
               ),
               const SizedBox(height: 10),
               TextButton(
@@ -176,7 +122,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   style: TextStyle(decoration: TextDecoration.underline),
                 ),
               ),
-            ],
+            ]
+                .map((widget) => Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: widget,
+                    ))
+                .toList(),
           ),
         ),
       ),

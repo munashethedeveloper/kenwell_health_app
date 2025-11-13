@@ -35,14 +35,6 @@ class CalendarViewModel extends ChangeNotifier {
         .toList();
   }
 
-  int getTotalEventsThisMonth(DateTime month) =>
-      getEventsForMonth(month).length;
-
-  int getUpcomingEvents() {
-    final today = DateTime.now();
-    return allEvents.where((e) => e.date.isAfter(today)).length;
-  }
-
   void addEvent(WellnessEvent event) {
     final key = _normalizeDate(event.date);
     _events.putIfAbsent(key, () => []);

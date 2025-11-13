@@ -74,7 +74,7 @@ class SplashScreenState extends State<SplashScreen>
       backgroundColor: Colors.blueAccent,
       body: FadeTransition(
         opacity: _animation,
-        child: const Center(child: AppLogo(size: 150)),
+        child: const Center(child: KenwellAppLogo(size: 150)),
       ),
     );
   }

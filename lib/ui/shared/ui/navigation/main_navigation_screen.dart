@@ -11,14 +11,15 @@ import '../../../features/wellness/widgets/wellness_flow_screen.dart';
 import '../../../features/wellness/view_model/wellness_flow_view_model.dart';
 import '../../../features/event/view_model/event_view_model.dart';
 
-class MainNavigationScreen extends StatefulWidget {
-  const MainNavigationScreen({super.key});
+class KenwellMainNavigationScreen extends StatefulWidget {
+  const KenwellMainNavigationScreen({super.key});
 
   @override
-  State<MainNavigationScreen> createState() => _MainNavigationScreenState();
+  State<KenwellMainNavigationScreen> createState() =>
+      _MainNavigationScreenState();
 }
 
-class _MainNavigationScreenState extends State<MainNavigationScreen> {
+class _MainNavigationScreenState extends State<KenwellMainNavigationScreen> {
   int _currentIndex = 0;
 
   @override

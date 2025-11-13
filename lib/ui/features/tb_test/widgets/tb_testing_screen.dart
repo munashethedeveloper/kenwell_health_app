@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/custom_yes_no_question.dart';
+import '../../../shared/ui/form/custom_date_picker.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/tb_testing_view_model.dart';
 
@@ -111,23 +113,10 @@ class TBTestingScreen extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 10),
             ),
             if (viewModel.treatedBefore == 'Yes')
-              KenwellTextField(
-                label: 'When were you treated?',
+              KenwellDatePickerField(
                 controller: viewModel.treatedDateController,
-                readOnly: true,
-                onTap: () async {
-                  FocusScope.of(context).requestFocus(FocusNode());
-                  final pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2100),
-                  );
-                  if (pickedDate != null) {
-                    viewModel.treatedDateController.text =
-                        '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
-                  }
-                },
+                label: 'When were you treated?',
+                displayFormat: DateFormat('dd/MM/yyyy'),
               ),
             KenwellYesNoQuestion<String>(
               question: 'Did you complete the treatment?',

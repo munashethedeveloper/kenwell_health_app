@@ -19,16 +19,25 @@ class ConsentScreenViewModel extends ChangeNotifier {
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
 
+  ConsentScreenViewModel() {
+    // 👇 Rebuild UI whenever user types something
+    venueController.addListener(notifyListeners);
+    dateController.addListener(notifyListeners);
+    practitionerController.addListener(notifyListeners);
+
+    // 👇 Rebuild UI whenever signature changes (draw or clear)
+    signatureController.addListener(() => notifyListeners());
+  }
+
+  // ✅ Dynamic validation
   bool get isFormValid =>
-      hra &&
-      vct &&
-      tb &&
-      hiv &&
       venueController.text.isNotEmpty &&
       dateController.text.isNotEmpty &&
       practitionerController.text.isNotEmpty &&
-      signatureController.isNotEmpty;
+      signatureController.isNotEmpty &&
+      (hra || vct || tb || hiv); // only need at least one checkbox
 
+  // ✅ Toggle a checkbox and notify listeners
   void toggleCheckbox(String field, bool? value) {
     switch (field) {
       case 'hra':
@@ -47,22 +56,27 @@ class ConsentScreenViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ✅ Clear the signature
   void clearSignature() {
     signatureController.clear();
     notifyListeners();
   }
 
+  // ✅ Simulated submit action
   Future<void> submitConsent() async {
+    if (!isFormValid) return;
+
     _isSubmitting = true;
     notifyListeners();
 
+    // Simulate a delay for loading state
     await Future.delayed(const Duration(milliseconds: 600));
 
     _isSubmitting = false;
     notifyListeners();
   }
 
-  /// Converts the consent data to a Map for submission
+  // ✅ Convert form data to Map
   Map<String, dynamic> toMap() {
     return {
       'venue': venueController.text,

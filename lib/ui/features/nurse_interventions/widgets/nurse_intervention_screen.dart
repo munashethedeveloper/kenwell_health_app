@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:signature/signature.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/form/custom_checkbox_field.dart';
+import '../../../shared/ui/form/custom_date_picker.dart';
+import '../../../shared/ui/form/custom_dropdown_field.dart';
+import '../../../shared/ui/form/custom_signature_pad.dart';
+import '../../../shared/ui/form/custom_text_field.dart';
+import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/nurse_intervention_view_model.dart';
 
 class NurseInterventionScreen extends StatelessWidget {
@@ -16,103 +22,105 @@ class NurseInterventionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<NurseInterventionViewModel>();
+    final vm = context.watch<NurseInterventionViewModel>();
 
     return Scaffold(
       appBar: const KenwellAppBar(
-          title: 'Health Risk Asessessment Nurse Intervention',
-          automaticallyImplyLeading: false),
+        title: 'Health Risk Assessment Nurse Intervention',
+        automaticallyImplyLeading: false,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- Window Period & Other Initial Fields ---
-            _buildDropdown(
-              'Window period risk assessment',
-              viewModel.windowPeriod,
-              viewModel.windowPeriodOptions,
-              viewModel.setWindowPeriod,
+            // --- Dropdowns (Using KenwellDropdownField) ---
+            KenwellDropdownField<WindowPeriod>(
+              label: 'Window period risk assessment',
+              value: vm.windowPeriod,
+              items: WindowPeriod.values,
+              optionLabelBuilder: (e) => e.toString().split('.').last,
+              onChanged: (val) => vm.toggleField('windowPeriod', val),
             ),
-            const SizedBox(height: 12),
-            _buildDropdown(
-              'Did patient expect HIV (+) result?',
-              viewModel.expectedResult,
-              viewModel.expectedResultOptions,
-              viewModel.setExpectedResult,
+            KenwellDropdownField<FollowUpLocation>(
+              label: 'Follow-up test location',
+              value: vm.followUpLocation,
+              items: FollowUpLocation.values,
+              optionLabelBuilder: (e) => e.toString().split('.').last,
+              onChanged: (val) => vm.toggleField('followUpLocation', val),
             ),
-            const SizedBox(height: 12),
-            _buildDropdown(
-              'Difficulty in dealing with result?',
-              viewModel.difficultyDealingResult,
-              viewModel.difficultyOptions,
-              viewModel.setDifficultyDealingResult,
+            if (vm.isFollowUpOtherSelected)
+              KenwellTextField(
+                label: 'Other location detail',
+                controller: vm.followUpOtherController,
+              ),
+            KenwellDatePickerField(
+              controller: vm.followUpDateController,
+              label: 'Follow-up test date',
+              displayFormat: DateFormat('dd/MM/yyyy'),
             ),
-            const SizedBox(height: 12),
-            _buildDropdown(
-              'Urgent psychosocial follow-up needed?',
-              viewModel.urgentPsychosocial,
-              viewModel.urgentOptions,
-              viewModel.setUrgentPsychosocial,
-            ),
-            const SizedBox(height: 12),
-            _buildDropdown(
-              'Committed to change behavior?',
-              viewModel.committedToChange,
-              viewModel.committedOptions,
-              viewModel.setCommittedToChange,
-            ),
-            const SizedBox(height: 12),
 
-            // --- Referral Nursing Interventions ---
+            const SizedBox(height: 24),
+
+            KenwellDropdownField<ExpectedResult>(
+              label: 'Expected HIV result',
+              value: vm.expectedResult,
+              items: ExpectedResult.values,
+              optionLabelBuilder: (e) => e.toString().split('.').last,
+              onChanged: (val) => vm.toggleField('expectedResult', val),
+            ),
+            KenwellDropdownField<DifficultyDealingResult>(
+              label: 'Difficulty dealing with result',
+              value: vm.difficultyDealingResult,
+              items: DifficultyDealingResult.values,
+              optionLabelBuilder: (e) => e.toString().split('.').last,
+              onChanged: (val) =>
+                  vm.toggleField('difficultyDealingResult', val),
+            ),
+            KenwellDropdownField<UrgentPsychosocial>(
+              label: 'Urgent psychosocial follow-up',
+              value: vm.urgentPsychosocial,
+              items: UrgentPsychosocial.values,
+              optionLabelBuilder: (e) => e.toString().split('.').last,
+              onChanged: (val) => vm.toggleField('urgentPsychosocial', val),
+            ),
+            KenwellDropdownField<CommittedToChange>(
+              label: 'Committed to behavior change',
+              value: vm.committedToChange,
+              items: CommittedToChange.values,
+              optionLabelBuilder: (e) => e.toString().split('.').last,
+              onChanged: (val) => vm.toggleField('committedToChange', val),
+            ),
+
+            const SizedBox(height: 24),
+
+            // --- Referral Checkboxes (using KenwellCheckbox) ---
             const Text(
               'Referral Nursing Interventions',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            CheckboxListTile(
-              title: const Text('Patient not referred'),
-              value: viewModel.patientNotReferred,
-              onChanged: (val) => viewModel.setPatientNotReferred(val ?? false),
-            ),
-            if (viewModel.patientNotReferred)
-              _buildTextField(
-                'Reason patient not referred',
-                viewModel.notReferredReasonController,
-              ),
-            CheckboxListTile(
-              title: const Text('Patient referred to GP'),
-              value: viewModel.referredToGP,
-              onChanged: (val) => viewModel.setReferredToGP(val ?? false),
-            ),
-            CheckboxListTile(
-              title: const Text('Patient referred to State HIV clinic'),
-              value: viewModel.referredToStateClinic,
-              onChanged: (val) =>
-                  viewModel.setReferredToStateClinic(val ?? false),
-            ),
 
-            // --- Follow-up Location & Date ---
-            if (viewModel.windowPeriod == 'Yes') ...[
-              const SizedBox(height: 12),
-              _buildDropdown(
-                'Follow-up location',
-                viewModel.followUpLocation,
-                viewModel.followUpLocationOptions,
-                viewModel.setFollowUpLocation,
+            KenwellCheckbox(
+              title: 'Patient Not Referred',
+              value: vm.patientNotReferred,
+              onChanged: (val) => vm.toggleField('patientNotReferred', val),
+            ),
+            if (vm.patientNotReferred)
+              KenwellTextField(
+                label: 'Reason',
+                controller: vm.notReferredReasonController,
               ),
-              if (viewModel.followUpLocation == 'Other')
-                _buildTextField(
-                  'Other location detail',
-                  viewModel.followUpOtherController,
-                ),
-              const SizedBox(height: 12),
-              _buildDateField(
-                context,
-                'Follow-up test date',
-                viewModel.followUpDateController,
-              ),
-            ],
+            KenwellCheckbox(
+              title: 'Referred to GP',
+              value: vm.referredToGP,
+              onChanged: (val) => vm.toggleField('referredToGP', val),
+            ),
+            KenwellCheckbox(
+              title: 'Referred to State Clinic',
+              value: vm.referredToStateClinic,
+              onChanged: (val) => vm.toggleField('referredToStateClinic', val),
+            ),
 
             const SizedBox(height: 24),
 
@@ -122,136 +130,50 @@ class NurseInterventionScreen extends StatelessWidget {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            _buildTextField(
-                'HIV Testing Nurse', viewModel.hivTestingNurseController),
-            const SizedBox(height: 12),
-            _buildTextField('Rank', viewModel.rankController),
+
+            KenwellTextField(
+              label: 'HIV Testing Nurse',
+              controller: vm.hivTestingNurseController,
+            ),
+            KenwellTextField(
+              label: 'Rank',
+              controller: vm.rankController,
+            ),
+            KenwellTextField(
+              label: 'SANC Number',
+              controller: vm.sancNumberController,
+            ),
+            KenwellDatePickerField(
+              controller: vm.nurseDateController,
+              label: 'Date',
+              displayFormat: DateFormat('dd/MM/yyyy'),
+            ),
+
             const SizedBox(height: 12),
 
             // --- Signature ---
-            const Text('Signature',
-                style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text(
+              'Signature',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
+            KenwellSignaturePad(
+              controller: vm.signatureController,
               height: 150,
-              child: Signature(
-                controller: viewModel.signatureController,
-                backgroundColor: Colors.white,
-              ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () => viewModel.signatureController.clear(),
-                  child: const Text('Clear'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
 
-            _buildTextField('SANC No', viewModel.sancNumberController),
-            const SizedBox(height: 12),
-            _buildDateField(context, 'Date', viewModel.nurseDateController),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
 
-            // --- Buttons ---
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                if (onPrevious != null)
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: onPrevious,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14.0),
-                      ),
-                      child: const Text('Previous'),
-                    ),
-                  ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: viewModel.isSubmitting
-                        ? null
-                        : () => viewModel.submitIntervention(context, onNext),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF90C048),
-                      padding: const EdgeInsets.symmetric(vertical: 14.0),
-                    ),
-                    child: viewModel.isSubmitting
-                        ? const CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation(Colors.white),
-                          )
-                        : const Text(
-                            'Next',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                  ),
-                ),
-              ],
+            // --- Navigation ---
+            KenwellFormNavigation(
+              onPrevious: onPrevious,
+              onNext: () => vm.submitIntervention(context, onNext),
+              isNextEnabled: vm.isFormValid && !vm.isSubmitting,
+              isNextBusy: vm.isSubmitting,
             ),
           ],
         ),
       ),
     );
   }
-}
-
-Widget _buildDropdown(String label, String? value, List<String> options,
-    Function(String?) onChanged) {
-  return DropdownButtonFormField<String>(
-    initialValue: value,
-    decoration: InputDecoration(
-      labelText: label,
-      border: const OutlineInputBorder(),
-    ),
-    items: options
-        .map((opt) => DropdownMenuItem(value: opt, child: Text(opt)))
-        .toList(),
-    onChanged: onChanged,
-  );
-}
-
-Widget _buildTextField(String label, TextEditingController controller) {
-  return Padding(
-    padding: const EdgeInsets.only(bottom: 12),
-    child: TextField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-      ),
-    ),
-  );
-}
-
-Widget _buildDateField(
-    BuildContext context, String label, TextEditingController controller) {
-  return Padding(
-    padding: const EdgeInsets.only(bottom: 12),
-    child: TextField(
-      controller: controller,
-      readOnly: true,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-      ),
-      onTap: () async {
-        FocusScope.of(context).requestFocus(FocusNode());
-        final pickedDate = await showDatePicker(
-          context: context,
-          initialDate: DateTime.now(),
-          firstDate: DateTime(2000),
-          lastDate: DateTime(2100),
-        );
-        if (pickedDate != null) {
-          controller.text =
-              '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
-        }
-      },
-    ),
-  );
 }

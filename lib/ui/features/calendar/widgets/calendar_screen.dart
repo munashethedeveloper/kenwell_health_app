@@ -1,51 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
-
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../routing/route_names.dart';
 import '../../event/widgets/event_screen.dart';
-import '../../event/view_model/event_view_model.dart';
-import '../../../../data/services/auth_service.dart';
+import '../view_model/calendar_view_model.dart';
 
 class CalendarScreen extends StatefulWidget {
-  final EventViewModel eventVM;
+  final CalendarViewModel vm;
 
-  const CalendarScreen({super.key, required this.eventVM});
+  const CalendarScreen({super.key, required this.vm});
 
   @override
   State<CalendarScreen> createState() => _CalendarScreenState();
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
-  DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
+  late final CalendarViewModel vm;
 
-  DateTime _normalizeDate(DateTime date) =>
-      DateTime(date.year, date.month, date.day);
-
-  List<WellnessEvent> _getEventsForDay(DateTime day) =>
-      widget.eventVM.getEventsForDate(day);
-
-  List<WellnessEvent> _getEventsForMonth(DateTime month) =>
-      widget.eventVM.events
-          .where((event) =>
-              event.date.year == month.year && event.date.month == month.month)
-          .toList();
-
-  void _goToPreviousMonth() {
-    setState(() =>
-        _focusedDay = DateTime(_focusedDay.year, _focusedDay.month - 1, 1));
+  @override
+  void initState() {
+    super.initState();
+    vm = widget.vm;
   }
 
-  void _goToNextMonth() {
-    setState(() =>
-        _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + 1, 1));
+  void _openEventScreen(DateTime date) {
+    final eventsForDay = vm.getEventsForDay(date);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => EventScreen(
+          date: date,
+          existingEvents: eventsForDay,
+          onSave: (newEvent) {
+            vm.addEvent(newEvent);
+          },
+        ),
+      ),
+    );
   }
 
   void _logout() async {
-    await AuthService().logout();
-    if (!mounted) return;
+    // Replace this with your AuthService logout if needed
     Navigator.pushReplacementNamed(context, RouteNames.login);
   }
 
@@ -61,6 +57,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
         return Colors.grey;
     }
   }
+
+  DateTime _normalizeDate(DateTime date) =>
+      DateTime(date.year, date.month, date.day);
 
   @override
   Widget build(BuildContext context) {
@@ -104,30 +103,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 TableCalendar(
                   firstDay: DateTime.utc(2020, 1, 1),
                   lastDay: DateTime.utc(3000, 12, 31),
-                  focusedDay: _focusedDay,
-                  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-                  eventLoader: _getEventsForDay,
+                  focusedDay: vm.focusedDay,
+                  selectedDayPredicate: (day) => isSameDay(vm.selectedDay, day),
+                  eventLoader: vm.getEventsForDay,
                   headerStyle: const HeaderStyle(formatButtonVisible: false),
                   onDaySelected: (selectedDay, focusedDay) {
                     setState(() {
-                      _selectedDay = selectedDay;
-                      _focusedDay = focusedDay;
+                      vm.setSelectedDay(selectedDay);
+                      vm.setFocusedDay(focusedDay);
                     });
-
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => EventScreen(
-                          date: selectedDay,
-                          existingEvents:
-                              widget.eventVM.getEventsForDate(selectedDay),
-                          onSave: (newEvent) {
-                            widget.eventVM.addEvent(newEvent);
-                          },
-                          viewModel: widget.eventVM,
-                        ),
-                      ),
-                    );
+                    _openEventScreen(selectedDay);
                   },
                 ),
               ],
@@ -136,7 +121,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
             // ===== Events List Tab =====
             Column(
               children: [
-                // === Month Navigation ===
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -145,10 +129,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     children: [
                       IconButton(
                         icon: const Icon(Icons.chevron_left),
-                        onPressed: _goToPreviousMonth,
+                        onPressed: () {
+                          setState(() => vm.goToPreviousMonth());
+                        },
                       ),
                       Text(
-                        DateFormat.yMMMM().format(_focusedDay),
+                        DateFormat.yMMMM().format(vm.focusedDay),
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -156,17 +142,19 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       ),
                       IconButton(
                         icon: const Icon(Icons.chevron_right),
-                        onPressed: _goToNextMonth,
+                        onPressed: () {
+                          setState(() => vm.goToNextMonth());
+                        },
                       ),
                     ],
                   ),
                 ),
-
-                // === Events List ===
                 Expanded(
                   child: Builder(
                     builder: (_) {
-                      final eventsThisMonth = _getEventsForMonth(_focusedDay);
+                      final eventsThisMonth =
+                          vm.getEventsForMonth(vm.focusedDay);
+
                       if (eventsThisMonth.isEmpty) {
                         return const Center(
                           child: Text("No events for this month."),
@@ -235,14 +223,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                           Text('End: ${event.endTime}'),
                                       ],
                                     ),
-                                    onTap: () {
-                                      // Navigate to EventDetailsScreen with the actual event
-                                      Navigator.pushNamed(
-                                        context,
-                                        RouteNames.eventDetails,
-                                        arguments: {'event': event},
-                                      );
-                                    },
+                                    onTap: () => _openEventScreen(event.date),
                                   ),
                                 ),
                               ),
@@ -261,20 +242,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
           backgroundColor: const Color(0xFF201C58),
           child: const Icon(Icons.add, color: Colors.white),
           onPressed: () {
-            final targetDate = _selectedDay ?? _focusedDay;
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => EventScreen(
-                  date: targetDate,
-                  existingEvents: widget.eventVM.getEventsForDate(targetDate),
-                  onSave: (newEvent) {
-                    widget.eventVM.addEvent(newEvent);
-                  },
-                  viewModel: widget.eventVM,
-                ),
-              ),
-            );
+            final targetDate = vm.selectedDay ?? vm.focusedDay;
+            _openEventScreen(targetDate);
           },
         ),
       ),

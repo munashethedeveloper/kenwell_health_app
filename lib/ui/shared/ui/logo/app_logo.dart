@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-class AppLogo extends StatelessWidget {
+class KenwellAppLogo extends StatelessWidget {
   final double size;
-  const AppLogo({super.key, this.size = 250});
+  const KenwellAppLogo({super.key, this.size = 250});
 
   @override
   Widget build(BuildContext context) {

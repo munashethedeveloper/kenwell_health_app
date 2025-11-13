@@ -53,5 +53,8 @@ class WellnessEvent {
     required this.mobileBooths,
     this.description,
     required this.medicalAid,
+    required String onsiteNumber,
+    required String onsiteContact,
+    required String onsiteEmail,
   }) : id = id ?? const Uuid().v4(); // <-- auto-generate unique ID
 }

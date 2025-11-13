@@ -9,24 +9,26 @@ class TBNursingInterventionViewModel extends ChangeNotifier {
   final TextEditingController reasonController = TextEditingController();
   final TextEditingController sessionNotesController = TextEditingController();
 
-  void toggleMemberNotReferred(bool? value) {
-    memberNotReferred = value ?? false;
-    if (!memberNotReferred) reasonController.clear();
-    notifyListeners();
-  }
+  bool isSubmitting = false;
 
-  void toggleReferredToGP(bool? value) {
-    referredToGP = value ?? false;
-    notifyListeners();
-  }
-
-  void toggleReferredToStateHIVClinic(bool? value) {
-    referredToStateHIVClinic = value ?? false;
-    notifyListeners();
-  }
-
-  void toggleReferredToOHConsultation(bool? value) {
-    referredToOHConsultation = value ?? false;
+  /// Unified toggle method
+  void toggleField(String key, bool? value) {
+    final val = value ?? false;
+    switch (key) {
+      case 'memberNotReferred':
+        memberNotReferred = val;
+        if (!val) reasonController.clear();
+        break;
+      case 'referredToGP':
+        referredToGP = val;
+        break;
+      case 'referredToStateHIVClinic':
+        referredToStateHIVClinic = val;
+        break;
+      case 'referredToOHConsultation':
+        referredToOHConsultation = val;
+        break;
+    }
     notifyListeners();
   }
 
@@ -42,12 +44,18 @@ class TBNursingInterventionViewModel extends ChangeNotifier {
   }
 
   Future<void> saveIntervention({VoidCallback? onNext}) async {
+    isSubmitting = true;
+    notifyListeners();
+
     final data = toMap();
     debugPrint('✅ TB Nursing Intervention Saved: $data');
+
     await Future.delayed(const Duration(milliseconds: 500));
-    if (onNext != null) {
-      onNext();
-    }
+
+    isSubmitting = false;
+    notifyListeners();
+
+    if (onNext != null) onNext();
   }
 
   @override

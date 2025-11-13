@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/form/custom_checkbox_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/custom_yes_no_question.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
@@ -28,8 +29,9 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
         builder: (context, vm, _) {
           return Scaffold(
             appBar: const KenwellAppBar(
-                title: 'Personal Risk Assessment',
-                automaticallyImplyLeading: false),
+              title: 'Personal Risk Assessment',
+              automaticallyImplyLeading: false,
+            ),
             body: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -48,9 +50,9 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   ...vm.chronicConditions.keys.map((condition) {
-                    return CheckboxListTile(
-                      title: Text(condition),
-                      value: vm.chronicConditions[condition],
+                    return KenwellCheckbox(
+                      title: condition,
+                      value: vm.chronicConditions[condition] ?? false,
                       onChanged: (val) => vm.toggleCondition(condition, val),
                     );
                   }).toList(),
@@ -91,8 +93,10 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                     keyboardType: TextInputType.number,
                   ),
                   const SizedBox(height: 8),
-                  const Text('3.1 What do you smoke?',
-                      style: TextStyle(fontSize: 16)),
+                  const Text(
+                    '3.1 What do you smoke?',
+                    style: TextStyle(fontSize: 16),
+                  ),
                   _buildStringRadioGroup(
                     selected: vm.smokeType.isEmpty ? null : vm.smokeType,
                     options: const ['Cigarette', 'Pipe', 'Dagga'],
@@ -166,8 +170,9 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                     ),
                   ],
 
-//buttons
                   const SizedBox(height: 20),
+
+                  // Navigation Buttons
                   KenwellFormNavigation(
                     onPrevious: onPrevious,
                     onNext: () {

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
+import '../../../shared/ui/form/custom_date_picker.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/personal_details_view_model.dart';
 
@@ -26,8 +28,9 @@ class PersonalDetailsScreen extends StatelessWidget {
         builder: (context, vm, _) {
           return Scaffold(
             appBar: const KenwellAppBar(
-                title: 'Patient Personal Details',
-                automaticallyImplyLeading: false),
+              title: 'Patient Personal Details',
+              automaticallyImplyLeading: false,
+            ),
             body: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -36,24 +39,19 @@ class PersonalDetailsScreen extends StatelessWidget {
                     label: 'Screening Site',
                     controller: vm.screeningSiteController,
                   ),
-                  KenwellTextField(
-                    label: 'Date',
+
+                  /// ✅ Refactored Date Field (now uses the reusable KenwellDatePickerField)
+                  KenwellDatePickerField(
                     controller: vm.dateController,
-                    readOnly: true,
-                    onTap: () async {
-                      FocusScope.of(context).requestFocus(FocusNode());
-                      final pickedDate = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime(2100),
-                      );
-                      if (pickedDate != null) {
-                        vm.dateController.text =
-                            '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
-                      }
+                    label: 'Date',
+                    displayFormat: DateFormat('dd/MM/yyyy'),
+                    onDateChanged: (pickedDate) {
+                      vm.dateController.text = pickedDate != null
+                          ? DateFormat('dd/MM/yyyy').format(pickedDate)
+                          : '';
                     },
                   ),
+
                   KenwellTextField(
                     label: 'Name',
                     controller: vm.nameController,
@@ -108,6 +106,7 @@ class PersonalDetailsScreen extends StatelessWidget {
                     label: 'Region / Province',
                     controller: vm.regionController,
                   ),
+
                   KenwellDropdownField<String>(
                     label: 'Marital Status',
                     value: vm.maritalStatus,
@@ -126,7 +125,9 @@ class PersonalDetailsScreen extends StatelessWidget {
                     items: vm.employmentStatusOptions,
                     onChanged: vm.setEmploymentStatus,
                   ),
+
                   const SizedBox(height: 24),
+
                   // --- Navigation Buttons ---
                   KenwellFormNavigation(
                     onPrevious: onPrevious,

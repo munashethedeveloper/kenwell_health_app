@@ -1,33 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
-import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
-import '../../../../data/services/auth_service.dart';
-import '../../../shared/ui/colours/kenwell_colours.dart';
+import 'package:provider/provider.dart';
+import '../../../shared/ui/buttons/custom_primary_button.dart';
+import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/logo/app_logo.dart';
+import '../../../shared/ui/form/custom_text_field.dart';
+import '../../../shared/ui/colours/kenwell_colours.dart';
+import '../view_models/forgot_password_view_model.dart';
 
-class ForgotPasswordScreen extends StatefulWidget {
+class ForgotPasswordScreen extends StatelessWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => ForgotPasswordViewModel(),
+      child: const _ForgotPasswordScreenBody(),
+    );
+  }
 }
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  bool _isLoading = false;
+class _ForgotPasswordScreenBody extends StatelessWidget {
+  const _ForgotPasswordScreenBody({super.key});
 
-  void _resetPassword() async {
-    if (!_formKey.currentState!.validate()) return;
+  @override
+  Widget build(BuildContext context) {
+    final vm = context.watch<ForgotPasswordViewModel>();
+    final formKey = GlobalKey<FormState>();
 
-    setState(() => _isLoading = true);
+    Future<void> _sendResetLink() async {
+      if (!(formKey.currentState?.validate() ?? false)) return;
 
-    try {
-      final bool success = await AuthService().forgotPassword(
-        _emailController.text.trim(),
-      );
-
-      if (!mounted) return;
+      final success = await vm.sendResetLink();
 
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -35,8 +38,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             content: Text('Password reset link sent! Please check your email.'),
           ),
         );
-
-        // Return to login screen
         Navigator.pop(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -45,22 +46,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           ),
         );
       }
-    } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error: $e')));
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
     }
-  }
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: const KenwellAppBar(
         title: 'Forgot Password',
@@ -69,26 +56,29 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
-          key: _formKey,
+          key: formKey,
           child: Column(
             children: [
               const SizedBox(height: 40),
-              const AppLogo(size: 250),
+              const KenwellAppLogo(size: 250),
               const SizedBox(height: 30),
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
-                validator: (val) =>
-                    val!.isEmpty ? 'Please enter your email' : null,
+              KenwellTextField(
+                label: 'Email',
+                controller: vm.emailController,
               ),
               const SizedBox(height: 20),
               CustomPrimaryButton(
                 label: 'Send Reset Link',
-                onPressed: _resetPassword,
-                isBusy: _isLoading,
+                onPressed: _sendResetLink,
+                isBusy: vm.isLoading,
                 backgroundColor: KenwellColors.primaryGreen,
               ),
-            ],
+            ]
+                .map((widget) => Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: widget,
+                    ))
+                .toList(),
           ),
         ),
       ),

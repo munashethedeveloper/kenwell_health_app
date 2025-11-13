@@ -26,24 +26,16 @@ class HIVTestResultViewModel extends ChangeNotifier {
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
 
-  // --- Pick expiry date ---
-  Future<void> pickExpiryDate(BuildContext context,
-      {required bool isScreening}) async {
-    DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2030),
-    );
-    if (picked != null) {
-      String formattedDate = DateFormat('yyyy-MM-dd').format(picked);
-      if (isScreening) {
-        screeningExpiryDateController.text = formattedDate;
-      } else {
-        confirmatoryExpiryDateController.text = formattedDate;
-      }
-      notifyListeners();
+  // --- Handle expiry date change (used by KenwellDatePickerField) ---
+  void handleExpiryDateChange(DateTime? date, {required bool isScreening}) {
+    final formattedDate =
+        date != null ? DateFormat('yyyy-MM-dd').format(date) : '';
+    if (isScreening) {
+      screeningExpiryDateController.text = formattedDate;
+    } else {
+      confirmatoryExpiryDateController.text = formattedDate;
     }
+    notifyListeners();
   }
 
   // --- Setters ---
@@ -69,15 +61,17 @@ class HIVTestResultViewModel extends ChangeNotifier {
         screeningExpiryDateController.text.isEmpty) {
       return false;
     }
+
     if (confirmatoryTestNameController.text.isEmpty ||
         confirmatoryBatchNoController.text.isEmpty ||
         confirmatoryExpiryDateController.text.isEmpty) {
       return false;
     }
+
     return true;
   }
 
-  /// ✅ Converts all HIV test result data to a Map
+  // --- Converts all HIV test result data to a Map ---
   Map<String, dynamic> toMap() {
     return {
       'screeningTestName': screeningTestNameController.text,

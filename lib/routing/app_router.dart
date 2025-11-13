@@ -61,7 +61,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const ForgotPasswordScreen());
 
       case RouteNames.main:
-        return MaterialPageRoute(builder: (_) => const MainNavigationScreen());
+        return MaterialPageRoute(
+            builder: (_) => const KenwellMainNavigationScreen());
 
       case RouteNames.statsReport:
         return MaterialPageRoute(
