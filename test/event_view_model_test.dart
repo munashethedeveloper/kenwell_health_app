@@ -212,5 +212,208 @@ void main() {
       expect(notified, isTrue);
       expect(viewModel.events.length, 1);
     });
+
+    test('updateEvent updates event in list and returns previous version', () {
+      // Arrange: Add an event
+      final originalEvent = WellnessEvent(
+        id: 'event-6',
+        title: 'Original Event',
+        date: DateTime(2024, 8, 10),
+        venue: 'Original Venue',
+        address: 'Original Address',
+        onsiteContactPerson: 'Alice',
+        onsiteContactNumber: '1111111111',
+        onsiteContactEmail: 'alice@example.com',
+        aeContactPerson: 'Bob',
+        aeContactNumber: '2222222222',
+        servicesRequested: 'HRA',
+        expectedParticipation: 50,
+        nonMembers: 10,
+        passports: 5,
+        nurses: 2,
+        coordinators: 1,
+        multiplyPromoters: 3,
+        setUpTime: '08:00 AM',
+        startTime: '09:00 AM',
+        endTime: '05:00 PM',
+        strikeDownTime: '06:00 PM',
+        mobileBooths: 'Yes',
+        medicalAid: 'Yes',
+      );
+      viewModel.addEvent(originalEvent);
+      expect(viewModel.events.length, 1);
+
+      // Create an updated version
+      final updatedEvent = originalEvent.copyWith(
+        title: 'Updated Event',
+        venue: 'Updated Venue',
+      );
+
+      // Act: Update the event
+      final previousEvent = viewModel.updateEvent(updatedEvent);
+
+      // Assert: Previous event should be returned
+      expect(previousEvent, isNotNull);
+      expect(previousEvent?.id, 'event-6');
+      expect(previousEvent?.title, 'Original Event');
+      expect(previousEvent?.venue, 'Original Venue');
+
+      // Assert: Updated event should be in list
+      expect(viewModel.events.length, 1);
+      expect(viewModel.events.first.title, 'Updated Event');
+      expect(viewModel.events.first.venue, 'Updated Venue');
+    });
+
+    test('updateEvent with non-existent id returns null', () {
+      // Arrange: Add an event with a different id
+      final event1 = WellnessEvent(
+        id: 'event-7',
+        title: 'Event 7',
+        date: DateTime(2024, 9, 15),
+        venue: 'Venue 7',
+        address: 'Address 7',
+        onsiteContactPerson: 'Charlie',
+        onsiteContactNumber: '3333333333',
+        onsiteContactEmail: 'charlie@example.com',
+        aeContactPerson: 'Diana',
+        aeContactNumber: '4444444444',
+        servicesRequested: 'Other',
+        expectedParticipation: 30,
+        nonMembers: 5,
+        passports: 2,
+        nurses: 1,
+        coordinators: 1,
+        multiplyPromoters: 1,
+        setUpTime: '10:00 AM',
+        startTime: '11:00 AM',
+        endTime: '03:00 PM',
+        strikeDownTime: '04:00 PM',
+        mobileBooths: 'No',
+        medicalAid: 'No',
+      );
+      viewModel.addEvent(event1);
+
+      // Create an event with a different id to update
+      final event2 = WellnessEvent(
+        id: 'non-existent-id',
+        title: 'Non-existent Event',
+        date: DateTime(2024, 10, 20),
+        venue: 'Venue X',
+        address: 'Address X',
+        onsiteContactPerson: 'Eve',
+        onsiteContactNumber: '5555555555',
+        onsiteContactEmail: 'eve@example.com',
+        aeContactPerson: 'Frank',
+        aeContactNumber: '6666666666',
+        servicesRequested: 'HRA',
+        expectedParticipation: 40,
+        nonMembers: 8,
+        passports: 3,
+        nurses: 2,
+        coordinators: 1,
+        multiplyPromoters: 2,
+        setUpTime: '09:00 AM',
+        startTime: '10:00 AM',
+        endTime: '04:00 PM',
+        strikeDownTime: '05:00 PM',
+        mobileBooths: 'Yes',
+        medicalAid: 'No',
+      );
+
+      // Act: Try to update a non-existent event
+      final previousEvent = viewModel.updateEvent(event2);
+
+      // Assert: Should return null and not affect existing events
+      expect(previousEvent, isNull);
+      expect(viewModel.events.length, 1);
+      expect(viewModel.events.first.id, 'event-7');
+    });
+
+    test('updateEvent notifies listeners', () {
+      // Arrange: Add an event and listen for notifications
+      final originalEvent = WellnessEvent(
+        id: 'event-8',
+        title: 'Original Title',
+        date: DateTime(2024, 11, 25),
+        venue: 'Venue 8',
+        address: 'Address 8',
+        onsiteContactPerson: 'Grace',
+        onsiteContactNumber: '7777777777',
+        onsiteContactEmail: 'grace@example.com',
+        aeContactPerson: 'Henry',
+        aeContactNumber: '8888888888',
+        servicesRequested: 'HRA',
+        expectedParticipation: 60,
+        nonMembers: 12,
+        passports: 6,
+        nurses: 3,
+        coordinators: 2,
+        multiplyPromoters: 4,
+        setUpTime: '07:00 AM',
+        startTime: '08:00 AM',
+        endTime: '06:00 PM',
+        strikeDownTime: '07:00 PM',
+        mobileBooths: 'Yes',
+        medicalAid: 'Yes',
+      );
+      viewModel.addEvent(originalEvent);
+
+      bool notified = false;
+      viewModel.addListener(() {
+        notified = true;
+      });
+
+      // Create an updated version
+      final updatedEvent = originalEvent.copyWith(title: 'Updated Title');
+
+      // Act: Update the event
+      viewModel.updateEvent(updatedEvent);
+
+      // Assert: Listener should be notified
+      expect(notified, isTrue);
+    });
+
+    test('updateEvent and undo flow works correctly', () {
+      // Arrange: Add an event
+      final originalEvent = WellnessEvent(
+        id: 'event-9',
+        title: 'Original Event',
+        date: DateTime(2024, 12, 30),
+        venue: 'Original Venue',
+        address: 'Original Address',
+        onsiteContactPerson: 'Alice',
+        onsiteContactNumber: '1111111111',
+        onsiteContactEmail: 'alice@example.com',
+        aeContactPerson: 'Bob',
+        aeContactNumber: '2222222222',
+        servicesRequested: 'HRA',
+        expectedParticipation: 50,
+        nonMembers: 10,
+        passports: 5,
+        nurses: 2,
+        coordinators: 1,
+        multiplyPromoters: 3,
+        setUpTime: '08:00 AM',
+        startTime: '09:00 AM',
+        endTime: '05:00 PM',
+        strikeDownTime: '06:00 PM',
+        mobileBooths: 'Yes',
+        medicalAid: 'Yes',
+      );
+      viewModel.addEvent(originalEvent);
+      expect(viewModel.events.first.title, 'Original Event');
+
+      // Act: Update the event
+      final updatedEvent = originalEvent.copyWith(title: 'Updated Event');
+      final previousEvent = viewModel.updateEvent(updatedEvent);
+      expect(viewModel.events.first.title, 'Updated Event');
+
+      // Act: Undo the update by restoring previous event
+      viewModel.updateEvent(previousEvent!);
+
+      // Assert: Event should be restored to original
+      expect(viewModel.events.first.title, 'Original Event');
+      expect(viewModel.events.first.venue, 'Original Venue');
+    });
   });
 }

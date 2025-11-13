@@ -92,8 +92,9 @@ class EventViewModel extends ChangeNotifier {
   }
 
   // Build event model
-  WellnessEvent buildEvent(DateTime date) {
+  WellnessEvent buildEvent(DateTime date, {String? existingId}) {
     return WellnessEvent(
+      id: existingId, // If existingId is provided, use it; otherwise auto-generate
       title: titleController.text,
       date: date,
       venue: venueController.text,
@@ -134,6 +135,19 @@ class EventViewModel extends ChangeNotifier {
       final deletedEvent = _events.removeAt(index);
       notifyListeners();
       return deletedEvent;
+    }
+    return null;
+  }
+
+  /// Updates an existing event in the list
+  /// Returns the previous version of the event for undo functionality
+  WellnessEvent? updateEvent(WellnessEvent updatedEvent) {
+    final index = _events.indexWhere((e) => e.id == updatedEvent.id);
+    if (index != -1) {
+      final previousEvent = _events[index];
+      _events[index] = updatedEvent;
+      notifyListeners();
+      return previousEvent;
     }
     return null;
   }
