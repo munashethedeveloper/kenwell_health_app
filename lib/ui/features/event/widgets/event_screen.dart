@@ -3,7 +3,7 @@ import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/event_view_model.dart';
 import '../../../../domain/models/wellness_event.dart';
 
-class EventScreen extends StatelessWidget {
+class EventScreen extends StatefulWidget {
   final EventViewModel viewModel;
   final DateTime date;
   final List<WellnessEvent>? existingEvents;
@@ -20,22 +20,45 @@ class EventScreen extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    // Determine if we're editing an event
-    final WellnessEvent? eventToEdit = existingEvent ?? 
-        (existingEvents != null && existingEvents!.isNotEmpty 
-            ? existingEvents!.first 
-            : null);
-    final bool isEditMode = eventToEdit != null;
+  State<EventScreen> createState() => _EventScreenState();
+}
 
-    // Load existing event if editing
+class _EventScreenState extends State<EventScreen> {
+  bool _didLoadExistingEvent = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final WellnessEvent? eventToEdit = widget.existingEvent ??
+        (widget.existingEvents != null && widget.existingEvents!.isNotEmpty
+            ? widget.existingEvents!.first
+            : null);
+
     if (eventToEdit != null) {
-      viewModel.loadExistingEvent(eventToEdit);
+      // Defer loading into the viewModel until after the first frame so we avoid
+      // notifyListeners() / markNeedsBuild() during the build phase.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        if (!_didLoadExistingEvent) {
+          widget.viewModel.loadExistingEvent(eventToEdit);
+          _didLoadExistingEvent = true;
+        }
+      });
     } else {
       // Initialize the dateController with the calendar-selected date
-      viewModel.dateController.text =
-          "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+      widget.viewModel.dateController.text =
+          "${widget.date.year}-${widget.date.month.toString().padLeft(2, '0')}-${widget.date.day.toString().padLeft(2, '0')}";
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final WellnessEvent? eventToEdit = widget.existingEvent ??
+        (widget.existingEvents != null && widget.existingEvents!.isNotEmpty
+            ? widget.existingEvents!.first
+            : null);
+    final bool isEditMode = eventToEdit != null;
 
     Widget buildDropdown(String label, String value, List<String> options,
         void Function(String) onChanged) {
@@ -61,7 +84,7 @@ class EventScreen extends StatelessWidget {
         ),
         onTap: () async {
           // Make the callback async
-          await viewModel.pickTime(context, controller);
+          await widget.viewModel.pickTime(context, controller);
         },
       );
     }
@@ -80,7 +103,7 @@ class EventScreen extends StatelessWidget {
 
             // Date Field
             TextFormField(
-              controller: viewModel.dateController,
+              controller: widget.viewModel.dateController,
               readOnly: true,
               decoration: const InputDecoration(
                 labelText: 'Event Date',
@@ -89,12 +112,12 @@ class EventScreen extends StatelessWidget {
               onTap: () async {
                 final pickedDate = await showDatePicker(
                   context: context,
-                  initialDate: date,
+                  initialDate: widget.date,
                   firstDate: DateTime(2000),
                   lastDate: DateTime(2100),
                 );
                 if (pickedDate != null && context.mounted) {
-                  viewModel.dateController.text =
+                  widget.viewModel.dateController.text =
                       "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
                 }
               },
@@ -102,15 +125,15 @@ class EventScreen extends StatelessWidget {
 
             // Title, Venue, Address
             TextFormField(
-              controller: viewModel.titleController,
+              controller: widget.viewModel.titleController,
               decoration: const InputDecoration(labelText: 'Event Title'),
             ),
             TextFormField(
-              controller: viewModel.venueController,
+              controller: widget.viewModel.venueController,
               decoration: const InputDecoration(labelText: 'Venue'),
             ),
             TextFormField(
-              controller: viewModel.addressController,
+              controller: widget.viewModel.addressController,
               decoration: const InputDecoration(labelText: 'Address'),
             ),
             const SizedBox(height: 16),
@@ -120,16 +143,16 @@ class EventScreen extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 8),
             TextFormField(
-              controller: viewModel.onsiteContactController,
+              controller: widget.viewModel.onsiteContactController,
               decoration: const InputDecoration(labelText: 'Contact Person'),
             ),
             TextFormField(
-              controller: viewModel.onsiteNumberController,
+              controller: widget.viewModel.onsiteNumberController,
               decoration: const InputDecoration(labelText: 'Contact Number'),
               keyboardType: TextInputType.phone,
             ),
             TextFormField(
-              controller: viewModel.onsiteEmailController,
+              controller: widget.viewModel.onsiteEmailController,
               decoration: const InputDecoration(labelText: 'Email'),
               keyboardType: TextInputType.emailAddress,
             ),
@@ -140,11 +163,11 @@ class EventScreen extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 8),
             TextFormField(
-              controller: viewModel.aeContactController,
+              controller: widget.viewModel.aeContactController,
               decoration: const InputDecoration(labelText: 'Contact Person'),
             ),
             TextFormField(
-              controller: viewModel.aeNumberController,
+              controller: widget.viewModel.aeNumberController,
               decoration: const InputDecoration(labelText: 'Contact Number'),
               keyboardType: TextInputType.phone,
             ),
@@ -155,18 +178,18 @@ class EventScreen extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 8),
             TextFormField(
-              controller: viewModel.expectedParticipationController,
+              controller: widget.viewModel.expectedParticipationController,
               decoration:
                   const InputDecoration(labelText: 'Expected Participation'),
               keyboardType: TextInputType.number,
             ),
             TextFormField(
-              controller: viewModel.passportsController,
+              controller: widget.viewModel.passportsController,
               decoration: const InputDecoration(labelText: 'Passports'),
               keyboardType: TextInputType.number,
             ),
             TextFormField(
-              controller: viewModel.nursesController,
+              controller: widget.viewModel.nursesController,
               decoration: const InputDecoration(labelText: 'Nurses'),
               keyboardType: TextInputType.number,
             ),
@@ -177,29 +200,35 @@ class EventScreen extends StatelessWidget {
             const Text('Options',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 8),
-            buildDropdown('Medical Aid', viewModel.medicalAid, ['Yes', 'No'],
-                (val) => viewModel.medicalAid = val),
-            buildDropdown('Non-Members', viewModel.nonMembers, ['Yes', 'No'],
-                (val) => viewModel.nonMembers = val),
-            buildDropdown('Coordinators', viewModel.coordinators, ['Yes', 'No'],
-                (val) => viewModel.coordinators = val),
-            buildDropdown('Multiply Promoters', viewModel.multiplyPromoters,
-                ['Yes', 'No'], (val) => viewModel.multiplyPromoters = val),
-            buildDropdown('Mobile Booths', viewModel.mobileBooths,
-                ['Yes', 'No'], (val) => viewModel.mobileBooths = val),
-            buildDropdown('Services Requested', viewModel.servicesRequested,
-                ['HRA', 'Other'], (val) => viewModel.servicesRequested = val),
+            buildDropdown('Medical Aid', widget.viewModel.medicalAid,
+                ['Yes', 'No'], (val) => widget.viewModel.medicalAid = val),
+            buildDropdown('Non-Members', widget.viewModel.nonMembers,
+                ['Yes', 'No'], (val) => widget.viewModel.nonMembers = val),
+            buildDropdown('Coordinators', widget.viewModel.coordinators,
+                ['Yes', 'No'], (val) => widget.viewModel.coordinators = val),
+            buildDropdown(
+                'Multiply Promoters',
+                widget.viewModel.multiplyPromoters,
+                ['Yes', 'No'],
+                (val) => widget.viewModel.multiplyPromoters = val),
+            buildDropdown('Mobile Booths', widget.viewModel.mobileBooths,
+                ['Yes', 'No'], (val) => widget.viewModel.mobileBooths = val),
+            buildDropdown(
+                'Services Requested',
+                widget.viewModel.servicesRequested,
+                ['HRA', 'Other'],
+                (val) => widget.viewModel.servicesRequested = val),
             const SizedBox(height: 16),
 
             // Time Details
             const Text('Time Details',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 8),
-            buildTimeField('Setup Time', viewModel.setUpTimeController),
-            buildTimeField('Start Time', viewModel.startTimeController),
-            buildTimeField('End Time', viewModel.endTimeController),
+            buildTimeField('Setup Time', widget.viewModel.setUpTimeController),
+            buildTimeField('Start Time', widget.viewModel.startTimeController),
+            buildTimeField('End Time', widget.viewModel.endTimeController),
             buildTimeField(
-                'Strike Down Time', viewModel.strikeDownTimeController),
+                'Strike Down Time', widget.viewModel.strikeDownTimeController),
 
             const SizedBox(height: 20),
             Center(
@@ -207,21 +236,23 @@ class EventScreen extends StatelessWidget {
                 onPressed: () {
                   // Use date from the dateController if available
                   final eventDate =
-                      DateTime.tryParse(viewModel.dateController.text) ?? date;
-                  
+                      DateTime.tryParse(widget.viewModel.dateController.text) ??
+                          widget.date;
+
                   WellnessEvent eventToSave;
                   if (isEditMode) {
                     // Create updated event with existing ID
-                    eventToSave = viewModel.buildEvent(eventDate).copyWith(
-                      id: eventToEdit!.id,
-                    );
+                    eventToSave =
+                        widget.viewModel.buildEvent(eventDate).copyWith(
+                              id: eventToEdit!.id,
+                            );
                   } else {
                     // Create new event
-                    eventToSave = viewModel.buildEvent(eventDate);
+                    eventToSave = widget.viewModel.buildEvent(eventDate);
                   }
-                  
-                  onSave(eventToSave);
-                  viewModel.clearControllers();
+
+                  widget.onSave(eventToSave);
+                  widget.viewModel.clearControllers();
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
