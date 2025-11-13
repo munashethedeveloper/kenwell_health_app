@@ -204,11 +204,15 @@ class AppRouter {
       case RouteNames.eventDetails:
         final args = settings.arguments as Map<String, dynamic>?;
         final WellnessEvent event = args?['event'] as WellnessEvent;
+        final EventViewModel? viewModel = args?['viewModel'] as EventViewModel?;
 
         return MaterialPageRoute(
           builder: (_) => ChangeNotifierProvider(
             create: (_) => EventDetailsViewModel()..setEvent(event),
-            child: EventDetailsScreen(event: event),
+            child: EventDetailsScreen(
+              event: event,
+              viewModel: viewModel,
+            ),
           ),
         );
 
