@@ -212,9 +212,8 @@ class EventScreen extends StatelessWidget {
                     final previousEvent = viewModel.updateEvent(updatedEvent);
                     
                     viewModel.clearControllers();
-                    Navigator.pop(context);
                     
-                    // Show SnackBar with undo option
+                    // Show SnackBar with undo option before navigating back
                     if (previousEvent != null) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -229,6 +228,8 @@ class EventScreen extends StatelessWidget {
                         ),
                       );
                     }
+                    
+                    Navigator.pop(context);
                   } else {
                     // Add mode: create new event
                     final newEvent = viewModel.buildEvent(eventDate);
