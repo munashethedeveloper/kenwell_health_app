@@ -16,6 +16,7 @@ class EventDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
         title: Text(
           event.title,
@@ -42,59 +43,60 @@ class EventDetailsScreen extends StatelessWidget {
             ),
         ],
       ),
-      body: Padding(
+      body: ListView(
         padding: const EdgeInsets.all(16),
-        child: ListView(
-          children: [
-            _detailRow('Category', event.servicesRequested),
-            _detailRow('Date', DateFormat.yMMMMd().format(event.date)),
-            _detailRow('Set Up Time', event.setUpTime),
-            _detailRow('Start Time', event.startTime),
-            _detailRow('End Time', event.endTime),
-            _detailRow('Strike Down Time', event.strikeDownTime),
-            _detailRow('Venue', event.venue),
-            _detailRow('Address', event.address),
-            _detailRow('Onsite Contact Person', event.onsiteContactPerson),
-            _detailRow('Onsite Contact Number', event.onsiteContactNumber),
-            _detailRow('Onsite Contact Email', event.onsiteContactEmail),
-            _detailRow('AE Contact Person', event.aeContactPerson),
-            _detailRow('AE Contact Number', event.aeContactNumber),
-            _detailRow('Expected Participation',
-                event.expectedParticipation.toString()),
-            _detailRow('Non Members', event.nonMembers.toString()),
-            _detailRow('Passports', event.passports.toString()),
-            _detailRow('Nurses', event.nurses.toString()),
-            _detailRow('Coordinators', event.coordinators.toString()),
-            _detailRow(
-                'Multiply Promoters', event.multiplyPromoters.toString()),
-            _detailRow('Mobile Booths', event.mobileBooths),
-            _detailRow('Medical Aid Option', event.medicalAid),
-            if (event.description != null && event.description!.isNotEmpty)
-              _detailRow('Description', event.description!),
-          ],
-        ),
+        children: [
+          _buildDetailCard('Category', event.servicesRequested),
+          _buildDetailCard('Date', DateFormat.yMMMMd().format(event.date)),
+          _buildDetailCard('Set Up Time', event.setUpTime),
+          _buildDetailCard('Start Time', event.startTime),
+          _buildDetailCard('End Time', event.endTime),
+          _buildDetailCard('Strike Down Time', event.strikeDownTime),
+          _buildDetailCard('Venue', event.venue),
+          _buildDetailCard('Address', event.address),
+          _buildDetailCard('Onsite Contact Person', event.onsiteContactPerson),
+          _buildDetailCard('Onsite Contact Number', event.onsiteContactNumber),
+          _buildDetailCard('Onsite Contact Email', event.onsiteContactEmail),
+          _buildDetailCard('AE Contact Person', event.aeContactPerson),
+          _buildDetailCard('AE Contact Number', event.aeContactNumber),
+          _buildDetailCard(
+              'Expected Participation', event.expectedParticipation.toString()),
+          _buildDetailCard('Non Members', event.nonMembers.toString()),
+          _buildDetailCard('Passports', event.passports.toString()),
+          _buildDetailCard('Nurses', event.nurses.toString()),
+          _buildDetailCard('Coordinators', event.coordinators.toString()),
+          _buildDetailCard(
+              'Multiply Promoters', event.multiplyPromoters.toString()),
+          _buildDetailCard('Mobile Booths', event.mobileBooths),
+          _buildDetailCard('Medical Aid Option', event.medicalAid),
+          if (event.description != null && event.description!.isNotEmpty)
+            _buildDetailCard('Description', event.description!),
+        ],
       ),
     );
   }
 
-  Widget _detailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-              color: Color(0xFF201C58),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(value, style: const TextStyle(fontSize: 15)),
-          const Divider(),
-        ],
+  Widget _buildDetailCard(String label, String value) {
+    return Card(
+      elevation: 3,
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shadowColor: Colors.grey.withOpacity(0.3),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Color(0xFF201C58),
+                )),
+            const SizedBox(height: 6),
+            Text(value, style: const TextStyle(fontSize: 15)),
+          ],
+        ),
       ),
     );
   }
@@ -148,10 +150,7 @@ class EventDetailsScreen extends StatelessWidget {
     final previousEvent = viewModel?.updateEvent(updatedEvent);
 
     if (previousEvent != null) {
-      // Navigate back after update
       Navigator.of(context).pop();
-
-      // Show Snackbar with undo option
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Event updated'),
@@ -172,10 +171,7 @@ class EventDetailsScreen extends StatelessWidget {
     final deletedEvent = viewModel?.deleteEvent(event.id);
 
     if (deletedEvent != null) {
-      // Navigate back after deletion
       Navigator.of(context).pop();
-
-      // Show Snackbar with undo option
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Event deleted'),

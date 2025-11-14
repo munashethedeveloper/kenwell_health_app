@@ -71,28 +71,28 @@ class _CalendarScreenState extends State<CalendarScreen> {
           title: const Text(
             'Wellness Planner',
             style: TextStyle(
-              color: Color(0xFF201C58),
+              color: Color(0xFFFFFFFF),
               fontWeight: FontWeight.bold,
             ),
           ),
           automaticallyImplyLeading: false,
-          backgroundColor: const Color(0xFF90C048),
+          backgroundColor: const Color(0xFF201C58),
           centerTitle: true,
           actions: [
             IconButton(
-              icon: const Icon(Icons.logout),
+              icon: const Icon(Icons.logout, color: Colors.white),
               tooltip: 'Logout',
               onPressed: _logout,
             ),
           ],
           bottom: const TabBar(
             indicatorSize: TabBarIndicatorSize.tab,
-            indicator: BoxDecoration(color: Color(0xFF201C58)),
+            indicator: BoxDecoration(color: Color(0xFF90C048)),
             labelColor: Colors.white,
-            unselectedLabelColor: Colors.black,
+            unselectedLabelColor: Colors.white70,
             tabs: [
-              Tab(icon: Icon(Icons.calendar_today), text: 'Events Calendar'),
-              Tab(icon: Icon(Icons.list), text: 'Events List'),
+              Tab(icon: Icon(Icons.calendar_today), text: 'Calendar'),
+              Tab(icon: Icon(Icons.list), text: 'List'),
             ],
           ),
         ),
@@ -101,34 +101,57 @@ class _CalendarScreenState extends State<CalendarScreen> {
             // ===== Calendar Tab =====
             Column(
               children: [
-                TableCalendar(
-                  firstDay: DateTime.utc(2020, 1, 1),
-                  lastDay: DateTime.utc(3000, 12, 31),
-                  focusedDay: _focusedDay,
-                  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-                  eventLoader: _getEventsForDay,
-                  headerStyle: const HeaderStyle(formatButtonVisible: false),
-                  onDaySelected: (selectedDay, focusedDay) {
-                    setState(() {
-                      _selectedDay = selectedDay;
-                      _focusedDay = focusedDay;
-                    });
-
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => EventScreen(
-                          date: selectedDay,
-                          existingEvents:
-                              widget.eventVM.getEventsForDate(selectedDay),
-                          onSave: (newEvent) {
-                            widget.eventVM.addEvent(newEvent);
-                          },
-                          viewModel: widget.eventVM,
-                        ),
+                Expanded(
+                  child: TableCalendar(
+                    firstDay: DateTime.utc(2020, 1, 1),
+                    lastDay: DateTime.utc(3000, 12, 31),
+                    focusedDay: _focusedDay,
+                    selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                    eventLoader: _getEventsForDay,
+                    headerStyle: const HeaderStyle(
+                      formatButtonVisible: false,
+                      titleCentered: true,
+                      titleTextStyle: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF201C58)),
+                    ),
+                    calendarStyle: CalendarStyle(
+                      todayDecoration: BoxDecoration(
+                        color: const Color(0xFF90C048),
+                        shape: BoxShape.circle,
                       ),
-                    );
-                  },
+                      selectedDecoration: BoxDecoration(
+                        color: const Color(0xFF201C58),
+                        shape: BoxShape.circle,
+                      ),
+                      markerDecoration: BoxDecoration(
+                        color: const Color(0xFF201C58),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    onDaySelected: (selectedDay, focusedDay) {
+                      setState(() {
+                        _selectedDay = selectedDay;
+                        _focusedDay = focusedDay;
+                      });
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => EventScreen(
+                            date: selectedDay,
+                            existingEvents:
+                                widget.eventVM.getEventsForDate(selectedDay),
+                            onSave: (newEvent) {
+                              widget.eventVM.addEvent(newEvent);
+                            },
+                            viewModel: widget.eventVM,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ],
             ),
@@ -146,17 +169,20 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       IconButton(
                         icon: const Icon(Icons.chevron_left),
                         onPressed: _goToPreviousMonth,
+                        color: Color(0xFF201C58),
                       ),
                       Text(
                         DateFormat.yMMMM().format(_focusedDay),
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
+                          color: Color(0xFF201C58),
                         ),
                       ),
                       IconButton(
                         icon: const Icon(Icons.chevron_right),
                         onPressed: _goToNextMonth,
+                        color: Color(0xFF201C58),
                       ),
                     ],
                   ),
@@ -194,16 +220,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Container(
-                                width: double.infinity,
-                                color: const Color(0xFF201C58),
+                              Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    vertical: 8, horizontal: 16),
+                                    horizontal: 16, vertical: 8),
                                 child: Text(
                                   DateFormat.yMMMMd().format(day),
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                    fontSize: 16,
+                                    color: Color(0xFF201C58),
                                   ),
                                 ),
                               ),
@@ -247,8 +272,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         SnackBar(
-                                          content:
-                                              const Text('Event deleted'),
+                                          content: const Text('Event deleted'),
                                           action: SnackBarAction(
                                             label: 'UNDO',
                                             onPressed: () {
@@ -271,8 +295,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                     ),
                                   ),
                                   child: Card(
+                                    elevation: 3,
                                     margin: const EdgeInsets.symmetric(
-                                        vertical: 6, horizontal: 12),
+                                        vertical: 6, horizontal: 16),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12)),
+                                    shadowColor: Colors.grey.withOpacity(0.3),
                                     child: ListTile(
                                       leading: CircleAvatar(
                                         backgroundColor: _categoryColor(
@@ -281,7 +310,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                       title: Text(
                                         event.title,
                                         style: const TextStyle(
-                                            fontWeight: FontWeight.bold),
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16),
                                       ),
                                       subtitle: Column(
                                         crossAxisAlignment:
@@ -298,7 +328,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                         ],
                                       ),
                                       onTap: () {
-                                        // Navigate to EventDetailsScreen with the actual event
                                         Navigator.pushNamed(
                                           context,
                                           RouteNames.eventDetails,
