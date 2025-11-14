@@ -71,7 +71,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           title: const Text(
             'Wellness Planner',
             style: TextStyle(
-              color: Color(0xFFFFFFFF),
+              color: Colors.white,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -87,7 +87,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ],
           bottom: const TabBar(
             indicatorSize: TabBarIndicatorSize.tab,
-            indicator: BoxDecoration(color: Color(0xFF90C048)),
+            indicator: BoxDecoration(
+              color: Color(0xFF90C048),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
+            ),
             labelColor: Colors.white,
             unselectedLabelColor: Colors.white70,
             tabs: [
@@ -112,23 +115,44 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       formatButtonVisible: false,
                       titleCentered: true,
                       titleTextStyle: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF201C58)),
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF201C58),
+                      ),
+                      leftChevronIcon:
+                          Icon(Icons.chevron_left, color: Color(0xFF201C58)),
+                      rightChevronIcon:
+                          Icon(Icons.chevron_right, color: Color(0xFF201C58)),
                     ),
                     calendarStyle: CalendarStyle(
                       todayDecoration: BoxDecoration(
                         color: const Color(0xFF90C048),
                         shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
                       ),
                       selectedDecoration: BoxDecoration(
                         color: const Color(0xFF201C58),
                         shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black38,
+                            blurRadius: 6,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
                       ),
                       markerDecoration: BoxDecoration(
                         color: const Color(0xFF201C58),
                         shape: BoxShape.circle,
                       ),
+                      weekendTextStyle:
+                          const TextStyle(color: Colors.redAccent),
                     ),
                     onDaySelected: (selectedDay, focusedDay) {
                       setState(() {
@@ -159,7 +183,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             // ===== Events List Tab =====
             Column(
               children: [
-                // === Month Navigation ===
+                // Month Navigation
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -170,25 +194,34 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         icon: const Icon(Icons.chevron_left),
                         onPressed: _goToPreviousMonth,
                         color: Color(0xFF201C58),
+                        splashRadius: 24,
                       ),
-                      Text(
-                        DateFormat.yMMMM().format(_focusedDay),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF201C58),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 4, horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF90C048).withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Text(
+                          DateFormat.yMMMM().format(_focusedDay),
+                          style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF201C58)),
                         ),
                       ),
                       IconButton(
                         icon: const Icon(Icons.chevron_right),
                         onPressed: _goToNextMonth,
                         color: Color(0xFF201C58),
+                        splashRadius: 24,
                       ),
                     ],
                   ),
                 ),
 
-                // === Events List ===
+                // Events List
                 Expanded(
                   child: Builder(
                     builder: (_) {
@@ -352,9 +385,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
             ),
           ],
         ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: const Color(0xFF201C58),
-          child: const Icon(Icons.add, color: Colors.white),
+        floatingActionButton: FloatingActionButton.extended(
+          backgroundColor: const Color(0xFF90C048),
+          icon: const Icon(Icons.add, color: Colors.white),
+          label: const Text(
+            'Add Event',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
           onPressed: () {
             final targetDate = _selectedDay ?? _focusedDay;
             Navigator.push(

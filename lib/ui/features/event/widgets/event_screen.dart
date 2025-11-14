@@ -29,7 +29,6 @@ class _EventScreenState extends State<EventScreen> {
   @override
   void initState() {
     super.initState();
-
     final WellnessEvent? eventToEdit = widget.existingEvent ??
         (widget.existingEvents != null && widget.existingEvents!.isNotEmpty
             ? widget.existingEvents!.first
@@ -64,10 +63,10 @@ class _EventScreenState extends State<EventScreen> {
         decoration: InputDecoration(
           labelText: label,
           filled: true,
-          fillColor: Colors.white,
+          fillColor: Colors.grey[100],
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none),
         ),
         items: options
             .map((e) => DropdownMenuItem(value: e, child: Text(e)))
@@ -85,10 +84,11 @@ class _EventScreenState extends State<EventScreen> {
         decoration: InputDecoration(
           labelText: label,
           filled: true,
-          fillColor: Colors.white,
+          fillColor: Colors.grey[100],
           suffixIcon: const Icon(Icons.access_time),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
           ),
         ),
         onTap: () async {
@@ -97,265 +97,257 @@ class _EventScreenState extends State<EventScreen> {
       );
     }
 
+    Widget sectionWrapper(String title, List<Widget> children) {
+      return Card(
+        elevation: 3,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        margin: const EdgeInsets.symmetric(vertical: 10),
+        shadowColor: Colors.black12,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title,
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
+              ...children
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
       appBar: KenwellAppBar(title: isEditMode ? 'Edit Event' : 'Add Event'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ===== Basic Info =====
-            _buildSectionCard(
-              title: 'Basic Info',
-              child: Column(
-                children: [
-                  TextFormField(
-                    controller: widget.viewModel.dateController,
-                    readOnly: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Event Date',
-                      suffixIcon: Icon(Icons.calendar_today),
-                    ),
-                    onTap: () async {
-                      final pickedDate = await showDatePicker(
-                        context: context,
-                        initialDate: widget.date,
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime(2100),
-                      );
-                      if (pickedDate != null && context.mounted) {
-                        widget.viewModel.dateController.text =
-                            "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: widget.viewModel.titleController,
-                    decoration: const InputDecoration(labelText: 'Event Title'),
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: widget.viewModel.venueController,
-                    decoration: const InputDecoration(labelText: 'Venue'),
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: widget.viewModel.addressController,
-                    decoration: const InputDecoration(labelText: 'Address'),
-                  ),
-                ],
+            // Basic Info Section
+            sectionWrapper('Basic Info', [
+              TextFormField(
+                controller: widget.viewModel.dateController,
+                readOnly: true,
+                decoration: const InputDecoration(
+                  labelText: 'Event Date',
+                  suffixIcon: Icon(Icons.calendar_today),
+                  filled: true,
+                  fillColor: Color(0xFFF0F0F0),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12))),
+                ),
+                onTap: () async {
+                  final pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: widget.date,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100),
+                  );
+                  if (pickedDate != null && context.mounted) {
+                    widget.viewModel.dateController.text =
+                        "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+                  }
+                },
               ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // ===== Onsite Contact =====
-            _buildSectionCard(
-              title: 'Onsite Contact',
-              child: Column(
-                children: [
-                  TextFormField(
-                    controller: widget.viewModel.onsiteContactController,
-                    decoration:
-                        const InputDecoration(labelText: 'Contact Person'),
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: widget.viewModel.onsiteNumberController,
-                    decoration:
-                        const InputDecoration(labelText: 'Contact Number'),
-                    keyboardType: TextInputType.phone,
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: widget.viewModel.onsiteEmailController,
-                    decoration: const InputDecoration(labelText: 'Email'),
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                ],
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: widget.viewModel.titleController,
+                decoration: const InputDecoration(
+                    labelText: 'Event Title',
+                    filled: true,
+                    fillColor: Color(0xFFF0F0F0),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)))),
               ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // ===== AE Contact =====
-            _buildSectionCard(
-              title: 'AE Contact',
-              child: Column(
-                children: [
-                  TextFormField(
-                    controller: widget.viewModel.aeContactController,
-                    decoration:
-                        const InputDecoration(labelText: 'Contact Person'),
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: widget.viewModel.aeNumberController,
-                    decoration:
-                        const InputDecoration(labelText: 'Contact Number'),
-                    keyboardType: TextInputType.phone,
-                  ),
-                ],
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: widget.viewModel.venueController,
+                decoration: const InputDecoration(
+                    labelText: 'Venue',
+                    filled: true,
+                    fillColor: Color(0xFFF0F0F0),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)))),
               ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // ===== Participation =====
-            _buildSectionCard(
-              title: 'Participation & Numbers',
-              child: Column(
-                children: [
-                  TextFormField(
-                    controller:
-                        widget.viewModel.expectedParticipationController,
-                    decoration: const InputDecoration(
-                        labelText: 'Expected Participation'),
-                    keyboardType: TextInputType.number,
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: widget.viewModel.passportsController,
-                    decoration: const InputDecoration(labelText: 'Passports'),
-                    keyboardType: TextInputType.number,
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: widget.viewModel.nursesController,
-                    decoration: const InputDecoration(labelText: 'Nurses'),
-                    keyboardType: TextInputType.number,
-                  ),
-                ],
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: widget.viewModel.addressController,
+                decoration: const InputDecoration(
+                    labelText: 'Address',
+                    filled: true,
+                    fillColor: Color(0xFFF0F0F0),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)))),
               ),
-            ),
+            ]),
 
-            const SizedBox(height: 16),
-
-            // ===== Options =====
-            _buildSectionCard(
-              title: 'Options',
-              child: Column(
-                children: [
-                  buildDropdown(
-                      'Medical Aid',
-                      widget.viewModel.medicalAid,
-                      ['Yes', 'No'],
-                      (val) => widget.viewModel.medicalAid = val),
-                  const SizedBox(height: 12),
-                  buildDropdown(
-                      'Non-Members',
-                      widget.viewModel.nonMembers,
-                      ['Yes', 'No'],
-                      (val) => widget.viewModel.nonMembers = val),
-                  const SizedBox(height: 12),
-                  buildDropdown(
-                      'Coordinators',
-                      widget.viewModel.coordinators,
-                      ['Yes', 'No'],
-                      (val) => widget.viewModel.coordinators = val),
-                  const SizedBox(height: 12),
-                  buildDropdown(
-                      'Multiply Promoters',
-                      widget.viewModel.multiplyPromoters,
-                      ['Yes', 'No'],
-                      (val) => widget.viewModel.multiplyPromoters = val),
-                  const SizedBox(height: 12),
-                  buildDropdown(
-                      'Mobile Booths',
-                      widget.viewModel.mobileBooths,
-                      ['Yes', 'No'],
-                      (val) => widget.viewModel.mobileBooths = val),
-                  const SizedBox(height: 12),
-                  buildDropdown(
-                      'Services Requested',
-                      widget.viewModel.servicesRequested,
-                      ['HRA', 'Other'],
-                      (val) => widget.viewModel.servicesRequested = val),
-                ],
+            // Onsite Contact Section
+            sectionWrapper('Onsite Contact', [
+              TextFormField(
+                controller: widget.viewModel.onsiteContactController,
+                decoration: const InputDecoration(
+                    labelText: 'Contact Person',
+                    filled: true,
+                    fillColor: Color(0xFFF0F0F0),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)))),
               ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // ===== Time Details =====
-            _buildSectionCard(
-              title: 'Time Details',
-              child: Column(
-                children: [
-                  buildTimeField(
-                      'Setup Time', widget.viewModel.setUpTimeController),
-                  const SizedBox(height: 12),
-                  buildTimeField(
-                      'Start Time', widget.viewModel.startTimeController),
-                  const SizedBox(height: 12),
-                  buildTimeField(
-                      'End Time', widget.viewModel.endTimeController),
-                  const SizedBox(height: 12),
-                  buildTimeField('Strike Down Time',
-                      widget.viewModel.strikeDownTimeController),
-                ],
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: widget.viewModel.onsiteNumberController,
+                decoration: const InputDecoration(
+                    labelText: 'Contact Number',
+                    filled: true,
+                    fillColor: Color(0xFFF0F0F0),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)))),
+                keyboardType: TextInputType.phone,
               ),
-            ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: widget.viewModel.onsiteEmailController,
+                decoration: const InputDecoration(
+                    labelText: 'Email',
+                    filled: true,
+                    fillColor: Color(0xFFF0F0F0),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)))),
+                keyboardType: TextInputType.emailAddress,
+              ),
+            ]),
+
+            // AE Contact Section
+            sectionWrapper('AE Contact', [
+              TextFormField(
+                controller: widget.viewModel.aeContactController,
+                decoration: const InputDecoration(
+                    labelText: 'Contact Person',
+                    filled: true,
+                    fillColor: Color(0xFFF0F0F0),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)))),
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: widget.viewModel.aeNumberController,
+                decoration: const InputDecoration(
+                    labelText: 'Contact Number',
+                    filled: true,
+                    fillColor: Color(0xFFF0F0F0),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)))),
+                keyboardType: TextInputType.phone,
+              ),
+            ]),
+
+            // Participation & Numbers Section
+            sectionWrapper('Participation & Numbers', [
+              TextFormField(
+                controller: widget.viewModel.expectedParticipationController,
+                decoration: const InputDecoration(
+                    labelText: 'Expected Participation',
+                    filled: true,
+                    fillColor: Color(0xFFF0F0F0),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)))),
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: widget.viewModel.passportsController,
+                decoration: const InputDecoration(
+                    labelText: 'Passports',
+                    filled: true,
+                    fillColor: Color(0xFFF0F0F0),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)))),
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: widget.viewModel.nursesController,
+                decoration: const InputDecoration(
+                    labelText: 'Nurses',
+                    filled: true,
+                    fillColor: Color(0xFFF0F0F0),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)))),
+                keyboardType: TextInputType.number,
+              ),
+            ]),
+
+            // Options Section
+            sectionWrapper('Options', [
+              buildDropdown('Medical Aid', widget.viewModel.medicalAid,
+                  ['Yes', 'No'], (val) => widget.viewModel.medicalAid = val),
+              const SizedBox(height: 10),
+              buildDropdown('Non-Members', widget.viewModel.nonMembers,
+                  ['Yes', 'No'], (val) => widget.viewModel.nonMembers = val),
+              const SizedBox(height: 10),
+              buildDropdown('Coordinators', widget.viewModel.coordinators,
+                  ['Yes', 'No'], (val) => widget.viewModel.coordinators = val),
+              const SizedBox(height: 10),
+              buildDropdown(
+                  'Multiply Promoters',
+                  widget.viewModel.multiplyPromoters,
+                  ['Yes', 'No'],
+                  (val) => widget.viewModel.multiplyPromoters = val),
+              const SizedBox(height: 10),
+              buildDropdown('Mobile Booths', widget.viewModel.mobileBooths,
+                  ['Yes', 'No'], (val) => widget.viewModel.mobileBooths = val),
+              const SizedBox(height: 10),
+              buildDropdown(
+                  'Services Requested',
+                  widget.viewModel.servicesRequested,
+                  ['HRA', 'Other'],
+                  (val) => widget.viewModel.servicesRequested = val),
+            ]),
+
+            // Time Details Section
+            sectionWrapper('Time Details', [
+              buildTimeField(
+                  'Setup Time', widget.viewModel.setUpTimeController),
+              const SizedBox(height: 10),
+              buildTimeField(
+                  'Start Time', widget.viewModel.startTimeController),
+              const SizedBox(height: 10),
+              buildTimeField('End Time', widget.viewModel.endTimeController),
+              const SizedBox(height: 10),
+              buildTimeField('Strike Down Time',
+                  widget.viewModel.strikeDownTimeController),
+            ]),
 
             const SizedBox(height: 20),
-
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  final eventDate =
-                      DateTime.tryParse(widget.viewModel.dateController.text) ??
-                          widget.date;
-
-                  WellnessEvent eventToSave;
-                  if (isEditMode) {
-                    eventToSave =
-                        widget.viewModel.buildEvent(eventDate).copyWith(
-                              id: eventToEdit!.id,
-                            );
-                  } else {
-                    eventToSave = widget.viewModel.buildEvent(eventDate);
-                  }
-
-                  widget.onSave(eventToSave);
-                  widget.viewModel.clearControllers();
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF201C58),
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size.fromHeight(50),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
-                child: const Text('Save Event'),
+            ElevatedButton(
+              onPressed: () {
+                final eventDate =
+                    DateTime.tryParse(widget.viewModel.dateController.text) ??
+                        widget.date;
+                WellnessEvent eventToSave;
+                if (isEditMode) {
+                  eventToSave = widget.viewModel
+                      .buildEvent(eventDate)
+                      .copyWith(id: eventToEdit!.id);
+                } else {
+                  eventToSave = widget.viewModel.buildEvent(eventDate);
+                }
+                widget.onSave(eventToSave);
+                widget.viewModel.clearControllers();
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF201C58),
+                foregroundColor: Colors.white,
+                minimumSize: const Size.fromHeight(50),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
               ),
+              child: const Text('Save Event',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSectionCard({required String title, required Widget child}) {
-    return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      shadowColor: Colors.grey.withOpacity(0.3),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: Color(0xFF201C58),
-                )),
-            const SizedBox(height: 12),
-            child,
+            const SizedBox(height: 30),
           ],
         ),
       ),
