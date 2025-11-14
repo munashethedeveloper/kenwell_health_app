@@ -21,45 +21,42 @@ class SettingsScreen extends StatelessWidget {
             return ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                // Dark Mode Toggle
-                SwitchListTile(
-                  title: const Text('Dark Mode'),
-                  value: viewModel.darkMode,
-                  onChanged: viewModel.toggleDarkMode,
-                ),
-
-                const Divider(),
-
-                // Notifications Toggle
-                SwitchListTile(
-                  title: const Text('Enable Notifications'),
-                  value: viewModel.notificationsEnabled,
-                  onChanged: viewModel.toggleNotifications,
-                ),
-
-                const Divider(),
-
-                // Language Dropdown
-                ListTile(
-                  title: const Text('Language'),
-                  trailing: DropdownButton<String>(
-                    value: viewModel.language,
-                    items: const [
-                      DropdownMenuItem(
-                          value: 'English', child: Text('English')),
-                      DropdownMenuItem(value: 'French', child: Text('French')),
-                      DropdownMenuItem(
-                          value: 'Spanish', child: Text('Spanish')),
-                    ],
-                    onChanged: (value) {
-                      if (value != null) viewModel.changeLanguage(value);
-                    },
+                _buildCard(
+                  child: SwitchListTile(
+                    title: const Text('Dark Mode'),
+                    value: viewModel.darkMode,
+                    onChanged: viewModel.toggleDarkMode,
                   ),
                 ),
-
-                const SizedBox(height: 20),
-
-                // Save Button
+                const SizedBox(height: 12),
+                _buildCard(
+                  child: SwitchListTile(
+                    title: const Text('Enable Notifications'),
+                    value: viewModel.notificationsEnabled,
+                    onChanged: viewModel.toggleNotifications,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _buildCard(
+                  child: ListTile(
+                    title: const Text('Language'),
+                    trailing: DropdownButton<String>(
+                      value: viewModel.language,
+                      items: const [
+                        DropdownMenuItem(
+                            value: 'English', child: Text('English')),
+                        DropdownMenuItem(
+                            value: 'French', child: Text('French')),
+                        DropdownMenuItem(
+                            value: 'Spanish', child: Text('Spanish')),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) viewModel.changeLanguage(value);
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
                 CustomPrimaryButton(
                   label: 'Save Settings',
                   onPressed: () async {
@@ -74,6 +71,18 @@ class SettingsScreen extends StatelessWidget {
             );
           },
         ),
+      ),
+    );
+  }
+
+  // --- Card wrapper for modern look ---
+  Widget _buildCard({required Widget child}) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        child: child,
       ),
     );
   }

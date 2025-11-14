@@ -10,8 +10,11 @@ class SurveyScreen extends StatelessWidget {
   final VoidCallback onPrevious;
   final VoidCallback onSubmit;
 
-  const SurveyScreen(
-      {super.key, required this.onPrevious, required this.onSubmit});
+  const SurveyScreen({
+    super.key,
+    required this.onPrevious,
+    required this.onSubmit,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +22,9 @@ class SurveyScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: const KenwellAppBar(
-          title: 'Survey', automaticallyImplyLeading: false),
+        title: 'Survey',
+        automaticallyImplyLeading: false,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -33,90 +38,125 @@ class SurveyScreen extends StatelessWidget {
             const SizedBox(height: 16),
 
             // 1. How did you hear about this Wellness Day?
-            const Text(
-              '1. How did you hear about this Wellness Day?',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            _buildCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '1. How did you hear about this Wellness Day?',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  _buildRadioGroup(vm, [
+                    'Intranet',
+                    'Flyer',
+                    'Wellness Team',
+                    'Poster',
+                    'Meeting',
+                    'Bathroom Reads'
+                  ]),
+                ],
+              ),
             ),
-            _buildRadioGroup(vm, [
-              'Intranet',
-              'Flyer',
-              'Wellness Team',
-              'Poster',
-              'Meeting',
-              'Bathroom Reads'
-            ]),
+
             const SizedBox(height: 16),
 
             // 2. Province
-            const Text(
-              '2. In which province did you attend the Wellness Day?',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            _buildCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '2. In which province did you attend the Wellness Day?',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  KenwellDropdownField<String>(
+                    label: 'Province',
+                    value: vm.province,
+                    items: const [
+                      'Gauteng',
+                      'Western Cape',
+                      'KwaZulu-Natal',
+                      'Eastern Cape',
+                      'Limpopo',
+                      'Mpumalanga',
+                      'North West',
+                      'Free State',
+                      'Northern Cape'
+                    ],
+                    onChanged: (val) {
+                      if (val != null) vm.updateProvince(val);
+                    },
+                  ),
+                ],
+              ),
             ),
-            KenwellDropdownField<String>(
-              label: 'Province',
-              value: vm.province,
-              items: const [
-                'Gauteng',
-                'Western Cape',
-                'KwaZulu-Natal',
-                'Eastern Cape',
-                'Limpopo',
-                'Mpumalanga',
-                'North West',
-                'Free State',
-                'Northern Cape'
-              ],
-              onChanged: (val) {
-                if (val != null) vm.updateProvince(val);
-              },
-            ),
-            const Divider(height: 32),
+
+            const SizedBox(height: 16),
 
             // 3–8. Ratings
-            const Text(
-              'Please rate the following (0 = Disappointed, 5 = Extremely Satisfied):',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            _buildCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Please rate the following (0 = Disappointed, 5 = Extremely Satisfied):',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  _buildRatingRow(
+                      vm,
+                      '3. Overall experience of this wellness day?',
+                      'overallExperience'),
+                  _buildRatingRow(
+                      vm,
+                      '4. Kenwell representatives were friendly and courteous?',
+                      'friendlyStaff'),
+                  _buildRatingRow(
+                      vm,
+                      '5. Nurses were knowledgeable, professional and courteous?',
+                      'nurseProfessional'),
+                  _buildRatingRow(vm, '6. Did nurses explain results clearly?',
+                      'clearResults'),
+                  _buildRatingRow(
+                      vm,
+                      '7. Did this event help you realise the full value of attending?',
+                      'realisedValue'),
+                  _buildRatingRow(
+                      vm,
+                      '8. I will encourage colleagues to attend next Wellness Day.',
+                      'encourageColleagues'),
+                ],
+              ),
             ),
-            const SizedBox(height: 8),
-            _buildRatingRow(vm, '3. Overall experience of this wellness day?',
-                'overallExperience'),
-            _buildRatingRow(
-                vm,
-                '4. Kenwell representatives were friendly and courteous?',
-                'friendlyStaff'),
-            _buildRatingRow(
-                vm,
-                '5. Nurses were knowledgeable, professional and courteous?',
-                'nurseProfessional'),
-            _buildRatingRow(
-                vm, '6. Did nurses explain results clearly?', 'clearResults'),
-            _buildRatingRow(
-                vm,
-                '7. Did this event help you realise the full value of attending?',
-                'realisedValue'),
-            _buildRatingRow(
-                vm,
-                '8. I will encourage colleagues to attend next Wellness Day.',
-                'encourageColleagues'),
-            const Divider(height: 32),
+
+            const SizedBox(height: 16),
 
             // 9. Contact Consent
-            const Text(
-              '9. Would you like Kenwell Consulting to contact you regarding your experience?',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            _buildCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '9. Would you like Kenwell Consulting to contact you regarding your experience?',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  KenwellYesNoQuestion<String>(
+                    question:
+                        'Would you like Kenwell Consulting to contact you regarding your experience?',
+                    value: vm.contactConsent,
+                    onChanged: (value) {
+                      if (value != null) vm.updateContactConsent(value);
+                    },
+                    yesValue: 'Yes',
+                    noValue: 'No',
+                  ),
+                ],
+              ),
             ),
-            KenwellYesNoQuestion<String>(
-              question:
-                  'Would you like Kenwell Consulting to contact you regarding your experience?',
-              value: vm.contactConsent,
-              onChanged: (value) {
-                if (value != null) {
-                  vm.updateContactConsent(value);
-                }
-              },
-              yesValue: 'Yes',
-              noValue: 'No',
-            ),
+
             const SizedBox(height: 24),
 
             // Buttons
@@ -140,6 +180,19 @@ class SurveyScreen extends StatelessWidget {
     );
   }
 
+  // --- Card Wrapper ---
+  Widget _buildCard({required Widget child}) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: child,
+      ),
+    );
+  }
+
   // --- Helpers ---
   Widget _buildRadioGroup(SurveyViewModel vm, List<String> options) {
     final groupValue = vm.heardAbout;
@@ -151,9 +204,7 @@ class SurveyScreen extends StatelessWidget {
               value: option,
               groupValue: groupValue,
               onChanged: (val) {
-                if (val != null) {
-                  vm.updateHeardAbout(val);
-                }
+                if (val != null) vm.updateHeardAbout(val);
               },
             ),
           )
@@ -179,9 +230,7 @@ class SurveyScreen extends StatelessWidget {
                   value: index,
                   groupValue: vm.ratings[key],
                   onChanged: (val) {
-                    if (val != null) {
-                      vm.updateRating(key, val);
-                    }
+                    if (val != null) vm.updateRating(key, val);
                   },
                 ),
               ),

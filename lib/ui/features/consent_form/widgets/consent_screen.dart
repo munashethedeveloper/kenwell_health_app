@@ -7,13 +7,11 @@ import '../view_model/consent_screen_view_model.dart';
 class ConsentScreen extends StatelessWidget {
   final VoidCallback onNext;
   final VoidCallback onCancel;
-  //final ConsentScreenViewModel viewModel;
 
   const ConsentScreen({
     super.key,
     required this.onNext,
     required this.onCancel,
-    //required this.viewModel
   });
 
   @override
@@ -28,36 +26,42 @@ class ConsentScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Venue, Date, Practitioner
-            _buildTextField(vm.venueController, 'Venue'),
-            const SizedBox(height: 16),
-            TextField(
-              controller: vm.dateController,
-              decoration: const InputDecoration(
-                labelText: 'Date',
-                border: OutlineInputBorder(),
+            // ===== Event Info =====
+            Card(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+              elevation: 2,
+              margin: EdgeInsets.zero,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    _buildTextField(vm.venueController, 'Venue'),
+                    const SizedBox(height: 16),
+                    _buildTextField(vm.dateController, 'Date', readOnly: true,
+                        onTap: () async {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                      final pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2100),
+                      );
+                      if (pickedDate != null) {
+                        vm.dateController.text =
+                            '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
+                      }
+                    }),
+                    const SizedBox(height: 16),
+                    _buildTextField(vm.practitionerController,
+                        'Name of Healthcare Practitioner'),
+                  ],
+                ),
               ),
-              readOnly: true,
-              onTap: () async {
-                FocusScope.of(context).requestFocus(FocusNode());
-                final pickedDate = await showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2100),
-                );
-                if (pickedDate != null) {
-                  vm.dateController.text =
-                      '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
-                }
-              },
             ),
-            const SizedBox(height: 16),
-            _buildTextField(
-                vm.practitionerController, 'Name of Healthcare Practitioner'),
             const SizedBox(height: 24),
 
-            // Information bullets
+            // ===== Information =====
             const Text(
               'I hereby declare that I have read and understood the information below. By signing, I confirm my understanding of:',
               style: TextStyle(fontSize: 16),
@@ -77,43 +81,57 @@ class ConsentScreen extends StatelessWidget {
                 'I have been offered HIV pre- and post-test counselling.'),
             const SizedBox(height: 20),
 
+            // ===== Screenings =====
             const Text(
               'Select applicable screenings:',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            CheckboxListTile(
-              title: const Text('HRA'),
-              value: vm.hra,
-              onChanged: (val) => vm.toggleCheckbox('hra', val),
-            ),
-            CheckboxListTile(
-              title: const Text('VCT'),
-              value: vm.vct,
-              onChanged: (val) => vm.toggleCheckbox('vct', val),
-            ),
-            CheckboxListTile(
-              title: const Text('TB'),
-              value: vm.tb,
-              onChanged: (val) => vm.toggleCheckbox('tb', val),
-            ),
-            CheckboxListTile(
-              title: const Text('HIV'),
-              value: vm.hiv,
-              onChanged: (val) => vm.toggleCheckbox('hiv', val),
+            const SizedBox(height: 8),
+            Card(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+              elevation: 2,
+              child: Column(
+                children: [
+                  CheckboxListTile(
+                    title: const Text('HRA'),
+                    value: vm.hra,
+                    onChanged: (val) => vm.toggleCheckbox('hra', val),
+                  ),
+                  CheckboxListTile(
+                    title: const Text('VCT'),
+                    value: vm.vct,
+                    onChanged: (val) => vm.toggleCheckbox('vct', val),
+                  ),
+                  CheckboxListTile(
+                    title: const Text('TB'),
+                    value: vm.tb,
+                    onChanged: (val) => vm.toggleCheckbox('tb', val),
+                  ),
+                  CheckboxListTile(
+                    title: const Text('HIV'),
+                    value: vm.hiv,
+                    onChanged: (val) => vm.toggleCheckbox('hiv', val),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 20),
 
+            // ===== Signature =====
             const Text('Signature:', style: TextStyle(fontSize: 16)),
             const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              height: 150,
-              child: Signature(
-                controller: vm.signatureController,
-                backgroundColor: Colors.grey[100]!,
+            Card(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+              elevation: 2,
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                height: 160,
+                child: Signature(
+                  controller: vm.signatureController,
+                  backgroundColor: Colors.grey[100]!,
+                ),
               ),
             ),
             const SizedBox(height: 8),
@@ -124,17 +142,17 @@ class ConsentScreen extends StatelessWidget {
                 child: const Text('Clear Signature'),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
-            // Buttons: Cancel + Next
+            // ===== Buttons =====
             Row(
               children: [
                 Expanded(
-                  child: ElevatedButton(
+                  child: OutlinedButton(
                     onPressed: onCancel,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14.0),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      side: const BorderSide(color: Colors.grey),
                     ),
                     child: const Text('Cancel'),
                   ),
@@ -159,8 +177,8 @@ class ConsentScreen extends StatelessWidget {
                             }
                           },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF90C048),
-                      padding: const EdgeInsets.symmetric(vertical: 14.0),
+                      backgroundColor: const Color(0xFF201C58),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
                     child: vm.isSubmitting
                         ? const CircularProgressIndicator(
@@ -181,12 +199,17 @@ class ConsentScreen extends StatelessWidget {
   }
 
   static Widget _buildTextField(
-      TextEditingController controller, String labelText) {
+      TextEditingController controller, String labelText,
+      {bool readOnly = false, VoidCallback? onTap}) {
     return TextField(
       controller: controller,
+      readOnly: readOnly,
+      onTap: onTap,
       decoration: InputDecoration(
         labelText: labelText,
-        border: const OutlineInputBorder(),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        filled: true,
+        fillColor: Colors.grey[100],
       ),
     );
   }

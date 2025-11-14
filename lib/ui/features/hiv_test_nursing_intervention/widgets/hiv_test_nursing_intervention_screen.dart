@@ -21,45 +21,60 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: const KenwellAppBar(
-          title: 'HIV Test Nursing Intervention',
-          automaticallyImplyLeading: false),
+        title: 'HIV Test Nursing Intervention',
+        automaticallyImplyLeading: false,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('HCT Nursing Interventions',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-
-            // Example sections
-            _buildSectionTitle(
-                '1. Did the risk assessment indicate window period?'),
-            _buildRadioOptions(
-                viewModel.windowPeriod, viewModel.setWindowPeriod),
-
-            _buildSectionTitle('2. Follow-up test location'),
-            _buildCheckbox('State Clinic', viewModel.followUpClinic,
-                viewModel.setFollowUpClinic),
-            _buildCheckbox('Private Doctor', viewModel.followUpPrivateDoctor,
-                viewModel.setFollowUpPrivateDoctor),
-            _buildCheckbox('Other (give detail)', viewModel.followUpOther,
-                viewModel.setFollowUpOther),
-            if (viewModel.followUpOther)
-              KenwellTextField(
-                label: 'Specify other location',
-                controller: viewModel.followUpOtherDetailsController,
+            _buildCard(
+              title: 'HCT Nursing Interventions',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildSection(
+                    '1. Did the risk assessment indicate window period?',
+                    _buildRadioOptions(
+                        viewModel.windowPeriod, viewModel.setWindowPeriod),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildSection(
+                    '2. Follow-up test location',
+                    Column(
+                      children: [
+                        _buildCheckbox('State Clinic', viewModel.followUpClinic,
+                            viewModel.setFollowUpClinic),
+                        _buildCheckbox(
+                            'Private Doctor',
+                            viewModel.followUpPrivateDoctor,
+                            viewModel.setFollowUpPrivateDoctor),
+                        _buildCheckbox(
+                            'Other (give detail)',
+                            viewModel.followUpOther,
+                            viewModel.setFollowUpOther),
+                        if (viewModel.followUpOther)
+                          KenwellTextField(
+                            label: 'Specify other location',
+                            controller:
+                                viewModel.followUpOtherDetailsController,
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildSection(
+                    '3. Follow-up test date',
+                    KenwellTextField(
+                      label: 'YYYY-MM-DD',
+                      controller: viewModel.followUpDateController,
+                      readOnly: true,
+                      onTap: () => viewModel.pickFollowUpDate(context),
+                    ),
+                  ),
+                ],
               ),
-
-            const SizedBox(height: 16),
-            _buildSectionTitle('3. Follow-up test date'),
-            KenwellTextField(
-              label: 'YYYY-MM-DD',
-              controller: viewModel.followUpDateController,
-              readOnly: true,
-              onTap: () => viewModel.pickFollowUpDate(context),
             ),
-
             const SizedBox(height: 24),
             KenwellFormNavigation(
               onPrevious: onPrevious,
@@ -74,8 +89,38 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
   }
 
   // --- Helpers ---
-  Widget _buildSectionTitle(String text) =>
-      Text(text, style: const TextStyle(fontWeight: FontWeight.bold));
+  Widget _buildCard({required String title, required Widget child}) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 3,
+      shadowColor: Colors.grey.shade300,
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title,
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            child,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSection(String title, Widget content) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        content,
+      ],
+    );
+  }
 
   Widget _buildRadioOptions(String groupValue, ValueChanged<String> onChanged) {
     const options = ['N/A', 'Yes', 'No'];
@@ -89,9 +134,7 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
                 dense: true,
                 groupValue: groupValue,
                 onChanged: (value) {
-                  if (value != null) {
-                    onChanged(value);
-                  }
+                  if (value != null) onChanged(value);
                 },
               ),
             ),
@@ -105,6 +148,7 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
       value: value,
       onChanged: (val) => onChanged(val!),
       title: Text(label),
+      controlAffinity: ListTileControlAffinity.leading,
     );
   }
 }

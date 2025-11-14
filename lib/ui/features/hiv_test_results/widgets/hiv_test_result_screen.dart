@@ -20,62 +20,79 @@ class HIVTestResultScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: const KenwellAppBar(
-          title: 'HIV Test Results', automaticallyImplyLeading: false),
+        title: 'HIV Test Results',
+        automaticallyImplyLeading: false,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _sectionTitle('Screening Test'),
-            const SizedBox(height: 8),
-            _buildTextField(
-                'Name of Test', viewModel.screeningTestNameController),
-            const SizedBox(height: 8),
-            _buildTextField('Batch No', viewModel.screeningBatchNoController),
-            const SizedBox(height: 8),
-            _buildTextField(
-                'Expiry Date', viewModel.screeningExpiryDateController,
-                readOnly: true,
-                onTap: () =>
-                    viewModel.pickExpiryDate(context, isScreening: true)),
-            const SizedBox(height: 8),
-            _buildDropdown(
-              'Test Result',
-              ['Negative', 'Positive'],
-              viewModel.screeningResult,
-              viewModel.setScreeningResult,
+            _buildCard(
+              title: 'Screening Test',
+              child: Column(
+                children: [
+                  _buildTextField(
+                      'Name of Test', viewModel.screeningTestNameController),
+                  const SizedBox(height: 12),
+                  _buildTextField(
+                      'Batch No', viewModel.screeningBatchNoController),
+                  const SizedBox(height: 12),
+                  _buildTextField(
+                    'Expiry Date',
+                    viewModel.screeningExpiryDateController,
+                    readOnly: true,
+                    onTap: () =>
+                        viewModel.pickExpiryDate(context, isScreening: true),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildDropdown(
+                    'Test Result',
+                    ['Negative', 'Positive'],
+                    viewModel.screeningResult,
+                    viewModel.setScreeningResult,
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 16),
-            _sectionTitle('Confirmatory Test'),
-            const SizedBox(height: 8),
-            _buildTextField(
-                'Name of Test', viewModel.confirmatoryTestNameController),
-            const SizedBox(height: 8),
-            _buildTextField(
-                'Batch No', viewModel.confirmatoryBatchNoController),
-            const SizedBox(height: 8),
-            _buildTextField(
-                'Expiry Date', viewModel.confirmatoryExpiryDateController,
-                readOnly: true,
-                onTap: () =>
-                    viewModel.pickExpiryDate(context, isScreening: false)),
-            const SizedBox(height: 8),
-            _buildDropdown(
-              'Test Result',
-              ['Negative', 'Positive'],
-              viewModel.confirmatoryResult,
-              viewModel.setConfirmatoryResult,
+            _buildCard(
+              title: 'Confirmatory Test',
+              child: Column(
+                children: [
+                  _buildTextField(
+                      'Name of Test', viewModel.confirmatoryTestNameController),
+                  const SizedBox(height: 12),
+                  _buildTextField(
+                      'Batch No', viewModel.confirmatoryBatchNoController),
+                  const SizedBox(height: 12),
+                  _buildTextField(
+                    'Expiry Date',
+                    viewModel.confirmatoryExpiryDateController,
+                    readOnly: true,
+                    onTap: () =>
+                        viewModel.pickExpiryDate(context, isScreening: false),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildDropdown(
+                    'Test Result',
+                    ['Negative', 'Positive'],
+                    viewModel.confirmatoryResult,
+                    viewModel.setConfirmatoryResult,
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 16),
-            _sectionTitle('Final HIV Test Result'),
-            const SizedBox(height: 8),
-            _buildDropdown(
-              'Final Result',
-              ['Negative', 'Positive'],
-              viewModel.finalResult,
-              viewModel.setFinalResult,
+            _buildCard(
+              title: 'Final HIV Test Result',
+              child: _buildDropdown(
+                'Final Result',
+                ['Negative', 'Positive'],
+                viewModel.finalResult,
+                viewModel.setFinalResult,
+              ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             KenwellFormNavigation(
               onPrevious: onPrevious,
               onNext: () => viewModel.submitTestResult(onNext),
@@ -88,10 +105,25 @@ class HIVTestResultScreen extends StatelessWidget {
     );
   }
 
-  Widget _sectionTitle(String text) {
-    return Text(
-      text,
-      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+  Widget _buildCard({required String title, required Widget child}) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 3,
+      shadowColor: Colors.grey.shade300,
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title,
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            child,
+          ],
+        ),
+      ),
     );
   }
 
@@ -111,7 +143,7 @@ class HIVTestResultScreen extends StatelessWidget {
   Widget _buildDropdown(String label, List<String> items, String value,
       void Function(String) onChanged) {
     return DropdownButtonFormField<String>(
-      initialValue: value,
+      value: value,
       decoration: InputDecoration(
         labelText: label,
         border: const OutlineInputBorder(),

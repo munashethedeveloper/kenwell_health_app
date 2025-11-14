@@ -29,28 +29,35 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  _buildTextField('Height (m or cm)', vm.heightController,
-                      keyboardType: TextInputType.number),
-                  const SizedBox(height: 12),
-                  _buildTextField('Weight (kg)', vm.weightController,
-                      keyboardType: TextInputType.number),
-                  const SizedBox(height: 12),
-                  _buildTextField('BMI', vm.bmiController, readOnly: true),
-                  const SizedBox(height: 12),
-                  _buildTextField(
-                      'Blood Pressure (mmHg)', vm.bloodPressureController),
-                  const SizedBox(height: 12),
-                  _buildTextField(
-                      'Cholesterol (mmol/L)', vm.cholesterolController,
-                      keyboardType: TextInputType.number),
-                  const SizedBox(height: 12),
-                  _buildTextField(
-                      'Blood Sugar (mmol/L)', vm.bloodSugarController,
-                      keyboardType: TextInputType.number),
-                  const SizedBox(height: 12),
-                  _buildTextField(
-                      'Waist Circumference (cm)', vm.waistController,
-                      keyboardType: TextInputType.number),
+                  _buildCard(
+                    child: Column(
+                      children: [
+                        _buildTextField('Height (m or cm)', vm.heightController,
+                            keyboardType: TextInputType.number),
+                        const SizedBox(height: 12),
+                        _buildTextField('Weight (kg)', vm.weightController,
+                            keyboardType: TextInputType.number),
+                        const SizedBox(height: 12),
+                        _buildTextField('BMI', vm.bmiController,
+                            readOnly: true),
+                        const SizedBox(height: 12),
+                        _buildTextField('Blood Pressure (mmHg)',
+                            vm.bloodPressureController),
+                        const SizedBox(height: 12),
+                        _buildTextField(
+                            'Cholesterol (mmol/L)', vm.cholesterolController,
+                            keyboardType: TextInputType.number),
+                        const SizedBox(height: 12),
+                        _buildTextField(
+                            'Blood Sugar (mmol/L)', vm.bloodSugarController,
+                            keyboardType: TextInputType.number),
+                        const SizedBox(height: 12),
+                        _buildTextField(
+                            'Waist Circumference (cm)', vm.waistController,
+                            keyboardType: TextInputType.number),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 24),
 
                   // ✅ Buttons
@@ -111,6 +118,19 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
       decoration: InputDecoration(
         labelText: label,
         border: const OutlineInputBorder(),
+      ),
+    );
+  }
+
+  Widget _buildCard({required Widget child}) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 3,
+      color: Colors.white,
+      shadowColor: Colors.grey.shade300,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: child,
       ),
     );
   }

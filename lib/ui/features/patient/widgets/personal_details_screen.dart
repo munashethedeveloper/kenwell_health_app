@@ -32,102 +32,134 @@ class PersonalDetailsScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  KenwellTextField(
-                    label: 'Screening Site',
-                    controller: vm.screeningSiteController,
+                  // ===== Personal Info Card =====
+                  _buildCard(
+                    child: Column(
+                      children: [
+                        KenwellTextField(
+                          label: 'Screening Site',
+                          controller: vm.screeningSiteController,
+                        ),
+                        const SizedBox(height: 16),
+                        KenwellTextField(
+                          label: 'Date',
+                          controller: vm.dateController,
+                          readOnly: true,
+                          onTap: () async {
+                            FocusScope.of(context).requestFocus(FocusNode());
+                            final pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(2100),
+                            );
+                            if (pickedDate != null) {
+                              vm.dateController.text =
+                                  '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        KenwellTextField(
+                          label: 'Name',
+                          controller: vm.nameController,
+                        ),
+                        KenwellTextField(
+                          label: 'Surname',
+                          controller: vm.surnameController,
+                        ),
+                        KenwellTextField(
+                          label: 'Initials',
+                          controller: vm.initialsController,
+                        ),
+                        KenwellTextField(
+                          label: 'ID Number',
+                          controller: vm.idNumberController,
+                        ),
+                        KenwellTextField(
+                          label: 'Nationality',
+                          controller: vm.nationalityController,
+                        ),
+                      ],
+                    ),
                   ),
-                  KenwellTextField(
-                    label: 'Date',
-                    controller: vm.dateController,
-                    readOnly: true,
-                    onTap: () async {
-                      FocusScope.of(context).requestFocus(FocusNode());
-                      final pickedDate = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime(2100),
-                      );
-                      if (pickedDate != null) {
-                        vm.dateController.text =
-                            '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
-                      }
-                    },
+
+                  const SizedBox(height: 16),
+
+                  // ===== Medical Aid Info Card =====
+                  _buildCard(
+                    child: Column(
+                      children: [
+                        KenwellTextField(
+                          label: 'Medical Aid Name',
+                          controller: vm.medicalAidNameController,
+                        ),
+                        KenwellTextField(
+                          label: 'Medical Aid Number',
+                          controller: vm.medicalAidNumberController,
+                        ),
+                        KenwellTextField(
+                          label: 'Email Address',
+                          controller: vm.emailController,
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                        KenwellTextField(
+                          label: 'Cell Number',
+                          controller: vm.cellNumberController,
+                          keyboardType: TextInputType.phone,
+                        ),
+                        KenwellTextField(
+                          label: 'Personal Number',
+                          controller: vm.personalNumberController,
+                        ),
+                      ],
+                    ),
                   ),
-                  KenwellTextField(
-                    label: 'Name',
-                    controller: vm.nameController,
+
+                  const SizedBox(height: 16),
+
+                  // ===== Work Info Card =====
+                  _buildCard(
+                    child: Column(
+                      children: [
+                        KenwellTextField(
+                          label: 'Division',
+                          controller: vm.divisionController,
+                        ),
+                        KenwellTextField(
+                          label: 'Position / Rank',
+                          controller: vm.positionController,
+                        ),
+                        KenwellTextField(
+                          label: 'Region / Province',
+                          controller: vm.regionController,
+                        ),
+                        const SizedBox(height: 16),
+                        KenwellDropdownField<String>(
+                          label: 'Marital Status',
+                          value: vm.maritalStatus,
+                          items: vm.maritalStatusOptions,
+                          onChanged: vm.setMaritalStatus,
+                        ),
+                        KenwellDropdownField<String>(
+                          label: 'Gender',
+                          value: vm.gender,
+                          items: vm.genderOptions,
+                          onChanged: vm.setGender,
+                        ),
+                        KenwellDropdownField<String>(
+                          label: 'Employment Status',
+                          value: vm.employmentStatus,
+                          items: vm.employmentStatusOptions,
+                          onChanged: vm.setEmploymentStatus,
+                        ),
+                      ],
+                    ),
                   ),
-                  KenwellTextField(
-                    label: 'Surname',
-                    controller: vm.surnameController,
-                  ),
-                  KenwellTextField(
-                    label: 'Initials',
-                    controller: vm.initialsController,
-                  ),
-                  KenwellTextField(
-                    label: 'ID Number',
-                    controller: vm.idNumberController,
-                  ),
-                  KenwellTextField(
-                    label: 'Nationality',
-                    controller: vm.nationalityController,
-                  ),
-                  KenwellTextField(
-                    label: 'Medical Aid Name',
-                    controller: vm.medicalAidNameController,
-                  ),
-                  KenwellTextField(
-                    label: 'Medical Aid Number',
-                    controller: vm.medicalAidNumberController,
-                  ),
-                  KenwellTextField(
-                    label: 'Email Address',
-                    controller: vm.emailController,
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                  KenwellTextField(
-                    label: 'Cell Number',
-                    controller: vm.cellNumberController,
-                    keyboardType: TextInputType.phone,
-                  ),
-                  KenwellTextField(
-                    label: 'Personal Number',
-                    controller: vm.personalNumberController,
-                  ),
-                  KenwellTextField(
-                    label: 'Division',
-                    controller: vm.divisionController,
-                  ),
-                  KenwellTextField(
-                    label: 'Position / Rank',
-                    controller: vm.positionController,
-                  ),
-                  KenwellTextField(
-                    label: 'Region / Province',
-                    controller: vm.regionController,
-                  ),
-                  KenwellDropdownField<String>(
-                    label: 'Marital Status',
-                    value: vm.maritalStatus,
-                    items: vm.maritalStatusOptions,
-                    onChanged: vm.setMaritalStatus,
-                  ),
-                  KenwellDropdownField<String>(
-                    label: 'Gender',
-                    value: vm.gender,
-                    items: vm.genderOptions,
-                    onChanged: vm.setGender,
-                  ),
-                  KenwellDropdownField<String>(
-                    label: 'Employment Status',
-                    value: vm.employmentStatus,
-                    items: vm.employmentStatusOptions,
-                    onChanged: vm.setEmploymentStatus,
-                  ),
+
                   const SizedBox(height: 24),
-                  // --- Navigation Buttons ---
+
+                  // ===== Navigation Buttons =====
                   KenwellFormNavigation(
                     onPrevious: onPrevious,
                     onNext: () async {
@@ -152,6 +184,18 @@ class PersonalDetailsScreen extends StatelessWidget {
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildCard({required Widget child}) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 2,
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: child,
       ),
     );
   }

@@ -87,12 +87,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ],
           bottom: const TabBar(
             indicatorSize: TabBarIndicatorSize.tab,
-            indicator: BoxDecoration(
-              color: Color(0xFF90C048),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
-            ),
+            indicator: BoxDecoration(color: Color(0xFF90C048)),
             labelColor: Colors.white,
-            unselectedLabelColor: Colors.white70,
+            unselectedLabelColor: Colors.white,
             tabs: [
               Tab(icon: Icon(Icons.calendar_today), text: 'Calendar'),
               Tab(icon: Icon(Icons.list), text: 'List'),
@@ -104,78 +101,48 @@ class _CalendarScreenState extends State<CalendarScreen> {
             // ===== Calendar Tab =====
             Column(
               children: [
-                Expanded(
-                  child: TableCalendar(
-                    firstDay: DateTime.utc(2020, 1, 1),
-                    lastDay: DateTime.utc(3000, 12, 31),
-                    focusedDay: _focusedDay,
-                    selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-                    eventLoader: _getEventsForDay,
-                    headerStyle: const HeaderStyle(
-                      formatButtonVisible: false,
-                      titleCentered: true,
-                      titleTextStyle: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF201C58),
-                      ),
-                      leftChevronIcon:
-                          Icon(Icons.chevron_left, color: Color(0xFF201C58)),
-                      rightChevronIcon:
-                          Icon(Icons.chevron_right, color: Color(0xFF201C58)),
-                    ),
-                    calendarStyle: CalendarStyle(
-                      todayDecoration: BoxDecoration(
-                        color: const Color(0xFF90C048),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black26,
-                            blurRadius: 4,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      selectedDecoration: BoxDecoration(
-                        color: const Color(0xFF201C58),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black38,
-                            blurRadius: 6,
-                            offset: Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      markerDecoration: BoxDecoration(
-                        color: const Color(0xFF201C58),
-                        shape: BoxShape.circle,
-                      ),
-                      weekendTextStyle:
-                          const TextStyle(color: Colors.redAccent),
-                    ),
-                    onDaySelected: (selectedDay, focusedDay) {
-                      setState(() {
-                        _selectedDay = selectedDay;
-                        _focusedDay = focusedDay;
-                      });
-
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => EventScreen(
-                            date: selectedDay,
-                            existingEvents:
-                                widget.eventVM.getEventsForDate(selectedDay),
-                            onSave: (newEvent) {
-                              widget.eventVM.addEvent(newEvent);
-                            },
-                            viewModel: widget.eventVM,
-                          ),
-                        ),
-                      );
-                    },
+                TableCalendar(
+                  firstDay: DateTime.utc(2020, 1, 1),
+                  lastDay: DateTime.utc(3000, 12, 31),
+                  focusedDay: _focusedDay,
+                  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                  eventLoader: _getEventsForDay,
+                  headerStyle: const HeaderStyle(
+                    formatButtonVisible: false,
+                    titleCentered: true,
                   ),
+                  calendarStyle: CalendarStyle(
+                    weekendTextStyle: const TextStyle(color: Colors.red),
+                    todayDecoration: BoxDecoration(
+                      color: Colors.greenAccent.withOpacity(0.5),
+                      shape: BoxShape.circle,
+                    ),
+                    selectedDecoration: const BoxDecoration(
+                      color: Color(0xFF90C048),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  onDaySelected: (selectedDay, focusedDay) {
+                    setState(() {
+                      _selectedDay = selectedDay;
+                      _focusedDay = focusedDay;
+                    });
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => EventScreen(
+                          date: selectedDay,
+                          existingEvents:
+                              widget.eventVM.getEventsForDate(selectedDay),
+                          onSave: (newEvent) {
+                            widget.eventVM.addEvent(newEvent);
+                          },
+                          viewModel: widget.eventVM,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
@@ -183,7 +150,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
             // ===== Events List Tab =====
             Column(
               children: [
-                // Month Navigation
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -193,35 +159,21 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       IconButton(
                         icon: const Icon(Icons.chevron_left),
                         onPressed: _goToPreviousMonth,
-                        color: Color(0xFF201C58),
-                        splashRadius: 24,
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 4, horizontal: 12),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF90C048).withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Text(
-                          DateFormat.yMMMM().format(_focusedDay),
-                          style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF201C58)),
+                      Text(
+                        DateFormat.yMMMM().format(_focusedDay),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                       IconButton(
                         icon: const Icon(Icons.chevron_right),
                         onPressed: _goToNextMonth,
-                        color: Color(0xFF201C58),
-                        splashRadius: 24,
                       ),
                     ],
                   ),
                 ),
-
-                // Events List
                 Expanded(
                   child: Builder(
                     builder: (_) {
@@ -253,15 +205,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Padding(
+                              Container(
+                                width: double.infinity,
+                                color: const Color(0xFF201C58),
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 8),
+                                    vertical: 8, horizontal: 16),
                                 child: Text(
                                   DateFormat.yMMMMd().format(day),
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: Color(0xFF201C58),
+                                    color: Colors.white,
                                   ),
                                 ),
                               ),
@@ -328,13 +281,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                     ),
                                   ),
                                   child: Card(
-                                    elevation: 3,
                                     margin: const EdgeInsets.symmetric(
-                                        vertical: 6, horizontal: 16),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12)),
-                                    shadowColor: Colors.grey.withOpacity(0.3),
+                                        vertical: 6, horizontal: 12),
                                     child: ListTile(
                                       leading: CircleAvatar(
                                         backgroundColor: _categoryColor(
@@ -343,8 +291,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                       title: Text(
                                         event.title,
                                         style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16),
+                                            fontWeight: FontWeight.bold),
                                       ),
                                       subtitle: Column(
                                         crossAxisAlignment:
@@ -388,10 +335,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         floatingActionButton: FloatingActionButton.extended(
           backgroundColor: const Color(0xFF90C048),
           icon: const Icon(Icons.add, color: Colors.white),
-          label: const Text(
-            'Add Event',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
+          label: const Text('Add Event', style: TextStyle(color: Colors.white)),
           onPressed: () {
             final targetDate = _selectedDay ?? _focusedDay;
             Navigator.push(

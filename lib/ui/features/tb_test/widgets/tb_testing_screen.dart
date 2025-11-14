@@ -10,8 +10,11 @@ class TBTestingScreen extends StatelessWidget {
   final VoidCallback onNext;
   final VoidCallback onPrevious;
 
-  const TBTestingScreen(
-      {super.key, required this.onNext, required this.onPrevious});
+  const TBTestingScreen({
+    super.key,
+    required this.onNext,
+    required this.onPrevious,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,132 +22,101 @@ class TBTestingScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: const KenwellAppBar(
-          title: 'TB Test Screening', automaticallyImplyLeading: false),
+        title: 'TB Test Screening',
+        automaticallyImplyLeading: false,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'TB Symptom Screening',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            KenwellYesNoQuestion<String>(
-              question: 'Have you been coughing for two weeks or more?',
-              value: viewModel.coughTwoWeeks,
-              onChanged: viewModel.setCoughTwoWeeks,
-              yesValue: 'Yes',
-              noValue: 'No',
-              padding: const EdgeInsets.only(bottom: 10),
-            ),
-            KenwellYesNoQuestion<String>(
-              question: 'Is your sputum coloured when coughing?',
-              value: viewModel.sputumColour,
-              onChanged: viewModel.setSputumColour,
-              yesValue: 'Yes',
-              noValue: 'No',
-              padding: const EdgeInsets.only(bottom: 10),
-            ),
-            KenwellYesNoQuestion<String>(
-              question: 'Is there blood in your sputum when you cough?',
-              value: viewModel.bloodInSputum,
-              onChanged: viewModel.setBloodInSputum,
-              yesValue: 'Yes',
-              noValue: 'No',
-              padding: const EdgeInsets.only(bottom: 10),
-            ),
-            KenwellYesNoQuestion<String>(
-              question: 'Have you lost more than 3kg in the past 4 weeks?',
-              value: viewModel.weightLoss,
-              onChanged: viewModel.setWeightLoss,
-              yesValue: 'Yes',
-              noValue: 'No',
-              padding: const EdgeInsets.only(bottom: 10),
-            ),
-            KenwellYesNoQuestion<String>(
-              question: 'Are you sweating unusually at night?',
-              value: viewModel.nightSweats,
-              onChanged: viewModel.setNightSweats,
-              yesValue: 'Yes',
-              noValue: 'No',
-              padding: const EdgeInsets.only(bottom: 10),
-            ),
-            KenwellYesNoQuestion<String>(
-              question:
-                  'Have you had recurrent fever/chills lasting more than three days?',
-              value: viewModel.feverChills,
-              onChanged: viewModel.setFeverChills,
-              yesValue: 'Yes',
-              noValue: 'No',
-              padding: const EdgeInsets.only(bottom: 10),
-            ),
-            KenwellYesNoQuestion<String>(
-              question:
-                  'Have you experienced chest pains or difficulty breathing?',
-              value: viewModel.chestPain,
-              onChanged: viewModel.setChestPain,
-              yesValue: 'Yes',
-              noValue: 'No',
-              padding: const EdgeInsets.only(bottom: 10),
-            ),
-            KenwellYesNoQuestion<String>(
-              question: 'Do you have swellings in the neck or armpits?',
-              value: viewModel.swellings,
-              onChanged: viewModel.setSwellings,
-              yesValue: 'Yes',
-              noValue: 'No',
-              padding: const EdgeInsets.only(bottom: 10),
-            ),
-            const Divider(height: 32),
-            const Text(
-              'History of TB Treatment',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            KenwellYesNoQuestion<String>(
-              question: 'Were you ever treated for Tuberculosis?',
-              value: viewModel.treatedBefore,
-              onChanged: viewModel.setTreatedBefore,
-              yesValue: 'Yes',
-              noValue: 'No',
-              padding: const EdgeInsets.only(bottom: 10),
-            ),
-            if (viewModel.treatedBefore == 'Yes')
-              KenwellTextField(
-                label: 'When were you treated?',
-                controller: viewModel.treatedDateController,
-                readOnly: true,
-                onTap: () async {
-                  FocusScope.of(context).requestFocus(FocusNode());
-                  final pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2100),
-                  );
-                  if (pickedDate != null) {
-                    viewModel.treatedDateController.text =
-                        '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
-                  }
-                },
+            _buildCard(
+              title: 'TB Symptom Screening',
+              child: Column(
+                children: [
+                  _buildYesNo(
+                    'Have you been coughing for two weeks or more?',
+                    viewModel.coughTwoWeeks,
+                    viewModel.setCoughTwoWeeks,
+                  ),
+                  _buildYesNo(
+                    'Is your sputum coloured when coughing?',
+                    viewModel.sputumColour,
+                    viewModel.setSputumColour,
+                  ),
+                  _buildYesNo(
+                    'Is there blood in your sputum when you cough?',
+                    viewModel.bloodInSputum,
+                    viewModel.setBloodInSputum,
+                  ),
+                  _buildYesNo(
+                    'Have you lost more than 3kg in the past 4 weeks?',
+                    viewModel.weightLoss,
+                    viewModel.setWeightLoss,
+                  ),
+                  _buildYesNo(
+                    'Are you sweating unusually at night?',
+                    viewModel.nightSweats,
+                    viewModel.setNightSweats,
+                  ),
+                  _buildYesNo(
+                    'Have you had recurrent fever/chills lasting more than three days?',
+                    viewModel.feverChills,
+                    viewModel.setFeverChills,
+                  ),
+                  _buildYesNo(
+                    'Have you experienced chest pains or difficulty breathing?',
+                    viewModel.chestPain,
+                    viewModel.setChestPain,
+                  ),
+                  _buildYesNo(
+                    'Do you have swellings in the neck or armpits?',
+                    viewModel.swellings,
+                    viewModel.setSwellings,
+                  ),
+                ],
               ),
-            KenwellYesNoQuestion<String>(
-              question: 'Did you complete the treatment?',
-              value: viewModel.completedTreatment,
-              onChanged: viewModel.setCompletedTreatment,
-              yesValue: 'Yes',
-              noValue: 'No',
-              padding: const EdgeInsets.only(bottom: 10),
             ),
-            KenwellYesNoQuestion<String>(
-              question:
-                  'Were you in contact with someone diagnosed with Tuberculosis in the past year?',
-              value: viewModel.contactWithTB,
-              onChanged: viewModel.setContactWithTB,
-              yesValue: 'Yes',
-              noValue: 'No',
-              padding: const EdgeInsets.only(bottom: 10),
+            const SizedBox(height: 16),
+            _buildCard(
+              title: 'History of TB Treatment',
+              child: Column(
+                children: [
+                  _buildYesNo(
+                    'Were you ever treated for Tuberculosis?',
+                    viewModel.treatedBefore,
+                    viewModel.setTreatedBefore,
+                  ),
+                  if (viewModel.treatedBefore == 'Yes')
+                    KenwellTextField(
+                      label: 'When were you treated?',
+                      controller: viewModel.treatedDateController,
+                      readOnly: true,
+                      onTap: () async {
+                        FocusScope.of(context).requestFocus(FocusNode());
+                        final pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2100),
+                        );
+                        if (pickedDate != null) {
+                          viewModel.treatedDateController.text =
+                              '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
+                        }
+                      },
+                    ),
+                  _buildYesNo(
+                    'Did you complete the treatment?',
+                    viewModel.completedTreatment,
+                    viewModel.setCompletedTreatment,
+                  ),
+                  _buildYesNo(
+                    'Were you in contact with someone diagnosed with Tuberculosis in the past year?',
+                    viewModel.contactWithTB,
+                    viewModel.setContactWithTB,
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 24),
             KenwellFormNavigation(
@@ -155,6 +127,43 @@ class TBTestingScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  // --- Helpers ---
+  Widget _buildCard({required String title, required Widget child}) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 3,
+      shadowColor: Colors.grey.shade300,
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title,
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            child,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildYesNo(
+      String question, String? value, ValueChanged<String?> onChanged) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: KenwellYesNoQuestion<String>(
+        question: question,
+        value: value,
+        onChanged: onChanged,
+        yesValue: 'Yes',
+        noValue: 'No',
       ),
     );
   }

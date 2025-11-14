@@ -12,41 +12,63 @@ class HelpScreen extends StatelessWidget {
       create: (_) => HelpScreenViewModel(),
       child: Scaffold(
         appBar: const KenwellAppBar(
-            title: 'Help & Support', automaticallyImplyLeading: false),
+          title: 'Help & Support',
+          automaticallyImplyLeading: false,
+        ),
         body: Consumer<HelpScreenViewModel>(
           builder: (context, viewModel, _) {
             return ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                ListTile(
-                  leading: const Icon(Icons.help_outline),
-                  title: const Text('FAQs / Help Center'),
-                  onTap: viewModel.openFAQs,
+                _buildCard(
+                  child: ListTile(
+                    leading: const Icon(Icons.help_outline),
+                    title: const Text('FAQs / Help Center'),
+                    onTap: viewModel.openFAQs,
+                  ),
                 ),
-                const Divider(),
-                ListTile(
-                  leading: const Icon(Icons.email_outlined),
-                  title: const Text('Contact Support'),
-                  subtitle: const Text('support@yourapp.com'),
-                  onTap: viewModel.contactSupport,
+                const SizedBox(height: 12),
+                _buildCard(
+                  child: ListTile(
+                    leading: const Icon(Icons.email_outlined),
+                    title: const Text('Contact Support'),
+                    subtitle: const Text('support@yourapp.com'),
+                    onTap: viewModel.contactSupport,
+                  ),
                 ),
-                const Divider(),
-                ListTile(
-                  leading: const Icon(Icons.info_outline),
-                  title: const Text('About the App'),
-                  subtitle: Text(
-                      'Version: ${viewModel.appVersion}\nDeveloper: ${viewModel.developer}'),
+                const SizedBox(height: 12),
+                _buildCard(
+                  child: ListTile(
+                    leading: const Icon(Icons.info_outline),
+                    title: const Text('About the App'),
+                    subtitle: Text(
+                        'Version: ${viewModel.appVersion}\nDeveloper: ${viewModel.developer}'),
+                  ),
                 ),
-                const Divider(),
-                ListTile(
-                  leading: const Icon(Icons.description_outlined),
-                  title: const Text('Terms & Conditions / Privacy Policy'),
-                  onTap: viewModel.openTermsAndPrivacy,
+                const SizedBox(height: 12),
+                _buildCard(
+                  child: ListTile(
+                    leading: const Icon(Icons.description_outlined),
+                    title: const Text('Terms & Conditions / Privacy Policy'),
+                    onTap: viewModel.openTermsAndPrivacy,
+                  ),
                 ),
               ],
             );
           },
         ),
+      ),
+    );
+  }
+
+  // --- Card wrapper for modern look ---
+  Widget _buildCard({required Widget child}) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        child: child,
       ),
     );
   }

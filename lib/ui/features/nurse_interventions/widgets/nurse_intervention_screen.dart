@@ -20,145 +20,150 @@ class NurseInterventionScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: const KenwellAppBar(
-          title: 'Health Risk Asessessment Nurse Intervention',
+          title: 'Health Risk Assessment Nurse Intervention',
           automaticallyImplyLeading: false),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- Window Period & Other Initial Fields ---
-            _buildDropdown(
-              'Window period risk assessment',
-              viewModel.windowPeriod,
-              viewModel.windowPeriodOptions,
-              viewModel.setWindowPeriod,
-            ),
-            const SizedBox(height: 12),
-            _buildDropdown(
-              'Did patient expect HIV (+) result?',
-              viewModel.expectedResult,
-              viewModel.expectedResultOptions,
-              viewModel.setExpectedResult,
-            ),
-            const SizedBox(height: 12),
-            _buildDropdown(
-              'Difficulty in dealing with result?',
-              viewModel.difficultyDealingResult,
-              viewModel.difficultyOptions,
-              viewModel.setDifficultyDealingResult,
-            ),
-            const SizedBox(height: 12),
-            _buildDropdown(
-              'Urgent psychosocial follow-up needed?',
-              viewModel.urgentPsychosocial,
-              viewModel.urgentOptions,
-              viewModel.setUrgentPsychosocial,
-            ),
-            const SizedBox(height: 12),
-            _buildDropdown(
-              'Committed to change behavior?',
-              viewModel.committedToChange,
-              viewModel.committedOptions,
-              viewModel.setCommittedToChange,
-            ),
-            const SizedBox(height: 12),
-
-            // --- Referral Nursing Interventions ---
-            const Text(
-              'Referral Nursing Interventions',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            CheckboxListTile(
-              title: const Text('Patient not referred'),
-              value: viewModel.patientNotReferred,
-              onChanged: (val) => viewModel.setPatientNotReferred(val ?? false),
-            ),
-            if (viewModel.patientNotReferred)
-              _buildTextField(
-                'Reason patient not referred',
-                viewModel.notReferredReasonController,
+            // --- Initial Assessment Section ---
+            _buildCard(
+              title: 'Initial Assessment',
+              child: Column(
+                children: [
+                  _buildDropdown(
+                    'Window period risk assessment',
+                    viewModel.windowPeriod,
+                    viewModel.windowPeriodOptions,
+                    viewModel.setWindowPeriod,
+                  ),
+                  _buildDropdown(
+                    'Did patient expect HIV (+) result?',
+                    viewModel.expectedResult,
+                    viewModel.expectedResultOptions,
+                    viewModel.setExpectedResult,
+                  ),
+                  _buildDropdown(
+                    'Difficulty in dealing with result?',
+                    viewModel.difficultyDealingResult,
+                    viewModel.difficultyOptions,
+                    viewModel.setDifficultyDealingResult,
+                  ),
+                  _buildDropdown(
+                    'Urgent psychosocial follow-up needed?',
+                    viewModel.urgentPsychosocial,
+                    viewModel.urgentOptions,
+                    viewModel.setUrgentPsychosocial,
+                  ),
+                  _buildDropdown(
+                    'Committed to change behavior?',
+                    viewModel.committedToChange,
+                    viewModel.committedOptions,
+                    viewModel.setCommittedToChange,
+                  ),
+                ],
               ),
-            CheckboxListTile(
-              title: const Text('Patient referred to GP'),
-              value: viewModel.referredToGP,
-              onChanged: (val) => viewModel.setReferredToGP(val ?? false),
             ),
-            CheckboxListTile(
-              title: const Text('Patient referred to State HIV clinic'),
-              value: viewModel.referredToStateClinic,
-              onChanged: (val) =>
-                  viewModel.setReferredToStateClinic(val ?? false),
-            ),
+            const SizedBox(height: 16),
 
-            // --- Follow-up Location & Date ---
-            if (viewModel.windowPeriod == 'Yes') ...[
-              const SizedBox(height: 12),
-              _buildDropdown(
-                'Follow-up location',
-                viewModel.followUpLocation,
-                viewModel.followUpLocationOptions,
-                viewModel.setFollowUpLocation,
+            // --- Referral Nursing Interventions Section ---
+            _buildCard(
+              title: 'Referral Nursing Interventions',
+              child: Column(
+                children: [
+                  CheckboxListTile(
+                    title: const Text('Patient not referred'),
+                    value: viewModel.patientNotReferred,
+                    onChanged: (val) =>
+                        viewModel.setPatientNotReferred(val ?? false),
+                  ),
+                  if (viewModel.patientNotReferred)
+                    _buildTextField(
+                      'Reason patient not referred',
+                      viewModel.notReferredReasonController,
+                    ),
+                  CheckboxListTile(
+                    title: const Text('Patient referred to GP'),
+                    value: viewModel.referredToGP,
+                    onChanged: (val) => viewModel.setReferredToGP(val ?? false),
+                  ),
+                  CheckboxListTile(
+                    title: const Text('Patient referred to State HIV clinic'),
+                    value: viewModel.referredToStateClinic,
+                    onChanged: (val) =>
+                        viewModel.setReferredToStateClinic(val ?? false),
+                  ),
+                ],
               ),
-              if (viewModel.followUpLocation == 'Other')
-                _buildTextField(
-                  'Other location detail',
-                  viewModel.followUpOtherController,
+            ),
+            const SizedBox(height: 16),
+
+            // --- Follow-up Section ---
+            if (viewModel.windowPeriod == 'Yes')
+              _buildCard(
+                title: 'Follow-up',
+                child: Column(
+                  children: [
+                    _buildDropdown(
+                      'Follow-up location',
+                      viewModel.followUpLocation,
+                      viewModel.followUpLocationOptions,
+                      viewModel.setFollowUpLocation,
+                    ),
+                    if (viewModel.followUpLocation == 'Other')
+                      _buildTextField(
+                        'Other location detail',
+                        viewModel.followUpOtherController,
+                      ),
+                    _buildDateField(context, 'Follow-up test date',
+                        viewModel.followUpDateController),
+                  ],
                 ),
-              const SizedBox(height: 12),
-              _buildDateField(
-                context,
-                'Follow-up test date',
-                viewModel.followUpDateController,
               ),
-            ],
+            const SizedBox(height: 16),
 
+            // --- Nurse Details Section ---
+            _buildCard(
+              title: 'Nurse Details',
+              child: Column(
+                children: [
+                  _buildTextField(
+                      'HIV Testing Nurse', viewModel.hivTestingNurseController),
+                  _buildTextField('Rank', viewModel.rankController),
+                  const SizedBox(height: 12),
+                  const Text('Signature',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(8)),
+                    height: 150,
+                    child: Signature(
+                      controller: viewModel.signatureController,
+                      backgroundColor: Colors.white,
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => viewModel.signatureController.clear(),
+                        child: const Text('Clear'),
+                      ),
+                    ],
+                  ),
+                  _buildTextField('SANC No', viewModel.sancNumberController),
+                  _buildDateField(
+                      context, 'Date', viewModel.nurseDateController),
+                ],
+              ),
+            ),
             const SizedBox(height: 24),
 
-            // --- Nurse Details ---
-            const Text(
-              'Nurse Details',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            _buildTextField(
-                'HIV Testing Nurse', viewModel.hivTestingNurseController),
-            const SizedBox(height: 12),
-            _buildTextField('Rank', viewModel.rankController),
-            const SizedBox(height: 12),
-
-            // --- Signature ---
-            const Text('Signature',
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
-              height: 150,
-              child: Signature(
-                controller: viewModel.signatureController,
-                backgroundColor: Colors.white,
-              ),
-            ),
+            // --- Navigation Buttons ---
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () => viewModel.signatureController.clear(),
-                  child: const Text('Clear'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-
-            _buildTextField('SANC No', viewModel.sancNumberController),
-            const SizedBox(height: 12),
-            _buildDateField(context, 'Date', viewModel.nurseDateController),
-            const SizedBox(height: 24),
-
-            // --- Buttons ---
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 if (onPrevious != null)
                   Expanded(
@@ -198,20 +203,45 @@ class NurseInterventionScreen extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildCard({required String title, required Widget child}) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 3,
+      color: Colors.white,
+      shadowColor: Colors.grey.shade300,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title,
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const SizedBox(height: 12),
+            child,
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 Widget _buildDropdown(String label, String? value, List<String> options,
     Function(String?) onChanged) {
-  return DropdownButtonFormField<String>(
-    initialValue: value,
-    decoration: InputDecoration(
-      labelText: label,
-      border: const OutlineInputBorder(),
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 12),
+    child: DropdownButtonFormField<String>(
+      value: value,
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+      ),
+      items: options
+          .map((opt) => DropdownMenuItem(value: opt, child: Text(opt)))
+          .toList(),
+      onChanged: onChanged,
     ),
-    items: options
-        .map((opt) => DropdownMenuItem(value: opt, child: Text(opt)))
-        .toList(),
-    onChanged: onChanged,
   );
 }
 
