@@ -20,6 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _obscurePassword = true;
 
   void _login() async {
     if (!_formKey.currentState!.validate()) return;
@@ -35,7 +36,6 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
 
       if (user != null) {
-        // Navigate to MainNavigationScreen with BottomNavigationBar
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
@@ -63,61 +63,93 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:
-          const KenwellAppBar(title: 'Login', automaticallyImplyLeading: false),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              const SizedBox(height: 40),
-              const AppLogo(size: 250),
-              const SizedBox(height: 30),
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
-                validator: (val) =>
-                    val!.isEmpty ? 'Please enter your email' : null,
-              ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(labelText: 'Password'),
-                validator: (val) =>
-                    val!.isEmpty ? 'Please enter your password' : null,
-              ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
+      appBar: const KenwellAppBar(
+        title: 'Login',
+        automaticallyImplyLeading: false,
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                const SizedBox(height: 40),
+                const AppLogo(size: 200),
+                const SizedBox(height: 30),
+
+                // Email Field
+                TextFormField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (val) =>
+                      val!.isEmpty ? 'Please enter your email' : null,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 16),
+
+                // Password Field with visibility toggle
+                TextFormField(
+                  controller: _passwordController,
+                  obscureText: _obscurePassword,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    border: const OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      icon: Icon(_obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                    ),
+                  ),
+                  validator: (val) =>
+                      val!.isEmpty ? 'Please enter your password' : null,
+                ),
+
+                // Forgot Password
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, RouteNames.forgotPassword);
+                    },
+                    child: const Text(
+                      'Forgot Password?',
+                      style: TextStyle(decoration: TextDecoration.underline),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Login Button
+                CustomPrimaryButton(
+                  label: 'Login',
+                  onPressed: _login,
+                  isBusy: _isLoading,
+                  backgroundColor: KenwellColors.primaryGreen,
+                ),
+                const SizedBox(height: 12),
+
+                // Register Button
+                TextButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, RouteNames.forgotPassword);
+                    Navigator.pushReplacementNamed(
+                        context, RouteNames.register);
                   },
                   child: const Text(
-                    'Forgot Password?',
+                    'Don’t have an account? Register',
                     style: TextStyle(decoration: TextDecoration.underline),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              CustomPrimaryButton(
-                label: 'Login',
-                onPressed: _login,
-                isBusy: _isLoading,
-                backgroundColor: KenwellColors.primaryGreen,
-              ),
-              const SizedBox(height: 10),
-              TextButton(
-                onPressed: () {
-                  Navigator.pushReplacementNamed(context, RouteNames.register);
-                },
-                child: const Text(
-                  'Don’t have an account? Register',
-                  style: TextStyle(decoration: TextDecoration.underline),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

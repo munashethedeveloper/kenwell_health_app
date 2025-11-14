@@ -32,11 +32,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Password reset link sent! Please check your email.'),
+            content: Text(
+              'Password reset link sent! Please check your email.',
+            ),
           ),
         );
 
-        // Return to login screen
         Navigator.pop(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -77,7 +78,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               const SizedBox(height: 30),
               TextFormField(
                 controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                  border: OutlineInputBorder(),
+                ),
                 validator: (val) =>
                     val!.isEmpty ? 'Please enter your email' : null,
               ),
