@@ -147,44 +147,47 @@ class NurseInterventionScreen extends StatelessWidget {
               _buildCard(
                 title: 'Nurse Details',
                 child: Column(
-                  children: [
-                    _buildTextField(
-                      'HIV Testing Nurse',
-                      viewModel.hivTestingNurseController,
-                      hint: 'Enter nurse name',
-                      requiredField: true,
-                    ),
-                    _buildTextField(
-                      'Rank',
-                      viewModel.rankController,
-                      hint: 'Enter nurse rank',
-                      requiredField: true,
-                    ),
-                    const SizedBox(height: 12),
-                    const Text('Signature',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 8),
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(8),
+                    children: [
+                      _buildTextField(
+                        'HIV Testing Nurse',
+                        viewModel.hivTestingNurseController,
+                        hint: 'Enter nurse name',
+                        requiredField: true,
                       ),
-                      height: 150,
-                      child: Signature(
-                        controller: viewModel.signatureController,
-                        backgroundColor: Colors.white,
+                      _buildTextField(
+                        'Rank',
+                        viewModel.rankController,
+                        hint: 'Enter nurse rank',
+                        requiredField: true,
                       ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        TextButton(
-                          onPressed: () =>
-                              viewModel.signatureController.clear(),
-                          child: const Text('Clear'),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'Signature',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                      ],
-                    ),
+                        elevation: 2,
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          height: 160,
+                          child: Signature(
+                            controller: viewModel.signatureController,
+                            backgroundColor: Colors.grey[100]!,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () => viewModel.signatureController.clear(),
+                          child: const Text('Clear Signature'),
+                        ),
+                      ),
                     _buildTextField(
                       'SANC No',
                       viewModel.sancNumberController,
