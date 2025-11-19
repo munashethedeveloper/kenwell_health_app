@@ -4,6 +4,7 @@ import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/hiv_test_nursing_intervention_view_model.dart';
+import 'package:signature/signature.dart';
 
 class HIVTestNursingInterventionScreen extends StatelessWidget {
   final VoidCallback onNext;
@@ -83,6 +84,11 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
                 ],
               ),
             ),
+            const SizedBox(height: 16),
+            _buildCard(
+              title: 'Signature:',
+              child: _buildSignatureSection(viewModel),
+            ),
             const SizedBox(height: 24),
             KenwellFormNavigation(
               onPrevious: onPrevious,
@@ -157,6 +163,36 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
       onChanged: (val) => onChanged(val!),
       title: Text(label),
       controlAffinity: ListTileControlAffinity.leading,
+    );
+  }
+
+  Widget _buildSignatureSection(HIVTestNursingInterventionViewModel viewModel) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 8),
+        Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          elevation: 2,
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            height: 160,
+            child: Signature(
+              controller: viewModel.signatureController,
+              backgroundColor: Colors.grey[100]!,
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton(
+            onPressed: viewModel.clearSignature,
+            child: const Text('Clear Signature'),
+          ),
+        ),
+      ],
     );
   }
 }

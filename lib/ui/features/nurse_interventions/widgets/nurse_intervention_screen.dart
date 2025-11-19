@@ -173,30 +173,7 @@ class NurseInterventionScreen extends StatelessWidget {
                       requiredField: true,
                     ),
                     const SizedBox(height: 12),
-                    const Text('Signature',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 8),
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      height: 150,
-                      child: Signature(
-                        controller: viewModel.signatureController,
-                        backgroundColor: Colors.white,
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        TextButton(
-                          onPressed: () =>
-                              viewModel.signatureController.clear(),
-                          child: const Text('Clear'),
-                        ),
-                      ],
-                    ),
+                    _buildSignatureSection(viewModel),
                   ],
                 ),
               ),
@@ -269,6 +246,38 @@ class NurseInterventionScreen extends StatelessWidget {
 }
 
 // ------------------ Reusable Widgets ------------------
+Widget _buildSignatureSection(NurseInterventionViewModel viewModel) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Text(
+        'Signature:',
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+      ),
+      const SizedBox(height: 8),
+      Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 2,
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          height: 160,
+          child: Signature(
+            controller: viewModel.signatureController,
+            backgroundColor: Colors.grey[100]!,
+          ),
+        ),
+      ),
+      const SizedBox(height: 8),
+      Align(
+        alignment: Alignment.centerRight,
+        child: TextButton(
+          onPressed: viewModel.clearSignature,
+          child: const Text('Clear Signature'),
+        ),
+      ),
+    ],
+  );
+}
 
 Widget _buildDropdown(String label, String? value, List<String> options,
     Function(String?) onChanged,
