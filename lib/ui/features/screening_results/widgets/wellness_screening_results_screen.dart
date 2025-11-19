@@ -31,7 +31,16 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
               child: Form(
                 key: vm.formKey,
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(
+                      'Section D',
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 16),
                     _buildCard(
                       child: Column(
                         children: [
