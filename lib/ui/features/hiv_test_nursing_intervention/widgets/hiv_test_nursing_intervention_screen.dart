@@ -83,7 +83,6 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
               const SizedBox(height: 16),
               _buildCard(
                 title: 'Signature',
@@ -166,38 +165,38 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
     );
   }
 
-    Widget _buildSignatureSection(
-        HIVTestNursingInterventionViewModel viewModel) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Signature:',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-          const SizedBox(height: 8),
-          Card(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            elevation: 2,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              height: 160,
-              child: Signature(
-                controller: viewModel.signatureController,
-                backgroundColor: Colors.grey[100]!,
-              ),
+  Widget _buildSignatureSection(
+      HIVTestNursingInterventionViewModel viewModel) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Signature:',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        const SizedBox(height: 8),
+        Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          elevation: 2,
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            height: 160,
+            child: Signature(
+              controller: viewModel.signatureController,
+              backgroundColor: Colors.grey[100]!,
             ),
           ),
-          const SizedBox(height: 8),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: viewModel.clearSignature,
-              child: const Text('Clear Signature'),
-            ),
+        ),
+        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton(
+            onPressed: viewModel.clearSignature,
+            child: const Text('Clear Signature'),
           ),
-        ],
-      );
-    }
+        ),
+      ],
+    );
+  }
 }
