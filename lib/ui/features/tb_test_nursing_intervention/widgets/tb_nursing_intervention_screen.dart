@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:signature/signature.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/tb_nursing_intervention_view_model.dart';
 
@@ -100,6 +101,10 @@ class TBNursingInterventionScreen extends StatelessWidget {
                 ],
               ),
             ),
+            const SizedBox(height: 16),
+            _buildCard(
+              child: _buildSignatureSection(viewModel),
+            ),
             const SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -117,7 +122,17 @@ class TBNursingInterventionScreen extends StatelessWidget {
                 const SizedBox(width: 16),
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: () => viewModel.saveIntervention(onNext: onNext),
+                      onPressed: () {
+                        if (!viewModel.hasSignature) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please capture a signature first.'),
+                            ),
+                          );
+                          return;
+                        }
+                        viewModel.saveIntervention(onNext: onNext);
+                      },
                     icon: const Icon(Icons.save),
                     label: const Text(
                       'Save and Submit',
@@ -147,6 +162,41 @@ class TBNursingInterventionScreen extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         child: child,
       ),
+    );
+  }
+
+  Widget _buildSignatureSection(
+      TBNursingInterventionViewModel viewModel) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Signature:',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        const SizedBox(height: 8),
+        Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          elevation: 2,
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            height: 160,
+            child: Signature(
+              controller: viewModel.signatureController,
+              backgroundColor: Colors.grey[100]!,
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton(
+            onPressed: viewModel.clearSignature,
+            child: const Text('Clear Signature'),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -78,6 +78,11 @@ class NurseInterventionViewModel extends ChangeNotifier {
   final TextEditingController sancNumberController = TextEditingController();
   final TextEditingController nurseDateController = TextEditingController();
 
+  void clearSignature() {
+    signatureController.clear();
+    notifyListeners();
+  }
+
   // --- Submission ---
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;

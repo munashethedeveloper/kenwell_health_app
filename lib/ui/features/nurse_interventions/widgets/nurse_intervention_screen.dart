@@ -78,172 +78,151 @@ class NurseInterventionScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // --- Referral Nursing Interventions Section ---
-              _buildCard(
-                title: 'Nursing Referrals',
-                child: Column(
-                  children: [
-                    CheckboxListTile(
-                      title: const Text('Patient not referred'),
-                      value: viewModel.patientNotReferred,
-                      onChanged: (val) =>
-                          viewModel.setPatientNotReferred(val ?? false),
-                    ),
-                    if (viewModel.patientNotReferred)
-                      _buildTextField(
-                        'Reason patient not referred',
-                        viewModel.notReferredReasonController,
-                        hint: 'Enter reason',
-                        requiredField: true,
-                      ),
-                    CheckboxListTile(
-                      title: const Text('Patient referred to GP'),
-                      value: viewModel.referredToGP,
-                      onChanged: (val) =>
-                          viewModel.setReferredToGP(val ?? false),
-                    ),
-                    CheckboxListTile(
-                      title: const Text('Patient referred to State HIV clinic'),
-                      value: viewModel.referredToStateClinic,
-                      onChanged: (val) =>
-                          viewModel.setReferredToStateClinic(val ?? false),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // --- Follow-up Section ---
-              if (viewModel.windowPeriod == 'Yes')
+                // --- Referral Nursing Interventions Section ---
                 _buildCard(
-                  title: 'Follow-up',
+                  title: 'Nursing Referrals',
                   child: Column(
                     children: [
-                      _buildDropdown(
-                        'Follow-up location',
-                        viewModel.followUpLocation,
-                        viewModel.followUpLocationOptions,
-                        viewModel.setFollowUpLocation,
+                      CheckboxListTile(
+                        title: const Text('Patient not referred'),
+                        value: viewModel.patientNotReferred,
+                        onChanged: (val) =>
+                            viewModel.setPatientNotReferred(val ?? false),
                       ),
-                      if (viewModel.followUpLocation == 'Other')
+                      if (viewModel.patientNotReferred)
                         _buildTextField(
-                          'Other location detail',
-                          viewModel.followUpOtherController,
-                          hint: 'Specify other location',
+                          'Reason patient not referred',
+                          viewModel.notReferredReasonController,
+                          hint: 'Enter reason',
                           requiredField: true,
                         ),
-                      _buildDateField(
-                        context,
-                        'Follow-up test date',
-                        viewModel.followUpDateController,
-                        requiredField: true,
+                      CheckboxListTile(
+                        title: const Text('Patient referred to GP'),
+                        value: viewModel.referredToGP,
+                        onChanged: (val) =>
+                            viewModel.setReferredToGP(val ?? false),
+                      ),
+                      CheckboxListTile(
+                        title: const Text('Patient referred to State HIV clinic'),
+                        value: viewModel.referredToStateClinic,
+                        onChanged: (val) =>
+                            viewModel.setReferredToStateClinic(val ?? false),
                       ),
                     ],
                   ),
                 ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              // --- Nurse Details Section ---
-              _buildCard(
-                title: 'Nurse Details',
-                child: Column(
-                  children: [
-                    _buildTextField(
-                      'HIV Testing Nurse',
-                      viewModel.hivTestingNurseController,
-                      hint: 'Enter nurse name',
-                      requiredField: true,
-                    ),
-                    _buildTextField(
-                      'Rank',
-                      viewModel.rankController,
-                      hint: 'Enter nurse rank',
-                      requiredField: true,
-                    ),
-                    _buildTextField(
-                      'SANC No',
-                      viewModel.sancNumberController,
-                      hint: 'Enter SANC number',
-                      requiredField: true,
-                    ),
-                    _buildDateField(
-                      context,
-                      'Date',
-                      viewModel.nurseDateController,
-                      requiredField: true,
-                    ),
-                    const SizedBox(height: 12),
-                    const Text('Signature',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 8),
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      height: 150,
-                      child: Signature(
-                        controller: viewModel.signatureController,
-                        backgroundColor: Colors.white,
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                // --- Follow-up Section ---
+                if (viewModel.windowPeriod == 'Yes')
+                  _buildCard(
+                    title: 'Follow-up',
+                    child: Column(
                       children: [
-                        TextButton(
-                          onPressed: () =>
-                              viewModel.signatureController.clear(),
-                          child: const Text('Clear'),
+                        _buildDropdown(
+                          'Follow-up location',
+                          viewModel.followUpLocation,
+                          viewModel.followUpLocationOptions,
+                          viewModel.setFollowUpLocation,
+                        ),
+                        if (viewModel.followUpLocation == 'Other')
+                          _buildTextField(
+                            'Other location detail',
+                            viewModel.followUpOtherController,
+                            hint: 'Specify other location',
+                            requiredField: true,
+                          ),
+                        _buildDateField(
+                          context,
+                          'Follow-up test date',
+                          viewModel.followUpDateController,
+                          requiredField: true,
                         ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
+                  ),
+                const SizedBox(height: 16),
 
-              // --- Navigation Buttons ---
-              Row(
-                children: [
-                  if (onPrevious != null)
+                // --- Nurse Details Section ---
+                _buildCard(
+                  title: 'Nurse Details',
+                  child: Column(
+                    children: [
+                      _buildTextField(
+                        'HIV Testing Nurse',
+                        viewModel.hivTestingNurseController,
+                        hint: 'Enter nurse name',
+                        requiredField: true,
+                      ),
+                      _buildTextField(
+                        'Rank',
+                        viewModel.rankController,
+                        hint: 'Enter nurse rank',
+                        requiredField: true,
+                      ),
+                      _buildTextField(
+                        'SANC No',
+                        viewModel.sancNumberController,
+                        hint: 'Enter SANC number',
+                        requiredField: true,
+                      ),
+                      _buildDateField(
+                        context,
+                        'Date',
+                        viewModel.nurseDateController,
+                        requiredField: true,
+                      ),
+                      const SizedBox(height: 12),
+                      _buildSignatureSection(viewModel),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // --- Navigation Buttons ---
+                Row(
+                  children: [
+                    if (onPrevious != null)
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: onPrevious,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14.0),
+                          ),
+                          child: const Text('Previous'),
+                        ),
+                      ),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: onPrevious,
+                        onPressed: viewModel.isSubmitting
+                            ? null
+                            : () =>
+                                viewModel.submitIntervention(context, onNext),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
+                          backgroundColor: const Color(0xFF90C048),
                           padding: const EdgeInsets.symmetric(vertical: 14.0),
                         ),
-                        child: const Text('Previous'),
+                        child: viewModel.isSubmitting
+                            ? const CircularProgressIndicator(
+                                valueColor:
+                                    AlwaysStoppedAnimation(Colors.white),
+                              )
+                            : const Text(
+                                'Next',
+                                style: TextStyle(color: Colors.white),
+                              ),
                       ),
                     ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: viewModel.isSubmitting
-                          ? null
-                          : () => viewModel.submitIntervention(context, onNext),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF90C048),
-                        padding: const EdgeInsets.symmetric(vertical: 14.0),
-                      ),
-                      child: viewModel.isSubmitting
-                          ? const CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation(Colors.white),
-                            )
-                          : const Text(
-                              'Next',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-    );
-  }
+      );
+    }
 
   Widget _buildCard({required String title, required Widget child}) {
     return Card(
@@ -264,6 +243,40 @@ class NurseInterventionScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSignatureSection(NurseInterventionViewModel viewModel) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Signature:',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        const SizedBox(height: 8),
+        Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          elevation: 2,
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            height: 160,
+            child: Signature(
+              controller: viewModel.signatureController,
+              backgroundColor: Colors.grey[100]!,
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton(
+            onPressed: viewModel.clearSignature,
+            child: const Text('Clear Signature'),
+          ),
+        ),
+      ],
     );
   }
 }

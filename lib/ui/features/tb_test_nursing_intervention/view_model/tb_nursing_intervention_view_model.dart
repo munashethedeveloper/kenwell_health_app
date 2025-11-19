@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:signature/signature.dart';
 
 class TBNursingInterventionViewModel extends ChangeNotifier {
   bool memberNotReferred = false;
@@ -8,6 +9,18 @@ class TBNursingInterventionViewModel extends ChangeNotifier {
 
   final TextEditingController reasonController = TextEditingController();
   final TextEditingController sessionNotesController = TextEditingController();
+  final SignatureController signatureController = SignatureController(
+    penStrokeWidth: 2,
+    penColor: Colors.black,
+    exportBackgroundColor: Colors.white,
+  );
+
+  bool get hasSignature => signatureController.isNotEmpty;
+
+  void clearSignature() {
+    signatureController.clear();
+    notifyListeners();
+  }
 
   void toggleMemberNotReferred(bool? value) {
     memberNotReferred = value ?? false;
@@ -38,6 +51,7 @@ class TBNursingInterventionViewModel extends ChangeNotifier {
       'referredToStateHIVClinic': referredToStateHIVClinic,
       'referredToOHConsultation': referredToOHConsultation,
       'sessionNotes': sessionNotesController.text,
+      'hasSignature': signatureController.isNotEmpty,
     };
   }
 
@@ -54,6 +68,7 @@ class TBNursingInterventionViewModel extends ChangeNotifier {
   void dispose() {
     reasonController.dispose();
     sessionNotesController.dispose();
+    signatureController.dispose();
     super.dispose();
   }
 }
