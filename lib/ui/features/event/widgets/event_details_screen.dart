@@ -48,7 +48,7 @@ class EventDetailsScreen extends StatelessWidget {
             Text(label,
                 style: const TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 15,
+                    fontSize: 16,
                     color: Colors.black87)),
             const SizedBox(height: 4),
             Text(value, style: const TextStyle(fontSize: 15)),
@@ -61,8 +61,8 @@ class EventDetailsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           event.title,
-          style:
-              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 30),
         ),
         automaticallyImplyLeading: true,
         backgroundColor: const Color(0xFF201C58),

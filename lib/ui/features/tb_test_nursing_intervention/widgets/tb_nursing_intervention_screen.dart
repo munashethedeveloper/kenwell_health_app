@@ -33,6 +33,7 @@ class TBNursingInterventionScreen extends StatelessWidget {
               'Section J: TB Screening Nursing Interventions',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
+                    fontSize: 24,
                     color: const Color(0xFF201C58),
                   ),
             ),
@@ -42,7 +43,10 @@ class TBNursingInterventionScreen extends StatelessWidget {
                 children: [
                   const Text(
                     'Nursing Referrals',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Color(0xFF201C58)),
                   ),
                   const SizedBox(height: 16),
                   CheckboxListTile(
@@ -88,7 +92,10 @@ class TBNursingInterventionScreen extends StatelessWidget {
                 children: [
                   const Text(
                     'Please make the relevant notes of your session below:',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF201C58)),
                   ),
                   const SizedBox(height: 8),
                   TextField(
@@ -172,7 +179,10 @@ class TBNursingInterventionScreen extends StatelessWidget {
       children: [
         const Text(
           'Signature:',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: Color(0xFF201C58)),
         ),
         const SizedBox(height: 8),
         Card(

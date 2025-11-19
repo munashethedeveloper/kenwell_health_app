@@ -109,6 +109,7 @@ class _EventScreenState extends State<EventScreen> {
     Widget sectionWrapper(String title, List<Widget> children) {
       return Card(
         elevation: 3,
+        //color: const Color(0xFFEFF2FF),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         margin: const EdgeInsets.symmetric(vertical: 10),
         shadowColor: Colors.black12,
@@ -119,7 +120,9 @@ class _EventScreenState extends State<EventScreen> {
             children: [
               Text(title,
                   style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold)),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF201C58))),
               const SizedBox(height: 12),
               ...children
             ],

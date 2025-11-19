@@ -33,6 +33,7 @@ class HIVTestScreen extends StatelessWidget {
                 'SECTION F: HIV SCREENING',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
+                      fontSize: 24,
                       color: const Color(0xFF201C58),
                     ),
               ),
@@ -147,7 +148,9 @@ class HIVTestScreen extends StatelessWidget {
                     const SizedBox(height: 12),
                     const Text(
                       'Reasons that may have put you at risk:',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF201C58)),
                     ),
                     const SizedBox(height: 8),
                     ..._riskReasonList(viewModel),
@@ -185,8 +188,10 @@ class HIVTestScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(title,
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Color(0xFF201C58))),
             const SizedBox(height: 12),
             child,
           ],

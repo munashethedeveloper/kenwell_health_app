@@ -34,6 +34,7 @@ class ConsentScreen extends StatelessWidget {
                 'SECTION A: INFORMED CONSENT',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
+                      fontSize: 24,
                       color: const Color(0xFF201C58),
                     ),
               ),
@@ -41,9 +42,9 @@ class ConsentScreen extends StatelessWidget {
               _buildEventInfoCard(context, vm),
               const SizedBox(height: 24),
               _buildInformationSection(),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               _buildScreeningSection(vm),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               _buildSignatureSection(vm),
               const SizedBox(height: 24),
               _buildActionButtons(context, vm),
@@ -117,7 +118,10 @@ class ConsentScreen extends StatelessWidget {
       children: [
         const Text(
           'I hereby declare that I have read and understood the information below. By signing, I confirm my understanding of:',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF201C58)),
         ),
         const SizedBox(height: 12),
         ...bullets.map(_buildBullet).toList(),
@@ -139,7 +143,10 @@ class ConsentScreen extends StatelessWidget {
       children: [
         const Text(
           'Select applicable screenings:',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF201C58)),
         ),
         const SizedBox(height: 8),
         Card(
@@ -169,7 +176,10 @@ class ConsentScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('Signature:',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF201C58))),
         const SizedBox(height: 8),
         Card(
           shape:

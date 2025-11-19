@@ -101,6 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         'Forgot Password?',
                         style: TextStyle(
                             decoration: TextDecoration.underline,
+                            fontSize: 16,
                             color: Color(0xFF201C58)),
                       ),
                     ),
@@ -119,9 +120,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           context, RouteNames.register);
                     },
                     child: const Text(
-                      "Don’t have an account? Register",
+                      "Don’t have an account yet? Click here to Register",
                       style: TextStyle(
                           decoration: TextDecoration.underline,
+                          fontSize: 16,
                           color: Color(0xFF201C58)),
                     ),
                   ),

@@ -35,6 +35,7 @@ class NurseInterventionScreen extends StatelessWidget {
                 'SECTION E: HEALTH RISK ASSESSMENT NURSE INTERVENTION',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
+                      fontSize: 24,
                       color: const Color(0xFF201C58),
                     ),
               ),
@@ -234,8 +235,10 @@ class NurseInterventionScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(title,
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Color(0xFF201C58))),
             const SizedBox(height: 12),
             child,
           ],
@@ -243,112 +246,117 @@ class NurseInterventionScreen extends StatelessWidget {
       ),
     );
   }
-}
 
 // ------------------ Reusable Widgets ------------------
-Widget _buildSignatureSection(NurseInterventionViewModel viewModel) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      const Text(
-        'Signature:',
-        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-      ),
-      const SizedBox(height: 8),
-      Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 2,
-        child: Container(
-          padding: const EdgeInsets.all(8),
-          height: 160,
-          child: Signature(
-            controller: viewModel.signatureController,
-            backgroundColor: Colors.grey[100]!,
+  Widget _buildSignatureSection(NurseInterventionViewModel viewModel) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Signature:',
+          style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: Color(0xFF201C58)),
+        ),
+        const SizedBox(height: 8),
+        Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          elevation: 2,
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            height: 160,
+            child: Signature(
+              controller: viewModel.signatureController,
+              backgroundColor: Colors.grey[100]!,
+            ),
           ),
         ),
-      ),
-      const SizedBox(height: 8),
-      Align(
-        alignment: Alignment.centerRight,
-        child: TextButton(
-          onPressed: viewModel.clearSignature,
-          child: const Text('Clear Signature'),
+        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton(
+            onPressed: viewModel.clearSignature,
+            child: const Text('Clear Signature'),
+          ),
         ),
-      ),
-    ],
-  );
-}
+      ],
+    );
+  }
 
-Widget _buildDropdown(String label, String? value, List<String> options,
-    Function(String?) onChanged,
-    {bool requiredField = false}) {
-  return Padding(
-    padding: const EdgeInsets.only(bottom: 12),
-    child: DropdownButtonFormField<String>(
-      value: value,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
+  Widget _buildDropdown(String label, String? value, List<String> options,
+      Function(String?) onChanged,
+      {bool requiredField = false}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: DropdownButtonFormField<String>(
+        initialValue: value,
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+        ),
+        items: options
+            .map((opt) => DropdownMenuItem(value: opt, child: Text(opt)))
+            .toList(),
+        onChanged: onChanged,
+        validator: requiredField
+            ? (val) =>
+                (val == null || val.isEmpty) ? 'Please select $label' : null
+            : null,
       ),
-      items: options
-          .map((opt) => DropdownMenuItem(value: opt, child: Text(opt)))
-          .toList(),
-      onChanged: onChanged,
-      validator: requiredField
-          ? (val) =>
-              (val == null || val.isEmpty) ? 'Please select $label' : null
-          : null,
-    ),
-  );
-}
+    );
+  }
 
-Widget _buildTextField(String label, TextEditingController controller,
-    {String? hint, bool requiredField = false}) {
-  return Padding(
-    padding: const EdgeInsets.only(bottom: 12),
-    child: TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        border: const OutlineInputBorder(),
+  Widget _buildTextField(String label, TextEditingController controller,
+      {String? hint, bool requiredField = false}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          hintText: hint,
+          border: const OutlineInputBorder(),
+        ),
+        validator: requiredField
+            ? (val) =>
+                (val == null || val.isEmpty) ? 'Please enter $label' : null
+            : null,
       ),
-      validator: requiredField
-          ? (val) => (val == null || val.isEmpty) ? 'Please enter $label' : null
-          : null,
-    ),
-  );
-}
+    );
+  }
 
-Widget _buildDateField(
-    BuildContext context, String label, TextEditingController controller,
-    {bool requiredField = false}) {
-  return Padding(
-    padding: const EdgeInsets.only(bottom: 12),
-    child: TextFormField(
-      controller: controller,
-      readOnly: true,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
+  Widget _buildDateField(
+      BuildContext context, String label, TextEditingController controller,
+      {bool requiredField = false}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: TextFormField(
+        controller: controller,
+        readOnly: true,
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+        ),
+        onTap: () async {
+          FocusScope.of(context).requestFocus(FocusNode());
+          final pickedDate = await showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime(2000),
+            lastDate: DateTime(2100),
+          );
+          if (pickedDate != null) {
+            controller.text =
+                '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
+          }
+        },
+        validator: requiredField
+            ? (val) =>
+                (val == null || val.isEmpty) ? 'Please select $label' : null
+            : null,
       ),
-      onTap: () async {
-        FocusScope.of(context).requestFocus(FocusNode());
-        final pickedDate = await showDatePicker(
-          context: context,
-          initialDate: DateTime.now(),
-          firstDate: DateTime(2000),
-          lastDate: DateTime(2100),
-        );
-        if (pickedDate != null) {
-          controller.text =
-              '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
-        }
-      },
-      validator: requiredField
-          ? (val) =>
-              (val == null || val.isEmpty) ? 'Please select $label' : null
-          : null,
-    ),
-  );
+    );
+  }
 }

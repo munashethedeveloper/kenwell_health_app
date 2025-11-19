@@ -71,9 +71,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           title: const Text(
             'Wellness Planner',
             style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
+                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 30),
           ),
           automaticallyImplyLeading: false,
           backgroundColor: const Color(0xFF201C58),

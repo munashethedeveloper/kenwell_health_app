@@ -34,6 +34,7 @@ class HIVTestResultScreen extends StatelessWidget {
                 'SECTION G: HIV TEST RESULTS',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
+                      fontSize: 24,
                       color: const Color(0xFF201C58),
                     ),
               ),
@@ -142,8 +143,10 @@ class HIVTestResultScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(title,
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF201C58))),
             const SizedBox(height: 12),
             child,
           ],
@@ -176,7 +179,7 @@ class HIVTestResultScreen extends StatelessWidget {
   Widget _buildDropdown(String label, List<String> items, String value,
       void Function(String) onChanged) {
     return DropdownButtonFormField<String>(
-      value: value,
+      initialValue: value,
       decoration: InputDecoration(
         labelText: label,
         border: const OutlineInputBorder(),

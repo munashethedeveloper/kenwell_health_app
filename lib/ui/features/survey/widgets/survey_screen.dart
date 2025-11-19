@@ -34,6 +34,7 @@ class SurveyScreen extends StatelessWidget {
               'Section K: Survey',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
+                    fontSize: 24,
                     color: const Color(0xFF201C58),
                   ),
             ),
@@ -41,7 +42,7 @@ class SurveyScreen extends StatelessWidget {
               child: Text(
                 'Welcome to Kenwell Consulting Wellness Day Survey.\n'
                 'Your contact number and answers will be used for administrative purposes only.',
-                style: TextStyle(fontSize: 15),
+                style: TextStyle(fontSize: 16),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -54,7 +55,10 @@ class SurveyScreen extends StatelessWidget {
                 children: [
                   const Text(
                     '1. How did you hear about this Wellness Day?',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF201C58)),
                   ),
                   const SizedBox(height: 8),
                   _buildRadioGroup(vm, [
@@ -78,7 +82,10 @@ class SurveyScreen extends StatelessWidget {
                 children: [
                   const Text(
                     '2. In which province did you attend the Wellness Day?',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF201C58)),
                   ),
                   const SizedBox(height: 8),
                   KenwellDropdownField<String>(
@@ -112,7 +119,10 @@ class SurveyScreen extends StatelessWidget {
                 children: [
                   const Text(
                     'Please rate the following (0 = Disappointed, 5 = Extremely Satisfied):',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF201C58)),
                   ),
                   const SizedBox(height: 8),
                   _buildRatingRow(
@@ -176,7 +186,7 @@ class SurveyScreen extends StatelessWidget {
               child: Text(
                 'Thank you for completing this survey.\nYour feedback helps us improve.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
             ),
           ],

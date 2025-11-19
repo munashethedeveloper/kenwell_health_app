@@ -84,7 +84,7 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool _isSubmitting = false;
+  final bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
 
   bool get isFormValid {

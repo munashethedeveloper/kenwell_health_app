@@ -164,9 +164,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       );
                     },
                     child: const Text(
-                      "Already have an account? Log in",
+                      "Already have an account? Click here to Log In",
                       style: TextStyle(
                           decoration: TextDecoration.underline,
+                          fontSize: 16,
                           color: Color(0xFF201C58)),
                     ),
                   ),

@@ -43,7 +43,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                       child: Text(
                         'SECTION C: HEALTH RISK ASSESSMENT',
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF201C58),
                         ),
@@ -58,7 +58,9 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                           const Text(
                             '1. Do you suffer or take medication for any of the following conditions?',
                             style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF201C58)),
                           ),
                           const SizedBox(height: 8),
                           ...vm.chronicConditions.keys.map((condition) {
@@ -93,7 +95,9 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                           const Text(
                             '2. Over the past month, how many days per week have you exercised for 30 minutes or longer?',
                             style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF201C58)),
                           ),
                           const SizedBox(height: 8),
                           _buildStringRadioGroup(
@@ -122,7 +126,9 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                           const Text(
                             '3. How much do you smoke per day?',
                             style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF201C58)),
                           ),
                           KenwellTextField(
                             label: 'Number per day',
@@ -156,7 +162,9 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                           const Text(
                             '4. How often do you use alcoholic beverages?',
                             style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF201C58)),
                           ),
                           const SizedBox(height: 8),
                           _buildStringRadioGroup(
@@ -189,10 +197,9 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                               child: Text(
                                 'Female Only Questions',
                                 style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF201C58)),
                               ),
                             ),
                             KenwellYesNoQuestion<bool>(
@@ -234,10 +241,9 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                               child: Text(
                                 'Male Only Questions',
                                 style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF201C58)),
                               ),
                             ),
                             KenwellYesNoQuestion<bool>(

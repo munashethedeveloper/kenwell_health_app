@@ -39,6 +39,7 @@ class PersonalDetailsScreen extends StatelessWidget {
                       'SECTION  B: PERSONAL DETAILS',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
+                            fontSize: 24,
                             color: const Color(0xFF201C58),
                           ),
                     ),
@@ -70,7 +71,7 @@ class PersonalDetailsScreen extends StatelessWidget {
           child: Text(
             'Personal Information',
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Color(0xFF201C58),
             ),
@@ -104,7 +105,7 @@ class PersonalDetailsScreen extends StatelessWidget {
           child: Text(
             'Medical Aid Information',
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Color(0xFF201C58),
             ),
@@ -126,7 +127,7 @@ class PersonalDetailsScreen extends StatelessWidget {
           child: Text(
             'Employment Details',
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Color(0xFF201C58),
             ),

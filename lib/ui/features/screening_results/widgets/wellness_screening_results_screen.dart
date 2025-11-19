@@ -37,6 +37,7 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
                       'SECTION D: WELLNESS SCREENING RESULTS',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
+                            fontSize: 24,
                             color: const Color(0xFF201C58),
                           ),
                     ),

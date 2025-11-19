@@ -34,6 +34,7 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
               'SECTION H: HIV TEST NURSING INTERVENTIONS',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
+                    fontSize: 24,
                     color: const Color(0xFF201C58),
                   ),
             ),
@@ -115,8 +116,10 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(title,
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF201C58))),
             const SizedBox(height: 12),
             child,
           ],
