@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 
 class WellnessScreeningResultsViewModel extends ChangeNotifier {
+  final formKey = GlobalKey<FormState>();
+
   final TextEditingController heightController = TextEditingController();
   final TextEditingController weightController = TextEditingController();
   final TextEditingController bmiController = TextEditingController();
@@ -18,12 +20,11 @@ class WellnessScreeningResultsViewModel extends ChangeNotifier {
     weightController.addListener(_calculateBMI);
   }
 
-  // ✅ Automatically calculate BMI when height or weight changes
   void _calculateBMI() {
     double? height = double.tryParse(heightController.text);
     double? weight = double.tryParse(weightController.text);
 
-    // Convert cm to meters if user enters cm
+    // Convert cm to meters if entered > 3
     if (height != null && height > 3) {
       height = height / 100;
     }
@@ -38,15 +39,8 @@ class WellnessScreeningResultsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool get isFormValid =>
-      heightController.text.isNotEmpty &&
-      weightController.text.isNotEmpty &&
-      bloodPressureController.text.isNotEmpty &&
-      cholesterolController.text.isNotEmpty &&
-      bloodSugarController.text.isNotEmpty &&
-      waistController.text.isNotEmpty;
+  bool get isFormValid => formKey.currentState?.validate() ?? false;
 
-  /// ✅ Converts all screening results to Map for submission
   Map<String, dynamic> toMap() {
     return {
       'height': heightController.text,
@@ -76,14 +70,13 @@ class WellnessScreeningResultsViewModel extends ChangeNotifier {
     try {
       await Future.delayed(const Duration(seconds: 1));
 
-      if (!context.mounted) {
-        return;
-      }
+      if (!context.mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Screening Results Saved!')),
       );
 
-      onNext(); // ✅ Move to Nurse Intervention Screen
+      onNext();
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

@@ -1,11 +1,29 @@
 import 'package:flutter/material.dart';
 
 class HIVTestViewModel extends ChangeNotifier {
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
   // --- 1. Questions ---
   String? firstHIVTest; // Yes/No
   TextEditingController lastTestMonthController = TextEditingController();
   TextEditingController lastTestYearController = TextEditingController();
   String? lastTestResult; // Positive/Negative
+
+  String? sharedNeedles; // Yes/No
+  String? unprotectedSex; // Yes/No
+  String? treatedSTI; // Yes/No
+  String? treatedTB; // Yes/No
+  String? noCondomUse; // Yes/No
+  TextEditingController noCondomReasonController = TextEditingController();
+
+  String? knowPartnerStatus; // Yes/No
+  List<String> riskReasons = [];
+  TextEditingController otherRiskReasonController = TextEditingController();
+
+  bool _isSubmitting = false;
+  bool get isSubmitting => _isSubmitting;
+
+  // --- Setters ---
   void setFirstHIVTest(String? value) {
     if (firstHIVTest == value) return;
     firstHIVTest = value;
@@ -18,12 +36,6 @@ class HIVTestViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  String? sharedNeedles; // Yes/No
-  String? unprotectedSex; // Yes/No
-  String? treatedSTI; // Yes/No
-  String? treatedTB; // Yes/No
-  String? noCondomUse; // Yes/No
-  TextEditingController noCondomReasonController = TextEditingController();
   void setSharedNeedles(String? value) {
     if (sharedNeedles == value) return;
     sharedNeedles = value;
@@ -51,26 +63,16 @@ class HIVTestViewModel extends ChangeNotifier {
   void setNoCondomUse(String? value) {
     if (noCondomUse == value) return;
     noCondomUse = value;
-    if (value != 'Yes') {
-      noCondomReasonController.clear();
-    }
+    if (value != 'Yes') noCondomReasonController.clear();
     notifyListeners();
   }
 
-  String? knowPartnerStatus; // Yes/No
   void setKnowPartnerStatus(String? value) {
     if (knowPartnerStatus == value) return;
     knowPartnerStatus = value;
     notifyListeners();
   }
 
-  List<String> riskReasons = [];
-  TextEditingController otherRiskReasonController = TextEditingController();
-
-  bool _isSubmitting = false;
-  bool get isSubmitting => _isSubmitting;
-
-  // --- Methods ---
   void toggleRiskReason(String reason) {
     if (riskReasons.contains(reason)) {
       riskReasons.remove(reason);
@@ -81,29 +83,9 @@ class HIVTestViewModel extends ChangeNotifier {
   }
 
   bool get isFormValid {
-    if (firstHIVTest == null) return false;
-    if (firstHIVTest == "No") {
-      if (lastTestMonthController.text.isEmpty ||
-          lastTestYearController.text.isEmpty ||
-          lastTestResult == null) {
-        return false;
-      }
-    }
-    if (sharedNeedles == null ||
-        unprotectedSex == null ||
-        treatedSTI == null ||
-        treatedTB == null ||
-        noCondomUse == null ||
-        knowPartnerStatus == null) {
-      return false;
-    }
-    if (noCondomUse == "Yes" && noCondomReasonController.text.trim().isEmpty) {
-      return false;
-    }
-    return true;
+    return formKey.currentState?.validate() == true;
   }
 
-  /// ✅ Converts all HIV test data to Map
   Map<String, dynamic> toMap() {
     return {
       'firstHIVTest': firstHIVTest,
@@ -128,7 +110,6 @@ class HIVTestViewModel extends ChangeNotifier {
     _isSubmitting = true;
     notifyListeners();
 
-    // Simulate save operation
     debugPrint("✅ HIV Test Submitted:");
     debugPrint(toMap().toString());
 
@@ -137,7 +118,6 @@ class HIVTestViewModel extends ChangeNotifier {
     _isSubmitting = false;
     notifyListeners();
 
-    // Move to next step
     onNext?.call();
   }
 

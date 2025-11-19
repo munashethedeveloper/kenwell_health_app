@@ -2,23 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:signature/signature.dart';
 
 class ConsentScreenViewModel extends ChangeNotifier {
+  // Form key for validation
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+  // Controllers
   final SignatureController signatureController = SignatureController(
     penStrokeWidth: 2,
     penColor: Colors.black,
   );
-
   final TextEditingController venueController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
   final TextEditingController practitionerController = TextEditingController();
 
+  // Screening checkboxes
   bool hra = false;
   bool vct = false;
   bool tb = false;
   bool hiv = false;
 
+  // Submission state
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
 
+  // Form validation
   bool get isFormValid =>
       hra &&
       vct &&
@@ -29,6 +35,7 @@ class ConsentScreenViewModel extends ChangeNotifier {
       practitionerController.text.isNotEmpty &&
       signatureController.isNotEmpty;
 
+  // Toggle screening checkbox
   void toggleCheckbox(String field, bool? value) {
     switch (field) {
       case 'hra':
@@ -47,11 +54,13 @@ class ConsentScreenViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Clear signature
   void clearSignature() {
     signatureController.clear();
     notifyListeners();
   }
 
+  // Submit consent
   Future<void> submitConsent() async {
     _isSubmitting = true;
     notifyListeners();
@@ -62,19 +71,17 @@ class ConsentScreenViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Converts the consent data to a Map for submission
-  Map<String, dynamic> toMap() {
-    return {
-      'venue': venueController.text,
-      'date': dateController.text,
-      'practitioner': practitionerController.text,
-      'hra': hra,
-      'vct': vct,
-      'tb': tb,
-      'hiv': hiv,
-      'hasSignature': signatureController.isNotEmpty,
-    };
-  }
+  // Convert data to Map
+  Map<String, dynamic> toMap() => {
+        'venue': venueController.text,
+        'date': dateController.text,
+        'practitioner': practitionerController.text,
+        'hra': hra,
+        'vct': vct,
+        'tb': tb,
+        'hiv': hiv,
+        'hasSignature': signatureController.isNotEmpty,
+      };
 
   @override
   void dispose() {

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 class PersonalDetailsViewModel extends ChangeNotifier {
+  // Form key
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
   // Controllers
   final screeningSiteController = TextEditingController();
   final dateController = TextEditingController();
@@ -23,85 +26,76 @@ class PersonalDetailsViewModel extends ChangeNotifier {
   String? gender;
   String? employmentStatus;
 
-  void setMaritalStatus(String? value) {
-    if (maritalStatus == value) return;
-    maritalStatus = value;
-    notifyListeners();
-  }
-
-  void setGender(String? value) {
-    if (gender == value) return;
-    gender = value;
-    notifyListeners();
-  }
-
-  void setEmploymentStatus(String? value) {
-    if (employmentStatus == value) return;
-    employmentStatus = value;
-    notifyListeners();
-  }
-
+  // Dropdown options
   final List<String> maritalStatusOptions = [
     'Single',
     'Widowed',
     'Married',
-    'Divorced',
+    'Divorced'
   ];
   final List<String> genderOptions = ['Male', 'Female'];
-  final List<String> firstTimeTestedOptions = ['Yes', 'No'];
   final List<String> employmentStatusOptions = [
     'Permanent fulltime',
     'Contract – limited duration',
-    'Outside contractor',
+    'Outside contractor'
   ];
 
+  // Submission state
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
 
+  // Setters with notify
+  void setMaritalStatus(String? value) {
+    if (maritalStatus != value) {
+      maritalStatus = value;
+      notifyListeners();
+    }
+  }
+
+  void setGender(String? value) {
+    if (gender != value) {
+      gender = value;
+      notifyListeners();
+    }
+  }
+
+  void setEmploymentStatus(String? value) {
+    if (employmentStatus != value) {
+      employmentStatus = value;
+      notifyListeners();
+    }
+  }
+
+  // Form validation
   bool get isFormValid =>
-      screeningSiteController.text.isNotEmpty &&
-      dateController.text.isNotEmpty &&
-      nameController.text.isNotEmpty &&
-      surnameController.text.isNotEmpty &&
-      initialsController.text.isNotEmpty &&
-      idNumberController.text.isNotEmpty &&
-      nationalityController.text.isNotEmpty &&
-      medicalAidNameController.text.isNotEmpty &&
-      medicalAidNumberController.text.isNotEmpty &&
-      emailController.text.isNotEmpty &&
-      cellNumberController.text.isNotEmpty &&
-      personalNumberController.text.isNotEmpty &&
-      divisionController.text.isNotEmpty &&
-      positionController.text.isNotEmpty &&
-      regionController.text.isNotEmpty &&
+      formKey.currentState?.validate() == true &&
       maritalStatus != null &&
       gender != null &&
       employmentStatus != null;
 
-  /// Convert personal details to a Map for submission
-  Map<String, dynamic> toMap() {
-    return {
-      'screeningSite': screeningSiteController.text,
-      'date': dateController.text,
-      'name': nameController.text,
-      'surname': surnameController.text,
-      'initials': initialsController.text,
-      'idNumber': idNumberController.text,
-      'nationality': nationalityController.text,
-      'medicalAidName': medicalAidNameController.text,
-      'medicalAidNumber': medicalAidNumberController.text,
-      'email': emailController.text,
-      'cellNumber': cellNumberController.text,
-      'personalNumber': personalNumberController.text,
-      'division': divisionController.text,
-      'position': positionController.text,
-      'region': regionController.text,
-      'maritalStatus': maritalStatus,
-      'gender': gender,
-      'employmentStatus': employmentStatus,
-    };
-  }
+  // Convert to Map
+  Map<String, dynamic> toMap() => {
+        'screeningSite': screeningSiteController.text,
+        'date': dateController.text,
+        'name': nameController.text,
+        'surname': surnameController.text,
+        'initials': initialsController.text,
+        'idNumber': idNumberController.text,
+        'nationality': nationalityController.text,
+        'medicalAidName': medicalAidNameController.text,
+        'medicalAidNumber': medicalAidNumberController.text,
+        'email': emailController.text,
+        'cellNumber': cellNumberController.text,
+        'personalNumber': personalNumberController.text,
+        'division': divisionController.text,
+        'position': positionController.text,
+        'region': regionController.text,
+        'maritalStatus': maritalStatus,
+        'gender': gender,
+        'employmentStatus': employmentStatus,
+      };
 
+  // Simulate saving
   Future<void> saveLocally() async {
     _isSubmitting = true;
     notifyListeners();
@@ -112,21 +106,23 @@ class PersonalDetailsViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
-    screeningSiteController.dispose();
-    dateController.dispose();
-    nameController.dispose();
-    surnameController.dispose();
-    initialsController.dispose();
-    idNumberController.dispose();
-    nationalityController.dispose();
-    medicalAidNameController.dispose();
-    medicalAidNumberController.dispose();
-    emailController.dispose();
-    cellNumberController.dispose();
-    personalNumberController.dispose();
-    divisionController.dispose();
-    positionController.dispose();
-    regionController.dispose();
+    [
+      screeningSiteController,
+      dateController,
+      nameController,
+      surnameController,
+      initialsController,
+      idNumberController,
+      nationalityController,
+      medicalAidNameController,
+      medicalAidNumberController,
+      emailController,
+      cellNumberController,
+      personalNumberController,
+      divisionController,
+      positionController,
+      regionController,
+    ].forEach((c) => c.dispose());
     super.dispose();
   }
 }

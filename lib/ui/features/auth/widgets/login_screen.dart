@@ -8,6 +8,11 @@ import '../../../../routing/route_names.dart';
 import '../../../../domain/models/user_model.dart';
 import '../../../shared/ui/navigation/main_navigation_screen.dart';
 
+const authOutlineInputBorder = OutlineInputBorder(
+  borderSide: BorderSide(color: Color(0xFF757575)),
+  borderRadius: BorderRadius.all(Radius.circular(100)),
+);
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -63,94 +68,114 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: const KenwellAppBar(
         title: 'Login',
         automaticallyImplyLeading: false,
       ),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                const SizedBox(height: 40),
-                const AppLogo(size: 200),
-                const SizedBox(height: 30),
-
-                // Email Field
-                TextFormField(
-                  controller: _emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (val) =>
-                      val!.isEmpty ? 'Please enter your email' : null,
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                const SizedBox(height: 16),
-
-                // Password Field with visibility toggle
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: _obscurePassword,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    border: const OutlineInputBorder(),
-                    suffixIcon: IconButton(
-                      icon: Icon(_obscurePassword
-                          ? Icons.visibility_off
-                          : Icons.visibility),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  const SizedBox(height: 16),
+                  const AppLogo(size: 200),
+                  const SizedBox(height: 24),
+                  _buildTextField(_emailController, "Email",
+                      keyboardType: TextInputType.emailAddress),
+                  const SizedBox(height: 16),
+                  _buildPasswordField(
+                      _passwordController, "Password", _obscurePassword, () {
+                    setState(() => _obscurePassword = !_obscurePassword);
+                  }),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
                       onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
+                        Navigator.pushNamed(context, RouteNames.forgotPassword);
                       },
+                      child: const Text(
+                        'Forgot Password?',
+                        style: TextStyle(
+                            decoration: TextDecoration.underline,
+                            color: Color(0xFF201C58)),
+                      ),
                     ),
                   ),
-                  validator: (val) =>
-                      val!.isEmpty ? 'Please enter your password' : null,
-                ),
-
-                // Forgot Password
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
+                  const SizedBox(height: 24),
+                  CustomPrimaryButton(
+                    label: "Login",
+                    onPressed: _login,
+                    isBusy: _isLoading,
+                    backgroundColor: KenwellColors.primaryGreen,
+                  ),
+                  const SizedBox(height: 16),
+                  TextButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, RouteNames.forgotPassword);
+                      Navigator.pushReplacementNamed(
+                          context, RouteNames.register);
                     },
                     child: const Text(
-                      'Forgot Password?',
-                      style: TextStyle(decoration: TextDecoration.underline),
+                      "Don’t have an account? Register",
+                      style: TextStyle(
+                          decoration: TextDecoration.underline,
+                          color: Color(0xFF201C58)),
                     ),
                   ),
-                ),
-                const SizedBox(height: 20),
-
-                // Login Button
-                CustomPrimaryButton(
-                  label: 'Login',
-                  onPressed: _login,
-                  isBusy: _isLoading,
-                  backgroundColor: KenwellColors.primaryGreen,
-                ),
-                const SizedBox(height: 12),
-
-                // Register Button
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushReplacementNamed(
-                        context, RouteNames.register);
-                  },
-                  child: const Text(
-                    'Don’t have an account? Register',
-                    style: TextStyle(decoration: TextDecoration.underline),
-                  ),
-                ),
-              ],
+                  const SizedBox(height: 16),
+                ],
+              ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String label,
+      {TextInputType keyboardType = TextInputType.text}) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      validator: (v) => (v == null || v.isEmpty) ? "Enter $label" : null,
+      decoration: InputDecoration(
+        labelText: label,
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        hintText: "Enter $label",
+        hintStyle: const TextStyle(color: Color(0xFF757575)),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        border: authOutlineInputBorder,
+        enabledBorder: authOutlineInputBorder,
+        focusedBorder: authOutlineInputBorder.copyWith(
+            borderSide: const BorderSide(color: Color(0xFFFF7643))),
+      ),
+    );
+  }
+
+  Widget _buildPasswordField(TextEditingController controller, String label,
+      bool obscureText, VoidCallback toggleObscure) {
+    return TextFormField(
+      controller: controller,
+      obscureText: obscureText,
+      validator: (v) => (v == null || v.isEmpty) ? "Enter $label" : null,
+      decoration: InputDecoration(
+        labelText: label,
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        hintText: "Enter $label",
+        hintStyle: const TextStyle(color: Color(0xFF757575)),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        border: authOutlineInputBorder,
+        enabledBorder: authOutlineInputBorder,
+        focusedBorder: authOutlineInputBorder.copyWith(
+            borderSide: const BorderSide(color: Color(0xFFFF7643))),
+        suffixIcon: IconButton(
+          icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility),
+          onPressed: toggleObscure,
         ),
       ),
     );

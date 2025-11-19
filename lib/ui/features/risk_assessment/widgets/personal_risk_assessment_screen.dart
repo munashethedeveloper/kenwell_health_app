@@ -28,216 +28,234 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
         builder: (context, vm, _) {
           return Scaffold(
             appBar: const KenwellAppBar(
-                title: 'Personal Risk Assessment',
-                automaticallyImplyLeading: false),
+              title: 'Personal Risk Assessment',
+              automaticallyImplyLeading: false,
+            ),
             body: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Section B Header
-                  const Padding(
-                    padding: EdgeInsets.only(bottom: 12),
-                    child: Text(
-                      'Section B: Personal Risk Assessment (previous 12 months)',
-                      style: TextStyle(
+              child: Form(
+                key: vm.formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(bottom: 12),
+                      child: Text(
+                        'Section B: Personal Risk Assessment (previous 12 months)',
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF201C58)),
-                    ),
-                  ),
-
-                  // ===== Section 1: Chronic Conditions =====
-                  _buildCard(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          '1. Do you suffer or take medication for any of the following conditions?',
-                          style: TextStyle(fontSize: 16),
+                          color: Color(0xFF201C58),
                         ),
-                        const SizedBox(height: 8),
-                        ...vm.chronicConditions.keys.map((condition) {
-                          return CheckboxListTile(
-                            title: Text(condition),
-                            value: vm.chronicConditions[condition],
-                            onChanged: (val) =>
-                                vm.toggleCondition(condition, val),
-                          );
-                        }).toList(),
-                        if (vm.chronicConditions['Other'] == true)
+                      ),
+                    ),
+
+                    // ===== Section 1: Chronic Conditions =====
+                    _buildCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            '1. Do you suffer or take medication for any of the following conditions?',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          const SizedBox(height: 8),
+                          ...vm.chronicConditions.keys.map((condition) {
+                            return CheckboxListTile(
+                              title: Text(condition),
+                              value: vm.chronicConditions[condition],
+                              onChanged: (val) =>
+                                  vm.toggleCondition(condition, val),
+                            );
+                          }).toList(),
+                          if (vm.chronicConditions['Other'] == true)
+                            KenwellTextField(
+                              label:
+                                  'If Other, please specify condition and treatment',
+                              controller: vm.otherConditionController,
+                              hintText: 'Specify other condition...',
+                              validator: (val) => val == null || val.isEmpty
+                                  ? 'Please specify other condition'
+                                  : null,
+                            ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // ===== Section 2: Exercise =====
+                    _buildCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            '2. Over the past month, how many days per week have you exercised for 30 minutes or longer?',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          const SizedBox(height: 8),
+                          _buildStringRadioGroup(
+                            selected: vm.exerciseFrequency.isEmpty
+                                ? null
+                                : vm.exerciseFrequency,
+                            options: const [
+                              'Never',
+                              'Once/week',
+                              'Twice/week',
+                              'Three times/week or more',
+                            ],
+                            onChanged: vm.setExerciseFrequency,
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // ===== Section 3: Smoking =====
+                    _buildCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            '3. How much do you smoke per day?',
+                            style: TextStyle(fontSize: 16),
+                          ),
                           KenwellTextField(
-                            label:
-                                'If Other, please specify condition and treatment',
-                            controller: vm.otherConditionController,
+                            label: 'Number per day',
+                            controller: vm.dailySmokeController,
+                            hintText: 'Enter number of cigarettes/day',
+                            keyboardType: TextInputType.number,
+                            validator: (val) => val == null || val.isEmpty
+                                ? 'Please enter daily smoking amount'
+                                : null,
                           ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // ===== Section 2: Exercise =====
-                  _buildCard(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          '2. Over the past month, how many days per week have you exercised for 30 minutes or longer?',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        const SizedBox(height: 8),
-                        _buildStringRadioGroup(
-                          selected: vm.exerciseFrequency.isEmpty
-                              ? null
-                              : vm.exerciseFrequency,
-                          options: const [
-                            'Never',
-                            'Once/week',
-                            'Twice/week',
-                            'Three times/week or more',
-                          ],
-                          onChanged: vm.setExerciseFrequency,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // ===== Section 3: Smoking =====
-                  _buildCard(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          '3. How much do you smoke per day?',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        KenwellTextField(
-                          label: 'Number per day',
-                          controller: vm.dailySmokeController,
-                          keyboardType: TextInputType.number,
-                        ),
-                        const SizedBox(height: 8),
-                        const Text('3.1 What do you smoke?',
-                            style: TextStyle(fontSize: 16)),
-                        _buildStringRadioGroup(
-                          selected: vm.smokeType.isEmpty ? null : vm.smokeType,
-                          options: const ['Cigarette', 'Pipe', 'Dagga'],
-                          onChanged: vm.setSmokeType,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // ===== Section 4: Alcohol =====
-                  _buildCard(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          '4. How often do you use alcoholic beverages?',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        const SizedBox(height: 8),
-                        _buildStringRadioGroup(
-                          selected: vm.alcoholFrequency.isEmpty
-                              ? null
-                              : vm.alcoholFrequency,
-                          options: const [
-                            'Never',
-                            'On occasion',
-                            'Two-three drinks per day',
-                            'More than 3 drinks per day',
-                            'I often drink too much',
-                          ],
-                          onChanged: vm.setAlcoholFrequency,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // ===== Section 5: Female Only =====
-                  if (isFemale)
-                    _buildCard(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          KenwellYesNoQuestion<bool>(
-                            question:
-                                '5. Have you had a pap smear in the last 24 months?',
-                            value: vm.papSmear,
-                            onChanged: vm.setPapSmear,
-                            yesValue: true,
-                            noValue: false,
-                          ),
-                          KenwellYesNoQuestion<bool>(
-                            question:
-                                '6. Do you examine your breasts regularly?',
-                            value: vm.breastExam,
-                            onChanged: vm.setBreastExam,
-                            yesValue: true,
-                            noValue: false,
-                          ),
-                          KenwellYesNoQuestion<bool>(
-                            question:
-                                '7. If older than 40, have you had a mammogram done?',
-                            value: vm.mammogram,
-                            onChanged: vm.setMammogram,
-                            yesValue: true,
-                            noValue: false,
+                          const SizedBox(height: 8),
+                          const Text('3.1 What do you smoke?',
+                              style: TextStyle(fontSize: 16)),
+                          _buildStringRadioGroup(
+                            selected:
+                                vm.smokeType.isEmpty ? null : vm.smokeType,
+                            options: const ['Cigarette', 'Pipe', 'Dagga'],
+                            onChanged: vm.setSmokeType,
                           ),
                         ],
                       ),
                     ),
 
-                  // ===== Section 6: Male Only =====
-                  if (!isFemale)
+                    const SizedBox(height: 16),
+
+                    // ===== Section 4: Alcohol =====
                     _buildCard(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          KenwellYesNoQuestion<bool>(
-                            question:
-                                '8. If > than 40, have you had your prostate checked?',
-                            value: vm.prostateCheck,
-                            onChanged: vm.setProstateCheck,
-                            yesValue: true,
-                            noValue: false,
+                          const Text(
+                            '4. How often do you use alcoholic beverages?',
+                            style: TextStyle(fontSize: 16),
                           ),
-                          KenwellYesNoQuestion<bool>(
-                            question:
-                                '9. Have you been tested for prostate cancer?',
-                            value: vm.prostateTested,
-                            onChanged: vm.setProstateTested,
-                            yesValue: true,
-                            noValue: false,
+                          const SizedBox(height: 8),
+                          _buildStringRadioGroup(
+                            selected: vm.alcoholFrequency.isEmpty
+                                ? null
+                                : vm.alcoholFrequency,
+                            options: const [
+                              'Never',
+                              'On occasion',
+                              'Two-three drinks per day',
+                              'More than 3 drinks per day',
+                              'I often drink too much',
+                            ],
+                            onChanged: vm.setAlcoholFrequency,
                           ),
                         ],
                       ),
                     ),
 
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 16),
 
-                  // ===== Navigation Buttons =====
-                  KenwellFormNavigation(
-                    onPrevious: onPrevious,
-                    onNext: () {
-                      if (!vm.isFormValid) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Please complete all fields'),
-                          ),
-                        );
-                        return;
-                      }
-                      if (onNext != null) onNext!();
-                    },
-                    isNextBusy: vm.isSubmitting,
-                    isNextEnabled: !vm.isSubmitting,
-                  ),
-                ],
+                    // ===== Section 5-7: Female Only =====
+                    if (isFemale)
+                      _buildCard(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            KenwellYesNoQuestion<bool>(
+                              question:
+                                  '5. Have you had a pap smear in the last 24 months?',
+                              value: vm.papSmear,
+                              onChanged: vm.setPapSmear,
+                              yesValue: true,
+                              noValue: false,
+                            ),
+                            KenwellYesNoQuestion<bool>(
+                              question:
+                                  '6. Do you examine your breasts regularly?',
+                              value: vm.breastExam,
+                              onChanged: vm.setBreastExam,
+                              yesValue: true,
+                              noValue: false,
+                            ),
+                            KenwellYesNoQuestion<bool>(
+                              question:
+                                  '7. If older than 40, have you had a mammogram done?',
+                              value: vm.mammogram,
+                              onChanged: vm.setMammogram,
+                              yesValue: true,
+                              noValue: false,
+                            ),
+                          ],
+                        ),
+                      ),
+
+                    // ===== Section 8-9: Male Only =====
+                    if (!isFemale)
+                      _buildCard(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            KenwellYesNoQuestion<bool>(
+                              question:
+                                  '8. If > than 40, have you had your prostate checked?',
+                              value: vm.prostateCheck,
+                              onChanged: vm.setProstateCheck,
+                              yesValue: true,
+                              noValue: false,
+                            ),
+                            KenwellYesNoQuestion<bool>(
+                              question:
+                                  '9. Have you been tested for prostate cancer?',
+                              value: vm.prostateTested,
+                              onChanged: vm.setProstateTested,
+                              yesValue: true,
+                              noValue: false,
+                            ),
+                          ],
+                        ),
+                      ),
+
+                    const SizedBox(height: 20),
+
+                    // ===== Navigation Buttons =====
+                    KenwellFormNavigation(
+                      onPrevious: onPrevious,
+                      onNext: () {
+                        if (vm.formKey.currentState!.validate() &&
+                            vm.isFormValid) {
+                          if (onNext != null) onNext!();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text(
+                                    'Please complete all required fields')),
+                          );
+                        }
+                      },
+                      isNextBusy: vm.isSubmitting,
+                      isNextEnabled: !vm.isSubmitting,
+                    ),
+                  ],
+                ),
               ),
             ),
           );
@@ -259,9 +277,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
               value: option,
               groupValue: selected,
               onChanged: (value) {
-                if (value != null) {
-                  onChanged(value);
-                }
+                if (value != null) onChanged(value);
               },
             ),
           )

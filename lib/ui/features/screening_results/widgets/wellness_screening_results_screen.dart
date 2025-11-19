@@ -23,80 +23,109 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
         builder: (context, vm, _) {
           return Scaffold(
             appBar: const KenwellAppBar(
-                title: 'Wellness Screening Results',
-                automaticallyImplyLeading: false),
+              title: 'Wellness Screening Results',
+              automaticallyImplyLeading: false,
+            ),
             body: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  _buildCard(
-                    child: Column(
+              child: Form(
+                key: vm.formKey,
+                child: Column(
+                  children: [
+                    _buildCard(
+                      child: Column(
+                        children: [
+                          _buildTextField(
+                            'Height (m or cm)',
+                            vm.heightController,
+                            hint: 'Enter your height',
+                            keyboardType: TextInputType.number,
+                          ),
+                          const SizedBox(height: 12),
+                          _buildTextField(
+                            'Weight (kg)',
+                            vm.weightController,
+                            hint: 'Enter your weight',
+                            keyboardType: TextInputType.number,
+                          ),
+                          const SizedBox(height: 12),
+                          _buildTextField(
+                            'BMI',
+                            vm.bmiController,
+                            hint: 'Automatically calculated',
+                            readOnly: true,
+                          ),
+                          const SizedBox(height: 12),
+                          _buildTextField(
+                            'Blood Pressure (mmHg)',
+                            vm.bloodPressureController,
+                            hint: 'e.g., 120/80',
+                          ),
+                          const SizedBox(height: 12),
+                          _buildTextField(
+                            'Cholesterol (mmol/L)',
+                            vm.cholesterolController,
+                            hint: 'e.g., 5.2',
+                            keyboardType: TextInputType.number,
+                          ),
+                          const SizedBox(height: 12),
+                          _buildTextField(
+                            'Blood Sugar (mmol/L)',
+                            vm.bloodSugarController,
+                            hint: 'e.g., 6.1',
+                            keyboardType: TextInputType.number,
+                          ),
+                          const SizedBox(height: 12),
+                          _buildTextField(
+                            'Waist Circumference (cm)',
+                            vm.waistController,
+                            hint: 'e.g., 80',
+                            keyboardType: TextInputType.number,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // ✅ Buttons
+                    Row(
                       children: [
-                        _buildTextField('Height (m or cm)', vm.heightController,
-                            keyboardType: TextInputType.number),
-                        const SizedBox(height: 12),
-                        _buildTextField('Weight (kg)', vm.weightController,
-                            keyboardType: TextInputType.number),
-                        const SizedBox(height: 12),
-                        _buildTextField('BMI', vm.bmiController,
-                            readOnly: true),
-                        const SizedBox(height: 12),
-                        _buildTextField('Blood Pressure (mmHg)',
-                            vm.bloodPressureController),
-                        const SizedBox(height: 12),
-                        _buildTextField(
-                            'Cholesterol (mmol/L)', vm.cholesterolController,
-                            keyboardType: TextInputType.number),
-                        const SizedBox(height: 12),
-                        _buildTextField(
-                            'Blood Sugar (mmol/L)', vm.bloodSugarController,
-                            keyboardType: TextInputType.number),
-                        const SizedBox(height: 12),
-                        _buildTextField(
-                            'Waist Circumference (cm)', vm.waistController,
-                            keyboardType: TextInputType.number),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: vm.isSubmitting ? null : onPrevious,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                            ),
+                            child: const Text('Previous'),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: vm.isSubmitting
+                                ? null
+                                : () =>
+                                    vm.submitResults(context, onNext: onNext),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF90C048),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                            ),
+                            child: vm.isSubmitting
+                                ? const CircularProgressIndicator(
+                                    valueColor:
+                                        AlwaysStoppedAnimation(Colors.white),
+                                  )
+                                : const Text(
+                                    'Next',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                          ),
+                        ),
                       ],
                     ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // ✅ Buttons
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: vm.isSubmitting ? null : onPrevious,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                          ),
-                          child: const Text('Previous'),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: vm.isSubmitting
-                              ? null
-                              : () => vm.submitResults(context, onNext: onNext),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF90C048),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                          ),
-                          child: vm.isSubmitting
-                              ? const CircularProgressIndicator(
-                                  valueColor:
-                                      AlwaysStoppedAnimation(Colors.white),
-                                )
-                              : const Text(
-                                  'Next',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );
@@ -108,17 +137,25 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
   Widget _buildTextField(
     String label,
     TextEditingController controller, {
+    String? hint,
     bool readOnly = false,
     TextInputType keyboardType = TextInputType.text,
   }) {
-    return TextField(
+    return TextFormField(
       controller: controller,
       readOnly: readOnly,
       keyboardType: keyboardType,
       decoration: InputDecoration(
         labelText: label,
+        hintText: hint,
         border: const OutlineInputBorder(),
       ),
+      validator: (val) {
+        if (!readOnly && (val == null || val.isEmpty)) {
+          return 'Please enter $label';
+        }
+        return null;
+      },
     );
   }
 

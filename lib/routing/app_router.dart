@@ -54,6 +54,9 @@ class AppRouter {
       case RouteNames.login:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
 
+      //case RouteNames.signup:
+      //return MaterialPageRoute(builder: (_) => const SignUpScreen());
+
       case RouteNames.register:
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
 
@@ -188,7 +191,7 @@ class AppRouter {
             (args?['existingEvents'] as List<dynamic>?)
                 ?.map((e) => e as WellnessEvent)
                 .toList();
-        final WellnessEvent? existingEvent = 
+        final WellnessEvent? existingEvent =
             args?['existingEvent'] as WellnessEvent?;
 
         return MaterialPageRoute(

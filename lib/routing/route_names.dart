@@ -1,6 +1,7 @@
 class RouteNames {
   static const String login = '/login';
   static const String register = '/register';
+  //static const String signup = '/sign-up'; // <-- UPDATED
   static const String calendar = '/calendar';
   static const String profile = '/profile';
   static const String settings = '/settings';

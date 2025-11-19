@@ -2,17 +2,36 @@ import 'package:flutter/material.dart';
 import 'package:signature/signature.dart';
 
 class NurseInterventionViewModel extends ChangeNotifier {
-  // 1. Window period risk assessment
+  // ✅ Form key for validation
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+  // --- Initial Assessment ---
   String? windowPeriod; // 'N/A', 'Yes', 'No'
   final List<String> windowPeriodOptions = ['N/A', 'Yes', 'No'];
 
-  void setWindowPeriod(String? value) {
-    if (windowPeriod == value) return;
-    windowPeriod = value;
-    notifyListeners();
-  }
+  String? expectedResult; // 'N/A', 'Yes', 'No'
+  final List<String> expectedResultOptions = ['N/A', 'Yes', 'No'];
 
-  // 2. Follow-up location
+  String? difficultyDealingResult; // 'N/A', 'Yes', 'No'
+  final List<String> difficultyOptions = ['N/A', 'Yes', 'No'];
+
+  String? urgentPsychosocial; // 'N/A', 'Yes', 'No'
+  final List<String> urgentOptions = ['N/A', 'Yes', 'No'];
+
+  String? committedToChange; // 'N/A', 'Yes', 'No'
+  final List<String> committedOptions = ['N/A', 'Yes', 'No'];
+
+  void setWindowPeriod(String? value) => _setValue(() => windowPeriod = value);
+  void setExpectedResult(String? value) =>
+      _setValue(() => expectedResult = value);
+  void setDifficultyDealingResult(String? value) =>
+      _setValue(() => difficultyDealingResult = value);
+  void setUrgentPsychosocial(String? value) =>
+      _setValue(() => urgentPsychosocial = value);
+  void setCommittedToChange(String? value) =>
+      _setValue(() => committedToChange = value);
+
+  // --- Follow-up ---
   String? followUpLocation; // 'State clinic', 'Private doctor', 'Other'
   final List<String> followUpLocationOptions = [
     'State clinic',
@@ -20,88 +39,34 @@ class NurseInterventionViewModel extends ChangeNotifier {
     'Other'
   ];
   final TextEditingController followUpOtherController = TextEditingController();
+  final TextEditingController followUpDateController = TextEditingController();
 
   void setFollowUpLocation(String? value) {
     if (followUpLocation == value) return;
     followUpLocation = value;
-    if (value != 'Other') {
-      followUpOtherController.clear();
-    }
+    if (value != 'Other') followUpOtherController.clear();
     notifyListeners();
   }
 
-  // 3. Follow-up test date
-  final TextEditingController followUpDateController = TextEditingController();
-
-  // 4. Expected HIV result
-  String? expectedResult; // 'N/A', 'Yes', 'No'
-  final List<String> expectedResultOptions = ['N/A', 'Yes', 'No'];
-
-  void setExpectedResult(String? value) {
-    if (expectedResult == value) return;
-    expectedResult = value;
-    notifyListeners();
-  }
-
-  // 5. Difficulty in dealing with result
-  String? difficultyDealingResult; // 'N/A', 'Yes', 'No'
-  final List<String> difficultyOptions = ['N/A', 'Yes', 'No'];
-
-  void setDifficultyDealingResult(String? value) {
-    if (difficultyDealingResult == value) return;
-    difficultyDealingResult = value;
-    notifyListeners();
-  }
-
-  // 6. Urgent psychosocial follow-up
-  String? urgentPsychosocial; // 'N/A', 'Yes', 'No'
-  final List<String> urgentOptions = ['N/A', 'Yes', 'No'];
-
-  void setUrgentPsychosocial(String? value) {
-    if (urgentPsychosocial == value) return;
-    urgentPsychosocial = value;
-    notifyListeners();
-  }
-
-  // 7. Commitment to behavior change
-  String? committedToChange; // 'N/A', 'Yes', 'No'
-  final List<String> committedOptions = ['N/A', 'Yes', 'No'];
-
-  void setCommittedToChange(String? value) {
-    if (committedToChange == value) return;
-    committedToChange = value;
-    notifyListeners();
-  }
-
-  // Referral Nursing Interventions
+  // --- Referral Nursing Interventions ---
   bool patientNotReferred = false;
-  final TextEditingController notReferredReasonController =
-      TextEditingController();
   bool referredToGP = false;
   bool referredToStateClinic = false;
+  final TextEditingController notReferredReasonController =
+      TextEditingController();
 
   void setPatientNotReferred(bool value) {
     if (patientNotReferred == value) return;
     patientNotReferred = value;
-    if (!value) {
-      notReferredReasonController.clear();
-    }
+    if (!value) notReferredReasonController.clear();
     notifyListeners();
   }
 
-  void setReferredToGP(bool value) {
-    if (referredToGP == value) return;
-    referredToGP = value;
-    notifyListeners();
-  }
+  void setReferredToGP(bool value) => _setValue(() => referredToGP = value);
+  void setReferredToStateClinic(bool value) =>
+      _setValue(() => referredToStateClinic = value);
 
-  void setReferredToStateClinic(bool value) {
-    if (referredToStateClinic == value) return;
-    referredToStateClinic = value;
-    notifyListeners();
-  }
-
-  // Nurse Details
+  // --- Nurse Details ---
   final TextEditingController hivTestingNurseController =
       TextEditingController();
   final TextEditingController rankController = TextEditingController();
@@ -113,41 +78,32 @@ class NurseInterventionViewModel extends ChangeNotifier {
   final TextEditingController sancNumberController = TextEditingController();
   final TextEditingController nurseDateController = TextEditingController();
 
+  // --- Submission ---
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
 
+  // --- Validation ---
   bool get isFormValid {
-    if (windowPeriod == null ||
-        (windowPeriod == 'Yes' && followUpLocation == null) ||
-        expectedResult == null ||
-        difficultyDealingResult == null ||
-        urgentPsychosocial == null ||
-        committedToChange == null) {
-      return false;
-    }
-    if (followUpLocation == 'Other' && followUpOtherController.text.isEmpty) {
-      return false;
-    }
-    if (patientNotReferred && notReferredReasonController.text.isEmpty) {
-      return false;
-    }
-
-    // Nurse details must not be empty
-    if (hivTestingNurseController.text.isEmpty ||
-        rankController.text.isEmpty ||
-        signatureController.isEmpty ||
-        sancNumberController.text.isEmpty ||
-        nurseDateController.text.isEmpty) {
-      return false;
-    }
-
-    return true;
+    return formKey.currentState?.validate() == true &&
+        windowPeriod != null &&
+        expectedResult != null &&
+        difficultyDealingResult != null &&
+        urgentPsychosocial != null &&
+        committedToChange != null &&
+        (windowPeriod != 'Yes' || followUpLocation != null) &&
+        (followUpLocation != 'Other' ||
+            followUpOtherController.text.isNotEmpty) &&
+        (!patientNotReferred || notReferredReasonController.text.isNotEmpty) &&
+        hivTestingNurseController.text.isNotEmpty &&
+        rankController.text.isNotEmpty &&
+        sancNumberController.text.isNotEmpty &&
+        nurseDateController.text.isNotEmpty &&
+        !signatureController.isEmpty;
   }
 
-  /// ✅ Converts all fields to Map for submission
+  /// Converts all fields to a Map
   Future<Map<String, dynamic>> toMap() async {
     final signatureBytes = await signatureController.toPngBytes();
-
     return {
       'windowPeriod': windowPeriod,
       'followUpLocation': followUpLocation,
@@ -185,14 +141,11 @@ class NurseInterventionViewModel extends ChangeNotifier {
       await toMap(); // Ensure signature bytes are included
       await Future.delayed(const Duration(seconds: 1));
 
-      if (!context.mounted) {
-        return;
-      }
+      if (!context.mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Intervention saved successfully!')),
       );
-
       onNext?.call();
     } catch (e) {
       if (context.mounted) {
@@ -204,6 +157,12 @@ class NurseInterventionViewModel extends ChangeNotifier {
       _isSubmitting = false;
       notifyListeners();
     }
+  }
+
+  // --- Helper for setter ---
+  void _setValue(VoidCallback setter) {
+    setter();
+    notifyListeners();
   }
 
   @override

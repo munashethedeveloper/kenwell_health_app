@@ -24,126 +24,141 @@ class HIVTestScreen extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _buildCard(
-              title: 'HIV Testing History',
-              child: Column(
-                children: [
-                  KenwellYesNoQuestion<String>(
-                    question: 'Is this your first HIV test?',
-                    value: viewModel.firstHIVTest,
-                    onChanged: viewModel.setFirstHIVTest,
-                    yesValue: 'Yes',
-                    noValue: 'No',
-                  ),
-                  if (viewModel.firstHIVTest == 'No') ...[
-                    KenwellTextField(
-                      label: 'Month of last test (MM)',
-                      controller: viewModel.lastTestMonthController,
+        child: Form(
+          key: viewModel.formKey,
+          child: Column(
+            children: [
+              _buildCard(
+                title: 'HIV Testing History',
+                child: Column(
+                  children: [
+                    KenwellYesNoQuestion<String>(
+                      question: 'Is this your first HIV test?',
+                      value: viewModel.firstHIVTest,
+                      onChanged: viewModel.setFirstHIVTest,
+                      yesValue: 'Yes',
+                      noValue: 'No',
                     ),
-                    KenwellTextField(
-                      label: 'Year of last test (YYYY)',
-                      controller: viewModel.lastTestYearController,
+                    if (viewModel.firstHIVTest == 'No') ...[
+                      KenwellTextField(
+                        label: 'Month of last test',
+                        hintText: 'MM',
+                        controller: viewModel.lastTestMonthController,
+                        validator: (val) =>
+                            val == null || val.isEmpty ? 'Required' : null,
+                      ),
+                      KenwellTextField(
+                        label: 'Year of last test',
+                        hintText: 'YYYY',
+                        controller: viewModel.lastTestYearController,
+                        validator: (val) =>
+                            val == null || val.isEmpty ? 'Required' : null,
+                      ),
+                      KenwellDropdownField<String>(
+                        label: 'Result of last test',
+                        value: viewModel.lastTestResult,
+                        items: const ['Positive', 'Negative'],
+                        onChanged: viewModel.setLastTestResult,
+                        validator: (val) =>
+                            val == null || val.isEmpty ? 'Required' : null,
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              _buildCard(
+                title: 'Risk Behaviors (last 12 months)',
+                child: Column(
+                  children: [
+                    KenwellYesNoQuestion<String>(
+                      question:
+                          'Have you ever shared used needles or syringes with someone?',
+                      value: viewModel.sharedNeedles,
+                      onChanged: viewModel.setSharedNeedles,
+                      yesValue: 'Yes',
+                      noValue: 'No',
                     ),
-                    KenwellDropdownField<String>(
-                      label: 'Result of last test',
-                      value: viewModel.lastTestResult,
-                      items: const ['Positive', 'Negative'],
-                      onChanged: viewModel.setLastTestResult,
+                    KenwellYesNoQuestion<String>(
+                      question:
+                          'Have you had unprotected sexual intercourse with more than one partner in the last 12 months?',
+                      value: viewModel.unprotectedSex,
+                      onChanged: viewModel.setUnprotectedSex,
+                      yesValue: 'Yes',
+                      noValue: 'No',
+                    ),
+                    KenwellYesNoQuestion<String>(
+                      question:
+                          'Have you been diagnosed/treated for a sexually transmitted infection in the last 12 months?',
+                      value: viewModel.treatedSTI,
+                      onChanged: viewModel.setTreatedSTI,
+                      yesValue: 'Yes',
+                      noValue: 'No',
+                    ),
+                    KenwellYesNoQuestion<String>(
+                      question:
+                          'Have you been diagnosed/treated for TB in the last 12 months?',
+                      value: viewModel.treatedTB,
+                      onChanged: viewModel.setTreatedTB,
+                      yesValue: 'Yes',
+                      noValue: 'No',
+                    ),
+                    KenwellYesNoQuestion<String>(
+                      question: 'Do you sometimes not use a condom?',
+                      value: viewModel.noCondomUse,
+                      onChanged: viewModel.setNoCondomUse,
+                      yesValue: 'Yes',
+                      noValue: 'No',
+                    ),
+                    if (viewModel.noCondomUse == 'Yes')
+                      KenwellTextField(
+                        label: 'Reason for not using a condom',
+                        hintText: 'Explain why',
+                        controller: viewModel.noCondomReasonController,
+                        validator: (val) =>
+                            val == null || val.isEmpty ? 'Required' : null,
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              _buildCard(
+                title: 'Partner HIV Status & Risk Reasons',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    KenwellYesNoQuestion<String>(
+                      question:
+                          'Do you know the HIV status of your regular sex partner/s?',
+                      value: viewModel.knowPartnerStatus,
+                      onChanged: viewModel.setKnowPartnerStatus,
+                      yesValue: 'Yes',
+                      noValue: 'No',
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Reasons that may have put you at risk:',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    ..._riskReasonList(viewModel),
+                    KenwellTextField(
+                      label: 'Other risk reason',
+                      hintText: 'Specify if "Other"',
+                      controller: viewModel.otherRiskReasonController,
                     ),
                   ],
-                ],
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            _buildCard(
-              title: 'Risk Behaviors (last 12 months)',
-              child: Column(
-                children: [
-                  KenwellYesNoQuestion<String>(
-                    question:
-                        'Have you ever shared used needles or syringes with someone?',
-                    value: viewModel.sharedNeedles,
-                    onChanged: viewModel.setSharedNeedles,
-                    yesValue: 'Yes',
-                    noValue: 'No',
-                  ),
-                  KenwellYesNoQuestion<String>(
-                    question:
-                        'Have you had unprotected sexual intercourse with more than one partner in the last 12 months?',
-                    value: viewModel.unprotectedSex,
-                    onChanged: viewModel.setUnprotectedSex,
-                    yesValue: 'Yes',
-                    noValue: 'No',
-                  ),
-                  KenwellYesNoQuestion<String>(
-                    question:
-                        'Have you been diagnosed/treated for a sexually transmitted infection in the last 12 months?',
-                    value: viewModel.treatedSTI,
-                    onChanged: viewModel.setTreatedSTI,
-                    yesValue: 'Yes',
-                    noValue: 'No',
-                  ),
-                  KenwellYesNoQuestion<String>(
-                    question:
-                        'Have you been diagnosed/treated for TB in the last 12 months?',
-                    value: viewModel.treatedTB,
-                    onChanged: viewModel.setTreatedTB,
-                    yesValue: 'Yes',
-                    noValue: 'No',
-                  ),
-                  KenwellYesNoQuestion<String>(
-                    question: 'Do you sometimes not use a condom?',
-                    value: viewModel.noCondomUse,
-                    onChanged: viewModel.setNoCondomUse,
-                    yesValue: 'Yes',
-                    noValue: 'No',
-                  ),
-                  if (viewModel.noCondomUse == 'Yes')
-                    KenwellTextField(
-                      label: 'If yes, why do you sometimes not use a condom?',
-                      controller: viewModel.noCondomReasonController,
-                    ),
-                ],
+              const SizedBox(height: 24),
+              KenwellFormNavigation(
+                onPrevious: onPrevious,
+                onNext: () => viewModel.submitHIVTest(onNext),
+                isNextEnabled: viewModel.isFormValid && !viewModel.isSubmitting,
+                isNextBusy: viewModel.isSubmitting,
               ),
-            ),
-            const SizedBox(height: 16),
-            _buildCard(
-              title: 'Partner HIV Status & Risk Reasons',
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  KenwellYesNoQuestion<String>(
-                    question:
-                        'Do you know the HIV status of your regular sex partner/s?',
-                    value: viewModel.knowPartnerStatus,
-                    onChanged: viewModel.setKnowPartnerStatus,
-                    yesValue: 'Yes',
-                    noValue: 'No',
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'Reasons that may have put you at risk:',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  ..._riskReasonList(viewModel),
-                  KenwellTextField(
-                    label: 'If other, specify',
-                    controller: viewModel.otherRiskReasonController,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-            KenwellFormNavigation(
-              onPrevious: onPrevious,
-              onNext: () => viewModel.submitHIVTest(onNext),
-              isNextEnabled: viewModel.isFormValid && !viewModel.isSubmitting,
-              isNextBusy: viewModel.isSubmitting,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

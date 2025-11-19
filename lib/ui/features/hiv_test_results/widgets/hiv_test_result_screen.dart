@@ -25,81 +25,98 @@ class HIVTestResultScreen extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _buildCard(
-              title: 'Screening Test',
-              child: Column(
-                children: [
-                  _buildTextField(
-                      'Name of Test', viewModel.screeningTestNameController),
-                  const SizedBox(height: 12),
-                  _buildTextField(
-                      'Batch No', viewModel.screeningBatchNoController),
-                  const SizedBox(height: 12),
-                  _buildTextField(
-                    'Expiry Date',
-                    viewModel.screeningExpiryDateController,
-                    readOnly: true,
-                    onTap: () =>
-                        viewModel.pickExpiryDate(context, isScreening: true),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildDropdown(
-                    'Test Result',
-                    ['Negative', 'Positive'],
-                    viewModel.screeningResult,
-                    viewModel.setScreeningResult,
-                  ),
-                ],
+        child: Form(
+          key: viewModel.formKey,
+          child: Column(
+            children: [
+              _buildCard(
+                title: 'Screening Test',
+                child: Column(
+                  children: [
+                    _buildTextField(
+                      label: 'Name of Test',
+                      controller: viewModel.screeningTestNameController,
+                      hint: 'Enter test name',
+                    ),
+                    const SizedBox(height: 12),
+                    _buildTextField(
+                      label: 'Batch No',
+                      controller: viewModel.screeningBatchNoController,
+                      hint: 'Enter batch number',
+                    ),
+                    const SizedBox(height: 12),
+                    _buildTextField(
+                      label: 'Expiry Date',
+                      controller: viewModel.screeningExpiryDateController,
+                      readOnly: true,
+                      hint: 'Select expiry date',
+                      onTap: () =>
+                          viewModel.pickExpiryDate(context, isScreening: true),
+                    ),
+                    const SizedBox(height: 12),
+                    _buildDropdown(
+                      'Test Result',
+                      ['Negative', 'Positive'],
+                      viewModel.screeningResult,
+                      viewModel.setScreeningResult,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            _buildCard(
-              title: 'Confirmatory Test',
-              child: Column(
-                children: [
-                  _buildTextField(
-                      'Name of Test', viewModel.confirmatoryTestNameController),
-                  const SizedBox(height: 12),
-                  _buildTextField(
-                      'Batch No', viewModel.confirmatoryBatchNoController),
-                  const SizedBox(height: 12),
-                  _buildTextField(
-                    'Expiry Date',
-                    viewModel.confirmatoryExpiryDateController,
-                    readOnly: true,
-                    onTap: () =>
-                        viewModel.pickExpiryDate(context, isScreening: false),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildDropdown(
-                    'Test Result',
-                    ['Negative', 'Positive'],
-                    viewModel.confirmatoryResult,
-                    viewModel.setConfirmatoryResult,
-                  ),
-                ],
+              const SizedBox(height: 16),
+              _buildCard(
+                title: 'Confirmatory Test',
+                child: Column(
+                  children: [
+                    _buildTextField(
+                      label: 'Name of Test',
+                      controller: viewModel.confirmatoryTestNameController,
+                      hint: 'Enter test name',
+                    ),
+                    const SizedBox(height: 12),
+                    _buildTextField(
+                      label: 'Batch No',
+                      controller: viewModel.confirmatoryBatchNoController,
+                      hint: 'Enter batch number',
+                    ),
+                    const SizedBox(height: 12),
+                    _buildTextField(
+                      label: 'Expiry Date',
+                      controller: viewModel.confirmatoryExpiryDateController,
+                      readOnly: true,
+                      hint: 'Select expiry date',
+                      onTap: () =>
+                          viewModel.pickExpiryDate(context, isScreening: false),
+                    ),
+                    const SizedBox(height: 12),
+                    _buildDropdown(
+                      'Test Result',
+                      ['Negative', 'Positive'],
+                      viewModel.confirmatoryResult,
+                      viewModel.setConfirmatoryResult,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            _buildCard(
-              title: 'Final HIV Test Result',
-              child: _buildDropdown(
-                'Final Result',
-                ['Negative', 'Positive'],
-                viewModel.finalResult,
-                viewModel.setFinalResult,
+              const SizedBox(height: 16),
+              _buildCard(
+                title: 'Final HIV Test Result',
+                child: _buildDropdown(
+                  'Final Result',
+                  ['Negative', 'Positive'],
+                  viewModel.finalResult,
+                  viewModel.setFinalResult,
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
-            KenwellFormNavigation(
-              onPrevious: onPrevious,
-              onNext: () => viewModel.submitTestResult(onNext),
-              isNextBusy: viewModel.isSubmitting,
-              isNextEnabled: viewModel.isFormValid && !viewModel.isSubmitting,
-            ),
-          ],
+              const SizedBox(height: 24),
+              KenwellFormNavigation(
+                onPrevious: onPrevious,
+                onNext: () => viewModel.submitTestResult(onNext),
+                isNextBusy: viewModel.isSubmitting,
+                isNextEnabled: viewModel.isFormValid && !viewModel.isSubmitting,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -127,16 +144,24 @@ class HIVTestResultScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller,
-      {bool readOnly = false, VoidCallback? onTap}) {
-    return TextField(
+  Widget _buildTextField({
+    required String label,
+    required TextEditingController controller,
+    String? hint,
+    bool readOnly = false,
+    VoidCallback? onTap,
+  }) {
+    return TextFormField(
       controller: controller,
       readOnly: readOnly,
       onTap: onTap,
       decoration: InputDecoration(
         labelText: label,
+        hintText: hint,
         border: const OutlineInputBorder(),
       ),
+      validator: (val) =>
+          val == null || val.isEmpty ? 'This field is required' : null,
     );
   }
 
@@ -153,6 +178,8 @@ class HIVTestResultScreen extends StatelessWidget {
       onChanged: (val) {
         if (val != null) onChanged(val);
       },
+      validator: (val) =>
+          val == null || val.isEmpty ? 'This field is required' : null,
     );
   }
 }

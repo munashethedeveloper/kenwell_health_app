@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kenwell_health_app/ui/features/auth/widgets/login_screen.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import '../../../../data/services/auth_service.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
-import '../../../shared/ui/logo/app_logo.dart';
+
+const authOutlineInputBorder = OutlineInputBorder(
+  borderSide: BorderSide(color: Color(0xFF757575)),
+  borderRadius: BorderRadius.all(Radius.circular(100)),
+);
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -57,7 +62,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           const SnackBar(
               content: Text('Registration successful! Please log in.')),
         );
-
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -92,90 +96,83 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: const KenwellAppBar(
-          title: 'Register', automaticallyImplyLeading: false),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                const SizedBox(height: 40),
-                const AppLogo(size: 200),
-                const SizedBox(height: 30),
-
-                // ===== User Info Fields =====
-                _buildTextField(_firstNameController, 'First Name',
-                    validator: (val) =>
-                        val!.isEmpty ? 'Enter first name' : null),
-                const SizedBox(height: 12),
-                _buildTextField(_lastNameController, 'Last Name',
-                    validator: (val) =>
-                        val!.isEmpty ? 'Enter last name' : null),
-                const SizedBox(height: 12),
-                _buildTextField(_usernameController, 'Username',
-                    validator: (val) => val!.isEmpty ? 'Enter username' : null),
-                const SizedBox(height: 12),
-                _buildTextField(_roleController, 'Role',
-                    validator: (val) => val!.isEmpty ? 'Enter role' : null),
-                const SizedBox(height: 12),
-                _buildTextField(_phoneController, 'Phone Number',
-                    keyboardType: TextInputType.phone,
-                    validator: (val) =>
-                        val!.isEmpty ? 'Enter phone number' : null),
-                const SizedBox(height: 12),
-                _buildTextField(_emailController, 'Email',
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (val) => val!.isEmpty ? 'Enter email' : null),
-                const SizedBox(height: 12),
-
-                // ===== Password Fields =====
-                _buildPasswordField(
-                    controller: _passwordController,
-                    label: 'Password',
-                    obscureText: _obscurePassword,
-                    toggleObscure: () {
-                      setState(() => _obscurePassword = !_obscurePassword);
-                    },
-                    validator: (val) => val!.length < 6
-                        ? 'Password must be at least 6 characters'
-                        : null),
-                const SizedBox(height: 12),
-                _buildPasswordField(
-                    controller: _confirmPasswordController,
-                    label: 'Confirm Password',
-                    obscureText: _obscureConfirmPassword,
-                    toggleObscure: () {
-                      setState(() =>
-                          _obscureConfirmPassword = !_obscureConfirmPassword);
-                    },
-                    validator: (val) =>
-                        val!.isEmpty ? 'Confirm your password' : null),
-                const SizedBox(height: 20),
-
-                // Register Button
-                CustomPrimaryButton(
-                  label: 'Register',
-                  onPressed: _register,
-                  isBusy: _isLoading,
-                ),
-                const SizedBox(height: 10),
-
-                // Navigate to Login
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (_) => const LoginScreen()),
-                    );
-                  },
-                  child: const Text(
-                    'Already have an account? Log in',
-                    style: TextStyle(decoration: TextDecoration.underline),
+        title: 'Register',
+        automaticallyImplyLeading: false,
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  const SizedBox(height: 16),
+                  const Text(
+                    "Register Account",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 8),
+                  const Text(
+                    "Complete your details or continue with social media",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Color(0xFF757575)),
+                  ),
+                  const SizedBox(height: 24),
+                  _buildTextField(_firstNameController, "First Name"),
+                  const SizedBox(height: 16),
+                  _buildTextField(_lastNameController, "Last Name"),
+                  const SizedBox(height: 16),
+                  _buildTextField(_usernameController, "Username"),
+                  const SizedBox(height: 16),
+                  _buildTextField(_roleController, "Role"),
+                  const SizedBox(height: 16),
+                  _buildTextField(_phoneController, "Phone Number",
+                      keyboardType: TextInputType.phone),
+                  const SizedBox(height: 16),
+                  _buildTextField(_emailController, "Email",
+                      keyboardType: TextInputType.emailAddress),
+                  const SizedBox(height: 16),
+                  _buildPasswordField(
+                      _passwordController, "Password", _obscurePassword, () {
+                    setState(() => _obscurePassword = !_obscurePassword);
+                  }),
+                  const SizedBox(height: 16),
+                  _buildPasswordField(_confirmPasswordController,
+                      "Confirm Password", _obscureConfirmPassword, () {
+                    setState(() =>
+                        _obscureConfirmPassword = !_obscureConfirmPassword);
+                  }),
+                  const SizedBox(height: 24),
+                  CustomPrimaryButton(
+                    label: "Register",
+                    onPressed: _register,
+                    isBusy: _isLoading,
+                  ),
+                  const SizedBox(height: 16),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) => const LoginScreen()),
+                      );
+                    },
+                    child: const Text(
+                      "Already have an account? Log in",
+                      style: TextStyle(
+                          decoration: TextDecoration.underline,
+                          color: Color(0xFF201C58)),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              ),
             ),
           ),
         ),
@@ -183,42 +180,49 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // ===== Helper Widgets =====
   Widget _buildTextField(TextEditingController controller, String label,
-      {TextInputType keyboardType = TextInputType.text,
-      String? Function(String?)? validator}) {
+      {TextInputType keyboardType = TextInputType.text}) {
     return TextFormField(
       controller: controller,
+      keyboardType: keyboardType,
+      validator: (v) => (v == null || v.isEmpty) ? "Enter $label" : null,
       decoration: InputDecoration(
         labelText: label,
-        border: const OutlineInputBorder(),
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        hintText: "Enter $label",
+        hintStyle: const TextStyle(color: Color(0xFF757575)),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        border: authOutlineInputBorder,
+        enabledBorder: authOutlineInputBorder,
+        focusedBorder: authOutlineInputBorder.copyWith(
+            borderSide: const BorderSide(color: Color(0xFFFF7643))),
       ),
-      keyboardType: keyboardType,
-      validator: validator,
     );
   }
 
-  Widget _buildPasswordField({
-    required TextEditingController controller,
-    required String label,
-    required bool obscureText,
-    required VoidCallback toggleObscure,
-    String? Function(String?)? validator,
-  }) {
+  Widget _buildPasswordField(TextEditingController controller, String label,
+      bool obscureText, VoidCallback toggleObscure) {
     return TextFormField(
       controller: controller,
       obscureText: obscureText,
+      validator: (v) => (v == null || v.isEmpty) ? "Enter $label" : null,
       decoration: InputDecoration(
         labelText: label,
-        border: const OutlineInputBorder(),
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        hintText: "Enter $label",
+        hintStyle: const TextStyle(color: Color(0xFF757575)),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        border: authOutlineInputBorder,
+        enabledBorder: authOutlineInputBorder,
+        focusedBorder: authOutlineInputBorder.copyWith(
+            borderSide: const BorderSide(color: Color(0xFFFF7643))),
         suffixIcon: IconButton(
-          icon: Icon(
-            obscureText ? Icons.visibility_off : Icons.visibility,
-          ),
+          icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility),
           onPressed: toggleObscure,
         ),
       ),
-      validator: validator,
     );
   }
 }

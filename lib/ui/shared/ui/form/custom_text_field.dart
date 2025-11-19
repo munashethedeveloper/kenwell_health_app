@@ -22,9 +22,12 @@ class KenwellTextField extends StatelessWidget {
     this.textCapitalization = TextCapitalization.none,
     this.autofocus = false,
     this.expands = false,
+    this.hintText,
+    this.validator,
   });
 
   final String label;
+  final String? hintText;
   final TextEditingController controller;
   final EdgeInsetsGeometry padding;
   final TextInputType? keyboardType;
@@ -42,18 +45,22 @@ class KenwellTextField extends StatelessWidget {
   final TextCapitalization textCapitalization;
   final bool autofocus;
   final bool expands;
+  final String? Function(String?)? validator;
 
   @override
   Widget build(BuildContext context) {
     final inputDecoration = decoration ??
         InputDecoration(
           labelText: label,
+          hintText: hintText,
           border: const OutlineInputBorder(),
+          filled: true,
+          fillColor: Colors.grey[100],
         );
 
     return Padding(
       padding: padding,
-      child: TextField(
+      child: TextFormField(
         controller: controller,
         keyboardType: keyboardType,
         textInputAction: textInputAction,
@@ -70,6 +77,7 @@ class KenwellTextField extends StatelessWidget {
         decoration: inputDecoration,
         textCapitalization: textCapitalization,
         autofocus: autofocus,
+        validator: validator,
       ),
     );
   }

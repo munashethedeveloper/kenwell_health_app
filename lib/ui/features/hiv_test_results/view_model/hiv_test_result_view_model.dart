@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class HIVTestResultViewModel extends ChangeNotifier {
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
   // --- Screening Test Controllers ---
   final TextEditingController screeningTestNameController =
       TextEditingController();
@@ -64,20 +66,10 @@ class HIVTestResultViewModel extends ChangeNotifier {
 
   // --- Form validation ---
   bool get isFormValid {
-    if (screeningTestNameController.text.isEmpty ||
-        screeningBatchNoController.text.isEmpty ||
-        screeningExpiryDateController.text.isEmpty) {
-      return false;
-    }
-    if (confirmatoryTestNameController.text.isEmpty ||
-        confirmatoryBatchNoController.text.isEmpty ||
-        confirmatoryExpiryDateController.text.isEmpty) {
-      return false;
-    }
-    return true;
+    return formKey.currentState?.validate() == true;
   }
 
-  /// ✅ Converts all HIV test result data to a Map
+  /// Converts all HIV test result data to a Map
   Map<String, dynamic> toMap() {
     return {
       'screeningTestName': screeningTestNameController.text,
@@ -99,7 +91,6 @@ class HIVTestResultViewModel extends ChangeNotifier {
     _isSubmitting = true;
     notifyListeners();
 
-    // Simulate save operation
     debugPrint('✅ HIV Test Result Saved:');
     debugPrint(toMap().toString());
 
@@ -108,7 +99,6 @@ class HIVTestResultViewModel extends ChangeNotifier {
     _isSubmitting = false;
     notifyListeners();
 
-    // Move to next step
     onNext?.call();
   }
 
