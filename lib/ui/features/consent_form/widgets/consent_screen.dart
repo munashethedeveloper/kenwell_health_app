@@ -30,6 +30,14 @@ class ConsentScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+                Text(
+                  'SECTION A',
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
               _buildEventInfoCard(context, vm),
               const SizedBox(height: 24),
               _buildInformationSection(),
