@@ -184,6 +184,17 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            const Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                'Female Only Questions',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
                             KenwellYesNoQuestion<bool>(
                               question:
                                   '5. Have you had a pap smear in the last 24 months?',
@@ -218,6 +229,17 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            const Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                'Male Only Questions',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
                             KenwellYesNoQuestion<bool>(
                               question:
                                   '8. If > than 40, have you had your prostate checked?',
