@@ -35,7 +35,10 @@ class ConsentScreen extends StatelessWidget {
                   style: Theme.of(context)
                       .textTheme
                       .titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                      ?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF201C58),
+                      ),
                 ),
                 const SizedBox(height: 16),
               _buildEventInfoCard(context, vm),
