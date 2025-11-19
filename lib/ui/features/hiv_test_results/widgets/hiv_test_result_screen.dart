@@ -28,7 +28,15 @@ class HIVTestResultScreen extends StatelessWidget {
         child: Form(
           key: viewModel.formKey,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(
+                'SECTION G: HIV TEST RESULTS',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF201C58),
+                    ),
+              ),
               _buildCard(
                 title: 'Screening Test',
                 child: Column(

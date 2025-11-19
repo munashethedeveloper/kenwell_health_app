@@ -22,6 +22,15 @@ class HelpScreen extends StatelessWidget {
               children: [
                 _buildCard(
                   child: ListTile(
+                    leading: const Icon(Icons.info_outline),
+                    title: const Text('About the App'),
+                    subtitle: Text(
+                        'Version: ${viewModel.appVersion}\nDeveloper: ${viewModel.developer}'),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _buildCard(
+                  child: ListTile(
                     leading: const Icon(Icons.help_outline),
                     title: const Text('FAQs / Help Center'),
                     onTap: viewModel.openFAQs,
@@ -32,17 +41,8 @@ class HelpScreen extends StatelessWidget {
                   child: ListTile(
                     leading: const Icon(Icons.email_outlined),
                     title: const Text('Contact Support'),
-                    subtitle: const Text('support@yourapp.com'),
+                    subtitle: const Text('mapiyem@kenwellhealthcare.co.za'),
                     onTap: viewModel.contactSupport,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                _buildCard(
-                  child: ListTile(
-                    leading: const Icon(Icons.info_outline),
-                    title: const Text('About the App'),
-                    subtitle: Text(
-                        'Version: ${viewModel.appVersion}\nDeveloper: ${viewModel.developer}'),
                   ),
                 ),
                 const SizedBox(height: 12),

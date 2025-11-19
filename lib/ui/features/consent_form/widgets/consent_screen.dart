@@ -30,6 +30,14 @@ class ConsentScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(
+                'SECTION A: INFORMED CONSENT',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF201C58),
+                    ),
+              ),
+              const SizedBox(height: 16),
               _buildEventInfoCard(context, vm),
               const SizedBox(height: 24),
               _buildInformationSection(),
@@ -60,14 +68,6 @@ class ConsentScreen extends StatelessWidget {
             // ===== Section B Text =====
             const Padding(
               padding: EdgeInsets.only(bottom: 12),
-              child: Text(
-                'Section A: Consent Form',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF201C58),
-                ),
-              ),
             ),
 
             // ===== Venue Field =====
@@ -117,7 +117,7 @@ class ConsentScreen extends StatelessWidget {
       children: [
         const Text(
           'I hereby declare that I have read and understood the information below. By signing, I confirm my understanding of:',
-          style: TextStyle(fontSize: 16),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 12),
         ...bullets.map(_buildBullet).toList(),
@@ -168,7 +168,8 @@ class ConsentScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Signature:', style: TextStyle(fontSize: 16)),
+        const Text('Signature:',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
         Card(
           shape:

@@ -41,7 +41,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                     const Padding(
                       padding: EdgeInsets.only(bottom: 12),
                       child: Text(
-                        'Section B: Personal Risk Assessment (previous 12 months)',
+                        'SECTION C: HEALTH RISK ASSESSMENT',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -57,7 +57,8 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                         children: [
                           const Text(
                             '1. Do you suffer or take medication for any of the following conditions?',
-                            style: TextStyle(fontSize: 16),
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 8),
                           ...vm.chronicConditions.keys.map((condition) {
@@ -91,7 +92,8 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                         children: [
                           const Text(
                             '2. Over the past month, how many days per week have you exercised for 30 minutes or longer?',
-                            style: TextStyle(fontSize: 16),
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 8),
                           _buildStringRadioGroup(
@@ -119,7 +121,8 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                         children: [
                           const Text(
                             '3. How much do you smoke per day?',
-                            style: TextStyle(fontSize: 16),
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                           KenwellTextField(
                             label: 'Number per day',
@@ -152,7 +155,8 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                         children: [
                           const Text(
                             '4. How often do you use alcoholic beverages?',
-                            style: TextStyle(fontSize: 16),
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 8),
                           _buildStringRadioGroup(

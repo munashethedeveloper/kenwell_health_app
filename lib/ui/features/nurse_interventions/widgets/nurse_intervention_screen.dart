@@ -31,6 +31,14 @@ class NurseInterventionScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // --- Initial Assessment Section ---
+              Text(
+                'SECTION E: HEALTH RISK ASSESSMENT NURSE INTERVENTION',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF201C58),
+                    ),
+              ),
+              const SizedBox(height: 16),
               _buildCard(
                 title: 'Initial Assessment',
                 child: Column(
@@ -72,7 +80,7 @@ class NurseInterventionScreen extends StatelessWidget {
 
               // --- Referral Nursing Interventions Section ---
               _buildCard(
-                title: 'Referral Nursing Interventions',
+                title: 'Nursing Referrals',
                 child: Column(
                   children: [
                     CheckboxListTile(
@@ -152,6 +160,18 @@ class NurseInterventionScreen extends StatelessWidget {
                       hint: 'Enter nurse rank',
                       requiredField: true,
                     ),
+                    _buildTextField(
+                      'SANC No',
+                      viewModel.sancNumberController,
+                      hint: 'Enter SANC number',
+                      requiredField: true,
+                    ),
+                    _buildDateField(
+                      context,
+                      'Date',
+                      viewModel.nurseDateController,
+                      requiredField: true,
+                    ),
                     const SizedBox(height: 12),
                     const Text('Signature',
                         style: TextStyle(fontWeight: FontWeight.bold)),
@@ -176,18 +196,6 @@ class NurseInterventionScreen extends StatelessWidget {
                           child: const Text('Clear'),
                         ),
                       ],
-                    ),
-                    _buildTextField(
-                      'SANC No',
-                      viewModel.sancNumberController,
-                      hint: 'Enter SANC number',
-                      requiredField: true,
-                    ),
-                    _buildDateField(
-                      context,
-                      'Date',
-                      viewModel.nurseDateController,
-                      requiredField: true,
                     ),
                   ],
                 ),

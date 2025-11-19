@@ -30,10 +30,20 @@ class SurveyScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Welcome to Kenwell Consulting Wellness Day Survey.\n'
-              'Your contact number and answers will be used for administrative purposes only.',
-              style: TextStyle(fontSize: 15),
+            Text(
+              'Section K: Survey',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF201C58),
+                  ),
+            ),
+            const Center(
+              child: Text(
+                'Welcome to Kenwell Consulting Wellness Day Survey.\n'
+                'Your contact number and answers will be used for administrative purposes only.',
+                style: TextStyle(fontSize: 15),
+                textAlign: TextAlign.center,
+              ),
             ),
             const SizedBox(height: 16),
 
@@ -138,14 +148,9 @@ class SurveyScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    '9. Would you like Kenwell Consulting to contact you regarding your experience?',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
                   KenwellYesNoQuestion<String>(
                     question:
-                        'Would you like Kenwell Consulting to contact you regarding your experience?',
+                        '9. Would you like Kenwell Consulting to contact you regarding your experience?',
                     value: vm.contactConsent,
                     onChanged: (value) {
                       if (value != null) vm.updateContactConsent(value);

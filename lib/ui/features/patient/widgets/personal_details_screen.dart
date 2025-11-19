@@ -33,6 +33,17 @@ class PersonalDetailsScreen extends StatelessWidget {
               key: vm.formKey,
               child: Column(
                 children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'SECTION  B: PERSONAL DETAILS',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF201C58),
+                          ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   _buildCard(child: _buildPersonalInfoSection(context, vm)),
                   const SizedBox(height: 16),
                   _buildCard(child: _buildMedicalAidSection(vm)),
@@ -54,30 +65,33 @@ class PersonalDetailsScreen extends StatelessWidget {
       BuildContext context, PersonalDetailsViewModel vm) {
     return Column(
       children: [
-        _buildTextField(vm.screeningSiteController, 'Screening Site',
-            'Enter screening site'),
-        const SizedBox(height: 16),
-        _buildTextField(vm.dateController, 'Date', 'Select date',
-            readOnly: true, onTap: () async {
-          FocusScope.of(context).requestFocus(FocusNode());
-          final pickedDate = await showDatePicker(
-            context: context,
-            initialDate: DateTime.now(),
-            firstDate: DateTime(2000),
-            lastDate: DateTime(2100),
-          );
-          if (pickedDate != null) {
-            vm.dateController.text =
-                '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
-          }
-        }),
-        const SizedBox(height: 16),
+        const Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            'Personal Information',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF201C58),
+            ),
+          ),
+        ),
         _buildTextField(vm.nameController, 'Name', 'Enter name'),
         _buildTextField(vm.surnameController, 'Surname', 'Enter surname'),
         _buildTextField(vm.initialsController, 'Initials', 'Enter initials'),
+        _buildDropdownField(vm, 'Marital Status', vm.maritalStatus,
+            vm.maritalStatusOptions, vm.setMaritalStatus),
+        _buildDropdownField(
+            vm, 'Gender', vm.gender, vm.genderOptions, vm.setGender),
         _buildTextField(vm.idNumberController, 'ID Number', 'Enter ID number'),
         _buildTextField(
             vm.nationalityController, 'Nationality', 'Enter nationality'),
+        _buildTextField(
+            vm.emailController, 'Email Address', 'Enter email address',
+            keyboardType: TextInputType.emailAddress),
+        _buildTextField(
+            vm.cellNumberController, 'Cell Number', 'Enter cell number',
+            keyboardType: TextInputType.phone),
       ],
     );
   }
@@ -85,18 +99,21 @@ class PersonalDetailsScreen extends StatelessWidget {
   Widget _buildMedicalAidSection(PersonalDetailsViewModel vm) {
     return Column(
       children: [
+        const Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            'Medical Aid Information',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF201C58),
+            ),
+          ),
+        ),
         _buildTextField(vm.medicalAidNameController, 'Medical Aid Name',
             'Enter medical aid name'),
         _buildTextField(vm.medicalAidNumberController, 'Medical Aid Number',
             'Enter medical aid number'),
-        _buildTextField(
-            vm.emailController, 'Email Address', 'Enter email address',
-            keyboardType: TextInputType.emailAddress),
-        _buildTextField(
-            vm.cellNumberController, 'Cell Number', 'Enter cell number',
-            keyboardType: TextInputType.phone),
-        _buildTextField(vm.personalNumberController, 'Personal Number',
-            'Enter personal number'),
       ],
     );
   }
@@ -104,16 +121,23 @@ class PersonalDetailsScreen extends StatelessWidget {
   Widget _buildWorkInfoSection(PersonalDetailsViewModel vm) {
     return Column(
       children: [
+        const Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            'Employment Details',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF201C58),
+            ),
+          ),
+        ),
         _buildTextField(vm.divisionController, 'Division', 'Enter division'),
         _buildTextField(
             vm.positionController, 'Position / Rank', 'Enter position or rank'),
         _buildTextField(vm.regionController, 'Region / Province',
             'Enter region or province'),
         const SizedBox(height: 16),
-        _buildDropdownField(vm, 'Marital Status', vm.maritalStatus,
-            vm.maritalStatusOptions, vm.setMaritalStatus),
-        _buildDropdownField(
-            vm, 'Gender', vm.gender, vm.genderOptions, vm.setGender),
         _buildDropdownField(vm, 'Employment Status', vm.employmentStatus,
             vm.employmentStatusOptions, vm.setEmploymentStatus),
       ],

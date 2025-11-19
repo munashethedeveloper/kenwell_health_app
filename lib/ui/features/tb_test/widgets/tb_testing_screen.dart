@@ -28,7 +28,15 @@ class TBTestingScreen extends StatelessWidget {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(
+              'Section I: TB Screening',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF201C58),
+                  ),
+            ),
             _buildCard(
               title: 'TB Symptom Screening',
               child: Column(
