@@ -23,28 +23,39 @@ class PersonalDetailsScreen extends StatelessWidget {
     return ChangeNotifierProvider.value(
       value: viewModel,
       child: Consumer<PersonalDetailsViewModel>(
-        builder: (context, vm, _) => Scaffold(
-          appBar: const KenwellAppBar(
-              title: 'Patient Personal Details',
-              automaticallyImplyLeading: false),
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Form(
-              key: vm.formKey,
-              child: Column(
-                children: [
-                  _buildCard(child: _buildPersonalInfoSection(context, vm)),
-                  const SizedBox(height: 16),
-                  _buildCard(child: _buildMedicalAidSection(vm)),
-                  const SizedBox(height: 16),
-                  _buildCard(child: _buildWorkInfoSection(vm)),
-                  const SizedBox(height: 24),
-                  _buildNavigationButtons(context, vm),
-                ],
+          builder: (context, vm, _) => Scaffold(
+            appBar: const KenwellAppBar(
+                title: 'Patient Personal Details',
+                automaticallyImplyLeading: false),
+            body: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Form(
+                key: vm.formKey,
+                child: Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'SECTION  B',
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildCard(child: _buildPersonalInfoSection(context, vm)),
+                    const SizedBox(height: 16),
+                    _buildCard(child: _buildMedicalAidSection(vm)),
+                    const SizedBox(height: 16),
+                    _buildCard(child: _buildWorkInfoSection(vm)),
+                    const SizedBox(height: 24),
+                    _buildNavigationButtons(context, vm),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
       ),
     );
   }
