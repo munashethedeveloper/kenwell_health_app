@@ -27,14 +27,17 @@ class SurveyScreen extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Welcome to Kenwell Consulting Wellness Day Survey.\n'
-              'Your contact number and answers will be used for administrative purposes only.',
-              style: TextStyle(fontSize: 15),
-            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+              const Center(
+                child: Text(
+                  'Welcome to Kenwell Consulting Wellness Day Survey.\n'
+                  'Your contact number and answers will be used for administrative purposes only.',
+                  style: TextStyle(fontSize: 15),
+                  textAlign: TextAlign.center,
+                ),
+              ),
             const SizedBox(height: 16),
 
             // 1. How did you hear about this Wellness Day?
