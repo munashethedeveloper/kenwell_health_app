@@ -141,65 +141,42 @@ class NurseInterventionScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              // --- Nurse Details Section ---
-              _buildCard(
-                title: 'Nurse Details',
-                child: Column(
-                  children: [
-                    _buildTextField(
-                      'HIV Testing Nurse',
-                      viewModel.hivTestingNurseController,
-                      hint: 'Enter nurse name',
-                      requiredField: true,
-                    ),
-                    _buildTextField(
-                      'Rank',
-                      viewModel.rankController,
-                      hint: 'Enter nurse rank',
-                      requiredField: true,
-                    ),
-                    _buildTextField(
-                      'SANC No',
-                      viewModel.sancNumberController,
-                      hint: 'Enter SANC number',
-                      requiredField: true,
-                    ),
-                    _buildDateField(
-                      context,
-                      'Date',
-                      viewModel.nurseDateController,
-                      requiredField: true,
-                    ),
-                    const SizedBox(height: 12),
-                    const Text('Signature',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 8),
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(8),
+                // --- Nurse Details Section ---
+                _buildCard(
+                  title: 'Nurse Details',
+                  child: Column(
+                    children: [
+                      _buildTextField(
+                        'HIV Testing Nurse',
+                        viewModel.hivTestingNurseController,
+                        hint: 'Enter nurse name',
+                        requiredField: true,
                       ),
-                      height: 150,
-                      child: Signature(
-                        controller: viewModel.signatureController,
-                        backgroundColor: Colors.white,
+                      _buildTextField(
+                        'Rank',
+                        viewModel.rankController,
+                        hint: 'Enter nurse rank',
+                        requiredField: true,
                       ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        TextButton(
-                          onPressed: () =>
-                              viewModel.signatureController.clear(),
-                          child: const Text('Clear'),
-                        ),
-                      ],
-                    ),
-                  ],
+                      _buildTextField(
+                        'SANC No',
+                        viewModel.sancNumberController,
+                        hint: 'Enter SANC number',
+                        requiredField: true,
+                      ),
+                      _buildDateField(
+                        context,
+                        'Date',
+                        viewModel.nurseDateController,
+                        requiredField: true,
+                      ),
+                      const SizedBox(height: 12),
+                      _buildSignatureSection(viewModel),
+                    ],
+                  ),
                 ),
-              ),
               const SizedBox(height: 24),
 
               // --- Navigation Buttons ---
@@ -245,7 +222,7 @@ class NurseInterventionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCard({required String title, required Widget child}) {
+    Widget _buildCard({required String title, required Widget child}) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 3,
@@ -266,6 +243,40 @@ class NurseInterventionScreen extends StatelessWidget {
       ),
     );
   }
+
+    Widget _buildSignatureSection(NurseInterventionViewModel viewModel) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Signature:',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          const SizedBox(height: 8),
+          Card(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            elevation: 2,
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              height: 160,
+              child: Signature(
+                controller: viewModel.signatureController,
+                backgroundColor: Colors.grey[100]!,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: viewModel.clearSignature,
+              child: const Text('Clear Signature'),
+            ),
+          ),
+        ],
+      );
+    }
 }
 
 // ------------------ Reusable Widgets ------------------

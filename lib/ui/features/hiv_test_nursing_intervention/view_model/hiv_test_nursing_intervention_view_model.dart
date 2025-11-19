@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:signature/signature.dart';
 
 class HIVTestNursingInterventionViewModel extends ChangeNotifier {
   // --- 1. Window period ---
@@ -37,9 +38,23 @@ class HIVTestNursingInterventionViewModel extends ChangeNotifier {
   // --- Notes ---
   final TextEditingController sessionNotesController = TextEditingController();
 
+  final SignatureController signatureController = SignatureController(
+    penStrokeWidth: 2,
+    penColor: Colors.black,
+    exportBackgroundColor: Colors.white,
+  );
+
+  HIVTestNursingInterventionViewModel() {
+    signatureController.addListener(_onSignatureChanged);
+  }
+
   // --- Submitting ---
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
+
+  void clearSignature() {
+    signatureController.clear();
+  }
 
   // --- Setters ---
   void setWindowPeriod(String value) {
@@ -121,6 +136,7 @@ class HIVTestNursingInterventionViewModel extends ChangeNotifier {
     if (notReferred && notReferredReasonController.text.trim().isEmpty) {
       return false;
     }
+    if (signatureController.isEmpty) return false;
     return true;
   }
 
@@ -141,7 +157,8 @@ class HIVTestNursingInterventionViewModel extends ChangeNotifier {
       'notReferredReason': notReferredReasonController.text,
       'referredGP': referredGP,
       'referredHIVClinic': referredHIVClinic,
-      'sessionNotes': sessionNotesController.text,
+        'sessionNotes': sessionNotesController.text,
+        'hasSignature': signatureController.isNotEmpty,
     };
   }
 
@@ -163,12 +180,17 @@ class HIVTestNursingInterventionViewModel extends ChangeNotifier {
     onNext?.call();
   }
 
+  void _onSignatureChanged() {
+    notifyListeners();
+  }
+
   @override
   void dispose() {
+    signatureController.removeListener(_onSignatureChanged);
+    signatureController.dispose();
     followUpOtherDetailsController.dispose();
     followUpDateController.dispose();
     notReferredReasonController.dispose();
     sessionNotesController.dispose();
     super.dispose();
-  }
 }
