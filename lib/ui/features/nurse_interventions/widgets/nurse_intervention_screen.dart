@@ -30,6 +30,14 @@ class NurseInterventionScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+                Text(
+                  'Section E',
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
               // --- Initial Assessment Section ---
               _buildCard(
                 title: 'Initial Assessment',
