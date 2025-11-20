@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/data/services/auth_service.dart';
 import '../../../../domain/models/user_model.dart';
 
 class ProfileViewModel extends ChangeNotifier {
+  ProfileViewModel();
+
+  final AuthService _authService = AuthService();
+
   // User fields
   String email = '';
   String password = '';
@@ -11,45 +16,59 @@ class ProfileViewModel extends ChangeNotifier {
   String firstName = '';
   String lastName = '';
 
-  bool isLoading = false;
+  bool isLoadingProfile = false;
+  bool isSavingProfile = false;
   UserModel? user;
 
   Future<void> loadProfile() async {
-    isLoading = true;
+    isLoadingProfile = true;
     notifyListeners();
 
-    // to do: Fetch profile from AuthRepository if you store user details persistently
-    // For now, this could pull from a logged-in user cache or Firebase
+    try {
+      user = await _authService.getCurrentUser();
+      password = await _authService.getStoredPassword() ?? '';
 
-    isLoading = false;
-    notifyListeners();
+      if (user != null) {
+        email = user!.email;
+        role = user!.role;
+        phoneNumber = user!.phoneNumber;
+        username = user!.username;
+        firstName = user!.firstName;
+        lastName = user!.lastName;
+      }
+    } catch (e) {
+      debugPrint("Error loading profile: $e");
+    } finally {
+      isLoadingProfile = false;
+      notifyListeners();
+    }
   }
 
   Future<void> updateProfile() async {
     if (email.isEmpty) return;
 
-    isLoading = true;
+    isSavingProfile = true;
     notifyListeners();
 
     try {
-      // Simulate update or save logic here
-      user = UserModel(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
+      final id = user?.id ?? DateTime.now().millisecondsSinceEpoch.toString();
+
+      user = await _authService.saveUser(
+        id: id,
         email: email,
+        password: password,
         role: role,
+        phoneNumber: phoneNumber,
         username: username,
         firstName: firstName,
         lastName: lastName,
-        phoneNumber: phoneNumber,
       );
-
-      // In a real app: push update to Firestore or your backend here
 
       debugPrint("Profile updated successfully");
     } catch (e) {
       debugPrint("Error updating profile: $e");
     } finally {
-      isLoading = false;
+      isSavingProfile = false;
       notifyListeners();
     }
   }
