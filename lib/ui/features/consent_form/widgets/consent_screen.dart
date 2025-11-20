@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 import 'package:provider/provider.dart';
 import 'package:signature/signature.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
@@ -204,89 +205,98 @@ class ConsentScreen extends StatelessWidget {
         ),
       ],
     );
-  }
+    }
 
-  // ===== Action Buttons =====
-  Widget _buildActionButtons(BuildContext context, ConsentScreenViewModel vm) {
-    return Row(
-      children: [
-        Expanded(
-          child: OutlinedButton(
-            onPressed: onCancel,
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              side: const BorderSide(color: Colors.grey),
-            ),
-            child: const Text('Cancel'),
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: ElevatedButton(
-            onPressed: vm.isSubmitting
-                ? null
-                : () async {
-                    if (vm.formKey.currentState!.validate() && vm.isFormValid) {
-                      await vm.submitConsent();
-                      onNext();
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Please complete all fields and sign before proceeding.',
-                          ),
-                        ),
-                      );
-                    }
-                  },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF201C58),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-            ),
-            child: vm.isSubmitting
-                ? const CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation(Colors.white),
-                  )
-                : const Text(
-                    'Next',
-                    style: TextStyle(color: Colors.white),
-                  ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // ===== Helpers =====
-  static Widget _buildTextField(
-      TextEditingController controller, String labelText,
-      {bool readOnly = false, VoidCallback? onTap}) {
-    return TextFormField(
-      controller: controller,
-      readOnly: readOnly,
-      onTap: onTap,
-      decoration: InputDecoration(
-        labelText: labelText,
-        hintText: 'Enter $labelText',
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        filled: true,
-        fillColor: Colors.grey[100],
-      ),
-      validator: (val) =>
-          (val == null || val.isEmpty) ? 'Please enter $labelText' : null,
-    );
-  }
-
-  static Widget _buildBullet(String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    // ===== Action Buttons =====
+    Widget _buildActionButtons(BuildContext context, ConsentScreenViewModel vm) {
+      return Row(
         children: [
-          const Text('• ', style: TextStyle(fontSize: 16)),
-          Expanded(child: Text(text, style: const TextStyle(fontSize: 16))),
+          Expanded(
+            child: OutlinedButton(
+              onPressed: onCancel,
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                side: const BorderSide(color: Colors.grey),
+              ),
+              child: const Text('Cancel'),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: vm.isSubmitting
+                  ? null
+                  : () async {
+                      if (vm.formKey.currentState!.validate() && vm.isFormValid) {
+                        await vm.submitConsent();
+                        onNext();
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Please complete all fields and sign before proceeding.',
+                            ),
+                          ),
+                        );
+                      }
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF201C58),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+              child: vm.isSubmitting
+                  ? const CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation(Colors.white),
+                    )
+                  : const Text(
+                      'Next',
+                      style: TextStyle(color: Colors.white),
+                    ),
+            ),
+          ),
         ],
-      ),
-    );
+      );
+    }
+
+    // ===== Helpers =====
+    static Widget _buildTextField(
+      TextEditingController controller,
+      String labelText, {
+      bool readOnly = false,
+      VoidCallback? onTap,
+    }) {
+      return TextFormField(
+        controller: controller,
+        readOnly: readOnly,
+        onTap: onTap,
+        decoration: InputDecoration(
+          labelText: labelText,
+          hintText: 'Enter $labelText',
+          floatingLabelBehavior: FloatingLabelBehavior.always,
+          hintStyle: const TextStyle(color: Color(0xFF757575)),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          border: authOutlineInputBorder,
+          enabledBorder: authOutlineInputBorder,
+          focusedBorder: authOutlineInputBorder.copyWith(
+            borderSide: const BorderSide(color: Color(0xFFFF7643)),
+          ),
+        ),
+        validator: (val) =>
+            (val == null || val.isEmpty) ? 'Please enter $labelText' : null,
+      );
+    }
+
+    static Widget _buildBullet(String text) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('• ', style: TextStyle(fontSize: 16)),
+            Expanded(child: Text(text, style: const TextStyle(fontSize: 16))),
+          ],
+        ),
+      );
+    }
   }
-}

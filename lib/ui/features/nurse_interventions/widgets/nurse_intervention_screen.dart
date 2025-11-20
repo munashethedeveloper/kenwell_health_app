@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 import 'package:provider/provider.dart';
 import 'package:signature/signature.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
@@ -247,7 +248,7 @@ class NurseInterventionScreen extends StatelessWidget {
     );
   }
 
-// ------------------ Reusable Widgets ------------------
+  // ------------------ Reusable Widgets ------------------
   Widget _buildSignatureSection(NurseInterventionViewModel viewModel) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -255,14 +256,11 @@ class NurseInterventionScreen extends StatelessWidget {
         const Text(
           'Signature:',
           style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-              color: Color(0xFF201C58)),
+              fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF201C58)),
         ),
         const SizedBox(height: 8),
         Card(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           elevation: 2,
           child: Container(
             padding: const EdgeInsets.all(8),
@@ -294,15 +292,21 @@ class NurseInterventionScreen extends StatelessWidget {
         initialValue: value,
         decoration: InputDecoration(
           labelText: label,
-          border: const OutlineInputBorder(),
+          floatingLabelBehavior: FloatingLabelBehavior.always,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          border: authOutlineInputBorder,
+          enabledBorder: authOutlineInputBorder,
+          focusedBorder: authOutlineInputBorder.copyWith(
+            borderSide: const BorderSide(color: Color(0xFFFF7643)),
+          ),
         ),
         items: options
             .map((opt) => DropdownMenuItem(value: opt, child: Text(opt)))
             .toList(),
         onChanged: onChanged,
         validator: requiredField
-            ? (val) =>
-                (val == null || val.isEmpty) ? 'Please select $label' : null
+            ? (val) => (val == null || val.isEmpty) ? 'Please select $label' : null
             : null,
       ),
     );
@@ -314,11 +318,7 @@ class NurseInterventionScreen extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
         controller: controller,
-        decoration: InputDecoration(
-          labelText: label,
-          hintText: hint,
-          border: const OutlineInputBorder(),
-        ),
+        decoration: _profileFieldDecoration(label, hint),
         validator: requiredField
             ? (val) =>
                 (val == null || val.isEmpty) ? 'Please enter $label' : null
@@ -335,10 +335,7 @@ class NurseInterventionScreen extends StatelessWidget {
       child: TextFormField(
         controller: controller,
         readOnly: true,
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-        ),
+        decoration: _profileFieldDecoration(label, null),
         onTap: () async {
           FocusScope.of(context).requestFocus(FocusNode());
           final pickedDate = await showDatePicker(
@@ -356,6 +353,21 @@ class NurseInterventionScreen extends StatelessWidget {
             ? (val) =>
                 (val == null || val.isEmpty) ? 'Please select $label' : null
             : null,
+      ),
+    );
+  }
+
+  InputDecoration _profileFieldDecoration(String label, String? hint) {
+    return InputDecoration(
+      labelText: label,
+      floatingLabelBehavior: FloatingLabelBehavior.always,
+      hintText: hint,
+      hintStyle: const TextStyle(color: Color(0xFF757575)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      border: authOutlineInputBorder,
+      enabledBorder: authOutlineInputBorder,
+      focusedBorder: authOutlineInputBorder.copyWith(
+        borderSide: const BorderSide(color: Color(0xFFFF7643)),
       ),
     );
   }

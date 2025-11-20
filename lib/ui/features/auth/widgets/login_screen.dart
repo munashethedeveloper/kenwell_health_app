@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 import '../../../../data/services/auth_service.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/colours/kenwell_colours.dart';
@@ -7,11 +8,6 @@ import '../../../shared/ui/logo/app_logo.dart';
 import '../../../../routing/route_names.dart';
 import '../../../../domain/models/user_model.dart';
 import '../../../shared/ui/navigation/main_navigation_screen.dart';
-
-const authOutlineInputBorder = OutlineInputBorder(
-  borderSide: BorderSide(color: Color(0xFF757575)),
-  borderRadius: BorderRadius.all(Radius.circular(100)),
-);
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
