@@ -61,7 +61,7 @@ class _EventScreenState extends State<EventScreen> {
     Widget buildDropdown(String label, String value, List<String> options,
         void Function(String) onChanged) {
       return DropdownButtonFormField<String>(
-        value: value,
+        initialValue: value,
         decoration: _profileFieldDecoration(label, 'Select $label'),
         items: options
             .map((e) => DropdownMenuItem(value: e, child: Text(e)))
@@ -327,7 +327,7 @@ class _EventScreenState extends State<EventScreen> {
                     if (isEditMode) {
                       eventToSave = widget.viewModel
                           .buildEvent(eventDate)
-                          .copyWith(id: eventToEdit!.id);
+                          .copyWith(id: eventToEdit.id);
                     } else {
                       eventToSave = widget.viewModel.buildEvent(eventDate);
                     }

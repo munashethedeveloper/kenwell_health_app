@@ -103,7 +103,7 @@ class NurseInterventionViewModel extends ChangeNotifier {
         rankController.text.isNotEmpty &&
         sancNumberController.text.isNotEmpty &&
         nurseDateController.text.isNotEmpty &&
-        !signatureController.isNotEmpty;
+        signatureController.isNotEmpty;
   }
 
   /// Converts all fields to a Map

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
@@ -54,6 +55,10 @@ class HIVTestScreen extends StatelessWidget {
                         label: 'Month of last test',
                         hintText: 'MM',
                         controller: viewModel.lastTestMonthController,
+                        decoration: _profileFieldDecoration(
+                          'Month of last test',
+                          'MM',
+                        ),
                         validator: (val) =>
                             val == null || val.isEmpty ? 'Required' : null,
                       ),
@@ -61,6 +66,10 @@ class HIVTestScreen extends StatelessWidget {
                         label: 'Year of last test',
                         hintText: 'YYYY',
                         controller: viewModel.lastTestYearController,
+                        decoration: _profileFieldDecoration(
+                          'Year of last test',
+                          'YYYY',
+                        ),
                         validator: (val) =>
                             val == null || val.isEmpty ? 'Required' : null,
                       ),
@@ -69,6 +78,10 @@ class HIVTestScreen extends StatelessWidget {
                         value: viewModel.lastTestResult,
                         items: const ['Positive', 'Negative'],
                         onChanged: viewModel.setLastTestResult,
+                        decoration: _profileFieldDecoration(
+                          'Result of last test',
+                          'Select result of last test',
+                        ),
                         validator: (val) =>
                             val == null || val.isEmpty ? 'Required' : null,
                       ),
@@ -125,6 +138,10 @@ class HIVTestScreen extends StatelessWidget {
                         label: 'Reason for not using a condom',
                         hintText: 'Explain why',
                         controller: viewModel.noCondomReasonController,
+                        decoration: _profileFieldDecoration(
+                          'Reason for not using a condom',
+                          'Explain why',
+                        ),
                         validator: (val) =>
                             val == null || val.isEmpty ? 'Required' : null,
                       ),
@@ -158,6 +175,10 @@ class HIVTestScreen extends StatelessWidget {
                       label: 'Other risk reason',
                       hintText: 'Specify if "Other"',
                       controller: viewModel.otherRiskReasonController,
+                      decoration: _profileFieldDecoration(
+                        'Other risk reason',
+                        'Specify if "Other"',
+                      ),
                     ),
                   ],
                 ),
@@ -216,5 +237,20 @@ class HIVTestScreen extends StatelessWidget {
         onChanged: (_) => vm.toggleRiskReason(reason),
       );
     }).toList();
+  }
+
+  InputDecoration _profileFieldDecoration(String label, String hint) {
+    return InputDecoration(
+      labelText: label,
+      floatingLabelBehavior: FloatingLabelBehavior.always,
+      hintText: hint,
+      hintStyle: const TextStyle(color: Color(0xFF757575)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      border: authOutlineInputBorder,
+      enabledBorder: authOutlineInputBorder,
+      focusedBorder: authOutlineInputBorder.copyWith(
+        borderSide: const BorderSide(color: Color(0xFFFF7643)),
+      ),
+    );
   }
 }

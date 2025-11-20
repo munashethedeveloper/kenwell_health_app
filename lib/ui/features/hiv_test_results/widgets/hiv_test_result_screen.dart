@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/hiv_test_result_view_model.dart';
@@ -59,6 +60,7 @@ class HIVTestResultScreen extends StatelessWidget {
                       controller: viewModel.screeningExpiryDateController,
                       readOnly: true,
                       hint: 'Select expiry date',
+                      suffixIcon: const Icon(Icons.calendar_today),
                       onTap: () =>
                           viewModel.pickExpiryDate(context, isScreening: true),
                     ),
@@ -94,6 +96,7 @@ class HIVTestResultScreen extends StatelessWidget {
                       controller: viewModel.confirmatoryExpiryDateController,
                       readOnly: true,
                       hint: 'Select expiry date',
+                      suffixIcon: const Icon(Icons.calendar_today),
                       onTap: () =>
                           viewModel.pickExpiryDate(context, isScreening: false),
                     ),
@@ -161,15 +164,14 @@ class HIVTestResultScreen extends StatelessWidget {
     String? hint,
     bool readOnly = false,
     VoidCallback? onTap,
+    Widget? suffixIcon,
   }) {
     return TextFormField(
       controller: controller,
       readOnly: readOnly,
       onTap: onTap,
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        border: const OutlineInputBorder(),
+      decoration: _profileFieldDecoration(label, hint).copyWith(
+        suffixIcon: suffixIcon,
       ),
       validator: (val) =>
           val == null || val.isEmpty ? 'This field is required' : null,
@@ -180,10 +182,7 @@ class HIVTestResultScreen extends StatelessWidget {
       void Function(String) onChanged) {
     return DropdownButtonFormField<String>(
       initialValue: value,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-      ),
+      decoration: _profileFieldDecoration(label, 'Select $label'),
       items:
           items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
       onChanged: (val) {
@@ -191,6 +190,21 @@ class HIVTestResultScreen extends StatelessWidget {
       },
       validator: (val) =>
           val == null || val.isEmpty ? 'This field is required' : null,
+    );
+  }
+
+  InputDecoration _profileFieldDecoration(String label, String? hint) {
+    return InputDecoration(
+      labelText: label,
+      floatingLabelBehavior: FloatingLabelBehavior.always,
+      hintText: hint,
+      hintStyle: const TextStyle(color: Color(0xFF757575)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      border: authOutlineInputBorder,
+      enabledBorder: authOutlineInputBorder,
+      focusedBorder: authOutlineInputBorder.copyWith(
+        borderSide: const BorderSide(color: Color(0xFFFF7643)),
+      ),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/custom_yes_no_question.dart';
@@ -100,6 +101,10 @@ class TBTestingScreen extends StatelessWidget {
                       label: 'When were you treated?',
                       controller: viewModel.treatedDateController,
                       readOnly: true,
+                      decoration: _profileFieldDecoration(
+                        'When were you treated?',
+                        'Select treatment date',
+                      ),
                       onTap: () async {
                         FocusScope.of(context).requestFocus(FocusNode());
                         final pickedDate = await showDatePicker(
@@ -175,6 +180,21 @@ class TBTestingScreen extends StatelessWidget {
         onChanged: onChanged,
         yesValue: 'Yes',
         noValue: 'No',
+      ),
+    );
+  }
+
+  InputDecoration _profileFieldDecoration(String label, String hint) {
+    return InputDecoration(
+      labelText: label,
+      floatingLabelBehavior: FloatingLabelBehavior.always,
+      hintText: hint,
+      hintStyle: const TextStyle(color: Color(0xFF757575)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      border: authOutlineInputBorder,
+      enabledBorder: authOutlineInputBorder,
+      focusedBorder: authOutlineInputBorder.copyWith(
+        borderSide: const BorderSide(color: Color(0xFFFF7643)),
       ),
     );
   }

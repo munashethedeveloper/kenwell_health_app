@@ -5,6 +5,7 @@ import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/hiv_test_nursing_intervention_view_model.dart';
 import 'package:signature/signature.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 
 class HIVTestNursingInterventionScreen extends StatelessWidget {
   final VoidCallback onNext;
@@ -68,6 +69,10 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
                             label: 'Specify other location',
                             controller:
                                 viewModel.followUpOtherDetailsController,
+                            decoration: _profileFieldDecoration(
+                              'Specify other location',
+                              'Enter location details',
+                            ),
                           ),
                       ],
                     ),
@@ -79,6 +84,10 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
                       label: 'YYYY-MM-DD',
                       controller: viewModel.followUpDateController,
                       readOnly: true,
+                      decoration: _profileFieldDecoration(
+                        'YYYY-MM-DD',
+                        'Select follow-up date',
+                      ),
                       onTap: () => viewModel.pickFollowUpDate(context),
                     ),
                   ),
@@ -196,6 +205,21 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  InputDecoration _profileFieldDecoration(String label, String hint) {
+    return InputDecoration(
+      labelText: label,
+      floatingLabelBehavior: FloatingLabelBehavior.always,
+      hintText: hint,
+      hintStyle: const TextStyle(color: Color(0xFF757575)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      border: authOutlineInputBorder,
+      enabledBorder: authOutlineInputBorder,
+      focusedBorder: authOutlineInputBorder.copyWith(
+        borderSide: const BorderSide(color: Color(0xFFFF7643)),
+      ),
     );
   }
 }
