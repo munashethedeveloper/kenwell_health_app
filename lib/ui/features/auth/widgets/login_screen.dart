@@ -7,11 +7,7 @@ import '../../../shared/ui/logo/app_logo.dart';
 import '../../../../routing/route_names.dart';
 import '../../../../domain/models/user_model.dart';
 import '../../../shared/ui/navigation/main_navigation_screen.dart';
-
-const authOutlineInputBorder = OutlineInputBorder(
-  borderSide: BorderSide(color: Color(0xFF757575)),
-  borderRadius: BorderRadius.all(Radius.circular(100)),
-);
+import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 import 'package:provider/provider.dart';
 import 'package:signature/signature.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
@@ -259,8 +260,11 @@ class ConsentScreen extends StatelessWidget {
 
   // ===== Helpers =====
   static Widget _buildTextField(
-      TextEditingController controller, String labelText,
-      {bool readOnly = false, VoidCallback? onTap}) {
+    TextEditingController controller,
+    String labelText, {
+    bool readOnly = false,
+    VoidCallback? onTap,
+  }) {
     return TextFormField(
       controller: controller,
       readOnly: readOnly,
@@ -268,9 +272,15 @@ class ConsentScreen extends StatelessWidget {
       decoration: InputDecoration(
         labelText: labelText,
         hintText: 'Enter $labelText',
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        filled: true,
-        fillColor: Colors.grey[100],
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        hintStyle: const TextStyle(color: Color(0xFF757575)),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        border: authOutlineInputBorder,
+        enabledBorder: authOutlineInputBorder,
+        focusedBorder: authOutlineInputBorder.copyWith(
+          borderSide: const BorderSide(color: Color(0xFFFF7643)),
+        ),
       ),
       validator: (val) =>
           (val == null || val.isEmpty) ? 'Please enter $labelText' : null,

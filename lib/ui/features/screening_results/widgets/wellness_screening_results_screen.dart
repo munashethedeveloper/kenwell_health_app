@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/wellness_screening_results_view_model.dart';
@@ -155,11 +156,7 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
       controller: controller,
       readOnly: readOnly,
       keyboardType: keyboardType,
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        border: const OutlineInputBorder(),
-      ),
+      decoration: _profileFieldDecoration(label, hint),
       validator: (val) {
         if (!readOnly && (val == null || val.isEmpty)) {
           return 'Please enter $label';
@@ -178,6 +175,21 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: child,
+      ),
+    );
+  }
+
+  InputDecoration _profileFieldDecoration(String label, String? hint) {
+    return InputDecoration(
+      labelText: label,
+      floatingLabelBehavior: FloatingLabelBehavior.always,
+      hintText: hint,
+      hintStyle: const TextStyle(color: Color(0xFF757575)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      border: authOutlineInputBorder,
+      enabledBorder: authOutlineInputBorder,
+      focusedBorder: authOutlineInputBorder.copyWith(
+        borderSide: const BorderSide(color: Color(0xFFFF7643)),
       ),
     );
   }
