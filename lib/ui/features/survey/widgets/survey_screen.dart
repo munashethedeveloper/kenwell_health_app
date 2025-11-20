@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_yes_no_question.dart';
+import '../../../shared/ui/form/form_input_borders.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/survey_view_model.dart';
 
@@ -105,6 +106,8 @@ class SurveyScreen extends StatelessWidget {
                     onChanged: (val) {
                       if (val != null) vm.updateProvince(val);
                     },
+                    decoration:
+                        _profileFieldDecoration('Province', 'Select Province'),
                   ),
                 ],
               ),
@@ -252,6 +255,21 @@ class SurveyScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  InputDecoration _profileFieldDecoration(String label, String hint) {
+    return InputDecoration(
+      labelText: label,
+      floatingLabelBehavior: FloatingLabelBehavior.always,
+      hintText: hint,
+      hintStyle: const TextStyle(color: Color(0xFF757575)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      border: authOutlineInputBorder,
+      enabledBorder: authOutlineInputBorder,
+      focusedBorder: authOutlineInputBorder.copyWith(
+        borderSide: const BorderSide(color: Color(0xFFFF7643)),
       ),
     );
   }

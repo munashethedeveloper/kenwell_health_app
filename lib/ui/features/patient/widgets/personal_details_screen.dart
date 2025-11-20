@@ -204,6 +204,7 @@ class PersonalDetailsScreen extends StatelessWidget {
       value: value,
       items: items,
       onChanged: onChanged,
+      decoration: _profileFieldDecoration(label, 'Select $label'),
     );
   }
 
