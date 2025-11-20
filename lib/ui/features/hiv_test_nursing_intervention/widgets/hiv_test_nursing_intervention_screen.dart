@@ -5,6 +5,7 @@ import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/hiv_test_nursing_intervention_view_model.dart';
 import 'package:signature/signature.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 
 class HIVTestNursingInterventionScreen extends StatelessWidget {
   final VoidCallback onNext;
@@ -63,24 +64,32 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
                             'Other (give detail)',
                             viewModel.followUpOther,
                             viewModel.setFollowUpOther),
-                        if (viewModel.followUpOther)
-                          KenwellTextField(
-                            label: 'Specify other location',
-                            controller:
-                                viewModel.followUpOtherDetailsController,
-                          ),
+                          if (viewModel.followUpOther)
+                            KenwellTextField(
+                              label: 'Specify other location',
+                              controller:
+                                  viewModel.followUpOtherDetailsController,
+                              decoration: _profileFieldDecoration(
+                                'Specify other location',
+                                'Enter location details',
+                              ),
+                            ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 16),
                   _buildSection(
                     '3. Follow-up test date',
-                    KenwellTextField(
-                      label: 'YYYY-MM-DD',
-                      controller: viewModel.followUpDateController,
-                      readOnly: true,
-                      onTap: () => viewModel.pickFollowUpDate(context),
-                    ),
+                      KenwellTextField(
+                        label: 'YYYY-MM-DD',
+                        controller: viewModel.followUpDateController,
+                        readOnly: true,
+                        decoration: _profileFieldDecoration(
+                          'YYYY-MM-DD',
+                          'Select follow-up date',
+                        ),
+                        onTap: () => viewModel.pickFollowUpDate(context),
+                      ),
                   ),
                 ],
               ),
@@ -169,7 +178,7 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSignatureSection(HIVTestNursingInterventionViewModel viewModel) {
+    Widget _buildSignatureSection(HIVTestNursingInterventionViewModel viewModel) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -197,5 +206,20 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
         ),
       ],
     );
-  }
+    }
+
+    InputDecoration _profileFieldDecoration(String label, String hint) {
+      return InputDecoration(
+        labelText: label,
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        hintText: hint,
+        hintStyle: const TextStyle(color: Color(0xFF757575)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        border: authOutlineInputBorder,
+        enabledBorder: authOutlineInputBorder,
+        focusedBorder: authOutlineInputBorder.copyWith(
+          borderSide: const BorderSide(color: Color(0xFFFF7643)),
+        ),
+      );
+    }
 }

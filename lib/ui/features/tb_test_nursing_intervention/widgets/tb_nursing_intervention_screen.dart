@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:signature/signature.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/tb_nursing_intervention_view_model.dart';
@@ -54,19 +55,19 @@ class TBNursingInterventionScreen extends StatelessWidget {
                     value: viewModel.memberNotReferred,
                     onChanged: viewModel.toggleMemberNotReferred,
                   ),
-                  if (viewModel.memberNotReferred)
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          left: 16.0, right: 8.0, bottom: 8.0),
-                      child: TextField(
-                        controller: viewModel.reasonController,
-                        decoration: const InputDecoration(
-                          labelText: 'Enter reason',
-                          border: OutlineInputBorder(),
+                    if (viewModel.memberNotReferred)
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 16.0, right: 8.0, bottom: 8.0),
+                        child: TextField(
+                          controller: viewModel.reasonController,
+                          decoration: _profileFieldDecoration(
+                            'Enter reason',
+                            'Provide additional detail',
+                          ),
+                          maxLines: 2,
                         ),
-                        maxLines: 2,
                       ),
-                    ),
                   CheckboxListTile(
                     title: const Text('Member referred to GP'),
                     value: viewModel.referredToGP,
@@ -98,14 +99,14 @@ class TBNursingInterventionScreen extends StatelessWidget {
                         color: Color(0xFF201C58)),
                   ),
                   const SizedBox(height: 8),
-                  TextField(
-                    controller: viewModel.sessionNotesController,
-                    decoration: const InputDecoration(
-                      hintText: 'Enter session notes...',
-                      border: OutlineInputBorder(),
+                    TextField(
+                      controller: viewModel.sessionNotesController,
+                      decoration: _profileFieldDecoration(
+                        'Session notes',
+                        'Enter session notes...',
+                      ),
+                      maxLines: 5,
                     ),
-                    maxLines: 5,
-                  ),
                 ],
               ),
             ),
@@ -207,6 +208,21 @@ class TBNursingInterventionScreen extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  InputDecoration _profileFieldDecoration(String label, String hint) {
+    return InputDecoration(
+      labelText: label,
+      floatingLabelBehavior: FloatingLabelBehavior.always,
+      hintText: hint,
+      hintStyle: const TextStyle(color: Color(0xFF757575)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      border: authOutlineInputBorder,
+      enabledBorder: authOutlineInputBorder,
+      focusedBorder: authOutlineInputBorder.copyWith(
+        borderSide: const BorderSide(color: Color(0xFFFF7643)),
+      ),
     );
   }
 }
