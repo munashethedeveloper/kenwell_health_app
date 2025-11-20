@@ -46,11 +46,21 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
   @override
   void initState() {
     super.initState();
-    _populateControllers();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadAndPopulateProfile();
+    });
   }
 
-  void _populateControllers() {
+  Future<void> _loadAndPopulateProfile() async {
     final vm = context.read<ProfileViewModel>();
+    await vm.loadProfile();
+    if (!mounted) return;
+    setState(() {
+      _syncControllersWithViewModel(vm);
+    });
+  }
+
+  void _syncControllersWithViewModel(ProfileViewModel vm) {
     _emailController.text = vm.email;
     _passwordController.text = vm.password;
     _confirmPasswordController.text = vm.password;
@@ -111,71 +121,92 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
           automaticallyImplyLeading: false,
         ),
         body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: SingleChildScrollView(
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    const SizedBox(height: 16),
-                    const Text(
-                      "Update Profile",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: AbsorbPointer(
+                  absorbing: vm.isSavingProfile || vm.isLoadingProfile,
+                  child: SingleChildScrollView(
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 16),
+                          const Text(
+                            "Update Profile",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            "Complete your details or update your information",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Color(0xFF757575)),
+                          ),
+                          const SizedBox(height: 24),
+                          _buildTextField(_firstNameController, "First Name"),
+                          const SizedBox(height: 16),
+                          _buildTextField(_lastNameController, "Last Name"),
+                          const SizedBox(height: 16),
+                          _buildTextField(_usernameController, "Username"),
+                          const SizedBox(height: 16),
+                          _buildTextField(_roleController, "Role"),
+                          const SizedBox(height: 16),
+                          _buildTextField(_phoneController, "Phone Number",
+                              keyboardType: TextInputType.phone),
+                          const SizedBox(height: 16),
+                          _buildTextField(_emailController, "Email",
+                              keyboardType: TextInputType.emailAddress),
+                          const SizedBox(height: 16),
+                          _buildPasswordField(
+                            _passwordController,
+                            "Password",
+                            _obscurePassword,
+                            () => setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            }),
+                          ),
+                          const SizedBox(height: 16),
+                          _buildPasswordField(
+                            _confirmPasswordController,
+                            "Confirm Password",
+                            _obscureConfirmPassword,
+                            () => setState(() {
+                              _obscureConfirmPassword =
+                                  !_obscureConfirmPassword;
+                            }),
+                          ),
+                          const SizedBox(height: 24),
+                          CustomPrimaryButton(
+                            label: "Save Profile",
+                            onPressed: (vm.isLoadingProfile || vm.isSavingProfile)
+                                ? null
+                                : () => _saveProfile(vm),
+                            isBusy: vm.isSavingProfile,
+                          ),
+                          const SizedBox(height: 16),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      "Complete your details or update your information",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Color(0xFF757575)),
-                    ),
-                    const SizedBox(height: 24),
-                    _buildTextField(_firstNameController, "First Name"),
-                    const SizedBox(height: 16),
-                    _buildTextField(_lastNameController, "Last Name"),
-                    const SizedBox(height: 16),
-                    _buildTextField(_usernameController, "Username"),
-                    const SizedBox(height: 16),
-                    _buildTextField(_roleController, "Role"),
-                    const SizedBox(height: 16),
-                    _buildTextField(_phoneController, "Phone Number",
-                        keyboardType: TextInputType.phone),
-                    const SizedBox(height: 16),
-                    _buildTextField(_emailController, "Email",
-                        keyboardType: TextInputType.emailAddress),
-                    const SizedBox(height: 16),
-                    _buildPasswordField(
-                      _passwordController,
-                      "Password",
-                      _obscurePassword,
-                      () => setState(() {
-                        _obscurePassword = !_obscurePassword;
-                      }),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildPasswordField(
-                      _confirmPasswordController,
-                      "Confirm Password",
-                      _obscureConfirmPassword,
-                      () => setState(() {
-                        _obscureConfirmPassword = !_obscureConfirmPassword;
-                      }),
-                    ),
-                    const SizedBox(height: 24),
-                    CustomPrimaryButton(
-                      label: "Save Profile",
-                      onPressed: () => _saveProfile(vm),
-                      isBusy: vm.isLoading,
-                    ),
-                    const SizedBox(height: 16),
-                  ],
+                  ),
                 ),
               ),
-            ),
+              if (vm.isLoadingProfile)
+                const Positioned.fill(
+                  child: IgnorePointer(
+                    child: ColoredBox(
+                      color: Color(0x66FFFFFF),
+                      child: Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
       ),
