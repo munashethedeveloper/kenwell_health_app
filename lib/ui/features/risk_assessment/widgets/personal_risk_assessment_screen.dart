@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
@@ -72,15 +73,19 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                             );
                           }).toList(),
                           if (vm.chronicConditions['Other'] == true)
-                            KenwellTextField(
-                              label:
-                                  'If Other, please specify condition and treatment',
-                              controller: vm.otherConditionController,
-                              hintText: 'Specify other condition...',
-                              validator: (val) => val == null || val.isEmpty
-                                  ? 'Please specify other condition'
-                                  : null,
+                          KenwellTextField(
+                            label:
+                                'If Other, please specify condition and treatment',
+                            controller: vm.otherConditionController,
+                            hintText: 'Specify other condition...',
+                            decoration: _profileFieldDecoration(
+                              'If Other, please specify condition and treatment',
+                              'Specify other condition...',
                             ),
+                            validator: (val) => val == null || val.isEmpty
+                                ? 'Please specify other condition'
+                                : null,
+                          ),
                         ],
                       ),
                     ),
@@ -130,15 +135,19 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF201C58)),
                           ),
-                          KenwellTextField(
-                            label: 'Number per day',
-                            controller: vm.dailySmokeController,
-                            hintText: 'Enter number of cigarettes/day',
-                            keyboardType: TextInputType.number,
-                            validator: (val) => val == null || val.isEmpty
-                                ? 'Please enter daily smoking amount'
-                                : null,
-                          ),
+                            KenwellTextField(
+                              label: 'Number per day',
+                              controller: vm.dailySmokeController,
+                              hintText: 'Enter number of cigarettes/day',
+                              keyboardType: TextInputType.number,
+                              decoration: _profileFieldDecoration(
+                                'Number per day',
+                                'Enter number of cigarettes/day',
+                              ),
+                              validator: (val) => val == null || val.isEmpty
+                                  ? 'Please enter daily smoking amount'
+                                  : null,
+                            ),
                           const SizedBox(height: 8),
                           const Text('3.1 What do you smoke?',
                               style: TextStyle(fontSize: 16)),
@@ -326,6 +335,21 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: child,
+      ),
+    );
+  }
+
+  InputDecoration _profileFieldDecoration(String label, String hint) {
+    return InputDecoration(
+      labelText: label,
+      floatingLabelBehavior: FloatingLabelBehavior.always,
+      hintText: hint,
+      hintStyle: const TextStyle(color: Color(0xFF757575)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      border: authOutlineInputBorder,
+      enabledBorder: authOutlineInputBorder,
+      focusedBorder: authOutlineInputBorder.copyWith(
+        borderSide: const BorderSide(color: Color(0xFFFF7643)),
       ),
     );
   }
