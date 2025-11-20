@@ -258,24 +258,38 @@ class ConsentScreen extends StatelessWidget {
   }
 
   // ===== Helpers =====
-  static Widget _buildTextField(
-      TextEditingController controller, String labelText,
-      {bool readOnly = false, VoidCallback? onTap}) {
-    return TextFormField(
-      controller: controller,
-      readOnly: readOnly,
-      onTap: onTap,
-      decoration: InputDecoration(
-        labelText: labelText,
-        hintText: 'Enter $labelText',
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        filled: true,
-        fillColor: Colors.grey[100],
-      ),
-      validator: (val) =>
-          (val == null || val.isEmpty) ? 'Please enter $labelText' : null,
+    static const OutlineInputBorder _authOutlineInputBorder = OutlineInputBorder(
+      borderSide: BorderSide(color: Color(0xFF757575)),
+      borderRadius: BorderRadius.all(Radius.circular(100)),
     );
-  }
+
+    static Widget _buildTextField(
+      TextEditingController controller,
+      String labelText, {
+      bool readOnly = false,
+      VoidCallback? onTap,
+    }) {
+      return TextFormField(
+        controller: controller,
+        readOnly: readOnly,
+        onTap: onTap,
+        validator: (val) =>
+            (val == null || val.isEmpty) ? 'Please enter $labelText' : null,
+        decoration: InputDecoration(
+          labelText: labelText,
+          floatingLabelBehavior: FloatingLabelBehavior.always,
+          hintText: 'Enter $labelText',
+          hintStyle: const TextStyle(color: Color(0xFF757575)),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          border: _authOutlineInputBorder,
+          enabledBorder: _authOutlineInputBorder,
+          focusedBorder: _authOutlineInputBorder.copyWith(
+            borderSide: const BorderSide(color: Color(0xFFFF7643)),
+          ),
+        ),
+      );
+    }
 
   static Widget _buildBullet(String text) {
     return Padding(
