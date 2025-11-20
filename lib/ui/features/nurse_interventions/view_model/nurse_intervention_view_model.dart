@@ -99,11 +99,11 @@ class NurseInterventionViewModel extends ChangeNotifier {
         (followUpLocation != 'Other' ||
             followUpOtherController.text.isNotEmpty) &&
         (!patientNotReferred || notReferredReasonController.text.isNotEmpty) &&
-        hivTestingNurseController.text.isNotEmpty &&
-        rankController.text.isNotEmpty &&
-        sancNumberController.text.isNotEmpty &&
-        nurseDateController.text.isNotEmpty &&
-        !signatureController.isNotEmpty;
+          hivTestingNurseController.text.isNotEmpty &&
+          rankController.text.isNotEmpty &&
+          sancNumberController.text.isNotEmpty &&
+          nurseDateController.text.isNotEmpty &&
+          signatureController.isNotEmpty;
   }
 
   /// Converts all fields to a Map
