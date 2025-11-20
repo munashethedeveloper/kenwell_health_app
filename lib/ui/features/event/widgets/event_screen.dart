@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/event_view_model.dart';
 import '../../../../domain/models/wellness_event.dart';
@@ -57,54 +58,36 @@ class _EventScreenState extends State<EventScreen> {
             : null);
     final bool isEditMode = eventToEdit != null;
 
-    Widget buildDropdown(String label, String value, List<String> options,
-        void Function(String) onChanged) {
-      return DropdownButtonFormField<String>(
-        value: value,
-        decoration: InputDecoration(
-          labelText: label,
-          hintText: 'Select $label',
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-          filled: true,
-          fillColor: const Color(0xFFF0F0F0),
-          border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none),
-        ),
-        items: options
-            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-            .toList(),
-        onChanged: (val) {
-          if (val != null) onChanged(val);
-        },
-        validator: (val) =>
-            (val == null || val.isEmpty) ? 'Select $label' : null,
-      );
-    }
+      Widget buildDropdown(String label, String value, List<String> options,
+          void Function(String) onChanged) {
+        return DropdownButtonFormField<String>(
+          value: value,
+          decoration: _profileFieldDecoration(label, 'Select $label'),
+          items: options
+              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+              .toList(),
+          onChanged: (val) {
+            if (val != null) onChanged(val);
+          },
+          validator: (val) =>
+              (val == null || val.isEmpty) ? 'Select $label' : null,
+        );
+      }
 
-    Widget buildTimeField(String label, TextEditingController controller) {
-      return TextFormField(
-        controller: controller,
-        readOnly: true,
-        decoration: InputDecoration(
-          labelText: label,
-          hintText: 'Select $label',
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-          filled: true,
-          fillColor: const Color(0xFFF0F0F0),
-          suffixIcon: const Icon(Icons.access_time),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
+      Widget buildTimeField(String label, TextEditingController controller) {
+        return TextFormField(
+          controller: controller,
+          readOnly: true,
+          decoration: _profileFieldDecoration(label, 'Select $label').copyWith(
+            suffixIcon: const Icon(Icons.access_time),
           ),
-        ),
-        validator: (val) =>
-            (val == null || val.isEmpty) ? 'Select $label' : null,
-        onTap: () async {
-          await widget.viewModel.pickTime(context, controller);
-        },
-      );
-    }
+          validator: (val) =>
+              (val == null || val.isEmpty) ? 'Select $label' : null,
+          onTap: () async {
+            await widget.viewModel.pickTime(context, controller);
+          },
+        );
+      }
 
     Widget sectionWrapper(String title, List<Widget> children) {
       return Card(
@@ -139,211 +122,136 @@ class _EventScreenState extends State<EventScreen> {
           key: _formKey,
           child: Column(
             children: [
-              // Basic Info Section
-              sectionWrapper('Basic Info', [
-                TextFormField(
-                  controller: widget.viewModel.dateController,
-                  readOnly: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Event Date',
-                    hintText: 'Select Event Date',
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                    suffixIcon: Icon(Icons.calendar_today),
-                    filled: true,
-                    fillColor: Color(0xFFF0F0F0),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(12))),
+                // Basic Info Section
+                sectionWrapper('Basic Info', [
+                  TextFormField(
+                    controller: widget.viewModel.dateController,
+                    readOnly: true,
+                    decoration: _profileFieldDecoration(
+                            'Event Date', 'Select Event Date')
+                        .copyWith(suffixIcon: const Icon(Icons.calendar_today)),
+                    validator: (val) =>
+                        (val == null || val.isEmpty) ? 'Select Event Date' : null,
+                    onTap: () async {
+                      final pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: widget.date,
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2100),
+                      );
+                      if (pickedDate != null && context.mounted) {
+                        widget.viewModel.dateController.text =
+                            "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+                      }
+                    },
                   ),
-                  validator: (val) =>
-                      (val == null || val.isEmpty) ? 'Select Event Date' : null,
-                  onTap: () async {
-                    final pickedDate = await showDatePicker(
-                      context: context,
-                      initialDate: widget.date,
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2100),
-                    );
-                    if (pickedDate != null && context.mounted) {
-                      widget.viewModel.dateController.text =
-                          "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
-                    }
-                  },
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: widget.viewModel.titleController,
-                  decoration: const InputDecoration(
-                      labelText: 'Event Title',
-                      hintText: 'Enter Event Title',
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      filled: true,
-                      fillColor: Color(0xFFF0F0F0),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(12)))),
-                  validator: (val) =>
-                      (val == null || val.isEmpty) ? 'Enter Event Title' : null,
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: widget.viewModel.venueController,
-                  decoration: const InputDecoration(
-                      labelText: 'Venue',
-                      hintText: 'Enter Venue',
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      filled: true,
-                      fillColor: Color(0xFFF0F0F0),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(12)))),
-                  validator: (val) =>
-                      (val == null || val.isEmpty) ? 'Enter Venue' : null,
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: widget.viewModel.addressController,
-                  decoration: const InputDecoration(
-                      labelText: 'Address',
-                      hintText: 'Enter Address',
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      filled: true,
-                      fillColor: Color(0xFFF0F0F0),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(12)))),
-                  validator: (val) =>
-                      (val == null || val.isEmpty) ? 'Enter Address' : null,
-                ),
-              ]),
+                  const SizedBox(height: 10),
+                  TextFormField(
+                    controller: widget.viewModel.titleController,
+                    decoration:
+                        _profileFieldDecoration('Event Title', 'Enter Event Title'),
+                    validator: (val) =>
+                        (val == null || val.isEmpty) ? 'Enter Event Title' : null,
+                  ),
+                  const SizedBox(height: 10),
+                  TextFormField(
+                    controller: widget.viewModel.venueController,
+                    decoration: _profileFieldDecoration('Venue', 'Enter Venue'),
+                    validator: (val) =>
+                        (val == null || val.isEmpty) ? 'Enter Venue' : null,
+                  ),
+                  const SizedBox(height: 10),
+                  TextFormField(
+                    controller: widget.viewModel.addressController,
+                    decoration:
+                        _profileFieldDecoration('Address', 'Enter Address'),
+                    validator: (val) =>
+                        (val == null || val.isEmpty) ? 'Enter Address' : null,
+                  ),
+                ]),
 
               // Onsite Contact Section
-              sectionWrapper('Onsite Contact', [
-                TextFormField(
-                  controller: widget.viewModel.onsiteContactController,
-                  decoration: const InputDecoration(
-                      labelText: 'Contact Person',
-                      hintText: 'Enter Contact Person',
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      filled: true,
-                      fillColor: Color(0xFFF0F0F0),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(12)))),
-                  validator: (val) => (val == null || val.isEmpty)
-                      ? 'Enter Contact Person'
-                      : null,
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: widget.viewModel.onsiteNumberController,
-                  decoration: const InputDecoration(
-                      labelText: 'Contact Number',
-                      hintText: 'Enter Contact Number',
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      filled: true,
-                      fillColor: Color(0xFFF0F0F0),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(12)))),
-                  keyboardType: TextInputType.phone,
-                  validator: (val) => (val == null || val.isEmpty)
-                      ? 'Enter Contact Number'
-                      : null,
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: widget.viewModel.onsiteEmailController,
-                  decoration: const InputDecoration(
-                      labelText: 'Email',
-                      hintText: 'Enter Email',
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      filled: true,
-                      fillColor: Color(0xFFF0F0F0),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(12)))),
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (val) =>
-                      (val == null || val.isEmpty) ? 'Enter Email' : null,
-                ),
-              ]),
+                sectionWrapper('Onsite Contact', [
+                  TextFormField(
+                    controller: widget.viewModel.onsiteContactController,
+                    decoration: _profileFieldDecoration(
+                        'Contact Person', 'Enter Contact Person'),
+                    validator: (val) => (val == null || val.isEmpty)
+                        ? 'Enter Contact Person'
+                        : null,
+                  ),
+                  const SizedBox(height: 10),
+                  TextFormField(
+                    controller: widget.viewModel.onsiteNumberController,
+                    decoration: _profileFieldDecoration(
+                        'Contact Number', 'Enter Contact Number'),
+                    keyboardType: TextInputType.phone,
+                    validator: (val) => (val == null || val.isEmpty)
+                        ? 'Enter Contact Number'
+                        : null,
+                  ),
+                  const SizedBox(height: 10),
+                  TextFormField(
+                    controller: widget.viewModel.onsiteEmailController,
+                    decoration: _profileFieldDecoration('Email', 'Enter Email'),
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (val) =>
+                        (val == null || val.isEmpty) ? 'Enter Email' : null,
+                  ),
+                ]),
 
               // AE Contact Section
-              sectionWrapper('AE Contact', [
-                TextFormField(
-                  controller: widget.viewModel.aeContactController,
-                  decoration: const InputDecoration(
-                      labelText: 'Contact Person',
-                      hintText: 'Enter Contact Person',
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      filled: true,
-                      fillColor: Color(0xFFF0F0F0),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(12)))),
-                  validator: (val) => (val == null || val.isEmpty)
-                      ? 'Enter Contact Person'
-                      : null,
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: widget.viewModel.aeNumberController,
-                  decoration: const InputDecoration(
-                      labelText: 'Contact Number',
-                      hintText: 'Enter Contact Number',
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      filled: true,
-                      fillColor: Color(0xFFF0F0F0),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(12)))),
-                  keyboardType: TextInputType.phone,
-                  validator: (val) => (val == null || val.isEmpty)
-                      ? 'Enter Contact Number'
-                      : null,
-                ),
-              ]),
+                sectionWrapper('AE Contact', [
+                  TextFormField(
+                    controller: widget.viewModel.aeContactController,
+                    decoration: _profileFieldDecoration(
+                        'Contact Person', 'Enter Contact Person'),
+                    validator: (val) => (val == null || val.isEmpty)
+                        ? 'Enter Contact Person'
+                        : null,
+                  ),
+                  const SizedBox(height: 10),
+                  TextFormField(
+                    controller: widget.viewModel.aeNumberController,
+                    decoration: _profileFieldDecoration(
+                        'Contact Number', 'Enter Contact Number'),
+                    keyboardType: TextInputType.phone,
+                    validator: (val) => (val == null || val.isEmpty)
+                        ? 'Enter Contact Number'
+                        : null,
+                  ),
+                ]),
 
               // Participation & Numbers Section
-              sectionWrapper('Participation & Numbers', [
-                TextFormField(
-                  controller: widget.viewModel.expectedParticipationController,
-                  decoration: const InputDecoration(
-                      labelText: 'Expected Participation',
-                      hintText: 'Enter Expected Participation',
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      filled: true,
-                      fillColor: Color(0xFFF0F0F0),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(12)))),
-                  keyboardType: TextInputType.number,
-                  validator: (val) => (val == null || val.isEmpty)
-                      ? 'Enter Expected Participation'
-                      : null,
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: widget.viewModel.passportsController,
-                  decoration: const InputDecoration(
-                      labelText: 'Passports',
-                      hintText: 'Enter Number of Passports',
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      filled: true,
-                      fillColor: Color(0xFFF0F0F0),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(12)))),
-                  keyboardType: TextInputType.number,
-                  validator: (val) =>
-                      (val == null || val.isEmpty) ? 'Enter Passports' : null,
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: widget.viewModel.nursesController,
-                  decoration: const InputDecoration(
-                      labelText: 'Nurses',
-                      hintText: 'Enter Number of Nurses',
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      filled: true,
-                      fillColor: Color(0xFFF0F0F0),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(12)))),
-                  keyboardType: TextInputType.number,
-                  validator: (val) =>
-                      (val == null || val.isEmpty) ? 'Enter Nurses' : null,
-                ),
-              ]),
+                sectionWrapper('Participation & Numbers', [
+                  TextFormField(
+                    controller: widget.viewModel.expectedParticipationController,
+                    decoration: _profileFieldDecoration('Expected Participation',
+                        'Enter Expected Participation'),
+                    keyboardType: TextInputType.number,
+                    validator: (val) => (val == null || val.isEmpty)
+                        ? 'Enter Expected Participation'
+                        : null,
+                  ),
+                  const SizedBox(height: 10),
+                  TextFormField(
+                    controller: widget.viewModel.passportsController,
+                    decoration: _profileFieldDecoration(
+                        'Passports', 'Enter Number of Passports'),
+                    keyboardType: TextInputType.number,
+                    validator: (val) =>
+                        (val == null || val.isEmpty) ? 'Enter Passports' : null,
+                  ),
+                  const SizedBox(height: 10),
+                  TextFormField(
+                    controller: widget.viewModel.nursesController,
+                    decoration: _profileFieldDecoration(
+                        'Nurses', 'Enter Number of Nurses'),
+                    keyboardType: TextInputType.number,
+                    validator: (val) =>
+                        (val == null || val.isEmpty) ? 'Enter Nurses' : null,
+                  ),
+                ]),
 
               // Options Section
               sectionWrapper('Options', [
@@ -429,4 +337,19 @@ class _EventScreenState extends State<EventScreen> {
       ),
     );
   }
+
+    InputDecoration _profileFieldDecoration(String label, String hint) {
+      return InputDecoration(
+        labelText: label,
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        hintText: hint,
+        hintStyle: const TextStyle(color: Color(0xFF757575)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        border: authOutlineInputBorder,
+        enabledBorder: authOutlineInputBorder,
+        focusedBorder: authOutlineInputBorder.copyWith(
+          borderSide: const BorderSide(color: Color(0xFFFF7643)),
+        ),
+      );
+    }
 }
