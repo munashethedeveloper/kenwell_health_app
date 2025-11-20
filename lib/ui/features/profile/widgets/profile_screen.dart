@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/profile_view_model.dart';
-
-const authOutlineInputBorder = OutlineInputBorder(
-  borderSide: BorderSide(color: Color(0xFF757575)),
-  borderRadius: BorderRadius.all(Radius.circular(100)),
-);
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
