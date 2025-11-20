@@ -257,27 +257,37 @@ class ConsentScreen extends StatelessWidget {
     );
   }
 
-  // ===== Helpers =====
-  static Widget _buildTextField(
-      TextEditingController controller, String labelText,
-      {bool readOnly = false, VoidCallback? onTap}) {
-    return TextFormField(
-      controller: controller,
-      readOnly: readOnly,
-      onTap: onTap,
-      decoration: InputDecoration(
-        labelText: labelText,
-        hintText: 'Enter $labelText',
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        filled: true,
-        fillColor: Colors.grey[100],
-      ),
-      validator: (val) =>
-          (val == null || val.isEmpty) ? 'Please enter $labelText' : null,
-    );
-  }
+    // ===== Helpers =====
+    static Widget _buildTextField(
+        TextEditingController controller, String labelText,
+        {bool readOnly = false, VoidCallback? onTap}) {
+      return _buildCardField(
+        child: TextFormField(
+          controller: controller,
+          readOnly: readOnly,
+          onTap: onTap,
+          decoration: InputDecoration(labelText: labelText),
+          validator: (val) =>
+              (val == null || val.isEmpty) ? 'Please enter $labelText' : null,
+        ),
+      );
+    }
 
-  static Widget _buildBullet(String text) {
+    static Widget _buildCardField({required Widget child}) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Card(
+          elevation: 2,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            child: child,
+          ),
+        ),
+      );
+    }
+
+    static Widget _buildBullet(String text) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
