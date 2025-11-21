@@ -187,10 +187,6 @@ class AppRouter {
         final DateTime date = args?['date'] as DateTime? ?? DateTime.now();
         final void Function(WellnessEvent) onSave =
             args?['onSave'] as void Function(WellnessEvent)? ?? (_) {};
-        final List<WellnessEvent>? existingEvents =
-            (args?['existingEvents'] as List<dynamic>?)
-                ?.map((e) => e as WellnessEvent)
-                .toList();
         final WellnessEvent? existingEvent =
             args?['existingEvent'] as WellnessEvent?;
 
@@ -200,7 +196,6 @@ class AppRouter {
             return EventScreen(
               date: date,
               onSave: onSave,
-              existingEvents: existingEvents,
               existingEvent: existingEvent,
               viewModel: eventVM,
             );

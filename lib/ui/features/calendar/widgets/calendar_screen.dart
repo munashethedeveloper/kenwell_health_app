@@ -120,26 +120,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       shape: BoxShape.circle,
                     ),
                   ),
-                  onDaySelected: (selectedDay, focusedDay) {
+                  onDaySelected: (selectedDay, focusedDay) async {
                     setState(() {
                       _selectedDay = selectedDay;
                       _focusedDay = focusedDay;
                     });
-
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => EventScreen(
-                          date: selectedDay,
-                          existingEvents:
-                              widget.eventVM.getEventsForDate(selectedDay),
-                          onSave: (newEvent) {
-                            widget.eventVM.addEvent(newEvent);
-                          },
-                          viewModel: widget.eventVM,
-                        ),
-                      ),
-                    );
+                    final eventsForDay = _getEventsForDay(selectedDay);
+                    if (eventsForDay.isEmpty) {
+                      await _openEventForm(selectedDay);
+                    } else {
+                      _showDayActionsSheet(selectedDay, eventsForDay);
+                    }
                   },
                 ),
               ],
@@ -336,22 +327,106 @@ class _CalendarScreenState extends State<CalendarScreen> {
           label: const Text('Add Event', style: TextStyle(color: Colors.white)),
           onPressed: () {
             final targetDate = _selectedDay ?? _focusedDay;
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => EventScreen(
-                  date: targetDate,
-                  existingEvents: widget.eventVM.getEventsForDate(targetDate),
-                  onSave: (newEvent) {
-                    widget.eventVM.addEvent(newEvent);
-                  },
-                  viewModel: widget.eventVM,
-                ),
-              ),
-            );
+            _openEventForm(targetDate);
           },
         ),
       ),
     );
+  }
+
+  Future<void> _openEventForm(DateTime date,
+      {WellnessEvent? existingEvent}) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => EventScreen(
+          date: date,
+          existingEvent: existingEvent,
+          onSave: (event) {
+            if (existingEvent == null) {
+              widget.eventVM.addEvent(event);
+            } else {
+              widget.eventVM.updateEvent(event);
+            }
+          },
+          viewModel: widget.eventVM,
+        ),
+      ),
+    );
+    if (!mounted) return;
+    setState(() {});
+  }
+
+  void _showDayActionsSheet(DateTime selectedDay, List<WellnessEvent> events) {
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Events on ${DateFormat.yMMMMd().format(selectedDay)}',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ...events.map(
+                  (event) => ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: _categoryColor(event.servicesRequested),
+                    ),
+                    title: Text(event.title),
+                    subtitle: Text(_eventSubtitle(event)),
+                    trailing: const Icon(Icons.edit_outlined),
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      _openEventForm(selectedDay, existingEvent: event);
+                    },
+                  ),
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.add),
+                  label: const Text('Add another event'),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(48),
+                    backgroundColor: const Color(0xFF201C58),
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    _openEventForm(selectedDay);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  String _eventSubtitle(WellnessEvent event) {
+    final parts = <String>[];
+    final times = [
+      if (event.startTime.isNotEmpty) event.startTime,
+      if (event.endTime.isNotEmpty) event.endTime,
+    ];
+    if (times.isNotEmpty) {
+      parts.add(times.join(' - '));
+    }
+    final location = event.venue.isNotEmpty
+        ? event.venue
+        : (event.address.isNotEmpty ? event.address : '');
+    if (location.isNotEmpty) {
+      parts.add(location);
+    }
+    return parts.isEmpty ? 'Tap to edit' : parts.join(' · ');
   }
 }
