@@ -38,6 +38,7 @@ class TBNursingInterventionScreen extends StatelessWidget {
                     color: const Color(0xFF201C58),
                   ),
             ),
+            const SizedBox(height: 24),
             _buildCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,12 +51,14 @@ class TBNursingInterventionScreen extends StatelessWidget {
                         color: Color(0xFF201C58)),
                   ),
                   const SizedBox(height: 16),
-                  CheckboxListTile(
+                  RadioListTile<TBNursingReferralOption>(
                     title: const Text('Member not referred – reason?'),
-                    value: viewModel.memberNotReferred,
-                    onChanged: viewModel.toggleMemberNotReferred,
+                    value: TBNursingReferralOption.memberNotReferred,
+                    groupValue: viewModel.selectedReferralOption,
+                    onChanged: viewModel.setReferralOption,
                   ),
-                  if (viewModel.memberNotReferred)
+                  if (viewModel.selectedReferralOption ==
+                      TBNursingReferralOption.memberNotReferred)
                     Padding(
                       padding: const EdgeInsets.only(
                           left: 16.0, right: 8.0, bottom: 8.0),
@@ -68,25 +71,28 @@ class TBNursingInterventionScreen extends StatelessWidget {
                         maxLines: 2,
                       ),
                     ),
-                  CheckboxListTile(
+                  RadioListTile<TBNursingReferralOption>(
                     title: const Text('Member referred to GP'),
-                    value: viewModel.referredToGP,
-                    onChanged: viewModel.toggleReferredToGP,
+                    value: TBNursingReferralOption.referredToGP,
+                    groupValue: viewModel.selectedReferralOption,
+                    onChanged: viewModel.setReferralOption,
                   ),
-                  CheckboxListTile(
+                  RadioListTile<TBNursingReferralOption>(
                     title: const Text('Member referred to state HIV clinic'),
-                    value: viewModel.referredToStateHIVClinic,
-                    onChanged: viewModel.toggleReferredToStateHIVClinic,
+                    value: TBNursingReferralOption.referredToStateHIVClinic,
+                    groupValue: viewModel.selectedReferralOption,
+                    onChanged: viewModel.setReferralOption,
                   ),
-                  CheckboxListTile(
+                  RadioListTile<TBNursingReferralOption>(
                     title: const Text('Member referred for OH consultation'),
-                    value: viewModel.referredToOHConsultation,
-                    onChanged: viewModel.toggleReferredToOHConsultation,
+                    value: TBNursingReferralOption.referredToOHConsultation,
+                    groupValue: viewModel.selectedReferralOption,
+                    onChanged: viewModel.setReferralOption,
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             _buildCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,7 +116,7 @@ class TBNursingInterventionScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             _buildCard(
               child: _buildSignatureSection(viewModel),
             ),
@@ -128,7 +134,7 @@ class TBNursingInterventionScreen extends StatelessWidget {
                     child: const Text('Previous'),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 24),
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {

@@ -45,11 +45,11 @@ class PersonalDetailsScreen extends StatelessWidget {
                           ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   _buildCard(child: _buildPersonalInfoSection(context, vm)),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   _buildCard(child: _buildMedicalAidSection(vm)),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   _buildCard(child: _buildWorkInfoSection(vm)),
                   const SizedBox(height: 24),
                   _buildNavigationButtons(context, vm),
@@ -139,7 +139,7 @@ class PersonalDetailsScreen extends StatelessWidget {
             vm.positionController, 'Position / Rank', 'Enter position or rank'),
         _buildDropdownField(
             vm, 'Province', vm.provinces, vm.provinceOptions, vm.setProvince),
-        const SizedBox(height: 16),
+        //const SizedBox(height: 16), - the spacing between province and employment status textfields
         _buildDropdownField(vm, 'Employment Status', vm.employmentStatus,
             vm.employmentStatusOptions, vm.setEmploymentStatus),
       ],

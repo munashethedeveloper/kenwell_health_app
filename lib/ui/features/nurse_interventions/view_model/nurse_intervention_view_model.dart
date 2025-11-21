@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:signature/signature.dart';
 
+enum NursingReferralOption {
+  patientNotReferred,
+  referredToGP,
+  referredToStateClinic,
+}
+
 class NurseInterventionViewModel extends ChangeNotifier {
   // ✅ Form key for validation
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -49,22 +55,18 @@ class NurseInterventionViewModel extends ChangeNotifier {
   }
 
   // --- Referral Nursing Interventions ---
-  bool patientNotReferred = false;
-  bool referredToGP = false;
-  bool referredToStateClinic = false;
+  NursingReferralOption? nursingReferralSelection;
   final TextEditingController notReferredReasonController =
       TextEditingController();
 
-  void setPatientNotReferred(bool value) {
-    if (patientNotReferred == value) return;
-    patientNotReferred = value;
-    if (!value) notReferredReasonController.clear();
+  void setNursingReferralSelection(NursingReferralOption? value) {
+    if (nursingReferralSelection == value) return;
+    nursingReferralSelection = value;
+    if (value != NursingReferralOption.patientNotReferred) {
+      notReferredReasonController.clear();
+    }
     notifyListeners();
   }
-
-  void setReferredToGP(bool value) => _setValue(() => referredToGP = value);
-  void setReferredToStateClinic(bool value) =>
-      _setValue(() => referredToStateClinic = value);
 
   // --- Nurse Details ---
   final TextEditingController hivTestingNurseController =
@@ -98,7 +100,8 @@ class NurseInterventionViewModel extends ChangeNotifier {
         (windowPeriod != 'Yes' || followUpLocation != null) &&
         (followUpLocation != 'Other' ||
             followUpOtherController.text.isNotEmpty) &&
-        (!patientNotReferred || notReferredReasonController.text.isNotEmpty) &&
+        (nursingReferralSelection != NursingReferralOption.patientNotReferred ||
+            notReferredReasonController.text.isNotEmpty) &&
         hivTestingNurseController.text.isNotEmpty &&
         rankController.text.isNotEmpty &&
         sancNumberController.text.isNotEmpty &&
@@ -118,10 +121,8 @@ class NurseInterventionViewModel extends ChangeNotifier {
       'difficultyDealingResult': difficultyDealingResult,
       'urgentPsychosocial': urgentPsychosocial,
       'committedToChange': committedToChange,
-      'patientNotReferred': patientNotReferred,
+      'nursingReferralSelection': nursingReferralSelection?.name,
       'notReferredReason': notReferredReasonController.text,
-      'referredToGP': referredToGP,
-      'referredToStateClinic': referredToStateClinic,
       'hivTestingNurse': hivTestingNurseController.text,
       'rank': rankController.text,
       'signature': signatureBytes,

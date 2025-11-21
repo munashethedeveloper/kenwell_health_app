@@ -39,6 +39,7 @@ class HIVTestResultScreen extends StatelessWidget {
                       color: const Color(0xFF201C58),
                     ),
               ),
+              const SizedBox(height: 24),
               _buildCard(
                 title: 'Screening Test',
                 child: Column(
@@ -74,7 +75,7 @@ class HIVTestResultScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
               _buildCard(
                 title: 'Confirmatory Test',
                 child: Column(
@@ -110,7 +111,7 @@ class HIVTestResultScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
               _buildCard(
                 title: 'Final HIV Test Result',
                 child: _buildDropdown(

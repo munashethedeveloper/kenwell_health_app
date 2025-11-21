@@ -54,17 +54,23 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
                     '2. Follow-up test location',
                     Column(
                       children: [
-                        _buildCheckbox('State Clinic', viewModel.followUpClinic,
-                            viewModel.setFollowUpClinic),
-                        _buildCheckbox(
-                            'Private Doctor',
-                            viewModel.followUpPrivateDoctor,
-                            viewModel.setFollowUpPrivateDoctor),
-                        _buildCheckbox(
-                            'Other (give detail)',
-                            viewModel.followUpOther,
-                            viewModel.setFollowUpOther),
-                        if (viewModel.followUpOther)
+                        _buildFollowUpRadio(
+                          label: 'State Clinic',
+                          option: FollowUpLocationOption.stateClinic,
+                          viewModel: viewModel,
+                        ),
+                        _buildFollowUpRadio(
+                          label: 'Private Doctor',
+                          option: FollowUpLocationOption.privateDoctor,
+                          viewModel: viewModel,
+                        ),
+                        _buildFollowUpRadio(
+                          label: 'Other (give detail)',
+                          option: FollowUpLocationOption.other,
+                          viewModel: viewModel,
+                        ),
+                        if (viewModel.followUpLocation ==
+                            FollowUpLocationOption.other)
                           KenwellTextField(
                             label: 'Specify other location',
                             controller:
@@ -87,6 +93,8 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
                       decoration: _profileFieldDecoration(
                         'YYYY-MM-DD',
                         'Select follow-up date',
+                      ).copyWith(
+                        suffixIcon: const Icon(Icons.calendar_today_outlined),
                       ),
                       onTap: () => viewModel.pickFollowUpDate(context),
                     ),
@@ -169,12 +177,18 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCheckbox(String label, bool value, Function(bool) onChanged) {
-    return CheckboxListTile(
-      value: value,
-      onChanged: (val) => onChanged(val!),
+  Widget _buildFollowUpRadio({
+    required String label,
+    required FollowUpLocationOption option,
+    required HIVTestNursingInterventionViewModel viewModel,
+  }) {
+    return RadioListTile<FollowUpLocationOption>(
       title: Text(label),
-      controlAffinity: ListTileControlAffinity.leading,
+      value: option,
+      groupValue: viewModel.followUpLocation,
+      onChanged: viewModel.setFollowUpLocation,
+      dense: true,
+      contentPadding: EdgeInsets.zero,
     );
   }
 

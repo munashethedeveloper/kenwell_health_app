@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:signature/signature.dart';
 
+enum FollowUpLocationOption {
+  stateClinic,
+  privateDoctor,
+  other,
+}
+
 class HIVTestNursingInterventionViewModel extends ChangeNotifier {
   // --- 1. Window period ---
   String windowPeriod = 'N/A';
 
   // --- 2. Follow-up location ---
-  bool followUpClinic = false;
-  bool followUpPrivateDoctor = false;
-  bool followUpOther = false;
+  FollowUpLocationOption? followUpLocation;
   final TextEditingController followUpOtherDetailsController =
       TextEditingController();
 
@@ -61,19 +65,11 @@ class HIVTestNursingInterventionViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setFollowUpClinic(bool value) {
-    followUpClinic = value;
-    notifyListeners();
-  }
-
-  void setFollowUpPrivateDoctor(bool value) {
-    followUpPrivateDoctor = value;
-    notifyListeners();
-  }
-
-  void setFollowUpOther(bool value) {
-    followUpOther = value;
-    if (!value) followUpOtherDetailsController.clear();
+  void setFollowUpLocation(FollowUpLocationOption? value) {
+    followUpLocation = value;
+    if (value != FollowUpLocationOption.other) {
+      followUpOtherDetailsController.clear();
+    }
     notifyListeners();
   }
 
@@ -129,7 +125,9 @@ class HIVTestNursingInterventionViewModel extends ChangeNotifier {
   // --- Form validation ---
   bool get isFormValid {
     if (windowPeriod.isEmpty) return false;
-    if (followUpOther && followUpOtherDetailsController.text.trim().isEmpty) {
+    if (followUpLocation == null) return false;
+    if (followUpLocation == FollowUpLocationOption.other &&
+        followUpOtherDetailsController.text.trim().isEmpty) {
       return false;
     }
     if (notReferred && notReferredReasonController.text.trim().isEmpty) {
@@ -144,9 +142,7 @@ class HIVTestNursingInterventionViewModel extends ChangeNotifier {
   Map<String, dynamic> toMap() {
     return {
       'windowPeriod': windowPeriod,
-      'followUpClinic': followUpClinic,
-      'followUpPrivateDoctor': followUpPrivateDoctor,
-      'followUpOther': followUpOther,
+      'followUpLocation': followUpLocation?.name,
       'followUpOtherDetails': followUpOtherDetailsController.text,
       'followUpDate': followUpDateController.text,
       'expectedResult': expectedResult,

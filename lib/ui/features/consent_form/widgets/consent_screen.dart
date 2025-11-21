@@ -39,14 +39,18 @@ class ConsentScreen extends StatelessWidget {
                       color: const Color(0xFF201C58),
                     ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
               _buildEventInfoCard(context, vm),
               const SizedBox(height: 24),
               _buildInformationSection(),
               const SizedBox(height: 24),
               _buildScreeningSection(vm),
               const SizedBox(height: 24),
-              _buildSignatureSection(vm),
+              _buildCard(
+                title: 'Signature:',
+                child: _buildSignatureSection(vm),
+              ),
+              // _buildSignatureSection(vm),
               const SizedBox(height: 24),
               _buildActionButtons(context, vm),
             ],
@@ -79,7 +83,9 @@ class ConsentScreen extends StatelessWidget {
             const SizedBox(height: 16),
 
             // ===== Date Field =====
-            _buildTextField(vm.dateController, 'Date', readOnly: true,
+            _buildTextField(vm.dateController, 'Date',
+                readOnly: true,
+                suffixIcon: const Icon(Icons.calendar_today_outlined),
                 onTap: () async {
               FocusScope.of(context).requestFocus(FocusNode());
               final pickedDate = await showDatePicker(
@@ -176,27 +182,20 @@ class ConsentScreen extends StatelessWidget {
   }
 
   // ===== Signature Section =====
-  Widget _buildSignatureSection(ConsentScreenViewModel vm) {
+  Widget _buildSignatureSection(ConsentScreenViewModel viewModel) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Signature:',
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF201C58))),
         const SizedBox(height: 8),
         Card(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           elevation: 2,
-          color: Colors.white,
-          shadowColor: Colors.grey.shade300,
           child: Container(
             padding: const EdgeInsets.all(8),
             height: 160,
             child: Signature(
-              controller: vm.signatureController,
+              controller: viewModel.signatureController,
               backgroundColor: Colors.grey[100]!,
             ),
           ),
@@ -205,7 +204,7 @@ class ConsentScreen extends StatelessWidget {
         Align(
           alignment: Alignment.centerRight,
           child: TextButton(
-            onPressed: vm.clearSignature,
+            onPressed: viewModel.clearSignature,
             child: const Text('Clear Signature'),
           ),
         ),
@@ -270,6 +269,7 @@ class ConsentScreen extends StatelessWidget {
     String labelText, {
     bool readOnly = false,
     VoidCallback? onTap,
+    Widget? suffixIcon,
   }) {
     return TextFormField(
       controller: controller,
@@ -282,6 +282,7 @@ class ConsentScreen extends StatelessWidget {
         hintStyle: const TextStyle(color: Color(0xFF757575)),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        suffixIcon: suffixIcon,
         border: authOutlineInputBorder,
         enabledBorder: authOutlineInputBorder,
         focusedBorder: authOutlineInputBorder.copyWith(
@@ -290,6 +291,30 @@ class ConsentScreen extends StatelessWidget {
       ),
       validator: (val) =>
           (val == null || val.isEmpty) ? 'Please enter $labelText' : null,
+    );
+  }
+
+  Widget _buildCard({required String title, required Widget child}) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 3,
+      shadowColor: Colors.grey.shade300,
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title,
+                style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF201C58))),
+            const SizedBox(height: 12),
+            child,
+          ],
+        ),
+      ),
     );
   }
 

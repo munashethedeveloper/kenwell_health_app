@@ -39,6 +39,7 @@ class TBTestingScreen extends StatelessWidget {
                     color: const Color(0xFF201C58),
                   ),
             ),
+            const SizedBox(height: 24),
             _buildCard(
               title: 'TB Symptom Screening',
               child: Column(
@@ -86,7 +87,7 @@ class TBTestingScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             _buildCard(
               title: 'History of TB Treatment',
               child: Column(

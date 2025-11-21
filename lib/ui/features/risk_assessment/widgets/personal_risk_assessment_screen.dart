@@ -90,7 +90,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 24),
 
                     // ===== Section 2: Exercise =====
                     _buildCard(
@@ -121,7 +121,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 24),
 
                     // ===== Section 3: Smoking =====
                     _buildCard(
@@ -161,7 +161,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 24),
 
                     // ===== Section 4: Alcohol =====
                     _buildCard(
@@ -193,7 +193,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 24),
 
                     // ===== Section 5-7: Female Only =====
                     if (isFemale)
@@ -275,7 +275,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                         ),
                       ),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 24),
 
                     // ===== Navigation Buttons =====
                     KenwellFormNavigation(

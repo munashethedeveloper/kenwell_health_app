@@ -38,7 +38,7 @@ class HIVTestScreen extends StatelessWidget {
                       color: const Color(0xFF201C58),
                     ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
               _buildCard(
                 title: 'HIV Testing History',
                 child: Column(
@@ -89,7 +89,7 @@ class HIVTestScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
               _buildCard(
                 title: 'Risk Behaviors (last 12 months)',
                 child: Column(
@@ -148,7 +148,7 @@ class HIVTestScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
               _buildCard(
                 title: 'Partner HIV Status & Risk Reasons',
                 child: Column(

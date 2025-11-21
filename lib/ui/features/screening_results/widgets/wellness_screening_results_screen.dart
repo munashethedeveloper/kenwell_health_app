@@ -42,7 +42,7 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
                             color: const Color(0xFF201C58),
                           ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 24),
                     _buildCard(
                       child: Column(
                         children: [

@@ -85,30 +85,28 @@ class NurseInterventionScreen extends StatelessWidget {
                 title: 'Nursing Referrals',
                 child: Column(
                   children: [
-                    CheckboxListTile(
-                      title: const Text('Patient not referred'),
-                      value: viewModel.patientNotReferred,
-                      onChanged: (val) =>
-                          viewModel.setPatientNotReferred(val ?? false),
+                    _buildReferralRadio(
+                      viewModel: viewModel,
+                      option: NursingReferralOption.patientNotReferred,
+                      label: 'Patient not referred',
                     ),
-                    if (viewModel.patientNotReferred)
+                    if (viewModel.nursingReferralSelection ==
+                        NursingReferralOption.patientNotReferred)
                       _buildTextField(
                         'Reason patient not referred',
                         viewModel.notReferredReasonController,
                         hint: 'Enter reason',
                         requiredField: true,
                       ),
-                    CheckboxListTile(
-                      title: const Text('Patient referred to GP'),
-                      value: viewModel.referredToGP,
-                      onChanged: (val) =>
-                          viewModel.setReferredToGP(val ?? false),
+                    _buildReferralRadio(
+                      viewModel: viewModel,
+                      option: NursingReferralOption.referredToGP,
+                      label: 'Patient referred to GP',
                     ),
-                    CheckboxListTile(
-                      title: const Text('Patient referred to State HIV clinic'),
-                      value: viewModel.referredToStateClinic,
-                      onChanged: (val) =>
-                          viewModel.setReferredToStateClinic(val ?? false),
+                    _buildReferralRadio(
+                      viewModel: viewModel,
+                      option: NursingReferralOption.referredToStateClinic,
+                      label: 'Patient referred to State HIV clinic',
                     ),
                   ],
                 ),
@@ -306,6 +304,21 @@ class NurseInterventionScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildReferralRadio({
+    required NurseInterventionViewModel viewModel,
+    required NursingReferralOption option,
+    required String label,
+  }) {
+    return RadioListTile<NursingReferralOption>(
+      value: option,
+      groupValue: viewModel.nursingReferralSelection,
+      onChanged: viewModel.setNursingReferralSelection,
+      title: Text(label),
+      contentPadding: EdgeInsets.zero,
+      dense: true,
+    );
+  }
+
   Widget _buildTextField(String label, TextEditingController controller,
       {String? hint, bool requiredField = false}) {
     return Padding(
@@ -329,6 +342,9 @@ class NurseInterventionScreen extends StatelessWidget {
       child: TextFormField(
         controller: controller,
         readOnly: true,
+        decoration: _profileFieldDecoration(label, 'Select $label').copyWith(
+          suffixIcon: const Icon(Icons.calendar_today_outlined),
+        ),
         onTap: () async {
           FocusScope.of(context).requestFocus(FocusNode());
           final pickedDate = await showDatePicker(

@@ -39,6 +39,8 @@ class SurveyScreen extends StatelessWidget {
                     color: const Color(0xFF201C58),
                   ),
             ),
+            const SizedBox(height: 24),
+
             const Center(
               child: Text(
                 'Welcome to Kenwell Consulting Wellness Day Survey.\n'
@@ -47,7 +49,7 @@ class SurveyScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
 
             // 1. How did you hear about this Wellness Day?
             _buildCard(
@@ -74,7 +76,7 @@ class SurveyScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
 
             // 2. Province
             _buildCard(
@@ -113,7 +115,7 @@ class SurveyScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
 
             // 3–8. Ratings
             _buildCard(
@@ -154,7 +156,7 @@ class SurveyScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
 
             // 9. Contact Consent
             _buildCard(
@@ -184,7 +186,7 @@ class SurveyScreen extends StatelessWidget {
               isNextEnabled: vm.isFormValid,
               nextLabel: 'Submit Survey',
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             const Center(
               child: Text(
                 'Thank you for completing this survey.\nYour feedback helps us improve.',
