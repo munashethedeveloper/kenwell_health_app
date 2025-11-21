@@ -83,20 +83,22 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                  const SizedBox(height: 16),
-                  _buildSection(
-                    '3. Follow-up test date',
-                    KenwellTextField(
-                      label: 'YYYY-MM-DD',
-                      controller: viewModel.followUpDateController,
-                      readOnly: true,
-                      decoration: _profileFieldDecoration(
-                        'YYYY-MM-DD',
-                        'Select follow-up date',
+                    const SizedBox(height: 16),
+                    _buildSection(
+                      '3. Follow-up test date',
+                      KenwellTextField(
+                        label: 'YYYY-MM-DD',
+                        controller: viewModel.followUpDateController,
+                        readOnly: true,
+                        decoration: _profileFieldDecoration(
+                          'YYYY-MM-DD',
+                          'Select follow-up date',
+                        ).copyWith(
+                          suffixIcon: const Icon(Icons.calendar_today_outlined),
+                        ),
+                        onTap: () => viewModel.pickFollowUpDate(context),
                       ),
-                      onTap: () => viewModel.pickFollowUpDate(context),
                     ),
-                  ),
                 ],
               ),
             ),

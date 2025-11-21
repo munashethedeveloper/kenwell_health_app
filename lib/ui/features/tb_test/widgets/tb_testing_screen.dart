@@ -85,53 +85,54 @@ class TBTestingScreen extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 16),
-            _buildCard(
-              title: 'History of TB Treatment',
-              child: Column(
-                children: [
-                  _buildYesNo(
-                    'Were you ever treated for Tuberculosis?',
-                    viewModel.treatedBefore,
-                    viewModel.setTreatedBefore,
-                  ),
-                  if (viewModel.treatedBefore == 'Yes')
-                    KenwellTextField(
-                      label: 'When were you treated?',
-                      controller: viewModel.treatedDateController,
-                      readOnly: true,
-                      decoration: _profileFieldDecoration(
-                        'When were you treated?',
-                        'Select treatment date',
-                      ),
-                      onTap: () async {
-                        FocusScope.of(context).requestFocus(FocusNode());
-                        final pickedDate = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2100),
-                        );
-                        if (pickedDate != null) {
-                          viewModel.treatedDateController.text =
-                              '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
-                        }
-                      },
+              const SizedBox(height: 16),
+              _buildCard(
+                title: 'History of TB Treatment',
+                child: Column(
+                  children: [
+                    _buildYesNo(
+                      'Were you ever treated for Tuberculosis?',
+                      viewModel.treatedBefore,
+                      viewModel.setTreatedBefore,
                     ),
-                  _buildYesNo(
-                    'Did you complete the treatment?',
-                    viewModel.completedTreatment,
-                    viewModel.setCompletedTreatment,
-                  ),
-                  _buildYesNo(
-                    'Were you in contact with someone diagnosed with Tuberculosis in the past year?',
-                    viewModel.contactWithTB,
-                    viewModel.setContactWithTB,
-                  ),
-                ],
+                    if (viewModel.treatedBefore == 'Yes')
+                      KenwellTextField(
+                        label: 'When were you treated?',
+                        controller: viewModel.treatedDateController,
+                        readOnly: true,
+                        decoration: _profileFieldDecoration(
+                          'When were you treated?',
+                          'Select treatment date',
+                        ).copyWith(
+                          suffixIcon: const Icon(Icons.calendar_today_outlined),
+                        ),
+                        onTap: () async {
+                          FocusScope.of(context).requestFocus(FocusNode());
+                          final pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2100),
+                          );
+                          if (pickedDate != null) {
+                            viewModel.treatedDateController.text =
+                                '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
+                          }
+                        },
+                      ),
+                    _buildYesNo(
+                      'Did you complete the treatment?',
+                      viewModel.completedTreatment,
+                      viewModel.setCompletedTreatment,
+                    ),
+                    _buildYesNo(
+                      'Were you in contact with someone diagnosed with Tuberculosis in the past year?',
+                      viewModel.contactWithTB,
+                      viewModel.setContactWithTB,
+                    ),
+                  ],
+                ),
               ),
-            ),
             const SizedBox(height: 24),
             KenwellFormNavigation(
               onPrevious: onPrevious,

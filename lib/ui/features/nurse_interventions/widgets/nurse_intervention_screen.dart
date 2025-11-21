@@ -342,6 +342,9 @@ class NurseInterventionScreen extends StatelessWidget {
       child: TextFormField(
         controller: controller,
         readOnly: true,
+        decoration: _profileFieldDecoration(label, 'Select $label').copyWith(
+          suffixIcon: const Icon(Icons.calendar_today_outlined),
+        ),
         onTap: () async {
           FocusScope.of(context).requestFocus(FocusNode());
           final pickedDate = await showDatePicker(
