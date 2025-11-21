@@ -78,41 +78,39 @@ class NurseInterventionScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              // --- Referral Nursing Interventions Section ---
-              _buildCard(
-                title: 'Nursing Referrals',
-                child: Column(
-                  children: [
-                    CheckboxListTile(
-                      title: const Text('Patient not referred'),
-                      value: viewModel.patientNotReferred,
-                      onChanged: (val) =>
-                          viewModel.setPatientNotReferred(val ?? false),
-                    ),
-                    if (viewModel.patientNotReferred)
-                      _buildTextField(
-                        'Reason patient not referred',
-                        viewModel.notReferredReasonController,
-                        hint: 'Enter reason',
-                        requiredField: true,
+                // --- Referral Nursing Interventions Section ---
+                _buildCard(
+                  title: 'Nursing Referrals',
+                  child: Column(
+                    children: [
+                      _buildReferralRadio(
+                        viewModel: viewModel,
+                        option: NursingReferralOption.patientNotReferred,
+                        label: 'Patient not referred',
                       ),
-                    CheckboxListTile(
-                      title: const Text('Patient referred to GP'),
-                      value: viewModel.referredToGP,
-                      onChanged: (val) =>
-                          viewModel.setReferredToGP(val ?? false),
-                    ),
-                    CheckboxListTile(
-                      title: const Text('Patient referred to State HIV clinic'),
-                      value: viewModel.referredToStateClinic,
-                      onChanged: (val) =>
-                          viewModel.setReferredToStateClinic(val ?? false),
-                    ),
-                  ],
+                      if (viewModel.nursingReferralSelection ==
+                          NursingReferralOption.patientNotReferred)
+                        _buildTextField(
+                          'Reason patient not referred',
+                          viewModel.notReferredReasonController,
+                          hint: 'Enter reason',
+                          requiredField: true,
+                        ),
+                      _buildReferralRadio(
+                        viewModel: viewModel,
+                        option: NursingReferralOption.referredToGP,
+                        label: 'Patient referred to GP',
+                      ),
+                      _buildReferralRadio(
+                        viewModel: viewModel,
+                        option: NursingReferralOption.referredToStateClinic,
+                        label: 'Patient referred to State HIV clinic',
+                      ),
+                    ],
+                  ),
                 ),
-              ),
               const SizedBox(height: 16),
 
               // --- Follow-up Section ---
@@ -303,6 +301,21 @@ class NurseInterventionScreen extends StatelessWidget {
                 (val == null || val.isEmpty) ? 'Please select $label' : null
             : null,
       ),
+    );
+  }
+
+  Widget _buildReferralRadio({
+    required NurseInterventionViewModel viewModel,
+    required NursingReferralOption option,
+    required String label,
+  }) {
+    return RadioListTile<NursingReferralOption>(
+      value: option,
+      groupValue: viewModel.nursingReferralSelection,
+      onChanged: viewModel.setNursingReferralSelection,
+      title: Text(label),
+      contentPadding: EdgeInsets.zero,
+      dense: true,
     );
   }
 
