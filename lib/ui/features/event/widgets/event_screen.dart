@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_spinbox/flutter_spinbox.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
@@ -9,7 +9,6 @@ import '../../../../domain/models/wellness_event.dart';
 class EventScreen extends StatefulWidget {
   final EventViewModel viewModel;
   final DateTime date;
-  final List<WellnessEvent>? existingEvents;
   final WellnessEvent? existingEvent;
   final void Function(WellnessEvent) onSave;
 
@@ -17,7 +16,6 @@ class EventScreen extends StatefulWidget {
     super.key,
     required this.viewModel,
     required this.date,
-    this.existingEvents,
     this.existingEvent,
     required this.onSave,
   });
@@ -33,17 +31,16 @@ class _EventScreenState extends State<EventScreen> {
   @override
   void initState() {
     super.initState();
-    final WellnessEvent? eventToEdit = widget.existingEvent ??
-        (widget.existingEvents != null && widget.existingEvents!.isNotEmpty
-            ? widget.existingEvents!.first
-            : null);
+    final WellnessEvent? eventToEdit = widget.existingEvent;
 
     if (eventToEdit != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         if (!_didLoadExistingEvent) {
           widget.viewModel.loadExistingEvent(eventToEdit);
-          _didLoadExistingEvent = true;
+          setState(() {
+            _didLoadExistingEvent = true;
+          });
         }
       });
     } else {
@@ -54,10 +51,7 @@ class _EventScreenState extends State<EventScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final WellnessEvent? eventToEdit = widget.existingEvent ??
-        (widget.existingEvents != null && widget.existingEvents!.isNotEmpty
-            ? widget.existingEvents!.first
-            : null);
+    final WellnessEvent? eventToEdit = widget.existingEvent;
     final bool isEditMode = eventToEdit != null;
 
     Widget buildDropdown(String label, String value, List<String> options,
@@ -250,36 +244,13 @@ class _EventScreenState extends State<EventScreen> {
 
               // Participation & Numbers Section
               sectionWrapper('Participation & Numbers', [
-                TextFormField(
-                  controller: widget.viewModel.expectedParticipationController,
-                  decoration: _profileFieldDecoration(
-                      'Expected Participation', 'Enter Expected Participation'),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: AppTextInputFormatters.numbersOnly(),
-                  validator: (val) => (val == null || val.isEmpty)
-                      ? 'Enter Expected Participation'
-                      : null,
-                ),
+                _buildSpinBoxField('Expected Participation',
+                    widget.viewModel.expectedParticipationController),
                 const SizedBox(height: 10),
-                TextFormField(
-                  controller: widget.viewModel.passportsController,
-                  decoration: _profileFieldDecoration(
-                      'Passports', 'Enter Number of Passports'),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: AppTextInputFormatters.numbersOnly(),
-                  validator: (val) =>
-                      (val == null || val.isEmpty) ? 'Enter Passports' : null,
-                ),
+                _buildSpinBoxField(
+                    'Passports', widget.viewModel.passportsController),
                 const SizedBox(height: 10),
-                TextFormField(
-                  controller: widget.viewModel.nursesController,
-                  decoration: _profileFieldDecoration(
-                      'Nurses', 'Enter Number of Nurses'),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: AppTextInputFormatters.numbersOnly(),
-                  validator: (val) =>
-                      (val == null || val.isEmpty) ? 'Enter Nurses' : null,
-                ),
+                _buildSpinBoxField('Nurses', widget.viewModel.nursesController),
               ]),
 
               // Options Section
@@ -364,6 +335,26 @@ class _EventScreenState extends State<EventScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildSpinBoxField(String label, TextEditingController controller) {
+    final initialValue =
+        double.tryParse(controller.text.isEmpty ? '0' : controller.text) ?? 0;
+
+    return SpinBox(
+      min: 0,
+      max: 100000,
+      value: initialValue,
+      step: 1,
+      decimals: 0,
+      keyboardType:
+          const TextInputType.numberWithOptions(decimal: false, signed: false),
+      decoration: _profileFieldDecoration(label, 'Enter $label'),
+      validator: (value) => value == null ? 'Enter $label' : null,
+      onChanged: (value) {
+        controller.text = value.round().toString();
+      },
     );
   }
 
