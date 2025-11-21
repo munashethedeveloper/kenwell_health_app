@@ -109,7 +109,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     formatButtonVisible: false,
                     titleCentered: true,
                   ),
-                  calendarStyle: CalendarStyle(
+                    daysOfWeekStyle: const DaysOfWeekStyle(
+                      weekdayStyle: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      weekendStyle: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                    ),
+                    calendarStyle: CalendarStyle(
                     weekendTextStyle: const TextStyle(color: Colors.red),
                     todayDecoration: BoxDecoration(
                       color: Colors.greenAccent.withOpacity(0.5),
