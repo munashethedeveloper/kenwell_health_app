@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 import 'package:provider/provider.dart';
+import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
@@ -78,22 +80,48 @@ class PersonalDetailsScreen extends StatelessWidget {
             ),
           ),
         ),
-        _buildTextField(vm.nameController, 'Name', 'Enter name'),
-        _buildTextField(vm.surnameController, 'Surname', 'Enter surname'),
-        _buildTextField(vm.initialsController, 'Initials', 'Enter initials'),
+          _buildTextField(
+            vm.nameController,
+            'Name',
+            'Enter name',
+            inputFormatters:
+                AppTextInputFormatters.lettersOnly(allowHyphen: true),
+          ),
+          _buildTextField(
+            vm.surnameController,
+            'Surname',
+            'Enter surname',
+            inputFormatters:
+                AppTextInputFormatters.lettersOnly(allowHyphen: true),
+          ),
+          _buildTextField(
+            vm.initialsController,
+            'Initials',
+            'Enter initials',
+            inputFormatters: AppTextInputFormatters.lettersOnly(),
+          ),
         _buildDropdownField(vm, 'Marital Status', vm.maritalStatus,
             vm.maritalStatusOptions, vm.setMaritalStatus),
         _buildDropdownField(
             vm, 'Gender', vm.gender, vm.genderOptions, vm.setGender),
-        _buildTextField(vm.idNumberController, 'ID Number', 'Enter ID number'),
+          _buildTextField(
+            vm.idNumberController,
+            'ID Number',
+            'Enter ID number',
+            inputFormatters: AppTextInputFormatters.numbersOnly(),
+          ),
         _buildTextField(
             vm.nationalityController, 'Nationality', 'Enter nationality'),
-        _buildTextField(
-            vm.emailController, 'Email Address', 'Enter email address',
+          _buildTextField(
+              vm.emailController, 'Email Address', 'Enter email address',
             keyboardType: TextInputType.emailAddress),
-        _buildTextField(
-            vm.cellNumberController, 'Cell Number', 'Enter cell number',
-            keyboardType: TextInputType.phone),
+          _buildTextField(
+            vm.cellNumberController,
+            'Cell Number',
+            'Enter cell number',
+            keyboardType: TextInputType.phone,
+            inputFormatters: AppTextInputFormatters.numbersOnly(),
+          ),
       ],
     );
   }
@@ -112,10 +140,14 @@ class PersonalDetailsScreen extends StatelessWidget {
             ),
           ),
         ),
-        _buildTextField(vm.medicalAidNameController, 'Medical Aid Name',
-            'Enter medical aid name'),
-        _buildTextField(vm.medicalAidNumberController, 'Medical Aid Number',
-            'Enter medical aid number'),
+          _buildTextField(vm.medicalAidNameController, 'Medical Aid Name',
+              'Enter medical aid name'),
+          _buildTextField(
+            vm.medicalAidNumberController,
+            'Medical Aid Number',
+            'Enter medical aid number',
+            inputFormatters: AppTextInputFormatters.numbersOnly(),
+          ),
       ],
     );
   }
@@ -181,11 +213,12 @@ class PersonalDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(
-      TextEditingController controller, String label, String hint,
-      {TextInputType keyboardType = TextInputType.text,
-      bool readOnly = false,
-      VoidCallback? onTap}) {
+    Widget _buildTextField(
+        TextEditingController controller, String label, String hint,
+        {TextInputType keyboardType = TextInputType.text,
+        bool readOnly = false,
+        VoidCallback? onTap,
+        List<TextInputFormatter>? inputFormatters}) {
     return KenwellTextField(
       label: label,
       hintText: hint,
@@ -193,6 +226,7 @@ class PersonalDetailsScreen extends StatelessWidget {
       keyboardType: keyboardType,
       readOnly: readOnly,
       onTap: onTap,
+        inputFormatters: inputFormatters,
       decoration: _profileFieldDecoration(label, hint),
       validator: (val) =>
           (val == null || val.isEmpty) ? 'Please enter $label' : null,

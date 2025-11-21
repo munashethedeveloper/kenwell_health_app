@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 import 'package:provider/provider.dart';
 import 'package:signature/signature.dart';
+import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/nurse_intervention_view_model.dart';
 
@@ -148,24 +150,27 @@ class NurseInterventionScreen extends StatelessWidget {
                 title: 'Nurse Details',
                 child: Column(
                   children: [
-                    _buildTextField(
-                      'HIV Testing Nurse',
-                      viewModel.hivTestingNurseController,
-                      hint: 'Enter nurse name',
-                      requiredField: true,
-                    ),
+                      _buildTextField(
+                        'HIV Testing Nurse',
+                        viewModel.hivTestingNurseController,
+                        hint: 'Enter nurse name',
+                        requiredField: true,
+                        inputFormatters:
+                            AppTextInputFormatters.lettersOnly(allowHyphen: true),
+                      ),
                     _buildTextField(
                       'Rank',
                       viewModel.rankController,
                       hint: 'Enter nurse rank',
                       requiredField: true,
                     ),
-                    _buildTextField(
-                      'SANC No',
-                      viewModel.sancNumberController,
-                      hint: 'Enter SANC number',
-                      requiredField: true,
-                    ),
+                      _buildTextField(
+                        'SANC No',
+                        viewModel.sancNumberController,
+                        hint: 'Enter SANC number',
+                        requiredField: true,
+                        inputFormatters: AppTextInputFormatters.numbersOnly(),
+                      ),
                     _buildDateField(
                       context,
                       'Date',
@@ -319,12 +324,15 @@ class NurseInterventionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller,
-      {String? hint, bool requiredField = false}) {
+    Widget _buildTextField(String label, TextEditingController controller,
+        {String? hint,
+        bool requiredField = false,
+        List<TextInputFormatter>? inputFormatters}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
         controller: controller,
+          inputFormatters: inputFormatters,
         decoration: _profileFieldDecoration(label, hint),
         validator: requiredField
             ? (val) =>
