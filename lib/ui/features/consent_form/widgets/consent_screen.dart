@@ -79,7 +79,9 @@ class ConsentScreen extends StatelessWidget {
             const SizedBox(height: 16),
 
             // ===== Date Field =====
-            _buildTextField(vm.dateController, 'Date', readOnly: true,
+            _buildTextField(vm.dateController, 'Date',
+                readOnly: true,
+                suffixIcon: const Icon(Icons.calendar_today_outlined),
                 onTap: () async {
               FocusScope.of(context).requestFocus(FocusNode());
               final pickedDate = await showDatePicker(
@@ -270,6 +272,7 @@ class ConsentScreen extends StatelessWidget {
     String labelText, {
     bool readOnly = false,
     VoidCallback? onTap,
+    Widget? suffixIcon,
   }) {
     return TextFormField(
       controller: controller,
@@ -282,6 +285,7 @@ class ConsentScreen extends StatelessWidget {
         hintStyle: const TextStyle(color: Color(0xFF757575)),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        suffixIcon: suffixIcon,
         border: authOutlineInputBorder,
         enabledBorder: authOutlineInputBorder,
         focusedBorder: authOutlineInputBorder.copyWith(

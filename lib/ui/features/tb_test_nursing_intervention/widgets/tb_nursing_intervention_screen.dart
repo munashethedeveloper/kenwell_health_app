@@ -49,40 +49,45 @@ class TBNursingInterventionScreen extends StatelessWidget {
                         fontSize: 16,
                         color: Color(0xFF201C58)),
                   ),
-                  const SizedBox(height: 16),
-                  CheckboxListTile(
-                    title: const Text('Member not referred – reason?'),
-                    value: viewModel.memberNotReferred,
-                    onChanged: viewModel.toggleMemberNotReferred,
-                  ),
-                  if (viewModel.memberNotReferred)
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          left: 16.0, right: 8.0, bottom: 8.0),
-                      child: TextField(
-                        controller: viewModel.reasonController,
-                        decoration: _profileFieldDecoration(
-                          'Enter reason',
-                          'Provide additional detail',
-                        ),
-                        maxLines: 2,
-                      ),
+                    const SizedBox(height: 16),
+                    RadioListTile<TBNursingReferralOption>(
+                      title: const Text('Member not referred – reason?'),
+                      value: TBNursingReferralOption.memberNotReferred,
+                      groupValue: viewModel.selectedReferralOption,
+                      onChanged: viewModel.setReferralOption,
                     ),
-                  CheckboxListTile(
-                    title: const Text('Member referred to GP'),
-                    value: viewModel.referredToGP,
-                    onChanged: viewModel.toggleReferredToGP,
-                  ),
-                  CheckboxListTile(
-                    title: const Text('Member referred to state HIV clinic'),
-                    value: viewModel.referredToStateHIVClinic,
-                    onChanged: viewModel.toggleReferredToStateHIVClinic,
-                  ),
-                  CheckboxListTile(
-                    title: const Text('Member referred for OH consultation'),
-                    value: viewModel.referredToOHConsultation,
-                    onChanged: viewModel.toggleReferredToOHConsultation,
-                  ),
+                    if (viewModel.selectedReferralOption ==
+                        TBNursingReferralOption.memberNotReferred)
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 16.0, right: 8.0, bottom: 8.0),
+                        child: TextField(
+                          controller: viewModel.reasonController,
+                          decoration: _profileFieldDecoration(
+                            'Enter reason',
+                            'Provide additional detail',
+                          ),
+                          maxLines: 2,
+                        ),
+                      ),
+                    RadioListTile<TBNursingReferralOption>(
+                      title: const Text('Member referred to GP'),
+                      value: TBNursingReferralOption.referredToGP,
+                      groupValue: viewModel.selectedReferralOption,
+                      onChanged: viewModel.setReferralOption,
+                    ),
+                    RadioListTile<TBNursingReferralOption>(
+                      title: const Text('Member referred to state HIV clinic'),
+                      value: TBNursingReferralOption.referredToStateHIVClinic,
+                      groupValue: viewModel.selectedReferralOption,
+                      onChanged: viewModel.setReferralOption,
+                    ),
+                    RadioListTile<TBNursingReferralOption>(
+                      title: const Text('Member referred for OH consultation'),
+                      value: TBNursingReferralOption.referredToOHConsultation,
+                      groupValue: viewModel.selectedReferralOption,
+                      onChanged: viewModel.setReferralOption,
+                    ),
                 ],
               ),
             ),

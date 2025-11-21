@@ -41,7 +41,10 @@ class StatsReportScreen extends StatelessWidget {
                     if (selectedDate != null) vm.setEventDate(selectedDate);
                   },
                   child: InputDecorator(
-                    decoration: const InputDecoration(labelText: 'Event Date'),
+                    decoration: const InputDecoration(
+                      labelText: 'Event Date',
+                      suffixIcon: Icon(Icons.calendar_today_outlined),
+                    ),
                     child: Text(
                       vm.eventDate != null
                           ? DateFormat.yMMMd().format(vm.eventDate!)
@@ -58,14 +61,20 @@ class StatsReportScreen extends StatelessWidget {
 
                 // Start Time
                 TextFormField(
-                  decoration: const InputDecoration(labelText: 'Start Time'),
+                  decoration: const InputDecoration(
+                    labelText: 'Start Time',
+                    suffixIcon: Icon(Icons.access_time),
+                  ),
                   onChanged: (val) => vm.startTime = val,
                 ),
                 const SizedBox(height: 10),
 
                 // End Time
                 TextFormField(
-                  decoration: const InputDecoration(labelText: 'End Time'),
+                  decoration: const InputDecoration(
+                    labelText: 'End Time',
+                    suffixIcon: Icon(Icons.access_time),
+                  ),
                   onChanged: (val) => vm.endTime = val,
                 ),
                 const SizedBox(height: 10),

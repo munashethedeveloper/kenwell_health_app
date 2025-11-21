@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:signature/signature.dart';
 
+enum TBNursingReferralOption {
+  memberNotReferred,
+  referredToGP,
+  referredToStateHIVClinic,
+  referredToOHConsultation,
+}
+
 class TBNursingInterventionViewModel extends ChangeNotifier {
-  bool memberNotReferred = false;
-  bool referredToGP = false;
-  bool referredToStateHIVClinic = false;
-  bool referredToOHConsultation = false;
+  TBNursingReferralOption? selectedReferralOption;
 
   final TextEditingController reasonController = TextEditingController();
   final TextEditingController sessionNotesController = TextEditingController();
@@ -22,34 +26,19 @@ class TBNursingInterventionViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void toggleMemberNotReferred(bool? value) {
-    memberNotReferred = value ?? false;
-    if (!memberNotReferred) reasonController.clear();
-    notifyListeners();
-  }
-
-  void toggleReferredToGP(bool? value) {
-    referredToGP = value ?? false;
-    notifyListeners();
-  }
-
-  void toggleReferredToStateHIVClinic(bool? value) {
-    referredToStateHIVClinic = value ?? false;
-    notifyListeners();
-  }
-
-  void toggleReferredToOHConsultation(bool? value) {
-    referredToOHConsultation = value ?? false;
+  void setReferralOption(TBNursingReferralOption? option) {
+    if (selectedReferralOption == option) return;
+    selectedReferralOption = option;
+    if (option != TBNursingReferralOption.memberNotReferred) {
+      reasonController.clear();
+    }
     notifyListeners();
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'memberNotReferred': memberNotReferred,
+      'selectedReferralOption': selectedReferralOption?.name,
       'reason': reasonController.text,
-      'referredToGP': referredToGP,
-      'referredToStateHIVClinic': referredToStateHIVClinic,
-      'referredToOHConsultation': referredToOHConsultation,
       'sessionNotes': sessionNotesController.text,
       'hasSignature': signatureController.isNotEmpty,
     };
