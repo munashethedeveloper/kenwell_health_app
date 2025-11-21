@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/stats_report_view_model.dart';
 
@@ -75,6 +77,7 @@ class StatsReportScreen extends StatelessWidget {
                   decoration: const InputDecoration(
                       labelText: 'Expected Participation'),
                   keyboardType: TextInputType.number,
+                  inputFormatters: AppTextInputFormatters.numbersOnly(),
                   onChanged: (val) =>
                       vm.expectedParticipation = int.tryParse(val) ?? 0,
                 ),
@@ -84,6 +87,7 @@ class StatsReportScreen extends StatelessWidget {
                 TextFormField(
                   decoration: const InputDecoration(labelText: 'Registered'),
                   keyboardType: TextInputType.number,
+                  inputFormatters: AppTextInputFormatters.numbersOnly(),
                   onChanged: (val) => vm.registered = int.tryParse(val) ?? 0,
                 ),
                 const SizedBox(height: 10),
@@ -92,6 +96,7 @@ class StatsReportScreen extends StatelessWidget {
                 TextFormField(
                   decoration: const InputDecoration(labelText: 'Screened'),
                   keyboardType: TextInputType.number,
+                  inputFormatters: AppTextInputFormatters.numbersOnly(),
                   onChanged: (val) => vm.screened = int.tryParse(val) ?? 0,
                 ),
                 const SizedBox(height: 30),

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
+import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/profile_view_model.dart';
 
@@ -144,16 +146,33 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
                             style: TextStyle(color: Color(0xFF757575)),
                           ),
                           const SizedBox(height: 24),
-                          _buildTextField(_firstNameController, "First Name"),
+                          _buildTextField(
+                            _firstNameController,
+                            "First Name",
+                            inputFormatters: AppTextInputFormatters.lettersOnly(
+                              allowHyphen: true,
+                            ),
+                          ),
                           const SizedBox(height: 16),
-                          _buildTextField(_lastNameController, "Last Name"),
+                          _buildTextField(
+                            _lastNameController,
+                            "Last Name",
+                            inputFormatters: AppTextInputFormatters.lettersOnly(
+                              allowHyphen: true,
+                            ),
+                          ),
                           const SizedBox(height: 16),
                           _buildTextField(_usernameController, "Username"),
                           const SizedBox(height: 16),
                           _buildTextField(_roleController, "Role"),
                           const SizedBox(height: 16),
-                          _buildTextField(_phoneController, "Phone Number",
-                              keyboardType: TextInputType.phone),
+                          _buildTextField(
+                            _phoneController,
+                            "Phone Number",
+                            keyboardType: TextInputType.phone,
+                            inputFormatters:
+                                AppTextInputFormatters.numbersOnly(),
+                          ),
                           const SizedBox(height: 16),
                           _buildTextField(_emailController, "Email",
                               keyboardType: TextInputType.emailAddress),
@@ -210,11 +229,16 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label,
-      {TextInputType keyboardType = TextInputType.text}) {
+  Widget _buildTextField(
+    TextEditingController controller,
+    String label, {
+    TextInputType keyboardType = TextInputType.text,
+    List<TextInputFormatter>? inputFormatters,
+  }) {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
+      inputFormatters: inputFormatters,
       validator: (v) => (v == null || v.isEmpty) ? "Enter $label" : null,
       decoration: InputDecoration(
         labelText: label,

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 import 'package:provider/provider.dart';
+import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/wellness_screening_results_view_model.dart';
 
@@ -51,6 +53,8 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
                             vm.heightController,
                             hint: 'Enter your height',
                             keyboardType: TextInputType.number,
+                            inputFormatters: AppTextInputFormatters.numbersOnly(
+                                allowDecimal: true),
                           ),
                           const SizedBox(height: 12),
                           _buildTextField(
@@ -58,6 +62,8 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
                             vm.weightController,
                             hint: 'Enter your weight',
                             keyboardType: TextInputType.number,
+                            inputFormatters: AppTextInputFormatters.numbersOnly(
+                                allowDecimal: true),
                           ),
                           const SizedBox(height: 12),
                           _buildTextField(
@@ -78,6 +84,8 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
                             vm.cholesterolController,
                             hint: 'e.g., 5.2',
                             keyboardType: TextInputType.number,
+                            inputFormatters: AppTextInputFormatters.numbersOnly(
+                                allowDecimal: true),
                           ),
                           const SizedBox(height: 12),
                           _buildTextField(
@@ -85,6 +93,8 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
                             vm.bloodSugarController,
                             hint: 'e.g., 6.1',
                             keyboardType: TextInputType.number,
+                            inputFormatters: AppTextInputFormatters.numbersOnly(
+                                allowDecimal: true),
                           ),
                           const SizedBox(height: 12),
                           _buildTextField(
@@ -92,6 +102,8 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
                             vm.waistController,
                             hint: 'e.g., 80',
                             keyboardType: TextInputType.number,
+                            inputFormatters:
+                                AppTextInputFormatters.numbersOnly(),
                           ),
                         ],
                       ),
@@ -151,11 +163,13 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
     String? hint,
     bool readOnly = false,
     TextInputType keyboardType = TextInputType.text,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return TextFormField(
       controller: controller,
       readOnly: readOnly,
       keyboardType: keyboardType,
+      inputFormatters: inputFormatters,
       decoration: _profileFieldDecoration(label, hint),
       validator: (val) {
         if (!readOnly && (val == null || val.isEmpty)) {

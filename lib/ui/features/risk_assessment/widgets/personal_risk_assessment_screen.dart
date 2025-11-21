@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 import 'package:provider/provider.dart';
+import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/custom_yes_no_question.dart';
@@ -140,6 +141,8 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                             controller: vm.dailySmokeController,
                             hintText: 'Enter number of cigarettes/day',
                             keyboardType: TextInputType.number,
+                            inputFormatters:
+                                AppTextInputFormatters.numbersOnly(),
                             decoration: _profileFieldDecoration(
                               'Number per day',
                               'Enter number of cigarettes/day',

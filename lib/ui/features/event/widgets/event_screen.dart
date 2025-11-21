@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
+import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/event_view_model.dart';
 import '../../../../domain/models/wellness_event.dart';
@@ -192,6 +194,9 @@ class _EventScreenState extends State<EventScreen> {
                   controller: widget.viewModel.onsiteContactController,
                   decoration: _profileFieldDecoration(
                       'Contact Person', 'Enter Contact Person'),
+                  inputFormatters: AppTextInputFormatters.lettersOnly(
+                    allowHyphen: true,
+                  ),
                   validator: (val) => (val == null || val.isEmpty)
                       ? 'Enter Contact Person'
                       : null,
@@ -202,6 +207,7 @@ class _EventScreenState extends State<EventScreen> {
                   decoration: _profileFieldDecoration(
                       'Contact Number', 'Enter Contact Number'),
                   keyboardType: TextInputType.phone,
+                  inputFormatters: AppTextInputFormatters.numbersOnly(),
                   validator: (val) => (val == null || val.isEmpty)
                       ? 'Enter Contact Number'
                       : null,
@@ -222,6 +228,9 @@ class _EventScreenState extends State<EventScreen> {
                   controller: widget.viewModel.aeContactController,
                   decoration: _profileFieldDecoration(
                       'Contact Person', 'Enter Contact Person'),
+                  inputFormatters: AppTextInputFormatters.lettersOnly(
+                    allowHyphen: true,
+                  ),
                   validator: (val) => (val == null || val.isEmpty)
                       ? 'Enter Contact Person'
                       : null,
@@ -232,6 +241,7 @@ class _EventScreenState extends State<EventScreen> {
                   decoration: _profileFieldDecoration(
                       'Contact Number', 'Enter Contact Number'),
                   keyboardType: TextInputType.phone,
+                  inputFormatters: AppTextInputFormatters.numbersOnly(),
                   validator: (val) => (val == null || val.isEmpty)
                       ? 'Enter Contact Number'
                       : null,
@@ -245,6 +255,7 @@ class _EventScreenState extends State<EventScreen> {
                   decoration: _profileFieldDecoration(
                       'Expected Participation', 'Enter Expected Participation'),
                   keyboardType: TextInputType.number,
+                  inputFormatters: AppTextInputFormatters.numbersOnly(),
                   validator: (val) => (val == null || val.isEmpty)
                       ? 'Enter Expected Participation'
                       : null,
@@ -255,6 +266,7 @@ class _EventScreenState extends State<EventScreen> {
                   decoration: _profileFieldDecoration(
                       'Passports', 'Enter Number of Passports'),
                   keyboardType: TextInputType.number,
+                  inputFormatters: AppTextInputFormatters.numbersOnly(),
                   validator: (val) =>
                       (val == null || val.isEmpty) ? 'Enter Passports' : null,
                 ),
@@ -264,6 +276,7 @@ class _EventScreenState extends State<EventScreen> {
                   decoration: _profileFieldDecoration(
                       'Nurses', 'Enter Number of Nurses'),
                   keyboardType: TextInputType.number,
+                  inputFormatters: AppTextInputFormatters.numbersOnly(),
                   validator: (val) =>
                       (val == null || val.isEmpty) ? 'Enter Nurses' : null,
                 ),
