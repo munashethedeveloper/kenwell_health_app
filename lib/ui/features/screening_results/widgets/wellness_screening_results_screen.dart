@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_spinbox/flutter_spinbox.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 import 'package:provider/provider.dart';
-import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/wellness_screening_results_view_model.dart';
 
@@ -48,24 +47,24 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
                     _buildCard(
                       child: Column(
                         children: [
-                            _buildTextField(
-                              'Height (m or cm)',
-                              vm.heightController,
+                            _buildSpinBoxField(
+                              label: 'Height (m or cm)',
+                              controller: vm.heightController,
                               hint: 'Enter your height',
-                              keyboardType: TextInputType.number,
-                              inputFormatters:
-                                  AppTextInputFormatters.numbersOnly(
-                                      allowDecimal: true),
+                              min: 0,
+                              max: 300,
+                              step: 0.01,
+                              decimals: 2,
                             ),
                           const SizedBox(height: 12),
-                            _buildTextField(
-                              'Weight (kg)',
-                              vm.weightController,
+                            _buildSpinBoxField(
+                              label: 'Weight (kg)',
+                              controller: vm.weightController,
                               hint: 'Enter your weight',
-                              keyboardType: TextInputType.number,
-                              inputFormatters:
-                                  AppTextInputFormatters.numbersOnly(
-                                      allowDecimal: true),
+                              min: 0,
+                              max: 500,
+                              step: 0.1,
+                              decimals: 1,
                             ),
                           const SizedBox(height: 12),
                           _buildTextField(
@@ -81,33 +80,34 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
                             hint: 'e.g., 120/80',
                           ),
                           const SizedBox(height: 12),
-                            _buildTextField(
-                              'Cholesterol (mmol/L)',
-                              vm.cholesterolController,
+                            _buildSpinBoxField(
+                              label: 'Cholesterol (mmol/L)',
+                              controller: vm.cholesterolController,
                               hint: 'e.g., 5.2',
-                              keyboardType: TextInputType.number,
-                              inputFormatters:
-                                  AppTextInputFormatters.numbersOnly(
-                                      allowDecimal: true),
+                              min: 0,
+                              max: 50,
+                              step: 0.1,
+                              decimals: 1,
                             ),
                           const SizedBox(height: 12),
-                            _buildTextField(
-                              'Blood Sugar (mmol/L)',
-                              vm.bloodSugarController,
+                            _buildSpinBoxField(
+                              label: 'Blood Sugar (mmol/L)',
+                              controller: vm.bloodSugarController,
                               hint: 'e.g., 6.1',
-                              keyboardType: TextInputType.number,
-                              inputFormatters:
-                                  AppTextInputFormatters.numbersOnly(
-                                      allowDecimal: true),
+                              min: 0,
+                              max: 50,
+                              step: 0.1,
+                              decimals: 1,
                             ),
                           const SizedBox(height: 12),
-                            _buildTextField(
-                              'Waist Circumference (cm)',
-                              vm.waistController,
+                            _buildSpinBoxField(
+                              label: 'Waist Circumference (cm)',
+                              controller: vm.waistController,
                               hint: 'e.g., 80',
-                              keyboardType: TextInputType.number,
-                              inputFormatters:
-                                  AppTextInputFormatters.numbersOnly(),
+                              min: 0,
+                              max: 300,
+                              step: 0.5,
+                              decimals: 1,
                             ),
                         ],
                       ),
@@ -167,19 +167,47 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
       String? hint,
       bool readOnly = false,
       TextInputType keyboardType = TextInputType.text,
-      List<TextInputFormatter>? inputFormatters,
     }) {
     return TextFormField(
       controller: controller,
       readOnly: readOnly,
       keyboardType: keyboardType,
-      inputFormatters: inputFormatters,
       decoration: _profileFieldDecoration(label, hint),
       validator: (val) {
         if (!readOnly && (val == null || val.isEmpty)) {
           return 'Please enter $label';
         }
         return null;
+      },
+    );
+  }
+
+  Widget _buildSpinBoxField({
+    required String label,
+    required TextEditingController controller,
+    String? hint,
+    double min = 0,
+    double max = 1000,
+    double step = 1,
+    int decimals = 0,
+  }) {
+    final initialValue =
+        double.tryParse(controller.text.isEmpty ? '0' : controller.text) ?? 0;
+
+    return SpinBox(
+      min: min,
+      max: max,
+      value: initialValue,
+      step: step,
+      decimals: decimals,
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      decoration: _profileFieldDecoration(label, hint),
+      validator: (value) =>
+          value == null ? 'Please enter $label' : null,
+      onChanged: (value) {
+        controller.text = decimals == 0
+            ? value.round().toString()
+            : value.toStringAsFixed(decimals);
       },
     );
   }
