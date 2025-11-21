@@ -9,7 +9,6 @@ import '../../../../domain/models/wellness_event.dart';
 class EventScreen extends StatefulWidget {
   final EventViewModel viewModel;
   final DateTime date;
-  final List<WellnessEvent>? existingEvents;
   final WellnessEvent? existingEvent;
   final void Function(WellnessEvent) onSave;
 
@@ -17,7 +16,6 @@ class EventScreen extends StatefulWidget {
     super.key,
     required this.viewModel,
     required this.date,
-    this.existingEvents,
     this.existingEvent,
     required this.onSave,
   });
@@ -31,12 +29,9 @@ class _EventScreenState extends State<EventScreen> {
   bool _didLoadExistingEvent = false;
 
   @override
-  void initState() {
+    void initState() {
     super.initState();
-    final WellnessEvent? eventToEdit = widget.existingEvent ??
-        (widget.existingEvents != null && widget.existingEvents!.isNotEmpty
-            ? widget.existingEvents!.first
-            : null);
+    final WellnessEvent? eventToEdit = widget.existingEvent;
 
     if (eventToEdit != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -54,10 +49,7 @@ class _EventScreenState extends State<EventScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final WellnessEvent? eventToEdit = widget.existingEvent ??
-        (widget.existingEvents != null && widget.existingEvents!.isNotEmpty
-            ? widget.existingEvents!.first
-            : null);
+      final WellnessEvent? eventToEdit = widget.existingEvent;
     final bool isEditMode = eventToEdit != null;
 
     Widget buildDropdown(String label, String value, List<String> options,

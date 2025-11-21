@@ -89,9 +89,8 @@ Users can now edit wellness events from the event details screen. The feature in
   - Undo restores previous event by calling updateEvent again
 
 #### EventScreen
-- Added `existingEvent` parameter (optional)
-  - Used alongside existing `existingEvents` parameter
-  - Prioritizes `existingEvent` over `existingEvents[0]`
+  - Added `existingEvent` parameter (optional)
+    - Determines edit mode when supplied
 - Added `isEditMode` flag
   - Computed based on presence of event to edit
   - Controls AppBar title and save behavior
