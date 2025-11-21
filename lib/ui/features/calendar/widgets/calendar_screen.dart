@@ -105,9 +105,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   focusedDay: _focusedDay,
                   selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
                   eventLoader: _getEventsForDay,
-                  headerStyle: const HeaderStyle(
+                    headerStyle: const HeaderStyle(
                     formatButtonVisible: false,
-                    titleCentered: true,
+                      titleCentered: true,
+                      titleTextStyle: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF201C58),
+                      ),
                   ),
                     daysOfWeekStyle: const DaysOfWeekStyle(
                       weekdayStyle: TextStyle(
