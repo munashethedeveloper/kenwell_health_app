@@ -108,6 +108,18 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   headerStyle: const HeaderStyle(
                     formatButtonVisible: false,
                     titleCentered: true,
+                    titleTextStyle: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF201C58),
+                    ),
+                  ),
+                  daysOfWeekStyle: const DaysOfWeekStyle(
+                    weekdayStyle: TextStyle(fontWeight: FontWeight.bold),
+                    weekendStyle: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                    ),
                   ),
                   calendarStyle: CalendarStyle(
                     weekendTextStyle: const TextStyle(color: Colors.red),
@@ -154,6 +166,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
+                          color: Color(0xFF201C58),
                         ),
                       ),
                       IconButton(
