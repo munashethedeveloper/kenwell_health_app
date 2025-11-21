@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 import 'package:provider/provider.dart';
+import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/custom_yes_no_question.dart';
@@ -135,19 +136,20 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF201C58)),
                           ),
-                          KenwellTextField(
-                            label: 'Number per day',
-                            controller: vm.dailySmokeController,
-                            hintText: 'Enter number of cigarettes/day',
-                            keyboardType: TextInputType.number,
-                            decoration: _profileFieldDecoration(
-                              'Number per day',
-                              'Enter number of cigarettes/day',
+                            KenwellTextField(
+                              label: 'Number per day',
+                              controller: vm.dailySmokeController,
+                              hintText: 'Enter number of cigarettes/day',
+                              keyboardType: TextInputType.number,
+                              inputFormatters: AppTextInputFormatters.numbersOnly(),
+                              decoration: _profileFieldDecoration(
+                                'Number per day',
+                                'Enter number of cigarettes/day',
+                              ),
+                              validator: (val) => val == null || val.isEmpty
+                                  ? 'Please enter daily smoking amount'
+                                  : null,
                             ),
-                            validator: (val) => val == null || val.isEmpty
-                                ? 'Please enter daily smoking amount'
-                                : null,
-                          ),
                           const SizedBox(height: 8),
                           const Text('3.1 What do you smoke?',
                               style: TextStyle(fontSize: 16)),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/stats_report_view_model.dart';
 
@@ -71,29 +73,32 @@ class StatsReportScreen extends StatelessWidget {
                 const SizedBox(height: 10),
 
                 // Expected Participation
-                TextFormField(
-                  decoration: const InputDecoration(
-                      labelText: 'Expected Participation'),
-                  keyboardType: TextInputType.number,
-                  onChanged: (val) =>
-                      vm.expectedParticipation = int.tryParse(val) ?? 0,
-                ),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                        labelText: 'Expected Participation'),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: AppTextInputFormatters.numbersOnly(),
+                    onChanged: (val) =>
+                        vm.expectedParticipation = int.tryParse(val) ?? 0,
+                  ),
                 const SizedBox(height: 10),
 
                 // Registered
-                TextFormField(
-                  decoration: const InputDecoration(labelText: 'Registered'),
-                  keyboardType: TextInputType.number,
-                  onChanged: (val) => vm.registered = int.tryParse(val) ?? 0,
-                ),
+                  TextFormField(
+                    decoration: const InputDecoration(labelText: 'Registered'),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: AppTextInputFormatters.numbersOnly(),
+                    onChanged: (val) => vm.registered = int.tryParse(val) ?? 0,
+                  ),
                 const SizedBox(height: 10),
 
                 // Screened
-                TextFormField(
-                  decoration: const InputDecoration(labelText: 'Screened'),
-                  keyboardType: TextInputType.number,
-                  onChanged: (val) => vm.screened = int.tryParse(val) ?? 0,
-                ),
+                  TextFormField(
+                    decoration: const InputDecoration(labelText: 'Screened'),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: AppTextInputFormatters.numbersOnly(),
+                    onChanged: (val) => vm.screened = int.tryParse(val) ?? 0,
+                  ),
                 const SizedBox(height: 30),
 
                 // Save / Generate Button

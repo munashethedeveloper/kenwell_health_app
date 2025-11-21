@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
+import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
@@ -51,17 +52,18 @@ class HIVTestScreen extends StatelessWidget {
                       noValue: 'No',
                     ),
                     if (viewModel.firstHIVTest == 'No') ...[
-                      KenwellTextField(
-                        label: 'Month of last test',
-                        hintText: 'MM',
-                        controller: viewModel.lastTestMonthController,
-                        decoration: _profileFieldDecoration(
-                          'Month of last test',
-                          'MM',
+                        KenwellTextField(
+                          label: 'Month of last test',
+                          hintText: 'MM',
+                          controller: viewModel.lastTestMonthController,
+                          decoration: _profileFieldDecoration(
+                            'Month of last test',
+                            'MM',
+                          ),
+                          inputFormatters: AppTextInputFormatters.numbersOnly(),
+                          validator: (val) =>
+                              val == null || val.isEmpty ? 'Required' : null,
                         ),
-                        validator: (val) =>
-                            val == null || val.isEmpty ? 'Required' : null,
-                      ),
                       KenwellTextField(
                         label: 'Year of last test',
                         hintText: 'YYYY',
@@ -70,6 +72,7 @@ class HIVTestScreen extends StatelessWidget {
                           'Year of last test',
                           'YYYY',
                         ),
+                          inputFormatters: AppTextInputFormatters.numbersOnly(),
                         validator: (val) =>
                             val == null || val.isEmpty ? 'Required' : null,
                       ),

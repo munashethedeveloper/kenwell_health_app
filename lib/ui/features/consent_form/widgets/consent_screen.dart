@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 import 'package:provider/provider.dart';
 import 'package:signature/signature.dart';
+import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/consent_screen_view_model.dart';
 
@@ -102,8 +104,12 @@ class ConsentScreen extends StatelessWidget {
             const SizedBox(height: 16),
 
             // ===== Practitioner Field =====
-            _buildTextField(
-                vm.practitionerController, 'Name of Healthcare Practitioner'),
+              _buildTextField(
+                vm.practitionerController,
+                'Name of Healthcare Practitioner',
+                inputFormatters:
+                    AppTextInputFormatters.lettersOnly(allowHyphen: true),
+              ),
           ],
         ),
       ),
@@ -264,17 +270,19 @@ class ConsentScreen extends StatelessWidget {
   }
 
   // ===== Helpers =====
-  static Widget _buildTextField(
-    TextEditingController controller,
-    String labelText, {
-    bool readOnly = false,
-    VoidCallback? onTap,
-    Widget? suffixIcon,
-  }) {
+    static Widget _buildTextField(
+      TextEditingController controller,
+      String labelText, {
+      bool readOnly = false,
+      VoidCallback? onTap,
+      Widget? suffixIcon,
+      List<TextInputFormatter>? inputFormatters,
+    }) {
     return TextFormField(
       controller: controller,
       readOnly: readOnly,
       onTap: onTap,
+        inputFormatters: inputFormatters,
       decoration: InputDecoration(
         labelText: labelText,
         hintText: 'Enter $labelText',
