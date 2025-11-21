@@ -137,8 +137,8 @@ class PersonalDetailsScreen extends StatelessWidget {
         _buildTextField(vm.divisionController, 'Division', 'Enter division'),
         _buildTextField(
             vm.positionController, 'Position / Rank', 'Enter position or rank'),
-        _buildTextField(vm.regionController, 'Region / Province',
-            'Enter region or province'),
+        _buildDropdownField(
+            vm, 'Province', vm.provinces, vm.provinceOptions, vm.setProvince),
         const SizedBox(height: 16),
         _buildDropdownField(vm, 'Employment Status', vm.employmentStatus,
             vm.employmentStatusOptions, vm.setEmploymentStatus),
@@ -174,6 +174,8 @@ class PersonalDetailsScreen extends StatelessWidget {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 2,
+      color: Colors.white,
+      shadowColor: Colors.grey.shade300,
       margin: EdgeInsets.zero,
       child: Padding(padding: const EdgeInsets.all(16), child: child),
     );
@@ -204,6 +206,7 @@ class PersonalDetailsScreen extends StatelessWidget {
       value: value,
       items: items,
       onChanged: onChanged,
+      decoration: _profileFieldDecoration(label, 'Select $label'),
     );
   }
 

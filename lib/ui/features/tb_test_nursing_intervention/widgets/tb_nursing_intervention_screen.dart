@@ -165,6 +165,8 @@ class TBNursingInterventionScreen extends StatelessWidget {
   Widget _buildCard({required Widget child}) {
     return Card(
       elevation: 2,
+      color: Colors.white,
+      shadowColor: Colors.grey.shade300,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       margin: EdgeInsets.zero,
       child: Padding(

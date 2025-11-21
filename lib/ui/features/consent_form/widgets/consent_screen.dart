@@ -61,6 +61,8 @@ class ConsentScreen extends StatelessWidget {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 2,
+      color: Colors.white,
+      shadowColor: Colors.grey.shade300,
       margin: EdgeInsets.zero,
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -154,6 +156,8 @@ class ConsentScreen extends StatelessWidget {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           elevation: 2,
+          color: Colors.white,
+          shadowColor: Colors.grey.shade300,
           child: Column(
             children: screenings
                 .map(
@@ -186,6 +190,8 @@ class ConsentScreen extends StatelessWidget {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           elevation: 2,
+          color: Colors.white,
+          shadowColor: Colors.grey.shade300,
           child: Container(
             padding: const EdgeInsets.all(8),
             height: 160,
@@ -216,7 +222,7 @@ class ConsentScreen extends StatelessWidget {
             onPressed: onCancel,
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
-              side: const BorderSide(color: Colors.grey),
+              side: const BorderSide(color: Color(0xFF201C58)),
             ),
             child: const Text('Cancel'),
           ),
@@ -241,7 +247,7 @@ class ConsentScreen extends StatelessWidget {
                     }
                   },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF201C58),
+              backgroundColor: const Color(0xFF90C048),
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
             child: vm.isSubmitting

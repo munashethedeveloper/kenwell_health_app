@@ -19,12 +19,13 @@ class PersonalDetailsViewModel extends ChangeNotifier {
   final personalNumberController = TextEditingController();
   final divisionController = TextEditingController();
   final positionController = TextEditingController();
-  final regionController = TextEditingController();
+  // final regionController = TextEditingController();
 
   // Dropdown values
   String? maritalStatus;
   String? gender;
   String? employmentStatus;
+  String? provinces;
 
   // Dropdown options
   final List<String> maritalStatusOptions = [
@@ -33,6 +34,19 @@ class PersonalDetailsViewModel extends ChangeNotifier {
     'Married',
     'Divorced'
   ];
+
+  final List<String> provinceOptions = [
+    'Gauteng',
+    'Western Cape',
+    'KwaZulu-Natal',
+    'Eastern Cape',
+    'Limpopo',
+    'Mpumalanga',
+    'North West',
+    'Free State',
+    'Northern Cape'
+  ];
+
   final List<String> genderOptions = ['Male', 'Female'];
   final List<String> employmentStatusOptions = [
     'Permanent fulltime',
@@ -48,6 +62,13 @@ class PersonalDetailsViewModel extends ChangeNotifier {
   void setMaritalStatus(String? value) {
     if (maritalStatus != value) {
       maritalStatus = value;
+      notifyListeners();
+    }
+  }
+
+  void setProvince(String? value) {
+    if (provinces != value) {
+      provinces = value;
       notifyListeners();
     }
   }
@@ -71,7 +92,8 @@ class PersonalDetailsViewModel extends ChangeNotifier {
       formKey.currentState?.validate() == true &&
       maritalStatus != null &&
       gender != null &&
-      employmentStatus != null;
+      employmentStatus != null &&
+      provinces != null;
 
   // Convert to Map
   Map<String, dynamic> toMap() => {
@@ -89,7 +111,7 @@ class PersonalDetailsViewModel extends ChangeNotifier {
         'personalNumber': personalNumberController.text,
         'division': divisionController.text,
         'position': positionController.text,
-        'region': regionController.text,
+        'region': provinces,
         'maritalStatus': maritalStatus,
         'gender': gender,
         'employmentStatus': employmentStatus,
@@ -121,7 +143,7 @@ class PersonalDetailsViewModel extends ChangeNotifier {
       personalNumberController,
       divisionController,
       positionController,
-      regionController,
+      // regionController,
     ].forEach((c) => c.dispose());
     super.dispose();
   }

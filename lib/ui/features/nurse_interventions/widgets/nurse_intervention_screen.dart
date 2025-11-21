@@ -293,17 +293,7 @@ class NurseInterventionScreen extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 12),
       child: DropdownButtonFormField<String>(
         initialValue: value,
-        decoration: InputDecoration(
-          labelText: label,
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          border: authOutlineInputBorder,
-          enabledBorder: authOutlineInputBorder,
-          focusedBorder: authOutlineInputBorder.copyWith(
-            borderSide: const BorderSide(color: Color(0xFFFF7643)),
-          ),
-        ),
+        decoration: _profileFieldDecoration(label, 'Select $label'),
         items: options
             .map((opt) => DropdownMenuItem(value: opt, child: Text(opt)))
             .toList(),
@@ -339,7 +329,6 @@ class NurseInterventionScreen extends StatelessWidget {
       child: TextFormField(
         controller: controller,
         readOnly: true,
-        decoration: _profileFieldDecoration(label, null),
         onTap: () async {
           FocusScope.of(context).requestFocus(FocusNode());
           final pickedDate = await showDatePicker(
