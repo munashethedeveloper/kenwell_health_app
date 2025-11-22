@@ -5,6 +5,7 @@ import 'package:kenwell_health_app/utils/input_formatters.dart';
 
 import '../../../../domain/models/wellness_event.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/buttons/custom_primary_button.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_date_field.dart';
@@ -182,63 +183,55 @@ class _EventScreenState extends State<EventScreen> {
                       widget.viewModel.servicesRequested = val ?? '',
                 ),
               ]),
-              _buildSectionCard('Time Details', [
-                _buildTimeField(
-                  label: 'Setup Time',
-                  controller: widget.viewModel.setUpTimeController,
-                  onPickTime: () => widget.viewModel
-                      .pickTime(context, widget.viewModel.setUpTimeController),
-                ),
-                _buildTimeField(
-                  label: 'Start Time',
-                  controller: widget.viewModel.startTimeController,
-                  onPickTime: () => widget.viewModel
-                      .pickTime(context, widget.viewModel.startTimeController),
-                ),
-                _buildTimeField(
-                  label: 'End Time',
-                  controller: widget.viewModel.endTimeController,
-                  onPickTime: () => widget.viewModel
-                      .pickTime(context, widget.viewModel.endTimeController),
-                ),
-                _buildTimeField(
-                  label: 'Strike Down Time',
-                  controller: widget.viewModel.strikeDownTimeController,
-                  onPickTime: () => widget.viewModel.pickTime(
-                      context, widget.viewModel.strikeDownTimeController),
-                ),
-              ]),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    final eventDate = DateTime.tryParse(
-                            widget.viewModel.dateController.text) ??
-                        widget.date;
-                    WellnessEvent eventToSave;
-                    if (isEditMode) {
-                      eventToSave = widget.viewModel
-                          .buildEvent(eventDate)
-                          .copyWith(id: eventToEdit.id);
-                    } else {
-                      eventToSave = widget.viewModel.buildEvent(eventDate);
+                _buildSectionCard('Time Details', [
+                  _buildTimeField(
+                    label: 'Setup Time',
+                    controller: widget.viewModel.setUpTimeController,
+                    onPickTime: () => widget.viewModel
+                        .pickTime(context, widget.viewModel.setUpTimeController),
+                  ),
+                  _buildTimeField(
+                    label: 'Start Time',
+                    controller: widget.viewModel.startTimeController,
+                    onPickTime: () => widget.viewModel
+                        .pickTime(context, widget.viewModel.startTimeController),
+                  ),
+                  _buildTimeField(
+                    label: 'End Time',
+                    controller: widget.viewModel.endTimeController,
+                    onPickTime: () => widget.viewModel
+                        .pickTime(context, widget.viewModel.endTimeController),
+                  ),
+                  _buildTimeField(
+                    label: 'Strike Down Time',
+                    controller: widget.viewModel.strikeDownTimeController,
+                    onPickTime: () => widget.viewModel.pickTime(
+                        context, widget.viewModel.strikeDownTimeController),
+                  ),
+                ]),
+                const SizedBox(height: 20),
+                CustomPrimaryButton(
+                  label: 'Save Event',
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      final eventDate = DateTime.tryParse(
+                              widget.viewModel.dateController.text) ??
+                          widget.date;
+                      WellnessEvent eventToSave;
+                      if (isEditMode) {
+                        eventToSave = widget.viewModel
+                            .buildEvent(eventDate)
+                            .copyWith(id: eventToEdit.id);
+                      } else {
+                        eventToSave = widget.viewModel.buildEvent(eventDate);
+                      }
+                      widget.onSave(eventToSave);
+                      widget.viewModel.clearControllers();
+                      Navigator.pop(context);
                     }
-                    widget.onSave(eventToSave);
-                    widget.viewModel.clearControllers();
-                    Navigator.pop(context);
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF201C58),
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size.fromHeight(50),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                  },
                 ),
-                child: const Text('Save Event',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-              ),
-              const SizedBox(height: 30),
+                const SizedBox(height: 30),
             ],
           ),
         ),

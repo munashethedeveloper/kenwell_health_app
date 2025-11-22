@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 
 import '../../../../domain/models/wellness_event.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/buttons/custom_primary_button.dart';
+import '../../../shared/ui/buttons/custom_secondary_button.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_section_header.dart';
 import '../view_model/event_view_model.dart';
@@ -115,17 +117,24 @@ class EventDetailsScreen extends StatelessWidget {
             'Are you sure you want to delete this event? You can undo this action.',
           ),
           actions: [
-            TextButton(
+            CustomSecondaryButton(
+              label: 'Cancel',
+              minHeight: 40,
+              fullWidth: false,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancel'),
             ),
-            TextButton(
+            CustomPrimaryButton(
+              label: 'Delete',
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              minHeight: 40,
+              fullWidth: false,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               onPressed: () {
                 Navigator.of(dialogContext).pop();
                 _deleteEvent(context);
               },
-              style: TextButton.styleFrom(foregroundColor: Colors.red),
-              child: const Text('Delete'),
             ),
           ],
         );

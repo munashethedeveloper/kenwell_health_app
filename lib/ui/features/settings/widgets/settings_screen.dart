@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../view_model/settings_view_model.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -21,7 +22,10 @@ class SettingsScreen extends StatelessWidget {
             return ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                _buildCard(
+                KenwellFormCard(
+                  margin: EdgeInsets.zero,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   child: SwitchListTile(
                     title: const Text('Dark Mode'),
                     value: viewModel.darkMode,
@@ -29,7 +33,10 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-                _buildCard(
+                KenwellFormCard(
+                  margin: EdgeInsets.zero,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   child: SwitchListTile(
                     title: const Text('Enable Notifications'),
                     value: viewModel.notificationsEnabled,
@@ -37,7 +44,10 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-                _buildCard(
+                KenwellFormCard(
+                  margin: EdgeInsets.zero,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   child: ListTile(
                     title: const Text('Language'),
                     trailing: DropdownButton<String>(
@@ -75,15 +85,4 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  // --- Card wrapper for modern look ---
-  Widget _buildCard({required Widget child}) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        child: child,
-      ),
-    );
-  }
 }

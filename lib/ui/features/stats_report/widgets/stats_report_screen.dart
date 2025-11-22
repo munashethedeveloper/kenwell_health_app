@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
+
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/buttons/custom_primary_button.dart';
+import '../../../shared/ui/form/custom_text_field.dart';
+import '../../../shared/ui/form/kenwell_date_field.dart';
+import '../../../shared/ui/form/kenwell_form_card.dart';
+import '../../../shared/ui/form/kenwell_form_styles.dart';
+import '../../../shared/ui/form/kenwell_section_header.dart';
 import '../view_model/stats_report_view_model.dart';
 
 class StatsReportScreen extends StatelessWidget {
@@ -15,108 +21,158 @@ class StatsReportScreen extends StatelessWidget {
       child: Consumer<StatsReportViewModel>(
         builder: (context, vm, _) => Scaffold(
           appBar: const KenwellAppBar(
-              title: 'Stats & Report', automaticallyImplyLeading: false),
+            title: 'Stats & Report',
+            automaticallyImplyLeading: false,
+          ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 20),
-
-                // Event Title
-                TextFormField(
-                  decoration: const InputDecoration(labelText: 'Event Title'),
-                  onChanged: (val) => vm.eventTitle = val,
-                ),
-                const SizedBox(height: 10),
-
-                // Event Date Picker
-                InkWell(
-                  onTap: () async {
-                    final selectedDate = await showDatePicker(
-                      context: context,
-                      initialDate: vm.eventDate ?? DateTime.now(),
-                      firstDate: DateTime(2020),
-                      lastDate: DateTime(2030),
-                    );
-                    if (selectedDate != null) vm.setEventDate(selectedDate);
-                  },
-                  child: InputDecorator(
-                    decoration: const InputDecoration(labelText: 'Event Date'),
-                    child: Text(
-                      vm.eventDate != null
-                          ? DateFormat.yMMMd().format(vm.eventDate!)
-                          : 'Select date',
-                      style: TextStyle(
-                        color: vm.eventDate != null
-                            ? Colors.black
-                            : Colors.grey[600],
-                      ),
+            child: Form(
+              key: vm.formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const KenwellSectionHeader(
+                    title: 'Capture Event Stats',
+                    subtitle: 'Log the core numbers before generating reports.',
+                  ),
+                  KenwellFormCard(
+                    title: 'Event Details',
+                    child: Column(
+                      children: [
+                        _buildTextField(
+                          controller: vm.eventTitleController,
+                          label: 'Event Title',
+                          validator: (val) => (val == null || val.isEmpty)
+                              ? 'Enter event title'
+                              : null,
+                        ),
+                        KenwellFormStyles.fieldSpacing,
+                        KenwellDateField(
+                          label: 'Event Date',
+                          controller: vm.eventDateController,
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime(2030),
+                          onDateSelected: vm.setEventDate,
+                          validator: (val) => (val == null || val.isEmpty)
+                              ? 'Select event date'
+                              : null,
+                        ),
+                        KenwellFormStyles.fieldSpacing,
+                        _buildTimeField(
+                          context: context,
+                          controller: vm.startTimeController,
+                          label: 'Start Time',
+                          vm: vm,
+                        ),
+                        KenwellFormStyles.fieldSpacing,
+                        _buildTimeField(
+                          context: context,
+                          controller: vm.endTimeController,
+                          label: 'End Time',
+                          vm: vm,
+                        ),
+                      ],
                     ),
                   ),
-                ),
-                const SizedBox(height: 10),
-
-                // Start Time
-                TextFormField(
-                  decoration: const InputDecoration(labelText: 'Start Time'),
-                  onChanged: (val) => vm.startTime = val,
-                ),
-                const SizedBox(height: 10),
-
-                // End Time
-                TextFormField(
-                  decoration: const InputDecoration(labelText: 'End Time'),
-                  onChanged: (val) => vm.endTime = val,
-                ),
-                const SizedBox(height: 10),
-
-                // Expected Participation
-                TextFormField(
-                  decoration: const InputDecoration(
-                      labelText: 'Expected Participation'),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: AppTextInputFormatters.numbersOnly(),
-                  onChanged: (val) =>
-                      vm.expectedParticipation = int.tryParse(val) ?? 0,
-                ),
-                const SizedBox(height: 10),
-
-                // Registered
-                TextFormField(
-                  decoration: const InputDecoration(labelText: 'Registered'),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: AppTextInputFormatters.numbersOnly(),
-                  onChanged: (val) => vm.registered = int.tryParse(val) ?? 0,
-                ),
-                const SizedBox(height: 10),
-
-                // Screened
-                TextFormField(
-                  decoration: const InputDecoration(labelText: 'Screened'),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: AppTextInputFormatters.numbersOnly(),
-                  onChanged: (val) => vm.screened = int.tryParse(val) ?? 0,
-                ),
-                const SizedBox(height: 30),
-
-                // Save / Generate Button
-                vm.isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : ElevatedButton(
-                        onPressed: vm.generateReport,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF201C58),
-                          foregroundColor: Colors.white,
-                          minimumSize: const Size.fromHeight(50),
+                  const SizedBox(height: 24),
+                  KenwellFormCard(
+                    title: 'Attendance & Throughput',
+                    child: Column(
+                      children: [
+                        _buildNumberField(
+                          controller: vm.expectedParticipationController,
+                          label: 'Expected Participation',
                         ),
-                        child: const Text('Generate Report'),
-                      ),
-              ],
+                        KenwellFormStyles.fieldSpacing,
+                        _buildNumberField(
+                          controller: vm.registeredController,
+                          label: 'Registered',
+                        ),
+                        KenwellFormStyles.fieldSpacing,
+                        _buildNumberField(
+                          controller: vm.screenedController,
+                          label: 'Screened',
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  CustomPrimaryButton(
+                    label: 'Generate Report',
+                    isBusy: vm.isLoading,
+                    onPressed: vm.isLoading
+                        ? null
+                        : () async {
+                            if (!(vm.formKey.currentState?.validate() ?? false)) {
+                              return;
+                            }
+                            final success = await vm.generateReport();
+                            if (!context.mounted) return;
+                            final messenger = ScaffoldMessenger.of(context);
+                            messenger.showSnackBar(
+                              SnackBar(
+                                content: Text(success
+                                    ? 'Report generated successfully.'
+                                    : 'Could not generate report, please try again.'),
+                              ),
+                            );
+                          },
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  static KenwellTextField _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    String? hint,
+    String? Function(String?)? validator,
+  }) {
+    return KenwellTextField(
+      label: label,
+      controller: controller,
+      hintText: hint ?? 'Enter $label',
+      decoration: KenwellFormStyles.decoration(label: label, hint: hint),
+      validator: validator,
+    );
+  }
+
+  static KenwellTextField _buildNumberField({
+    required TextEditingController controller,
+    required String label,
+  }) {
+    return KenwellTextField(
+      label: label,
+      controller: controller,
+      keyboardType: TextInputType.number,
+      inputFormatters: AppTextInputFormatters.numbersOnly(),
+      decoration: KenwellFormStyles.decoration(label: label),
+      validator: (val) =>
+          (val == null || val.isEmpty) ? 'Enter $label' : null,
+    );
+  }
+
+  static KenwellTextField _buildTimeField({
+    required BuildContext context,
+    required TextEditingController controller,
+    required String label,
+    required StatsReportViewModel vm,
+  }) {
+    return KenwellTextField(
+      label: label,
+      controller: controller,
+      readOnly: true,
+      decoration: KenwellFormStyles.decoration(
+        label: label,
+        hint: 'Select $label',
+        suffixIcon: const Icon(Icons.access_time),
+      ),
+      onTap: () => vm.pickTime(context, controller),
     );
   }
 }

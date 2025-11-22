@@ -6,6 +6,8 @@ import '../../../../routing/route_names.dart';
 import '../../event/widgets/event_screen.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../../../data/services/auth_service.dart';
+import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/buttons/custom_primary_button.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 
 class CalendarScreen extends StatefulWidget {
@@ -66,34 +68,35 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'Wellness Planner',
-            style: TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 30),
-          ),
-          automaticallyImplyLeading: false,
-          backgroundColor: const Color(0xFF201C58),
-          centerTitle: true,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.logout, color: Colors.white),
-              tooltip: 'Logout',
-              onPressed: _logout,
+        child: Scaffold(
+          appBar: KenwellAppBar(
+            title: 'Wellness Planner',
+            titleColor: Colors.white,
+            titleStyle: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 30,
             ),
-          ],
-          bottom: const TabBar(
-            indicatorSize: TabBarIndicatorSize.tab,
-            indicator: BoxDecoration(color: Color(0xFF90C048)),
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white,
-            tabs: [
-              Tab(icon: Icon(Icons.calendar_today), text: 'Calendar'),
-              Tab(icon: Icon(Icons.list), text: 'List'),
+            automaticallyImplyLeading: false,
+            backgroundColor: const Color(0xFF201C58),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.logout, color: Colors.white),
+                tooltip: 'Logout',
+                onPressed: _logout,
+              ),
             ],
+            bottom: const TabBar(
+              indicatorSize: TabBarIndicatorSize.tab,
+              indicator: BoxDecoration(color: Color(0xFF90C048)),
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.white,
+              tabs: [
+                Tab(icon: Icon(Icons.calendar_today), text: 'Calendar'),
+                Tab(icon: Icon(Icons.list), text: 'List'),
+              ],
+            ),
           ),
-        ),
         body: TabBarView(
           children: [
             // ===== Calendar Tab =====
@@ -541,14 +544,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.add),
-                  label: const Text('Add another event'),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(48),
-                    backgroundColor: const Color(0xFF201C58),
-                    foregroundColor: Colors.white,
-                  ),
+                CustomPrimaryButton(
+                  label: 'Add another event',
+                  leading: const Icon(Icons.add),
+                  minHeight: 48,
                   onPressed: () {
                     Navigator.pop(ctx);
                     _openEventForm(selectedDay);
