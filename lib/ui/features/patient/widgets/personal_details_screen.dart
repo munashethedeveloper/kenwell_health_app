@@ -72,47 +72,80 @@ class PersonalDetailsScreen extends StatelessWidget {
   Widget _buildPersonalInfoSection(PersonalDetailsViewModel vm) {
     return Column(
       children: [
-        _buildTextField(
-          vm.nameController,
-          'Name',
-          'Enter name',
+        KenwellTextField(
+          label: 'Name',
+          hintText: 'Enter name',
+          controller: vm.nameController,
           inputFormatters:
               AppTextInputFormatters.lettersOnly(allowHyphen: true),
+          validator: (val) =>
+              (val == null || val.isEmpty) ? 'Please enter Name' : null,
         ),
-        _buildTextField(
-          vm.surnameController,
-          'Surname',
-          'Enter surname',
+        KenwellTextField(
+          label: 'Surname',
+          hintText: 'Enter surname',
+          controller: vm.surnameController,
           inputFormatters:
               AppTextInputFormatters.lettersOnly(allowHyphen: true),
+          validator: (val) =>
+              (val == null || val.isEmpty) ? 'Please enter Surname' : null,
         ),
-        _buildTextField(
-          vm.initialsController,
-          'Initials',
-          'Enter initials',
+        KenwellTextField(
+          label: 'Initials',
+          hintText: 'Enter initials',
+          controller: vm.initialsController,
           inputFormatters: AppTextInputFormatters.lettersOnly(),
+          validator: (val) =>
+              (val == null || val.isEmpty) ? 'Please enter Initials' : null,
         ),
-        _buildDropdownField(vm, 'Marital Status', vm.maritalStatus,
-            vm.maritalStatusOptions, vm.setMaritalStatus),
-        _buildDropdownField(
-            vm, 'Gender', vm.gender, vm.genderOptions, vm.setGender),
-        _buildTextField(
-          vm.idNumberController,
-          'ID Number',
-          'Enter ID number',
+        KenwellDropdownField<String>(
+          label: 'Marital Status',
+          value: vm.maritalStatus,
+          items: vm.maritalStatusOptions,
+          onChanged: vm.setMaritalStatus,
+          validator: (val) =>
+              (val == null || val.isEmpty) ? 'Select Marital Status' : null,
+        ),
+        KenwellDropdownField<String>(
+          label: 'Gender',
+          value: vm.gender,
+          items: vm.genderOptions,
+          onChanged: vm.setGender,
+          validator: (val) =>
+              (val == null || val.isEmpty) ? 'Select Gender' : null,
+        ),
+        KenwellTextField(
+          label: 'ID Number',
+          hintText: 'Enter ID number',
+          controller: vm.idNumberController,
           inputFormatters: AppTextInputFormatters.numbersOnly(),
+          validator: (val) =>
+              (val == null || val.isEmpty) ? 'Please enter ID Number' : null,
         ),
-        _buildTextField(
-            vm.nationalityController, 'Nationality', 'Enter nationality'),
-        _buildTextField(
-            vm.emailController, 'Email Address', 'Enter email address',
-            keyboardType: TextInputType.emailAddress),
-        _buildTextField(
-          vm.cellNumberController,
-          'Cell Number',
-          'Enter cell number',
+        KenwellTextField(
+          label: 'Nationality',
+          hintText: 'Enter nationality',
+          controller: vm.nationalityController,
+          validator: (val) =>
+              (val == null || val.isEmpty) ? 'Please enter Nationality' : null,
+        ),
+        KenwellTextField(
+          label: 'Email Address',
+          hintText: 'Enter email address',
+          controller: vm.emailController,
+          keyboardType: TextInputType.emailAddress,
+          validator: (val) => (val == null || val.isEmpty)
+              ? 'Please enter Email Address'
+              : null,
+        ),
+        KenwellTextField(
+          label: 'Cell Number',
+          hintText: 'Enter cell number',
+          controller: vm.cellNumberController,
           keyboardType: TextInputType.phone,
           inputFormatters: AppTextInputFormatters.numbersOnly(),
+          validator: (val) =>
+              (val == null || val.isEmpty) ? 'Please enter Cell Number' : null,
         ),
       ],
     );
@@ -121,13 +154,22 @@ class PersonalDetailsScreen extends StatelessWidget {
   Widget _buildMedicalAidSection(PersonalDetailsViewModel vm) {
     return Column(
       children: [
-        _buildTextField(vm.medicalAidNameController, 'Medical Aid Name',
-            'Enter medical aid name'),
-        _buildTextField(
-          vm.medicalAidNumberController,
-          'Medical Aid Number',
-          'Enter medical aid number',
+        KenwellTextField(
+          label: 'Medical Aid Name',
+          hintText: 'Enter medical aid name',
+          controller: vm.medicalAidNameController,
+          validator: (val) => (val == null || val.isEmpty)
+              ? 'Please enter Medical Aid Name'
+              : null,
+        ),
+        KenwellTextField(
+          label: 'Medical Aid Number',
+          hintText: 'Enter medical aid number',
+          controller: vm.medicalAidNumberController,
           inputFormatters: AppTextInputFormatters.numbersOnly(),
+          validator: (val) => (val == null || val.isEmpty)
+              ? 'Please enter Medical Aid Number'
+              : null,
         ),
       ],
     );
@@ -136,13 +178,37 @@ class PersonalDetailsScreen extends StatelessWidget {
   Widget _buildWorkInfoSection(PersonalDetailsViewModel vm) {
     return Column(
       children: [
-        _buildTextField(vm.divisionController, 'Division', 'Enter division'),
-        _buildTextField(
-            vm.positionController, 'Position / Rank', 'Enter position or rank'),
-        _buildDropdownField(
-            vm, 'Province', vm.provinces, vm.provinceOptions, vm.setProvince),
-        _buildDropdownField(vm, 'Employment Status', vm.employmentStatus,
-            vm.employmentStatusOptions, vm.setEmploymentStatus),
+        KenwellTextField(
+          label: 'Division',
+          hintText: 'Enter division',
+          controller: vm.divisionController,
+          validator: (val) =>
+              (val == null || val.isEmpty) ? 'Please enter Division' : null,
+        ),
+        KenwellTextField(
+          label: 'Position / Rank',
+          hintText: 'Enter position or rank',
+          controller: vm.positionController,
+          validator: (val) => (val == null || val.isEmpty)
+              ? 'Please enter Position / Rank'
+              : null,
+        ),
+        KenwellDropdownField<String>(
+          label: 'Province',
+          value: vm.provinces,
+          items: vm.provinceOptions,
+          onChanged: vm.setProvince,
+          validator: (val) =>
+              (val == null || val.isEmpty) ? 'Select Province' : null,
+        ),
+        KenwellDropdownField<String>(
+          label: 'Employment Status',
+          value: vm.employmentStatus,
+          items: vm.employmentStatusOptions,
+          onChanged: vm.setEmploymentStatus,
+          validator: (val) =>
+              (val == null || val.isEmpty) ? 'Select Employment Status' : null,
+        ),
       ],
     );
   }
@@ -167,41 +233,6 @@ class PersonalDetailsScreen extends StatelessWidget {
       },
       isNextBusy: vm.isSubmitting,
       isNextEnabled: !vm.isSubmitting,
-    );
-  }
-
-  // ===== Helpers =====
-  Widget _buildTextField(
-      TextEditingController controller, String label, String hint,
-      {TextInputType keyboardType = TextInputType.text,
-      bool readOnly = false,
-      VoidCallback? onTap,
-      List<TextInputFormatter>? inputFormatters}) {
-    return KenwellTextField(
-      label: label,
-      hintText: hint,
-      controller: controller,
-      keyboardType: keyboardType,
-      readOnly: readOnly,
-      onTap: onTap,
-      inputFormatters: inputFormatters,
-      decoration: KenwellFormStyles.decoration(label: label, hint: hint),
-      validator: (val) =>
-          (val == null || val.isEmpty) ? 'Please enter $label' : null,
-    );
-  }
-
-  Widget _buildDropdownField<T>(PersonalDetailsViewModel vm, String label,
-      T? value, List<T> items, ValueChanged<T?> onChanged) {
-    return KenwellDropdownField<T>(
-      label: label,
-      value: value,
-      items: items,
-      onChanged: onChanged,
-      decoration: KenwellFormStyles.decoration(
-        label: label,
-        hint: 'Select $label',
-      ),
     );
   }
 }

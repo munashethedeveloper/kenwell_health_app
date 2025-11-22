@@ -100,7 +100,7 @@ class TBNursingInterventionScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             KenwellFormCard(
-              title: 'Signature',
+              //  title: 'Signature',
               child: KenwellSignatureField(
                 controller: viewModel.signatureController,
                 onClear: viewModel.clearSignature,

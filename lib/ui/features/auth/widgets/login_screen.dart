@@ -93,19 +93,30 @@ class _LoginScreenState extends State<LoginScreen> {
                     margin: const EdgeInsets.only(bottom: 16),
                     child: Column(
                       children: [
-                        _buildTextField(
-                          _emailController,
-                          "Email",
+                        KenwellTextField(
+                          label: "Email",
+                          controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
+                          padding: EdgeInsets.zero,
+                          validator: (v) =>
+                              (v == null || v.isEmpty) ? "Enter Email" : null,
                         ),
-                        _buildPasswordField(
-                          _passwordController,
-                          "Password",
-                          _obscurePassword,
-                          () {
-                            setState(
-                                () => _obscurePassword = !_obscurePassword);
-                          },
+                        const SizedBox(height: 24),
+                        KenwellTextField(
+                          label: "Password",
+                          controller: _passwordController,
+                          obscureText: _obscurePassword,
+                          padding: EdgeInsets.zero,
+                          suffixIcon: IconButton(
+                            icon: Icon(_obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility),
+                            onPressed: () => setState(
+                                () => _obscurePassword = !_obscurePassword),
+                          ),
+                          validator: (v) => (v == null || v.isEmpty)
+                              ? "Enter Password"
+                              : null,
                         ),
                       ],
                     ),
@@ -153,40 +164,6 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildTextField(TextEditingController controller, String label,
-      {TextInputType keyboardType = TextInputType.text}) {
-    return KenwellTextField(
-      label: label,
-      controller: controller,
-      keyboardType: keyboardType,
-      decoration: KenwellFormStyles.decoration(
-        label: label,
-        hint: "Enter $label",
-      ),
-      validator: (v) => (v == null || v.isEmpty) ? "Enter $label" : null,
-      padding: EdgeInsets.zero,
-    );
-  }
-
-  Widget _buildPasswordField(TextEditingController controller, String label,
-      bool obscureText, VoidCallback toggleObscure) {
-    return KenwellTextField(
-      label: label,
-      controller: controller,
-      obscureText: obscureText,
-      decoration: KenwellFormStyles.decoration(
-        label: label,
-        hint: "Enter $label",
-        suffixIcon: IconButton(
-          icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility),
-          onPressed: toggleObscure,
-        ),
-      ),
-      validator: (v) => (v == null || v.isEmpty) ? "Enter $label" : null,
-      padding: EdgeInsets.zero,
     );
   }
 }

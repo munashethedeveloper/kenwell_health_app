@@ -47,35 +47,45 @@ class NurseInterventionScreen extends StatelessWidget {
                 title: 'Initial Assessment',
                 child: Column(
                   children: [
-                    _buildDropdownField(
+                    KenwellDropdownField<String>(
                       label: 'Window period risk assessment',
                       value: viewModel.windowPeriod,
-                      options: viewModel.windowPeriodOptions,
+                      items: viewModel.windowPeriodOptions,
                       onChanged: viewModel.setWindowPeriod,
+                      validator:
+                          _requireSelection('Window period risk assessment'),
                     ),
-                    _buildDropdownField(
+                    KenwellDropdownField<String>(
                       label: 'Did patient expect HIV (+) result?',
                       value: viewModel.expectedResult,
-                      options: viewModel.expectedResultOptions,
+                      items: viewModel.expectedResultOptions,
                       onChanged: viewModel.setExpectedResult,
+                      validator: _requireSelection(
+                          'Did patient expect HIV (+) result?'),
                     ),
-                    _buildDropdownField(
+                    KenwellDropdownField<String>(
                       label: 'Difficulty in dealing with result?',
                       value: viewModel.difficultyDealingResult,
-                      options: viewModel.difficultyOptions,
+                      items: viewModel.difficultyOptions,
                       onChanged: viewModel.setDifficultyDealingResult,
+                      validator: _requireSelection(
+                          'Difficulty in dealing with result?'),
                     ),
-                    _buildDropdownField(
+                    KenwellDropdownField<String>(
                       label: 'Urgent psychosocial follow-up needed?',
                       value: viewModel.urgentPsychosocial,
-                      options: viewModel.urgentOptions,
+                      items: viewModel.urgentOptions,
                       onChanged: viewModel.setUrgentPsychosocial,
+                      validator: _requireSelection(
+                          'Urgent psychosocial follow-up needed?'),
                     ),
-                    _buildDropdownField(
+                    KenwellDropdownField<String>(
                       label: 'Committed to change behavior?',
                       value: viewModel.committedToChange,
-                      options: viewModel.committedOptions,
+                      items: viewModel.committedOptions,
                       onChanged: viewModel.setCommittedToChange,
+                      validator:
+                          _requireSelection('Committed to change behavior?'),
                     ),
                   ],
                 ),
@@ -92,11 +102,13 @@ class NurseInterventionScreen extends StatelessWidget {
                     ),
                     if (viewModel.nursingReferralSelection ==
                         NursingReferralOption.patientNotReferred)
-                      _buildTextField(
+                      KenwellTextField(
                         label: 'Reason patient not referred',
+                        hintText: 'Enter reason',
                         controller: viewModel.notReferredReasonController,
-                        hint: 'Enter reason',
-                        requiredField: true,
+                        validator: (val) => (val == null || val.isEmpty)
+                            ? 'Please enter Reason patient not referred'
+                            : null,
                       ),
                     _buildReferralRadio(
                       viewModel: viewModel,
@@ -117,19 +129,21 @@ class NurseInterventionScreen extends StatelessWidget {
                   title: 'Follow-up',
                   child: Column(
                     children: [
-                      _buildDropdownField(
+                      KenwellDropdownField<String>(
                         label: 'Follow-up location',
                         value: viewModel.followUpLocation,
-                        options: viewModel.followUpLocationOptions,
+                        items: viewModel.followUpLocationOptions,
                         onChanged: viewModel.setFollowUpLocation,
-                        requiredField: true,
+                        validator: _requireSelection('Follow-up location'),
                       ),
                       if (viewModel.followUpLocation == 'Other')
-                        _buildTextField(
+                        KenwellTextField(
                           label: 'Other location detail',
+                          hintText: 'Specify other location',
                           controller: viewModel.followUpOtherController,
-                          hint: 'Specify other location',
-                          requiredField: true,
+                          validator: (val) => (val == null || val.isEmpty)
+                              ? 'Please enter Other location detail'
+                              : null,
                         ),
                       KenwellDateField(
                         label: 'Follow-up test date',
@@ -146,26 +160,32 @@ class NurseInterventionScreen extends StatelessWidget {
                 title: 'Nurse Details',
                 child: Column(
                   children: [
-                    _buildTextField(
+                    KenwellTextField(
                       label: 'HIV Testing Nurse',
+                      hintText: 'Enter nurse name',
                       controller: viewModel.hivTestingNurseController,
-                      hint: 'Enter nurse name',
-                      requiredField: true,
                       inputFormatters:
                           AppTextInputFormatters.lettersOnly(allowHyphen: true),
+                      validator: (val) => (val == null || val.isEmpty)
+                          ? 'Please enter HIV Testing Nurse'
+                          : null,
                     ),
-                    _buildTextField(
+                    KenwellTextField(
                       label: 'Rank',
+                      hintText: 'Enter nurse rank',
                       controller: viewModel.rankController,
-                      hint: 'Enter nurse rank',
-                      requiredField: true,
+                      validator: (val) => (val == null || val.isEmpty)
+                          ? 'Please enter Rank'
+                          : null,
                     ),
-                    _buildTextField(
+                    KenwellTextField(
                       label: 'SANC No',
+                      hintText: 'Enter SANC number',
                       controller: viewModel.sancNumberController,
-                      hint: 'Enter SANC number',
-                      requiredField: true,
                       inputFormatters: AppTextInputFormatters.numbersOnly(),
+                      validator: (val) => (val == null || val.isEmpty)
+                          ? 'Please enter SANC No'
+                          : null,
                     ),
                     KenwellDateField(
                       label: 'Date',
@@ -197,29 +217,6 @@ class NurseInterventionScreen extends StatelessWidget {
   }
 
   // ------------------ Reusable Widgets ------------------
-  Widget _buildDropdownField({
-    required String label,
-    required String? value,
-    required List<String> options,
-    required ValueChanged<String?> onChanged,
-    bool requiredField = true,
-  }) {
-    return KenwellDropdownField<String>(
-      label: label,
-      value: value,
-      items: options,
-      onChanged: onChanged,
-      decoration: KenwellFormStyles.decoration(
-        label: label,
-        hint: 'Select $label',
-      ),
-      validator: requiredField
-          ? (val) =>
-              (val == null || val.isEmpty) ? 'Please select $label' : null
-          : null,
-    );
-  }
-
   Widget _buildReferralRadio({
     required NurseInterventionViewModel viewModel,
     required NursingReferralOption option,
@@ -235,22 +232,8 @@ class NurseInterventionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField({
-    required String label,
-    required TextEditingController controller,
-    String? hint,
-    bool requiredField = false,
-    List<TextInputFormatter>? inputFormatters,
-  }) {
-    return KenwellTextField(
-      label: label,
-      hintText: hint,
-      controller: controller,
-      inputFormatters: inputFormatters,
-      decoration: KenwellFormStyles.decoration(label: label, hint: hint),
-      validator: requiredField
-          ? (val) => (val == null || val.isEmpty) ? 'Please enter $label' : null
-          : null,
-    );
+  FormFieldValidator<String> _requireSelection(String label) {
+    return (val) =>
+        (val == null || val.isEmpty) ? 'Please select $label' : null;
   }
 }

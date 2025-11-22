@@ -135,29 +135,29 @@ class HIVTestResultScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCard({required String title, required Widget child}) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 3,
-      shadowColor: Colors.grey.shade300,
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title,
-                style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF201C58))),
-            const SizedBox(height: 12),
-            child,
-          ],
-        ),
-      ),
-    );
-  }
+  // Widget _buildCard({required String title, required Widget child}) {
+  // return Card(
+  //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+  //   elevation: 3,
+  //   shadowColor: Colors.grey.shade300,
+  //   color: Colors.white,
+  //   child: Padding(
+  //     padding: const EdgeInsets.all(16),
+  //    child: Column(
+  //    crossAxisAlignment: CrossAxisAlignment.start,
+  //    children: [
+  //      Text(title,
+  //          style: const TextStyle(
+  //              fontSize: 16,
+  //               fontWeight: FontWeight.bold,
+  //               color: Color(0xFF201C58))),
+  //        const SizedBox(height: 12),
+  //        child,
+  //      ],
+  //    ),
+  //  ),
+  //  );
+  //}
 
   Widget _buildTextField({
     required String label,

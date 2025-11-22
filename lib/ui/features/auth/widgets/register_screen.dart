@@ -10,6 +10,7 @@ import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_styles.dart';
 import '../../../shared/ui/form/kenwell_section_header.dart';
+import '../../../shared/ui/logo/app_logo.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -112,6 +113,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 16),
+                  const AppLogo(size: 200),
+                  const SizedBox(height: 24),
                   const KenwellSectionHeader(
                     title: "Register Account",
                     subtitle:
@@ -122,27 +125,56 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     margin: const EdgeInsets.only(bottom: 16),
                     child: Column(
                       children: [
-                        _buildTextField(
-                          _firstNameController,
-                          "First Name",
+                        KenwellTextField(
+                          label: "First Name",
+                          controller: _firstNameController,
                           inputFormatters: AppTextInputFormatters.lettersOnly(
                             allowHyphen: true,
                           ),
+                          padding: EdgeInsets.zero,
+                          validator: (v) => (v == null || v.isEmpty)
+                              ? "Enter First Name"
+                              : null,
                         ),
-                        _buildTextField(
-                          _lastNameController,
-                          "Last Name",
+                        const SizedBox(height: 24),
+                        KenwellTextField(
+                          label: "Last Name",
+                          controller: _lastNameController,
                           inputFormatters: AppTextInputFormatters.lettersOnly(
                             allowHyphen: true,
                           ),
+                          padding: EdgeInsets.zero,
+                          validator: (v) => (v == null || v.isEmpty)
+                              ? "Enter Last Name"
+                              : null,
                         ),
-                        _buildTextField(_usernameController, "Username"),
-                        _buildTextField(_roleController, "Role"),
-                        _buildTextField(
-                          _phoneController,
-                          "Phone Number",
+                        const SizedBox(height: 24),
+                        KenwellTextField(
+                          label: "Username",
+                          controller: _usernameController,
+                          padding: EdgeInsets.zero,
+                          validator: (v) => (v == null || v.isEmpty)
+                              ? "Enter Username"
+                              : null,
+                        ),
+                        const SizedBox(height: 24),
+                        KenwellTextField(
+                          label: "Role",
+                          controller: _roleController,
+                          padding: EdgeInsets.zero,
+                          validator: (v) =>
+                              (v == null || v.isEmpty) ? "Enter Role" : null,
+                        ),
+                        const SizedBox(height: 24),
+                        KenwellTextField(
+                          label: "Phone Number",
+                          controller: _phoneController,
                           keyboardType: TextInputType.phone,
                           inputFormatters: AppTextInputFormatters.numbersOnly(),
+                          padding: EdgeInsets.zero,
+                          validator: (v) => (v == null || v.isEmpty)
+                              ? "Enter Phone Number"
+                              : null,
                         ),
                       ],
                     ),
@@ -152,28 +184,48 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     margin: const EdgeInsets.only(bottom: 24),
                     child: Column(
                       children: [
-                        _buildTextField(
-                          _emailController,
-                          "Email",
+                        KenwellTextField(
+                          label: "Email",
+                          controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
+                          padding: EdgeInsets.zero,
+                          validator: (v) =>
+                              (v == null || v.isEmpty) ? "Enter Email" : null,
                         ),
-                        _buildPasswordField(
-                          _passwordController,
-                          "Password",
-                          _obscurePassword,
-                          () {
-                            setState(
-                                () => _obscurePassword = !_obscurePassword);
-                          },
+                        const SizedBox(height: 24),
+                        KenwellTextField(
+                          label: "Password",
+                          controller: _passwordController,
+                          obscureText: _obscurePassword,
+                          padding: EdgeInsets.zero,
+                          suffixIcon: IconButton(
+                            icon: Icon(_obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility),
+                            onPressed: () => setState(
+                                () => _obscurePassword = !_obscurePassword),
+                          ),
+                          validator: (v) => (v == null || v.isEmpty)
+                              ? "Enter Password"
+                              : null,
                         ),
-                        _buildPasswordField(
-                          _confirmPasswordController,
-                          "Confirm Password",
-                          _obscureConfirmPassword,
-                          () {
-                            setState(() => _obscureConfirmPassword =
-                                !_obscureConfirmPassword);
-                          },
+                        const SizedBox(height: 24),
+                        KenwellTextField(
+                          label: "Confirm Password",
+                          controller: _confirmPasswordController,
+                          obscureText: _obscureConfirmPassword,
+                          padding: EdgeInsets.zero,
+                          suffixIcon: IconButton(
+                            icon: Icon(_obscureConfirmPassword
+                                ? Icons.visibility_off
+                                : Icons.visibility),
+                            onPressed: () => setState(() =>
+                                _obscureConfirmPassword =
+                                    !_obscureConfirmPassword),
+                          ),
+                          validator: (v) => (v == null || v.isEmpty)
+                              ? "Enter Confirm Password"
+                              : null,
                         ),
                       ],
                     ),
@@ -206,43 +258,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildTextField(
-    TextEditingController controller,
-    String label, {
-    TextInputType keyboardType = TextInputType.text,
-    List<TextInputFormatter>? inputFormatters,
-  }) {
-    return KenwellTextField(
-      label: label,
-      controller: controller,
-      keyboardType: keyboardType,
-      inputFormatters: inputFormatters,
-      decoration:
-          KenwellFormStyles.decoration(label: label, hint: "Enter $label"),
-      validator: (v) => (v == null || v.isEmpty) ? "Enter $label" : null,
-      padding: EdgeInsets.zero,
-    );
-  }
-
-  Widget _buildPasswordField(TextEditingController controller, String label,
-      bool obscureText, VoidCallback toggleObscure) {
-    return KenwellTextField(
-      label: label,
-      controller: controller,
-      obscureText: obscureText,
-      decoration: KenwellFormStyles.decoration(
-        label: label,
-        hint: "Enter $label",
-        suffixIcon: IconButton(
-          icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility),
-          onPressed: toggleObscure,
-        ),
-      ),
-      validator: (v) => (v == null || v.isEmpty) ? "Enter $label" : null,
-      padding: EdgeInsets.zero,
     );
   }
 }

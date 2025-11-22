@@ -98,7 +98,7 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             KenwellFormCard(
-              title: 'Signature',
+              // title: 'Signature',
               child: KenwellSignatureField(
                 controller: viewModel.signatureController,
                 onClear: viewModel.clearSignature,

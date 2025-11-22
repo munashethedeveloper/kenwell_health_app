@@ -50,62 +50,74 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
                       title: 'Measurements',
                       child: Column(
                         children: [
-                          _buildTextField(
-                            'Height (m or cm)',
-                            vm.heightController,
-                            hint: 'Enter your height',
+                          KenwellTextField(
+                            label: 'Height (m or cm)',
+                            hintText: 'Enter your height',
+                            controller: vm.heightController,
                             keyboardType: TextInputType.number,
                             inputFormatters: AppTextInputFormatters.numbersOnly(
                                 allowDecimal: true),
+                            validator: (val) =>
+                                _validateRequired(val, 'Height (m or cm)'),
                           ),
                           const SizedBox(height: 12),
-                          _buildTextField(
-                            'Weight (kg)',
-                            vm.weightController,
-                            hint: 'Enter your weight',
+                          KenwellTextField(
+                            label: 'Weight (kg)',
+                            hintText: 'Enter your weight',
+                            controller: vm.weightController,
                             keyboardType: TextInputType.number,
                             inputFormatters: AppTextInputFormatters.numbersOnly(
                                 allowDecimal: true),
+                            validator: (val) =>
+                                _validateRequired(val, 'Weight (kg)'),
                           ),
                           const SizedBox(height: 12),
-                          _buildTextField(
-                            'BMI',
-                            vm.bmiController,
-                            hint: 'Automatically calculated',
+                          KenwellTextField(
+                            label: 'BMI',
+                            hintText: 'Automatically calculated',
+                            controller: vm.bmiController,
                             readOnly: true,
                           ),
                           const SizedBox(height: 12),
-                          _buildTextField(
-                            'Blood Pressure (mmHg)',
-                            vm.bloodPressureController,
-                            hint: 'e.g., 120/80',
+                          KenwellTextField(
+                            label: 'Blood Pressure (mmHg)',
+                            hintText: 'e.g., 120/80',
+                            controller: vm.bloodPressureController,
+                            validator: (val) =>
+                                _validateRequired(val, 'Blood Pressure (mmHg)'),
                           ),
                           const SizedBox(height: 12),
-                          _buildTextField(
-                            'Cholesterol (mmol/L)',
-                            vm.cholesterolController,
-                            hint: 'e.g., 5.2',
+                          KenwellTextField(
+                            label: 'Cholesterol (mmol/L)',
+                            hintText: 'e.g., 5.2',
+                            controller: vm.cholesterolController,
                             keyboardType: TextInputType.number,
                             inputFormatters: AppTextInputFormatters.numbersOnly(
                                 allowDecimal: true),
+                            validator: (val) =>
+                                _validateRequired(val, 'Cholesterol (mmol/L)'),
                           ),
                           const SizedBox(height: 12),
-                          _buildTextField(
-                            'Blood Sugar (mmol/L)',
-                            vm.bloodSugarController,
-                            hint: 'e.g., 6.1',
+                          KenwellTextField(
+                            label: 'Blood Sugar (mmol/L)',
+                            hintText: 'e.g., 6.1',
+                            controller: vm.bloodSugarController,
                             keyboardType: TextInputType.number,
                             inputFormatters: AppTextInputFormatters.numbersOnly(
                                 allowDecimal: true),
+                            validator: (val) =>
+                                _validateRequired(val, 'Blood Sugar (mmol/L)'),
                           ),
                           const SizedBox(height: 12),
-                          _buildTextField(
-                            'Waist Circumference (cm)',
-                            vm.waistController,
-                            hint: 'e.g., 80',
+                          KenwellTextField(
+                            label: 'Waist Circumference (cm)',
+                            hintText: 'e.g., 80',
+                            controller: vm.waistController,
                             keyboardType: TextInputType.number,
                             inputFormatters:
                                 AppTextInputFormatters.numbersOnly(),
+                            validator: (val) => _validateRequired(
+                                val, 'Waist Circumference (cm)'),
                           ),
                         ],
                       ),
@@ -127,28 +139,10 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(
-    String label,
-    TextEditingController controller, {
-    String? hint,
-    bool readOnly = false,
-    TextInputType keyboardType = TextInputType.text,
-    List<TextInputFormatter>? inputFormatters,
-  }) {
-    return KenwellTextField(
-      label: label,
-      hintText: hint,
-      controller: controller,
-      readOnly: readOnly,
-      keyboardType: keyboardType,
-      inputFormatters: inputFormatters,
-      decoration: KenwellFormStyles.decoration(label: label, hint: hint),
-      validator: (val) {
-        if (!readOnly && (val == null || val.isEmpty)) {
-          return 'Please enter $label';
-        }
-        return null;
-      },
-    );
+  String? _validateRequired(String? value, String label) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter $label';
+    }
+    return null;
   }
 }
