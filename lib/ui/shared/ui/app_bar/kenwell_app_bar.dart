@@ -10,6 +10,7 @@ class KenwellAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.automaticallyImplyLeading = true,
     this.backgroundColor,
     this.titleColor,
+    this.titleStyle,
     this.actions,
     this.bottom,
   });
@@ -19,6 +20,7 @@ class KenwellAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool automaticallyImplyLeading;
   final Color? backgroundColor;
   final Color? titleColor;
+  final TextStyle? titleStyle;
   final List<Widget>? actions;
   final PreferredSizeWidget? bottom;
 
@@ -26,15 +28,18 @@ class KenwellAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final Color resolvedBackground =
         backgroundColor ?? KenwellColors.primaryGreen;
-    final Color resolvedTitleColor = titleColor ?? KenwellColors.secondaryNavy;
+    final Color resolvedTitleColor =
+        titleColor ?? KenwellColors.secondaryNavy;
+    final TextStyle resolvedTitleStyle = titleStyle ??
+        TextStyle(
+          color: resolvedTitleColor,
+          fontWeight: FontWeight.bold,
+        );
 
     return AppBar(
       title: Text(
         title,
-        style: TextStyle(
-          color: resolvedTitleColor,
-          fontWeight: FontWeight.bold,
-        ),
+        style: resolvedTitleStyle,
       ),
       centerTitle: centerTitle,
       automaticallyImplyLeading: automaticallyImplyLeading,

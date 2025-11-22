@@ -8,23 +8,36 @@ class CustomSecondaryButton extends StatelessWidget {
     this.onPressed,
     this.minHeight = 50,
     this.padding = const EdgeInsets.symmetric(vertical: 14),
+    this.foregroundColor,
+    this.backgroundColor,
+    this.borderColor,
+    this.fullWidth = true,
   });
 
   final String label;
   final VoidCallback? onPressed;
   final double minHeight;
   final EdgeInsetsGeometry padding;
+  final Color? foregroundColor;
+  final Color? backgroundColor;
+  final Color? borderColor;
+  final bool fullWidth;
 
   @override
   Widget build(BuildContext context) {
+    final Color resolvedForeground =
+        foregroundColor ?? KenwellColors.secondaryNavy;
+    final Color resolvedBackground = backgroundColor ?? Colors.white;
+    final Color resolvedBorder = borderColor ?? resolvedForeground;
+
     return OutlinedButton(
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
-        minimumSize: Size.fromHeight(minHeight),
+        minimumSize: Size(fullWidth ? double.infinity : 0, minHeight),
         padding: padding,
-        backgroundColor: Colors.white,
-        foregroundColor: KenwellColors.secondaryNavy,
-        side: BorderSide(color: KenwellColors.secondaryNavy.withValues()),
+        backgroundColor: resolvedBackground,
+        foregroundColor: resolvedForeground,
+        side: BorderSide(color: resolvedBorder.withValues()),
       ),
       child: Text(label),
     );

@@ -5,6 +5,7 @@ import 'package:kenwell_health_app/utils/input_formatters.dart';
 
 import '../../../../domain/models/wellness_event.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/buttons/custom_primary_button.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_date_field.dart';
@@ -75,59 +76,75 @@ class _EventScreenState extends State<EventScreen> {
                 subtitle:
                     'Complete the event details or update the event information',
               ),
-              _buildSectionCard('Basic Info', [
-                KenwellDateField(
-                  label: 'Event Date',
-                  controller: widget.viewModel.dateController,
-                  dateFormat: 'yyyy-MM-dd',
-                  initialDate: widget.date,
-                ),
-                _buildTextField(
-                  controller: widget.viewModel.titleController,
-                  label: 'Event Title',
-                ),
-                _buildTextField(
-                  controller: widget.viewModel.venueController,
-                  label: 'Venue',
-                ),
-                _buildTextField(
-                  controller: widget.viewModel.addressController,
-                  label: 'Address',
-                ),
-              ]),
-              _buildSectionCard('Onsite Contact', [
-                _buildTextField(
-                  controller: widget.viewModel.onsiteContactController,
-                  label: 'Contact Person',
-                  inputFormatters:
-                      AppTextInputFormatters.lettersOnly(allowHyphen: true),
-                ),
-                _buildTextField(
-                  controller: widget.viewModel.onsiteNumberController,
-                  label: 'Contact Number',
-                  keyboardType: TextInputType.phone,
-                  inputFormatters: AppTextInputFormatters.numbersOnly(),
-                ),
-                _buildTextField(
-                  controller: widget.viewModel.onsiteEmailController,
-                  label: 'Email',
-                  keyboardType: TextInputType.emailAddress,
-                ),
-              ]),
-              _buildSectionCard('AE Contact', [
-                _buildTextField(
-                  controller: widget.viewModel.aeContactController,
-                  label: 'Contact Person',
-                  inputFormatters:
-                      AppTextInputFormatters.lettersOnly(allowHyphen: true),
-                ),
-                _buildTextField(
-                  controller: widget.viewModel.aeNumberController,
-                  label: 'Contact Number',
-                  keyboardType: TextInputType.phone,
-                  inputFormatters: AppTextInputFormatters.numbersOnly(),
-                ),
-              ]),
+                _buildSectionCard('Basic Info', [
+                  KenwellDateField(
+                    label: 'Event Date',
+                    controller: widget.viewModel.dateController,
+                    dateFormat: 'yyyy-MM-dd',
+                    initialDate: widget.date,
+                  ),
+                  KenwellTextField(
+                    label: 'Event Title',
+                    controller: widget.viewModel.titleController,
+                    padding: EdgeInsets.zero,
+                    validator: (value) => _requiredField('Event Title', value),
+                  ),
+                  KenwellTextField(
+                    label: 'Venue',
+                    controller: widget.viewModel.venueController,
+                    padding: EdgeInsets.zero,
+                    validator: (value) => _requiredField('Venue', value),
+                  ),
+                  KenwellTextField(
+                    label: 'Address',
+                    controller: widget.viewModel.addressController,
+                    padding: EdgeInsets.zero,
+                    validator: (value) => _requiredField('Address', value),
+                  ),
+                ]),
+                _buildSectionCard('Onsite Contact', [
+                  KenwellTextField(
+                    label: 'Contact Person',
+                    controller: widget.viewModel.onsiteContactController,
+                    padding: EdgeInsets.zero,
+                    inputFormatters:
+                        AppTextInputFormatters.lettersOnly(allowHyphen: true),
+                    validator: (value) => _requiredField('Contact Person', value),
+                  ),
+                  KenwellTextField(
+                    label: 'Contact Number',
+                    controller: widget.viewModel.onsiteNumberController,
+                    padding: EdgeInsets.zero,
+                    keyboardType: TextInputType.phone,
+                    inputFormatters: AppTextInputFormatters.numbersOnly(),
+                    validator: (value) => _requiredField('Contact Number', value),
+                  ),
+                  KenwellTextField(
+                    label: 'Email',
+                    controller: widget.viewModel.onsiteEmailController,
+                    padding: EdgeInsets.zero,
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (value) => _requiredField('Email', value),
+                  ),
+                ]),
+                _buildSectionCard('AE Contact', [
+                  KenwellTextField(
+                    label: 'Contact Person',
+                    controller: widget.viewModel.aeContactController,
+                    padding: EdgeInsets.zero,
+                    inputFormatters:
+                        AppTextInputFormatters.lettersOnly(allowHyphen: true),
+                    validator: (value) => _requiredField('Contact Person', value),
+                  ),
+                  KenwellTextField(
+                    label: 'Contact Number',
+                    controller: widget.viewModel.aeNumberController,
+                    padding: EdgeInsets.zero,
+                    keyboardType: TextInputType.phone,
+                    inputFormatters: AppTextInputFormatters.numbersOnly(),
+                    validator: (value) => _requiredField('Contact Number', value),
+                  ),
+                ]),
               _buildSectionCard('Participation & Numbers', [
                 _buildSpinBoxField(
                   'Expected Participation',
@@ -142,103 +159,126 @@ class _EventScreenState extends State<EventScreen> {
                   widget.viewModel.nursesController,
                 ),
               ]),
-              _buildSectionCard('Options', [
-                _buildDropdownField(
-                  label: 'Medical Aid',
-                  value: _nullableValue(widget.viewModel.medicalAid),
-                  options: const ['Yes', 'No'],
-                  onChanged: (val) => widget.viewModel.medicalAid = val ?? '',
-                ),
-                _buildDropdownField(
-                  label: 'Non-Members',
-                  value: _nullableValue(widget.viewModel.nonMembers),
-                  options: const ['Yes', 'No'],
-                  onChanged: (val) => widget.viewModel.nonMembers = val ?? '',
-                ),
-                _buildDropdownField(
-                  label: 'Coordinators',
-                  value: _nullableValue(widget.viewModel.coordinators),
-                  options: const ['Yes', 'No'],
-                  onChanged: (val) => widget.viewModel.coordinators = val ?? '',
-                ),
-                _buildDropdownField(
-                  label: 'Multiply Promoters',
-                  value: _nullableValue(widget.viewModel.multiplyPromoters),
-                  options: const ['Yes', 'No'],
-                  onChanged: (val) =>
-                      widget.viewModel.multiplyPromoters = val ?? '',
-                ),
-                _buildDropdownField(
-                  label: 'Mobile Booths',
-                  value: _nullableValue(widget.viewModel.mobileBooths),
-                  options: const ['Yes', 'No'],
-                  onChanged: (val) => widget.viewModel.mobileBooths = val ?? '',
-                ),
-                _buildDropdownField(
-                  label: 'Services Requested',
-                  value: _nullableValue(widget.viewModel.servicesRequested),
-                  options: const ['HRA', 'Other'],
-                  onChanged: (val) =>
-                      widget.viewModel.servicesRequested = val ?? '',
-                ),
-              ]),
-              _buildSectionCard('Time Details', [
-                _buildTimeField(
-                  label: 'Setup Time',
-                  controller: widget.viewModel.setUpTimeController,
-                  onPickTime: () => widget.viewModel
-                      .pickTime(context, widget.viewModel.setUpTimeController),
-                ),
-                _buildTimeField(
-                  label: 'Start Time',
-                  controller: widget.viewModel.startTimeController,
-                  onPickTime: () => widget.viewModel
-                      .pickTime(context, widget.viewModel.startTimeController),
-                ),
-                _buildTimeField(
-                  label: 'End Time',
-                  controller: widget.viewModel.endTimeController,
-                  onPickTime: () => widget.viewModel
-                      .pickTime(context, widget.viewModel.endTimeController),
-                ),
-                _buildTimeField(
-                  label: 'Strike Down Time',
-                  controller: widget.viewModel.strikeDownTimeController,
-                  onPickTime: () => widget.viewModel.pickTime(
-                      context, widget.viewModel.strikeDownTimeController),
-                ),
-              ]),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    final eventDate = DateTime.tryParse(
-                            widget.viewModel.dateController.text) ??
-                        widget.date;
-                    WellnessEvent eventToSave;
-                    if (isEditMode) {
-                      eventToSave = widget.viewModel
-                          .buildEvent(eventDate)
-                          .copyWith(id: eventToEdit.id);
-                    } else {
-                      eventToSave = widget.viewModel.buildEvent(eventDate);
+                _buildSectionCard('Options', [
+                  KenwellDropdownField<String>(
+                    label: 'Medical Aid',
+                    value: _nullableValue(widget.viewModel.medicalAid),
+                    items: const ['Yes', 'No'],
+                    onChanged: (val) => widget.viewModel.medicalAid = val ?? '',
+                    padding: EdgeInsets.zero,
+                    validator: (val) => _requiredSelection('Medical Aid', val),
+                  ),
+                  KenwellDropdownField<String>(
+                    label: 'Non-Members',
+                    value: _nullableValue(widget.viewModel.nonMembers),
+                    items: const ['Yes', 'No'],
+                    onChanged: (val) => widget.viewModel.nonMembers = val ?? '',
+                    padding: EdgeInsets.zero,
+                    validator: (val) => _requiredSelection('Non-Members', val),
+                  ),
+                  KenwellDropdownField<String>(
+                    label: 'Coordinators',
+                    value: _nullableValue(widget.viewModel.coordinators),
+                    items: const ['Yes', 'No'],
+                    onChanged: (val) => widget.viewModel.coordinators = val ?? '',
+                    padding: EdgeInsets.zero,
+                    validator: (val) => _requiredSelection('Coordinators', val),
+                  ),
+                  KenwellDropdownField<String>(
+                    label: 'Multiply Promoters',
+                    value: _nullableValue(widget.viewModel.multiplyPromoters),
+                    items: const ['Yes', 'No'],
+                    onChanged: (val) =>
+                        widget.viewModel.multiplyPromoters = val ?? '',
+                    padding: EdgeInsets.zero,
+                    validator: (val) =>
+                        _requiredSelection('Multiply Promoters', val),
+                  ),
+                  KenwellDropdownField<String>(
+                    label: 'Mobile Booths',
+                    value: _nullableValue(widget.viewModel.mobileBooths),
+                    items: const ['Yes', 'No'],
+                    onChanged: (val) => widget.viewModel.mobileBooths = val ?? '',
+                    padding: EdgeInsets.zero,
+                    validator: (val) => _requiredSelection('Mobile Booths', val),
+                  ),
+                  KenwellDropdownField<String>(
+                    label: 'Services Requested',
+                    value: _nullableValue(widget.viewModel.servicesRequested),
+                    items: const ['HRA', 'Other'],
+                    onChanged: (val) =>
+                        widget.viewModel.servicesRequested = val ?? '',
+                    padding: EdgeInsets.zero,
+                    validator: (val) =>
+                        _requiredSelection('Services Requested', val),
+                  ),
+                ]),
+                _buildSectionCard('Time Details', [
+                  KenwellTextField(
+                    label: 'Setup Time',
+                    controller: widget.viewModel.setUpTimeController,
+                    padding: EdgeInsets.zero,
+                    readOnly: true,
+                    suffixIcon: const Icon(Icons.access_time),
+                    validator: (value) => _requiredField('Setup Time', value),
+                    onTap: () => widget.viewModel
+                        .pickTime(context, widget.viewModel.setUpTimeController),
+                  ),
+                  KenwellTextField(
+                    label: 'Start Time',
+                    controller: widget.viewModel.startTimeController,
+                    padding: EdgeInsets.zero,
+                    readOnly: true,
+                    suffixIcon: const Icon(Icons.access_time),
+                    validator: (value) => _requiredField('Start Time', value),
+                    onTap: () => widget.viewModel
+                        .pickTime(context, widget.viewModel.startTimeController),
+                  ),
+                  KenwellTextField(
+                    label: 'End Time',
+                    controller: widget.viewModel.endTimeController,
+                    padding: EdgeInsets.zero,
+                    readOnly: true,
+                    suffixIcon: const Icon(Icons.access_time),
+                    validator: (value) => _requiredField('End Time', value),
+                    onTap: () => widget.viewModel
+                        .pickTime(context, widget.viewModel.endTimeController),
+                  ),
+                  KenwellTextField(
+                    label: 'Strike Down Time',
+                    controller: widget.viewModel.strikeDownTimeController,
+                    padding: EdgeInsets.zero,
+                    readOnly: true,
+                    suffixIcon: const Icon(Icons.access_time),
+                    validator: (value) =>
+                        _requiredField('Strike Down Time', value),
+                    onTap: () => widget.viewModel.pickTime(
+                        context, widget.viewModel.strikeDownTimeController),
+                  ),
+                ]),
+                const SizedBox(height: 20),
+                CustomPrimaryButton(
+                  label: 'Save Event',
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      final eventDate = DateTime.tryParse(
+                              widget.viewModel.dateController.text) ??
+                          widget.date;
+                      WellnessEvent eventToSave;
+                      if (isEditMode) {
+                        eventToSave = widget.viewModel
+                            .buildEvent(eventDate)
+                            .copyWith(id: eventToEdit.id);
+                      } else {
+                        eventToSave = widget.viewModel.buildEvent(eventDate);
+                      }
+                      widget.onSave(eventToSave);
+                      widget.viewModel.clearControllers();
+                      Navigator.pop(context);
                     }
-                    widget.onSave(eventToSave);
-                    widget.viewModel.clearControllers();
-                    Navigator.pop(context);
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF201C58),
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size.fromHeight(50),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                  },
                 ),
-                child: const Text('Save Event',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-              ),
-              const SizedBox(height: 30),
+                const SizedBox(height: 30),
             ],
           ),
         ),
@@ -283,62 +323,10 @@ Widget _buildSectionCard(String title, List<Widget> children) {
   );
 }
 
-Widget _buildTextField({
-  required TextEditingController controller,
-  required String label,
-  String? hint,
-  TextInputType keyboardType = TextInputType.text,
-  List<TextInputFormatter>? inputFormatters,
-}) {
-  return KenwellTextField(
-    label: label,
-    controller: controller,
-    hintText: hint ?? 'Enter $label',
-    keyboardType: keyboardType,
-    inputFormatters: inputFormatters,
-    padding: EdgeInsets.zero,
-    decoration: KenwellFormStyles.decoration(
-        label: label, hint: hint ?? 'Enter $label'),
-    validator: (val) => (val == null || val.isEmpty) ? 'Enter $label' : null,
-  );
-}
-
-Widget _buildTimeField({
-  required String label,
-  required TextEditingController controller,
-  required Future<void> Function() onPickTime,
-}) {
-  return KenwellTextField(
-    label: label,
-    controller: controller,
-    readOnly: true,
-    padding: EdgeInsets.zero,
-    decoration: KenwellFormStyles.decoration(
-      label: label,
-      hint: 'Select $label',
-      suffixIcon: const Icon(Icons.access_time),
-    ),
-    onTap: onPickTime,
-    validator: (val) => (val == null || val.isEmpty) ? 'Select $label' : null,
-  );
-}
-
-Widget _buildDropdownField({
-  required String label,
-  required String? value,
-  required List<String> options,
-  required ValueChanged<String?> onChanged,
-}) {
-  return KenwellDropdownField<String>(
-    label: label,
-    value: value,
-    items: options,
-    onChanged: onChanged,
-    padding: EdgeInsets.zero,
-    decoration:
-        KenwellFormStyles.decoration(label: label, hint: 'Select $label'),
-    validator: (val) => (val == null || val.isEmpty) ? 'Select $label' : null,
-  );
-}
-
 String? _nullableValue(String value) => value.isEmpty ? null : value;
+
+String? _requiredField(String label, String? value) =>
+    (value == null || value.isEmpty) ? 'Enter $label' : null;
+
+String? _requiredSelection(String label, String? value) =>
+    (value == null || value.isEmpty) ? 'Select $label' : null;

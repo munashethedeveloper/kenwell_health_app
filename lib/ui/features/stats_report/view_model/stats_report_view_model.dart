@@ -1,39 +1,90 @@
 import 'package:flutter/material.dart';
 
 class StatsReportViewModel extends ChangeNotifier {
-  // Fields
-  String eventTitle = '';
-  DateTime? eventDate;
-  String startTime = '';
-  String endTime = '';
-  int expectedParticipation = 0;
-  int registered = 0;
-  int screened = 0;
+  StatsReportViewModel() {
+    for (final controller in _allControllers) {
+      controller.addListener(_onFieldChanged);
+    }
+  }
 
+  final formKey = GlobalKey<FormState>();
+
+  final TextEditingController eventTitleController = TextEditingController();
+  final TextEditingController eventDateController = TextEditingController();
+  final TextEditingController startTimeController = TextEditingController();
+  final TextEditingController endTimeController = TextEditingController();
+  final TextEditingController expectedParticipationController =
+      TextEditingController();
+  final TextEditingController registeredController = TextEditingController();
+  final TextEditingController screenedController = TextEditingController();
+
+  DateTime? eventDate;
   bool isLoading = false;
 
-  /// Update event date
+  List<TextEditingController> get _allControllers => [
+        eventTitleController,
+        eventDateController,
+        startTimeController,
+        endTimeController,
+        expectedParticipationController,
+        registeredController,
+        screenedController,
+      ];
+
+  bool get canSubmit =>
+      eventTitleController.text.trim().isNotEmpty && eventDate != null;
+
+  void _onFieldChanged() {
+    notifyListeners();
+  }
+
   void setEventDate(DateTime date) {
     eventDate = date;
     notifyListeners();
   }
 
-  /// Save or generate report logic
-  Future<void> generateReport() async {
-    if (eventTitle.isEmpty || eventDate == null) return;
+  Future<void> pickTime(
+      BuildContext context, TextEditingController controller) async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (picked != null && context.mounted) {
+      controller.text = picked.format(context);
+      notifyListeners();
+    }
+  }
+
+  Future<bool> generateReport() async {
+    if (!canSubmit) return false;
 
     isLoading = true;
     notifyListeners();
 
     try {
-      // In a real app: Save to Firestore or generate downloadable report here
-      await Future.delayed(const Duration(seconds: 1)); // Simulated delay
-      debugPrint('Stats report generated successfully');
-    } catch (e) {
-      debugPrint('Error generating report: $e');
+      // In a real app: Save to Firestore or generate downloadable report here.
+      await Future.delayed(const Duration(seconds: 1));
+      debugPrint(
+        'Stats report generated for ${eventTitleController.text} on $eventDate',
+      );
+      return true;
+    } catch (e, stackTrace) {
+      debugPrint('Error generating report: $e\n$stackTrace');
+      return false;
     } finally {
       isLoading = false;
       notifyListeners();
     }
+  }
+
+  @override
+  void dispose() {
+    for (final controller in _allControllers) {
+      controller
+        ..removeListener(_onFieldChanged)
+        ..dispose();
+    }
+    super.dispose();
   }
 }

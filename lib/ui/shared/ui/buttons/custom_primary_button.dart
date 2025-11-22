@@ -11,6 +11,10 @@ class CustomPrimaryButton extends StatelessWidget {
     this.foregroundColor,
     this.minHeight = 50,
     this.padding = const EdgeInsets.symmetric(vertical: 14),
+    this.leading,
+    this.labelStyle,
+    this.iconGap = 8,
+    this.fullWidth = true,
   });
 
   final String label;
@@ -20,6 +24,10 @@ class CustomPrimaryButton extends StatelessWidget {
   final Color? foregroundColor;
   final double minHeight;
   final EdgeInsetsGeometry padding;
+  final Widget? leading;
+  final TextStyle? labelStyle;
+  final double iconGap;
+  final bool fullWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +41,7 @@ class CustomPrimaryButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: resolvedBackground,
         foregroundColor: resolvedForeground,
-        minimumSize: Size.fromHeight(minHeight),
+        minimumSize: Size(fullWidth ? double.infinity : 0, minHeight),
         padding: padding,
       ),
       child: isBusy
@@ -45,7 +53,31 @@ class CustomPrimaryButton extends StatelessWidget {
                 valueColor: AlwaysStoppedAnimation<Color>(resolvedForeground),
               ),
             )
-          : Text(label),
+          : _buildLabel(resolvedForeground),
+    );
+  }
+
+  Widget _buildLabel(Color resolvedForeground) {
+    final textWidget = Text(
+      label,
+      style: labelStyle,
+    );
+
+    if (leading == null) {
+      return textWidget;
+    }
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        IconTheme(
+          data: IconThemeData(color: resolvedForeground),
+          child: leading!,
+        ),
+        SizedBox(width: iconGap),
+        Flexible(child: textWidget),
+      ],
     );
   }
 }

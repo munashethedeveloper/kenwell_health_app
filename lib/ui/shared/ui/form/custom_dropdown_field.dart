@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'kenwell_form_styles.dart';
+
 class KenwellDropdownField<T> extends StatelessWidget {
   const KenwellDropdownField({
     super.key,
@@ -15,6 +17,10 @@ class KenwellDropdownField<T> extends StatelessWidget {
     this.enabled = true,
     this.isExpanded = true,
     this.hint,
+    this.hintText,
+    this.prefixIcon,
+    this.suffixIcon,
+    this.alwaysFloatLabel = true,
   });
 
   final String label;
@@ -29,13 +35,20 @@ class KenwellDropdownField<T> extends StatelessWidget {
   final bool enabled;
   final bool isExpanded;
   final Widget? hint;
+  final String? hintText;
+  final Widget? prefixIcon;
+  final Widget? suffixIcon;
+  final bool alwaysFloatLabel;
 
   @override
   Widget build(BuildContext context) {
-    final inputDecoration = decoration ??
-        InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
+    final InputDecoration inputDecoration = decoration ??
+        KenwellFormStyles.decoration(
+          label: label,
+          hint: hintText ?? 'Select $label',
+          prefixIcon: prefixIcon,
+          suffixIcon: suffixIcon,
+          alwaysFloat: alwaysFloatLabel,
         );
 
     return Padding(
