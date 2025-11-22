@@ -115,7 +115,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     ),
                   ),
                   daysOfWeekStyle: const DaysOfWeekStyle(
-                    weekdayStyle: TextStyle(fontWeight: FontWeight.bold),
+                    weekdayStyle: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
                     weekendStyle: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.red,
@@ -282,44 +284,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                       color: Colors.white,
                                     ),
                                   ),
-                                  child: Card(
-                                    margin: const EdgeInsets.symmetric(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
                                         vertical: 6, horizontal: 12),
-                                    child: ListTile(
-                                      leading: CircleAvatar(
-                                        backgroundColor: _categoryColor(
-                                            event.servicesRequested),
-                                      ),
-                                      title: Text(
-                                        event.title,
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      subtitle: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          if (event.address.isNotEmpty)
-                                            Text('Address: ${event.address}'),
-                                          if (event.venue.isNotEmpty)
-                                            Text('Venue: ${event.venue}'),
-                                          if (event.startTime.isNotEmpty)
-                                            Text('Start: ${event.startTime}'),
-                                          if (event.endTime.isNotEmpty)
-                                            Text('End: ${event.endTime}'),
-                                        ],
-                                      ),
-                                      onTap: () {
-                                        Navigator.pushNamed(
-                                          context,
-                                          RouteNames.eventDetails,
-                                          arguments: {
-                                            'event': event,
-                                            'viewModel': widget.eventVM,
-                                          },
-                                        );
-                                      },
-                                    ),
+                                    child: _buildModernEventCard(event),
                                   ),
                                 ),
                               ),
@@ -345,6 +313,148 @@ class _CalendarScreenState extends State<CalendarScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildModernEventCard(WellnessEvent event) {
+    final gradient = _eventGradient(event.servicesRequested);
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(18),
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          RouteNames.eventDetails,
+          arguments: {
+            'event': event,
+            'viewModel': widget.eventVM,
+          },
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: gradient,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: gradient.last.withOpacity(0.25),
+              blurRadius: 10,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CircleAvatar(
+                  backgroundColor: Colors.white,
+                  child: Icon(
+                    Icons.event,
+                    color: gradient.last,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        event.title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        event.venue.isNotEmpty
+                            ? event.venue
+                            : (event.address.isNotEmpty ? event.address : ''),
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.85),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.arrow_forward_ios,
+                  size: 16,
+                  color: Colors.white,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                if (event.startTime.isNotEmpty || event.endTime.isNotEmpty)
+                  _buildInfoChip(
+                    icon: Icons.access_time,
+                    label:
+                        (event.startTime.isNotEmpty && event.endTime.isNotEmpty)
+                            ? '${event.startTime} - ${event.endTime}'
+                            : (event.startTime.isNotEmpty
+                                ? event.startTime
+                                : event.endTime),
+                  ),
+                if (event.expectedParticipation > 0)
+                  _buildInfoChip(
+                    icon: Icons.people_alt_outlined,
+                    label: '${event.expectedParticipation} expected',
+                  ),
+                if (event.servicesRequested.isNotEmpty)
+                  _buildInfoChip(
+                    icon: Icons.medical_services_outlined,
+                    label: event.servicesRequested,
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoChip({required IconData icon, required String label}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: Colors.white),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<Color> _eventGradient(String category) {
+    final base = _categoryColor(category);
+    return [
+      base.withOpacity(0.85),
+      base,
+    ];
   }
 
   Future<void> _openEventForm(DateTime date,
