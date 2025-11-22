@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 import 'package:provider/provider.dart';
 import 'package:signature/signature.dart';
+
 import 'package:kenwell_health_app/utils/input_formatters.dart';
+
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/form/custom_text_field.dart';
+import '../../../shared/ui/form/kenwell_checkbox_group.dart';
+import '../../../shared/ui/form/kenwell_date_field.dart';
+import '../../../shared/ui/form/kenwell_form_card.dart';
+import '../../../shared/ui/form/kenwell_form_styles.dart';
+import '../../../shared/ui/form/kenwell_section_header.dart';
+import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/consent_screen_view_model.dart';
 
 class ConsentScreen extends StatelessWidget {
@@ -33,26 +41,20 @@ class ConsentScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'SECTION A: INFORMED CONSENT',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 24,
-                      color: const Color(0xFF201C58),
-                    ),
+              const KenwellSectionHeader(
+                title: 'Section A: Informed Consent',
+                uppercase: true,
               ),
-              const SizedBox(height: 24),
               _buildEventInfoCard(context, vm),
               const SizedBox(height: 24),
               _buildInformationSection(),
               const SizedBox(height: 24),
               _buildScreeningSection(vm),
               const SizedBox(height: 24),
-              _buildCard(
-                title: 'Signature:',
+              KenwellFormCard(
+                title: 'Signature',
                 child: _buildSignatureSection(vm),
               ),
-              // _buildSignatureSection(vm),
               const SizedBox(height: 24),
               _buildActionButtons(context, vm),
             ],
@@ -64,54 +66,26 @@ class ConsentScreen extends StatelessWidget {
 
   // ===== Event Info Card =====
   Widget _buildEventInfoCard(BuildContext context, ConsentScreenViewModel vm) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 2,
-      color: Colors.white,
-      shadowColor: Colors.grey.shade300,
-      margin: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ===== Section B Text =====
-            const Padding(
-              padding: EdgeInsets.only(bottom: 12),
+    return KenwellFormCard(
+      title: 'Event Details',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildTextField(vm.venueController, 'Venue'),
+          const SizedBox(height: 16),
+          KenwellDateField(
+            label: 'Date',
+            controller: vm.dateController,
+          ),
+          const SizedBox(height: 16),
+          _buildTextField(
+            vm.practitionerController,
+            'Name of Healthcare Practitioner',
+            inputFormatters: AppTextInputFormatters.lettersOnly(
+              allowHyphen: true,
             ),
-
-            // ===== Venue Field =====
-            _buildTextField(vm.venueController, 'Venue'),
-            const SizedBox(height: 16),
-
-            // ===== Date Field =====
-            _buildTextField(vm.dateController, 'Date',
-                readOnly: true,
-                suffixIcon: const Icon(Icons.calendar_today_outlined),
-                onTap: () async {
-              FocusScope.of(context).requestFocus(FocusNode());
-              final pickedDate = await showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2100),
-              );
-              if (pickedDate != null) {
-                vm.dateController.text =
-                    '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
-              }
-            }),
-            const SizedBox(height: 16),
-
-            // ===== Practitioner Field =====
-            _buildTextField(
-              vm.practitionerController,
-              'Name of Healthcare Practitioner',
-              inputFormatters:
-                  AppTextInputFormatters.lettersOnly(allowHyphen: true),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -153,37 +127,20 @@ class ConsentScreen extends StatelessWidget {
       {'label': 'HIV', 'field': 'hiv', 'value': vm.hiv},
     ];
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Select applicable screenings:',
-          style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF201C58)),
-        ),
-        const SizedBox(height: 8),
-        Card(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          elevation: 2,
-          color: Colors.white,
-          shadowColor: Colors.grey.shade300,
-          child: Column(
-            children: screenings
-                .map(
-                  (s) => CheckboxListTile(
-                    title: Text(s['label'] as String),
-                    value: s['value'] as bool,
-                    onChanged: (val) =>
-                        vm.toggleCheckbox(s['field'] as String, val),
-                  ),
-                )
-                .toList(),
-          ),
-        ),
-      ],
+    return KenwellFormCard(
+      title: 'Select applicable screenings',
+      child: KenwellCheckboxGroup(
+        options: screenings
+            .map(
+              (s) => KenwellCheckboxOption(
+                label: s['label'] as String,
+                value: s['value'] as bool,
+                onChanged: (val) =>
+                    vm.toggleCheckbox(s['field'] as String, val),
+              ),
+            )
+            .toList(),
+      ),
     );
   }
 
@@ -192,18 +149,17 @@ class ConsentScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 8),
-        Card(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          elevation: 2,
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            height: 160,
-            child: Signature(
-              controller: viewModel.signatureController,
-              backgroundColor: Colors.grey[100]!,
-            ),
+        Container(
+          height: 160,
+          decoration: BoxDecoration(
+            color: Colors.grey[100],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.shade300),
+          ),
+          padding: const EdgeInsets.all(8),
+          child: Signature(
+            controller: viewModel.signatureController,
+            backgroundColor: Colors.grey[100]!,
           ),
         ),
         const SizedBox(height: 8),
@@ -220,52 +176,25 @@ class ConsentScreen extends StatelessWidget {
 
   // ===== Action Buttons =====
   Widget _buildActionButtons(BuildContext context, ConsentScreenViewModel vm) {
-    return Row(
-      children: [
-        Expanded(
-          child: OutlinedButton(
-            onPressed: onCancel,
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              side: const BorderSide(color: Color(0xFF201C58)),
+    return KenwellFormNavigation(
+      previousLabel: 'Cancel',
+      onPrevious: onCancel,
+      onNext: () async {
+        if (vm.formKey.currentState!.validate() && vm.isFormValid) {
+          await vm.submitConsent();
+          onNext();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Please complete all fields and sign before proceeding.',
+              ),
             ),
-            child: const Text('Cancel'),
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: ElevatedButton(
-            onPressed: vm.isSubmitting
-                ? null
-                : () async {
-                    if (vm.formKey.currentState!.validate() && vm.isFormValid) {
-                      await vm.submitConsent();
-                      onNext();
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Please complete all fields and sign before proceeding.',
-                          ),
-                        ),
-                      );
-                    }
-                  },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF90C048),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-            ),
-            child: vm.isSubmitting
-                ? const CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation(Colors.white),
-                  )
-                : const Text(
-                    'Next',
-                    style: TextStyle(color: Colors.white),
-                  ),
-          ),
-        ),
-      ],
+          );
+        }
+      },
+      isNextBusy: vm.isSubmitting,
+      isNextEnabled: !vm.isSubmitting,
     );
   }
 
@@ -275,54 +204,17 @@ class ConsentScreen extends StatelessWidget {
     String labelText, {
     bool readOnly = false,
     VoidCallback? onTap,
-    Widget? suffixIcon,
     List<TextInputFormatter>? inputFormatters,
   }) {
-    return TextFormField(
+    return KenwellTextField(
+      label: labelText,
       controller: controller,
       readOnly: readOnly,
       onTap: onTap,
       inputFormatters: inputFormatters,
-      decoration: InputDecoration(
-        labelText: labelText,
-        hintText: 'Enter $labelText',
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        hintStyle: const TextStyle(color: Color(0xFF757575)),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        suffixIcon: suffixIcon,
-        border: authOutlineInputBorder,
-        enabledBorder: authOutlineInputBorder,
-        focusedBorder: authOutlineInputBorder.copyWith(
-          borderSide: const BorderSide(color: Color(0xFFFF7643)),
-        ),
-      ),
+      decoration: KenwellFormStyles.decoration(label: labelText),
       validator: (val) =>
           (val == null || val.isEmpty) ? 'Please enter $labelText' : null,
-    );
-  }
-
-  Widget _buildCard({required String title, required Widget child}) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 3,
-      shadowColor: Colors.grey.shade300,
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title,
-                style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF201C58))),
-            const SizedBox(height: 12),
-            child,
-          ],
-        ),
-      ),
     );
   }
 
