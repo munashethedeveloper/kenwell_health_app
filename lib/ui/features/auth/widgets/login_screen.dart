@@ -88,28 +88,37 @@ class _LoginScreenState extends State<LoginScreen> {
                     title: 'Welcome Back',
                     subtitle: 'Log in to access your wellness planner',
                   ),
-                  KenwellFormCard(
-                    title: 'Account Details',
-                    margin: const EdgeInsets.only(bottom: 16),
-                    child: Column(
-                      children: [
-                        _buildTextField(
-                          _emailController,
-                          "Email",
-                          keyboardType: TextInputType.emailAddress,
-                        ),
-                        _buildPasswordField(
-                          _passwordController,
-                          "Password",
-                          _obscurePassword,
-                          () {
-                            setState(
-                                () => _obscurePassword = !_obscurePassword);
-                          },
-                        ),
-                      ],
+                    KenwellFormCard(
+                      title: 'Account Details',
+                      margin: const EdgeInsets.only(bottom: 16),
+                      child: Column(
+                        children: [
+                          KenwellTextField(
+                            label: "Email",
+                            controller: _emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            padding: EdgeInsets.zero,
+                            validator: (v) =>
+                                (v == null || v.isEmpty) ? "Enter Email" : null,
+                          ),
+                          KenwellTextField(
+                            label: "Password",
+                            controller: _passwordController,
+                            obscureText: _obscurePassword,
+                            padding: EdgeInsets.zero,
+                            suffixIcon: IconButton(
+                              icon: Icon(_obscurePassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility),
+                              onPressed: () => setState(
+                                  () => _obscurePassword = !_obscurePassword),
+                            ),
+                            validator: (v) =>
+                                (v == null || v.isEmpty) ? "Enter Password" : null,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
@@ -156,37 +165,4 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label,
-      {TextInputType keyboardType = TextInputType.text}) {
-    return KenwellTextField(
-      label: label,
-      controller: controller,
-      keyboardType: keyboardType,
-      decoration: KenwellFormStyles.decoration(
-        label: label,
-        hint: "Enter $label",
-      ),
-      validator: (v) => (v == null || v.isEmpty) ? "Enter $label" : null,
-      padding: EdgeInsets.zero,
-    );
-  }
-
-  Widget _buildPasswordField(TextEditingController controller, String label,
-      bool obscureText, VoidCallback toggleObscure) {
-    return KenwellTextField(
-      label: label,
-      controller: controller,
-      obscureText: obscureText,
-      decoration: KenwellFormStyles.decoration(
-        label: label,
-        hint: "Enter $label",
-        suffixIcon: IconButton(
-          icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility),
-          onPressed: toggleObscure,
-        ),
-      ),
-      validator: (v) => (v == null || v.isEmpty) ? "Enter $label" : null,
-      padding: EdgeInsets.zero,
-    );
-  }
 }

@@ -39,9 +39,10 @@ class StatsReportScreen extends StatelessWidget {
                     title: 'Event Details',
                     child: Column(
                       children: [
-                        _buildTextField(
-                          controller: vm.eventTitleController,
+                        KenwellTextField(
                           label: 'Event Title',
+                          controller: vm.eventTitleController,
+                          padding: EdgeInsets.zero,
                           validator: (val) => (val == null || val.isEmpty)
                               ? 'Enter event title'
                               : null,
@@ -58,18 +59,26 @@ class StatsReportScreen extends StatelessWidget {
                               : null,
                         ),
                         KenwellFormStyles.fieldSpacing,
-                        _buildTimeField(
-                          context: context,
-                          controller: vm.startTimeController,
+                        KenwellTextField(
                           label: 'Start Time',
-                          vm: vm,
+                          controller: vm.startTimeController,
+                          readOnly: true,
+                          padding: EdgeInsets.zero,
+                          suffixIcon: const Icon(Icons.access_time),
+                          validator: (val) =>
+                              (val == null || val.isEmpty) ? 'Select Start Time' : null,
+                          onTap: () => vm.pickTime(context, vm.startTimeController),
                         ),
                         KenwellFormStyles.fieldSpacing,
-                        _buildTimeField(
-                          context: context,
-                          controller: vm.endTimeController,
+                        KenwellTextField(
                           label: 'End Time',
-                          vm: vm,
+                          controller: vm.endTimeController,
+                          readOnly: true,
+                          padding: EdgeInsets.zero,
+                          suffixIcon: const Icon(Icons.access_time),
+                          validator: (val) =>
+                              (val == null || val.isEmpty) ? 'Select End Time' : null,
+                          onTap: () => vm.pickTime(context, vm.endTimeController),
                         ),
                       ],
                     ),
@@ -79,19 +88,35 @@ class StatsReportScreen extends StatelessWidget {
                     title: 'Attendance & Throughput',
                     child: Column(
                       children: [
-                        _buildNumberField(
-                          controller: vm.expectedParticipationController,
+                        KenwellTextField(
                           label: 'Expected Participation',
+                          controller: vm.expectedParticipationController,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: AppTextInputFormatters.numbersOnly(),
+                          padding: EdgeInsets.zero,
+                          validator: (val) => (val == null || val.isEmpty)
+                              ? 'Enter Expected Participation'
+                              : null,
                         ),
                         KenwellFormStyles.fieldSpacing,
-                        _buildNumberField(
-                          controller: vm.registeredController,
+                        KenwellTextField(
                           label: 'Registered',
+                          controller: vm.registeredController,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: AppTextInputFormatters.numbersOnly(),
+                          padding: EdgeInsets.zero,
+                          validator: (val) =>
+                              (val == null || val.isEmpty) ? 'Enter Registered' : null,
                         ),
                         KenwellFormStyles.fieldSpacing,
-                        _buildNumberField(
-                          controller: vm.screenedController,
+                        KenwellTextField(
                           label: 'Screened',
+                          controller: vm.screenedController,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: AppTextInputFormatters.numbersOnly(),
+                          padding: EdgeInsets.zero,
+                          validator: (val) =>
+                              (val == null || val.isEmpty) ? 'Enter Screened' : null,
                         ),
                       ],
                     ),
@@ -127,52 +152,4 @@ class StatsReportScreen extends StatelessWidget {
     );
   }
 
-  static KenwellTextField _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    String? hint,
-    String? Function(String?)? validator,
-  }) {
-    return KenwellTextField(
-      label: label,
-      controller: controller,
-      hintText: hint ?? 'Enter $label',
-      decoration: KenwellFormStyles.decoration(label: label, hint: hint),
-      validator: validator,
-    );
-  }
-
-  static KenwellTextField _buildNumberField({
-    required TextEditingController controller,
-    required String label,
-  }) {
-    return KenwellTextField(
-      label: label,
-      controller: controller,
-      keyboardType: TextInputType.number,
-      inputFormatters: AppTextInputFormatters.numbersOnly(),
-      decoration: KenwellFormStyles.decoration(label: label),
-      validator: (val) =>
-          (val == null || val.isEmpty) ? 'Enter $label' : null,
-    );
-  }
-
-  static KenwellTextField _buildTimeField({
-    required BuildContext context,
-    required TextEditingController controller,
-    required String label,
-    required StatsReportViewModel vm,
-  }) {
-    return KenwellTextField(
-      label: label,
-      controller: controller,
-      readOnly: true,
-      decoration: KenwellFormStyles.decoration(
-        label: label,
-        hint: 'Select $label',
-        suffixIcon: const Icon(Icons.access_time),
-      ),
-      onTap: () => vm.pickTime(context, controller),
-    );
-  }
 }

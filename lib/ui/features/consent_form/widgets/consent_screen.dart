@@ -67,28 +67,36 @@ class ConsentScreen extends StatelessWidget {
 
   // ===== Event Info Card =====
   Widget _buildEventInfoCard(BuildContext context, ConsentScreenViewModel vm) {
-    return KenwellFormCard(
-      title: 'Event Details',
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildTextField(vm.venueController, 'Venue'),
-          const SizedBox(height: 16),
-          KenwellDateField(
-            label: 'Date',
-            controller: vm.dateController,
-          ),
-          const SizedBox(height: 16),
-          _buildTextField(
-            vm.practitionerController,
-            'Name of Healthcare Practitioner',
-            inputFormatters: AppTextInputFormatters.lettersOnly(
-              allowHyphen: true,
+      return KenwellFormCard(
+        title: 'Event Details',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            KenwellTextField(
+              label: 'Venue',
+              controller: vm.venueController,
+              validator: (val) =>
+                  (val == null || val.isEmpty) ? 'Please enter Venue' : null,
             ),
-          ),
-        ],
-      ),
-    );
+            const SizedBox(height: 16),
+            KenwellDateField(
+              label: 'Date',
+              controller: vm.dateController,
+            ),
+            const SizedBox(height: 16),
+            KenwellTextField(
+              label: 'Name of Healthcare Practitioner',
+              controller: vm.practitionerController,
+              inputFormatters: AppTextInputFormatters.lettersOnly(
+                allowHyphen: true,
+              ),
+              validator: (val) => (val == null || val.isEmpty)
+                  ? 'Please enter Name of Healthcare Practitioner'
+                  : null,
+            ),
+          ],
+        ),
+      );
   }
 
   // ===== Information Section =====
@@ -177,27 +185,7 @@ class ConsentScreen extends StatelessWidget {
     );
   }
 
-  // ===== Helpers =====
-  static Widget _buildTextField(
-    TextEditingController controller,
-    String labelText, {
-    bool readOnly = false,
-    VoidCallback? onTap,
-    List<TextInputFormatter>? inputFormatters,
-  }) {
-    return KenwellTextField(
-      label: labelText,
-      controller: controller,
-      readOnly: readOnly,
-      onTap: onTap,
-      inputFormatters: inputFormatters,
-      decoration: KenwellFormStyles.decoration(label: labelText),
-      validator: (val) =>
-          (val == null || val.isEmpty) ? 'Please enter $labelText' : null,
-    );
-  }
-
-  static Widget _buildBullet(String text) {
+    static Widget _buildBullet(String text) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(

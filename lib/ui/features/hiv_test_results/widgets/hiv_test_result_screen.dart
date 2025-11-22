@@ -43,36 +43,42 @@ class HIVTestResultScreen extends StatelessWidget {
               KenwellFormCard(
                 title: 'Screening Test',
                 child: Column(
-                  children: [
-                    _buildTextField(
-                      label: 'Name of Test',
-                      controller: viewModel.screeningTestNameController,
-                      hint: 'Enter test name',
-                    ),
-                    const SizedBox(height: 12),
-                    _buildTextField(
-                      label: 'Batch No',
-                      controller: viewModel.screeningBatchNoController,
-                      hint: 'Enter batch number',
-                    ),
-                    const SizedBox(height: 12),
-                    _buildTextField(
-                      label: 'Expiry Date',
-                      controller: viewModel.screeningExpiryDateController,
-                      readOnly: true,
-                      hint: 'Select expiry date',
-                      suffixIcon: const Icon(Icons.calendar_today),
-                      onTap: () =>
-                          viewModel.pickExpiryDate(context, isScreening: true),
-                    ),
-                    const SizedBox(height: 12),
-                    _buildDropdown(
-                      'Test Result',
-                      ['Negative', 'Positive'],
-                      viewModel.screeningResult,
-                      viewModel.setScreeningResult,
-                    ),
-                  ],
+                    children: [
+                      KenwellTextField(
+                        label: 'Name of Test',
+                        hintText: 'Enter test name',
+                        controller: viewModel.screeningTestNameController,
+                        validator: _requiredField,
+                      ),
+                      const SizedBox(height: 12),
+                      KenwellTextField(
+                        label: 'Batch No',
+                        hintText: 'Enter batch number',
+                        controller: viewModel.screeningBatchNoController,
+                        validator: _requiredField,
+                      ),
+                      const SizedBox(height: 12),
+                      KenwellTextField(
+                        label: 'Expiry Date',
+                        hintText: 'Select expiry date',
+                        controller: viewModel.screeningExpiryDateController,
+                        readOnly: true,
+                        suffixIcon: const Icon(Icons.calendar_today),
+                        onTap: () =>
+                            viewModel.pickExpiryDate(context, isScreening: true),
+                        validator: _requiredField,
+                      ),
+                      const SizedBox(height: 12),
+                      KenwellDropdownField<String>(
+                        label: 'Test Result',
+                        value: viewModel.screeningResult,
+                        items: const ['Negative', 'Positive'],
+                        onChanged: (val) {
+                          if (val != null) viewModel.setScreeningResult(val);
+                        },
+                        validator: _requiredField,
+                      ),
+                    ],
                 ),
               ),
               const SizedBox(height: 24),
@@ -80,45 +86,54 @@ class HIVTestResultScreen extends StatelessWidget {
                 title: 'Confirmatory Test',
                 child: Column(
                   children: [
-                    _buildTextField(
-                      label: 'Name of Test',
-                      controller: viewModel.confirmatoryTestNameController,
-                      hint: 'Enter test name',
-                    ),
-                    const SizedBox(height: 12),
-                    _buildTextField(
-                      label: 'Batch No',
-                      controller: viewModel.confirmatoryBatchNoController,
-                      hint: 'Enter batch number',
-                    ),
-                    const SizedBox(height: 12),
-                    _buildTextField(
-                      label: 'Expiry Date',
-                      controller: viewModel.confirmatoryExpiryDateController,
-                      readOnly: true,
-                      hint: 'Select expiry date',
-                      suffixIcon: const Icon(Icons.calendar_today),
-                      onTap: () =>
-                          viewModel.pickExpiryDate(context, isScreening: false),
-                    ),
-                    const SizedBox(height: 12),
-                    _buildDropdown(
-                      'Test Result',
-                      ['Negative', 'Positive'],
-                      viewModel.confirmatoryResult,
-                      viewModel.setConfirmatoryResult,
-                    ),
+                      KenwellTextField(
+                        label: 'Name of Test',
+                        hintText: 'Enter test name',
+                        controller: viewModel.confirmatoryTestNameController,
+                        validator: _requiredField,
+                      ),
+                      const SizedBox(height: 12),
+                      KenwellTextField(
+                        label: 'Batch No',
+                        hintText: 'Enter batch number',
+                        controller: viewModel.confirmatoryBatchNoController,
+                        validator: _requiredField,
+                      ),
+                      const SizedBox(height: 12),
+                      KenwellTextField(
+                        label: 'Expiry Date',
+                        hintText: 'Select expiry date',
+                        controller: viewModel.confirmatoryExpiryDateController,
+                        readOnly: true,
+                        suffixIcon: const Icon(Icons.calendar_today),
+                        onTap: () =>
+                            viewModel.pickExpiryDate(context, isScreening: false),
+                        validator: _requiredField,
+                      ),
+                      const SizedBox(height: 12),
+                      KenwellDropdownField<String>(
+                        label: 'Test Result',
+                        value: viewModel.confirmatoryResult,
+                        items: const ['Negative', 'Positive'],
+                        onChanged: (val) {
+                          if (val != null) viewModel.setConfirmatoryResult(val);
+                        },
+                        validator: _requiredField,
+                      ),
                   ],
                 ),
               ),
               const SizedBox(height: 24),
               KenwellFormCard(
                 title: 'Final HIV Test Result',
-                child: _buildDropdown(
-                  'Final Result',
-                  ['Negative', 'Positive'],
-                  viewModel.finalResult,
-                  viewModel.setFinalResult,
+                  child: KenwellDropdownField<String>(
+                    label: 'Final Result',
+                    value: viewModel.finalResult,
+                    items: const ['Negative', 'Positive'],
+                    onChanged: (val) {
+                      if (val != null) viewModel.setFinalResult(val);
+                    },
+                    validator: _requiredField,
                 ),
               ),
               const SizedBox(height: 24),
@@ -159,45 +174,6 @@ class HIVTestResultScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField({
-    required String label,
-    required TextEditingController controller,
-    String? hint,
-    bool readOnly = false,
-    VoidCallback? onTap,
-    Widget? suffixIcon,
-  }) {
-    return KenwellTextField(
-      label: label,
-      hintText: hint,
-      controller: controller,
-      readOnly: readOnly,
-      onTap: onTap,
-      decoration: KenwellFormStyles.decoration(
-        label: label,
-        hint: hint,
-        suffixIcon: suffixIcon,
-      ),
-      validator: (val) =>
-          val == null || val.isEmpty ? 'This field is required' : null,
-    );
-  }
-
-  Widget _buildDropdown(String label, List<String> items, String value,
-      void Function(String) onChanged) {
-    return KenwellDropdownField<String>(
-      label: label,
-      value: value,
-      items: items,
-      onChanged: (val) {
-        if (val != null) onChanged(val);
-      },
-      decoration: KenwellFormStyles.decoration(
-        label: label,
-        hint: 'Select $label',
-      ),
-      validator: (val) =>
-          val == null || val.isEmpty ? 'This field is required' : null,
-    );
-  }
+    String? _requiredField(String? value) =>
+        value == null || value.isEmpty ? 'This field is required' : null;
 }
