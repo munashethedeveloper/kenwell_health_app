@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'kenwell_form_styles.dart';
+
 class KenwellTextField extends StatelessWidget {
   const KenwellTextField({
     super.key,
@@ -24,6 +26,9 @@ class KenwellTextField extends StatelessWidget {
     this.expands = false,
     this.hintText,
     this.validator,
+    this.prefixIcon,
+    this.suffixIcon,
+    this.alwaysFloatLabel = true,
   });
 
   final String label;
@@ -46,16 +51,19 @@ class KenwellTextField extends StatelessWidget {
   final bool autofocus;
   final bool expands;
   final String? Function(String?)? validator;
+  final Widget? prefixIcon;
+  final Widget? suffixIcon;
+  final bool alwaysFloatLabel;
 
   @override
   Widget build(BuildContext context) {
-    final inputDecoration = decoration ??
-        InputDecoration(
-          labelText: label,
-          hintText: hintText,
-          border: const OutlineInputBorder(),
-          filled: true,
-          fillColor: Colors.grey[100],
+    final InputDecoration inputDecoration = decoration ??
+        KenwellFormStyles.decoration(
+          label: label,
+          hint: hintText,
+          prefixIcon: prefixIcon,
+          suffixIcon: suffixIcon,
+          alwaysFloat: alwaysFloatLabel,
         );
 
     return Padding(
