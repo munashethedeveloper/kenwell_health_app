@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
+import '../../../shared/ui/form/kenwell_form_card.dart';
+import '../../../shared/ui/form/kenwell_form_styles.dart';
+import '../../../shared/ui/form/kenwell_section_header.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/personal_details_view_model.dart';
 
@@ -35,24 +37,26 @@ class PersonalDetailsScreen extends StatelessWidget {
             child: Form(
               key: vm.formKey,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'SECTION  B: PERSONAL DETAILS',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 24,
-                            color: const Color(0xFF201C58),
-                          ),
-                    ),
+                  const KenwellSectionHeader(
+                    title: 'Section B: Personal Details',
+                    uppercase: true,
+                  ),
+                  KenwellFormCard(
+                    title: 'Personal Information',
+                    child: _buildPersonalInfoSection(vm),
                   ),
                   const SizedBox(height: 24),
-                  _buildCard(child: _buildPersonalInfoSection(context, vm)),
+                  KenwellFormCard(
+                    title: 'Medical Aid Information',
+                    child: _buildMedicalAidSection(vm),
+                  ),
                   const SizedBox(height: 24),
-                  _buildCard(child: _buildMedicalAidSection(vm)),
-                  const SizedBox(height: 24),
-                  _buildCard(child: _buildWorkInfoSection(vm)),
+                  KenwellFormCard(
+                    title: 'Employment Details',
+                    child: _buildWorkInfoSection(vm),
+                  ),
                   const SizedBox(height: 24),
                   _buildNavigationButtons(context, vm),
                 ],
@@ -65,21 +69,9 @@ class PersonalDetailsScreen extends StatelessWidget {
   }
 
   // ===== Sections =====
-  Widget _buildPersonalInfoSection(
-      BuildContext context, PersonalDetailsViewModel vm) {
+  Widget _buildPersonalInfoSection(PersonalDetailsViewModel vm) {
     return Column(
       children: [
-        const Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            'Personal Information',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF201C58),
-            ),
-          ),
-        ),
         _buildTextField(
           vm.nameController,
           'Name',
@@ -129,17 +121,6 @@ class PersonalDetailsScreen extends StatelessWidget {
   Widget _buildMedicalAidSection(PersonalDetailsViewModel vm) {
     return Column(
       children: [
-        const Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            'Medical Aid Information',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF201C58),
-            ),
-          ),
-        ),
         _buildTextField(vm.medicalAidNameController, 'Medical Aid Name',
             'Enter medical aid name'),
         _buildTextField(
@@ -155,23 +136,11 @@ class PersonalDetailsScreen extends StatelessWidget {
   Widget _buildWorkInfoSection(PersonalDetailsViewModel vm) {
     return Column(
       children: [
-        const Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            'Employment Details',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF201C58),
-            ),
-          ),
-        ),
         _buildTextField(vm.divisionController, 'Division', 'Enter division'),
         _buildTextField(
             vm.positionController, 'Position / Rank', 'Enter position or rank'),
         _buildDropdownField(
             vm, 'Province', vm.provinces, vm.provinceOptions, vm.setProvince),
-        //const SizedBox(height: 16), - the spacing between province and employment status textfields
         _buildDropdownField(vm, 'Employment Status', vm.employmentStatus,
             vm.employmentStatusOptions, vm.setEmploymentStatus),
       ],
@@ -202,17 +171,6 @@ class PersonalDetailsScreen extends StatelessWidget {
   }
 
   // ===== Helpers =====
-  Widget _buildCard({required Widget child}) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 2,
-      color: Colors.white,
-      shadowColor: Colors.grey.shade300,
-      margin: EdgeInsets.zero,
-      child: Padding(padding: const EdgeInsets.all(16), child: child),
-    );
-  }
-
   Widget _buildTextField(
       TextEditingController controller, String label, String hint,
       {TextInputType keyboardType = TextInputType.text,
@@ -227,7 +185,7 @@ class PersonalDetailsScreen extends StatelessWidget {
       readOnly: readOnly,
       onTap: onTap,
       inputFormatters: inputFormatters,
-      decoration: _profileFieldDecoration(label, hint),
+      decoration: KenwellFormStyles.decoration(label: label, hint: hint),
       validator: (val) =>
           (val == null || val.isEmpty) ? 'Please enter $label' : null,
     );
@@ -240,21 +198,9 @@ class PersonalDetailsScreen extends StatelessWidget {
       value: value,
       items: items,
       onChanged: onChanged,
-      decoration: _profileFieldDecoration(label, 'Select $label'),
-    );
-  }
-
-  InputDecoration _profileFieldDecoration(String label, String hint) {
-    return InputDecoration(
-      labelText: label,
-      floatingLabelBehavior: FloatingLabelBehavior.always,
-      hintText: hint,
-      hintStyle: const TextStyle(color: Color(0xFF757575)),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      border: authOutlineInputBorder,
-      enabledBorder: authOutlineInputBorder,
-      focusedBorder: authOutlineInputBorder.copyWith(
-        borderSide: const BorderSide(color: Color(0xFFFF7643)),
+      decoration: KenwellFormStyles.decoration(
+        label: label,
+        hint: 'Select $label',
       ),
     );
   }

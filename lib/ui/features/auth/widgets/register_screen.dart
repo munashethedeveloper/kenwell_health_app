@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 import 'package:kenwell_health_app/ui/features/auth/widgets/login_screen.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
+
 import '../../../../data/services/auth_service.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/form/custom_text_field.dart';
+import '../../../shared/ui/form/kenwell_form_card.dart';
+import '../../../shared/ui/form/kenwell_form_styles.dart';
+import '../../../shared/ui/form/kenwell_section_header.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -105,62 +109,75 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Form(
               key: _formKey,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 16),
-                  const Text(
-                    "Register Account",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+                  const KenwellSectionHeader(
+                    title: "Register Account",
+                    subtitle:
+                        "Complete your details or continue with social media",
+                  ),
+                  KenwellFormCard(
+                    title: 'Personal Information',
+                    margin: const EdgeInsets.only(bottom: 16),
+                    child: Column(
+                      children: [
+                        _buildTextField(
+                          _firstNameController,
+                          "First Name",
+                          inputFormatters: AppTextInputFormatters.lettersOnly(
+                            allowHyphen: true,
+                          ),
+                        ),
+                        _buildTextField(
+                          _lastNameController,
+                          "Last Name",
+                          inputFormatters: AppTextInputFormatters.lettersOnly(
+                            allowHyphen: true,
+                          ),
+                        ),
+                        _buildTextField(_usernameController, "Username"),
+                        _buildTextField(_roleController, "Role"),
+                        _buildTextField(
+                          _phoneController,
+                          "Phone Number",
+                          keyboardType: TextInputType.phone,
+                          inputFormatters: AppTextInputFormatters.numbersOnly(),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    "Complete your details or continue with social media",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Color(0xFF757575)),
+                  KenwellFormCard(
+                    title: 'Account Credentials',
+                    margin: const EdgeInsets.only(bottom: 24),
+                    child: Column(
+                      children: [
+                        _buildTextField(
+                          _emailController,
+                          "Email",
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                        _buildPasswordField(
+                          _passwordController,
+                          "Password",
+                          _obscurePassword,
+                          () {
+                            setState(
+                                () => _obscurePassword = !_obscurePassword);
+                          },
+                        ),
+                        _buildPasswordField(
+                          _confirmPasswordController,
+                          "Confirm Password",
+                          _obscureConfirmPassword,
+                          () {
+                            setState(() => _obscureConfirmPassword =
+                                !_obscureConfirmPassword);
+                          },
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 24),
-                  _buildTextField(
-                    _firstNameController,
-                    "First Name",
-                    inputFormatters:
-                        AppTextInputFormatters.lettersOnly(allowHyphen: true),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildTextField(
-                    _lastNameController,
-                    "Last Name",
-                    inputFormatters:
-                        AppTextInputFormatters.lettersOnly(allowHyphen: true),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildTextField(_usernameController, "Username"),
-                  const SizedBox(height: 16),
-                  _buildTextField(_roleController, "Role"),
-                  const SizedBox(height: 16),
-                  _buildTextField(
-                    _phoneController,
-                    "Phone Number",
-                    keyboardType: TextInputType.phone,
-                    inputFormatters: AppTextInputFormatters.numbersOnly(),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildTextField(_emailController, "Email",
-                      keyboardType: TextInputType.emailAddress),
-                  const SizedBox(height: 16),
-                  _buildPasswordField(
-                      _passwordController, "Password", _obscurePassword, () {
-                    setState(() => _obscurePassword = !_obscurePassword);
-                  }),
-                  const SizedBox(height: 16),
-                  _buildPasswordField(_confirmPasswordController,
-                      "Confirm Password", _obscureConfirmPassword, () {
-                    setState(() =>
-                        _obscureConfirmPassword = !_obscureConfirmPassword);
-                  }),
-                  const SizedBox(height: 24),
                   CustomPrimaryButton(
                     label: "Register",
                     onPressed: _register,
@@ -198,48 +215,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
     TextInputType keyboardType = TextInputType.text,
     List<TextInputFormatter>? inputFormatters,
   }) {
-    return TextFormField(
+    return KenwellTextField(
+      label: label,
       controller: controller,
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,
+      decoration:
+          KenwellFormStyles.decoration(label: label, hint: "Enter $label"),
       validator: (v) => (v == null || v.isEmpty) ? "Enter $label" : null,
-      decoration: InputDecoration(
-        labelText: label,
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        hintText: "Enter $label",
-        hintStyle: const TextStyle(color: Color(0xFF757575)),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        border: authOutlineInputBorder,
-        enabledBorder: authOutlineInputBorder,
-        focusedBorder: authOutlineInputBorder.copyWith(
-            borderSide: const BorderSide(color: Color(0xFFFF7643))),
-      ),
+      padding: EdgeInsets.zero,
     );
   }
 
   Widget _buildPasswordField(TextEditingController controller, String label,
       bool obscureText, VoidCallback toggleObscure) {
-    return TextFormField(
+    return KenwellTextField(
+      label: label,
       controller: controller,
       obscureText: obscureText,
-      validator: (v) => (v == null || v.isEmpty) ? "Enter $label" : null,
-      decoration: InputDecoration(
-        labelText: label,
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        hintText: "Enter $label",
-        hintStyle: const TextStyle(color: Color(0xFF757575)),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        border: authOutlineInputBorder,
-        enabledBorder: authOutlineInputBorder,
-        focusedBorder: authOutlineInputBorder.copyWith(
-            borderSide: const BorderSide(color: Color(0xFFFF7643))),
+      decoration: KenwellFormStyles.decoration(
+        label: label,
+        hint: "Enter $label",
         suffixIcon: IconButton(
           icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility),
           onPressed: toggleObscure,
         ),
       ),
+      validator: (v) => (v == null || v.isEmpty) ? "Enter $label" : null,
+      padding: EdgeInsets.zero,
     );
   }
 }

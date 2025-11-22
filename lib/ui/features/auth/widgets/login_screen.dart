@@ -6,8 +6,11 @@ import '../../../shared/ui/colours/kenwell_colours.dart';
 import '../../../shared/ui/logo/app_logo.dart';
 import '../../../../routing/route_names.dart';
 import '../../../../domain/models/user_model.dart';
+import '../../../shared/ui/form/custom_text_field.dart';
+import '../../../shared/ui/form/kenwell_form_card.dart';
+import '../../../shared/ui/form/kenwell_form_styles.dart';
+import '../../../shared/ui/form/kenwell_section_header.dart';
 import '../../../shared/ui/navigation/main_navigation_screen.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -76,17 +79,37 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Form(
               key: _formKey,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 16),
                   const AppLogo(size: 200),
                   const SizedBox(height: 24),
-                  _buildTextField(_emailController, "Email",
-                      keyboardType: TextInputType.emailAddress),
-                  const SizedBox(height: 16),
-                  _buildPasswordField(
-                      _passwordController, "Password", _obscurePassword, () {
-                    setState(() => _obscurePassword = !_obscurePassword);
-                  }),
+                  const KenwellSectionHeader(
+                    title: 'Welcome Back',
+                    subtitle: 'Log in to access your wellness planner',
+                  ),
+                  KenwellFormCard(
+                    title: 'Account Details',
+                    margin: const EdgeInsets.only(bottom: 16),
+                    child: Column(
+                      children: [
+                        _buildTextField(
+                          _emailController,
+                          "Email",
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                        _buildPasswordField(
+                          _passwordController,
+                          "Password",
+                          _obscurePassword,
+                          () {
+                            setState(
+                                () => _obscurePassword = !_obscurePassword);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
@@ -135,47 +158,35 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildTextField(TextEditingController controller, String label,
       {TextInputType keyboardType = TextInputType.text}) {
-    return TextFormField(
+    return KenwellTextField(
+      label: label,
       controller: controller,
       keyboardType: keyboardType,
-      validator: (v) => (v == null || v.isEmpty) ? "Enter $label" : null,
-      decoration: InputDecoration(
-        labelText: label,
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        hintText: "Enter $label",
-        hintStyle: const TextStyle(color: Color(0xFF757575)),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        border: authOutlineInputBorder,
-        enabledBorder: authOutlineInputBorder,
-        focusedBorder: authOutlineInputBorder.copyWith(
-            borderSide: const BorderSide(color: Color(0xFFFF7643))),
+      decoration: KenwellFormStyles.decoration(
+        label: label,
+        hint: "Enter $label",
       ),
+      validator: (v) => (v == null || v.isEmpty) ? "Enter $label" : null,
+      padding: EdgeInsets.zero,
     );
   }
 
   Widget _buildPasswordField(TextEditingController controller, String label,
       bool obscureText, VoidCallback toggleObscure) {
-    return TextFormField(
+    return KenwellTextField(
+      label: label,
       controller: controller,
       obscureText: obscureText,
-      validator: (v) => (v == null || v.isEmpty) ? "Enter $label" : null,
-      decoration: InputDecoration(
-        labelText: label,
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        hintText: "Enter $label",
-        hintStyle: const TextStyle(color: Color(0xFF757575)),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        border: authOutlineInputBorder,
-        enabledBorder: authOutlineInputBorder,
-        focusedBorder: authOutlineInputBorder.copyWith(
-            borderSide: const BorderSide(color: Color(0xFFFF7643))),
+      decoration: KenwellFormStyles.decoration(
+        label: label,
+        hint: "Enter $label",
         suffixIcon: IconButton(
           icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility),
           onPressed: toggleObscure,
         ),
       ),
+      validator: (v) => (v == null || v.isEmpty) ? "Enter $label" : null,
+      padding: EdgeInsets.zero,
     );
   }
 }

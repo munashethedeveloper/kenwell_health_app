@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
+
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
-import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/custom_yes_no_question.dart';
+import '../../../shared/ui/form/kenwell_form_card.dart';
+import '../../../shared/ui/form/kenwell_section_header.dart';
+import '../../../shared/ui/form/kenwell_date_field.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/tb_testing_view_model.dart';
 
@@ -31,16 +33,11 @@ class TBTestingScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Section I: TB Screening',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24,
-                    color: const Color(0xFF201C58),
-                  ),
+            const KenwellSectionHeader(
+              title: 'Section I: TB Screening',
+              uppercase: true,
             ),
-            const SizedBox(height: 24),
-            _buildCard(
+            KenwellFormCard(
               title: 'TB Symptom Screening',
               child: Column(
                 children: [
@@ -88,7 +85,7 @@ class TBTestingScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            _buildCard(
+            KenwellFormCard(
               title: 'History of TB Treatment',
               child: Column(
                 children: [
@@ -98,27 +95,10 @@ class TBTestingScreen extends StatelessWidget {
                     viewModel.setTreatedBefore,
                   ),
                   if (viewModel.treatedBefore == 'Yes')
-                    KenwellTextField(
+                    KenwellDateField(
                       label: 'When were you treated?',
                       controller: viewModel.treatedDateController,
-                      readOnly: true,
-                      decoration: _profileFieldDecoration(
-                        'When were you treated?',
-                        'Select treatment date',
-                      ),
-                      onTap: () async {
-                        FocusScope.of(context).requestFocus(FocusNode());
-                        final pickedDate = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2100),
-                        );
-                        if (pickedDate != null) {
-                          viewModel.treatedDateController.text =
-                              '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
-                        }
-                      },
+                      hint: 'Select treatment date',
                     ),
                   _buildYesNo(
                     'Did you complete the treatment?',
@@ -147,30 +127,6 @@ class TBTestingScreen extends StatelessWidget {
   }
 
   // --- Helpers ---
-  Widget _buildCard({required String title, required Widget child}) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 3,
-      shadowColor: Colors.grey.shade300,
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title,
-                style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF201C58))),
-            const SizedBox(height: 12),
-            child,
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildYesNo(
       String question, String? value, ValueChanged<String?> onChanged) {
     return Padding(
@@ -181,21 +137,6 @@ class TBTestingScreen extends StatelessWidget {
         onChanged: onChanged,
         yesValue: 'Yes',
         noValue: 'No',
-      ),
-    );
-  }
-
-  InputDecoration _profileFieldDecoration(String label, String hint) {
-    return InputDecoration(
-      labelText: label,
-      floatingLabelBehavior: FloatingLabelBehavior.always,
-      hintText: hint,
-      hintStyle: const TextStyle(color: Color(0xFF757575)),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      border: authOutlineInputBorder,
-      enabledBorder: authOutlineInputBorder,
-      focusedBorder: authOutlineInputBorder.copyWith(
-        borderSide: const BorderSide(color: Color(0xFFFF7643)),
       ),
     );
   }

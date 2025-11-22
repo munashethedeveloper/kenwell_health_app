@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/custom_yes_no_question.dart';
+import '../../../shared/ui/form/kenwell_form_card.dart';
+import '../../../shared/ui/form/kenwell_form_styles.dart';
+import '../../../shared/ui/form/kenwell_section_header.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/personal_risk_assessment_view_model.dart';
 
@@ -40,31 +42,17 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Padding(
-                      padding: EdgeInsets.only(bottom: 12),
-                      child: Text(
-                        'SECTION C: HEALTH RISK ASSESSMENT',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF201C58),
-                        ),
-                      ),
+                    const KenwellSectionHeader(
+                      title: 'Section C: Health Risk Assessment',
+                      uppercase: true,
                     ),
 
                     // ===== Section 1: Chronic Conditions =====
-                    _buildCard(
+                    KenwellFormCard(
+                      title:
+                          '1. Do you suffer or take medication for any of the following conditions?',
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            '1. Do you suffer or take medication for any of the following conditions?',
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF201C58)),
-                          ),
-                          const SizedBox(height: 8),
                           ...vm.chronicConditions.keys.map((condition) {
                             return CheckboxListTile(
                               title: Text(condition),
@@ -79,9 +67,10 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                                   'If Other, please specify condition and treatment',
                               controller: vm.otherConditionController,
                               hintText: 'Specify other condition...',
-                              decoration: _profileFieldDecoration(
-                                'If Other, please specify condition and treatment',
-                                'Specify other condition...',
+                              decoration: KenwellFormStyles.decoration(
+                                label:
+                                    'If Other, please specify condition and treatment',
+                                hint: 'Specify other condition...',
                               ),
                               validator: (val) => val == null || val.isEmpty
                                   ? 'Please specify other condition'
@@ -94,48 +83,31 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                     const SizedBox(height: 24),
 
                     // ===== Section 2: Exercise =====
-                    _buildCard(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            '2. Over the past month, how many days per week have you exercised for 30 minutes or longer?',
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF201C58)),
-                          ),
-                          const SizedBox(height: 8),
-                          _buildStringRadioGroup(
-                            selected: vm.exerciseFrequency.isEmpty
-                                ? null
-                                : vm.exerciseFrequency,
-                            options: const [
-                              'Never',
-                              'Once/week',
-                              'Twice/week',
-                              'Three times/week or more',
-                            ],
-                            onChanged: vm.setExerciseFrequency,
-                          ),
+                    KenwellFormCard(
+                      title:
+                          '2. Over the past month, how many days per week have you exercised for 30 minutes or longer?',
+                      child: _buildStringRadioGroup(
+                        selected: vm.exerciseFrequency.isEmpty
+                            ? null
+                            : vm.exerciseFrequency,
+                        options: const [
+                          'Never',
+                          'Once/week',
+                          'Twice/week',
+                          'Three times/week or more',
                         ],
+                        onChanged: vm.setExerciseFrequency,
                       ),
                     ),
 
                     const SizedBox(height: 24),
 
                     // ===== Section 3: Smoking =====
-                    _buildCard(
+                    KenwellFormCard(
+                      title: '3. How much do you smoke per day?',
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            '3. How much do you smoke per day?',
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF201C58)),
-                          ),
                           KenwellTextField(
                             label: 'Number per day',
                             controller: vm.dailySmokeController,
@@ -143,9 +115,9 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                             keyboardType: TextInputType.number,
                             inputFormatters:
                                 AppTextInputFormatters.numbersOnly(),
-                            decoration: _profileFieldDecoration(
-                              'Number per day',
-                              'Enter number of cigarettes/day',
+                            decoration: KenwellFormStyles.decoration(
+                              label: 'Number per day',
+                              hint: 'Enter number of cigarettes/day',
                             ),
                             validator: (val) => val == null || val.isEmpty
                                 ? 'Please enter daily smoking amount'
@@ -167,32 +139,20 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                     const SizedBox(height: 24),
 
                     // ===== Section 4: Alcohol =====
-                    _buildCard(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            '4. How often do you use alcoholic beverages?',
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF201C58)),
-                          ),
-                          const SizedBox(height: 8),
-                          _buildStringRadioGroup(
-                            selected: vm.alcoholFrequency.isEmpty
-                                ? null
-                                : vm.alcoholFrequency,
-                            options: const [
-                              'Never',
-                              'On occasion',
-                              'Two-three drinks per day',
-                              'More than 3 drinks per day',
-                              'I often drink too much',
-                            ],
-                            onChanged: vm.setAlcoholFrequency,
-                          ),
+                    KenwellFormCard(
+                      title: '4. How often do you use alcoholic beverages?',
+                      child: _buildStringRadioGroup(
+                        selected: vm.alcoholFrequency.isEmpty
+                            ? null
+                            : vm.alcoholFrequency,
+                        options: const [
+                          'Never',
+                          'On occasion',
+                          'Two-three drinks per day',
+                          'More than 3 drinks per day',
+                          'I often drink too much',
                         ],
+                        onChanged: vm.setAlcoholFrequency,
                       ),
                     ),
 
@@ -200,20 +160,11 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
 
                     // ===== Section 5-7: Female Only =====
                     if (isFemale)
-                      _buildCard(
+                      KenwellFormCard(
+                        title: 'Female Only Questions',
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                'Female Only Questions',
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF201C58)),
-                              ),
-                            ),
                             KenwellYesNoQuestion<bool>(
                               question:
                                   '5. Have you had a pap smear in the last 24 months?',
@@ -244,20 +195,11 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
 
                     // ===== Section 8-9: Male Only =====
                     if (!isFemale)
-                      _buildCard(
+                      KenwellFormCard(
+                        title: 'Male Only Questions',
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                'Male Only Questions',
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF201C58)),
-                              ),
-                            ),
                             KenwellYesNoQuestion<bool>(
                               question:
                                   '8. If > than 40, have you had your prostate checked?',
@@ -326,34 +268,6 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
             ),
           )
           .toList(),
-    );
-  }
-
-  Widget _buildCard({required Widget child}) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 3,
-      color: Colors.white,
-      shadowColor: Colors.grey.shade300,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: child,
-      ),
-    );
-  }
-
-  InputDecoration _profileFieldDecoration(String label, String hint) {
-    return InputDecoration(
-      labelText: label,
-      floatingLabelBehavior: FloatingLabelBehavior.always,
-      hintText: hint,
-      hintStyle: const TextStyle(color: Color(0xFF757575)),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      border: authOutlineInputBorder,
-      enabledBorder: authOutlineInputBorder,
-      focusedBorder: authOutlineInputBorder.copyWith(
-        borderSide: const BorderSide(color: Color(0xFFFF7643)),
-      ),
     );
   }
 }

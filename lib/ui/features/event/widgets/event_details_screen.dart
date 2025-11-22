@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import '../../../../domain/models/wellness_event.dart';
+import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/form/kenwell_form_card.dart';
+import '../../../shared/ui/form/kenwell_section_header.dart';
 import '../view_model/event_view_model.dart';
 
 class EventDetailsScreen extends StatelessWidget {
@@ -15,30 +19,6 @@ class EventDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget sectionCard(String title, List<Widget> children) {
-      return Card(
-        elevation: 3,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-        shadowColor: Colors.black12,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Color(0xFF201C58))),
-              const SizedBox(height: 12),
-              ...children,
-            ],
-          ),
-        ),
-      );
-    }
-
     Widget detailRow(String label, String value) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
@@ -58,15 +38,12 @@ class EventDetailsScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          event.title,
-          style: const TextStyle(
-              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 30),
-        ),
+      appBar: KenwellAppBar(
+        title: event.title,
         automaticallyImplyLeading: true,
         backgroundColor: const Color(0xFF201C58),
-        iconTheme: const IconThemeData(color: Colors.white),
+        titleColor: Colors.white,
+        centerTitle: false,
         actions: [
           if (viewModel != null)
             IconButton(
@@ -83,9 +60,13 @@ class EventDetailsScreen extends StatelessWidget {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        padding: const EdgeInsets.all(16),
         children: [
-          sectionCard('Event Details', [
+          const KenwellSectionHeader(
+            title: 'Event Summary',
+            uppercase: true,
+          ),
+          _buildSectionCard('Event Details', [
             detailRow('Category', event.servicesRequested),
             detailRow('Date', DateFormat.yMMMMd().format(event.date)),
             detailRow('Set Up Time', event.setUpTime),
@@ -93,20 +74,20 @@ class EventDetailsScreen extends StatelessWidget {
             detailRow('End Time', event.endTime),
             detailRow('Strike Down Time', event.strikeDownTime),
           ]),
-          sectionCard('Venue & Address', [
+          _buildSectionCard('Venue & Address', [
             detailRow('Venue', event.venue),
             detailRow('Address', event.address),
           ]),
-          sectionCard('Onsite Contact', [
+          _buildSectionCard('Onsite Contact', [
             detailRow('Contact Person', event.onsiteContactPerson),
             detailRow('Contact Number', event.onsiteContactNumber),
             detailRow('Email', event.onsiteContactEmail),
           ]),
-          sectionCard('AE Contact', [
+          _buildSectionCard('AE Contact', [
             detailRow('Contact Person', event.aeContactPerson),
             detailRow('Contact Number', event.aeContactNumber),
           ]),
-          sectionCard('Participation & Options', [
+          _buildSectionCard('Participation & Options', [
             detailRow('Expected Participation',
                 event.expectedParticipation.toString()),
             detailRow('Non Members', event.nonMembers.toString()),
@@ -202,5 +183,16 @@ class EventDetailsScreen extends StatelessWidget {
         ),
       );
     }
+  }
+
+  Widget _buildSectionCard(String title, List<Widget> children) {
+    return KenwellFormCard(
+      title: title,
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: children,
+      ),
+    );
   }
 }

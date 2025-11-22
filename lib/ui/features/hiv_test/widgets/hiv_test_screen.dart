@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/custom_yes_no_question.dart';
+import '../../../shared/ui/form/kenwell_checkbox_group.dart';
+import '../../../shared/ui/form/kenwell_form_card.dart';
+import '../../../shared/ui/form/kenwell_form_styles.dart';
+import '../../../shared/ui/form/kenwell_section_header.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/hiv_test_view_model.dart';
 
@@ -31,16 +34,11 @@ class HIVTestScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'SECTION F: HIV SCREENING',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 24,
-                      color: const Color(0xFF201C58),
-                    ),
+              const KenwellSectionHeader(
+                title: 'Section F: HIV Screening',
+                uppercase: true,
               ),
-              const SizedBox(height: 24),
-              _buildCard(
+              KenwellFormCard(
                 title: 'HIV Testing History',
                 child: Column(
                   children: [
@@ -56,9 +54,9 @@ class HIVTestScreen extends StatelessWidget {
                         label: 'Month of last test',
                         hintText: 'MM',
                         controller: viewModel.lastTestMonthController,
-                        decoration: _profileFieldDecoration(
-                          'Month of last test',
-                          'MM',
+                        decoration: KenwellFormStyles.decoration(
+                          label: 'Month of last test',
+                          hint: 'MM',
                         ),
                         inputFormatters: AppTextInputFormatters.numbersOnly(),
                         validator: (val) =>
@@ -68,9 +66,9 @@ class HIVTestScreen extends StatelessWidget {
                         label: 'Year of last test',
                         hintText: 'YYYY',
                         controller: viewModel.lastTestYearController,
-                        decoration: _profileFieldDecoration(
-                          'Year of last test',
-                          'YYYY',
+                        decoration: KenwellFormStyles.decoration(
+                          label: 'Year of last test',
+                          hint: 'YYYY',
                         ),
                         inputFormatters: AppTextInputFormatters.numbersOnly(),
                         validator: (val) =>
@@ -81,9 +79,9 @@ class HIVTestScreen extends StatelessWidget {
                         value: viewModel.lastTestResult,
                         items: const ['Positive', 'Negative'],
                         onChanged: viewModel.setLastTestResult,
-                        decoration: _profileFieldDecoration(
-                          'Result of last test',
-                          'Select result of last test',
+                        decoration: KenwellFormStyles.decoration(
+                          label: 'Result of last test',
+                          hint: 'Select result of last test',
                         ),
                         validator: (val) =>
                             val == null || val.isEmpty ? 'Required' : null,
@@ -93,7 +91,7 @@ class HIVTestScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              _buildCard(
+              KenwellFormCard(
                 title: 'Risk Behaviors (last 12 months)',
                 child: Column(
                   children: [
@@ -141,9 +139,9 @@ class HIVTestScreen extends StatelessWidget {
                         label: 'Reason for not using a condom',
                         hintText: 'Explain why',
                         controller: viewModel.noCondomReasonController,
-                        decoration: _profileFieldDecoration(
-                          'Reason for not using a condom',
-                          'Explain why',
+                        decoration: KenwellFormStyles.decoration(
+                          label: 'Reason for not using a condom',
+                          hint: 'Explain why',
                         ),
                         validator: (val) =>
                             val == null || val.isEmpty ? 'Required' : null,
@@ -152,7 +150,7 @@ class HIVTestScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              _buildCard(
+              KenwellFormCard(
                 title: 'Partner HIV Status & Risk Reasons',
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,15 +170,17 @@ class HIVTestScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF201C58)),
                     ),
-                    const SizedBox(height: 8),
-                    ..._riskReasonList(viewModel),
+                    KenwellCheckboxGroup(
+                      separator: const Divider(height: 0),
+                      options: _riskReasonOptions(viewModel),
+                    ),
                     KenwellTextField(
                       label: 'Other risk reason',
                       hintText: 'Specify if "Other"',
                       controller: viewModel.otherRiskReasonController,
-                      decoration: _profileFieldDecoration(
-                        'Other risk reason',
-                        'Specify if "Other"',
+                      decoration: KenwellFormStyles.decoration(
+                        label: 'Other risk reason',
+                        hint: 'Specify if "Other"',
                       ),
                     ),
                   ],
@@ -200,31 +200,7 @@ class HIVTestScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCard({required String title, required Widget child}) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 3,
-      shadowColor: Colors.grey.shade300,
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title,
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Color(0xFF201C58))),
-            const SizedBox(height: 12),
-            child,
-          ],
-        ),
-      ),
-    );
-  }
-
-  List<Widget> _riskReasonList(HIVTestViewModel vm) {
+  List<KenwellCheckboxOption> _riskReasonOptions(HIVTestViewModel vm) {
     const reasons = [
       'Partner has been unfaithful',
       'Exposed to another person’s body fluids while assisting with an injury',
@@ -233,27 +209,14 @@ class HIVTestScreen extends StatelessWidget {
       'Rape',
       'Other (specify below)',
     ];
-    return reasons.map((reason) {
-      return CheckboxListTile(
-        title: Text(reason),
-        value: vm.riskReasons.contains(reason),
-        onChanged: (_) => vm.toggleRiskReason(reason),
-      );
-    }).toList();
-  }
-
-  InputDecoration _profileFieldDecoration(String label, String hint) {
-    return InputDecoration(
-      labelText: label,
-      floatingLabelBehavior: FloatingLabelBehavior.always,
-      hintText: hint,
-      hintStyle: const TextStyle(color: Color(0xFF757575)),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      border: authOutlineInputBorder,
-      enabledBorder: authOutlineInputBorder,
-      focusedBorder: authOutlineInputBorder.copyWith(
-        borderSide: const BorderSide(color: Color(0xFFFF7643)),
-      ),
-    );
+    return reasons
+        .map(
+          (reason) => KenwellCheckboxOption(
+            label: reason,
+            value: vm.riskReasons.contains(reason),
+            onChanged: (_) => vm.toggleRiskReason(reason),
+          ),
+        )
+        .toList();
   }
 }

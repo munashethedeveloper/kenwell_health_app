@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
-
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../routing/route_names.dart';
 import '../../event/widgets/event_screen.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../../../data/services/auth_service.dart';
+import '../../../shared/ui/form/kenwell_form_card.dart';
 
 class CalendarScreen extends StatefulWidget {
   final EventViewModel eventVM;
@@ -99,53 +99,59 @@ class _CalendarScreenState extends State<CalendarScreen> {
             // ===== Calendar Tab =====
             Column(
               children: [
-                TableCalendar(
-                  firstDay: DateTime.utc(2020, 1, 1),
-                  lastDay: DateTime.utc(3000, 12, 31),
-                  focusedDay: _focusedDay,
-                  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-                  eventLoader: _getEventsForDay,
-                  headerStyle: const HeaderStyle(
-                    formatButtonVisible: false,
-                    titleCentered: true,
-                    titleTextStyle: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF201C58),
+                // const KenwellSectionHeader(
+                //  title: 'Calendar View',
+                //    uppercase: true,
+                //   ),
+                KenwellFormCard(
+                  child: TableCalendar(
+                    firstDay: DateTime.utc(2020, 1, 1),
+                    lastDay: DateTime.utc(3000, 12, 31),
+                    focusedDay: _focusedDay,
+                    selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                    eventLoader: _getEventsForDay,
+                    headerStyle: const HeaderStyle(
+                      formatButtonVisible: false,
+                      titleCentered: true,
+                      titleTextStyle: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF201C58),
+                      ),
                     ),
+                    daysOfWeekStyle: const DaysOfWeekStyle(
+                      weekdayStyle: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      weekendStyle: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                    ),
+                    calendarStyle: CalendarStyle(
+                      weekendTextStyle: const TextStyle(color: Colors.red),
+                      todayDecoration: BoxDecoration(
+                        color: Colors.greenAccent.withOpacity(0.5),
+                        shape: BoxShape.circle,
+                      ),
+                      selectedDecoration: const BoxDecoration(
+                        color: Color(0xFF90C048),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    onDaySelected: (selectedDay, focusedDay) async {
+                      setState(() {
+                        _selectedDay = selectedDay;
+                        _focusedDay = focusedDay;
+                      });
+                      final eventsForDay = _getEventsForDay(selectedDay);
+                      if (eventsForDay.isEmpty) {
+                        await _openEventForm(selectedDay);
+                      } else {
+                        _showDayActionsSheet(selectedDay, eventsForDay);
+                      }
+                    },
                   ),
-                  daysOfWeekStyle: const DaysOfWeekStyle(
-                    weekdayStyle: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                    weekendStyle: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red,
-                    ),
-                  ),
-                  calendarStyle: CalendarStyle(
-                    weekendTextStyle: const TextStyle(color: Colors.red),
-                    todayDecoration: BoxDecoration(
-                      color: Colors.greenAccent.withOpacity(0.5),
-                      shape: BoxShape.circle,
-                    ),
-                    selectedDecoration: const BoxDecoration(
-                      color: Color(0xFF90C048),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  onDaySelected: (selectedDay, focusedDay) async {
-                    setState(() {
-                      _selectedDay = selectedDay;
-                      _focusedDay = focusedDay;
-                    });
-                    final eventsForDay = _getEventsForDay(selectedDay);
-                    if (eventsForDay.isEmpty) {
-                      await _openEventForm(selectedDay);
-                    } else {
-                      _showDayActionsSheet(selectedDay, eventsForDay);
-                    }
-                  },
                 ),
               ],
             ),
@@ -153,6 +159,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
             // ===== Events List Tab =====
             Column(
               children: [
+                //  const KenwellSectionHeader(
+                // title: 'Events List',
+                //   uppercase: true,
+                // ),
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -209,85 +219,102 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Container(
-                                width: double.infinity,
-                                color: const Color(0xFF201C58),
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 8, horizontal: 16),
-                                child: Text(
-                                  DateFormat.yMMMMd().format(day),
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                              ...events.map(
-                                (event) => Dismissible(
-                                  key: Key(event.id),
-                                  direction: DismissDirection.endToStart,
-                                  confirmDismiss: (direction) async {
-                                    return await showDialog(
-                                      context: context,
-                                      builder: (BuildContext dialogContext) {
-                                        return AlertDialog(
-                                          title: const Text('Delete Event'),
-                                          content: const Text(
-                                            'Are you sure you want to delete this event?',
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () =>
-                                                  Navigator.of(dialogContext)
-                                                      .pop(false),
-                                              child: const Text('Cancel'),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8),
+                                child: KenwellFormCard(
+                                  title: DateFormat.yMMMMd().format(day),
+                                  child: Column(
+                                    children: [
+                                      for (int i = 0;
+                                          i < events.length;
+                                          i++) ...[
+                                        Dismissible(
+                                          key: Key(events[i].id),
+                                          direction:
+                                              DismissDirection.endToStart,
+                                          confirmDismiss: (direction) async {
+                                            return await showDialog(
+                                              context: context,
+                                              builder:
+                                                  (BuildContext dialogContext) {
+                                                return AlertDialog(
+                                                  title: const Text(
+                                                      'Delete Event'),
+                                                  content: const Text(
+                                                    'Are you sure you want to delete this event?',
+                                                  ),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () =>
+                                                          Navigator.of(
+                                                                  dialogContext)
+                                                              .pop(false),
+                                                      child:
+                                                          const Text('Cancel'),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () =>
+                                                          Navigator.of(
+                                                                  dialogContext)
+                                                              .pop(true),
+                                                      style:
+                                                          TextButton.styleFrom(
+                                                              foregroundColor:
+                                                                  Colors.red),
+                                                      child:
+                                                          const Text('Delete'),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                          },
+                                          onDismissed: (direction) {
+                                            final deletedEvent = widget.eventVM
+                                                .deleteEvent(events[i].id);
+                                            if (deletedEvent != null) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: const Text(
+                                                      'Event deleted'),
+                                                  action: SnackBarAction(
+                                                    label: 'UNDO',
+                                                    onPressed: () {
+                                                      widget.eventVM
+                                                          .restoreEvent(
+                                                              deletedEvent);
+                                                    },
+                                                  ),
+                                                  duration: const Duration(
+                                                      seconds: 5),
+                                                ),
+                                              );
+                                            }
+                                          },
+                                          background: Container(
+                                            alignment: Alignment.centerRight,
+                                            padding: const EdgeInsets.only(
+                                                right: 20),
+                                            color: Colors.red,
+                                            child: const Icon(
+                                              Icons.delete,
+                                              color: Colors.white,
                                             ),
-                                            TextButton(
-                                              onPressed: () =>
-                                                  Navigator.of(dialogContext)
-                                                      .pop(true),
-                                              style: TextButton.styleFrom(
-                                                  foregroundColor: Colors.red),
-                                              child: const Text('Delete'),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  },
-                                  onDismissed: (direction) {
-                                    final deletedEvent =
-                                        widget.eventVM.deleteEvent(event.id);
-                                    if (deletedEvent != null) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content: const Text('Event deleted'),
-                                          action: SnackBarAction(
-                                            label: 'UNDO',
-                                            onPressed: () {
-                                              widget.eventVM
-                                                  .restoreEvent(deletedEvent);
-                                            },
                                           ),
-                                          duration: const Duration(seconds: 5),
+                                          child: Padding(
+                                            padding: EdgeInsets.only(
+                                              bottom: i == events.length - 1
+                                                  ? 0
+                                                  : 12,
+                                            ),
+                                            child: _buildModernEventCard(
+                                                events[i]),
+                                          ),
                                         ),
-                                      );
-                                    }
-                                  },
-                                  background: Container(
-                                    alignment: Alignment.centerRight,
-                                    padding: const EdgeInsets.only(right: 20),
-                                    color: Colors.red,
-                                    child: const Icon(
-                                      Icons.delete,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 6, horizontal: 12),
-                                    child: _buildModernEventCard(event),
+                                      ],
+                                    ],
                                   ),
                                 ),
                               ),
