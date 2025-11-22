@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 import 'package:provider/provider.dart';
-import 'package:signature/signature.dart';
+
 import 'package:kenwell_health_app/utils/input_formatters.dart';
+
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/form/custom_dropdown_field.dart';
+import '../../../shared/ui/form/custom_text_field.dart';
+import '../../../shared/ui/form/kenwell_date_field.dart';
+import '../../../shared/ui/form/kenwell_form_card.dart';
+import '../../../shared/ui/form/kenwell_form_styles.dart';
+import '../../../shared/ui/form/kenwell_section_header.dart';
+import '../../../shared/ui/form/kenwell_signature_field.dart';
+import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/nurse_intervention_view_model.dart';
 
 class NurseInterventionScreen extends StatelessWidget {
@@ -26,286 +34,191 @@ class NurseInterventionScreen extends StatelessWidget {
         title: 'Health Risk Assessment Nurse Intervention',
         automaticallyImplyLeading: false,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: viewModel.formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // --- Initial Assessment Section ---
-              Text(
-                'SECTION E: HEALTH RISK ASSESSMENT NURSE INTERVENTION',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 24,
-                      color: const Color(0xFF201C58),
-                    ),
-              ),
-              const SizedBox(height: 16),
-              _buildCard(
-                title: 'Initial Assessment',
-                child: Column(
-                  children: [
-                    _buildDropdown(
-                      'Window period risk assessment',
-                      viewModel.windowPeriod,
-                      viewModel.windowPeriodOptions,
-                      viewModel.setWindowPeriod,
-                    ),
-                    _buildDropdown(
-                      'Did patient expect HIV (+) result?',
-                      viewModel.expectedResult,
-                      viewModel.expectedResultOptions,
-                      viewModel.setExpectedResult,
-                    ),
-                    _buildDropdown(
-                      'Difficulty in dealing with result?',
-                      viewModel.difficultyDealingResult,
-                      viewModel.difficultyOptions,
-                      viewModel.setDifficultyDealingResult,
-                    ),
-                    _buildDropdown(
-                      'Urgent psychosocial follow-up needed?',
-                      viewModel.urgentPsychosocial,
-                      viewModel.urgentOptions,
-                      viewModel.setUrgentPsychosocial,
-                    ),
-                    _buildDropdown(
-                      'Committed to change behavior?',
-                      viewModel.committedToChange,
-                      viewModel.committedOptions,
-                      viewModel.setCommittedToChange,
-                    ),
-                  ],
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Form(
+            key: viewModel.formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const KenwellSectionHeader(
+                  title: 'Section E: Health Risk Assessment Nurse Intervention',
+                  uppercase: true,
                 ),
-              ),
-              const SizedBox(height: 16),
-
-              // --- Referral Nursing Interventions Section ---
-              _buildCard(
-                title: 'Nursing Referrals',
-                child: Column(
-                  children: [
-                    _buildReferralRadio(
-                      viewModel: viewModel,
-                      option: NursingReferralOption.patientNotReferred,
-                      label: 'Patient not referred',
-                    ),
-                    if (viewModel.nursingReferralSelection ==
-                        NursingReferralOption.patientNotReferred)
-                      _buildTextField(
-                        'Reason patient not referred',
-                        viewModel.notReferredReasonController,
-                        hint: 'Enter reason',
-                        requiredField: true,
-                      ),
-                    _buildReferralRadio(
-                      viewModel: viewModel,
-                      option: NursingReferralOption.referredToGP,
-                      label: 'Patient referred to GP',
-                    ),
-                    _buildReferralRadio(
-                      viewModel: viewModel,
-                      option: NursingReferralOption.referredToStateClinic,
-                      label: 'Patient referred to State HIV clinic',
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // --- Follow-up Section ---
-              if (viewModel.windowPeriod == 'Yes')
-                _buildCard(
-                  title: 'Follow-up',
+                KenwellFormCard(
+                  title: 'Initial Assessment',
                   child: Column(
                     children: [
-                      _buildDropdown(
-                        'Follow-up location',
-                        viewModel.followUpLocation,
-                        viewModel.followUpLocationOptions,
-                        viewModel.setFollowUpLocation,
+                      _buildDropdownField(
+                        label: 'Window period risk assessment',
+                        value: viewModel.windowPeriod,
+                        options: viewModel.windowPeriodOptions,
+                        onChanged: viewModel.setWindowPeriod,
                       ),
-                      if (viewModel.followUpLocation == 'Other')
-                        _buildTextField(
-                          'Other location detail',
-                          viewModel.followUpOtherController,
-                          hint: 'Specify other location',
-                          requiredField: true,
-                        ),
-                      _buildDateField(
-                        context,
-                        'Follow-up test date',
-                        viewModel.followUpDateController,
-                        requiredField: true,
+                      _buildDropdownField(
+                        label: 'Did patient expect HIV (+) result?',
+                        value: viewModel.expectedResult,
+                        options: viewModel.expectedResultOptions,
+                        onChanged: viewModel.setExpectedResult,
+                      ),
+                      _buildDropdownField(
+                        label: 'Difficulty in dealing with result?',
+                        value: viewModel.difficultyDealingResult,
+                        options: viewModel.difficultyOptions,
+                        onChanged: viewModel.setDifficultyDealingResult,
+                      ),
+                      _buildDropdownField(
+                        label: 'Urgent psychosocial follow-up needed?',
+                        value: viewModel.urgentPsychosocial,
+                        options: viewModel.urgentOptions,
+                        onChanged: viewModel.setUrgentPsychosocial,
+                      ),
+                      _buildDropdownField(
+                        label: 'Committed to change behavior?',
+                        value: viewModel.committedToChange,
+                        options: viewModel.committedOptions,
+                        onChanged: viewModel.setCommittedToChange,
                       ),
                     ],
                   ),
                 ),
-              const SizedBox(height: 16),
-
-              // --- Nurse Details Section ---
-              _buildCard(
-                title: 'Nurse Details',
-                child: Column(
-                  children: [
-                    _buildTextField(
-                      'HIV Testing Nurse',
-                      viewModel.hivTestingNurseController,
-                      hint: 'Enter nurse name',
-                      requiredField: true,
-                      inputFormatters:
-                          AppTextInputFormatters.lettersOnly(allowHyphen: true),
-                    ),
-                    _buildTextField(
-                      'Rank',
-                      viewModel.rankController,
-                      hint: 'Enter nurse rank',
-                      requiredField: true,
-                    ),
-                    _buildTextField(
-                      'SANC No',
-                      viewModel.sancNumberController,
-                      hint: 'Enter SANC number',
-                      requiredField: true,
-                      inputFormatters: AppTextInputFormatters.numbersOnly(),
-                    ),
-                    _buildDateField(
-                      context,
-                      'Date',
-                      viewModel.nurseDateController,
-                      requiredField: true,
-                    ),
-                    const SizedBox(height: 12),
-                    _buildSignatureSection(viewModel),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // --- Navigation Buttons ---
-              Row(
-                children: [
-                  if (onPrevious != null)
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: onPrevious,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14.0),
+                const SizedBox(height: 16),
+                KenwellFormCard(
+                  title: 'Nursing Referrals',
+                  child: Column(
+                    children: [
+                      _buildReferralRadio(
+                        viewModel: viewModel,
+                        option: NursingReferralOption.patientNotReferred,
+                        label: 'Patient not referred',
+                      ),
+                      if (viewModel.nursingReferralSelection ==
+                          NursingReferralOption.patientNotReferred)
+                        _buildTextField(
+                          label: 'Reason patient not referred',
+                          controller: viewModel.notReferredReasonController,
+                          hint: 'Enter reason',
+                          requiredField: true,
                         ),
-                        child: const Text('Previous'),
+                      _buildReferralRadio(
+                        viewModel: viewModel,
+                        option: NursingReferralOption.referredToGP,
+                        label: 'Patient referred to GP',
                       ),
-                    ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: viewModel.isSubmitting
-                          ? null
-                          : () => viewModel.submitIntervention(context, onNext),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF90C048),
-                        padding: const EdgeInsets.symmetric(vertical: 14.0),
+                      _buildReferralRadio(
+                        viewModel: viewModel,
+                        option: NursingReferralOption.referredToStateClinic,
+                        label: 'Patient referred to State HIV clinic',
                       ),
-                      child: viewModel.isSubmitting
-                          ? const CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation(Colors.white),
-                            )
-                          : const Text(
-                              'Next',
-                              style: TextStyle(color: Colors.white),
-                            ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                if (viewModel.windowPeriod == 'Yes')
+                  KenwellFormCard(
+                    title: 'Follow-up',
+                    child: Column(
+                      children: [
+                        _buildDropdownField(
+                          label: 'Follow-up location',
+                          value: viewModel.followUpLocation,
+                          options: viewModel.followUpLocationOptions,
+                          onChanged: viewModel.setFollowUpLocation,
+                          requiredField: true,
+                        ),
+                        if (viewModel.followUpLocation == 'Other')
+                          _buildTextField(
+                            label: 'Other location detail',
+                            controller: viewModel.followUpOtherController,
+                            hint: 'Specify other location',
+                            requiredField: true,
+                          ),
+                        KenwellDateField(
+                          label: 'Follow-up test date',
+                          controller: viewModel.followUpDateController,
+                          validator: (val) => (val == null || val.isEmpty)
+                              ? 'Please select Follow-up test date'
+                              : null,
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ],
+                if (viewModel.windowPeriod == 'Yes') const SizedBox(height: 16),
+                KenwellFormCard(
+                  title: 'Nurse Details',
+                  child: Column(
+                    children: [
+                      _buildTextField(
+                        label: 'HIV Testing Nurse',
+                        controller: viewModel.hivTestingNurseController,
+                        hint: 'Enter nurse name',
+                        requiredField: true,
+                        inputFormatters:
+                            AppTextInputFormatters.lettersOnly(allowHyphen: true),
+                      ),
+                      _buildTextField(
+                        label: 'Rank',
+                        controller: viewModel.rankController,
+                        hint: 'Enter nurse rank',
+                        requiredField: true,
+                      ),
+                      _buildTextField(
+                        label: 'SANC No',
+                        controller: viewModel.sancNumberController,
+                        hint: 'Enter SANC number',
+                        requiredField: true,
+                        inputFormatters: AppTextInputFormatters.numbersOnly(),
+                      ),
+                      KenwellDateField(
+                        label: 'Date',
+                        controller: viewModel.nurseDateController,
+                        validator: (val) => (val == null || val.isEmpty)
+                            ? 'Please select Date'
+                            : null,
+                      ),
+                      const SizedBox(height: 12),
+                      KenwellSignatureField(
+                        controller: viewModel.signatureController,
+                        onClear: viewModel.clearSignature,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                KenwellFormNavigation(
+                  onPrevious: onPrevious,
+                  onNext: () => viewModel.submitIntervention(context, onNext),
+                  isNextBusy: viewModel.isSubmitting,
+                  isNextEnabled: !viewModel.isSubmitting,
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildCard({required String title, required Widget child}) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 3,
-      color: Colors.white,
-      shadowColor: Colors.grey.shade300,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title,
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Color(0xFF201C58))),
-            const SizedBox(height: 12),
-            child,
-          ],
-        ),
-      ),
     );
   }
 
   // ------------------ Reusable Widgets ------------------
-  Widget _buildSignatureSection(NurseInterventionViewModel viewModel) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Signature:',
-          style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-              color: Color(0xFF201C58)),
-        ),
-        const SizedBox(height: 8),
-        Card(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          elevation: 2,
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            height: 160,
-            child: Signature(
-              controller: viewModel.signatureController,
-              backgroundColor: Colors.grey[100]!,
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Align(
-          alignment: Alignment.centerRight,
-          child: TextButton(
-            onPressed: viewModel.clearSignature,
-            child: const Text('Clear Signature'),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDropdown(String label, String? value, List<String> options,
-      Function(String?) onChanged,
-      {bool requiredField = false}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: DropdownButtonFormField<String>(
-        initialValue: value,
-        decoration: _profileFieldDecoration(label, 'Select $label'),
-        items: options
-            .map((opt) => DropdownMenuItem(value: opt, child: Text(opt)))
-            .toList(),
-        onChanged: onChanged,
-        validator: requiredField
-            ? (val) =>
-                (val == null || val.isEmpty) ? 'Please select $label' : null
-            : null,
+  Widget _buildDropdownField({
+    required String label,
+    required String? value,
+    required List<String> options,
+    required ValueChanged<String?> onChanged,
+    bool requiredField = true,
+  }) {
+    return KenwellDropdownField<String>(
+      label: label,
+      value: value,
+      items: options,
+      onChanged: onChanged,
+      decoration: KenwellFormStyles.decoration(
+        label: label,
+        hint: 'Select $label',
       ),
+      validator: requiredField
+          ? (val) =>
+              (val == null || val.isEmpty) ? 'Please select $label' : null
+          : null,
     );
   }
 
@@ -324,68 +237,22 @@ class NurseInterventionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller,
-      {String? hint,
-      bool requiredField = false,
-      List<TextInputFormatter>? inputFormatters}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: TextFormField(
-        controller: controller,
-        inputFormatters: inputFormatters,
-        decoration: _profileFieldDecoration(label, hint),
-        validator: requiredField
-            ? (val) =>
-                (val == null || val.isEmpty) ? 'Please enter $label' : null
-            : null,
-      ),
-    );
-  }
-
-  Widget _buildDateField(
-      BuildContext context, String label, TextEditingController controller,
-      {bool requiredField = false}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: TextFormField(
-        controller: controller,
-        readOnly: true,
-        decoration: _profileFieldDecoration(label, 'Select $label').copyWith(
-          suffixIcon: const Icon(Icons.calendar_today_outlined),
-        ),
-        onTap: () async {
-          FocusScope.of(context).requestFocus(FocusNode());
-          final pickedDate = await showDatePicker(
-            context: context,
-            initialDate: DateTime.now(),
-            firstDate: DateTime(2000),
-            lastDate: DateTime(2100),
-          );
-          if (pickedDate != null) {
-            controller.text =
-                '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
-          }
-        },
-        validator: requiredField
-            ? (val) =>
-                (val == null || val.isEmpty) ? 'Please select $label' : null
-            : null,
-      ),
-    );
-  }
-
-  InputDecoration _profileFieldDecoration(String label, String? hint) {
-    return InputDecoration(
-      labelText: label,
-      floatingLabelBehavior: FloatingLabelBehavior.always,
+  Widget _buildTextField({
+    required String label,
+    required TextEditingController controller,
+    String? hint,
+    bool requiredField = false,
+    List<TextInputFormatter>? inputFormatters,
+  }) {
+    return KenwellTextField(
+      label: label,
       hintText: hint,
-      hintStyle: const TextStyle(color: Color(0xFF757575)),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      border: authOutlineInputBorder,
-      enabledBorder: authOutlineInputBorder,
-      focusedBorder: authOutlineInputBorder.copyWith(
-        borderSide: const BorderSide(color: Color(0xFFFF7643)),
-      ),
+      controller: controller,
+      inputFormatters: inputFormatters,
+      decoration: KenwellFormStyles.decoration(label: label, hint: hint),
+      validator: requiredField
+          ? (val) => (val == null || val.isEmpty) ? 'Please enter $label' : null
+          : null,
     );
   }
 }

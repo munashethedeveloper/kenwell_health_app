@@ -11,6 +11,7 @@ import '../../../shared/ui/form/kenwell_checkbox_group.dart';
 import '../../../shared/ui/form/kenwell_date_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_styles.dart';
+import '../../../shared/ui/form/kenwell_signature_field.dart';
 import '../../../shared/ui/form/kenwell_section_header.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/consent_screen_view_model.dart';
@@ -146,31 +147,9 @@ class ConsentScreen extends StatelessWidget {
 
   // ===== Signature Section =====
   Widget _buildSignatureSection(ConsentScreenViewModel viewModel) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          height: 160,
-          decoration: BoxDecoration(
-            color: Colors.grey[100],
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade300),
-          ),
-          padding: const EdgeInsets.all(8),
-          child: Signature(
-            controller: viewModel.signatureController,
-            backgroundColor: Colors.grey[100]!,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Align(
-          alignment: Alignment.centerRight,
-          child: TextButton(
-            onPressed: viewModel.clearSignature,
-            child: const Text('Clear Signature'),
-          ),
-        ),
-      ],
+    return KenwellSignatureField(
+      controller: viewModel.signatureController,
+      onClear: viewModel.clearSignature,
     );
   }
 

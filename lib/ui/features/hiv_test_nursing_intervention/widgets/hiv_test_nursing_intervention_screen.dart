@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
+import '../../../shared/ui/form/kenwell_date_field.dart';
+import '../../../shared/ui/form/kenwell_form_card.dart';
+import '../../../shared/ui/form/kenwell_form_styles.dart';
+import '../../../shared/ui/form/kenwell_section_header.dart';
+import '../../../shared/ui/form/kenwell_signature_field.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/hiv_test_nursing_intervention_view_model.dart';
-import 'package:signature/signature.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 
 class HIVTestNursingInterventionScreen extends StatelessWidget {
   final VoidCallback onNext;
@@ -26,122 +29,91 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
         title: 'HIV Test Nursing Intervention',
         automaticallyImplyLeading: false,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'SECTION H: HIV TEST NURSING INTERVENTIONS',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24,
-                    color: const Color(0xFF201C58),
-                  ),
-            ),
-            _buildCard(
-              title: 'Initial Assessment',
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSection(
-                    '1. Did the risk assessment indicate window period?',
-                    _buildRadioOptions(
-                        viewModel.windowPeriod, viewModel.setWindowPeriod),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildSection(
-                    '2. Follow-up test location',
-                    Column(
-                      children: [
-                        _buildFollowUpRadio(
-                          label: 'State Clinic',
-                          option: FollowUpLocationOption.stateClinic,
-                          viewModel: viewModel,
-                        ),
-                        _buildFollowUpRadio(
-                          label: 'Private Doctor',
-                          option: FollowUpLocationOption.privateDoctor,
-                          viewModel: viewModel,
-                        ),
-                        _buildFollowUpRadio(
-                          label: 'Other (give detail)',
-                          option: FollowUpLocationOption.other,
-                          viewModel: viewModel,
-                        ),
-                        if (viewModel.followUpLocation ==
-                            FollowUpLocationOption.other)
-                          KenwellTextField(
-                            label: 'Specify other location',
-                            controller:
-                                viewModel.followUpOtherDetailsController,
-                            decoration: _profileFieldDecoration(
-                              'Specify other location',
-                              'Enter location details',
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildSection(
-                    '3. Follow-up test date',
-                    KenwellTextField(
-                      label: 'YYYY-MM-DD',
-                      controller: viewModel.followUpDateController,
-                      readOnly: true,
-                      decoration: _profileFieldDecoration(
-                        'YYYY-MM-DD',
-                        'Select follow-up date',
-                      ).copyWith(
-                        suffixIcon: const Icon(Icons.calendar_today_outlined),
-                      ),
-                      onTap: () => viewModel.pickFollowUpDate(context),
-                    ),
-                  ),
-                ],
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const KenwellSectionHeader(
+                title: 'Section H: HIV Test Nursing Interventions',
+                uppercase: true,
               ),
-            ),
-            const SizedBox(height: 16),
-            _buildCard(
-              title: 'Signature:',
-              child: _buildSignatureSection(viewModel),
-            ),
-            const SizedBox(height: 24),
-            KenwellFormNavigation(
-              onPrevious: onPrevious,
-              onNext: () => viewModel.submitIntervention(onNext),
-              isNextEnabled: viewModel.isFormValid && !viewModel.isSubmitting,
-              isNextBusy: viewModel.isSubmitting,
-            ),
-          ],
+              KenwellFormCard(
+                title: 'Initial Assessment',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildSection(
+                      '1. Did the risk assessment indicate window period?',
+                      _buildRadioOptions(
+                        viewModel.windowPeriod,
+                        viewModel.setWindowPeriod,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildSection(
+                      '2. Follow-up test location',
+                      Column(
+                        children: [
+                          _buildFollowUpRadio(
+                            label: 'State Clinic',
+                            option: FollowUpLocationOption.stateClinic,
+                            viewModel: viewModel,
+                          ),
+                          _buildFollowUpRadio(
+                            label: 'Private Doctor',
+                            option: FollowUpLocationOption.privateDoctor,
+                            viewModel: viewModel,
+                          ),
+                          _buildFollowUpRadio(
+                            label: 'Other (give detail)',
+                            option: FollowUpLocationOption.other,
+                            viewModel: viewModel,
+                          ),
+                          if (viewModel.followUpLocation ==
+                              FollowUpLocationOption.other)
+                            KenwellTextField(
+                              label: 'Specify other location',
+                              controller:
+                                  viewModel.followUpOtherDetailsController,
+                              decoration: KenwellFormStyles.decoration(
+                                label: 'Specify other location',
+                                hint: 'Enter location details',
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildSection(
+                      '3. Follow-up test date',
+                      KenwellDateField(
+                        label: 'Follow-up Date',
+                        controller: viewModel.followUpDateController,
+                        dateFormat: 'yyyy-MM-dd',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              KenwellFormCard(
+                title: 'Signature',
+                child: KenwellSignatureField(
+                  controller: viewModel.signatureController,
+                  onClear: viewModel.clearSignature,
+                ),
+              ),
+              const SizedBox(height: 24),
+              KenwellFormNavigation(
+                onPrevious: onPrevious,
+                onNext: () => viewModel.submitIntervention(onNext),
+                isNextEnabled: viewModel.isFormValid && !viewModel.isSubmitting,
+                isNextBusy: viewModel.isSubmitting,
+              ),
+            ],
+          ),
         ),
-      ),
-    );
-  }
-
-  // --- Helpers ---
-  Widget _buildCard({required String title, required Widget child}) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 3,
-      shadowColor: Colors.grey.shade300,
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title,
-                style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF201C58))),
-            const SizedBox(height: 12),
-            child,
-          ],
-        ),
-      ),
     );
   }
 
@@ -192,48 +164,4 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSignatureSection(HIVTestNursingInterventionViewModel viewModel) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 8),
-        Card(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          elevation: 2,
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            height: 160,
-            child: Signature(
-              controller: viewModel.signatureController,
-              backgroundColor: Colors.grey[100]!,
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Align(
-          alignment: Alignment.centerRight,
-          child: TextButton(
-            onPressed: viewModel.clearSignature,
-            child: const Text('Clear Signature'),
-          ),
-        ),
-      ],
-    );
-  }
-
-  InputDecoration _profileFieldDecoration(String label, String hint) {
-    return InputDecoration(
-      labelText: label,
-      floatingLabelBehavior: FloatingLabelBehavior.always,
-      hintText: hint,
-      hintStyle: const TextStyle(color: Color(0xFF757575)),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      border: authOutlineInputBorder,
-      enabledBorder: authOutlineInputBorder,
-      focusedBorder: authOutlineInputBorder.copyWith(
-        borderSide: const BorderSide(color: Color(0xFFFF7643)),
-      ),
-    );
-  }
 }
