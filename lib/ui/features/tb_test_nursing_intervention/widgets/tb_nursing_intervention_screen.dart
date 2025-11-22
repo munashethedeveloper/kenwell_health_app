@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:signature/signature.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
-
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/form/custom_text_field.dart';
+import '../../../shared/ui/form/kenwell_form_card.dart';
+import '../../../shared/ui/form/kenwell_form_styles.dart';
+import '../../../shared/ui/form/kenwell_section_header.dart';
+import '../../../shared/ui/form/kenwell_signature_field.dart';
+import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/tb_nursing_intervention_view_model.dart';
 
 class TBNursingInterventionScreen extends StatelessWidget {
@@ -25,212 +28,105 @@ class TBNursingInterventionScreen extends StatelessWidget {
         title: 'TB Test Nursing Intervention',
         automaticallyImplyLeading: false,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Section J: TB Screening Nursing Interventions',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24,
-                    color: const Color(0xFF201C58),
-                  ),
-            ),
-            const SizedBox(height: 24),
-            _buildCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Nursing Referrals',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: Color(0xFF201C58)),
-                  ),
-                  const SizedBox(height: 16),
-                  RadioListTile<TBNursingReferralOption>(
-                    title: const Text('Member not referred – reason?'),
-                    value: TBNursingReferralOption.memberNotReferred,
-                    groupValue: viewModel.selectedReferralOption,
-                    onChanged: viewModel.setReferralOption,
-                  ),
-                  if (viewModel.selectedReferralOption ==
-                      TBNursingReferralOption.memberNotReferred)
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          left: 16.0, right: 8.0, bottom: 8.0),
-                      child: TextField(
-                        controller: viewModel.reasonController,
-                        decoration: _profileFieldDecoration(
-                          'Enter reason',
-                          'Provide additional detail',
-                        ),
-                        maxLines: 2,
-                      ),
-                    ),
-                  RadioListTile<TBNursingReferralOption>(
-                    title: const Text('Member referred to GP'),
-                    value: TBNursingReferralOption.referredToGP,
-                    groupValue: viewModel.selectedReferralOption,
-                    onChanged: viewModel.setReferralOption,
-                  ),
-                  RadioListTile<TBNursingReferralOption>(
-                    title: const Text('Member referred to state HIV clinic'),
-                    value: TBNursingReferralOption.referredToStateHIVClinic,
-                    groupValue: viewModel.selectedReferralOption,
-                    onChanged: viewModel.setReferralOption,
-                  ),
-                  RadioListTile<TBNursingReferralOption>(
-                    title: const Text('Member referred for OH consultation'),
-                    value: TBNursingReferralOption.referredToOHConsultation,
-                    groupValue: viewModel.selectedReferralOption,
-                    onChanged: viewModel.setReferralOption,
-                  ),
-                ],
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const KenwellSectionHeader(
+                title: 'Section J: TB Screening Nursing Interventions',
+                uppercase: true,
               ),
-            ),
-            const SizedBox(height: 24),
-            _buildCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Please make the relevant notes of your session below:',
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF201C58)),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: viewModel.sessionNotesController,
-                    decoration: _profileFieldDecoration(
-                      'Session notes',
-                      'Enter session notes...',
+              KenwellFormCard(
+                title: 'Nursing Referrals',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    RadioListTile<TBNursingReferralOption>(
+                      title: const Text('Member not referred – reason?'),
+                      value: TBNursingReferralOption.memberNotReferred,
+                      groupValue: viewModel.selectedReferralOption,
+                      onChanged: viewModel.setReferralOption,
                     ),
-                    maxLines: 5,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-            _buildCard(
-              child: _buildSignatureSection(viewModel),
-            ),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: onPrevious,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14.0),
-                    ),
-                    child: const Text('Previous'),
-                  ),
-                ),
-                const SizedBox(width: 24),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      if (!viewModel.hasSignature) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Please capture a signature first.'),
+                    if (viewModel.selectedReferralOption ==
+                        TBNursingReferralOption.memberNotReferred)
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 8.0, right: 8.0, bottom: 12.0),
+                        child: KenwellTextField(
+                          label: 'Enter reason',
+                          controller: viewModel.reasonController,
+                          maxLines: 2,
+                          decoration: KenwellFormStyles.decoration(
+                            label: 'Enter reason',
+                            hint: 'Provide additional detail',
                           ),
-                        );
-                        return;
-                      }
-                      viewModel.saveIntervention(onNext: onNext);
-                    },
-                    icon: const Icon(Icons.save),
-                    label: const Text(
-                      'Save and Submit',
-                      style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    RadioListTile<TBNursingReferralOption>(
+                      title: const Text('Member referred to GP'),
+                      value: TBNursingReferralOption.referredToGP,
+                      groupValue: viewModel.selectedReferralOption,
+                      onChanged: viewModel.setReferralOption,
                     ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF90C048),
-                      padding: const EdgeInsets.symmetric(vertical: 14.0),
+                    RadioListTile<TBNursingReferralOption>(
+                      title: const Text('Member referred to state HIV clinic'),
+                      value: TBNursingReferralOption.referredToStateHIVClinic,
+                      groupValue: viewModel.selectedReferralOption,
+                      onChanged: viewModel.setReferralOption,
                     ),
+                    RadioListTile<TBNursingReferralOption>(
+                      title: const Text('Member referred for OH consultation'),
+                      value: TBNursingReferralOption.referredToOHConsultation,
+                      groupValue: viewModel.selectedReferralOption,
+                      onChanged: viewModel.setReferralOption,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              KenwellFormCard(
+                title: 'Session Notes',
+                child: KenwellTextField(
+                  label: 'Session notes',
+                  controller: viewModel.sessionNotesController,
+                  hintText: 'Enter session notes...',
+                  maxLines: 5,
+                  decoration: KenwellFormStyles.decoration(
+                    label: 'Session notes',
+                    hint: 'Enter session notes...',
                   ),
                 ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // --- Card Wrapper ---
-  Widget _buildCard({required Widget child}) {
-    return Card(
-      elevation: 2,
-      color: Colors.white,
-      shadowColor: Colors.grey.shade300,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      margin: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: child,
-      ),
-    );
-  }
-
-  Widget _buildSignatureSection(TBNursingInterventionViewModel viewModel) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Signature:',
-          style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-              color: Color(0xFF201C58)),
-        ),
-        const SizedBox(height: 8),
-        Card(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          elevation: 2,
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            height: 160,
-            child: Signature(
-              controller: viewModel.signatureController,
-              backgroundColor: Colors.grey[100]!,
-            ),
+              ),
+              const SizedBox(height: 24),
+              KenwellFormCard(
+                title: 'Signature',
+                child: KenwellSignatureField(
+                  controller: viewModel.signatureController,
+                  onClear: viewModel.clearSignature,
+                ),
+              ),
+              const SizedBox(height: 24),
+              KenwellFormNavigation(
+                onPrevious: onPrevious,
+                onNext: () {
+                  if (!viewModel.hasSignature) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Please capture a signature first.'),
+                      ),
+                    );
+                    return;
+                  }
+                  viewModel.saveIntervention(onNext: onNext);
+                },
+                isNextEnabled: viewModel.hasSignature,
+                nextLabel: 'Save and Submit',
+              ),
+            ],
           ),
         ),
-        const SizedBox(height: 8),
-        Align(
-          alignment: Alignment.centerRight,
-          child: TextButton(
-            onPressed: viewModel.clearSignature,
-            child: const Text('Clear Signature'),
-          ),
-        ),
-      ],
     );
   }
 
-  InputDecoration _profileFieldDecoration(String label, String hint) {
-    return InputDecoration(
-      labelText: label,
-      floatingLabelBehavior: FloatingLabelBehavior.always,
-      hintText: hint,
-      hintStyle: const TextStyle(color: Color(0xFF757575)),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      border: authOutlineInputBorder,
-      enabledBorder: authOutlineInputBorder,
-      focusedBorder: authOutlineInputBorder.copyWith(
-        borderSide: const BorderSide(color: Color(0xFFFF7643)),
-      ),
-    );
-  }
 }

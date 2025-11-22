@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
+
 import '../../../../data/services/auth_service.dart';
 import '../../../shared/ui/colours/kenwell_colours.dart';
+import '../../../shared/ui/form/custom_text_field.dart';
+import '../../../shared/ui/form/kenwell_form_card.dart';
+import '../../../shared/ui/form/kenwell_form_styles.dart';
+import '../../../shared/ui/form/kenwell_section_header.dart';
 import '../../../shared/ui/logo/app_logo.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -67,35 +72,45 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         title: 'Forgot Password',
         automaticallyImplyLeading: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              const SizedBox(height: 40),
-              const AppLogo(size: 250),
-              const SizedBox(height: 30),
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 40),
+                const AppLogo(size: 250),
+                const SizedBox(height: 24),
+                const KenwellSectionHeader(
+                  title: 'Reset Password',
+                  subtitle:
+                      'Enter the email associated with your account and we will send a reset link.',
                 ),
-                validator: (val) =>
-                    val!.isEmpty ? 'Please enter your email' : null,
-              ),
-              const SizedBox(height: 20),
-              CustomPrimaryButton(
-                label: 'Send Reset Link',
-                onPressed: _resetPassword,
-                isBusy: _isLoading,
-                backgroundColor: KenwellColors.primaryGreen,
-              ),
-            ],
+                KenwellFormCard(
+                  child: KenwellTextField(
+                    label: 'Email',
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: KenwellFormStyles.decoration(
+                      label: 'Email',
+                      hint: 'Enter your email',
+                    ),
+                    validator: (val) =>
+                        (val == null || val.isEmpty) ? 'Please enter your email' : null,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                CustomPrimaryButton(
+                  label: 'Send Reset Link',
+                  onPressed: _resetPassword,
+                  isBusy: _isLoading,
+                  backgroundColor: KenwellColors.primaryGreen,
+                ),
+              ],
+            ),
           ),
         ),
-      ),
     );
   }
 }

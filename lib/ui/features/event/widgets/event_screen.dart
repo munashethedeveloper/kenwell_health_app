@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_spinbox/flutter_spinbox.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/form_input_borders.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
-import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
-import '../view_model/event_view_model.dart';
+
 import '../../../../domain/models/wellness_event.dart';
+import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/form/custom_dropdown_field.dart';
+import '../../../shared/ui/form/custom_text_field.dart';
+import '../../../shared/ui/form/kenwell_date_field.dart';
+import '../../../shared/ui/form/kenwell_form_card.dart';
+import '../../../shared/ui/form/kenwell_form_styles.dart';
+import '../../../shared/ui/form/kenwell_section_header.dart';
+import '../view_model/event_view_model.dart';
 
 class EventScreen extends StatefulWidget {
   final EventViewModel viewModel;
@@ -49,66 +56,10 @@ class _EventScreenState extends State<EventScreen> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final WellnessEvent? eventToEdit = widget.existingEvent;
-    final bool isEditMode = eventToEdit != null;
-
-    Widget buildDropdown(String label, String value, List<String> options,
-        void Function(String) onChanged) {
-      return DropdownButtonFormField<String>(
-        initialValue: value,
-        decoration: _profileFieldDecoration(label, 'Select $label'),
-        items: options
-            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-            .toList(),
-        onChanged: (val) {
-          if (val != null) onChanged(val);
-        },
-        validator: (val) =>
-            (val == null || val.isEmpty) ? 'Select $label' : null,
-      );
-    }
-
-    Widget buildTimeField(String label, TextEditingController controller) {
-      return TextFormField(
-        controller: controller,
-        readOnly: true,
-        decoration: _profileFieldDecoration(label, 'Select $label').copyWith(
-          suffixIcon: const Icon(Icons.access_time),
-        ),
-        validator: (val) =>
-            (val == null || val.isEmpty) ? 'Select $label' : null,
-        onTap: () async {
-          await widget.viewModel.pickTime(context, controller);
-        },
-      );
-    }
-
-    Widget sectionWrapper(String title, List<Widget> children) {
-      return Card(
-        elevation: 3,
-        //color: const Color(0xFFEFF2FF),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        margin: const EdgeInsets.symmetric(vertical: 10),
-        shadowColor: Colors.black12,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title,
-                  style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF201C58))),
-              const SizedBox(height: 12),
-              ...children
-            ],
-          ),
-        ),
-      );
-    }
+    @override
+    Widget build(BuildContext context) {
+      final WellnessEvent? eventToEdit = widget.existingEvent;
+      final bool isEditMode = eventToEdit != null;
 
     return Scaffold(
       appBar: KenwellAppBar(title: isEditMode ? 'Edit Event' : 'Add Event'),
@@ -116,189 +67,148 @@ class _EventScreenState extends State<EventScreen> {
         padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
-          child: Column(
-            children: [
-              const SizedBox(height: 16),
-              const Text(
-                "Add New Event",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                KenwellSectionHeader(
+                  title: isEditMode ? 'Edit Event' : 'Add New Event',
+                  subtitle:
+                      'Complete the event details or update the event information',
                 ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                "Complete the event details or update the event information",
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Color(0xFF757575)),
-              ),
-              const SizedBox(height: 24),
-              // Basic Info Section
-              sectionWrapper('Basic Info', [
-                TextFormField(
-                  controller: widget.viewModel.dateController,
-                  readOnly: true,
-                  decoration: _profileFieldDecoration(
-                          'Event Date', 'Select Event Date')
-                      .copyWith(suffixIcon: const Icon(Icons.calendar_today)),
-                  validator: (val) =>
-                      (val == null || val.isEmpty) ? 'Select Event Date' : null,
-                  onTap: () async {
-                    final pickedDate = await showDatePicker(
-                      context: context,
-                      initialDate: widget.date,
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2100),
-                    );
-                    if (pickedDate != null && context.mounted) {
-                      widget.viewModel.dateController.text =
-                          "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
-                    }
-                  },
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: widget.viewModel.titleController,
-                  decoration: _profileFieldDecoration(
-                      'Event Title', 'Enter Event Title'),
-                  validator: (val) =>
-                      (val == null || val.isEmpty) ? 'Enter Event Title' : null,
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: widget.viewModel.venueController,
-                  decoration: _profileFieldDecoration('Venue', 'Enter Venue'),
-                  validator: (val) =>
-                      (val == null || val.isEmpty) ? 'Enter Venue' : null,
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: widget.viewModel.addressController,
-                  decoration:
-                      _profileFieldDecoration('Address', 'Enter Address'),
-                  validator: (val) =>
-                      (val == null || val.isEmpty) ? 'Enter Address' : null,
-                ),
-              ]),
-
-              // Onsite Contact Section
-              sectionWrapper('Onsite Contact', [
-                TextFormField(
-                  controller: widget.viewModel.onsiteContactController,
-                  decoration: _profileFieldDecoration(
-                      'Contact Person', 'Enter Contact Person'),
-                  inputFormatters: AppTextInputFormatters.lettersOnly(
-                    allowHyphen: true,
+                _buildSectionCard('Basic Info', [
+                  KenwellDateField(
+                    label: 'Event Date',
+                    controller: widget.viewModel.dateController,
+                    dateFormat: 'yyyy-MM-dd',
+                    initialDate: widget.date,
                   ),
-                  validator: (val) => (val == null || val.isEmpty)
-                      ? 'Enter Contact Person'
-                      : null,
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: widget.viewModel.onsiteNumberController,
-                  decoration: _profileFieldDecoration(
-                      'Contact Number', 'Enter Contact Number'),
-                  keyboardType: TextInputType.phone,
-                  inputFormatters: AppTextInputFormatters.numbersOnly(),
-                  validator: (val) => (val == null || val.isEmpty)
-                      ? 'Enter Contact Number'
-                      : null,
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: widget.viewModel.onsiteEmailController,
-                  decoration: _profileFieldDecoration('Email', 'Enter Email'),
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (val) =>
-                      (val == null || val.isEmpty) ? 'Enter Email' : null,
-                ),
-              ]),
-
-              // AE Contact Section
-              sectionWrapper('AE Contact', [
-                TextFormField(
-                  controller: widget.viewModel.aeContactController,
-                  decoration: _profileFieldDecoration(
-                      'Contact Person', 'Enter Contact Person'),
-                  inputFormatters: AppTextInputFormatters.lettersOnly(
-                    allowHyphen: true,
+                  _buildTextField(
+                    controller: widget.viewModel.titleController,
+                    label: 'Event Title',
                   ),
-                  validator: (val) => (val == null || val.isEmpty)
-                      ? 'Enter Contact Person'
-                      : null,
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: widget.viewModel.aeNumberController,
-                  decoration: _profileFieldDecoration(
-                      'Contact Number', 'Enter Contact Number'),
-                  keyboardType: TextInputType.phone,
-                  inputFormatters: AppTextInputFormatters.numbersOnly(),
-                  validator: (val) => (val == null || val.isEmpty)
-                      ? 'Enter Contact Number'
-                      : null,
-                ),
-              ]),
-
-              // Participation & Numbers Section
-              sectionWrapper('Participation & Numbers', [
-                _buildSpinBoxField('Expected Participation',
-                    widget.viewModel.expectedParticipationController),
-                const SizedBox(height: 10),
-                _buildSpinBoxField(
-                    'Passports', widget.viewModel.passportsController),
-                const SizedBox(height: 10),
-                _buildSpinBoxField('Nurses', widget.viewModel.nursesController),
-              ]),
-
-              // Options Section
-              sectionWrapper('Options', [
-                buildDropdown('Medical Aid', widget.viewModel.medicalAid,
-                    ['Yes', 'No'], (val) => widget.viewModel.medicalAid = val),
-                const SizedBox(height: 10),
-                buildDropdown('Non-Members', widget.viewModel.nonMembers,
-                    ['Yes', 'No'], (val) => widget.viewModel.nonMembers = val),
-                const SizedBox(height: 10),
-                buildDropdown(
-                    'Coordinators',
-                    widget.viewModel.coordinators,
-                    ['Yes', 'No'],
-                    (val) => widget.viewModel.coordinators = val),
-                const SizedBox(height: 10),
-                buildDropdown(
-                    'Multiply Promoters',
-                    widget.viewModel.multiplyPromoters,
-                    ['Yes', 'No'],
-                    (val) => widget.viewModel.multiplyPromoters = val),
-                const SizedBox(height: 10),
-                buildDropdown(
-                    'Mobile Booths',
-                    widget.viewModel.mobileBooths,
-                    ['Yes', 'No'],
-                    (val) => widget.viewModel.mobileBooths = val),
-                const SizedBox(height: 10),
-                buildDropdown(
-                    'Services Requested',
-                    widget.viewModel.servicesRequested,
-                    ['HRA', 'Other'],
-                    (val) => widget.viewModel.servicesRequested = val),
-              ]),
-
-              // Time Details Section
-              sectionWrapper('Time Details', [
-                buildTimeField(
-                    'Setup Time', widget.viewModel.setUpTimeController),
-                const SizedBox(height: 10),
-                buildTimeField(
-                    'Start Time', widget.viewModel.startTimeController),
-                const SizedBox(height: 10),
-                buildTimeField('End Time', widget.viewModel.endTimeController),
-                const SizedBox(height: 10),
-                buildTimeField('Strike Down Time',
-                    widget.viewModel.strikeDownTimeController),
-              ]),
+                  _buildTextField(
+                    controller: widget.viewModel.venueController,
+                    label: 'Venue',
+                  ),
+                  _buildTextField(
+                    controller: widget.viewModel.addressController,
+                    label: 'Address',
+                  ),
+                ]),
+                _buildSectionCard('Onsite Contact', [
+                  _buildTextField(
+                    controller: widget.viewModel.onsiteContactController,
+                    label: 'Contact Person',
+                    inputFormatters:
+                        AppTextInputFormatters.lettersOnly(allowHyphen: true),
+                  ),
+                  _buildTextField(
+                    controller: widget.viewModel.onsiteNumberController,
+                    label: 'Contact Number',
+                    keyboardType: TextInputType.phone,
+                    inputFormatters: AppTextInputFormatters.numbersOnly(),
+                  ),
+                  _buildTextField(
+                    controller: widget.viewModel.onsiteEmailController,
+                    label: 'Email',
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                ]),
+                _buildSectionCard('AE Contact', [
+                  _buildTextField(
+                    controller: widget.viewModel.aeContactController,
+                    label: 'Contact Person',
+                    inputFormatters:
+                        AppTextInputFormatters.lettersOnly(allowHyphen: true),
+                  ),
+                  _buildTextField(
+                    controller: widget.viewModel.aeNumberController,
+                    label: 'Contact Number',
+                    keyboardType: TextInputType.phone,
+                    inputFormatters: AppTextInputFormatters.numbersOnly(),
+                  ),
+                ]),
+                _buildSectionCard('Participation & Numbers', [
+                  _buildSpinBoxField(
+                    'Expected Participation',
+                    widget.viewModel.expectedParticipationController,
+                  ),
+                  _buildSpinBoxField(
+                    'Passports',
+                    widget.viewModel.passportsController,
+                  ),
+                  _buildSpinBoxField(
+                    'Nurses',
+                    widget.viewModel.nursesController,
+                  ),
+                ]),
+                _buildSectionCard('Options', [
+                  _buildDropdownField(
+                    label: 'Medical Aid',
+                    value: _nullableValue(widget.viewModel.medicalAid),
+                    options: const ['Yes', 'No'],
+                    onChanged: (val) => widget.viewModel.medicalAid = val ?? '',
+                  ),
+                  _buildDropdownField(
+                    label: 'Non-Members',
+                    value: _nullableValue(widget.viewModel.nonMembers),
+                    options: const ['Yes', 'No'],
+                    onChanged: (val) => widget.viewModel.nonMembers = val ?? '',
+                  ),
+                  _buildDropdownField(
+                    label: 'Coordinators',
+                    value: _nullableValue(widget.viewModel.coordinators),
+                    options: const ['Yes', 'No'],
+                    onChanged: (val) => widget.viewModel.coordinators = val ?? '',
+                  ),
+                  _buildDropdownField(
+                    label: 'Multiply Promoters',
+                    value: _nullableValue(widget.viewModel.multiplyPromoters),
+                    options: const ['Yes', 'No'],
+                    onChanged: (val) =>
+                        widget.viewModel.multiplyPromoters = val ?? '',
+                  ),
+                  _buildDropdownField(
+                    label: 'Mobile Booths',
+                    value: _nullableValue(widget.viewModel.mobileBooths),
+                    options: const ['Yes', 'No'],
+                    onChanged: (val) =>
+                        widget.viewModel.mobileBooths = val ?? '',
+                  ),
+                  _buildDropdownField(
+                    label: 'Services Requested',
+                    value: _nullableValue(widget.viewModel.servicesRequested),
+                    options: const ['HRA', 'Other'],
+                    onChanged: (val) =>
+                        widget.viewModel.servicesRequested = val ?? '',
+                  ),
+                ]),
+                _buildSectionCard('Time Details', [
+                  _buildTimeField(
+                    label: 'Setup Time',
+                    controller: widget.viewModel.setUpTimeController,
+                    onPickTime: () =>
+                        widget.viewModel.pickTime(context, widget.viewModel.setUpTimeController),
+                  ),
+                  _buildTimeField(
+                    label: 'Start Time',
+                    controller: widget.viewModel.startTimeController,
+                    onPickTime: () =>
+                        widget.viewModel.pickTime(context, widget.viewModel.startTimeController),
+                  ),
+                  _buildTimeField(
+                    label: 'End Time',
+                    controller: widget.viewModel.endTimeController,
+                    onPickTime: () =>
+                        widget.viewModel.pickTime(context, widget.viewModel.endTimeController),
+                  ),
+                  _buildTimeField(
+                    label: 'Strike Down Time',
+                    controller: widget.viewModel.strikeDownTimeController,
+                    onPickTime: () =>
+                        widget.viewModel.pickTime(context, widget.viewModel.strikeDownTimeController),
+                  ),
+                ]),
 
               const SizedBox(height: 20),
               ElevatedButton(
@@ -350,26 +260,84 @@ class _EventScreenState extends State<EventScreen> {
       decimals: 0,
       keyboardType:
           const TextInputType.numberWithOptions(decimal: false, signed: false),
-      decoration: _profileFieldDecoration(label, 'Enter $label'),
+        decoration: KenwellFormStyles.decoration(label: label, hint: 'Enter $label'),
       validator: (value) => value == null ? 'Enter $label' : null,
       onChanged: (value) {
         controller.text = value.round().toString();
       },
     );
   }
-
-  InputDecoration _profileFieldDecoration(String label, String hint) {
-    return InputDecoration(
-      labelText: label,
-      floatingLabelBehavior: FloatingLabelBehavior.always,
-      hintText: hint,
-      hintStyle: const TextStyle(color: Color(0xFF757575)),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      border: authOutlineInputBorder,
-      enabledBorder: authOutlineInputBorder,
-      focusedBorder: authOutlineInputBorder.copyWith(
-        borderSide: const BorderSide(color: Color(0xFFFF7643)),
-      ),
-    );
-  }
 }
+
+Widget _buildSectionCard(String title, List<Widget> children) {
+  return KenwellFormCard(
+    title: title,
+    margin: const EdgeInsets.only(bottom: 16),
+    child: Column(
+      children: [
+        for (int i = 0; i < children.length; i++) ...[
+          children[i],
+          if (i != children.length - 1) KenwellFormStyles.fieldSpacing,
+        ],
+      ],
+    ),
+  );
+}
+
+Widget _buildTextField({
+  required TextEditingController controller,
+  required String label,
+  String? hint,
+  TextInputType keyboardType = TextInputType.text,
+  List<TextInputFormatter>? inputFormatters,
+}) {
+  return KenwellTextField(
+    label: label,
+    controller: controller,
+    hintText: hint ?? 'Enter $label',
+    keyboardType: keyboardType,
+    inputFormatters: inputFormatters,
+    padding: EdgeInsets.zero,
+    decoration: KenwellFormStyles.decoration(label: label, hint: hint ?? 'Enter $label'),
+    validator: (val) => (val == null || val.isEmpty) ? 'Enter $label' : null,
+  );
+}
+
+Widget _buildTimeField({
+  required String label,
+  required TextEditingController controller,
+  required Future<void> Function() onPickTime,
+}) {
+  return KenwellTextField(
+    label: label,
+    controller: controller,
+    readOnly: true,
+    padding: EdgeInsets.zero,
+    decoration: KenwellFormStyles.decoration(
+      label: label,
+      hint: 'Select $label',
+      suffixIcon: const Icon(Icons.access_time),
+    ),
+    onTap: onPickTime,
+    validator: (val) => (val == null || val.isEmpty) ? 'Select $label' : null,
+  );
+}
+
+Widget _buildDropdownField({
+  required String label,
+  required String? value,
+  required List<String> options,
+  required ValueChanged<String?> onChanged,
+}) {
+  return KenwellDropdownField<String>(
+    label: label,
+    value: value,
+    items: options,
+    onChanged: onChanged,
+    padding: EdgeInsets.zero,
+    decoration: KenwellFormStyles.decoration(label: label, hint: 'Select $label'),
+    validator: (val) => (val == null || val.isEmpty) ? 'Select $label' : null,
+  );
+}
+
+String? _nullableValue(String value) => value.isEmpty ? null : value;
