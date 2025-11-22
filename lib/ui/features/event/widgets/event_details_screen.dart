@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import '../../../../domain/models/wellness_event.dart';
+import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/form/kenwell_form_card.dart';
+import '../../../shared/ui/form/kenwell_section_header.dart';
 import '../view_model/event_view_model.dart';
 
 class EventDetailsScreen extends StatelessWidget {
@@ -13,32 +17,8 @@ class EventDetailsScreen extends StatelessWidget {
     this.viewModel,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    Widget sectionCard(String title, List<Widget> children) {
-      return Card(
-        elevation: 3,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-        shadowColor: Colors.black12,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Color(0xFF201C58))),
-              const SizedBox(height: 12),
-              ...children,
-            ],
-          ),
-        ),
-      );
-    }
-
+    @override
+    Widget build(BuildContext context) {
     Widget detailRow(String label, String value) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
@@ -57,71 +37,72 @@ class EventDetailsScreen extends StatelessWidget {
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          event.title,
-          style: const TextStyle(
-              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 30),
+      return Scaffold(
+        appBar: KenwellAppBar(
+          title: event.title,
+          automaticallyImplyLeading: true,
+          backgroundColor: const Color(0xFF201C58),
+          titleColor: Colors.white,
+          centerTitle: false,
+          actions: [
+            if (viewModel != null)
+              IconButton(
+                icon: const Icon(Icons.edit, color: Colors.white),
+                tooltip: 'Edit Event',
+                onPressed: () => _navigateToEditEvent(context),
+              ),
+            if (viewModel != null)
+              IconButton(
+                icon: const Icon(Icons.delete, color: Colors.white),
+                tooltip: 'Delete Event',
+                onPressed: () => _showDeleteConfirmation(context),
+              ),
+          ],
         ),
-        automaticallyImplyLeading: true,
-        backgroundColor: const Color(0xFF201C58),
-        iconTheme: const IconThemeData(color: Colors.white),
-        actions: [
-          if (viewModel != null)
-            IconButton(
-              icon: const Icon(Icons.edit, color: Colors.white),
-              tooltip: 'Edit Event',
-              onPressed: () => _navigateToEditEvent(context),
+        body: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            const KenwellSectionHeader(
+              title: 'Event Summary',
+              uppercase: true,
             ),
-          if (viewModel != null)
-            IconButton(
-              icon: const Icon(Icons.delete, color: Colors.white),
-              tooltip: 'Delete Event',
-              onPressed: () => _showDeleteConfirmation(context),
-            ),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-        children: [
-          sectionCard('Event Details', [
-            detailRow('Category', event.servicesRequested),
-            detailRow('Date', DateFormat.yMMMMd().format(event.date)),
-            detailRow('Set Up Time', event.setUpTime),
-            detailRow('Start Time', event.startTime),
-            detailRow('End Time', event.endTime),
-            detailRow('Strike Down Time', event.strikeDownTime),
-          ]),
-          sectionCard('Venue & Address', [
-            detailRow('Venue', event.venue),
-            detailRow('Address', event.address),
-          ]),
-          sectionCard('Onsite Contact', [
-            detailRow('Contact Person', event.onsiteContactPerson),
-            detailRow('Contact Number', event.onsiteContactNumber),
-            detailRow('Email', event.onsiteContactEmail),
-          ]),
-          sectionCard('AE Contact', [
-            detailRow('Contact Person', event.aeContactPerson),
-            detailRow('Contact Number', event.aeContactNumber),
-          ]),
-          sectionCard('Participation & Options', [
-            detailRow('Expected Participation',
-                event.expectedParticipation.toString()),
-            detailRow('Non Members', event.nonMembers.toString()),
-            detailRow('Passports', event.passports.toString()),
-            detailRow('Nurses', event.nurses.toString()),
-            detailRow('Coordinators', event.coordinators.toString()),
-            detailRow('Multiply Promoters', event.multiplyPromoters.toString()),
-            detailRow('Mobile Booths', event.mobileBooths),
-            detailRow('Medical Aid Option', event.medicalAid),
-            if (event.description != null && event.description!.isNotEmpty)
-              detailRow('Description', event.description!),
-          ]),
-        ],
-      ),
-    );
+            _buildSectionCard('Event Details', [
+              detailRow('Category', event.servicesRequested),
+              detailRow('Date', DateFormat.yMMMMd().format(event.date)),
+              detailRow('Set Up Time', event.setUpTime),
+              detailRow('Start Time', event.startTime),
+              detailRow('End Time', event.endTime),
+              detailRow('Strike Down Time', event.strikeDownTime),
+            ]),
+            _buildSectionCard('Venue & Address', [
+              detailRow('Venue', event.venue),
+              detailRow('Address', event.address),
+            ]),
+            _buildSectionCard('Onsite Contact', [
+              detailRow('Contact Person', event.onsiteContactPerson),
+              detailRow('Contact Number', event.onsiteContactNumber),
+              detailRow('Email', event.onsiteContactEmail),
+            ]),
+            _buildSectionCard('AE Contact', [
+              detailRow('Contact Person', event.aeContactPerson),
+              detailRow('Contact Number', event.aeContactNumber),
+            ]),
+            _buildSectionCard('Participation & Options', [
+              detailRow('Expected Participation',
+                  event.expectedParticipation.toString()),
+              detailRow('Non Members', event.nonMembers.toString()),
+              detailRow('Passports', event.passports.toString()),
+              detailRow('Nurses', event.nurses.toString()),
+              detailRow('Coordinators', event.coordinators.toString()),
+              detailRow('Multiply Promoters', event.multiplyPromoters.toString()),
+              detailRow('Mobile Booths', event.mobileBooths),
+              detailRow('Medical Aid Option', event.medicalAid),
+              if (event.description != null && event.description!.isNotEmpty)
+                detailRow('Description', event.description!),
+            ]),
+          ],
+        ),
+      );
   }
 
   void _showDeleteConfirmation(BuildContext context) {
@@ -202,5 +183,16 @@ class EventDetailsScreen extends StatelessWidget {
         ),
       );
     }
+  }
+
+  Widget _buildSectionCard(String title, List<Widget> children) {
+    return KenwellFormCard(
+      title: title,
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: children,
+      ),
+    );
   }
 }
