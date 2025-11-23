@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'routing/app_router.dart';
 import 'ui/features/auth/view_models/auth_view_model.dart';
 import 'ui/features/calendar/view_model/calendar_view_model.dart';
 import 'ui/features/event/view_model/event_view_model.dart';
+import 'ui/shared/themes/app_theme.dart';
 
 void main() {
   runApp(const MyApp());
@@ -23,16 +25,15 @@ class MyApp extends StatelessWidget {
           create: (_) => EventViewModel(),
         ),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Wellness Planner',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Wellness Planner',
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: ThemeMode.system,
+          onGenerateRoute: AppRouter.generateRoute,
+          initialRoute: '/login', // Start at login
         ),
-        onGenerateRoute: AppRouter.generateRoute,
-        initialRoute: '/login', // Start at login
-      ),
     );
   }
 }
