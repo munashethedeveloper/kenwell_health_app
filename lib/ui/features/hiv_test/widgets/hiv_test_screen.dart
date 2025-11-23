@@ -3,11 +3,11 @@ import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
-import '../../../shared/ui/form/custom_yes_no_question.dart';
 import '../../../shared/ui/form/kenwell_checkbox_group.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_page.dart';
 import '../../../shared/ui/form/kenwell_form_styles.dart';
+import '../../../shared/ui/form/kenwell_yes_no_list.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/hiv_test_view_model.dart';
 
@@ -82,57 +82,65 @@ class HIVTestScreen extends StatelessWidget {
         KenwellFormCard(
           title: 'Risk Behaviors (last 12 months)',
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              KenwellYesNoQuestion<String>(
-                question:
-                    'Have you ever shared used needles or syringes with someone?',
-                value: viewModel.sharedNeedles,
-                onChanged: viewModel.setSharedNeedles,
-                yesValue: 'Yes',
-                noValue: 'No',
-              ),
-              KenwellYesNoQuestion<String>(
-                question:
-                    'Have you had unprotected sexual intercourse with more than one partner in the last 12 months?',
-                value: viewModel.unprotectedSex,
-                onChanged: viewModel.setUnprotectedSex,
-                yesValue: 'Yes',
-                noValue: 'No',
-              ),
-              KenwellYesNoQuestion<String>(
-                question:
-                    'Have you been diagnosed/treated for a sexually transmitted infection in the last 12 months?',
-                value: viewModel.treatedSTI,
-                onChanged: viewModel.setTreatedSTI,
-                yesValue: 'Yes',
-                noValue: 'No',
-              ),
-              KenwellYesNoQuestion<String>(
-                question:
-                    'Have you been diagnosed/treated for TB in the last 12 months?',
-                value: viewModel.treatedTB,
-                onChanged: viewModel.setTreatedTB,
-                yesValue: 'Yes',
-                noValue: 'No',
-              ),
-              KenwellYesNoQuestion<String>(
-                question: 'Do you sometimes not use a condom?',
-                value: viewModel.noCondomUse,
-                onChanged: viewModel.setNoCondomUse,
-                yesValue: 'Yes',
-                noValue: 'No',
+              KenwellYesNoList<String>(
+                items: [
+                  KenwellYesNoItem(
+                    question:
+                        'Have you ever shared used needles or syringes with someone?',
+                    value: viewModel.sharedNeedles,
+                    onChanged: viewModel.setSharedNeedles,
+                    yesValue: 'Yes',
+                    noValue: 'No',
+                  ),
+                  KenwellYesNoItem(
+                    question:
+                        'Have you had unprotected sexual intercourse with more than one partner in the last 12 months?',
+                    value: viewModel.unprotectedSex,
+                    onChanged: viewModel.setUnprotectedSex,
+                    yesValue: 'Yes',
+                    noValue: 'No',
+                  ),
+                  KenwellYesNoItem(
+                    question:
+                        'Have you been diagnosed/treated for a sexually transmitted infection in the last 12 months?',
+                    value: viewModel.treatedSTI,
+                    onChanged: viewModel.setTreatedSTI,
+                    yesValue: 'Yes',
+                    noValue: 'No',
+                  ),
+                  KenwellYesNoItem(
+                    question:
+                        'Have you been diagnosed/treated for TB in the last 12 months?',
+                    value: viewModel.treatedTB,
+                    onChanged: viewModel.setTreatedTB,
+                    yesValue: 'Yes',
+                    noValue: 'No',
+                  ),
+                  KenwellYesNoItem(
+                    question: 'Do you sometimes not use a condom?',
+                    value: viewModel.noCondomUse,
+                    onChanged: viewModel.setNoCondomUse,
+                    yesValue: 'Yes',
+                    noValue: 'No',
+                  ),
+                ],
               ),
               if (viewModel.noCondomUse == 'Yes')
-                KenwellTextField(
-                  label: 'Reason for not using a condom',
-                  hintText: 'Explain why',
-                  controller: viewModel.noCondomReasonController,
-                  decoration: KenwellFormStyles.decoration(
+                Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: KenwellTextField(
                     label: 'Reason for not using a condom',
-                    hint: 'Explain why',
+                    hintText: 'Explain why',
+                    controller: viewModel.noCondomReasonController,
+                    decoration: KenwellFormStyles.decoration(
+                      label: 'Reason for not using a condom',
+                      hint: 'Explain why',
+                    ),
+                    validator: (val) =>
+                        val == null || val.isEmpty ? 'Required' : null,
                   ),
-                  validator: (val) =>
-                      val == null || val.isEmpty ? 'Required' : null,
                 ),
             ],
           ),
