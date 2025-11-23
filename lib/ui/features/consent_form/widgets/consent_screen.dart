@@ -5,14 +5,13 @@ import 'package:signature/signature.dart';
 
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 
-import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_checkbox_group.dart';
 import '../../../shared/ui/form/kenwell_date_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
+import '../../../shared/ui/form/kenwell_form_page.dart';
 import '../../../shared/ui/form/kenwell_form_styles.dart';
 import '../../../shared/ui/form/kenwell_signature_field.dart';
-import '../../../shared/ui/form/kenwell_section_header.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/consent_screen_view_model.dart';
 
@@ -30,38 +29,24 @@ class ConsentScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final vm = Provider.of<ConsentScreenViewModel>(context);
 
-    return Scaffold(
-      appBar: const KenwellAppBar(
-        title: 'Consent Form',
-        automaticallyImplyLeading: false,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: vm.formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const KenwellSectionHeader(
-                title: 'Section A: Informed Consent',
-                uppercase: true,
-              ),
-              _buildEventInfoCard(context, vm),
-              const SizedBox(height: 24),
-              _buildInformationSection(),
-              const SizedBox(height: 24),
-              _buildScreeningSection(vm),
-              const SizedBox(height: 24),
-              KenwellFormCard(
-                //title: 'Signature',
-                child: _buildSignatureSection(vm),
-              ),
-              const SizedBox(height: 24),
-              _buildActionButtons(context, vm),
-            ],
-          ),
+    return KenwellFormPage(
+      title: 'Consent Form',
+      sectionTitle: 'Section A: Informed Consent',
+      formKey: vm.formKey,
+      children: [
+        _buildEventInfoCard(context, vm),
+        const SizedBox(height: 24),
+        _buildInformationSection(),
+        const SizedBox(height: 24),
+        _buildScreeningSection(vm),
+        const SizedBox(height: 24),
+        KenwellFormCard(
+          //title: 'Signature',
+          child: _buildSignatureSection(vm),
         ),
-      ),
+        const SizedBox(height: 24),
+        _buildActionButtons(context, vm),
+      ],
     );
   }
 
