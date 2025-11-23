@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/providers/theme_provider.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
@@ -11,14 +12,17 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => SettingsViewModel(),
+      create: (context) => SettingsViewModel(
+        initialDarkMode: context.read<ThemeProvider>().isDarkMode,
+      ),
       child: Scaffold(
         appBar: const KenwellAppBar(
           title: 'Settings',
           automaticallyImplyLeading: false,
         ),
-        body: Consumer<SettingsViewModel>(
-          builder: (context, viewModel, _) {
+        body: Consumer2<SettingsViewModel, ThemeProvider>(
+          builder: (context, viewModel, themeProvider, _) {
+            final colorScheme = Theme.of(context).colorScheme;
             return ListView(
               padding: const EdgeInsets.all(16),
               children: [
@@ -26,10 +30,24 @@ class SettingsScreen extends StatelessWidget {
                   margin: EdgeInsets.zero,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  child: SwitchListTile(
+                  child: SwitchListTile.adaptive(
                     title: const Text('Dark Mode'),
-                    value: viewModel.darkMode,
-                    onChanged: viewModel.toggleDarkMode,
+                    subtitle: Text(
+                      themeProvider.isDarkMode
+                          ? 'Using Kenwell Dark theme'
+                          : 'Using Kenwell Light theme',
+                    ),
+                    secondary: Icon(
+                      themeProvider.isDarkMode
+                          ? Icons.dark_mode
+                          : Icons.light_mode,
+                      color: colorScheme.secondary,
+                    ),
+                    value: themeProvider.isDarkMode,
+                    onChanged: (value) {
+                      themeProvider.toggleDarkMode(value);
+                      viewModel.toggleDarkMode(value);
+                    },
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -72,9 +90,11 @@ class SettingsScreen extends StatelessWidget {
                   onPressed: () async {
                     await viewModel.saveSettings();
                     if (!context.mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Settings saved!')),
-                    );
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text(
+                        'Settings saved · ${themeProvider.isDarkMode ? 'Dark' : 'Light'} mode active',
+                      ),
+                    ));
                   },
                 ),
               ],
