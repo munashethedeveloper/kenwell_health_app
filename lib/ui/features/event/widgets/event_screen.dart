@@ -6,6 +6,7 @@ import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/buttons/custom_primary_button.dart';
+import '../../../shared/ui/colours/kenwell_colours.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_checkbox_group.dart';
@@ -211,7 +212,10 @@ class _EventScreenState extends State<EventScreen> {
                   controller: widget.viewModel.setUpTimeController,
                   padding: EdgeInsets.zero,
                   readOnly: true,
-                  suffixIcon: const Icon(Icons.access_time),
+                  suffixIcon: const Icon(
+                    Icons.access_time,
+                    color: KenwellColors.primaryGreen,
+                  ),
                   validator: (value) => _requiredField('Setup Time', value),
                   onTap: () => widget.viewModel
                       .pickTime(context, widget.viewModel.setUpTimeController),
@@ -221,7 +225,10 @@ class _EventScreenState extends State<EventScreen> {
                   controller: widget.viewModel.startTimeController,
                   padding: EdgeInsets.zero,
                   readOnly: true,
-                  suffixIcon: const Icon(Icons.access_time),
+                  suffixIcon: const Icon(
+                    Icons.access_time,
+                    color: KenwellColors.primaryGreen,
+                  ),
                   validator: (value) => _requiredField('Start Time', value),
                   onTap: () => widget.viewModel
                       .pickTime(context, widget.viewModel.startTimeController),
@@ -231,7 +238,10 @@ class _EventScreenState extends State<EventScreen> {
                   controller: widget.viewModel.endTimeController,
                   padding: EdgeInsets.zero,
                   readOnly: true,
-                  suffixIcon: const Icon(Icons.access_time),
+                  suffixIcon: const Icon(
+                    Icons.access_time,
+                    color: KenwellColors.primaryGreen,
+                  ),
                   validator: (value) => _requiredField('End Time', value),
                   onTap: () => widget.viewModel
                       .pickTime(context, widget.viewModel.endTimeController),
@@ -241,7 +251,10 @@ class _EventScreenState extends State<EventScreen> {
                   controller: widget.viewModel.strikeDownTimeController,
                   padding: EdgeInsets.zero,
                   readOnly: true,
-                  suffixIcon: const Icon(Icons.access_time),
+                  suffixIcon: const Icon(
+                    Icons.access_time,
+                    color: KenwellColors.primaryGreen,
+                  ),
                   validator: (value) =>
                       _requiredField('Strike Down Time', value),
                   onTap: () => widget.viewModel.pickTime(
