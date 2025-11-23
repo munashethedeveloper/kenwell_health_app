@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 
 class SettingsViewModel extends ChangeNotifier {
-  bool _darkMode = false;
+  SettingsViewModel({bool initialDarkMode = false}) : _darkMode = initialDarkMode;
+
+  bool _darkMode;
   bool _notificationsEnabled = true;
   String _language = 'English';
 
