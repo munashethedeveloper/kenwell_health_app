@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+
 import '../../../../domain/models/wellness_event.dart';
 
 class EventViewModel extends ChangeNotifier {
+  EventViewModel() {
+    _resetServiceSelections();
+  }
+
+  static const List<String> _serviceOptions = ['HRA', 'VCT', 'HIV', 'TB'];
+
   // Controllers
   final titleController = TextEditingController();
   final venueController = TextEditingController();
@@ -26,14 +33,34 @@ class EventViewModel extends ChangeNotifier {
   String coordinators = 'No';
   String multiplyPromoters = 'No';
   String mobileBooths = 'No';
-  String servicesRequested = 'HRA';
   String medicalAid = "No";
 
   // Events
   final List<WellnessEvent> _events = [];
   List<WellnessEvent> get events => _events;
 
-  EventViewModel();
+  final Set<String> _selectedServices = {};
+
+  List<String> get availableServiceOptions =>
+      List<String>.unmodifiable(_serviceOptions);
+
+  Set<String> get selectedServices =>
+      Set<String>.unmodifiable(_selectedServices);
+
+  bool isServiceSelected(String service) => _selectedServices.contains(service);
+
+  void toggleServiceSelection(String service, bool shouldSelect) {
+    if (!_serviceOptions.contains(service)) return;
+    if (shouldSelect) {
+      _selectedServices.add(service);
+    } else {
+      _selectedServices.remove(service);
+    }
+    notifyListeners();
+  }
+
+  String get servicesRequested =>
+      _selectedServices.isEmpty ? '' : _selectedServices.join(', ');
 
   // Load existing event for editing
   void loadExistingEvent(WellnessEvent? e) {
@@ -63,7 +90,7 @@ class EventViewModel extends ChangeNotifier {
     coordinators = e.coordinators == 1 ? 'Yes' : 'No';
     multiplyPromoters = e.multiplyPromoters == 1 ? 'Yes' : 'No';
     mobileBooths = e.mobileBooths;
-    servicesRequested = e.servicesRequested;
+    _setServicesFromString(e.servicesRequested);
     medicalAid = e.medicalAid;
 
     notifyListeners();
@@ -184,6 +211,7 @@ class EventViewModel extends ChangeNotifier {
     strikeDownTimeController.clear();
     //medicalAidController.clear();
     dateController.clear();
+    _resetServiceSelections();
   }
 
   @override
@@ -206,5 +234,26 @@ class EventViewModel extends ChangeNotifier {
     //medicalAidController.dispose();
     dateController.dispose();
     super.dispose();
+  }
+
+  void _setServicesFromString(String raw) {
+    final parsed = raw
+        .split(',')
+        .map((value) => value.trim())
+        .where((value) => value.isNotEmpty && _serviceOptions.contains(value));
+
+    _selectedServices
+      ..clear()
+      ..addAll(parsed);
+
+    if (_selectedServices.isEmpty) {
+      _resetServiceSelections();
+    }
+  }
+
+  void _resetServiceSelections() {
+    _selectedServices
+      ..clear()
+      ..add(_serviceOptions.first);
   }
 }

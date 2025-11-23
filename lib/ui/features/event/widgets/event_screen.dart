@@ -8,6 +8,7 @@ import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/buttons/custom_primary_button.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
+import '../../../shared/ui/form/kenwell_checkbox_group.dart';
 import '../../../shared/ui/form/kenwell_date_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_styles.dart';
@@ -127,93 +128,84 @@ class _EventScreenState extends State<EventScreen> {
                   validator: (value) => _requiredField('Email', value),
                 ),
               ]),
-              _buildSectionCard('AE Contact', [
-                KenwellTextField(
-                  label: 'Contact Person',
-                  controller: widget.viewModel.aeContactController,
-                  padding: EdgeInsets.zero,
-                  inputFormatters:
-                      AppTextInputFormatters.lettersOnly(allowHyphen: true),
-                  validator: (value) => _requiredField('Contact Person', value),
-                ),
-                KenwellTextField(
-                  label: 'Contact Number',
-                  controller: widget.viewModel.aeNumberController,
-                  padding: EdgeInsets.zero,
-                  keyboardType: TextInputType.phone,
-                  inputFormatters: AppTextInputFormatters.numbersOnly(),
-                  validator: (value) => _requiredField('Contact Number', value),
-                ),
-              ]),
-              _buildSectionCard('Participation & Numbers', [
-                _buildSpinBoxField(
-                  'Expected Participation',
-                  widget.viewModel.expectedParticipationController,
-                ),
-                _buildSpinBoxField(
-                  'Passports',
-                  widget.viewModel.passportsController,
-                ),
-                _buildSpinBoxField(
-                  'Nurses',
-                  widget.viewModel.nursesController,
-                ),
-              ]),
-              _buildSectionCard('Options', [
-                KenwellDropdownField<String>(
-                  label: 'Medical Aid',
-                  value: _nullableValue(widget.viewModel.medicalAid),
-                  items: const ['Yes', 'No'],
-                  onChanged: (val) => widget.viewModel.medicalAid = val ?? '',
-                  padding: EdgeInsets.zero,
-                  validator: (val) => _requiredSelection('Medical Aid', val),
-                ),
-                KenwellDropdownField<String>(
-                  label: 'Non-Members',
-                  value: _nullableValue(widget.viewModel.nonMembers),
-                  items: const ['Yes', 'No'],
-                  onChanged: (val) => widget.viewModel.nonMembers = val ?? '',
-                  padding: EdgeInsets.zero,
-                  validator: (val) => _requiredSelection('Non-Members', val),
-                ),
-                KenwellDropdownField<String>(
-                  label: 'Coordinators',
-                  value: _nullableValue(widget.viewModel.coordinators),
-                  items: const ['Yes', 'No'],
-                  onChanged: (val) => widget.viewModel.coordinators = val ?? '',
-                  padding: EdgeInsets.zero,
-                  validator: (val) => _requiredSelection('Coordinators', val),
-                ),
-                KenwellDropdownField<String>(
-                  label: 'Multiply Promoters',
-                  value: _nullableValue(widget.viewModel.multiplyPromoters),
-                  items: const ['Yes', 'No'],
-                  onChanged: (val) =>
-                      widget.viewModel.multiplyPromoters = val ?? '',
-                  padding: EdgeInsets.zero,
-                  validator: (val) =>
-                      _requiredSelection('Multiply Promoters', val),
-                ),
-                KenwellDropdownField<String>(
-                  label: 'Mobile Booths',
-                  value: _nullableValue(widget.viewModel.mobileBooths),
-                  items: const ['Yes', 'No'],
-                  onChanged: (val) => widget.viewModel.mobileBooths = val ?? '',
-                  padding: EdgeInsets.zero,
-                  validator: (val) => _requiredSelection('Mobile Booths', val),
-                ),
-                KenwellDropdownField<String>(
-                  label: 'Services Requested',
-                  value: _nullableValue(widget.viewModel.servicesRequested),
-                  items: const ['HRA', 'Other'],
-                  onChanged: (val) =>
-                      widget.viewModel.servicesRequested = val ?? '',
-                  padding: EdgeInsets.zero,
-                  validator: (val) =>
-                      _requiredSelection('Services Requested', val),
-                ),
-              ]),
-              _buildSectionCard('Time Details', [
+                _buildSectionCard('AE Contact', [
+                  KenwellTextField(
+                    label: 'Contact Person',
+                    controller: widget.viewModel.aeContactController,
+                    padding: EdgeInsets.zero,
+                    inputFormatters:
+                        AppTextInputFormatters.lettersOnly(allowHyphen: true),
+                    validator: (value) => _requiredField('Contact Person', value),
+                  ),
+                  KenwellTextField(
+                    label: 'Contact Number',
+                    controller: widget.viewModel.aeNumberController,
+                    padding: EdgeInsets.zero,
+                    keyboardType: TextInputType.phone,
+                    inputFormatters: AppTextInputFormatters.numbersOnly(),
+                    validator: (value) => _requiredField('Contact Number', value),
+                  ),
+                ]),
+                _buildSectionCard('Participation & Numbers', [
+                  _buildSpinBoxField(
+                    'Expected Participation',
+                    widget.viewModel.expectedParticipationController,
+                  ),
+                  _buildSpinBoxField(
+                    'Passports',
+                    widget.viewModel.passportsController,
+                  ),
+                  _buildSpinBoxField(
+                    'Nurses',
+                    widget.viewModel.nursesController,
+                  ),
+                ]),
+                _buildSectionCard('Options', [
+                  KenwellDropdownField<String>(
+                    label: 'Medical Aid',
+                    value: _nullableValue(widget.viewModel.medicalAid),
+                    items: const ['Yes', 'No'],
+                    onChanged: (val) => widget.viewModel.medicalAid = val ?? '',
+                    padding: EdgeInsets.zero,
+                    validator: (val) => _requiredSelection('Medical Aid', val),
+                  ),
+                  KenwellDropdownField<String>(
+                    label: 'Non-Members',
+                    value: _nullableValue(widget.viewModel.nonMembers),
+                    items: const ['Yes', 'No'],
+                    onChanged: (val) => widget.viewModel.nonMembers = val ?? '',
+                    padding: EdgeInsets.zero,
+                    validator: (val) => _requiredSelection('Non-Members', val),
+                  ),
+                  KenwellDropdownField<String>(
+                    label: 'Coordinators',
+                    value: _nullableValue(widget.viewModel.coordinators),
+                    items: const ['Yes', 'No'],
+                    onChanged: (val) => widget.viewModel.coordinators = val ?? '',
+                    padding: EdgeInsets.zero,
+                    validator: (val) => _requiredSelection('Coordinators', val),
+                  ),
+                  KenwellDropdownField<String>(
+                    label: 'Multiply Promoters',
+                    value: _nullableValue(widget.viewModel.multiplyPromoters),
+                    items: const ['Yes', 'No'],
+                    onChanged: (val) =>
+                        widget.viewModel.multiplyPromoters = val ?? '',
+                    padding: EdgeInsets.zero,
+                    validator: (val) =>
+                        _requiredSelection('Multiply Promoters', val),
+                  ),
+                  KenwellDropdownField<String>(
+                    label: 'Mobile Booths',
+                    value: _nullableValue(widget.viewModel.mobileBooths),
+                    items: const ['Yes', 'No'],
+                    onChanged: (val) => widget.viewModel.mobileBooths = val ?? '',
+                    padding: EdgeInsets.zero,
+                    validator: (val) => _requiredSelection('Mobile Booths', val),
+                  ),
+                  _buildServicesRequestedField(context),
+                ]),
+                _buildSectionCard('Time Details', [
                 KenwellTextField(
                   label: 'Setup Time',
                   controller: widget.viewModel.setUpTimeController,
@@ -303,6 +295,63 @@ class _EventScreenState extends State<EventScreen> {
       validator: (value) => value == null ? 'Enter $label' : null,
       onChanged: (value) {
         controller.text = value.round().toString();
+      },
+    );
+  }
+
+  Widget _buildServicesRequestedField(BuildContext context) {
+    return FormField<Set<String>>(
+      initialValue: widget.viewModel.selectedServices,
+      validator: (_) {
+        if (widget.viewModel.selectedServices.isEmpty) {
+          return 'Select at least one service';
+        }
+        return null;
+      },
+      builder: (field) {
+        final labelStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+            );
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Services Requested',
+              style: labelStyle,
+            ),
+            const SizedBox(height: 8),
+            KenwellCheckboxGroup(
+              options: widget.viewModel.availableServiceOptions
+                  .map(
+                    (service) => KenwellCheckboxOption(
+                      label: service,
+                      value: widget.viewModel.isServiceSelected(service),
+                      onChanged: (checked) {
+                        setState(() {
+                          widget.viewModel.toggleServiceSelection(
+                            service,
+                            checked ?? false,
+                          );
+                          field.didChange(widget.viewModel.selectedServices);
+                        });
+                      },
+                    ),
+                  )
+                  .toList(),
+            ),
+            if (field.hasError)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  field.errorText!,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.error,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+          ],
+        );
       },
     );
   }
