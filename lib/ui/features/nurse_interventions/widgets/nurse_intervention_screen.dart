@@ -9,6 +9,7 @@ import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_page.dart';
 import '../../../shared/ui/form/kenwell_form_styles.dart';
 import '../../../shared/ui/form/kenwell_signature_actions.dart';
+import '../../../shared/ui/form/kenwell_referral_card.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/nurse_intervention_view_model.dart';
 
@@ -79,37 +80,29 @@ class NurseInterventionScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        KenwellFormCard(
+        KenwellReferralCard<NursingReferralOption>(
           title: 'Nursing Referrals',
-          child: Column(
-            children: [
-              _buildReferralRadio(
-                viewModel: viewModel,
-                option: NursingReferralOption.patientNotReferred,
-                label: 'Patient not referred',
-              ),
-              if (viewModel.nursingReferralSelection ==
-                  NursingReferralOption.patientNotReferred)
-                KenwellTextField(
-                  label: 'Reason patient not referred',
-                  hintText: 'Enter reason',
-                  controller: viewModel.notReferredReasonController,
-                  validator: (val) => (val == null || val.isEmpty)
-                      ? 'Please enter Reason patient not referred'
-                      : null,
-                ),
-              _buildReferralRadio(
-                viewModel: viewModel,
-                option: NursingReferralOption.referredToGP,
-                label: 'Patient referred to GP',
-              ),
-              _buildReferralRadio(
-                viewModel: viewModel,
-                option: NursingReferralOption.referredToStateClinic,
-                label: 'Patient referred to State HIV clinic',
-              ),
-            ],
-          ),
+          selectedValue: viewModel.nursingReferralSelection,
+          onChanged: viewModel.setNursingReferralSelection,
+          reasonValidator: (val) =>
+              (val == null || val.isEmpty) ? 'Please enter a reason' : null,
+          options: [
+            KenwellReferralOption(
+              value: NursingReferralOption.patientNotReferred,
+              label: 'Patient not referred',
+              requiresReason: true,
+              reasonController: viewModel.notReferredReasonController,
+              reasonLabel: 'Reason patient not referred',
+            ),
+            KenwellReferralOption(
+              value: NursingReferralOption.referredToGP,
+              label: 'Patient referred to GP',
+            ),
+            KenwellReferralOption(
+              value: NursingReferralOption.referredToStateClinic,
+              label: 'Patient referred to State HIV clinic',
+            ),
+          ],
         ),
         const SizedBox(height: 16),
         if (viewModel.windowPeriod == 'Yes')
@@ -197,22 +190,6 @@ class NurseInterventionScreen extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  // ------------------ Reusable Widgets ------------------
-  Widget _buildReferralRadio({
-    required NurseInterventionViewModel viewModel,
-    required NursingReferralOption option,
-    required String label,
-  }) {
-    return RadioListTile<NursingReferralOption>(
-      value: option,
-      groupValue: viewModel.nursingReferralSelection,
-      onChanged: viewModel.setNursingReferralSelection,
-      title: Text(label),
-      contentPadding: EdgeInsets.zero,
-      dense: true,
     );
   }
 

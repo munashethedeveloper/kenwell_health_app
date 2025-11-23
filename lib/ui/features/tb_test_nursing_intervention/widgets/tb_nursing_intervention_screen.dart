@@ -5,6 +5,7 @@ import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_styles.dart';
 import '../../../shared/ui/form/kenwell_form_page.dart';
 import '../../../shared/ui/form/kenwell_signature_actions.dart';
+import '../../../shared/ui/form/kenwell_referral_card.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/tb_nursing_intervention_view_model.dart';
 
@@ -26,52 +27,34 @@ class TBNursingInterventionScreen extends StatelessWidget {
       title: 'TB Test Nursing Intervention',
       sectionTitle: 'Section J: TB Screening Nursing Interventions',
       children: [
-        KenwellFormCard(
+        KenwellReferralCard<TBNursingReferralOption>(
           title: 'Nursing Referrals',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              RadioListTile<TBNursingReferralOption>(
-                title: const Text('Member not referred – reason?'),
-                value: TBNursingReferralOption.memberNotReferred,
-                groupValue: viewModel.selectedReferralOption,
-                onChanged: viewModel.setReferralOption,
-              ),
-              if (viewModel.selectedReferralOption ==
-                  TBNursingReferralOption.memberNotReferred)
-                Padding(
-                  padding:
-                      const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 12.0),
-                  child: KenwellTextField(
-                    label: 'Enter reason',
-                    controller: viewModel.reasonController,
-                    maxLines: 2,
-                    decoration: KenwellFormStyles.decoration(
-                      label: 'Enter reason',
-                      hint: 'Provide additional detail',
-                    ),
-                  ),
-                ),
-              RadioListTile<TBNursingReferralOption>(
-                title: const Text('Member referred to GP'),
-                value: TBNursingReferralOption.referredToGP,
-                groupValue: viewModel.selectedReferralOption,
-                onChanged: viewModel.setReferralOption,
-              ),
-              RadioListTile<TBNursingReferralOption>(
-                title: const Text('Member referred to state HIV clinic'),
-                value: TBNursingReferralOption.referredToStateHIVClinic,
-                groupValue: viewModel.selectedReferralOption,
-                onChanged: viewModel.setReferralOption,
-              ),
-              RadioListTile<TBNursingReferralOption>(
-                title: const Text('Member referred for OH consultation'),
-                value: TBNursingReferralOption.referredToOHConsultation,
-                groupValue: viewModel.selectedReferralOption,
-                onChanged: viewModel.setReferralOption,
-              ),
-            ],
-          ),
+          selectedValue: viewModel.selectedReferralOption,
+          onChanged: viewModel.setReferralOption,
+          reasonValidator: (val) =>
+              (val == null || val.isEmpty) ? 'Please enter a reason' : null,
+          options: [
+            KenwellReferralOption(
+              value: TBNursingReferralOption.memberNotReferred,
+              label: 'Member not referred – reason?',
+              requiresReason: true,
+              reasonController: viewModel.reasonController,
+              reasonLabel: 'Enter reason',
+              reasonMaxLines: 2,
+            ),
+            KenwellReferralOption(
+              value: TBNursingReferralOption.referredToGP,
+              label: 'Member referred to GP',
+            ),
+            KenwellReferralOption(
+              value: TBNursingReferralOption.referredToStateHIVClinic,
+              label: 'Member referred to state HIV clinic',
+            ),
+            KenwellReferralOption(
+              value: TBNursingReferralOption.referredToOHConsultation,
+              label: 'Member referred for OH consultation',
+            ),
+          ],
         ),
         const SizedBox(height: 24),
         KenwellFormCard(
