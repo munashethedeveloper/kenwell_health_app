@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
-import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
+import '../../../shared/ui/form/kenwell_form_page.dart';
 import '../../../shared/ui/form/kenwell_form_styles.dart';
-import '../../../shared/ui/form/kenwell_section_header.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/personal_details_view_model.dart';
 
@@ -28,41 +27,28 @@ class PersonalDetailsScreen extends StatelessWidget {
     return ChangeNotifierProvider.value(
       value: viewModel,
       child: Consumer<PersonalDetailsViewModel>(
-        builder: (context, vm, _) => Scaffold(
-          appBar: const KenwellAppBar(
-              title: 'Patient Personal Details',
-              automaticallyImplyLeading: false),
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Form(
-              key: vm.formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const KenwellSectionHeader(
-                    title: 'Section B: Personal Details',
-                    uppercase: true,
-                  ),
-                  KenwellFormCard(
-                    title: 'Personal Information',
-                    child: _buildPersonalInfoSection(vm),
-                  ),
-                  const SizedBox(height: 24),
-                  KenwellFormCard(
-                    title: 'Medical Aid Information',
-                    child: _buildMedicalAidSection(vm),
-                  ),
-                  const SizedBox(height: 24),
-                  KenwellFormCard(
-                    title: 'Employment Details',
-                    child: _buildWorkInfoSection(vm),
-                  ),
-                  const SizedBox(height: 24),
-                  _buildNavigationButtons(context, vm),
-                ],
-              ),
+        builder: (context, vm, _) => KenwellFormPage(
+          title: 'Patient Personal Details',
+          sectionTitle: 'Section B: Personal Details',
+          formKey: vm.formKey,
+          children: [
+            KenwellFormCard(
+              title: 'Personal Information',
+              child: _buildPersonalInfoSection(vm),
             ),
-          ),
+            const SizedBox(height: 24),
+            KenwellFormCard(
+              title: 'Medical Aid Information',
+              child: _buildMedicalAidSection(vm),
+            ),
+            const SizedBox(height: 24),
+            KenwellFormCard(
+              title: 'Employment Details',
+              child: _buildWorkInfoSection(vm),
+            ),
+            const SizedBox(height: 24),
+            _buildNavigationButtons(context, vm),
+          ],
         ),
       ),
     );

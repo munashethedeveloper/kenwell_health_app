@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_date_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
+import '../../../shared/ui/form/kenwell_form_page.dart';
+import '../../../shared/ui/form/kenwell_signature_actions.dart';
 import '../../../shared/ui/form/kenwell_form_styles.dart';
-import '../../../shared/ui/form/kenwell_section_header.dart';
-import '../../../shared/ui/form/kenwell_signature_field.dart';
+import '../../../shared/ui/form/kenwell_referral_card.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/hiv_test_nursing_intervention_view_model.dart';
 
@@ -24,96 +24,79 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<HIVTestNursingInterventionViewModel>();
 
-    return Scaffold(
-      appBar: const KenwellAppBar(
-        title: 'HIV Test Nursing Intervention',
-        automaticallyImplyLeading: false,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const KenwellSectionHeader(
-              title: 'Section H: HIV Test Nursing Interventions',
-              uppercase: true,
-            ),
-            KenwellFormCard(
-              title: 'Initial Assessment',
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSection(
-                    '1. Did the risk assessment indicate window period?',
-                    _buildRadioOptions(
-                      viewModel.windowPeriod,
-                      viewModel.setWindowPeriod,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildSection(
-                    '2. Follow-up test location',
-                    Column(
-                      children: [
-                        _buildFollowUpRadio(
-                          label: 'State Clinic',
-                          option: FollowUpLocationOption.stateClinic,
-                          viewModel: viewModel,
-                        ),
-                        _buildFollowUpRadio(
-                          label: 'Private Doctor',
-                          option: FollowUpLocationOption.privateDoctor,
-                          viewModel: viewModel,
-                        ),
-                        _buildFollowUpRadio(
-                          label: 'Other (give detail)',
-                          option: FollowUpLocationOption.other,
-                          viewModel: viewModel,
-                        ),
-                        if (viewModel.followUpLocation ==
-                            FollowUpLocationOption.other)
-                          KenwellTextField(
-                            label: 'Specify other location',
-                            controller:
-                                viewModel.followUpOtherDetailsController,
-                            decoration: KenwellFormStyles.decoration(
-                              label: 'Specify other location',
-                              hint: 'Enter location details',
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildSection(
-                    '3. Follow-up test date',
-                    KenwellDateField(
-                      label: 'Follow-up Date',
-                      controller: viewModel.followUpDateController,
-                      dateFormat: 'yyyy-MM-dd',
-                    ),
-                  ),
-                ],
+    return KenwellFormPage(
+      title: 'HIV Test Nursing Intervention',
+      sectionTitle: 'Section H: HIV Test Nursing Interventions',
+      children: [
+        KenwellFormCard(
+          title: 'Initial Assessment',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildSection(
+                '1. Did the risk assessment indicate window period?',
+                _buildRadioOptions(
+                  viewModel.windowPeriod,
+                  viewModel.setWindowPeriod,
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            KenwellFormCard(
-              // title: 'Signature',
-              child: KenwellSignatureField(
-                controller: viewModel.signatureController,
-                onClear: viewModel.clearSignature,
+              const SizedBox(height: 16),
+              _buildSection(
+                '2. Follow-up test location',
+                Column(
+                  children: [
+                    _buildFollowUpRadio(
+                      label: 'State Clinic',
+                      option: FollowUpLocationOption.stateClinic,
+                      viewModel: viewModel,
+                    ),
+                    _buildFollowUpRadio(
+                      label: 'Private Doctor',
+                      option: FollowUpLocationOption.privateDoctor,
+                      viewModel: viewModel,
+                    ),
+                    _buildFollowUpRadio(
+                      label: 'Other (give detail)',
+                      option: FollowUpLocationOption.other,
+                      viewModel: viewModel,
+                    ),
+                    if (viewModel.followUpLocation ==
+                        FollowUpLocationOption.other)
+                      KenwellTextField(
+                        label: 'Specify other location',
+                        controller: viewModel.followUpOtherDetailsController,
+                        decoration: KenwellFormStyles.decoration(
+                          label: 'Specify other location',
+                          hint: 'Enter location details',
+                        ),
+                      ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
-            KenwellFormNavigation(
-              onPrevious: onPrevious,
-              onNext: () => viewModel.submitIntervention(onNext),
-              isNextEnabled: viewModel.isFormValid && !viewModel.isSubmitting,
-              isNextBusy: viewModel.isSubmitting,
-            ),
-          ],
+              const SizedBox(height: 16),
+              _buildSection(
+                '3. Follow-up test date',
+                KenwellDateField(
+                  label: 'Follow-up Date',
+                  controller: viewModel.followUpDateController,
+                  dateFormat: 'yyyy-MM-dd',
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
+        const SizedBox(height: 16),
+        KenwellSignatureActions(
+          controller: viewModel.signatureController,
+          onClear: viewModel.clearSignature,
+          navigation: KenwellFormNavigation(
+            onPrevious: onPrevious,
+            onNext: () => viewModel.submitIntervention(onNext),
+            isNextEnabled: viewModel.isFormValid && !viewModel.isSubmitting,
+            isNextBusy: viewModel.isSubmitting,
+          ),
+        ),
+      ],
     );
   }
 
