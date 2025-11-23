@@ -73,7 +73,7 @@ class AppTheme {
           fontWeight: FontWeight.w600,
         ),
       ),
-      textTheme: _buildTextTheme(colorScheme),
+      textTheme: _buildTextTheme(colorScheme, isDark),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: colorScheme.secondary,
@@ -146,8 +146,10 @@ class AppTheme {
     );
   }
 
-  static TextTheme _buildTextTheme(ColorScheme colorScheme) {
-    final Color baseColor = colorScheme.onBackground;
+  static TextTheme _buildTextTheme(ColorScheme colorScheme, bool isDark) {
+    final Color baseColor = isDark ? Colors.black : colorScheme.onBackground;
+    final Color secondaryTextColor =
+        isDark ? Colors.black : colorScheme.onSurfaceVariant;
     return TextTheme(
       displayLarge: TextStyle(
         fontSize: 48,
@@ -171,12 +173,12 @@ class AppTheme {
       ),
       bodyMedium: TextStyle(
         fontSize: 14,
-        color: colorScheme.onSurfaceVariant,
+        color: secondaryTextColor,
       ),
       labelLarge: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w600,
-        color: colorScheme.onPrimary,
+        color: isDark ? Colors.black : colorScheme.onPrimary,
       ),
     );
   }
