@@ -30,23 +30,23 @@ class AppTheme {
 
   static final ColorScheme _darkColorScheme = ColorScheme.dark(
     primary: KenwellColors.secondaryNavy,
-    onPrimary: KenwellColors.neutralWhite,
+    onPrimary: Colors.black,
     secondary: KenwellColors.primaryGreen,
-    onSecondary: KenwellColors.secondaryNavyDark,
+    onSecondary: Colors.black,
     tertiary: KenwellColors.secondaryNavyLight,
-    onTertiary: KenwellColors.neutralWhite,
+    onTertiary: Colors.black,
     surface: KenwellColors.secondaryNavyDark,
-    onSurface: KenwellColors.neutralSurface,
+    onSurface: Colors.black,
     surfaceVariant: KenwellColors.secondaryNavy,
-    onSurfaceVariant: KenwellColors.primaryGreenLight,
+    onSurfaceVariant: Colors.black,
     background: const Color(0xFF0E1024),
-    onBackground: KenwellColors.neutralSurface,
+    onBackground: Colors.black,
     error: KenwellColors.error,
-    onError: KenwellColors.neutralWhite,
+    onError: Colors.black,
     outline: KenwellColors.secondaryNavyLight,
     outlineVariant: KenwellColors.secondaryNavyLight,
     inverseSurface: KenwellColors.neutralSurface,
-    onInverseSurface: KenwellColors.secondaryNavy,
+    onInverseSurface: Colors.black,
     inversePrimary: KenwellColors.primaryGreenLight,
   );
 
@@ -138,7 +138,7 @@ class AppTheme {
       snackBarTheme: SnackBarThemeData(
         backgroundColor: isDark ? KenwellColors.secondaryNavyLight : colorScheme.secondary,
         contentTextStyle: TextStyle(
-          color: isDark ? KenwellColors.secondaryNavyDark : colorScheme.onSecondary,
+          color: isDark ? Colors.black : colorScheme.onSecondary,
         ),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
