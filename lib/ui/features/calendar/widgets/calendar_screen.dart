@@ -565,6 +565,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   void _showDayActionsSheet(DateTime selectedDay, List<WellnessEvent> events) {
+    final dayEvents = [...events]..sort(_compareEvents);
+
     showModalBottomSheet(
       context: context,
       builder: (ctx) {
@@ -583,7 +585,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                ...events.map(
+                ...dayEvents.map(
                   (event) => ListTile(
                     leading: CircleAvatar(
                       backgroundColor: _categoryColor(event.servicesRequested),
