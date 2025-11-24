@@ -75,12 +75,34 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
                             readOnly: true,
                           ),
                           const SizedBox(height: 12),
-                          KenwellTextField(
-                            label: 'Blood Pressure (mmHg)',
-                            hintText: 'e.g., 120/80',
-                            controller: vm.bloodPressureController,
-                            validator: (val) =>
-                                _validateRequired(val, 'Blood Pressure (mmHg)'),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: KenwellTextField(
+                                  label: 'Systolic (mmHg)',
+                                  hintText: 'e.g., 120',
+                                  controller: vm.systolicBpController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters:
+                                      AppTextInputFormatters.numbersOnly(),
+                                  validator: (val) =>
+                                      _validateRequired(val, 'Systolic (mmHg)'),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: KenwellTextField(
+                                  label: 'Diastolic (mmHg)',
+                                  hintText: 'e.g., 80',
+                                  controller: vm.diastolicBpController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters:
+                                      AppTextInputFormatters.numbersOnly(),
+                                  validator: (val) => _validateRequired(
+                                      val, 'Diastolic (mmHg)'),
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 12),
                           KenwellTextField(
