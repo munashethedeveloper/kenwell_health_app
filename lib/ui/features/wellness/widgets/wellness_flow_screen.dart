@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../consent_form/widgets/consent_screen.dart';
 import '../../hiv_test_nursing_intervention/widgets/hiv_test_nursing_intervention_screen.dart';
 import '../../hiv_test_results/widgets/hiv_test_result_screen.dart';
+import '../../nurse_interventions/view_model/nurse_intervention_view_model.dart';
 import '../../nurse_interventions/widgets/nurse_intervention_screen.dart';
 import '../../patient/widgets/personal_details_screen.dart';
 import '../../risk_assessment/widgets/personal_risk_assessment_screen.dart';
@@ -65,7 +66,7 @@ class WellnessFlowScreen extends StatelessWidget {
       case 4:
         currentScreen = ChangeNotifierProvider.value(
           value: flowVM.nurseVM,
-          child: NurseInterventionScreen(
+          child: NurseInterventionScreen<NurseInterventionViewModel>(
             onNext: flowVM.nextStep,
             onPrevious: flowVM.previousStep,
           ),

@@ -10,15 +10,19 @@ class PersonalDetailsViewModel extends ChangeNotifier {
   final nameController = TextEditingController();
   final surnameController = TextEditingController();
   final initialsController = TextEditingController();
+  final dobController = TextEditingController();
   final idNumberController = TextEditingController();
+  final passportNumberController = TextEditingController();
   final nationalityController = TextEditingController();
   final medicalAidNameController = TextEditingController();
   final medicalAidNumberController = TextEditingController();
   final emailController = TextEditingController();
   final cellNumberController = TextEditingController();
+  final alternateContactNumberController = TextEditingController();
   final personalNumberController = TextEditingController();
   final divisionController = TextEditingController();
   final positionController = TextEditingController();
+  final employeeNumberController = TextEditingController();
   // final regionController = TextEditingController();
 
   // Dropdown values
@@ -26,6 +30,8 @@ class PersonalDetailsViewModel extends ChangeNotifier {
   String? gender;
   String? employmentStatus;
   String? provinces;
+  String idDocumentChoice = 'ID';
+  String? medicalAidStatus;
 
   // Dropdown options
   final List<String> maritalStatusOptions = [
@@ -53,6 +59,8 @@ class PersonalDetailsViewModel extends ChangeNotifier {
     'Contract – limited duration',
     'Outside contractor'
   ];
+  final List<String> idDocumentOptions = ['ID', 'Passport'];
+  final List<String> medicalAidStatusOptions = ['Yes', 'No'];
 
   // Submission state
   bool _isSubmitting = false;
@@ -87,13 +95,45 @@ class PersonalDetailsViewModel extends ChangeNotifier {
     }
   }
 
+  void setIdDocumentChoice(String? value) {
+    if (value == null || idDocumentChoice == value) return;
+    idDocumentChoice = value;
+    if (idDocumentChoice == 'ID') {
+      passportNumberController.clear();
+    } else {
+      idNumberController.clear();
+    }
+    notifyListeners();
+  }
+
+  void setMedicalAidStatus(String? value) {
+    if (medicalAidStatus == value) return;
+    medicalAidStatus = value;
+    if (medicalAidStatus == 'No') {
+      medicalAidNameController.clear();
+      medicalAidNumberController.clear();
+    }
+    notifyListeners();
+  }
+
+  bool get showIdField => idDocumentChoice == 'ID';
+  bool get showPassportField => idDocumentChoice == 'Passport';
+  bool get showMedicalAidFields => medicalAidStatus == 'Yes';
+
   // Form validation
   bool get isFormValid =>
       formKey.currentState?.validate() == true &&
       maritalStatus != null &&
       gender != null &&
       employmentStatus != null &&
-      provinces != null;
+      provinces != null &&
+      medicalAidStatus != null &&
+      (showIdField
+          ? idNumberController.text.isNotEmpty
+          : passportNumberController.text.isNotEmpty) &&
+      (!showMedicalAidFields ||
+          (medicalAidNameController.text.isNotEmpty &&
+              medicalAidNumberController.text.isNotEmpty));
 
   // Convert to Map
   Map<String, dynamic> toMap() => {
@@ -102,15 +142,21 @@ class PersonalDetailsViewModel extends ChangeNotifier {
         'name': nameController.text,
         'surname': surnameController.text,
         'initials': initialsController.text,
+        'dateOfBirth': dobController.text,
         'idNumber': idNumberController.text,
+        'passportNumber': passportNumberController.text,
+        'idDocumentChoice': idDocumentChoice,
         'nationality': nationalityController.text,
         'medicalAidName': medicalAidNameController.text,
         'medicalAidNumber': medicalAidNumberController.text,
+        'medicalAidStatus': medicalAidStatus,
         'email': emailController.text,
         'cellNumber': cellNumberController.text,
+        'alternateContactNumber': alternateContactNumberController.text,
         'personalNumber': personalNumberController.text,
         'division': divisionController.text,
         'position': positionController.text,
+        'employeeNumber': employeeNumberController.text,
         'region': provinces,
         'maritalStatus': maritalStatus,
         'gender': gender,
@@ -134,15 +180,19 @@ class PersonalDetailsViewModel extends ChangeNotifier {
       nameController,
       surnameController,
       initialsController,
+      dobController,
       idNumberController,
+      passportNumberController,
       nationalityController,
       medicalAidNameController,
       medicalAidNumberController,
       emailController,
       cellNumberController,
+      alternateContactNumberController,
       personalNumberController,
       divisionController,
       positionController,
+      employeeNumberController,
       // regionController,
     ].forEach((c) => c.dispose());
     super.dispose();

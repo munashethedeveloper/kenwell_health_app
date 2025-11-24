@@ -6,11 +6,14 @@ class WellnessEvent {
   final DateTime date;
   final String venue;
   final String address;
-  final String onsiteContactPerson;
+  final String onsiteContactFirstName;
+  final String onsiteContactLastName;
   final String onsiteContactNumber;
   final String onsiteContactEmail;
-  final String aeContactPerson;
+  final String aeContactFirstName;
+  final String aeContactLastName;
   final String aeContactNumber;
+  final String aeContactEmail;
   final String servicesRequested;
   final int expectedParticipation;
   final int nonMembers;
@@ -33,11 +36,14 @@ class WellnessEvent {
     required this.date,
     required this.venue,
     required this.address,
-    required this.onsiteContactPerson,
+    required this.onsiteContactFirstName,
+    required this.onsiteContactLastName,
     required this.onsiteContactNumber,
     required this.onsiteContactEmail,
-    required this.aeContactPerson,
+    required this.aeContactFirstName,
+    required this.aeContactLastName,
     required this.aeContactNumber,
+    required this.aeContactEmail,
     required this.servicesRequested,
     required this.expectedParticipation,
     required this.nonMembers,
@@ -55,6 +61,13 @@ class WellnessEvent {
     required this.medicalAid,
   }) : id = id ?? const Uuid().v4(); // <-- auto-generate unique ID
 
+  /// Convenience getters to keep compatibility with previous single fields.
+  String get onsiteContactPerson =>
+      _joinNameParts(onsiteContactFirstName, onsiteContactLastName);
+
+  String get aeContactPerson =>
+      _joinNameParts(aeContactFirstName, aeContactLastName);
+
   /// Creates a copy of this event with the given fields replaced with new values
   WellnessEvent copyWith({
     String? id,
@@ -62,11 +75,14 @@ class WellnessEvent {
     DateTime? date,
     String? venue,
     String? address,
-    String? onsiteContactPerson,
+    String? onsiteContactFirstName,
+    String? onsiteContactLastName,
     String? onsiteContactNumber,
     String? onsiteContactEmail,
-    String? aeContactPerson,
+    String? aeContactFirstName,
+    String? aeContactLastName,
     String? aeContactNumber,
+    String? aeContactEmail,
     String? servicesRequested,
     int? expectedParticipation,
     int? nonMembers,
@@ -88,11 +104,16 @@ class WellnessEvent {
       date: date ?? this.date,
       venue: venue ?? this.venue,
       address: address ?? this.address,
-      onsiteContactPerson: onsiteContactPerson ?? this.onsiteContactPerson,
+      onsiteContactFirstName:
+          onsiteContactFirstName ?? this.onsiteContactFirstName,
+      onsiteContactLastName:
+          onsiteContactLastName ?? this.onsiteContactLastName,
       onsiteContactNumber: onsiteContactNumber ?? this.onsiteContactNumber,
       onsiteContactEmail: onsiteContactEmail ?? this.onsiteContactEmail,
-      aeContactPerson: aeContactPerson ?? this.aeContactPerson,
+      aeContactFirstName: aeContactFirstName ?? this.aeContactFirstName,
+      aeContactLastName: aeContactLastName ?? this.aeContactLastName,
       aeContactNumber: aeContactNumber ?? this.aeContactNumber,
+      aeContactEmail: aeContactEmail ?? this.aeContactEmail,
       servicesRequested: servicesRequested ?? this.servicesRequested,
       expectedParticipation: expectedParticipation ?? this.expectedParticipation,
       nonMembers: nonMembers ?? this.nonMembers,
@@ -120,11 +141,14 @@ class WellnessEvent {
         other.date == date &&
         other.venue == venue &&
         other.address == address &&
-        other.onsiteContactPerson == onsiteContactPerson &&
+        other.onsiteContactFirstName == onsiteContactFirstName &&
+        other.onsiteContactLastName == onsiteContactLastName &&
         other.onsiteContactNumber == onsiteContactNumber &&
         other.onsiteContactEmail == onsiteContactEmail &&
-        other.aeContactPerson == aeContactPerson &&
+        other.aeContactFirstName == aeContactFirstName &&
+        other.aeContactLastName == aeContactLastName &&
         other.aeContactNumber == aeContactNumber &&
+        other.aeContactEmail == aeContactEmail &&
         other.servicesRequested == servicesRequested &&
         other.expectedParticipation == expectedParticipation &&
         other.nonMembers == nonMembers &&
@@ -148,11 +172,14 @@ class WellnessEvent {
         date.hashCode ^
         venue.hashCode ^
         address.hashCode ^
-        onsiteContactPerson.hashCode ^
+        onsiteContactFirstName.hashCode ^
+        onsiteContactLastName.hashCode ^
         onsiteContactNumber.hashCode ^
         onsiteContactEmail.hashCode ^
-        aeContactPerson.hashCode ^
+        aeContactFirstName.hashCode ^
+        aeContactLastName.hashCode ^
         aeContactNumber.hashCode ^
+        aeContactEmail.hashCode ^
         servicesRequested.hashCode ^
         expectedParticipation.hashCode ^
         nonMembers.hashCode ^
@@ -167,5 +194,17 @@ class WellnessEvent {
         mobileBooths.hashCode ^
         description.hashCode ^
         medicalAid.hashCode;
+  }
+
+  static String _joinNameParts(String first, String last) {
+    final trimmedFirst = first.trim();
+    final trimmedLast = last.trim();
+    if (trimmedFirst.isEmpty) {
+      return trimmedLast;
+    }
+    if (trimmedLast.isEmpty) {
+      return trimmedFirst;
+    }
+    return '$trimmedFirst $trimmedLast';
   }
 }

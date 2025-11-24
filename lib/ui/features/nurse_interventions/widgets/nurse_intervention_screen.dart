@@ -11,71 +11,81 @@ import '../../../shared/ui/form/kenwell_referral_card.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/nurse_intervention_view_model.dart';
 
-class NurseInterventionScreen extends StatelessWidget {
+class NurseInterventionScreen<T extends NurseInterventionViewModel>
+    extends StatelessWidget {
   final VoidCallback? onNext;
   final VoidCallback? onPrevious;
+  final String title;
+  final String sectionTitle;
+  final bool showInitialAssessment;
 
   const NurseInterventionScreen({
     super.key,
     this.onNext,
     this.onPrevious,
+    this.title = 'Health Risk Assessment Nurse Intervention',
+    this.sectionTitle = 'Section E: HRA - Nurse Intervention',
+    this.showInitialAssessment = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<NurseInterventionViewModel>();
+    final viewModel = context.watch<T>();
 
     return KenwellFormPage(
-      title: 'Health Risk Assessment Nurse Intervention',
-      sectionTitle: 'Section E: HRA - Nurse Intervention',
+      title: title,
+      sectionTitle: sectionTitle,
       formKey: viewModel.formKey,
       children: [
-        KenwellFormCard(
-          title: 'Initial Assessment',
-          child: Column(
-            children: [
-              KenwellDropdownField<String>(
-                label: 'Window period risk assessment',
-                value: viewModel.windowPeriod,
-                items: viewModel.windowPeriodOptions,
-                onChanged: viewModel.setWindowPeriod,
-                validator: _requireSelection('Window period risk assessment'),
-              ),
-              KenwellDropdownField<String>(
-                label: 'Did patient expect HIV (+) result?',
-                value: viewModel.expectedResult,
-                items: viewModel.expectedResultOptions,
-                onChanged: viewModel.setExpectedResult,
-                validator:
-                    _requireSelection('Did patient expect HIV (+) result?'),
-              ),
-              KenwellDropdownField<String>(
-                label: 'Difficulty in dealing with result?',
-                value: viewModel.difficultyDealingResult,
-                items: viewModel.difficultyOptions,
-                onChanged: viewModel.setDifficultyDealingResult,
-                validator:
-                    _requireSelection('Difficulty in dealing with result?'),
-              ),
-              KenwellDropdownField<String>(
-                label: 'Urgent psychosocial follow-up needed?',
-                value: viewModel.urgentPsychosocial,
-                items: viewModel.urgentOptions,
-                onChanged: viewModel.setUrgentPsychosocial,
-                validator:
-                    _requireSelection('Urgent psychosocial follow-up needed?'),
-              ),
-              KenwellDropdownField<String>(
-                label: 'Committed to change behavior?',
-                value: viewModel.committedToChange,
-                items: viewModel.committedOptions,
-                onChanged: viewModel.setCommittedToChange,
-                validator: _requireSelection('Committed to change behavior?'),
-              ),
-            ],
+        if (showInitialAssessment) ...[
+          KenwellFormCard(
+            title: 'Initial Assessment',
+            child: Column(
+              children: [
+                KenwellDropdownField<String>(
+                  label: 'Window period risk assessment',
+                  value: viewModel.windowPeriod,
+                  items: viewModel.windowPeriodOptions,
+                  onChanged: viewModel.setWindowPeriod,
+                  validator: _requireSelection('Window period risk assessment'),
+                ),
+                KenwellDropdownField<String>(
+                  label: 'Did patient expect HIV (+) result?',
+                  value: viewModel.expectedResult,
+                  items: viewModel.expectedResultOptions,
+                  onChanged: viewModel.setExpectedResult,
+                  validator:
+                      _requireSelection('Did patient expect HIV (+) result?'),
+                ),
+                KenwellDropdownField<String>(
+                  label: 'Difficulty in dealing with result?',
+                  value: viewModel.difficultyDealingResult,
+                  items: viewModel.difficultyOptions,
+                  onChanged: viewModel.setDifficultyDealingResult,
+                  validator:
+                      _requireSelection('Difficulty in dealing with result?'),
+                ),
+                KenwellDropdownField<String>(
+                  label: 'Urgent psychosocial follow-up needed?',
+                  value: viewModel.urgentPsychosocial,
+                  items: viewModel.urgentOptions,
+                  onChanged: viewModel.setUrgentPsychosocial,
+                  validator: _requireSelection(
+                      'Urgent psychosocial follow-up needed?'),
+                ),
+                KenwellDropdownField<String>(
+                  label: 'Committed to change behavior?',
+                  value: viewModel.committedToChange,
+                  items: viewModel.committedOptions,
+                  onChanged: viewModel.setCommittedToChange,
+                  validator:
+                      _requireSelection('Committed to change behavior?'),
+                ),
+              ],
+            ),
           ),
-        ),
-        const SizedBox(height: 16),
+          const SizedBox(height: 16),
+        ],
         KenwellReferralCard<NursingReferralOption>(
           title: 'Nursing Referrals',
           selectedValue: viewModel.nursingReferralSelection,
@@ -138,13 +148,23 @@ class NurseInterventionScreen extends StatelessWidget {
           child: Column(
             children: [
               KenwellTextField(
-                label: 'HIV Testing Nurse',
-                hintText: 'Enter nurse name',
-                controller: viewModel.hivTestingNurseController,
+                label: 'HIV Testing Nurse First Name',
+                hintText: 'Enter nurse first name',
+                controller: viewModel.nurseFirstNameController,
                 inputFormatters:
                     AppTextInputFormatters.lettersOnly(allowHyphen: true),
                 validator: (val) => (val == null || val.isEmpty)
-                    ? 'Please enter HIV Testing Nurse'
+                    ? 'Please enter Nurse First Name'
+                    : null,
+              ),
+              KenwellTextField(
+                label: 'HIV Testing Nurse Last Name',
+                hintText: 'Enter nurse last name',
+                controller: viewModel.nurseLastNameController,
+                inputFormatters:
+                    AppTextInputFormatters.lettersOnly(allowHyphen: true),
+                validator: (val) => (val == null || val.isEmpty)
+                    ? 'Please enter Nurse Last Name'
                     : null,
               ),
               KenwellTextField(
