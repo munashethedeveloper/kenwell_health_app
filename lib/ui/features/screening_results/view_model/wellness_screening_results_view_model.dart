@@ -22,17 +22,13 @@ class WellnessScreeningResultsViewModel extends ChangeNotifier {
   }
 
   void _calculateBMI() {
-    double? height = double.tryParse(heightController.text);
-    double? weight = double.tryParse(weightController.text);
+    final heightCm = double.tryParse(heightController.text);
+    final weightKg = double.tryParse(weightController.text);
 
-    // Convert cm to meters if entered > 3
-    if (height != null && height > 3) {
-      height = height / 100;
-    }
-
-    if (height != null && weight != null && height > 0) {
-      final bmi = weight / pow(height, 2);
-      bmiController.text = bmi.toStringAsFixed(2);
+    if (heightCm != null && heightCm > 0 && weightKg != null) {
+      final heightMeters = heightCm / 100;
+      final bmi = weightKg / pow(heightMeters, 2);
+      bmiController.text = bmi.isFinite ? bmi.toStringAsFixed(2) : '';
     } else {
       bmiController.text = '';
     }

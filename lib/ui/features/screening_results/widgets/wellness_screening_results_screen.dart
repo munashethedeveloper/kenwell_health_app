@@ -47,14 +47,14 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
                       child: Column(
                         children: [
                           KenwellTextField(
-                            label: 'Height (m or cm)',
-                            hintText: 'Enter your height',
+                            label: 'Height (cm)',
+                            hintText: 'Enter your height in centimeters',
                             controller: vm.heightController,
                             keyboardType: TextInputType.number,
                             inputFormatters: AppTextInputFormatters.numbersOnly(
                                 allowDecimal: true),
                             validator: (val) =>
-                                _validateRequired(val, 'Height (m or cm)'),
+                                _validateRequired(val, 'Height (cm)'),
                           ),
                           const SizedBox(height: 12),
                           KenwellTextField(
