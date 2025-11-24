@@ -13,8 +13,11 @@ class EventEntries extends Table {
   TextColumn get title => text()();
   DateTimeColumn get date => dateTime()();
   TextColumn get payload => text()();
+  TextColumn get syncStatus =>
+      text().withDefault(const Constant('pending'))();
   DateTimeColumn get updatedAt =>
       dateTime().withDefault(currentDateAndTime())();
+  DateTimeColumn get remoteUpdatedAt => dateTime().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -56,6 +59,23 @@ class AppDatabase extends _$AppDatabase {
 
   Future<int> deleteEventById(String id) =>
       (delete(eventEntries)..where((tbl) => tbl.id.equals(id))).go();
+
+  Future<List<EventEntry>> listEventsBySyncStatus(String status) =>
+      (select(eventEntries)..where((tbl) => tbl.syncStatus.equals(status)))
+          .get();
+
+  Future<void> markEventSynced(String id, DateTime remoteUpdatedAt) =>
+      (update(eventEntries)..where((tbl) => tbl.id.equals(id))).write(
+        EventEntriesCompanion(
+          syncStatus: const Value('synced'),
+          remoteUpdatedAt: Value(remoteUpdatedAt),
+          updatedAt: Value(DateTime.now()),
+        ),
+      );
+
+  Future<EventEntry?> getEventEntry(String id) =>
+      (select(eventEntries)..where((tbl) => tbl.id.equals(id)))
+          .getSingleOrNull();
 
   Future<List<UserEntry>> listUsers() => select(userEntries).get();
 

@@ -45,6 +45,18 @@ class $EventEntriesTable extends EventEntries
     requiredDuringInsert: true,
   );
 
+  static const VerificationMeta _syncStatusMeta =
+      VerificationMeta('syncStatus');
+  @override
+  late final GeneratedColumn<String> syncStatus = GeneratedColumn<String>(
+    'sync_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('pending'),
+  );
+
   static const VerificationMeta _updatedAtMeta =
       VerificationMeta('updatedAt');
   @override
@@ -54,8 +66,16 @@ class $EventEntriesTable extends EventEntries
           requiredDuringInsert: false,
           defaultValue: currentDateAndTime);
 
+  static const VerificationMeta _remoteUpdatedAtMeta =
+      VerificationMeta('remoteUpdatedAt');
   @override
-  List<GeneratedColumn> get $columns => [id, title, date, payload, updatedAt];
+  late final GeneratedColumn<DateTime> remoteUpdatedAt =
+      GeneratedColumn<DateTime>('remote_updated_at', aliasedName, true,
+          type: DriftSqlType.dateTime, requiredDuringInsert: false);
+
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, title, date, payload, syncStatus, updatedAt, remoteUpdatedAt];
 
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -91,11 +111,23 @@ class $EventEntriesTable extends EventEntries
     } else if (isInserting) {
       context.missing(_payloadMeta);
     }
+    if (data.containsKey('sync_status')) {
+      context.handle(
+          _syncStatusMeta,
+          syncStatus.isAcceptableOrUnknown(
+              data['sync_status']!, _syncStatusMeta));
+    }
     if (data.containsKey('updated_at')) {
       context.handle(
           _updatedAtMeta,
           updatedAt.isAcceptableOrUnknown(
               data['updated_at']!, _updatedAtMeta));
+    }
+    if (data.containsKey('remote_updated_at')) {
+      context.handle(
+          _remoteUpdatedAtMeta,
+          remoteUpdatedAt.isAcceptableOrUnknown(
+              data['remote_updated_at']!, _remoteUpdatedAtMeta));
     }
     return context;
   }
@@ -123,10 +155,18 @@ class $EventEntriesTable extends EventEntries
         DriftSqlType.string,
         data['${effectivePrefix}payload'],
       )!,
+      syncStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sync_status'],
+      )!,
       updatedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
       )!,
+      remoteUpdatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}remote_updated_at'],
+      ),
     );
   }
 
@@ -140,14 +180,18 @@ class EventEntry extends DataClass implements Insertable<EventEntry> {
   final String title;
   final DateTime date;
   final String payload;
+  final String syncStatus;
   final DateTime updatedAt;
+  final DateTime? remoteUpdatedAt;
 
   const EventEntry({
     required this.id,
     required this.title,
     required this.date,
     required this.payload,
+    required this.syncStatus,
     required this.updatedAt,
+    this.remoteUpdatedAt,
   });
 
   @override
@@ -157,7 +201,10 @@ class EventEntry extends DataClass implements Insertable<EventEntry> {
       'title': Variable<String>(title),
       'date': Variable<DateTime>(date),
       'payload': Variable<String>(payload),
+      'sync_status': Variable<String>(syncStatus),
       'updated_at': Variable<DateTime>(updatedAt),
+      if (!nullToAbsent || remoteUpdatedAt != null)
+        'remote_updated_at': Variable<DateTime?>(remoteUpdatedAt),
     };
   }
 
@@ -167,7 +214,11 @@ class EventEntry extends DataClass implements Insertable<EventEntry> {
       title: Value(title),
       date: Value(date),
       payload: Value(payload),
+      syncStatus: Value(syncStatus),
       updatedAt: Value(updatedAt),
+      remoteUpdatedAt: remoteUpdatedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remoteUpdatedAt),
     );
   }
 
@@ -179,7 +230,9 @@ class EventEntry extends DataClass implements Insertable<EventEntry> {
       title: serializer.fromJson<String>(json['title']),
       date: serializer.fromJson<DateTime>(json['date']),
       payload: serializer.fromJson<String>(json['payload']),
+      syncStatus: serializer.fromJson<String>(json['syncStatus']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      remoteUpdatedAt: serializer.fromJson<DateTime?>(json['remoteUpdatedAt']),
     );
   }
 
@@ -190,7 +243,9 @@ class EventEntry extends DataClass implements Insertable<EventEntry> {
       'title': serializer.toJson<String>(title),
       'date': serializer.toJson<DateTime>(date),
       'payload': serializer.toJson<String>(payload),
+      'syncStatus': serializer.toJson<String>(syncStatus),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'remoteUpdatedAt': serializer.toJson<DateTime?>(remoteUpdatedAt),
     };
   }
 
@@ -199,14 +254,20 @@ class EventEntry extends DataClass implements Insertable<EventEntry> {
     String? title,
     DateTime? date,
     String? payload,
+    String? syncStatus,
     DateTime? updatedAt,
+    Object? remoteUpdatedAt = _undefinedDateTime,
   }) =>
       EventEntry(
         id: id ?? this.id,
         title: title ?? this.title,
         date: date ?? this.date,
         payload: payload ?? this.payload,
+        syncStatus: syncStatus ?? this.syncStatus,
         updatedAt: updatedAt ?? this.updatedAt,
+        remoteUpdatedAt: remoteUpdatedAt == _undefinedDateTime
+            ? this.remoteUpdatedAt
+            : remoteUpdatedAt as DateTime?,
       );
 
   @override
@@ -216,14 +277,16 @@ class EventEntry extends DataClass implements Insertable<EventEntry> {
           ..write('title: $title, ')
           ..write('date: $date, ')
           ..write('payload: $payload, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('remoteUpdatedAt: $remoteUpdatedAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, title, date, payload, updatedAt);
+  int get hashCode => Object.hash(
+      id, title, date, payload, syncStatus, updatedAt, remoteUpdatedAt);
 
   @override
   bool operator ==(Object other) =>
@@ -233,22 +296,30 @@ class EventEntry extends DataClass implements Insertable<EventEntry> {
           other.title == title &&
           other.date == date &&
           other.payload == payload &&
-          other.updatedAt == updatedAt);
+          other.syncStatus == syncStatus &&
+          other.updatedAt == updatedAt &&
+          other.remoteUpdatedAt == remoteUpdatedAt);
 }
+
+const Object _undefinedDateTime = Object();
 
 class EventEntriesCompanion extends UpdateCompanion<EventEntry> {
   final Value<String> id;
   final Value<String> title;
   final Value<DateTime> date;
   final Value<String> payload;
+  final Value<String> syncStatus;
   final Value<DateTime> updatedAt;
+  final Value<DateTime?> remoteUpdatedAt;
 
   const EventEntriesCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
     this.date = const Value.absent(),
     this.payload = const Value.absent(),
+    this.syncStatus = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.remoteUpdatedAt = const Value.absent(),
   });
 
   EventEntriesCompanion.insert({
@@ -256,7 +327,9 @@ class EventEntriesCompanion extends UpdateCompanion<EventEntry> {
     required String title,
     required DateTime date,
     required String payload,
+    this.syncStatus = const Value('pending'),
     this.updatedAt = const Value.absent(),
+    this.remoteUpdatedAt = const Value.absent(),
   })  : id = Value(id),
         title = Value(title),
         date = Value(date),
@@ -267,14 +340,18 @@ class EventEntriesCompanion extends UpdateCompanion<EventEntry> {
     Expression<String>? title,
     Expression<DateTime>? date,
     Expression<String>? payload,
+    Expression<String>? syncStatus,
     Expression<DateTime>? updatedAt,
+    Expression<DateTime?>? remoteUpdatedAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (title != null) 'title': title,
       if (date != null) 'date': date,
       if (payload != null) 'payload': payload,
+      if (syncStatus != null) 'sync_status': syncStatus,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (remoteUpdatedAt != null) 'remote_updated_at': remoteUpdatedAt,
     });
   }
 
@@ -283,14 +360,18 @@ class EventEntriesCompanion extends UpdateCompanion<EventEntry> {
     Value<String>? title,
     Value<DateTime>? date,
     Value<String>? payload,
+    Value<String>? syncStatus,
     Value<DateTime>? updatedAt,
+    Value<DateTime?>? remoteUpdatedAt,
   }) {
     return EventEntriesCompanion(
       id: id ?? this.id,
       title: title ?? this.title,
       date: date ?? this.date,
       payload: payload ?? this.payload,
+      syncStatus: syncStatus ?? this.syncStatus,
       updatedAt: updatedAt ?? this.updatedAt,
+      remoteUpdatedAt: remoteUpdatedAt ?? this.remoteUpdatedAt,
     );
   }
 
@@ -309,8 +390,14 @@ class EventEntriesCompanion extends UpdateCompanion<EventEntry> {
     if (payload.present) {
       map['payload'] = Variable<String>(payload.value);
     }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<String>(syncStatus.value);
+    }
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (remoteUpdatedAt.present) {
+      map['remote_updated_at'] = Variable<DateTime?>(remoteUpdatedAt.value);
     }
     return map;
   }
@@ -322,7 +409,9 @@ class EventEntriesCompanion extends UpdateCompanion<EventEntry> {
           ..write('title: $title, ')
           ..write('date: $date, ')
           ..write('payload: $payload, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('remoteUpdatedAt: $remoteUpdatedAt')
           ..write(')'))
         .toString();
   }

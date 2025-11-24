@@ -1,13 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:kenwell_health_app/data/services/auth_service.dart';
+import 'package:kenwell_health_app/data/services/event_sync_service.dart';
 import 'package:kenwell_health_app/domain/models/user_model.dart';
 
 class AuthViewModel extends ChangeNotifier {
-  AuthViewModel(this._authService) {
+  AuthViewModel(this._authService, this._eventSyncService) {
     _checkLoginStatus();
   }
 
   final AuthService _authService;
+  final EventSyncService _eventSyncService;
 
   bool _isLoggedIn = false;
   bool _isLoading = true;
@@ -20,6 +22,11 @@ class AuthViewModel extends ChangeNotifier {
     notifyListeners();
 
     _isLoggedIn = await _authService.isLoggedIn();
+    if (_isLoggedIn) {
+      _eventSyncService.start();
+    } else {
+      _eventSyncService.stop();
+    }
 
     _isLoading = false;
     notifyListeners();
@@ -31,12 +38,17 @@ class AuthViewModel extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    final user = await _authService.login(email, password);
-    _isLoggedIn = user != null;
-
-    _isLoading = false;
-    notifyListeners();
-    return user;
+    try {
+      final user = await _authService.login(email, password);
+      _isLoggedIn = user != null;
+      if (_isLoggedIn) {
+        _eventSyncService.start();
+      }
+      return user;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<UserModel?> register({
@@ -51,20 +63,23 @@ class AuthViewModel extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    final user = await _authService.register(
-      email: email,
-      password: password,
-      role: role,
-      phoneNumber: phoneNumber,
-      username: username,
-      firstName: firstName,
-      lastName: lastName,
-    );
+    try {
+      final user = await _authService.register(
+        email: email,
+        password: password,
+        role: role,
+        phoneNumber: phoneNumber,
+        username: username,
+        firstName: firstName,
+        lastName: lastName,
+      );
 
-    _isLoggedIn = false;
-    _isLoading = false;
-    notifyListeners();
-    return user;
+      _isLoggedIn = false;
+      return user;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<bool> forgotPassword(String email) async {
@@ -75,10 +90,13 @@ class AuthViewModel extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    await _authService.logout();
-    _isLoggedIn = false;
-
-    _isLoading = false;
-    notifyListeners();
+    try {
+      await _authService.logout();
+      _isLoggedIn = false;
+      _eventSyncService.stop();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 }

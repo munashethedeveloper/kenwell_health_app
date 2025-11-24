@@ -26,6 +26,9 @@ class EventRepository {
     return _mapEntries(entries);
   }
 
+  Future<List<EventEntry>> listPendingEntries() =>
+      _database.listEventsBySyncStatus('pending');
+
   Future<void> deleteEvent(String id) => _database.deleteEventById(id);
 
   Future<void> updateEvent(WellnessEvent updatedEvent) =>
@@ -34,17 +37,43 @@ class EventRepository {
   Future<void> addEvent(WellnessEvent event) =>
       _database.upsertEvent(_toCompanion(event));
 
+  Future<void> upsertRemoteEvent(
+    WellnessEvent event,
+    DateTime remoteUpdatedAt,
+  ) =>
+      _database.upsertEvent(
+        _toCompanion(
+          event,
+          syncStatus: 'synced',
+          remoteUpdatedAt: remoteUpdatedAt,
+        ),
+      );
+
+  Future<void> markEventSynced(String id, DateTime remoteUpdatedAt) =>
+      _database.markEventSynced(id, remoteUpdatedAt);
+
+  Future<EventEntry?> getEventEntry(String id) =>
+      _database.getEventEntry(id);
+
   List<WellnessEvent> _mapEntries(List<EventEntry> entries) {
     return entries.map(_fromEntry).toList();
   }
 
-  EventEntriesCompanion _toCompanion(WellnessEvent event) {
+  EventEntriesCompanion _toCompanion(
+    WellnessEvent event, {
+    String syncStatus = 'pending',
+    DateTime? remoteUpdatedAt,
+  }) {
     return EventEntriesCompanion(
       id: Value(event.id),
       title: Value(event.title),
       date: Value(event.date),
       payload: Value(jsonEncode(event.toJson())),
+      syncStatus: Value(syncStatus),
       updatedAt: Value(DateTime.now()),
+      remoteUpdatedAt: remoteUpdatedAt == null
+          ? const Value.absent()
+          : Value(remoteUpdatedAt),
     );
   }
 
