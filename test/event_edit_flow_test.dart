@@ -18,11 +18,14 @@ void main() {
         date: DateTime(2024, 10, 15),
         venue: 'Original Venue',
         address: 'Original Address',
-        onsiteContactPerson: 'John Smith',
+        onsiteContactFirstName: 'John',
+        onsiteContactLastName: 'Smith',
         onsiteContactNumber: '555-0123',
         onsiteContactEmail: 'john@example.com',
-        aeContactPerson: 'Jane Doe',
+        aeContactFirstName: 'Jane',
+        aeContactLastName: 'Doe',
         aeContactNumber: '555-0456',
+        aeContactEmail: 'jane@example.com',
         servicesRequested: 'HRA',
         expectedParticipation: 100,
         nonMembers: 20,
@@ -100,10 +103,12 @@ void main() {
       expect(find.text('Original Event Title'), findsOneWidget);
       expect(find.text('Original Venue'), findsOneWidget);
       expect(find.text('Original Address'), findsOneWidget);
-      expect(find.text('John Smith'), findsOneWidget);
+      expect(find.text('John'), findsOneWidget);
+      expect(find.text('Smith'), findsOneWidget);
       expect(find.text('555-0123'), findsOneWidget);
       expect(find.text('john@example.com'), findsOneWidget);
-      expect(find.text('Jane Doe'), findsOneWidget);
+      expect(find.text('Jane'), findsOneWidget);
+      expect(find.text('Doe'), findsOneWidget);
       expect(find.text('555-0456'), findsOneWidget);
     });
 

@@ -88,6 +88,7 @@ class EventDetailsScreen extends StatelessWidget {
           _buildSectionCard('AE Contact', [
             detailRow('Contact Person', event.aeContactPerson),
             detailRow('Contact Number', event.aeContactNumber),
+            detailRow('Email', event.aeContactEmail),
           ]),
           _buildSectionCard('Participation & Options', [
             detailRow('Expected Participation',
