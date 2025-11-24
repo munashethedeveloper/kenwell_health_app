@@ -19,7 +19,7 @@ class TBNursingInterventionScreen extends StatelessWidget {
 
     return NurseInterventionForm(
       viewModel: viewModel,
-      title: 'TB Test Nursing Intervention',
+      title: 'TB Test Nurse Intervention Form',
       sectionTitle: 'Section J: TB - Nurse Intervention',
       onNext: onNext,
       onPrevious: onPrevious,

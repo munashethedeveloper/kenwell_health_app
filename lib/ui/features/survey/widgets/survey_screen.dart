@@ -23,7 +23,7 @@ class SurveyScreen extends StatelessWidget {
     final vm = context.watch<SurveyViewModel>();
 
     return KenwellFormPage(
-      title: 'Survey',
+      title: 'Survey Form',
       sectionTitle: 'Section K: Survey',
       children: [
         const Center(

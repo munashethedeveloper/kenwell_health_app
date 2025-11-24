@@ -23,7 +23,7 @@ class TBTestingScreen extends StatelessWidget {
     final viewModel = context.watch<TBTestingViewModel>();
 
     return KenwellFormPage(
-      title: 'TB Test Screening',
+      title: 'TB Test Screening Form',
       sectionTitle: 'Section I: TB Screening',
       children: [
         KenwellFormCard(

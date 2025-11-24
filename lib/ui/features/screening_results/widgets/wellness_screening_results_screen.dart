@@ -28,7 +28,7 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
         builder: (context, vm, _) {
           return Scaffold(
             appBar: const KenwellAppBar(
-              title: 'Wellness Screening Results',
+              title: 'Health Metrics Form',
               automaticallyImplyLeading: false,
             ),
             body: SingleChildScrollView(
@@ -39,7 +39,7 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const KenwellSectionHeader(
-                      title: 'Section D: Wellness Screening Results',
+                      title: 'Section D: Health Metrics',
                       uppercase: true,
                     ),
                     KenwellFormCard(

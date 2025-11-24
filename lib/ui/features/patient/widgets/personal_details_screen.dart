@@ -27,7 +27,7 @@ class PersonalDetailsScreen extends StatelessWidget {
       value: viewModel,
       child: Consumer<PersonalDetailsViewModel>(
         builder: (context, vm, _) => KenwellFormPage(
-          title: 'Patient Personal Details',
+          title: 'Personal Details Form',
           sectionTitle: 'Section B: Personal Details',
           formKey: vm.formKey,
           children: [

@@ -19,7 +19,7 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
 
     return NurseInterventionForm(
       viewModel: viewModel,
-      title: 'HIV Test Nursing Intervention',
+      title: 'HIV Test Nurse Intervention Form',
       sectionTitle: 'Section H: HIV - Nurse Intervention',
       onNext: onNext,
       onPrevious: onPrevious,

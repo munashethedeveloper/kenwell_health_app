@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import '../../consent_form/widgets/consent_screen.dart';
 import '../../hiv_test_nursing_intervention/widgets/hiv_test_nursing_intervention_screen.dart';
 import '../../hiv_test_results/widgets/hiv_test_result_screen.dart';
-import '../../nurse_interventions/view_model/nurse_intervention_view_model.dart';
 import '../../nurse_interventions/widgets/nurse_intervention_screen.dart';
 import '../../patient/widgets/personal_details_screen.dart';
 import '../../risk_assessment/widgets/personal_risk_assessment_screen.dart';
@@ -13,9 +12,9 @@ import '../../screening_results/widgets/wellness_screening_results_screen.dart';
 import '../../hiv_test/widgets/hiv_test_screen.dart';
 import '../../survey/widgets/survey_screen.dart';
 import '../../tb_test/widgets/tb_testing_screen.dart';
-import '../../tb_test_nursing_intervention/widgets/tb_nursing_intervention_screen.dart';
 
 // ViewModel
+import '../../tb_test_nursing_intervention/widgets/tb_nursing_intervention_screen.dart';
 import '../view_model/wellness_flow_view_model.dart';
 
 class WellnessFlowScreen extends StatelessWidget {

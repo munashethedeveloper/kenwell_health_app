@@ -23,7 +23,7 @@ class HIVTestScreen extends StatelessWidget {
     final viewModel = context.watch<HIVTestViewModel>();
 
     return KenwellFormPage(
-      title: 'HIV Test Screening',
+      title: 'HIV Test Screening Form',
       sectionTitle: 'Section F: HIV Screening',
       formKey: viewModel.formKey,
       children: [

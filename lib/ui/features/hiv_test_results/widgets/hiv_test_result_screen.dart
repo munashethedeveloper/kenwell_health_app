@@ -27,7 +27,7 @@ class HIVTestResultScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: const KenwellAppBar(
-        title: 'HIV Test Results',
+        title: 'HIV Test Results Form',
         automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(

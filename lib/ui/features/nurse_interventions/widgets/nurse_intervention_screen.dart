@@ -19,7 +19,7 @@ class NurseInterventionScreen extends StatelessWidget {
 
     return NurseInterventionForm(
       viewModel: viewModel,
-      title: 'Health Risk Assessment Nurse Intervention',
+      title: 'HRA Nurse Intervention Form',
       sectionTitle: 'Section E: HRA - Nurse Intervention',
       onNext: onNext,
       onPrevious: onPrevious,

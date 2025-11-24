@@ -34,11 +34,14 @@ class NurseInterventionForm extends StatelessWidget {
       sectionTitle: sectionTitle,
       formKey: viewModel.formKey,
       children: [
-        _buildInitialAssessment(),
-        const SizedBox(height: 16),
+        if (viewModel.showInitialAssessment) ...[
+          _buildInitialAssessment(),
+          const SizedBox(height: 16),
+        ],
         _buildReferrals(),
         const SizedBox(height: 16),
-        if (viewModel.windowPeriod == 'Yes') ...[
+        if (viewModel.showInitialAssessment &&
+            viewModel.windowPeriod == 'Yes') ...[
           _buildFollowUpSection(),
           const SizedBox(height: 16),
         ],

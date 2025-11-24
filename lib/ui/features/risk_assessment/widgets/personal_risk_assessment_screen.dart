@@ -32,7 +32,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
         builder: (context, vm, _) {
           return Scaffold(
             appBar: const KenwellAppBar(
-              title: 'Health Risk Assessment',
+              title: 'Health Risk Assessment Form',
               automaticallyImplyLeading: false,
             ),
             body: SingleChildScrollView(
