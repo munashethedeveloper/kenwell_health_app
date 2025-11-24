@@ -69,8 +69,8 @@ class NurseInterventionViewModel extends ChangeNotifier {
   }
 
   // --- Nurse Details ---
-  final TextEditingController hivTestingNurseController =
-      TextEditingController();
+  final TextEditingController nurseFirstNameController = TextEditingController();
+  final TextEditingController nurseLastNameController = TextEditingController();
   final TextEditingController rankController = TextEditingController();
   final SignatureController signatureController = SignatureController(
     penStrokeWidth: 2,
@@ -102,7 +102,8 @@ class NurseInterventionViewModel extends ChangeNotifier {
             followUpOtherController.text.isNotEmpty) &&
         (nursingReferralSelection != NursingReferralOption.patientNotReferred ||
             notReferredReasonController.text.isNotEmpty) &&
-        hivTestingNurseController.text.isNotEmpty &&
+        nurseFirstNameController.text.isNotEmpty &&
+        nurseLastNameController.text.isNotEmpty &&
         rankController.text.isNotEmpty &&
         sancNumberController.text.isNotEmpty &&
         nurseDateController.text.isNotEmpty &&
@@ -123,7 +124,10 @@ class NurseInterventionViewModel extends ChangeNotifier {
       'committedToChange': committedToChange,
       'nursingReferralSelection': nursingReferralSelection?.name,
       'notReferredReason': notReferredReasonController.text,
-      'hivTestingNurse': hivTestingNurseController.text,
+      'hivTestingNurseFirstName': nurseFirstNameController.text,
+      'hivTestingNurseLastName': nurseLastNameController.text,
+      'hivTestingNurse':
+          '${nurseFirstNameController.text} ${nurseLastNameController.text}'.trim(),
       'rank': rankController.text,
       'signature': signatureBytes,
       'sancNumber': sancNumberController.text,
@@ -176,7 +180,8 @@ class NurseInterventionViewModel extends ChangeNotifier {
     followUpOtherController.dispose();
     followUpDateController.dispose();
     notReferredReasonController.dispose();
-    hivTestingNurseController.dispose();
+    nurseFirstNameController.dispose();
+    nurseLastNameController.dispose();
     rankController.dispose();
     signatureController.dispose();
     sancNumberController.dispose();
