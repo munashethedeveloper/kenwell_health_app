@@ -1,16 +1,23 @@
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kenwell_health_app/data/local/app_database.dart';
+import 'package:kenwell_health_app/data/repositories_dcl/event_repository.dart';
 import 'package:kenwell_health_app/ui/features/event/widgets/event_details_screen.dart';
 import 'package:kenwell_health_app/ui/features/event/view_model/event_view_model.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 
 void main() {
   group('EventDetailsScreen Delete Functionality', () {
+    late AppDatabase database;
+    late EventRepository repository;
     late EventViewModel viewModel;
     late WellnessEvent testEvent;
 
     setUp(() {
-      viewModel = EventViewModel();
+      database = AppDatabase(executor: NativeDatabase.memory());
+      repository = EventRepository(database);
+      viewModel = EventViewModel(repository: repository);
       testEvent = WellnessEvent(
         id: 'test-event-1',
         title: 'Test Wellness Event',
@@ -43,8 +50,9 @@ void main() {
       viewModel.addEvent(testEvent);
     });
 
-    tearDown(() {
+    tearDown(() async {
       viewModel.dispose();
+      await database.close();
     });
 
     testWidgets('Delete button is visible when viewModel is provided',
@@ -195,11 +203,15 @@ void main() {
   });
 
   group('EventDetailsScreen Edit Functionality', () {
+    late AppDatabase database;
+    late EventRepository repository;
     late EventViewModel viewModel;
     late WellnessEvent testEvent;
 
     setUp(() {
-      viewModel = EventViewModel();
+      database = AppDatabase(executor: NativeDatabase.memory());
+      repository = EventRepository(database);
+      viewModel = EventViewModel(repository: repository);
       testEvent = WellnessEvent(
         id: 'test-event-2',
         title: 'Test Wellness Event for Edit',
@@ -232,8 +244,9 @@ void main() {
       viewModel.addEvent(testEvent);
     });
 
-    tearDown(() {
+    tearDown(() async {
       viewModel.dispose();
+      await database.close();
     });
 
     testWidgets('Edit button is visible when viewModel is provided',

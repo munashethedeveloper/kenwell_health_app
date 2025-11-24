@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'data/local/app_database.dart';
+import 'data/repositories_dcl/event_repository.dart';
 import 'providers/theme_provider.dart';
 import 'routing/app_router.dart';
 import 'ui/features/auth/view_models/auth_view_model.dart';
@@ -19,11 +21,20 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        Provider<AppDatabase>(
+          create: (_) => AppDatabase(),
+          dispose: (_, db) => db.close(),
+        ),
+        Provider<EventRepository>(
+          create: (context) => EventRepository(context.read<AppDatabase>()),
+        ),
         ChangeNotifierProvider<AuthViewModel>(create: (_) => AuthViewModel()),
         ChangeNotifierProvider<CalendarViewModel>(
             create: (_) => CalendarViewModel()),
         ChangeNotifierProvider<EventViewModel>(
-          create: (_) => EventViewModel(),
+          create: (context) => EventViewModel(
+            repository: context.read<EventRepository>(),
+          ),
         ),
         ChangeNotifierProvider<ThemeProvider>(
           create: (_) => ThemeProvider(),

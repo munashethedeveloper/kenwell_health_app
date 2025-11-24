@@ -1,30 +1,55 @@
+import 'dart:convert';
+
+import 'package:drift/drift.dart';
+
+import '../../local/app_database.dart';
 import '../../../../domain/models/wellness_event.dart';
 
 class EventRepository {
-  final List<WellnessEvent> _mockEvents = [];
+  EventRepository(this._database);
+
+  final AppDatabase _database;
 
   Future<WellnessEvent?> fetchEventById(String id) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    try {
-      return _mockEvents.firstWhere((e) => e.id == id);
-    } catch (_) {
-      return null;
-    }
+    final entry = await _database.getEventById(id);
+    return entry == null ? null : _fromEntry(entry);
   }
 
-  Future<void> deleteEvent(String id) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    _mockEvents.removeWhere((e) => e.id == id);
+  Stream<List<WellnessEvent>> watchEvents() {
+    final query = (_database.select(_database.eventEntries)
+      ..orderBy([(tbl) => OrderingTerm(expression: tbl.date)]));
+    return query.watch().map(_mapEntries);
   }
 
-  /// Updates an existing event in the repository
-  Future<void> updateEvent(WellnessEvent updatedEvent) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    final index = _mockEvents.indexWhere((e) => e.id == updatedEvent.id);
-    if (index != -1) {
-      _mockEvents[index] = updatedEvent;
-    }
+  Future<List<WellnessEvent>> listEvents() async {
+    final entries = await _database.listAllEvents();
+    return _mapEntries(entries);
   }
 
-  void addEvent(WellnessEvent e) => _mockEvents.add(e);
+  Future<void> deleteEvent(String id) => _database.deleteEventById(id);
+
+  Future<void> updateEvent(WellnessEvent updatedEvent) =>
+      _database.upsertEvent(_toCompanion(updatedEvent));
+
+  Future<void> addEvent(WellnessEvent event) =>
+      _database.upsertEvent(_toCompanion(event));
+
+  List<WellnessEvent> _mapEntries(List<EventEntry> entries) {
+    return entries.map(_fromEntry).toList();
+  }
+
+  EventEntriesCompanion _toCompanion(WellnessEvent event) {
+    return EventEntriesCompanion(
+      id: Value(event.id),
+      title: Value(event.title),
+      date: Value(event.date),
+      payload: Value(jsonEncode(event.toJson())),
+      updatedAt: Value(DateTime.now()),
+    );
+  }
+
+  WellnessEvent _fromEntry(EventEntry entry) {
+    final decoded = jsonDecode(entry.payload) as Map<String, dynamic>;
+    return WellnessEvent.fromJson(decoded);
+  }
 }

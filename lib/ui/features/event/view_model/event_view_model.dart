@@ -1,11 +1,19 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../../domain/models/wellness_event.dart';
+import '../../../../data/repositories_dcl/event_repository.dart';
 
 class EventViewModel extends ChangeNotifier {
-  EventViewModel() {
+  EventViewModel({required EventRepository repository})
+      : _repository = repository {
     _resetServiceSelections();
+    _eventsSubscription = _repository.watchEvents().listen(_syncEventsFromDb);
   }
+
+  final EventRepository _repository;
+  StreamSubscription<List<WellnessEvent>>? _eventsSubscription;
 
   static const List<String> _serviceOptions = ['HRA', 'VCT', 'HIV', 'TB'];
 
@@ -160,18 +168,20 @@ class EventViewModel extends ChangeNotifier {
   void addEvent(WellnessEvent event) {
     _events.add(event);
     notifyListeners();
+    unawaited(_repository.addEvent(event));
   }
 
   /// Deletes an event by removing it from the list
   /// Returns the deleted event for potential undo operation
   WellnessEvent? deleteEvent(String eventId) {
     final index = _events.indexWhere((e) => e.id == eventId);
-    if (index != -1) {
-      final deletedEvent = _events.removeAt(index);
-      notifyListeners();
-      return deletedEvent;
+    if (index == -1) {
+      return null;
     }
-    return null;
+    final deletedEvent = _events.removeAt(index);
+    notifyListeners();
+    unawaited(_repository.deleteEvent(eventId));
+    return deletedEvent;
   }
 
   /// Updates an existing event in the list
@@ -182,6 +192,7 @@ class EventViewModel extends ChangeNotifier {
       final previousEvent = _events[index];
       _events[index] = updatedEvent;
       notifyListeners();
+      unawaited(_repository.updateEvent(updatedEvent));
       return previousEvent;
     }
     return null;
@@ -191,6 +202,7 @@ class EventViewModel extends ChangeNotifier {
   void restoreEvent(WellnessEvent event) {
     _events.add(event);
     notifyListeners();
+    unawaited(_repository.addEvent(event));
   }
 
   List<WellnessEvent> getEventsForDate(DateTime date) {
@@ -248,6 +260,7 @@ class EventViewModel extends ChangeNotifier {
     strikeDownTimeController.dispose();
     //medicalAidController.dispose();
     dateController.dispose();
+    _eventsSubscription?.cancel();
     super.dispose();
   }
 
@@ -270,5 +283,12 @@ class EventViewModel extends ChangeNotifier {
     _selectedServices
       ..clear()
       ..add(_serviceOptions.first);
+  }
+
+  void _syncEventsFromDb(List<WellnessEvent> eventsFromDb) {
+    _events
+      ..clear()
+      ..addAll(eventsFromDb);
+    notifyListeners();
   }
 }
