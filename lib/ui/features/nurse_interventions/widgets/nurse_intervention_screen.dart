@@ -14,11 +14,15 @@ import '../view_model/nurse_intervention_view_model.dart';
 class NurseInterventionScreen extends StatelessWidget {
   final VoidCallback? onNext;
   final VoidCallback? onPrevious;
+  final String title;
+  final String sectionTitle;
 
   const NurseInterventionScreen({
     super.key,
     this.onNext,
     this.onPrevious,
+    this.title = 'Health Risk Assessment Nurse Intervention',
+    this.sectionTitle = 'Section E: HRA - Nurse Intervention',
   });
 
   @override
@@ -26,8 +30,8 @@ class NurseInterventionScreen extends StatelessWidget {
     final viewModel = context.watch<NurseInterventionViewModel>();
 
     return KenwellFormPage(
-      title: 'Health Risk Assessment Nurse Intervention',
-      sectionTitle: 'Section E: HRA - Nurse Intervention',
+      title: title,
+      sectionTitle: sectionTitle,
       formKey: viewModel.formKey,
       children: [
         KenwellFormCard(
