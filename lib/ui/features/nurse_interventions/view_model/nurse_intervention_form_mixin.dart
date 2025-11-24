@@ -8,6 +8,8 @@ enum NursingReferralOption {
 }
 
 mixin NurseInterventionFormMixin on ChangeNotifier {
+  /// Controls whether the Initial Assessment card (and related validations) show.
+  bool get showInitialAssessment => true;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   // --- Initial Assessment ---
@@ -91,15 +93,25 @@ mixin NurseInterventionFormMixin on ChangeNotifier {
 
   // --- Validation ---
   bool get isFormValid {
+    final requiresInitialAssessment = showInitialAssessment;
+    final requiresFollowUp =
+        showInitialAssessment && windowPeriod != null && windowPeriod == 'Yes';
+
+    final initialAssessmentValid = !requiresInitialAssessment ||
+        (windowPeriod != null &&
+            expectedResult != null &&
+            difficultyDealingResult != null &&
+            urgentPsychosocial != null &&
+            committedToChange != null);
+
+    final followUpValid = !requiresFollowUp ||
+        (followUpLocation != null &&
+            (followUpLocation != 'Other' ||
+                followUpOtherController.text.isNotEmpty));
+
     return formKey.currentState?.validate() == true &&
-        windowPeriod != null &&
-        expectedResult != null &&
-        difficultyDealingResult != null &&
-        urgentPsychosocial != null &&
-        committedToChange != null &&
-        (windowPeriod != 'Yes' || followUpLocation != null) &&
-        (followUpLocation != 'Other' ||
-            followUpOtherController.text.isNotEmpty) &&
+        initialAssessmentValid &&
+        followUpValid &&
         (nursingReferralSelection != NursingReferralOption.patientNotReferred ||
             notReferredReasonController.text.isNotEmpty) &&
         nurseFirstNameController.text.isNotEmpty &&
