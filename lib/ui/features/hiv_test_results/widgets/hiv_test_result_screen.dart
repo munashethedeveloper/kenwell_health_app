@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/colours/kenwell_colours.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
@@ -61,7 +62,8 @@ class HIVTestResultScreen extends StatelessWidget {
                       controller: viewModel.screeningExpiryDateController,
                       readOnly: true,
                       hint: 'Select expiry date',
-                      suffixIcon: const Icon(Icons.calendar_today),
+                      suffixIcon: const Icon(Icons.calendar_today,
+                          color: KenwellColors.primaryGreenDark),
                       onTap: () =>
                           viewModel.pickExpiryDate(context, isScreening: true),
                     ),
@@ -97,7 +99,8 @@ class HIVTestResultScreen extends StatelessWidget {
                       controller: viewModel.confirmatoryExpiryDateController,
                       readOnly: true,
                       hint: 'Select expiry date',
-                      suffixIcon: const Icon(Icons.calendar_today),
+                      suffixIcon: const Icon(Icons.calendar_today,
+                          color: KenwellColors.primaryGreenDark),
                       onTap: () =>
                           viewModel.pickExpiryDate(context, isScreening: false),
                     ),

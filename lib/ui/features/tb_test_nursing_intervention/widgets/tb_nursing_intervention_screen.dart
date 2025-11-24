@@ -25,7 +25,7 @@ class TBNursingInterventionScreen extends StatelessWidget {
 
     return KenwellFormPage(
       title: 'TB Test Nursing Intervention',
-      sectionTitle: 'Section J: TB Screening Nursing Interventions',
+      sectionTitle: 'Section J: TB - Nurse Intervention',
       children: [
         KenwellReferralCard<TBNursingReferralOption>(
           title: 'Nursing Referrals',

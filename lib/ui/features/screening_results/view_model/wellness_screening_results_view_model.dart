@@ -7,7 +7,8 @@ class WellnessScreeningResultsViewModel extends ChangeNotifier {
   final TextEditingController heightController = TextEditingController();
   final TextEditingController weightController = TextEditingController();
   final TextEditingController bmiController = TextEditingController();
-  final TextEditingController bloodPressureController = TextEditingController();
+  final TextEditingController systolicBpController = TextEditingController();
+  final TextEditingController diastolicBpController = TextEditingController();
   final TextEditingController cholesterolController = TextEditingController();
   final TextEditingController bloodSugarController = TextEditingController();
   final TextEditingController waistController = TextEditingController();
@@ -46,7 +47,8 @@ class WellnessScreeningResultsViewModel extends ChangeNotifier {
       'height': heightController.text,
       'weight': weightController.text,
       'bmi': bmiController.text,
-      'bloodPressure': bloodPressureController.text,
+      'bloodPressureSystolic': systolicBpController.text,
+      'bloodPressureDiastolic': diastolicBpController.text,
       'cholesterol': cholesterolController.text,
       'bloodSugar': bloodSugarController.text,
       'waist': waistController.text,
@@ -94,7 +96,8 @@ class WellnessScreeningResultsViewModel extends ChangeNotifier {
     heightController.dispose();
     weightController.dispose();
     bmiController.dispose();
-    bloodPressureController.dispose();
+    systolicBpController.dispose();
+    diastolicBpController.dispose();
     cholesterolController.dispose();
     bloodSugarController.dispose();
     waistController.dispose();

@@ -27,7 +27,7 @@ class NurseInterventionScreen extends StatelessWidget {
 
     return KenwellFormPage(
       title: 'Health Risk Assessment Nurse Intervention',
-      sectionTitle: 'Section E: Health Risk Assessment Nurse Intervention',
+      sectionTitle: 'Section E: HRA - Nurse Intervention',
       formKey: viewModel.formKey,
       children: [
         KenwellFormCard(

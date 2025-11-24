@@ -8,6 +8,7 @@ import '../../event/view_model/event_view_model.dart';
 import '../../../../data/services/auth_service.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/buttons/custom_primary_button.dart';
+import '../../../shared/ui/colours/kenwell_colours.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 
 class CalendarScreen extends StatefulWidget {
@@ -201,7 +202,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         );
                       }
 
-                      eventsThisMonth.sort((a, b) => a.date.compareTo(b.date));
+                      eventsThisMonth.sort(_compareEvents);
 
                       final Map<DateTime, List<WellnessEvent>> groupedEvents =
                           {};
@@ -479,12 +480,65 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
-  List<Color> _eventGradient(String category) {
-    final base = _categoryColor(category);
-    return [
-      base.withOpacity(0.85),
-      base,
+  List<Color> _eventGradient(String _) {
+    return const [
+      KenwellColors.primaryGreenLight,
+      KenwellColors.primaryGreen,
     ];
+  }
+
+  int _compareEvents(WellnessEvent a, WellnessEvent b) {
+    final dateComparison = a.date.compareTo(b.date);
+    if (dateComparison != 0) {
+      return dateComparison;
+    }
+
+    final aMinutes = _timeStringToMinutes(a.startTime);
+    final bMinutes = _timeStringToMinutes(b.startTime);
+
+    if (aMinutes != null && bMinutes != null) {
+      final timeComparison = aMinutes.compareTo(bMinutes);
+      if (timeComparison != 0) {
+        return timeComparison;
+      }
+    } else if (aMinutes != null) {
+      return -1;
+    } else if (bMinutes != null) {
+      return 1;
+    }
+
+    return a.title.toLowerCase().compareTo(b.title.toLowerCase());
+  }
+
+  int? _timeStringToMinutes(String raw) {
+    if (raw.trim().isEmpty) return null;
+    final timeText = raw.trim();
+
+    final formatters = <DateFormat>[
+      DateFormat.Hm(),
+      DateFormat.jm(),
+    ];
+
+    for (final formatter in formatters) {
+      try {
+        final parsed = formatter.parse(timeText);
+        return parsed.hour * 60 + parsed.minute;
+      } catch (_) {
+        continue;
+      }
+    }
+
+    final match =
+        RegExp(r'^(?<hour>\d{1,2}):(?<minute>\d{2})').firstMatch(timeText);
+    if (match != null) {
+      final hour = int.tryParse(match.namedGroup('hour') ?? '');
+      final minute = int.tryParse(match.namedGroup('minute') ?? '');
+      if (hour != null && minute != null && hour < 24 && minute < 60) {
+        return hour * 60 + minute;
+      }
+    }
+
+    return null;
   }
 
   Future<void> _openEventForm(DateTime date,
@@ -511,6 +565,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   void _showDayActionsSheet(DateTime selectedDay, List<WellnessEvent> events) {
+    final dayEvents = [...events]..sort(_compareEvents);
+
     showModalBottomSheet(
       context: context,
       builder: (ctx) {
@@ -529,7 +585,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                ...events.map(
+                ...dayEvents.map(
                   (event) => ListTile(
                     leading: CircleAvatar(
                       backgroundColor: _categoryColor(event.servicesRequested),

@@ -25,7 +25,7 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
 
     return KenwellFormPage(
       title: 'HIV Test Nursing Intervention',
-      sectionTitle: 'Section H: HIV Test Nursing Interventions',
+      sectionTitle: 'Section H: HIV - Nurse Intervention',
       children: [
         KenwellFormCard(
           title: 'Initial Assessment',
