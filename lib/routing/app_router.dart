@@ -130,9 +130,9 @@ class AppRouter {
 
       case RouteNames.nurseIntervention:
         return MaterialPageRoute(
-          builder: (_) => ChangeNotifierProvider(
+          builder: (_) => ChangeNotifierProvider<NurseInterventionViewModel>(
             create: (_) => NurseInterventionViewModel(),
-            child: NurseInterventionScreen(
+            child: NurseInterventionScreen<NurseInterventionViewModel>(
               onPrevious: () {
                 Navigator.pop(_);
               },
@@ -145,7 +145,8 @@ class AppRouter {
 
       case RouteNames.hivNurseIntervention:
         return MaterialPageRoute(
-          builder: (_) => ChangeNotifierProvider<NurseInterventionViewModel>(
+          builder: (_) =>
+              ChangeNotifierProvider<HIVTestNursingInterventionViewModel>(
             create: (_) => HIVTestNursingInterventionViewModel(),
             child: HIVTestNursingInterventionScreen(
               onPrevious: () {
@@ -160,7 +161,8 @@ class AppRouter {
 
       case RouteNames.tbNurseIntervention:
         return MaterialPageRoute(
-          builder: (_) => ChangeNotifierProvider<NurseInterventionViewModel>(
+          builder: (_) =>
+              ChangeNotifierProvider<TBNursingInterventionViewModel>(
             create: (_) => TBNursingInterventionViewModel(),
             child: TBNursingInterventionScreen(
               onPrevious: () {

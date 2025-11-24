@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../nurse_interventions/widgets/nurse_intervention_screen.dart';
+import '../view_model/tb_nursing_intervention_view_model.dart';
 
 class TBNursingInterventionScreen extends StatelessWidget {
   final VoidCallback onNext;
@@ -14,7 +15,7 @@ class TBNursingInterventionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return NurseInterventionScreen(
+    return NurseInterventionScreen<TBNursingInterventionViewModel>(
       onNext: onNext,
       onPrevious: onPrevious,
       title: 'TB Test Nursing Intervention',

@@ -11,7 +11,8 @@ import '../../../shared/ui/form/kenwell_referral_card.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/nurse_intervention_view_model.dart';
 
-class NurseInterventionScreen extends StatelessWidget {
+class NurseInterventionScreen<T extends NurseInterventionViewModel>
+    extends StatelessWidget {
   final VoidCallback? onNext;
   final VoidCallback? onPrevious;
   final String title;
@@ -27,7 +28,7 @@ class NurseInterventionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<NurseInterventionViewModel>();
+    final viewModel = context.watch<T>();
 
     return KenwellFormPage(
       title: title,
