@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../colours/kenwell_colours.dart';
 import 'custom_text_field.dart';
 import 'kenwell_form_styles.dart';
 
@@ -44,7 +45,11 @@ class KenwellDateField extends StatelessWidget {
       decoration: KenwellFormStyles.decoration(
         label: label,
         hint: hint ?? 'Select $label',
-        suffixIcon: const Icon(Icons.calendar_today_outlined, size: 20),
+        suffixIcon: const Icon(
+          Icons.calendar_today_outlined,
+          size: 20,
+          color: KenwellColors.primaryGreen,
+        ),
       ),
       validator: validator ??
           (val) => (val == null || val.isEmpty) ? 'Please select $label' : null,

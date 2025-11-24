@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_spinbox/flutter_spinbox.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
-
 import '../../../../domain/models/wellness_event.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/buttons/custom_primary_button.dart';
+import '../../../shared/ui/colours/kenwell_colours.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
+import '../../../shared/ui/form/kenwell_checkbox_group.dart';
 import '../../../shared/ui/form/kenwell_date_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_styles.dart';
@@ -202,16 +202,7 @@ class _EventScreenState extends State<EventScreen> {
                   padding: EdgeInsets.zero,
                   validator: (val) => _requiredSelection('Mobile Booths', val),
                 ),
-                KenwellDropdownField<String>(
-                  label: 'Services Requested',
-                  value: _nullableValue(widget.viewModel.servicesRequested),
-                  items: const ['HRA', 'Other'],
-                  onChanged: (val) =>
-                      widget.viewModel.servicesRequested = val ?? '',
-                  padding: EdgeInsets.zero,
-                  validator: (val) =>
-                      _requiredSelection('Services Requested', val),
-                ),
+                _buildServicesRequestedField(context),
               ]),
               _buildSectionCard('Time Details', [
                 KenwellTextField(
@@ -219,7 +210,10 @@ class _EventScreenState extends State<EventScreen> {
                   controller: widget.viewModel.setUpTimeController,
                   padding: EdgeInsets.zero,
                   readOnly: true,
-                  suffixIcon: const Icon(Icons.access_time),
+                  suffixIcon: const Icon(
+                    Icons.access_time,
+                    color: KenwellColors.primaryGreen,
+                  ),
                   validator: (value) => _requiredField('Setup Time', value),
                   onTap: () => widget.viewModel
                       .pickTime(context, widget.viewModel.setUpTimeController),
@@ -229,7 +223,10 @@ class _EventScreenState extends State<EventScreen> {
                   controller: widget.viewModel.startTimeController,
                   padding: EdgeInsets.zero,
                   readOnly: true,
-                  suffixIcon: const Icon(Icons.access_time),
+                  suffixIcon: const Icon(
+                    Icons.access_time,
+                    color: KenwellColors.primaryGreen,
+                  ),
                   validator: (value) => _requiredField('Start Time', value),
                   onTap: () => widget.viewModel
                       .pickTime(context, widget.viewModel.startTimeController),
@@ -239,7 +236,10 @@ class _EventScreenState extends State<EventScreen> {
                   controller: widget.viewModel.endTimeController,
                   padding: EdgeInsets.zero,
                   readOnly: true,
-                  suffixIcon: const Icon(Icons.access_time),
+                  suffixIcon: const Icon(
+                    Icons.access_time,
+                    color: KenwellColors.primaryGreen,
+                  ),
                   validator: (value) => _requiredField('End Time', value),
                   onTap: () => widget.viewModel
                       .pickTime(context, widget.viewModel.endTimeController),
@@ -249,7 +249,10 @@ class _EventScreenState extends State<EventScreen> {
                   controller: widget.viewModel.strikeDownTimeController,
                   padding: EdgeInsets.zero,
                   readOnly: true,
-                  suffixIcon: const Icon(Icons.access_time),
+                  suffixIcon: const Icon(
+                    Icons.access_time,
+                    color: KenwellColors.primaryGreen,
+                  ),
                   validator: (value) =>
                       _requiredField('Strike Down Time', value),
                   onTap: () => widget.viewModel.pickTime(
@@ -303,6 +306,63 @@ class _EventScreenState extends State<EventScreen> {
       validator: (value) => value == null ? 'Enter $label' : null,
       onChanged: (value) {
         controller.text = value.round().toString();
+      },
+    );
+  }
+
+  Widget _buildServicesRequestedField(BuildContext context) {
+    return FormField<Set<String>>(
+      initialValue: widget.viewModel.selectedServices,
+      validator: (_) {
+        if (widget.viewModel.selectedServices.isEmpty) {
+          return 'Select at least one service';
+        }
+        return null;
+      },
+      builder: (field) {
+        final labelStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+            );
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Services Requested',
+              style: labelStyle,
+            ),
+            const SizedBox(height: 8),
+            KenwellCheckboxGroup(
+              options: widget.viewModel.availableServiceOptions
+                  .map(
+                    (service) => KenwellCheckboxOption(
+                      label: service,
+                      value: widget.viewModel.isServiceSelected(service),
+                      onChanged: (checked) {
+                        setState(() {
+                          widget.viewModel.toggleServiceSelection(
+                            service,
+                            checked ?? false,
+                          );
+                          field.didChange(widget.viewModel.selectedServices);
+                        });
+                      },
+                    ),
+                  )
+                  .toList(),
+            ),
+            if (field.hasError)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  field.errorText!,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.error,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+          ],
+        );
       },
     );
   }

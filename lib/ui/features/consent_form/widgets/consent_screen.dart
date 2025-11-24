@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-
 import 'package:kenwell_health_app/utils/input_formatters.dart';
-
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_bullet_list.dart';
 import '../../../shared/ui/form/kenwell_checkbox_group.dart';
@@ -12,7 +9,6 @@ import '../../../shared/ui/form/kenwell_date_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_page.dart';
 import '../../../shared/ui/form/kenwell_form_step.dart';
-import '../../../shared/ui/form/kenwell_form_styles.dart';
 import '../../../shared/ui/form/kenwell_signature_actions.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/consent_screen_view_model.dart';
@@ -110,9 +106,9 @@ class ConsentScreen extends StatelessWidget {
         ),
       ),
       KenwellFormStep(
-        builder: (_) => Column(
+        builder: (_) => const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children: [
             Text(
               'I hereby declare that I have read and understood the information below. By signing, I confirm my understanding of:',
               style: TextStyle(
