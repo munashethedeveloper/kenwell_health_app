@@ -7,7 +7,7 @@ class KenwellSignatureField extends StatelessWidget {
     required this.controller,
     required this.onClear,
     this.height = 160,
-    this.label = 'Signature',
+    this.label = 'Kindly provide your signature below',
     this.backgroundColor,
   });
 
@@ -27,7 +27,7 @@ class KenwellSignatureField extends StatelessWidget {
             '$label:',
             style: const TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 16,
+              fontSize: 14,
               color: Color(0xFF201C58),
             ),
           ),

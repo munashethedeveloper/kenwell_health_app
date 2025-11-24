@@ -132,13 +132,19 @@ class ConsentScreen extends StatelessWidget {
   }
 
   static const List<String> _informationBullets = [
-    'HIV, glucose, cholesterol, blood pressure, BMI, TB, and stress/psychological screenings may take place.',
-    'The screening process was explained to me.',
-    'These are screening tests and not diagnostic. Further testing may be needed.',
-    'A finger prick will be used for testing and may cause temporary discomfort.',
-    'My privacy will be respected, and I consent to data sharing with relevant health partners.',
-    'Participation is voluntary.',
-    'I have been offered HIV pre- and post-test counselling.',
+    'HIV, glucose, cholesterol, blood pressure, BMI, TB, stress / psychological screenings, and a lifestyle assessment, amongst others, will take place'
+        'The process of these screening tests was explained to me',
+    'These tests to be done are screening tests, and not diagnostic tests, and further testing may be required to conclude the diagnostic process',
+    'A finger prick will be used to collect a few drops of blood. The finger prick may cause some short-term discomfort like pain and / or swelling or other complications',
+    'I have the opportunity to ask questions about these screening tests and processes',
+    'My privacy will be respected, and I give consent for my screening test results to be shared with my medical scheme, it’s administrator, and / or managed health care organization, or other parties involved (doctors and nurses), in the management of my health',
+    'The health screening tests are entirely voluntary',
+    'I have been offered pre-test and post-test counselling for the HIV test',
+    'I have the legal capacity to give informed consent',
+    'I understand and agree that all health information supplied by me in connection with my personal health will be used by Kenwell Consulting to assess my health risk and I agree that the information can be sent to my Medical Aid to suggest appropriate intervention programmes aimed at improving my health risk and that this information will be kept confidential. I understand that my employer will receive a statistical report with no personal information.',
+    'I understand and agree that information relevant to my current health can be disclosed to third parties, for the purposes of analysis without the disclosure of my identity.',
+    'I also accept that anonymous data will be shared with my employer to help them understand health trends in my company and to further help me and my colleagues.',
+    'I understand and agree that I may receive a follow up regarding my medical condition.',
   ];
 
   List<KenwellCheckboxOption> _screeningOptions(ConsentScreenViewModel vm) {

@@ -86,6 +86,7 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         KenwellSignatureActions(
+          title: 'Signature',
           controller: viewModel.signatureController,
           onClear: viewModel.clearSignature,
           navigation: KenwellFormNavigation(
