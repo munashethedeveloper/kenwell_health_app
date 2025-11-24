@@ -3,9 +3,10 @@ import 'package:kenwell_health_app/data/services/auth_service.dart';
 import '../../../../domain/models/user_model.dart';
 
 class ProfileViewModel extends ChangeNotifier {
-  ProfileViewModel();
+  ProfileViewModel({required AuthService authService})
+      : _authService = authService;
 
-  final AuthService _authService = AuthService();
+  final AuthService _authService;
 
   // User fields
   String email = '';

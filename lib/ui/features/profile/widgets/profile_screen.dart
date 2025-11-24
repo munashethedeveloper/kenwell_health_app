@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/data/services/auth_service.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
-import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
+import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
@@ -14,7 +15,8 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => ProfileViewModel(),
+      create: (context) =>
+          ProfileViewModel(authService: context.read<AuthService>()),
       child: const _ProfileScreenBody(),
     );
   }

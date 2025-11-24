@@ -20,7 +20,23 @@ class EventEntries extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-@DriftDatabase(tables: [EventEntries])
+class UserEntries extends Table {
+  TextColumn get id => text()();
+  TextColumn get email => text()();
+  TextColumn get password => text()();
+  TextColumn get role => text()();
+  TextColumn get phoneNumber => text()();
+  TextColumn get username => text()();
+  TextColumn get firstName => text()();
+  TextColumn get lastName => text()();
+  BoolColumn get isCurrent =>
+      boolean().withDefault(const Constant(false))();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+@DriftDatabase(tables: [EventEntries, UserEntries])
 class AppDatabase extends _$AppDatabase {
   AppDatabase({QueryExecutor? executor})
       : super(executor ?? connection_factory.createExecutor());
@@ -40,4 +56,27 @@ class AppDatabase extends _$AppDatabase {
 
   Future<int> deleteEventById(String id) =>
       (delete(eventEntries)..where((tbl) => tbl.id.equals(id))).go();
+
+  Future<List<UserEntry>> listUsers() => select(userEntries).get();
+
+  Future<UserEntry?> getUserByEmail(String email) =>
+      (select(userEntries)..where((tbl) => tbl.email.equals(email))).getSingleOrNull();
+
+  Future<UserEntry?> getCurrentUserEntry() =>
+      (select(userEntries)..where((tbl) => tbl.isCurrent.equals(true))).getSingleOrNull();
+
+  Future<void> upsertUser(UserEntriesCompanion entry) =>
+      into(userEntries).insertOnConflictUpdate(entry);
+
+  Future<void> setCurrentUser(String userId) => transaction(() async {
+        await (update(userEntries)..where((tbl) => tbl.isCurrent.equals(true)))
+            .write(const UserEntriesCompanion(isCurrent: Value(false)));
+        await (update(userEntries)..where((tbl) => tbl.id.equals(userId)))
+            .write(const UserEntriesCompanion(isCurrent: Value(true)));
+      });
+
+  Future<void> clearCurrentUser() async {
+    await (update(userEntries)..where((tbl) => tbl.isCurrent.equals(true)))
+        .write(const UserEntriesCompanion(isCurrent: Value(false)));
+  }
 }

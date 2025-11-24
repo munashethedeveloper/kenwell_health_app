@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'data/local/app_database.dart';
 import 'data/repositories_dcl/event_repository.dart';
+import 'data/services/auth_service.dart';
 import 'providers/theme_provider.dart';
 import 'routing/app_router.dart';
 import 'ui/features/auth/view_models/auth_view_model.dart';
@@ -25,10 +26,15 @@ class MyApp extends StatelessWidget {
           create: (_) => AppDatabase(),
           dispose: (_, db) => db.close(),
         ),
+        Provider<AuthService>(
+          create: (context) => AuthService(context.read<AppDatabase>()),
+        ),
         Provider<EventRepository>(
           create: (context) => EventRepository(context.read<AppDatabase>()),
         ),
-        ChangeNotifierProvider<AuthViewModel>(create: (_) => AuthViewModel()),
+        ChangeNotifierProvider<AuthViewModel>(
+          create: (context) => AuthViewModel(context.read<AuthService>()),
+        ),
         ChangeNotifierProvider<CalendarViewModel>(
             create: (_) => CalendarViewModel()),
         ChangeNotifierProvider<EventViewModel>(

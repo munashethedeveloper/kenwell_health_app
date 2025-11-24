@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
-
-import '../../../../data/services/auth_service.dart';
+import 'package:provider/provider.dart';
 import '../../../shared/ui/colours/kenwell_colours.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_styles.dart';
 import '../../../shared/ui/form/kenwell_section_header.dart';
 import '../../../shared/ui/logo/app_logo.dart';
+import '../view_models/auth_view_model.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -28,7 +28,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final bool success = await AuthService().forgotPassword(
+      final authViewModel = context.read<AuthViewModel>();
+      final bool success = await authViewModel.forgotPassword(
         _emailController.text.trim(),
       );
 
