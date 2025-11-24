@@ -20,6 +20,7 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
       onPrevious: onPrevious,
       title: 'HIV Test Nursing Intervention',
       sectionTitle: 'Section H: HIV - Nurse Intervention',
+      showInitialAssessment: true,
     );
   }
 }

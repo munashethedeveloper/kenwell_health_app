@@ -17,6 +17,7 @@ class NurseInterventionScreen<T extends NurseInterventionViewModel>
   final VoidCallback? onPrevious;
   final String title;
   final String sectionTitle;
+  final bool showInitialAssessment;
 
   const NurseInterventionScreen({
     super.key,
@@ -24,6 +25,7 @@ class NurseInterventionScreen<T extends NurseInterventionViewModel>
     this.onPrevious,
     this.title = 'Health Risk Assessment Nurse Intervention',
     this.sectionTitle = 'Section E: HRA - Nurse Intervention',
+    this.showInitialAssessment = false,
   });
 
   @override
@@ -35,52 +37,55 @@ class NurseInterventionScreen<T extends NurseInterventionViewModel>
       sectionTitle: sectionTitle,
       formKey: viewModel.formKey,
       children: [
-        KenwellFormCard(
-          title: 'Initial Assessment',
-          child: Column(
-            children: [
-              KenwellDropdownField<String>(
-                label: 'Window period risk assessment',
-                value: viewModel.windowPeriod,
-                items: viewModel.windowPeriodOptions,
-                onChanged: viewModel.setWindowPeriod,
-                validator: _requireSelection('Window period risk assessment'),
-              ),
-              KenwellDropdownField<String>(
-                label: 'Did patient expect HIV (+) result?',
-                value: viewModel.expectedResult,
-                items: viewModel.expectedResultOptions,
-                onChanged: viewModel.setExpectedResult,
-                validator:
-                    _requireSelection('Did patient expect HIV (+) result?'),
-              ),
-              KenwellDropdownField<String>(
-                label: 'Difficulty in dealing with result?',
-                value: viewModel.difficultyDealingResult,
-                items: viewModel.difficultyOptions,
-                onChanged: viewModel.setDifficultyDealingResult,
-                validator:
-                    _requireSelection('Difficulty in dealing with result?'),
-              ),
-              KenwellDropdownField<String>(
-                label: 'Urgent psychosocial follow-up needed?',
-                value: viewModel.urgentPsychosocial,
-                items: viewModel.urgentOptions,
-                onChanged: viewModel.setUrgentPsychosocial,
-                validator:
-                    _requireSelection('Urgent psychosocial follow-up needed?'),
-              ),
-              KenwellDropdownField<String>(
-                label: 'Committed to change behavior?',
-                value: viewModel.committedToChange,
-                items: viewModel.committedOptions,
-                onChanged: viewModel.setCommittedToChange,
-                validator: _requireSelection('Committed to change behavior?'),
-              ),
-            ],
+        if (showInitialAssessment) ...[
+          KenwellFormCard(
+            title: 'Initial Assessment',
+            child: Column(
+              children: [
+                KenwellDropdownField<String>(
+                  label: 'Window period risk assessment',
+                  value: viewModel.windowPeriod,
+                  items: viewModel.windowPeriodOptions,
+                  onChanged: viewModel.setWindowPeriod,
+                  validator: _requireSelection('Window period risk assessment'),
+                ),
+                KenwellDropdownField<String>(
+                  label: 'Did patient expect HIV (+) result?',
+                  value: viewModel.expectedResult,
+                  items: viewModel.expectedResultOptions,
+                  onChanged: viewModel.setExpectedResult,
+                  validator:
+                      _requireSelection('Did patient expect HIV (+) result?'),
+                ),
+                KenwellDropdownField<String>(
+                  label: 'Difficulty in dealing with result?',
+                  value: viewModel.difficultyDealingResult,
+                  items: viewModel.difficultyOptions,
+                  onChanged: viewModel.setDifficultyDealingResult,
+                  validator:
+                      _requireSelection('Difficulty in dealing with result?'),
+                ),
+                KenwellDropdownField<String>(
+                  label: 'Urgent psychosocial follow-up needed?',
+                  value: viewModel.urgentPsychosocial,
+                  items: viewModel.urgentOptions,
+                  onChanged: viewModel.setUrgentPsychosocial,
+                  validator: _requireSelection(
+                      'Urgent psychosocial follow-up needed?'),
+                ),
+                KenwellDropdownField<String>(
+                  label: 'Committed to change behavior?',
+                  value: viewModel.committedToChange,
+                  items: viewModel.committedOptions,
+                  onChanged: viewModel.setCommittedToChange,
+                  validator:
+                      _requireSelection('Committed to change behavior?'),
+                ),
+              ],
+            ),
           ),
-        ),
-        const SizedBox(height: 16),
+          const SizedBox(height: 16),
+        ],
         KenwellReferralCard<NursingReferralOption>(
           title: 'Nursing Referrals',
           selectedValue: viewModel.nursingReferralSelection,
