@@ -5,6 +5,7 @@ import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_page.dart';
+import '../../../shared/ui/form/kenwell_date_field.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/personal_details_view_model.dart';
 
@@ -82,6 +83,13 @@ class PersonalDetailsScreen extends StatelessWidget {
           validator: (val) =>
               (val == null || val.isEmpty) ? 'Please enter Initials' : null,
         ),
+        KenwellDateField(
+          label: 'Date of Birth',
+          controller: vm.dobController,
+          validator: (val) => (val == null || val.isEmpty)
+              ? 'Please select Date of Birth'
+              : null,
+        ),
         KenwellDropdownField<String>(
           label: 'Marital Status',
           value: vm.maritalStatus,
@@ -98,14 +106,33 @@ class PersonalDetailsScreen extends StatelessWidget {
           validator: (val) =>
               (val == null || val.isEmpty) ? 'Select Gender' : null,
         ),
-        KenwellTextField(
-          label: 'ID Number',
-          hintText: 'Enter ID number',
-          controller: vm.idNumberController,
-          inputFormatters: AppTextInputFormatters.numbersOnly(),
-          validator: (val) =>
-              (val == null || val.isEmpty) ? 'Please enter ID Number' : null,
+        KenwellDropdownField<String>(
+          label: 'Identification Type',
+          value: vm.idDocumentChoice,
+          items: vm.idDocumentOptions,
+          onChanged: vm.setIdDocumentChoice,
+          validator: (val) => (val == null || val.isEmpty)
+              ? 'Select Identification Type'
+              : null,
         ),
+        if (vm.showIdField)
+          KenwellTextField(
+            label: 'ID Number',
+            hintText: 'Enter ID number',
+            controller: vm.idNumberController,
+            inputFormatters: AppTextInputFormatters.numbersOnly(),
+            validator: (val) =>
+                (val == null || val.isEmpty) ? 'Please enter ID Number' : null,
+          ),
+        if (vm.showPassportField)
+          KenwellTextField(
+            label: 'Passport Number',
+            hintText: 'Enter passport number',
+            controller: vm.passportNumberController,
+            validator: (val) => (val == null || val.isEmpty)
+                ? 'Please enter Passport Number'
+                : null,
+          ),
         KenwellTextField(
           label: 'Nationality',
           hintText: 'Enter nationality',
@@ -131,6 +158,16 @@ class PersonalDetailsScreen extends StatelessWidget {
           validator: (val) =>
               (val == null || val.isEmpty) ? 'Please enter Cell Number' : null,
         ),
+        KenwellTextField(
+          label: 'Alternate Contact Number',
+          hintText: 'Enter alternate contact number',
+          controller: vm.alternateContactNumberController,
+          keyboardType: TextInputType.phone,
+          inputFormatters: AppTextInputFormatters.numbersOnly(),
+          validator: (val) => (val == null || val.isEmpty)
+              ? 'Please enter Alternate Contact Number'
+              : null,
+        ),
       ],
     );
   }
@@ -138,23 +175,33 @@ class PersonalDetailsScreen extends StatelessWidget {
   Widget _buildMedicalAidSection(PersonalDetailsViewModel vm) {
     return Column(
       children: [
-        KenwellTextField(
-          label: 'Medical Aid Name',
-          hintText: 'Enter medical aid name',
-          controller: vm.medicalAidNameController,
-          validator: (val) => (val == null || val.isEmpty)
-              ? 'Please enter Medical Aid Name'
-              : null,
+        KenwellDropdownField<String>(
+          label: 'Do you have Medical Aid?',
+          value: vm.medicalAidStatus,
+          items: vm.medicalAidStatusOptions,
+          onChanged: vm.setMedicalAidStatus,
+          validator: (val) =>
+              (val == null || val.isEmpty) ? 'Select Medical Aid status' : null,
         ),
-        KenwellTextField(
-          label: 'Medical Aid Number',
-          hintText: 'Enter medical aid number',
-          controller: vm.medicalAidNumberController,
-          inputFormatters: AppTextInputFormatters.numbersOnly(),
-          validator: (val) => (val == null || val.isEmpty)
-              ? 'Please enter Medical Aid Number'
-              : null,
-        ),
+        if (vm.showMedicalAidFields) ...[
+          KenwellTextField(
+            label: 'Medical Aid Name',
+            hintText: 'Enter medical aid name',
+            controller: vm.medicalAidNameController,
+            validator: (val) => (val == null || val.isEmpty)
+                ? 'Please enter Medical Aid Name'
+                : null,
+          ),
+          KenwellTextField(
+            label: 'Medical Aid Number',
+            hintText: 'Enter medical aid number',
+            controller: vm.medicalAidNumberController,
+            inputFormatters: AppTextInputFormatters.numbersOnly(),
+            validator: (val) => (val == null || val.isEmpty)
+                ? 'Please enter Medical Aid Number'
+                : null,
+          ),
+        ],
       ],
     );
   }
@@ -175,6 +222,14 @@ class PersonalDetailsScreen extends StatelessWidget {
           controller: vm.positionController,
           validator: (val) => (val == null || val.isEmpty)
               ? 'Please enter Position / Rank'
+              : null,
+        ),
+        KenwellTextField(
+          label: 'Employee Number',
+          hintText: 'Enter employee number',
+          controller: vm.employeeNumberController,
+          validator: (val) => (val == null || val.isEmpty)
+              ? 'Please enter Employee Number'
               : null,
         ),
         KenwellDropdownField<String>(

@@ -42,7 +42,7 @@ class ConsentScreen extends StatelessWidget {
           controller: vm.signatureController,
           onClear: vm.clearSignature,
           navigation: _buildActionButtons(context, vm),
-          title: 'Signature',
+          title: 'Patient Signature',
         ),
       ],
     );

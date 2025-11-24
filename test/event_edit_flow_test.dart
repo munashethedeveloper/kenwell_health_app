@@ -18,11 +18,14 @@ void main() {
         date: DateTime(2024, 10, 15),
         venue: 'Original Venue',
         address: 'Original Address',
-        onsiteContactPerson: 'John Smith',
+        onsiteContactFirstName: 'John',
+        onsiteContactLastName: 'Smith',
         onsiteContactNumber: '555-0123',
         onsiteContactEmail: 'john@example.com',
-        aeContactPerson: 'Jane Doe',
+        aeContactFirstName: 'Jane',
+        aeContactLastName: 'Doe',
         aeContactNumber: '555-0456',
+        aeContactEmail: 'jane@example.com',
         servicesRequested: 'HRA',
         expectedParticipation: 100,
         nonMembers: 20,
@@ -100,15 +103,16 @@ void main() {
       expect(find.text('Original Event Title'), findsOneWidget);
       expect(find.text('Original Venue'), findsOneWidget);
       expect(find.text('Original Address'), findsOneWidget);
-      expect(find.text('John Smith'), findsOneWidget);
+      expect(find.text('John'), findsOneWidget);
+      expect(find.text('Smith'), findsOneWidget);
       expect(find.text('555-0123'), findsOneWidget);
       expect(find.text('john@example.com'), findsOneWidget);
-      expect(find.text('Jane Doe'), findsOneWidget);
+      expect(find.text('Jane'), findsOneWidget);
+      expect(find.text('Doe'), findsOneWidget);
       expect(find.text('555-0456'), findsOneWidget);
     });
 
-    testWidgets('Saving edit preserves event ID',
-        (WidgetTester tester) async {
+    testWidgets('Saving edit preserves event ID', (WidgetTester tester) async {
       WellnessEvent? savedEvent;
 
       // Arrange: Build the EventScreen with existing event
@@ -140,8 +144,7 @@ void main() {
       expect(savedEvent?.title, 'Updated Event Title');
     });
 
-    testWidgets('Update shows SnackBar with UNDO',
-        (WidgetTester tester) async {
+    testWidgets('Update shows SnackBar with UNDO', (WidgetTester tester) async {
       // Arrange: Build a complete flow with navigation
       await tester.pumpWidget(
         MaterialApp(
@@ -232,7 +235,8 @@ void main() {
       expect(copiedEvent.id, testEvent.id);
       expect(copiedEvent.address, testEvent.address);
       expect(copiedEvent.onsiteContactPerson, testEvent.onsiteContactPerson);
-      expect(copiedEvent.expectedParticipation, testEvent.expectedParticipation);
+      expect(
+          copiedEvent.expectedParticipation, testEvent.expectedParticipation);
       expect(copiedEvent.date, testEvent.date);
 
       // Assert: Original event should be unchanged

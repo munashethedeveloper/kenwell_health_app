@@ -104,12 +104,22 @@ class _EventScreenState extends State<EventScreen> {
               ]),
               _buildSectionCard('Onsite Contact', [
                 KenwellTextField(
-                  label: 'Contact Person',
-                  controller: widget.viewModel.onsiteContactController,
+                  label: 'Contact Person First Name',
+                  controller: widget.viewModel.onsiteContactFirstNameController,
                   padding: EdgeInsets.zero,
                   inputFormatters:
                       AppTextInputFormatters.lettersOnly(allowHyphen: true),
-                  validator: (value) => _requiredField('Contact Person', value),
+                  validator: (value) =>
+                      _requiredField('Contact Person First Name', value),
+                ),
+                KenwellTextField(
+                  label: 'Contact Person Last Name',
+                  controller: widget.viewModel.onsiteContactLastNameController,
+                  padding: EdgeInsets.zero,
+                  inputFormatters:
+                      AppTextInputFormatters.lettersOnly(allowHyphen: true),
+                  validator: (value) =>
+                      _requiredField('Contact Person Last Name', value),
                 ),
                 KenwellTextField(
                   label: 'Contact Number',
@@ -129,12 +139,22 @@ class _EventScreenState extends State<EventScreen> {
               ]),
               _buildSectionCard('AE Contact', [
                 KenwellTextField(
-                  label: 'Contact Person',
-                  controller: widget.viewModel.aeContactController,
+                  label: 'Contact Person First Name',
+                  controller: widget.viewModel.aeContactFirstNameController,
                   padding: EdgeInsets.zero,
                   inputFormatters:
                       AppTextInputFormatters.lettersOnly(allowHyphen: true),
-                  validator: (value) => _requiredField('Contact Person', value),
+                  validator: (value) =>
+                      _requiredField('AE Contact Person First Name', value),
+                ),
+                KenwellTextField(
+                  label: 'Contact Person Last Name',
+                  controller: widget.viewModel.aeContactLastNameController,
+                  padding: EdgeInsets.zero,
+                  inputFormatters:
+                      AppTextInputFormatters.lettersOnly(allowHyphen: true),
+                  validator: (value) =>
+                      _requiredField('AE Contact Person Last Name', value),
                 ),
                 KenwellTextField(
                   label: 'Contact Number',
@@ -143,6 +163,13 @@ class _EventScreenState extends State<EventScreen> {
                   keyboardType: TextInputType.phone,
                   inputFormatters: AppTextInputFormatters.numbersOnly(),
                   validator: (value) => _requiredField('Contact Number', value),
+                ),
+                KenwellTextField(
+                  label: 'Email',
+                  controller: widget.viewModel.aeEmailController,
+                  padding: EdgeInsets.zero,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) => _requiredField('Email', value),
                 ),
               ]),
               _buildSectionCard('Participation & Numbers', [

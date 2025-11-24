@@ -17,11 +17,14 @@ void main() {
         date: DateTime(2024, 8, 15),
         venue: 'Community Center',
         address: '123 Main St',
-        onsiteContactPerson: 'John Smith',
+        onsiteContactFirstName: 'John',
+        onsiteContactLastName: 'Smith',
         onsiteContactNumber: '555-0123',
         onsiteContactEmail: 'john@example.com',
-        aeContactPerson: 'Jane Doe',
+        aeContactFirstName: 'Jane',
+        aeContactLastName: 'Doe',
         aeContactNumber: '555-0456',
+        aeContactEmail: 'jane@example.com',
         servicesRequested: 'HRA',
         expectedParticipation: 100,
         nonMembers: 20,
@@ -96,7 +99,8 @@ void main() {
       // Assert: Confirmation dialog should be shown
       expect(find.text('Delete Event'), findsOneWidget);
       expect(
-        find.text('Are you sure you want to delete this event? You can undo this action.'),
+        find.text(
+            'Are you sure you want to delete this event? You can undo this action.'),
         findsOneWidget,
       );
       expect(find.text('Cancel'), findsOneWidget);
@@ -202,11 +206,14 @@ void main() {
         date: DateTime(2024, 9, 20),
         venue: 'Community Center',
         address: '123 Main St',
-        onsiteContactPerson: 'John Smith',
+        onsiteContactFirstName: 'John',
+        onsiteContactLastName: 'Smith',
         onsiteContactNumber: '555-0123',
         onsiteContactEmail: 'john@example.com',
-        aeContactPerson: 'Jane Doe',
+        aeContactFirstName: 'Jane',
+        aeContactLastName: 'Doe',
         aeContactNumber: '555-0456',
+        aeContactEmail: 'jane@example.com',
         servicesRequested: 'HRA',
         expectedParticipation: 100,
         nonMembers: 20,

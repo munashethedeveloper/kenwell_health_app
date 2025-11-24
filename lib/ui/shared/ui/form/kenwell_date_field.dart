@@ -59,8 +59,8 @@ class KenwellDateField extends StatelessWidget {
               final pickedDate = await showDatePicker(
                 context: context,
                 initialDate: initialDate ?? DateTime.now(),
-                firstDate: firstDate ?? DateTime(2000),
-                lastDate: lastDate ?? DateTime(2100),
+                firstDate: firstDate ?? DateTime(1900),
+                lastDate: lastDate ?? DateTime(4000),
               );
               if (pickedDate != null) {
                 controller.text = DateFormat(dateFormat).format(pickedDate);

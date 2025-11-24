@@ -13,11 +13,14 @@ class EventViewModel extends ChangeNotifier {
   final titleController = TextEditingController();
   final venueController = TextEditingController();
   final addressController = TextEditingController();
-  final onsiteContactController = TextEditingController();
+  final onsiteContactFirstNameController = TextEditingController();
+  final onsiteContactLastNameController = TextEditingController();
   final onsiteNumberController = TextEditingController();
   final onsiteEmailController = TextEditingController();
-  final aeContactController = TextEditingController();
+  final aeContactFirstNameController = TextEditingController();
+  final aeContactLastNameController = TextEditingController();
   final aeNumberController = TextEditingController();
+  final aeEmailController = TextEditingController();
   final expectedParticipationController = TextEditingController();
   final passportsController = TextEditingController();
   final nursesController = TextEditingController();
@@ -69,11 +72,14 @@ class EventViewModel extends ChangeNotifier {
     titleController.text = e.title;
     venueController.text = e.venue;
     addressController.text = e.address;
-    onsiteContactController.text = e.onsiteContactPerson;
+    onsiteContactFirstNameController.text = e.onsiteContactFirstName;
+    onsiteContactLastNameController.text = e.onsiteContactLastName;
     onsiteNumberController.text = e.onsiteContactNumber;
     onsiteEmailController.text = e.onsiteContactEmail;
-    aeContactController.text = e.aeContactPerson;
+    aeContactFirstNameController.text = e.aeContactFirstName;
+    aeContactLastNameController.text = e.aeContactLastName;
     aeNumberController.text = e.aeContactNumber;
+    aeEmailController.text = e.aeContactEmail;
     expectedParticipationController.text = e.expectedParticipation.toString();
     passportsController.text = e.passports.toString();
     nursesController.text = e.nurses.toString();
@@ -125,11 +131,14 @@ class EventViewModel extends ChangeNotifier {
       date: date,
       venue: venueController.text,
       address: addressController.text,
-      onsiteContactPerson: onsiteContactController.text,
+      onsiteContactFirstName: onsiteContactFirstNameController.text,
+      onsiteContactLastName: onsiteContactLastNameController.text,
       onsiteContactNumber: onsiteNumberController.text,
       onsiteContactEmail: onsiteEmailController.text,
-      aeContactPerson: aeContactController.text,
+      aeContactFirstName: aeContactFirstNameController.text,
+      aeContactLastName: aeContactLastNameController.text,
       aeContactNumber: aeNumberController.text,
+      aeContactEmail: aeEmailController.text,
       servicesRequested: servicesRequested,
       expectedParticipation:
           int.tryParse(expectedParticipationController.text) ?? 0,
@@ -197,11 +206,14 @@ class EventViewModel extends ChangeNotifier {
     titleController.clear();
     venueController.clear();
     addressController.clear();
-    onsiteContactController.clear();
+    onsiteContactFirstNameController.clear();
+    onsiteContactLastNameController.clear();
     onsiteNumberController.clear();
     onsiteEmailController.clear();
-    aeContactController.clear();
+    aeContactFirstNameController.clear();
+    aeContactLastNameController.clear();
     aeNumberController.clear();
+    aeEmailController.clear();
     expectedParticipationController.clear();
     passportsController.clear();
     nursesController.clear();
@@ -219,11 +231,14 @@ class EventViewModel extends ChangeNotifier {
     titleController.dispose();
     venueController.dispose();
     addressController.dispose();
-    onsiteContactController.dispose();
+    onsiteContactFirstNameController.dispose();
+    onsiteContactLastNameController.dispose();
     onsiteNumberController.dispose();
     onsiteEmailController.dispose();
-    aeContactController.dispose();
+    aeContactFirstNameController.dispose();
+    aeContactLastNameController.dispose();
     aeNumberController.dispose();
+    aeEmailController.dispose();
     expectedParticipationController.dispose();
     passportsController.dispose();
     nursesController.dispose();
