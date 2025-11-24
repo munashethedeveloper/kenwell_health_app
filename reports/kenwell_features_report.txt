@@ -1,0 +1,67 @@
+Kenwell Health App Feature Report
+Generated on 2025-11-24 08:39
+
+CURRENT CAPABILITIES
+
+AUTHENTICATION & ACCOUNT RECOVERY
+- Email/password login with validation, password-visibility toggles, and busy states for async calls.
+- Registration captures identity, contact, and credential data with shared input-formatters for cleaner data entry.
+- Forgot-password screen confirms stored credentials and surfaces contextual SnackBar messaging.
+- AuthService + AuthViewModel centralize SharedPreferences storage for Login, Register, Forgot Password, and Profile flows.
+
+PROFILE MANAGEMENT
+- Profile view reloads stored user metadata into editable text fields and validates every entry before save.
+- Password confirmation enforcement with inline mismatch messaging.
+- UI locks while saves are running and acknowledges success via SnackBars.
+
+PLANNER & EVENT LIFECYCLE
+- TableCalendar planner with calendar + monthly list tabs, grouped day cards, and add-event FAB.
+- Comprehensive event form capturing venue, staffing counts, services requested, contact details, logistics, and timing.
+- Gradient event cards with tap-through to EventDetails plus edit/delete actions and undo support.
+- EventViewModel manages controllers, service selections, add/update/delete/restore helpers, and has unit tests for regressions.
+
+NAVIGATION & THEMING SHELL
+- Named AppRouter connects every auth, planner, settings, and wellness flow screen through a single switch.
+- Bottom navigation exposes Planner, Profile, Settings, Stats, Help, and Conduct Event tabs inside an IndexedStack.
+- ThemeProvider-backed light/dark mode toggle, notifications switch, and language selector in Settings.
+
+WELLNESS DAY WORKFLOW
+- Conduct Event tab orchestrates an 11-step workflow (consent, personal info, risk, screening, interventions, HIV/TB tests, survey).
+- Each step owns a ChangeNotifier view model plus Kenwell-branded form components, validation, and navigation controls.
+- Signature capture for consent and nurse interventions and contextual previous/next/cancel actions.
+- Survey captures referral source, province, multi-question Likert ratings, and contact-consent before submission.
+
+SUPPORT, REPORTING, AND UTILITIES
+- Stats & Report screen logs event timing + throughput metrics ahead of report generation.
+- Help & Support view surfaces version info, FAQ link, email shortcut, and T&C/Privacy links.
+- Shared UI kit (form cards, buttons, checkbox groups, yes/no questions) plus reusable input-formatters and validators.
+- Widget tests validate EventViewModel delete/update/restore scenarios.
+
+RECOMMENDED FUTURE ENHANCEMENTS
+
+SECURE, MULTI-USER AUTHENTICATION
+- Migrate credentials away from plaintext SharedPreferences to a managed identity provider (e.g., Firebase Auth) with hashed storage.
+- Add role-based access, MFA, and portable session refresh so multiple clinics/employers can authenticate safely.
+- Connect forgot-password flow to transactional email/SMS services instead of local flag checks.
+
+PERSISTENT EVENT & WORKFLOW DATA
+- Back EventViewModel with SQLite/Firestore so planner entries persist across sessions and devices.
+- Store complete wellness-flow submissions (including signatures) via repositories/APIs and expose participant history.
+- Provide offline-first caching plus conflict resolution for teams operating without network coverage.
+
+ANALYTICS, EXPORTS, AND DASHBOARDS
+- Extend StatsReport to auto-ingest event data, compute KPIs, and export PDF/Excel bundles.
+- Add charts for participation vs. expectation, screening completion, and referral outcome tracking.
+- Automate employer- or scheme-facing recap emails after each wellness day.
+
+NOTIFICATIONS & FOLLOW-UP AUTOMATION
+- Wire Settings toggles into actual local/push notifications for upcoming events, nurse follow-ups, and survey reminders.
+- Alert teams when HIV/TB follow-up dates are overdue with deep links back into the relevant workflow step.
+
+RICHER SUPPORT & KNOWLEDGE BASE
+- Embed searchable FAQs, SOP PDFs, and contextual help snippets directly inside the Help experience.
+- Offer live-chat or WhatsApp escalation plus per-screen "Need help?" affordances.
+
+INTEGRATIONS & DATA GOVERNANCE
+- Expose secure exports/APIs so medical schemes and employers can ingest screening data automatically.
+- Add consent/audit logging, encryption at rest, and configurable data-retention windows for POPIA/GDPR compliance.
