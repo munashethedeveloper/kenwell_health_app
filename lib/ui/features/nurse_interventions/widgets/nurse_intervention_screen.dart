@@ -148,13 +148,23 @@ class NurseInterventionScreen<T extends NurseInterventionViewModel>
           child: Column(
             children: [
               KenwellTextField(
-                label: 'HIV Testing Nurse',
-                hintText: 'Enter nurse name',
-                controller: viewModel.hivTestingNurseController,
+                label: 'HIV Testing Nurse First Name',
+                hintText: 'Enter nurse first name',
+                controller: viewModel.nurseFirstNameController,
                 inputFormatters:
                     AppTextInputFormatters.lettersOnly(allowHyphen: true),
                 validator: (val) => (val == null || val.isEmpty)
-                    ? 'Please enter HIV Testing Nurse'
+                    ? 'Please enter Nurse First Name'
+                    : null,
+              ),
+              KenwellTextField(
+                label: 'HIV Testing Nurse Last Name',
+                hintText: 'Enter nurse last name',
+                controller: viewModel.nurseLastNameController,
+                inputFormatters:
+                    AppTextInputFormatters.lettersOnly(allowHyphen: true),
+                validator: (val) => (val == null || val.isEmpty)
+                    ? 'Please enter Nurse Last Name'
                     : null,
               ),
               KenwellTextField(
