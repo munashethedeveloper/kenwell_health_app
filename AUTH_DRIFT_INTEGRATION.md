@@ -11,9 +11,9 @@
 ## Architecture Overview
 
 1. **Drift database (`lib/data/local/app_database.dart`)**
-   - `Users` table holds the canonical copy of auth + profile data with timestamps.
+   - `Users` stores the canonical auth/profile state with created/updated timestamps.
    - `AppDatabase.instance` exposes helpers such as `createUser`, `getUserByEmail`, `getUserByCredentials`, and `updateUser`.
-   - Uses `LazyDatabase` on mobile/desktop and `WebDatabase` on web, so the same DAO works across platforms.
+   - The app now targets Android (with optional desktop debugging) and no longer ships a web backend. The database always uses `LazyDatabase` + `NativeDatabase`/`sqlite3_flutter_libs`, so Windows/macOS debug builds share the same on-disk store as the Android runtime.
 
 2. **Auth service (`lib/data/services/auth_service.dart`)**
    - Now orchestrates all reads/writes through Drift and only keeps the current user id in `SharedPreferences`.

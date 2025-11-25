@@ -2,8 +2,6 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
-import 'package:drift/web.dart';
-import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -113,14 +111,13 @@ class AppDatabase extends _$AppDatabase {
   }
 }
 
-QueryExecutor _openConnection() {
-  if (kIsWeb) {
-    return WebDatabase('kenwell_db');
-  }
-
+LazyDatabase _openConnection() {
   return LazyDatabase(() async {
-    final directory = await getApplicationDocumentsDirectory();
+    final directory = await getApplicationSupportDirectory();
     final file = File(p.join(directory.path, 'kenwell.db'));
-    return NativeDatabase.createInBackground(file);
+    return NativeDatabase.createInBackground(
+      file,
+      logStatements: false,
+    );
   });
 }
