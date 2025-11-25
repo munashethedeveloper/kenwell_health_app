@@ -1,80 +1,54 @@
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:kenwell_health_app/data/services/auth_service.dart';
 
 class AuthViewModel extends ChangeNotifier {
+  AuthViewModel({AuthService? authService})
+      : _authService = authService ?? AuthService() {
+    _checkLoginStatus();
+  }
+
+  final AuthService _authService;
+
   bool _isLoggedIn = false;
   bool _isLoading = true;
 
   bool get isLoggedIn => _isLoggedIn;
   bool get isLoading => _isLoading;
 
-  AuthViewModel() {
-    _checkLoginStatus();
-  }
-
-  // Private method
   Future<void> _checkLoginStatus() async {
-    _isLoading = true;
-    notifyListeners();
-
-    final prefs = await SharedPreferences.getInstance();
-    _isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-
-    _isLoading = false;
-    notifyListeners();
+    _setLoading(true);
+    try {
+      _isLoggedIn = await _authService.isLoggedIn();
+    } finally {
+      _setLoading(false);
+    }
   }
 
-  // PUBLIC method for SplashScreen
-  Future<void> checkLoginStatus() async {
-    await _checkLoginStatus();
-  }
+  Future<void> checkLoginStatus() => _checkLoginStatus();
 
   Future<bool> login(String email, String password) async {
-    _isLoading = true;
-    notifyListeners();
-
-    final prefs = await SharedPreferences.getInstance();
-    final storedEmail = prefs.getString('email');
-    final storedPassword = prefs.getString('password');
-
-    if (storedEmail == email && storedPassword == password) {
-      _isLoggedIn = true;
-      await prefs.setBool('isLoggedIn', true);
-      _isLoading = false;
-      notifyListeners();
-      return true;
+    _setLoading(true);
+    try {
+      final user = await _authService.login(email, password);
+      _isLoggedIn = user != null;
+      return _isLoggedIn;
+    } finally {
+      _setLoading(false);
     }
-
-    _isLoggedIn = false;
-    _isLoading = false;
-    notifyListeners();
-    return false;
-  }
-
-  Future<bool> register(String email, String password) async {
-    _isLoading = true;
-    notifyListeners();
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('email', email);
-    await prefs.setString('password', password);
-    _isLoggedIn = false;
-    await prefs.setBool('isLoggedIn', false);
-
-    _isLoading = false;
-    notifyListeners();
-    return true;
   }
 
   Future<void> logout() async {
-    _isLoading = true;
-    notifyListeners();
+    _setLoading(true);
+    try {
+      await _authService.logout();
+      _isLoggedIn = false;
+    } finally {
+      _setLoading(false);
+    }
+  }
 
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', false);
-    _isLoggedIn = false;
-
-    _isLoading = false;
+  void _setLoading(bool value) {
+    _isLoading = value;
     notifyListeners();
   }
 }
