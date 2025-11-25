@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
-import '../../../../data/services/auth_service.dart';
+import 'package:provider/provider.dart';
+import '../../../../domain/models/user_model.dart';
+import '../../../../routing/route_names.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/colours/kenwell_colours.dart';
-import '../../../shared/ui/logo/app_logo.dart';
-import '../../../../routing/route_names.dart';
-import '../../../../domain/models/user_model.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_section_header.dart';
+import '../../../shared/ui/logo/app_logo.dart';
 import '../../../shared/ui/navigation/main_navigation_screen.dart';
+import '../view_models/auth_view_model.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -31,7 +32,8 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final UserModel? user = await AuthService().login(
+      final authViewModel = context.read<AuthViewModel>();
+      final UserModel? user = await authViewModel.login(
         _emailController.text.trim(),
         _passwordController.text.trim(),
       );

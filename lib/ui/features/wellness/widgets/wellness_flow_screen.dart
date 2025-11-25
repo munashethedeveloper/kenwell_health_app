@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import '../../../domain/models/wellness_event.dart';
 
 // Screens
 import '../../consent_form/widgets/consent_screen.dart';
@@ -128,11 +130,54 @@ class WellnessFlowScreen extends StatelessWidget {
       default:
         currentScreen = const Center(child: Text('Invalid step'));
     }
-    return AnimatedSwitcher(
+    final banner = flowVM.attachedEvent == null
+        ? null
+        : _EventBanner(
+            event: flowVM.attachedEvent!,
+            onClear: flowVM.detachEvent,
+          );
+
+    final flowContent = AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
       child: KeyedSubtree(
         key: ValueKey<int>(flowVM.currentStep),
         child: currentScreen,
+      ),
+    );
+
+    return Column(
+      children: [
+        if (banner != null) banner,
+        Expanded(child: flowContent),
+      ],
+    );
+  }
+}
+
+class _EventBanner extends StatelessWidget {
+  final WellnessEvent event;
+  final VoidCallback? onClear;
+
+  const _EventBanner({
+    required this.event,
+    this.onClear,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final dateText = DateFormat.yMMMEd().format(event.date);
+    return Card(
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      color: const Color(0xFFE8F5E9),
+      child: ListTile(
+        leading: const Icon(Icons.event_available, color: Color(0xFF2E7D32)),
+        title: Text(event.title),
+        subtitle: Text('$dateText • ${event.venue}'),
+        trailing: IconButton(
+          icon: const Icon(Icons.close),
+          tooltip: 'Detach event',
+          onPressed: onClear,
+        ),
       ),
     );
   }

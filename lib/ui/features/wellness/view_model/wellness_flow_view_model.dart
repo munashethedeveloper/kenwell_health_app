@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-
-// Import all view models
+import '../../../domain/models/wellness_event.dart';
 import '../../consent_form/view_model/consent_screen_view_model.dart';
+import '../../hiv_test/view_model/hiv_test_view_model.dart';
 import '../../hiv_test_nursing_intervention/view_model/hiv_test_nursing_intervention_view_model.dart';
 import '../../hiv_test_results/view_model/hiv_test_result_view_model.dart';
 import '../../nurse_interventions/view_model/nurse_intervention_view_model.dart';
 import '../../patient/view_model/personal_details_view_model.dart';
 import '../../risk_assessment/view_model/personal_risk_assessment_view_model.dart';
 import '../../screening_results/view_model/wellness_screening_results_view_model.dart';
-import '../../hiv_test/view_model/hiv_test_view_model.dart';
 import '../../survey/view_model/survey_view_model.dart';
 import '../../tb_test/view_model/tb_testing_view_model.dart';
 import '../../tb_test_nursing_intervention/view_model/tb_nursing_intervention_view_model.dart';
@@ -29,6 +28,21 @@ class WellnessFlowViewModel extends ChangeNotifier {
 
   int _currentStep = 0;
   int get currentStep => _currentStep;
+  WellnessEvent? _attachedEvent;
+  WellnessEvent? get attachedEvent => _attachedEvent;
+
+  void startWithEvent(WellnessEvent event) {
+    _attachedEvent = event;
+    _currentStep = 0;
+    _seedFromEvent(event);
+    notifyListeners();
+  }
+
+  void detachEvent() {
+    _attachedEvent = null;
+    personalVM.reset();
+    notifyListeners();
+  }
 
   void nextStep() {
     if (_currentStep < 10) {
@@ -46,7 +60,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
 
   void cancelFlow() {
     _currentStep = 0;
-    notifyListeners();
+    detachEvent();
     //Navigator.popUntil(context, (route) => route.isFirst);
     //Navigator.popUntil(context, (route) => route.settings.name == '/calendar');
   }
@@ -90,6 +104,11 @@ class WellnessFlowViewModel extends ChangeNotifier {
     );
 
     _currentStep = 0;
-    notifyListeners();
+    detachEvent();
+  }
+
+  void _seedFromEvent(WellnessEvent event) {
+    personalVM.reset();
+    personalVM.prefillFromEvent(event);
   }
 }

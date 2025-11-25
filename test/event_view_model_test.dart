@@ -1,17 +1,25 @@
+import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kenwell_health_app/data/local/app_database.dart';
+import 'package:kenwell_health_app/data/repositories_dcl/event_repository.dart';
 import 'package:kenwell_health_app/ui/features/event/view_model/event_view_model.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 
 void main() {
   group('EventViewModel Delete Functionality', () {
+    late AppDatabase database;
+    late EventRepository repository;
     late EventViewModel viewModel;
 
     setUp(() {
-      viewModel = EventViewModel();
+      database = AppDatabase(executor: NativeDatabase.memory());
+      repository = EventRepository(database);
+      viewModel = EventViewModel(repository: repository);
     });
 
-    tearDown(() {
+    tearDown(() async {
       viewModel.dispose();
+      await database.close();
     });
 
     test('deleteEvent removes event from list and returns it', () {
@@ -230,14 +238,19 @@ void main() {
   });
 
   group('EventViewModel Update Functionality', () {
+    late AppDatabase database;
+    late EventRepository repository;
     late EventViewModel viewModel;
 
     setUp(() {
-      viewModel = EventViewModel();
+      database = AppDatabase(executor: NativeDatabase.memory());
+      repository = EventRepository(database);
+      viewModel = EventViewModel(repository: repository);
     });
 
-    tearDown(() {
+    tearDown(() async {
       viewModel.dispose();
+      await database.close();
     });
 
     test('updateEvent returns previous event and updates list', () {

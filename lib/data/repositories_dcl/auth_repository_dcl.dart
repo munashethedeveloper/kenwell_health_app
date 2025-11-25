@@ -2,7 +2,9 @@ import '../services/auth_service.dart';
 import '../../domain/models/user_model.dart';
 
 class AuthRepository {
-  final AuthService _authService = AuthService();
+  AuthRepository(this._authService);
+
+  final AuthService _authService;
 
   /// Login user
   Future<UserModel?> login(String email, String password) {

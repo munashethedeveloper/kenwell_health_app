@@ -41,6 +41,8 @@ import '../ui/features/survey/widgets/survey_screen.dart';
 // Profile & Settings
 import '../ui/features/profile/widgets/profile_screen.dart';
 import '../ui/features/settings/widgets/settings_screen.dart';
+import '../ui/features/debug/sync_diagnostics_screen.dart';
+import '../ui/features/debug/user_diagnostics_screen.dart';
 
 // TB Intervention
 import '../ui/features/tb_test_nursing_intervention/view_model/tb_nursing_intervention_view_model.dart';
@@ -224,6 +226,16 @@ class AppRouter {
 
       case RouteNames.settings:
         return MaterialPageRoute(builder: (_) => const SettingsScreen());
+
+      case RouteNames.syncDiagnostics:
+        return MaterialPageRoute(
+          builder: (_) => const SyncDiagnosticsScreen(),
+        );
+
+      case RouteNames.userDiagnostics:
+        return MaterialPageRoute(
+          builder: (_) => const UserDiagnosticsScreen(),
+        );
 
       default:
         return MaterialPageRoute(

@@ -7,6 +7,8 @@ class RouteNames {
   static const String settings = '/settings';
   static const String event = '/event';
   static const String eventDetails = '/event-details'; // <-- NEW
+  static const String syncDiagnostics = '/sync-diagnostics';
+  static const String userDiagnostics = '/user-diagnostics';
 
   static const String forgotPassword = '/forgot-password';
   static const String main = '/';

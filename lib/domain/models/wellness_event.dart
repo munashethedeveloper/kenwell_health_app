@@ -208,4 +208,77 @@ class WellnessEvent {
     }
     return '$trimmedFirst $trimmedLast';
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'date': date.toIso8601String(),
+      'venue': venue,
+      'address': address,
+      'onsiteContactFirstName': onsiteContactFirstName,
+      'onsiteContactLastName': onsiteContactLastName,
+      'onsiteContactNumber': onsiteContactNumber,
+      'onsiteContactEmail': onsiteContactEmail,
+      'aeContactFirstName': aeContactFirstName,
+      'aeContactLastName': aeContactLastName,
+      'aeContactNumber': aeContactNumber,
+      'aeContactEmail': aeContactEmail,
+      'servicesRequested': servicesRequested,
+      'expectedParticipation': expectedParticipation,
+      'nonMembers': nonMembers,
+      'passports': passports,
+      'nurses': nurses,
+      'coordinators': coordinators,
+      'multiplyPromoters': multiplyPromoters,
+      'setUpTime': setUpTime,
+      'startTime': startTime,
+      'endTime': endTime,
+      'strikeDownTime': strikeDownTime,
+      'mobileBooths': mobileBooths,
+      'description': description,
+      'medicalAid': medicalAid,
+    };
+  }
+
+  factory WellnessEvent.fromJson(Map<String, dynamic> json) {
+    return WellnessEvent(
+      id: json['id'] as String?,
+      title: json['title'] as String? ?? '',
+      date: DateTime.parse(json['date'] as String),
+      venue: json['venue'] as String? ?? '',
+      address: json['address'] as String? ?? '',
+      onsiteContactFirstName: json['onsiteContactFirstName'] as String? ?? '',
+      onsiteContactLastName: json['onsiteContactLastName'] as String? ?? '',
+      onsiteContactNumber: json['onsiteContactNumber'] as String? ?? '',
+      onsiteContactEmail: json['onsiteContactEmail'] as String? ?? '',
+      aeContactFirstName: json['aeContactFirstName'] as String? ?? '',
+      aeContactLastName: json['aeContactLastName'] as String? ?? '',
+      aeContactNumber: json['aeContactNumber'] as String? ?? '',
+      aeContactEmail: json['aeContactEmail'] as String? ?? '',
+      servicesRequested: json['servicesRequested'] as String? ?? '',
+      expectedParticipation: _toInt(json['expectedParticipation']),
+      nonMembers: _toInt(json['nonMembers']),
+      passports: _toInt(json['passports']),
+      nurses: _toInt(json['nurses']),
+      coordinators: _toInt(json['coordinators']),
+      multiplyPromoters: _toInt(json['multiplyPromoters']),
+      setUpTime: json['setUpTime'] as String? ?? '',
+      startTime: json['startTime'] as String? ?? '',
+      endTime: json['endTime'] as String? ?? '',
+      strikeDownTime: json['strikeDownTime'] as String? ?? '',
+      mobileBooths: json['mobileBooths'] as String? ?? '',
+      description: json['description'] as String?,
+      medicalAid: json['medicalAid'] as String? ?? '',
+    );
+  }
+
+  static int _toInt(Object? value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    if (value is String) {
+      return int.tryParse(value) ?? 0;
+    }
+    return 0;
+  }
 }

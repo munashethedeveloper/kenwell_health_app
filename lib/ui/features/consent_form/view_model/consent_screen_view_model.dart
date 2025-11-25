@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:signature/signature.dart';
+
+import '../../../../domain/models/wellness_event.dart';
 
 class ConsentScreenViewModel extends ChangeNotifier {
   // Form key for validation
@@ -82,6 +85,25 @@ class ConsentScreenViewModel extends ChangeNotifier {
         'hiv': hiv,
         'hasSignature': signatureController.isNotEmpty,
       };
+
+  void prefillFromEvent(WellnessEvent event) {
+    venueController.text = event.venue;
+    dateController.text =
+        DateFormat('yyyy-MM-dd').format(event.date);
+    notifyListeners();
+  }
+
+  void reset() {
+    venueController.clear();
+    dateController.clear();
+    practitionerController.clear();
+    hra = false;
+    vct = false;
+    tb = false;
+    hiv = false;
+    signatureController.clear();
+    notifyListeners();
+  }
 
   @override
   void dispose() {
