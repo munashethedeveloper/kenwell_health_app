@@ -6,10 +6,11 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../../background/sync_worker.dart';
-import '../../../data/local/app_database.dart';
 import '../../../data/repositories_dcl/event_repository.dart';
 import '../../../data/services/event_sync_service.dart';
 import '../../../domain/models/wellness_event.dart';
+import '../../../routing/route_names.dart';
+import '../../../utils/db_exporter.dart';
 import '../../auth/view_models/auth_view_model.dart';
 
 class SyncDiagnosticsScreen extends StatefulWidget {
@@ -61,6 +62,36 @@ class _SyncDiagnosticsScreenState extends State<SyncDiagnosticsScreen> {
   }
 
   Future<void> _copyPendingAsJson() async {
+    final repository = context.read<EventRepository>();
+    final entries = await repository.listPendingEntries();
+    final payload = entries
+        .map((entry) => jsonDecode(entry.payload) as Map<String, dynamic>)
+        .toList();
+    final prettyJson = const JsonEncoder.withIndent('  ').convert(payload);
+    await Clipboard.setData(ClipboardData(text: prettyJson));
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Copied ${entries.length} event(s) to clipboard.'),
+        ),
+      );
+    }
+  }
+
+  Future<void> _exportDatabase() async {
+    final file = await exportLocalDatabase();
+    if (!mounted) return;
+    if (file == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Database file not found.')),
+      );
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Exported to ${file.path}')),
+    );
+  }
+
     final repository = context.read<EventRepository>();
     final entries = await repository.listPendingEntries();
     final payload = entries
@@ -206,6 +237,17 @@ class _SyncDiagnosticsScreenState extends State<SyncDiagnosticsScreen> {
                   onPressed: _copyPendingAsJson,
                   icon: const Icon(Icons.copy),
                   label: const Text('Copy pending JSON'),
+                ),
+                OutlinedButton.icon(
+                  onPressed: _exportDatabase,
+                  icon: const Icon(Icons.save_alt),
+                  label: const Text('Export local DB'),
+                ),
+                OutlinedButton.icon(
+                  onPressed: () =>
+                      Navigator.pushNamed(context, RouteNames.userDiagnostics),
+                  icon: const Icon(Icons.people),
+                  label: const Text('User diagnostics'),
                 ),
               ],
             ),

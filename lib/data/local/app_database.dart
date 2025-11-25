@@ -107,4 +107,7 @@ class AppDatabase extends _$AppDatabase {
     await (update(userEntries)..where((tbl) => tbl.isCurrent.equals(true)))
         .write(const UserEntriesCompanion(isCurrent: Value(false)));
   }
+
+  Future<int> deleteUserById(String id) =>
+      (delete(userEntries)..where((tbl) => tbl.id.equals(id))).go();
 }
