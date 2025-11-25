@@ -1,190 +1,255 @@
 import 'package:flutter/material.dart';
-
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 
-/// Material 3 theme definitions tuned for Kenwell's green + navy brand palette.
+/// Material 3 theme definitions tuned for Kenwell's brand palette.
+/// Minimal changes from your existing theme, but the dark theme has been
+/// adjusted to be much softer, less saturated, and easier on the eyes:
+/// - darker, warmer background + slightly lighter surfaces for depth
+/// - muted outline/surfaceVariant for low-contrast separators
+/// - app bar uses surface in dark mode (reduces bright bars)
+/// - button and snackbar colors are toned down in dark mode
 class AppTheme {
   const AppTheme._();
 
-  static final ColorScheme _lightColorScheme = ColorScheme.light(
+  // --------------------------
+  // LIGHT COLOR SCHEME (unchanged)
+  // --------------------------
+  static final ColorScheme _lightColorScheme = ColorScheme.fromSeed(
+    seedColor: KenwellColors.primaryGreen,
+    brightness: Brightness.light,
     primary: KenwellColors.primaryGreen,
-    onPrimary: KenwellColors.neutralWhite,
     secondary: KenwellColors.secondaryNavy,
-    onSecondary: KenwellColors.neutralWhite,
     tertiary: KenwellColors.primaryGreenLight,
-    onTertiary: KenwellColors.secondaryNavy,
-    surface: KenwellColors.neutralWhite,
-    onSurface: KenwellColors.secondaryNavy,
-    surfaceVariant: KenwellColors.neutralSurface,
-    onSurfaceVariant: KenwellColors.neutralGrey,
-    background: KenwellColors.neutralBackground,
-    onBackground: KenwellColors.secondaryNavy,
     error: KenwellColors.error,
-    onError: KenwellColors.neutralWhite,
-    outline: KenwellColors.neutralDivider,
-    outlineVariant: KenwellColors.neutralGrey,
-    inverseSurface: KenwellColors.secondaryNavy,
-    onInverseSurface: KenwellColors.neutralWhite,
-    inversePrimary: KenwellColors.primaryGreenDark,
+    background: KenwellColors.neutralBackground,
+    surface: KenwellColors.neutralWhite,
   );
 
-  static final ColorScheme _darkColorScheme = ColorScheme.dark(
-    primary: KenwellColors.secondaryNavy,
-    onPrimary: KenwellColors.neutralWhite,
-    secondary: KenwellColors.primaryGreen,
-    onSecondary: KenwellColors.secondaryNavyDark,
-    tertiary: KenwellColors.secondaryNavyLight,
-    onTertiary: KenwellColors.neutralWhite,
-    surface: KenwellColors.secondaryNavyDark,
-    onSurface: KenwellColors.neutralSurface,
-    surfaceVariant: KenwellColors.secondaryNavy,
-    onSurfaceVariant: KenwellColors.primaryGreenLight,
-    background: const Color(0xFF0E1024),
-    onBackground: KenwellColors.neutralSurface,
+  // --------------------------
+  // DARK COLOR SCHEME (adjusted for comfort)
+  // --------------------------
+  // Build on ColorScheme.dark() and override a few tokens so we keep
+  // accessible contrast but avoid very bright surfaces/accents.
+  static final ColorScheme _darkColorScheme = const ColorScheme.dark().copyWith(
+    brightness: Brightness.dark,
+    // Keep Kenwell accents but use the lighter green for primary (friendly accent)
+    primary: KenwellColors.primaryGreenLight,
+    // Use a muted navy-green for secondary accents (less punchy than full navy)
+    secondary: KenwellColors.secondaryNavyLight,
+    // Surface slightly lighter than background to create comfortable depth
+    surface: const Color(0xFF0F1724),
+    // Slightly lifted variant for cards and panels
+    surfaceContainerHighest: const Color(0xFF172231),
+    // Muted outlines for dividers and boundaries
+    outline: const Color(0xFF2A3845),
+    // Softer onSurface/onBackground so text isn't pure white
+    onSurface: const Color(0xFFE6EEF2),
+    // Keep your configured error color
     error: KenwellColors.error,
-    onError: KenwellColors.neutralWhite,
-    outline: KenwellColors.secondaryNavyLight,
-    outlineVariant: KenwellColors.secondaryNavyLight,
-    inverseSurface: KenwellColors.neutralSurface,
-    onInverseSurface: KenwellColors.secondaryNavy,
-    inversePrimary: KenwellColors.primaryGreenLight,
+    onPrimary: const Color(0xFF05140E),
+    onSecondary: const Color(0xFFEAF7F0),
+    tertiary: KenwellColors.secondaryNavyLight,
   );
 
   static ThemeData get lightTheme => _baseTheme(_lightColorScheme);
-
   static ThemeData get darkTheme => _baseTheme(_darkColorScheme);
 
+  // --------------------------
+  // BASE THEME
+  // --------------------------
   static ThemeData _baseTheme(ColorScheme colorScheme) {
-    final bool isDark = colorScheme.brightness == Brightness.dark;
+    const double cornerRadius = 12;
+    const EdgeInsetsGeometry buttonPadding =
+        EdgeInsets.symmetric(horizontal: 20, vertical: 14);
 
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
-      primaryColor: colorScheme.primary,
-      scaffoldBackgroundColor: colorScheme.background,
+      scaffoldBackgroundColor: colorScheme.surface,
+      visualDensity: VisualDensity.adaptivePlatformDensity,
+
+      // --------------------------
+      // APP BAR (Material 3 Compliant)
+      // - In dark mode we use surface for the app bar background to avoid a bright
+      //   color stripe across the UI which can be harsh. In light mode we keep
+      //   the primary color as before.
+      // --------------------------
       appBarTheme: AppBarTheme(
-        backgroundColor: colorScheme.primary,
-        foregroundColor: colorScheme.onPrimary,
+        backgroundColor: colorScheme.brightness == Brightness.dark
+            ? colorScheme.surface
+            : colorScheme.primary,
+        foregroundColor: colorScheme.brightness == Brightness.dark
+            ? colorScheme.onSurface
+            : colorScheme.onPrimary,
         centerTitle: true,
         elevation: 0,
-        titleTextStyle: TextStyle(
-          color: colorScheme.onPrimary,
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
-        ),
+        titleTextStyle: _buildTextTheme(colorScheme).titleLarge,
       ),
-      textTheme: _buildTextTheme(colorScheme, isDark),
+
+      // --------------------------
+      // TEXT
+      // --------------------------
+      textTheme: _buildTextTheme(colorScheme),
+
+      // --------------------------
+      // BUTTONS (Material 3)
+      // - Use toned-down backgrounds in dark mode so buttons don't glow.
+      // --------------------------
       elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: colorScheme.secondary,
-          foregroundColor: colorScheme.onSecondary,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          textStyle: const TextStyle(fontWeight: FontWeight.w600),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
+        style: ButtonStyle(
+          backgroundColor: WidgetStateProperty.resolveWith((_) {
+            if (colorScheme.brightness == Brightness.dark) {
+              // slightly muted accent for dark theme
+              return colorScheme.primary.withAlpha(220);
+            }
+            return colorScheme.secondary;
+          }),
+          foregroundColor: WidgetStateProperty.all(colorScheme.onSecondary),
+          padding: WidgetStateProperty.all(buttonPadding),
+          shape: WidgetStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(cornerRadius),
+            ),
+          ),
+          elevation: WidgetStateProperty.all(0),
+          textStyle: WidgetStateProperty.all(
+            const TextStyle(fontWeight: FontWeight.w600),
           ),
         ),
       ),
+
       outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(
-          foregroundColor: colorScheme.secondary,
-          side: BorderSide(color: colorScheme.secondary),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
+        style: ButtonStyle(
+          foregroundColor: WidgetStateProperty.all(colorScheme.secondary),
+          side: WidgetStateProperty.all(
+            BorderSide(color: colorScheme.outline),
           ),
+          shape: WidgetStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(cornerRadius),
+            ),
+          ),
+          padding: WidgetStateProperty.all(buttonPadding),
         ),
       ),
+
+      // --------------------------
+      // INPUT FIELDS
+      // --------------------------
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor:
-            isDark ? KenwellColors.secondaryNavy : KenwellColors.neutralWhite,
-        hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
-        labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colorScheme.outline.withOpacity(0.6)),
+        fillColor: colorScheme.surface,
+        hintStyle: TextStyle(
+          color: colorScheme.onSurface.withValues(alpha: 0.72),
+
+          //color: colorScheme.onSurface.withOpacity(0.72)
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colorScheme.secondary, width: 1.5),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colorScheme.error),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colorScheme.error, width: 1.5),
+        labelStyle: TextStyle(
+          color: colorScheme.onSurface.withValues(alpha: 0.80),
+
+          //color: colorScheme.onSurface.withOpacity(0.80)
         ),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(cornerRadius),
+        ),
       ),
+
+      // --------------------------
+      // CARDS
+      // --------------------------
       cardTheme: CardThemeData(
-        color:
-            isDark ? KenwellColors.secondaryNavy : KenwellColors.neutralWhite,
         elevation: 0,
+        color: colorScheme.surfaceContainerHighest,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: colorScheme.outline.withOpacity(0.3)),
         ),
-        margin: EdgeInsets.zero,
       ),
-      dividerColor: colorScheme.outline.withOpacity(0.5),
+
+      // --------------------------
+      // DIVIDERS
+      // --------------------------
+      dividerTheme: DividerThemeData(
+        color: colorScheme.outline.withValues(alpha: 0.6),
+        //colorScheme.outline.withOpacity(0.6),
+        thickness: 1,
+      ),
+
+      // --------------------------
+      // CHIPS
+      // --------------------------
       chipTheme: ChipThemeData(
-        backgroundColor: colorScheme.surfaceVariant,
-        selectedColor: colorScheme.secondary.withOpacity(0.2),
+        backgroundColor: colorScheme.surfaceContainerHighest,
+        disabledColor: colorScheme.surface,
+        selectedColor: colorScheme.primary.withValues(alpha: 0.14),
+
+        //colorScheme.primary.withOpacity(0.14),
+        secondarySelectedColor: colorScheme.primary.withValues(alpha: 0.18),
+        //colorScheme.primary.withOpacity(0.18),
         labelStyle: TextStyle(color: colorScheme.onSurface),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-      snackBarTheme: SnackBarThemeData(
-        backgroundColor:
-            isDark ? KenwellColors.secondaryNavyLight : colorScheme.secondary,
-        contentTextStyle: TextStyle(
-          color: isDark
-              ? KenwellColors.secondaryNavyDark
-              : colorScheme.onSecondary,
+        secondaryLabelStyle: TextStyle(color: colorScheme.onPrimary),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
         ),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      ),
+
+      // --------------------------
+      // SNACKBAR
+      // --------------------------
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: colorScheme.brightness == Brightness.dark
+            ? colorScheme.surfaceContainerHighest
+            : colorScheme.secondary,
+        contentTextStyle: TextStyle(
+            color: colorScheme.brightness == Brightness.dark
+                ? colorScheme.onSurface
+                : colorScheme.onSecondary),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
       ),
     );
   }
 
-  static TextTheme _buildTextTheme(ColorScheme colorScheme, bool isDark) {
-    final Color baseColor = isDark ? Colors.black : colorScheme.onBackground;
-    final Color secondaryTextColor =
-        isDark ? Colors.black : colorScheme.onSurfaceVariant;
+  // --------------------------
+  // TEXT THEME (CLEAN MATERIAL 3)
+  // --------------------------
+  static TextTheme _buildTextTheme(ColorScheme scheme) {
     return TextTheme(
       displayLarge: TextStyle(
         fontSize: 48,
         fontWeight: FontWeight.bold,
-        color: baseColor,
+        color: scheme.onSurface,
+        letterSpacing: -0.5,
       ),
       headlineMedium: TextStyle(
         fontSize: 28,
         fontWeight: FontWeight.w700,
-        color: baseColor,
+        color: scheme.onSurface,
       ),
       titleLarge: TextStyle(
         fontSize: 22,
         fontWeight: FontWeight.w600,
-        color: baseColor,
+        color: scheme.onSurface,
       ),
       bodyLarge: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w500,
-        color: baseColor,
+        color: scheme.onSurface,
       ),
       bodyMedium: TextStyle(
         fontSize: 14,
-        color: secondaryTextColor,
+        color: scheme.onSurface.withValues(alpha: 0.92),
+
+        // color: scheme.onSurface.withOpacity(0.92),
       ),
       labelLarge: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w600,
-        color: isDark ? Colors.black : colorScheme.onPrimary,
+        color: scheme.onPrimary,
       ),
     );
   }

@@ -172,6 +172,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                               onChanged: vm.setPapSmear,
                               yesValue: true,
                               noValue: false,
+                              textStyle: const TextStyle(fontSize: 16),
                             ),
                             KenwellYesNoQuestion<bool>(
                               question:
@@ -180,6 +181,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                               onChanged: vm.setBreastExam,
                               yesValue: true,
                               noValue: false,
+                              textStyle: const TextStyle(fontSize: 16),
                             ),
                             KenwellYesNoQuestion<bool>(
                               question:
@@ -188,6 +190,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                               onChanged: vm.setMammogram,
                               yesValue: true,
                               noValue: false,
+                              textStyle: const TextStyle(fontSize: 16),
                             ),
                           ],
                         ),
@@ -207,6 +210,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                               onChanged: vm.setProstateCheck,
                               yesValue: true,
                               noValue: false,
+                              textStyle: const TextStyle(fontSize: 16),
                             ),
                             KenwellYesNoQuestion<bool>(
                               question:
@@ -215,6 +219,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                               onChanged: vm.setProstateTested,
                               yesValue: true,
                               noValue: false,
+                              textStyle: const TextStyle(fontSize: 16),
                             ),
                           ],
                         ),

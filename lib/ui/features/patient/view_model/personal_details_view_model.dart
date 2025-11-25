@@ -174,7 +174,7 @@ class PersonalDetailsViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
-    [
+    for (var c in [
       screeningSiteController,
       dateController,
       nameController,
@@ -194,7 +194,9 @@ class PersonalDetailsViewModel extends ChangeNotifier {
       positionController,
       employeeNumberController,
       // regionController,
-    ].forEach((c) => c.dispose());
+    ]) {
+      c.dispose();
+    }
     super.dispose();
   }
 }

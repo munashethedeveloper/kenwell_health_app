@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
+import 'package:kenwell_health_app/utils/validators.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
@@ -201,9 +202,7 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
                                   controller: _emailController,
                                   keyboardType: TextInputType.emailAddress,
                                   padding: EdgeInsets.zero,
-                                  validator: (v) => (v == null || v.isEmpty)
-                                      ? "Enter Email"
-                                      : null,
+                                  validator: Validators.validateEmail,
                                 ),
                                 const SizedBox(height: 24),
                                 KenwellTextField(
@@ -218,9 +217,7 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
                                     onPressed: () => setState(() =>
                                         _obscurePassword = !_obscurePassword),
                                   ),
-                                  validator: (v) => (v == null || v.isEmpty)
-                                      ? "Enter Password"
-                                      : null,
+                                  validator: Validators.validateStrongPassword,
                                 ),
                                 const SizedBox(height: 24),
                                 KenwellTextField(
@@ -236,9 +233,15 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
                                         _obscureConfirmPassword =
                                             !_obscureConfirmPassword),
                                   ),
-                                  validator: (v) => (v == null || v.isEmpty)
-                                      ? "Enter Confirm Password"
-                                      : null,
+                                  validator: (v) {
+                                    final message =
+                                        Validators.validatePasswordPresence(v);
+                                    if (message != null) return message;
+                                    if (v != _passwordController.text) {
+                                      return "Passwords do not match";
+                                    }
+                                    return null;
+                                  },
                                 ),
                               ],
                             ),

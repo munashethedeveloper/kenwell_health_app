@@ -124,7 +124,7 @@ class ConsentScreen extends StatelessWidget {
       ),
       KenwellFormStep(
         builder: (_) => KenwellCheckboxListCard(
-          title: 'Select applicable screenings',
+          title: 'Please select applicable screenings',
           options: _screeningOptions(vm),
         ),
       ),

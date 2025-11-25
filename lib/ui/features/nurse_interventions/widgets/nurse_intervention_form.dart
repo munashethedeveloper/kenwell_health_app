@@ -123,11 +123,11 @@ class NurseInterventionForm extends StatelessWidget {
           reasonController: viewModel.notReferredReasonController,
           reasonLabel: 'Reason patient not referred',
         ),
-        KenwellReferralOption(
+        const KenwellReferralOption(
           value: NursingReferralOption.referredToGP,
           label: 'Patient referred to GP',
         ),
-        KenwellReferralOption(
+        const KenwellReferralOption(
           value: NursingReferralOption.referredToStateClinic,
           label: 'Patient referred to State HIV clinic',
         ),

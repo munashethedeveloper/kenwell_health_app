@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
+import 'package:kenwell_health_app/utils/validators.dart';
 
 import '../../../../data/services/auth_service.dart';
 import '../../../shared/ui/colours/kenwell_colours.dart';
@@ -96,9 +97,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     label: 'Email',
                     hint: 'Enter your email',
                   ),
-                  validator: (val) => (val == null || val.isEmpty)
-                      ? 'Please enter your email'
-                      : null,
+                  validator: Validators.validateEmail,
                 ),
               ),
               const SizedBox(height: 20),

@@ -164,7 +164,9 @@ class HIVTestScreen extends StatelessWidget {
               const Text(
                 'Reasons that may have put you at risk:',
                 style: TextStyle(
-                    fontWeight: FontWeight.bold, color: Color(0xFF201C58)),
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF201C58),
+                    fontSize: 16),
               ),
               KenwellCheckboxGroup(
                 separator: const Divider(height: 0),

@@ -32,7 +32,7 @@ class PersonalDetailsScreen extends StatelessWidget {
           formKey: vm.formKey,
           children: [
             KenwellFormCard(
-              title: 'Personal Information',
+              title: 'Basic Information',
               child: _buildPersonalInfoSection(vm),
             ),
             const SizedBox(height: 24),

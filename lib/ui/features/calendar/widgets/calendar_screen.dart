@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:table_calendar/table_calendar.dart';
+
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../routing/route_names.dart';
-import '../../event/widgets/event_screen.dart';
+import '../../auth/view_models/auth_view_model.dart';
 import '../../event/view_model/event_view_model.dart';
-import '../../../../data/services/auth_service.dart';
+import '../../event/widgets/event_screen.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/buttons/custom_primary_button.dart';
 import '../../../shared/ui/colours/kenwell_colours.dart';
@@ -46,8 +48,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
         _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + 1, 1));
   }
 
-  void _logout() async {
-    await AuthService().logout();
+  Future<void> _logout() async {
+    final authVM = context.read<AuthViewModel>();
+    await authVM.logout();
     if (!mounted) return;
     Navigator.pushReplacementNamed(context, RouteNames.login);
   }
@@ -135,7 +138,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     calendarStyle: CalendarStyle(
                       weekendTextStyle: const TextStyle(color: Colors.red),
                       todayDecoration: BoxDecoration(
-                        color: Colors.greenAccent.withOpacity(0.5),
+                        color: Colors.greenAccent.withValues(alpha: 0.5),
                         shape: BoxShape.circle,
                       ),
                       selectedDecoration: const BoxDecoration(
@@ -371,7 +374,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: gradient.last.withOpacity(0.25),
+              color: gradient.last.withValues(alpha: 0.25),
+              // color: gradient.last.withOpacity(0.25),
               blurRadius: 10,
               offset: const Offset(0, 6),
             ),
@@ -410,7 +414,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                             ? event.venue
                             : (event.address.isNotEmpty ? event.address : ''),
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.85),
+                          color: Colors.white.withValues(alpha: 0.85),
+
+                          //color: Colors.white.withOpacity(0.85),
                         ),
                       ),
                     ],
@@ -460,7 +466,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.2),
+
+        //color: Colors.white.withOpacity(0.2),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
