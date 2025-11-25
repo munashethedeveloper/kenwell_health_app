@@ -4,11 +4,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:workmanager/workmanager.dart';
 
 import 'data/local/app_database.dart';
 import 'data/repositories_dcl/event_repository.dart';
 import 'data/services/auth_service.dart';
 import 'data/services/event_sync_service.dart';
+import 'background/sync_worker.dart';
 import 'firebase_options.dart';
 import 'providers/theme_provider.dart';
 import 'routing/app_router.dart';
@@ -20,6 +22,10 @@ import 'ui/shared/themes/app_theme.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _initializeFirebase();
+  await Workmanager().initialize(
+    callbackDispatcher,
+    isInDebugMode: kDebugMode,
+  );
   runApp(const MyApp());
 }
 

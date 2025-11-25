@@ -23,9 +23,18 @@ class EventSyncService {
 
   Timer? _timer;
   bool _isSyncing = false;
+  final ValueNotifier<DateTime?> _lastSyncTime = ValueNotifier<DateTime?>(null);
+  final ValueNotifier<int> _pendingCount = ValueNotifier<int>(0);
+  final ValueNotifier<bool> _syncing = ValueNotifier<bool>(false);
+
+  ValueListenable<DateTime?> get lastSyncTimeListenable => _lastSyncTime;
+  ValueListenable<int> get pendingCountListenable => _pendingCount;
+  ValueListenable<bool> get isSyncingListenable => _syncing;
+  bool get isSyncing => _isSyncing;
 
   void start({Duration interval = const Duration(minutes: 5)}) {
     _timer ??= Timer.periodic(interval, (_) => syncNow());
+    unawaited(refreshPendingCount());
     unawaited(syncNow());
   }
 
@@ -40,16 +49,25 @@ class EventSyncService {
     if (user == null) return;
 
     _isSyncing = true;
+    _syncing.value = true;
     try {
       final eventsCollection = _userEventsCollection(user.uid);
       await _pushPending(eventsCollection);
       await _pullRemote(eventsCollection);
+      _lastSyncTime.value = DateTime.now();
+      await refreshPendingCount();
     } catch (error, stackTrace) {
       debugPrint('EventSyncService error: $error');
       debugPrintStack(stackTrace: stackTrace);
     } finally {
       _isSyncing = false;
+      _syncing.value = false;
     }
+  }
+
+  Future<void> refreshPendingCount() async {
+    final pendingEntries = await _eventRepository.listPendingEntries();
+    _pendingCount.value = pendingEntries.length;
   }
 
   CollectionReference<Map<String, dynamic>> _userEventsCollection(
@@ -77,6 +95,8 @@ class EventSyncService {
         await _eventRepository.markEventSynced(event.id, remoteUpdatedAt);
       }
     }
+
+    await refreshPendingCount();
   }
 
   Future<void> _pullRemote(

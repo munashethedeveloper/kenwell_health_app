@@ -3,6 +3,8 @@ import 'package:kenwell_health_app/data/services/auth_service.dart';
 import 'package:kenwell_health_app/data/services/event_sync_service.dart';
 import 'package:kenwell_health_app/domain/models/user_model.dart';
 
+import '../../../../background/sync_worker.dart';
+
 class AuthViewModel extends ChangeNotifier {
   AuthViewModel(this._authService, this._eventSyncService) {
     _checkLoginStatus();
@@ -24,8 +26,10 @@ class AuthViewModel extends ChangeNotifier {
     _isLoggedIn = await _authService.isLoggedIn();
     if (_isLoggedIn) {
       _eventSyncService.start();
+      await scheduleBackgroundSyncTask();
     } else {
       _eventSyncService.stop();
+      await cancelBackgroundSyncTask();
     }
 
     _isLoading = false;
@@ -43,6 +47,7 @@ class AuthViewModel extends ChangeNotifier {
       _isLoggedIn = user != null;
       if (_isLoggedIn) {
         _eventSyncService.start();
+        await scheduleBackgroundSyncTask();
       }
       return user;
     } finally {
@@ -94,6 +99,7 @@ class AuthViewModel extends ChangeNotifier {
       await _authService.logout();
       _isLoggedIn = false;
       _eventSyncService.stop();
+      await cancelBackgroundSyncTask();
     } finally {
       _isLoading = false;
       notifyListeners();

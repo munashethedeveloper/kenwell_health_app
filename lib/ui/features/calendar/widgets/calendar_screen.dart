@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -83,6 +84,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
           automaticallyImplyLeading: false,
           backgroundColor: const Color(0xFF201C58),
           actions: [
+            if (kDebugMode)
+              IconButton(
+                icon: const Icon(Icons.bug_report, color: Colors.white),
+                tooltip: 'Sync diagnostics',
+                onPressed: () =>
+                    Navigator.pushNamed(context, RouteNames.syncDiagnostics),
+              ),
             IconButton(
               icon: const Icon(Icons.logout, color: Colors.white),
               tooltip: 'Logout',
