@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:table_calendar/table_calendar.dart';
+
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../routing/route_names.dart';
-import '../../event/widgets/event_screen.dart';
+import '../../auth/view_models/auth_view_model.dart';
 import '../../event/view_model/event_view_model.dart';
-import '../../../../data/services/auth_service.dart';
+import '../../event/widgets/event_screen.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/buttons/custom_primary_button.dart';
 import '../../../shared/ui/colours/kenwell_colours.dart';
@@ -46,8 +48,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
         _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + 1, 1));
   }
 
-  void _logout() async {
-    await AuthService().logout();
+  Future<void> _logout() async {
+    final authVM = context.read<AuthViewModel>();
+    await authVM.logout();
     if (!mounted) return;
     Navigator.pushReplacementNamed(context, RouteNames.login);
   }

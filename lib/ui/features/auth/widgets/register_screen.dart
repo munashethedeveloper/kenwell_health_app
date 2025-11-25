@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/features/auth/widgets/login_screen.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
+import 'package:kenwell_health_app/utils/validators.dart';
 import '../../../../data/services/auth_service.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
@@ -186,8 +187,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           padding: EdgeInsets.zero,
-                          validator: (v) =>
-                              (v == null || v.isEmpty) ? "Enter Email" : null,
+                          validator: Validators.validateEmail,
                         ),
                         const SizedBox(height: 24),
                         KenwellTextField(
@@ -202,9 +202,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             onPressed: () => setState(
                                 () => _obscurePassword = !_obscurePassword),
                           ),
-                          validator: (v) => (v == null || v.isEmpty)
-                              ? "Enter Password"
-                              : null,
+                          validator: Validators.validateStrongPassword,
                         ),
                         const SizedBox(height: 24),
                         KenwellTextField(
@@ -220,9 +218,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 _obscureConfirmPassword =
                                     !_obscureConfirmPassword),
                           ),
-                          validator: (v) => (v == null || v.isEmpty)
-                              ? "Enter Confirm Password"
-                              : null,
+                          validator: (v) {
+                            final message =
+                                Validators.validatePasswordPresence(v);
+                            if (message != null) return message;
+                            if (v != _passwordController.text) {
+                              return "Passwords do not match";
+                            }
+                            return null;
+                          },
                         ),
                       ],
                     ),

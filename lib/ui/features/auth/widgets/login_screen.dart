@@ -10,6 +10,7 @@ import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_section_header.dart';
 import '../../../shared/ui/navigation/main_navigation_screen.dart';
+import 'package:kenwell_health_app/utils/validators.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -97,8 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           padding: EdgeInsets.zero,
-                          validator: (v) =>
-                              (v == null || v.isEmpty) ? "Enter Email" : null,
+                          validator: Validators.validateEmail,
                         ),
                         const SizedBox(height: 24),
                         KenwellTextField(
@@ -113,9 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             onPressed: () => setState(
                                 () => _obscurePassword = !_obscurePassword),
                           ),
-                          validator: (v) => (v == null || v.isEmpty)
-                              ? "Enter Password"
-                              : null,
+                          validator: Validators.validatePasswordPresence,
                         ),
                       ],
                     ),
