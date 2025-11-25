@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../domain/models/wellness_event.dart';
+import '../../utils/db_exporter.dart';
 import '../repositories_dcl/event_repository.dart';
 
 class EventSyncService {
@@ -56,6 +57,7 @@ class EventSyncService {
       await _pullRemote(eventsCollection);
       _lastSyncTime.value = DateTime.now();
       await refreshPendingCount();
+      await _autoExportDatabaseSnapshot();
     } catch (error, stackTrace) {
       debugPrint('EventSyncService error: $error');
       debugPrintStack(stackTrace: stackTrace);
@@ -138,5 +140,14 @@ class EventSyncService {
       return DateTime.tryParse(raw);
     }
     return snapshot.updateTime?.toDate();
+  }
+
+  Future<void> _autoExportDatabaseSnapshot() async {
+    try {
+      await exportLocalDatabase();
+    } catch (error, stackTrace) {
+      debugPrint('Database export failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
+    }
   }
 }

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../domain/models/wellness_event.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/buttons/custom_primary_button.dart';
 import '../../../shared/ui/buttons/custom_secondary_button.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
-import '../../../shared/ui/form/kenwell_section_header.dart';
+import ../../../shared/ui/form/kenwell_section_header.dart';
+import '../../wellness/view_model/wellness_flow_view_model.dart';
+import '../../wellness/widgets/wellness_flow_screen.dart';
 import '../view_model/event_view_model.dart';
 
 class EventDetailsScreen extends StatelessWidget {
@@ -103,6 +106,12 @@ class EventDetailsScreen extends StatelessWidget {
             if (event.description != null && event.description!.isNotEmpty)
               detailRow('Description', event.description!),
           ]),
+          const SizedBox(height: 24),
+          CustomPrimaryButton(
+            label: 'Start wellness flow',
+            icon: const Icon(Icons.medical_services_outlined),
+            onPressed: () => _startWellnessFlow(context),
+          ),
         ],
       ),
     );
@@ -202,6 +211,19 @@ class EventDetailsScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: children,
+      ),
+    );
+  }
+
+  void _startWellnessFlow(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) => ChangeNotifierProvider(
+          create: (_) => WellnessFlowViewModel()..startWithEvent(event),
+          child: WellnessFlowScreen(
+            onExitFlow: () => Navigator.of(ctx).pop(),
+          ),
+        ),
       ),
     );
   }

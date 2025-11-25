@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+import '../../../../domain/models/wellness_event.dart';
 
 class PersonalDetailsViewModel extends ChangeNotifier {
   // Form key
@@ -162,6 +165,53 @@ class PersonalDetailsViewModel extends ChangeNotifier {
         'gender': gender,
         'employmentStatus': employmentStatus,
       };
+
+  void prefillFromEvent(WellnessEvent event) {
+    screeningSiteController.text = event.venue;
+    dateController.text = DateFormat('yyyy-MM-dd').format(event.date);
+    nameController.text = event.onsiteContactFirstName;
+    surnameController.text = event.onsiteContactLastName;
+    cellNumberController.text = event.onsiteContactNumber;
+    alternateContactNumberController.text = event.aeContactNumber;
+    emailController.text = event.onsiteContactEmail;
+    medicalAidStatus = event.medicalAid.isEmpty ? null : event.medicalAid;
+    medicalAidNameController.text =
+        event.medicalAid == 'Yes' ? event.medicalAid : '';
+    medicalAidNumberController.text = '';
+    notifyListeners();
+  }
+
+  void reset() {
+    for (final controller in [
+      screeningSiteController,
+      dateController,
+      nameController,
+      surnameController,
+      initialsController,
+      dobController,
+      idNumberController,
+      passportNumberController,
+      nationalityController,
+      medicalAidNameController,
+      medicalAidNumberController,
+      emailController,
+      cellNumberController,
+      alternateContactNumberController,
+      personalNumberController,
+      divisionController,
+      positionController,
+      employeeNumberController,
+    ]) {
+      controller.clear();
+    }
+    maritalStatus = null;
+    provinces = null;
+    gender = null;
+    employmentStatus = null;
+    medicalAidStatus = null;
+    idDocumentChoice = 'ID';
+    notifyListeners();
+  }
 
   // Simulate saving
   Future<void> saveLocally() async {
