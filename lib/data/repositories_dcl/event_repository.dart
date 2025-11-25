@@ -55,6 +55,9 @@ class EventRepository {
   Future<EventEntry?> getEventEntry(String id) =>
       _database.getEventEntry(id);
 
+  Future<void> updateSyncStatus(String id, String status) =>
+      _database.updateEventSyncStatus(id, status);
+
   List<WellnessEvent> _mapEntries(List<EventEntry> entries) {
     return entries.map(_fromEntry).toList();
   }

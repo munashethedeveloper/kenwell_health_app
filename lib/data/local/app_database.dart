@@ -77,6 +77,14 @@ class AppDatabase extends _$AppDatabase {
       (select(eventEntries)..where((tbl) => tbl.id.equals(id)))
           .getSingleOrNull();
 
+  Future<void> updateEventSyncStatus(String id, String status) =>
+      (update(eventEntries)..where((tbl) => tbl.id.equals(id))).write(
+        EventEntriesCompanion(
+          syncStatus: Value(status),
+          updatedAt: Value(DateTime.now()),
+        ),
+      );
+
   Future<List<UserEntry>> listUsers() => select(userEntries).get();
 
   Future<UserEntry?> getUserByEmail(String email) =>
