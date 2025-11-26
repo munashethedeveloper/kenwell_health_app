@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_section_header.dart';
@@ -34,12 +35,12 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  final _roleController = TextEditingController();
   final _phoneController = TextEditingController();
   final _usernameController = TextEditingController();
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
 
+  String? _selectedRole;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
@@ -64,11 +65,14 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
     _emailController.text = vm.email;
     _passwordController.text = vm.password;
     _confirmPasswordController.text = vm.password;
-    _roleController.text = vm.role;
     _phoneController.text = vm.phoneNumber;
     _usernameController.text = vm.username;
     _firstNameController.text = vm.firstName;
     _lastNameController.text = vm.lastName;
+    _selectedRole =
+        vm.role.isNotEmpty && vm.availableRoles.contains(vm.role)
+            ? vm.role
+            : null;
   }
 
   @override
@@ -76,7 +80,6 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
-    _roleController.dispose();
     _phoneController.dispose();
     _usernameController.dispose();
     _firstNameController.dispose();
@@ -93,11 +96,19 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
       return;
     }
 
+    final role = _selectedRole;
+    if (role == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a role')),
+      );
+      return;
+    }
+
     vm
       ..firstName = _firstNameController.text.trim()
       ..lastName = _lastNameController.text.trim()
       ..username = _usernameController.text.trim()
-      ..role = _roleController.text.trim()
+      ..role = role
       ..phoneNumber = _phoneController.text.trim()
       ..email = _emailController.text.trim()
       ..password = _passwordController.text.trim();
@@ -176,13 +187,16 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
                                       : null,
                                 ),
                                 const SizedBox(height: 24),
-                                KenwellTextField(
+                                KenwellDropdownField<String>(
                                   label: "Role",
-                                  controller: _roleController,
+                                  value: _selectedRole,
+                                  items: vm.availableRoles,
                                   padding: EdgeInsets.zero,
                                   validator: (v) => (v == null || v.isEmpty)
-                                      ? "Enter Role"
+                                      ? "Select Role"
                                       : null,
+                                  onChanged: (value) =>
+                                      setState(() => _selectedRole = value),
                                 ),
                                 const SizedBox(height: 24),
                                 KenwellTextField(
