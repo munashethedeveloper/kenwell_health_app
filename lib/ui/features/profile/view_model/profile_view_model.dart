@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/data/services/auth_service.dart';
+import 'package:kenwell_health_app/domain/constants/user_roles.dart';
 import '../../../../domain/models/user_model.dart';
 
 class ProfileViewModel extends ChangeNotifier {
@@ -16,6 +17,8 @@ class ProfileViewModel extends ChangeNotifier {
   String firstName = '';
   String lastName = '';
 
+  List<String> get availableRoles => UserRoles.values;
+
   bool isLoadingProfile = false;
   bool isSavingProfile = false;
   UserModel? user;
@@ -30,7 +33,7 @@ class ProfileViewModel extends ChangeNotifier {
 
       if (user != null) {
         email = user!.email;
-        role = user!.role;
+        role = UserRoles.ifValid(user!.role) ?? '';
         phoneNumber = user!.phoneNumber;
         username = user!.username;
         firstName = user!.firstName;
@@ -57,7 +60,7 @@ class ProfileViewModel extends ChangeNotifier {
         id: id,
         email: email,
         password: password,
-        role: role,
+        role: UserRoles.normalize(role),
         phoneNumber: phoneNumber,
         username: username,
         firstName: firstName,
