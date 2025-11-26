@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/domain/constants/user_roles.dart';
 import 'package:kenwell_health_app/ui/features/auth/widgets/login_screen.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
 import '../../../../data/services/auth_service.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_section_header.dart';
@@ -23,12 +25,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  final _roleController = TextEditingController();
   final _phoneController = TextEditingController();
   final _usernameController = TextEditingController();
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
 
+  String? _selectedRole;
   bool _isLoading = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
@@ -42,13 +44,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
+    final role = _selectedRole;
+    if (role == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a role')),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {
       final user = await AuthService().register(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
-        role: _roleController.text.trim(),
+        role: role,
         phoneNumber: _phoneController.text.trim(),
         username: _usernameController.text.trim(),
         firstName: _firstNameController.text.trim(),
@@ -85,7 +95,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
-    _roleController.dispose();
     _phoneController.dispose();
     _usernameController.dispose();
     _firstNameController.dispose();
@@ -156,12 +165,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               : null,
                         ),
                         const SizedBox(height: 24),
-                        KenwellTextField(
+                        KenwellDropdownField<String>(
                           label: "Role",
-                          controller: _roleController,
+                          value: _selectedRole,
+                          items: UserRoles.values,
                           padding: EdgeInsets.zero,
                           validator: (v) =>
-                              (v == null || v.isEmpty) ? "Enter Role" : null,
+                              (v == null || v.isEmpty) ? "Select Role" : null,
+                          onChanged: (value) =>
+                              setState(() => _selectedRole = value),
                         ),
                         const SizedBox(height: 24),
                         KenwellTextField(
