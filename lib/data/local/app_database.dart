@@ -23,7 +23,48 @@ class Users extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-@DriftDatabase(tables: [Users])
+@DataClassName('EventEntity')
+class Events extends Table {
+  TextColumn get id => text()();
+  TextColumn get title => text()();
+  DateTimeColumn get date => dateTime()();
+  TextColumn get venue => text()();
+  TextColumn get address => text()();
+  TextColumn get onsiteContactFirstName => text()();
+  TextColumn get onsiteContactLastName => text()();
+  TextColumn get onsiteContactNumber => text()();
+  TextColumn get onsiteContactEmail => text()();
+  TextColumn get aeContactFirstName => text()();
+  TextColumn get aeContactLastName => text()();
+  TextColumn get aeContactNumber => text()();
+  TextColumn get aeContactEmail => text()();
+  TextColumn get servicesRequested => text()();
+  IntColumn get expectedParticipation =>
+      integer().withDefault(const Constant(0))();
+  IntColumn get nonMembers => integer().withDefault(const Constant(0))();
+  IntColumn get passports => integer().withDefault(const Constant(0))();
+  IntColumn get nurses => integer().withDefault(const Constant(0))();
+  IntColumn get coordinators => integer().withDefault(const Constant(0))();
+  IntColumn get multiplyPromoters => integer().withDefault(const Constant(0))();
+  TextColumn get setUpTime => text().withDefault(const Constant(''))();
+  TextColumn get startTime => text().withDefault(const Constant(''))();
+  TextColumn get endTime => text().withDefault(const Constant(''))();
+  TextColumn get strikeDownTime => text().withDefault(const Constant(''))();
+  TextColumn get mobileBooths => text().withDefault(const Constant(''))();
+  TextColumn get medicalAid => text().withDefault(const Constant(''))();
+  TextColumn get description => text().nullable()();
+  TextColumn get status =>
+      text().withDefault(const Constant('scheduled'))();
+  DateTimeColumn get actualStartTime => dateTime().nullable()();
+  DateTimeColumn get actualEndTime => dateTime().nullable()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+@DriftDatabase(tables: [Users, Events])
 class AppDatabase extends _$AppDatabase {
   AppDatabase._internal() : super(_openConnection());
 
@@ -32,7 +73,17 @@ class AppDatabase extends _$AppDatabase {
   static final AppDatabase instance = AppDatabase._internal();
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (migrator) => migrator.createAllTables(),
+        onUpgrade: (migrator, from, to) async {
+          if (from < 2) {
+            await migrator.createTable(events);
+          }
+        },
+      );
 
   Future<UserEntity> createUser({
     required String id,
@@ -107,6 +158,22 @@ class AppDatabase extends _$AppDatabase {
     }
 
     return getUserById(id);
+  }
+
+  Future<List<EventEntity>> getAllEvents() => select(events).get();
+
+  Stream<List<EventEntity>> watchAllEvents() => select(events).watch();
+
+  Future<EventEntity?> getEventById(String id) {
+    return (select(events)..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
+  }
+
+  Future<void> upsertEvent(EventsCompanion entry) async {
+    await into(events).insertOnConflictUpdate(entry);
+  }
+
+  Future<int> deleteEventById(String id) {
+    return (delete(events)..where((tbl) => tbl.id.equals(id))).go();
   }
 }
 

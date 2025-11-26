@@ -1,5 +1,8 @@
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kenwell_health_app/data/local/app_database.dart';
+import 'package:kenwell_health_app/data/repositories_dcl/event_repository.dart';
 import 'package:kenwell_health_app/ui/features/event/widgets/event_details_screen.dart';
 import 'package:kenwell_health_app/ui/features/event/view_model/event_view_model.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
@@ -8,9 +11,14 @@ void main() {
   group('EventDetailsScreen Delete Functionality', () {
     late EventViewModel viewModel;
     late WellnessEvent testEvent;
+    late AppDatabase database;
+    late EventRepository repository;
 
-    setUp(() {
-      viewModel = EventViewModel();
+    setUp(() async {
+      database = AppDatabase.forTesting(NativeDatabase.memory());
+      repository = EventRepository(database: database);
+      viewModel = EventViewModel(repository: repository);
+      await viewModel.initialized;
       testEvent = WellnessEvent(
         id: 'test-event-1',
         title: 'Test Wellness Event',
@@ -40,11 +48,12 @@ void main() {
         medicalAid: 'Yes',
         description: 'A test wellness event',
       );
-      viewModel.addEvent(testEvent);
+      await viewModel.addEvent(testEvent);
     });
 
-    tearDown(() {
+    tearDown(() async {
       viewModel.dispose();
+      await database.close();
     });
 
     testWidgets('Delete button is visible when viewModel is provided',
@@ -197,9 +206,14 @@ void main() {
   group('EventDetailsScreen Edit Functionality', () {
     late EventViewModel viewModel;
     late WellnessEvent testEvent;
+    late AppDatabase database;
+    late EventRepository repository;
 
-    setUp(() {
-      viewModel = EventViewModel();
+    setUp(() async {
+      database = AppDatabase.forTesting(NativeDatabase.memory());
+      repository = EventRepository(database: database);
+      viewModel = EventViewModel(repository: repository);
+      await viewModel.initialized;
       testEvent = WellnessEvent(
         id: 'test-event-2',
         title: 'Test Wellness Event for Edit',
@@ -229,11 +243,12 @@ void main() {
         medicalAid: 'Yes',
         description: 'A test wellness event for editing',
       );
-      viewModel.addEvent(testEvent);
+      await viewModel.addEvent(testEvent);
     });
 
-    tearDown(() {
+    tearDown(() async {
       viewModel.dispose();
+      await database.close();
     });
 
     testWidgets('Edit button is visible when viewModel is provided',

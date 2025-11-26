@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 
 import '../../../../domain/models/wellness_event.dart';
+import '../../../../data/repositories_dcl/event_repository.dart';
 
 class EventViewModel extends ChangeNotifier {
-  EventViewModel() {
+  EventViewModel({EventRepository? repository})
+      : _repository = repository ?? EventRepository() {
     _resetServiceSelections();
+    _initializationFuture = _loadPersistedEvents();
   }
 
   static const List<String> _serviceOptions = ['HRA', 'VCT', 'HIV', 'TB'];
+  final EventRepository _repository;
+  late final Future<void> _initializationFuture;
 
   // Controllers
   final titleController = TextEditingController();
@@ -41,6 +46,8 @@ class EventViewModel extends ChangeNotifier {
   // Events
   final List<WellnessEvent> _events = [];
   List<WellnessEvent> get events => _events;
+
+  Future<void> get initialized => _initializationFuture;
 
   final Set<String> _selectedServices = {};
 
@@ -157,18 +164,20 @@ class EventViewModel extends ChangeNotifier {
     );
   }
 
-  void addEvent(WellnessEvent event) {
+  Future<void> addEvent(WellnessEvent event) async {
     _events.add(event);
     notifyListeners();
+    await _repository.addEvent(event);
   }
 
   /// Deletes an event by removing it from the list
   /// Returns the deleted event for potential undo operation
-  WellnessEvent? deleteEvent(String eventId) {
+  Future<WellnessEvent?> deleteEvent(String eventId) async {
     final index = _events.indexWhere((e) => e.id == eventId);
     if (index != -1) {
       final deletedEvent = _events.removeAt(index);
       notifyListeners();
+      await _repository.deleteEvent(eventId);
       return deletedEvent;
     }
     return null;
@@ -176,21 +185,26 @@ class EventViewModel extends ChangeNotifier {
 
   /// Updates an existing event in the list
   /// Returns the previous version of the event for potential undo operation
-  WellnessEvent? updateEvent(WellnessEvent updatedEvent) {
+  Future<WellnessEvent?> updateEvent(WellnessEvent updatedEvent) async {
     final index = _events.indexWhere((e) => e.id == updatedEvent.id);
     if (index != -1) {
       final previousEvent = _events[index];
       _events[index] = updatedEvent;
       notifyListeners();
+      await _repository.updateEvent(updatedEvent);
       return previousEvent;
     }
     return null;
   }
 
   /// Restores a previously deleted event (undo functionality)
-  void restoreEvent(WellnessEvent event) {
-    _events.add(event);
-    notifyListeners();
+  Future<void> restoreEvent(WellnessEvent event) async {
+    final exists = _events.any((e) => e.id == event.id);
+    if (!exists) {
+      _events.add(event);
+      notifyListeners();
+    }
+    await _repository.upsertEvent(event);
   }
 
   List<WellnessEvent> getEventsForDate(DateTime date) {
@@ -200,6 +214,42 @@ class EventViewModel extends ChangeNotifier {
             e.date.month == date.month &&
             e.date.day == date.day)
         .toList();
+  }
+
+  List<WellnessEvent> getUpcomingEvents({DateTime? from}) {
+    final reference = from ?? DateTime.now();
+    final eventsCopy = _events.where((event) {
+      final start = event.startDateTime;
+      if (start == null) return false;
+      if (event.status == WellnessEventStatus.completed) return false;
+      return !start.isBefore(reference.subtract(const Duration(minutes: 30)));
+    }).toList();
+    eventsCopy.sort(_compareEventsByStartTime);
+    return eventsCopy;
+  }
+
+  Future<WellnessEvent?> markEventInProgress(String eventId) async {
+    final index = _events.indexWhere((e) => e.id == eventId);
+    if (index == -1) return null;
+    final event = _events[index];
+    final updated = event.copyWith(
+      status: WellnessEventStatus.inProgress,
+      actualStartTime: DateTime.now(),
+    );
+    await updateEvent(updated);
+    return updated;
+  }
+
+  Future<WellnessEvent?> markEventCompleted(String eventId) async {
+    final index = _events.indexWhere((e) => e.id == eventId);
+    if (index == -1) return null;
+    final event = _events[index];
+    final updated = event.copyWith(
+      status: WellnessEventStatus.completed,
+      actualEndTime: DateTime.now(),
+    );
+    await updateEvent(updated);
+    return updated;
   }
 
   void clearControllers() {
@@ -270,5 +320,23 @@ class EventViewModel extends ChangeNotifier {
     _selectedServices
       ..clear()
       ..add(_serviceOptions.first);
+  }
+
+  Future<void> _loadPersistedEvents() async {
+    try {
+      final stored = await _repository.fetchAllEvents();
+      _events
+        ..clear()
+        ..addAll(stored);
+      notifyListeners();
+    } catch (_) {
+      // Ignore and keep in-memory list empty
+    }
+  }
+
+  int _compareEventsByStartTime(WellnessEvent a, WellnessEvent b) {
+    final aStart = a.startDateTime ?? a.date;
+    final bStart = b.startDateTime ?? b.date;
+    return aStart.compareTo(bStart);
   }
 }
