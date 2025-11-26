@@ -1,5 +1,8 @@
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kenwell_health_app/data/local/app_database.dart';
+import 'package:kenwell_health_app/data/repositories_dcl/event_repository.dart';
 import 'package:kenwell_health_app/ui/features/event/widgets/event_details_screen.dart';
 import 'package:kenwell_health_app/ui/features/event/widgets/event_screen.dart';
 import 'package:kenwell_health_app/ui/features/event/view_model/event_view_model.dart';
@@ -9,9 +12,14 @@ void main() {
   group('Event Edit Flow Widget Tests', () {
     late EventViewModel viewModel;
     late WellnessEvent testEvent;
+    late AppDatabase database;
+    late EventRepository repository;
 
-    setUp(() {
-      viewModel = EventViewModel();
+    setUp(() async {
+      database = AppDatabase.forTesting(NativeDatabase.memory());
+      repository = EventRepository(database: database);
+      viewModel = EventViewModel(repository: repository);
+      await viewModel.initialized;
       testEvent = WellnessEvent(
         id: 'test-event-edit',
         title: 'Original Event Title',
@@ -40,11 +48,12 @@ void main() {
         mobileBooths: 'Yes',
         medicalAid: 'Yes',
       );
-      viewModel.addEvent(testEvent);
+      await viewModel.addEvent(testEvent);
     });
 
-    tearDown(() {
+    tearDown(() async {
       viewModel.dispose();
+      await database.close();
     });
 
     testWidgets('EventScreen shows Edit Event title when editing',
@@ -161,7 +170,7 @@ void main() {
 
       // Simulate update by calling the viewModel directly
       final updatedEvent = testEvent.copyWith(title: 'Updated Title');
-      viewModel.updateEvent(updatedEvent);
+      await viewModel.updateEvent(updatedEvent);
       await tester.pumpAndSettle();
 
       // Note: Full integration test with navigation would require more setup
@@ -180,14 +189,14 @@ void main() {
         title: 'Updated Title',
         venue: 'Updated Venue',
       );
-      final previousEvent = viewModel.updateEvent(updatedEvent);
+      final previousEvent = await viewModel.updateEvent(updatedEvent);
 
       // Assert: Event should be updated
       expect(viewModel.events.first.title, 'Updated Title');
       expect(viewModel.events.first.venue, 'Updated Venue');
 
       // Act: Undo by restoring previous event
-      viewModel.updateEvent(previousEvent!);
+      await viewModel.updateEvent(previousEvent!);
 
       // Assert: Event should be restored to original values
       expect(viewModel.events.first.title, originalTitle);
@@ -205,7 +214,7 @@ void main() {
       );
 
       // Act: Update event
-      viewModel.updateEvent(updatedEvent);
+      await viewModel.updateEvent(updatedEvent);
       await tester.pumpAndSettle();
 
       // Assert: All updated fields should be preserved

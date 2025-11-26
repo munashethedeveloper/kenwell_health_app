@@ -12,8 +12,11 @@ import '../../hiv_test/view_model/hiv_test_view_model.dart';
 import '../../survey/view_model/survey_view_model.dart';
 import '../../tb_test/view_model/tb_testing_view_model.dart';
 import '../../tb_test_nursing_intervention/view_model/tb_nursing_intervention_view_model.dart';
+import '../../../../domain/models/wellness_event.dart';
 
 class WellnessFlowViewModel extends ChangeNotifier {
+  WellnessFlowViewModel({this.activeEvent});
+
   // ViewModels for each step
   final consentVM = ConsentScreenViewModel();
   final personalVM = PersonalDetailsViewModel();
@@ -26,6 +29,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
   final tbTestVM = TBTestingViewModel();
   final tbNurseVM = TBNursingInterventionViewModel();
   final surveyVM = SurveyViewModel();
+  WellnessEvent? activeEvent;
 
   int _currentStep = 0;
   int get currentStep => _currentStep;
@@ -90,6 +94,11 @@ class WellnessFlowViewModel extends ChangeNotifier {
     );
 
     _currentStep = 0;
+    notifyListeners();
+  }
+
+  void setActiveEvent(WellnessEvent event) {
+    activeEvent = event;
     notifyListeners();
   }
 }

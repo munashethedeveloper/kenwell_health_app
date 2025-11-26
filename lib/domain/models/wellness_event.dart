@@ -1,4 +1,16 @@
+import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
+
+class WellnessEventStatus {
+  const WellnessEventStatus._();
+
+  static const String scheduled = 'scheduled';
+  static const String inProgress = 'in_progress';
+  static const String completed = 'completed';
+
+  static bool isValid(String value) =>
+      value == scheduled || value == inProgress || value == completed;
+}
 
 class WellnessEvent {
   final String id;
@@ -29,6 +41,9 @@ class WellnessEvent {
   final String medicalAid;
   final String mobileBooths;
   final String? description; // optional
+  final String status;
+  final DateTime? actualStartTime;
+  final DateTime? actualEndTime;
 
   WellnessEvent({
     String? id,
@@ -59,7 +74,15 @@ class WellnessEvent {
     required this.mobileBooths,
     this.description,
     required this.medicalAid,
-  }) : id = id ?? const Uuid().v4(); // <-- auto-generate unique ID
+    String status = WellnessEventStatus.scheduled,
+    DateTime? actualStartTime,
+    DateTime? actualEndTime,
+  })  : id = id ?? const Uuid().v4(), // <-- auto-generate unique ID
+        status = WellnessEventStatus.isValid(status)
+            ? status
+            : WellnessEventStatus.scheduled,
+        actualStartTime = actualStartTime,
+        actualEndTime = actualEndTime;
 
   /// Convenience getters to keep compatibility with previous single fields.
   String get onsiteContactPerson =>
@@ -67,6 +90,12 @@ class WellnessEvent {
 
   String get aeContactPerson =>
       _joinNameParts(aeContactFirstName, aeContactLastName);
+
+  DateTime? get startDateTime => _combineDateWithTime(startTime);
+
+  DateTime? get endDateTime => _combineDateWithTime(endTime);
+
+  DateTime? get setUpDateTime => _combineDateWithTime(setUpTime);
 
   /// Creates a copy of this event with the given fields replaced with new values
   WellnessEvent copyWith({
@@ -97,6 +126,9 @@ class WellnessEvent {
     String? mobileBooths,
     String? description,
     String? medicalAid,
+    String? status,
+    DateTime? actualStartTime,
+    DateTime? actualEndTime,
   }) {
     return WellnessEvent(
       id: id ?? this.id,
@@ -129,6 +161,9 @@ class WellnessEvent {
       mobileBooths: mobileBooths ?? this.mobileBooths,
       description: description ?? this.description,
       medicalAid: medicalAid ?? this.medicalAid,
+      status: status ?? this.status,
+      actualStartTime: actualStartTime ?? this.actualStartTime,
+      actualEndTime: actualEndTime ?? this.actualEndTime,
     );
   }
 
@@ -163,7 +198,10 @@ class WellnessEvent {
         other.strikeDownTime == strikeDownTime &&
         other.mobileBooths == mobileBooths &&
         other.description == description &&
-        other.medicalAid == medicalAid;
+        other.medicalAid == medicalAid &&
+        other.status == status &&
+        other.actualStartTime == actualStartTime &&
+        other.actualEndTime == actualEndTime;
   }
 
   @override
@@ -194,7 +232,10 @@ class WellnessEvent {
         strikeDownTime.hashCode ^
         mobileBooths.hashCode ^
         description.hashCode ^
-        medicalAid.hashCode;
+        medicalAid.hashCode ^
+        status.hashCode ^
+        actualStartTime.hashCode ^
+        actualEndTime.hashCode;
   }
 
   static String _joinNameParts(String first, String last) {
@@ -207,5 +248,42 @@ class WellnessEvent {
       return trimmedFirst;
     }
     return '$trimmedFirst $trimmedLast';
+  }
+
+  DateTime? _combineDateWithTime(String rawTime) {
+    final trimmed = rawTime.trim();
+    if (trimmed.isEmpty) return null;
+
+    final formats = <DateFormat>[
+      DateFormat.Hm(),
+      DateFormat.jm(),
+    ];
+
+    for (final format in formats) {
+      try {
+        final parsed = format.parse(trimmed);
+        return DateTime(
+          date.year,
+          date.month,
+          date.day,
+          parsed.hour,
+          parsed.minute,
+        );
+      } catch (_) {
+        continue;
+      }
+    }
+
+    final match =
+        RegExp(r'^(?<hour>\d{1,2}):(?<minute>\d{2})').firstMatch(trimmed);
+    if (match != null) {
+      final hour = int.tryParse(match.namedGroup('hour') ?? '');
+      final minute = int.tryParse(match.namedGroup('minute') ?? '');
+      if (hour != null && minute != null && hour < 24 && minute < 60) {
+        return DateTime(date.year, date.month, date.day, hour, minute);
+      }
+    }
+
+    return null;
   }
 }

@@ -277,10 +277,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                               },
                                             );
                                           },
-                                          onDismissed: (direction) {
-                                            final deletedEvent = widget.eventVM
-                                                .deleteEvent(events[i].id);
+                                          onDismissed: (direction) async {
+                                            final deletedEvent =
+                                                await widget.eventVM
+                                                    .deleteEvent(
+                                                        events[i].id);
                                             if (deletedEvent != null) {
+                                              if (!context.mounted) return;
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(
                                                 SnackBar(
@@ -557,11 +560,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
         builder: (_) => EventScreen(
           date: date,
           existingEvent: existingEvent,
-          onSave: (event) {
+          onSave: (event) async {
             if (existingEvent == null) {
-              widget.eventVM.addEvent(event);
+              await widget.eventVM.addEvent(event);
             } else {
-              widget.eventVM.updateEvent(event);
+              await widget.eventVM.updateEvent(event);
             }
           },
           viewModel: widget.eventVM,

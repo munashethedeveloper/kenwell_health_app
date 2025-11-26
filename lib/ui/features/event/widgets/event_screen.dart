@@ -18,7 +18,7 @@ class EventScreen extends StatefulWidget {
   final EventViewModel viewModel;
   final DateTime date;
   final WellnessEvent? existingEvent;
-  final void Function(WellnessEvent) onSave;
+  final Future<void> Function(WellnessEvent) onSave;
 
   const EventScreen({
     super.key,
@@ -289,7 +289,7 @@ class _EventScreenState extends State<EventScreen> {
               const SizedBox(height: 20),
               CustomPrimaryButton(
                 label: 'Save Event',
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     final eventDate = DateTime.tryParse(
                             widget.viewModel.dateController.text) ??
@@ -302,7 +302,8 @@ class _EventScreenState extends State<EventScreen> {
                     } else {
                       eventToSave = widget.viewModel.buildEvent(eventDate);
                     }
-                    widget.onSave(eventToSave);
+                    await widget.onSave(eventToSave);
+                    if (!mounted) return;
                     widget.viewModel.clearControllers();
                     Navigator.pop(context);
                   }

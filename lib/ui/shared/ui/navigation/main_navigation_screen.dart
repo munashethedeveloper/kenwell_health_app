@@ -7,9 +7,8 @@ import '../../../features/profile/widgets/profile_screen.dart';
 import '../../../features/settings/widgets/settings_screen.dart';
 import '../../../features/stats_report/widgets/stats_report_screen.dart';
 import '../../../features/help/widgets/help_screen.dart';
-import '../../../features/wellness/widgets/wellness_flow_screen.dart';
-import '../../../features/wellness/view_model/wellness_flow_view_model.dart';
 import '../../../features/event/view_model/event_view_model.dart';
+import '../../../features/event/widgets/conduct_event_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -31,8 +30,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       const SettingsScreen(),
       const StatsReportScreen(),
       const HelpScreen(),
-      // Conduct Event Tab
-      _buildConductEventTab(),
+      const ConductEventScreen(),
     ];
 
     return Scaffold(
@@ -81,21 +79,5 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         ],
       ),
     );
-  }
-
-  Widget _buildConductEventTab() {
-    // Wrap WellnessFlowScreen with its ViewModel
-    return ChangeNotifierProvider(
-      create: (_) => WellnessFlowViewModel(),
-      child: WellnessFlowScreen(
-        onExitFlow: _switchToCalendarTab,
-      ),
-    );
-  }
-
-  void _switchToCalendarTab() {
-    setState(() {
-      _currentIndex = 0;
-    });
   }
 }

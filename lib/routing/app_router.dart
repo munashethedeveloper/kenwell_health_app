@@ -187,8 +187,9 @@ class AppRouter {
       case RouteNames.event:
         final args = settings.arguments as Map<String, dynamic>?;
         final DateTime date = args?['date'] as DateTime? ?? DateTime.now();
-        final void Function(WellnessEvent) onSave =
-            args?['onSave'] as void Function(WellnessEvent)? ?? (_) {};
+        final Future<void> Function(WellnessEvent) onSave =
+            args?['onSave'] as Future<void> Function(WellnessEvent)? ??
+                (_) async {};
         final WellnessEvent? existingEvent =
             args?['existingEvent'] as WellnessEvent?;
 
