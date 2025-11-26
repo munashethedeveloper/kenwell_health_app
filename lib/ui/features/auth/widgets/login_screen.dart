@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/domain/constants/user_roles.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import '../../../../data/services/auth_service.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
@@ -6,6 +7,7 @@ import '../../../shared/ui/colours/kenwell_colours.dart';
 import '../../../shared/ui/logo/app_logo.dart';
 import '../../../../routing/route_names.dart';
 import '../../../../domain/models/user_model.dart';
+import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_section_header.dart';
@@ -114,6 +116,17 @@ class _LoginScreenState extends State<LoginScreen> {
                                 () => _obscurePassword = !_obscurePassword),
                           ),
                           validator: Validators.validatePasswordPresence,
+                        ),
+                        const SizedBox(height: 24),
+                        KenwellDropdownField<String>(
+                          label: "Role",
+                          value: null,
+                          items: UserRoles.values,
+                          padding: EdgeInsets.zero,
+                          hint: const Text('Role is set during registration'),
+                          enabled: false,
+                          suffixIcon: const Icon(Icons.lock_outline, size: 20),
+                          onChanged: (_) {},
                         ),
                       ],
                     ),
