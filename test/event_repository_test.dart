@@ -1,13 +1,21 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:drift/native.dart';
+import 'package:kenwell_health_app/data/local/app_database.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/event_repository.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 
 void main() {
   group('EventRepository', () {
     late EventRepository repository;
+    late AppDatabase database;
 
     setUp(() {
-      repository = EventRepository();
+      database = AppDatabase.forTesting(NativeDatabase.memory());
+      repository = EventRepository(database: database);
+    });
+
+    tearDown(() async {
+      await database.close();
     });
 
     test('deleteEvent removes event from repository', () async {
@@ -40,7 +48,7 @@ void main() {
         mobileBooths: 'Yes',
         medicalAid: 'Yes',
       );
-      repository.addEvent(event);
+      await repository.addEvent(event);
 
       // Act: Delete the event
       await repository.deleteEvent('test-id-1');
@@ -88,7 +96,7 @@ void main() {
         mobileBooths: 'No',
         medicalAid: 'No',
       );
-      repository.addEvent(event);
+      await repository.addEvent(event);
 
       // Verify event exists
       final fetchedBefore = await repository.fetchEventById('test-id-2');
@@ -133,7 +141,7 @@ void main() {
         mobileBooths: 'Yes',
         medicalAid: 'Yes',
       );
-      repository.addEvent(event);
+      await repository.addEvent(event);
 
       // Act: Update the event with new title and venue
       final updatedEvent = event.copyWith(
@@ -218,7 +226,7 @@ void main() {
         mobileBooths: 'Yes',
         medicalAid: 'Yes',
       );
-      repository.addEvent(event);
+      await repository.addEvent(event);
 
       // Act: Update multiple fields
       final updatedEvent = event.copyWith(

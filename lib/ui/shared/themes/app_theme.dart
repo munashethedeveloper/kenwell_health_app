@@ -21,7 +21,9 @@ class AppTheme {
     secondary: KenwellColors.secondaryNavy,
     tertiary: KenwellColors.primaryGreenLight,
     error: KenwellColors.error,
-    background: KenwellColors.neutralBackground,
+    //surface: KenwellColors.neutralBackground,
+
+    //background: KenwellColors.neutralBackground,
     surface: KenwellColors.neutralWhite,
   );
 

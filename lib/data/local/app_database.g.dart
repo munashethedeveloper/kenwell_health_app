@@ -508,15 +508,1475 @@ class UsersCompanion extends UpdateCompanion<UserEntity> {
   }
 }
 
+class $EventsTable extends Events with TableInfo<$EventsTable, EventEntity> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $EventsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+      'title', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _dateMeta = const VerificationMeta('date');
+  @override
+  late final GeneratedColumn<DateTime> date = GeneratedColumn<DateTime>(
+      'date', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _venueMeta = const VerificationMeta('venue');
+  @override
+  late final GeneratedColumn<String> venue = GeneratedColumn<String>(
+      'venue', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _addressMeta =
+      const VerificationMeta('address');
+  @override
+  late final GeneratedColumn<String> address = GeneratedColumn<String>(
+      'address', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _onsiteContactFirstNameMeta =
+      const VerificationMeta('onsiteContactFirstName');
+  @override
+  late final GeneratedColumn<String> onsiteContactFirstName =
+      GeneratedColumn<String>('onsite_contact_first_name', aliasedName, false,
+          type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _onsiteContactLastNameMeta =
+      const VerificationMeta('onsiteContactLastName');
+  @override
+  late final GeneratedColumn<String> onsiteContactLastName =
+      GeneratedColumn<String>('onsite_contact_last_name', aliasedName, false,
+          type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _onsiteContactNumberMeta =
+      const VerificationMeta('onsiteContactNumber');
+  @override
+  late final GeneratedColumn<String> onsiteContactNumber =
+      GeneratedColumn<String>('onsite_contact_number', aliasedName, false,
+          type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _onsiteContactEmailMeta =
+      const VerificationMeta('onsiteContactEmail');
+  @override
+  late final GeneratedColumn<String> onsiteContactEmail =
+      GeneratedColumn<String>('onsite_contact_email', aliasedName, false,
+          type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _aeContactFirstNameMeta =
+      const VerificationMeta('aeContactFirstName');
+  @override
+  late final GeneratedColumn<String> aeContactFirstName =
+      GeneratedColumn<String>('ae_contact_first_name', aliasedName, false,
+          type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _aeContactLastNameMeta =
+      const VerificationMeta('aeContactLastName');
+  @override
+  late final GeneratedColumn<String> aeContactLastName =
+      GeneratedColumn<String>('ae_contact_last_name', aliasedName, false,
+          type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _aeContactNumberMeta =
+      const VerificationMeta('aeContactNumber');
+  @override
+  late final GeneratedColumn<String> aeContactNumber = GeneratedColumn<String>(
+      'ae_contact_number', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _aeContactEmailMeta =
+      const VerificationMeta('aeContactEmail');
+  @override
+  late final GeneratedColumn<String> aeContactEmail = GeneratedColumn<String>(
+      'ae_contact_email', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _servicesRequestedMeta =
+      const VerificationMeta('servicesRequested');
+  @override
+  late final GeneratedColumn<String> servicesRequested =
+      GeneratedColumn<String>('services_requested', aliasedName, false,
+          type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _expectedParticipationMeta =
+      const VerificationMeta('expectedParticipation');
+  @override
+  late final GeneratedColumn<int> expectedParticipation = GeneratedColumn<int>(
+      'expected_participation', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _nonMembersMeta =
+      const VerificationMeta('nonMembers');
+  @override
+  late final GeneratedColumn<int> nonMembers = GeneratedColumn<int>(
+      'non_members', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _passportsMeta =
+      const VerificationMeta('passports');
+  @override
+  late final GeneratedColumn<int> passports = GeneratedColumn<int>(
+      'passports', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _nursesMeta = const VerificationMeta('nurses');
+  @override
+  late final GeneratedColumn<int> nurses = GeneratedColumn<int>(
+      'nurses', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _coordinatorsMeta =
+      const VerificationMeta('coordinators');
+  @override
+  late final GeneratedColumn<int> coordinators = GeneratedColumn<int>(
+      'coordinators', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _multiplyPromotersMeta =
+      const VerificationMeta('multiplyPromoters');
+  @override
+  late final GeneratedColumn<int> multiplyPromoters = GeneratedColumn<int>(
+      'multiply_promoters', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _setUpTimeMeta =
+      const VerificationMeta('setUpTime');
+  @override
+  late final GeneratedColumn<String> setUpTime = GeneratedColumn<String>(
+      'set_up_time', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
+  static const VerificationMeta _startTimeMeta =
+      const VerificationMeta('startTime');
+  @override
+  late final GeneratedColumn<String> startTime = GeneratedColumn<String>(
+      'start_time', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
+  static const VerificationMeta _endTimeMeta =
+      const VerificationMeta('endTime');
+  @override
+  late final GeneratedColumn<String> endTime = GeneratedColumn<String>(
+      'end_time', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
+  static const VerificationMeta _strikeDownTimeMeta =
+      const VerificationMeta('strikeDownTime');
+  @override
+  late final GeneratedColumn<String> strikeDownTime = GeneratedColumn<String>(
+      'strike_down_time', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
+  static const VerificationMeta _mobileBoothsMeta =
+      const VerificationMeta('mobileBooths');
+  @override
+  late final GeneratedColumn<String> mobileBooths = GeneratedColumn<String>(
+      'mobile_booths', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
+  static const VerificationMeta _medicalAidMeta =
+      const VerificationMeta('medicalAid');
+  @override
+  late final GeneratedColumn<String> medicalAid = GeneratedColumn<String>(
+      'medical_aid', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
+  static const VerificationMeta _descriptionMeta =
+      const VerificationMeta('description');
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+      'description', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+      'status', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('scheduled'));
+  static const VerificationMeta _actualStartTimeMeta =
+      const VerificationMeta('actualStartTime');
+  @override
+  late final GeneratedColumn<DateTime> actualStartTime =
+      GeneratedColumn<DateTime>('actual_start_time', aliasedName, true,
+          type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _actualEndTimeMeta =
+      const VerificationMeta('actualEndTime');
+  @override
+  late final GeneratedColumn<DateTime> actualEndTime =
+      GeneratedColumn<DateTime>('actual_end_time', aliasedName, true,
+          type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        title,
+        date,
+        venue,
+        address,
+        onsiteContactFirstName,
+        onsiteContactLastName,
+        onsiteContactNumber,
+        onsiteContactEmail,
+        aeContactFirstName,
+        aeContactLastName,
+        aeContactNumber,
+        aeContactEmail,
+        servicesRequested,
+        expectedParticipation,
+        nonMembers,
+        passports,
+        nurses,
+        coordinators,
+        multiplyPromoters,
+        setUpTime,
+        startTime,
+        endTime,
+        strikeDownTime,
+        mobileBooths,
+        medicalAid,
+        description,
+        status,
+        actualStartTime,
+        actualEndTime,
+        createdAt,
+        updatedAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'events';
+  @override
+  VerificationContext validateIntegrity(Insertable<EventEntity> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+          _titleMeta, title.isAcceptableOrUnknown(data['title']!, _titleMeta));
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('date')) {
+      context.handle(
+          _dateMeta, date.isAcceptableOrUnknown(data['date']!, _dateMeta));
+    } else if (isInserting) {
+      context.missing(_dateMeta);
+    }
+    if (data.containsKey('venue')) {
+      context.handle(
+          _venueMeta, venue.isAcceptableOrUnknown(data['venue']!, _venueMeta));
+    } else if (isInserting) {
+      context.missing(_venueMeta);
+    }
+    if (data.containsKey('address')) {
+      context.handle(_addressMeta,
+          address.isAcceptableOrUnknown(data['address']!, _addressMeta));
+    } else if (isInserting) {
+      context.missing(_addressMeta);
+    }
+    if (data.containsKey('onsite_contact_first_name')) {
+      context.handle(
+          _onsiteContactFirstNameMeta,
+          onsiteContactFirstName.isAcceptableOrUnknown(
+              data['onsite_contact_first_name']!, _onsiteContactFirstNameMeta));
+    } else if (isInserting) {
+      context.missing(_onsiteContactFirstNameMeta);
+    }
+    if (data.containsKey('onsite_contact_last_name')) {
+      context.handle(
+          _onsiteContactLastNameMeta,
+          onsiteContactLastName.isAcceptableOrUnknown(
+              data['onsite_contact_last_name']!, _onsiteContactLastNameMeta));
+    } else if (isInserting) {
+      context.missing(_onsiteContactLastNameMeta);
+    }
+    if (data.containsKey('onsite_contact_number')) {
+      context.handle(
+          _onsiteContactNumberMeta,
+          onsiteContactNumber.isAcceptableOrUnknown(
+              data['onsite_contact_number']!, _onsiteContactNumberMeta));
+    } else if (isInserting) {
+      context.missing(_onsiteContactNumberMeta);
+    }
+    if (data.containsKey('onsite_contact_email')) {
+      context.handle(
+          _onsiteContactEmailMeta,
+          onsiteContactEmail.isAcceptableOrUnknown(
+              data['onsite_contact_email']!, _onsiteContactEmailMeta));
+    } else if (isInserting) {
+      context.missing(_onsiteContactEmailMeta);
+    }
+    if (data.containsKey('ae_contact_first_name')) {
+      context.handle(
+          _aeContactFirstNameMeta,
+          aeContactFirstName.isAcceptableOrUnknown(
+              data['ae_contact_first_name']!, _aeContactFirstNameMeta));
+    } else if (isInserting) {
+      context.missing(_aeContactFirstNameMeta);
+    }
+    if (data.containsKey('ae_contact_last_name')) {
+      context.handle(
+          _aeContactLastNameMeta,
+          aeContactLastName.isAcceptableOrUnknown(
+              data['ae_contact_last_name']!, _aeContactLastNameMeta));
+    } else if (isInserting) {
+      context.missing(_aeContactLastNameMeta);
+    }
+    if (data.containsKey('ae_contact_number')) {
+      context.handle(
+          _aeContactNumberMeta,
+          aeContactNumber.isAcceptableOrUnknown(
+              data['ae_contact_number']!, _aeContactNumberMeta));
+    } else if (isInserting) {
+      context.missing(_aeContactNumberMeta);
+    }
+    if (data.containsKey('ae_contact_email')) {
+      context.handle(
+          _aeContactEmailMeta,
+          aeContactEmail.isAcceptableOrUnknown(
+              data['ae_contact_email']!, _aeContactEmailMeta));
+    } else if (isInserting) {
+      context.missing(_aeContactEmailMeta);
+    }
+    if (data.containsKey('services_requested')) {
+      context.handle(
+          _servicesRequestedMeta,
+          servicesRequested.isAcceptableOrUnknown(
+              data['services_requested']!, _servicesRequestedMeta));
+    } else if (isInserting) {
+      context.missing(_servicesRequestedMeta);
+    }
+    if (data.containsKey('expected_participation')) {
+      context.handle(
+          _expectedParticipationMeta,
+          expectedParticipation.isAcceptableOrUnknown(
+              data['expected_participation']!, _expectedParticipationMeta));
+    }
+    if (data.containsKey('non_members')) {
+      context.handle(
+          _nonMembersMeta,
+          nonMembers.isAcceptableOrUnknown(
+              data['non_members']!, _nonMembersMeta));
+    }
+    if (data.containsKey('passports')) {
+      context.handle(_passportsMeta,
+          passports.isAcceptableOrUnknown(data['passports']!, _passportsMeta));
+    }
+    if (data.containsKey('nurses')) {
+      context.handle(_nursesMeta,
+          nurses.isAcceptableOrUnknown(data['nurses']!, _nursesMeta));
+    }
+    if (data.containsKey('coordinators')) {
+      context.handle(
+          _coordinatorsMeta,
+          coordinators.isAcceptableOrUnknown(
+              data['coordinators']!, _coordinatorsMeta));
+    }
+    if (data.containsKey('multiply_promoters')) {
+      context.handle(
+          _multiplyPromotersMeta,
+          multiplyPromoters.isAcceptableOrUnknown(
+              data['multiply_promoters']!, _multiplyPromotersMeta));
+    }
+    if (data.containsKey('set_up_time')) {
+      context.handle(
+          _setUpTimeMeta,
+          setUpTime.isAcceptableOrUnknown(
+              data['set_up_time']!, _setUpTimeMeta));
+    }
+    if (data.containsKey('start_time')) {
+      context.handle(_startTimeMeta,
+          startTime.isAcceptableOrUnknown(data['start_time']!, _startTimeMeta));
+    }
+    if (data.containsKey('end_time')) {
+      context.handle(_endTimeMeta,
+          endTime.isAcceptableOrUnknown(data['end_time']!, _endTimeMeta));
+    }
+    if (data.containsKey('strike_down_time')) {
+      context.handle(
+          _strikeDownTimeMeta,
+          strikeDownTime.isAcceptableOrUnknown(
+              data['strike_down_time']!, _strikeDownTimeMeta));
+    }
+    if (data.containsKey('mobile_booths')) {
+      context.handle(
+          _mobileBoothsMeta,
+          mobileBooths.isAcceptableOrUnknown(
+              data['mobile_booths']!, _mobileBoothsMeta));
+    }
+    if (data.containsKey('medical_aid')) {
+      context.handle(
+          _medicalAidMeta,
+          medicalAid.isAcceptableOrUnknown(
+              data['medical_aid']!, _medicalAidMeta));
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+          _descriptionMeta,
+          description.isAcceptableOrUnknown(
+              data['description']!, _descriptionMeta));
+    }
+    if (data.containsKey('status')) {
+      context.handle(_statusMeta,
+          status.isAcceptableOrUnknown(data['status']!, _statusMeta));
+    }
+    if (data.containsKey('actual_start_time')) {
+      context.handle(
+          _actualStartTimeMeta,
+          actualStartTime.isAcceptableOrUnknown(
+              data['actual_start_time']!, _actualStartTimeMeta));
+    }
+    if (data.containsKey('actual_end_time')) {
+      context.handle(
+          _actualEndTimeMeta,
+          actualEndTime.isAcceptableOrUnknown(
+              data['actual_end_time']!, _actualEndTimeMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  EventEntity map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return EventEntity(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      title: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
+      date: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}date'])!,
+      venue: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}venue'])!,
+      address: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}address'])!,
+      onsiteContactFirstName: attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}onsite_contact_first_name'])!,
+      onsiteContactLastName: attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}onsite_contact_last_name'])!,
+      onsiteContactNumber: attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}onsite_contact_number'])!,
+      onsiteContactEmail: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}onsite_contact_email'])!,
+      aeContactFirstName: attachedDatabase.typeMapping.read(DriftSqlType.string,
+          data['${effectivePrefix}ae_contact_first_name'])!,
+      aeContactLastName: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}ae_contact_last_name'])!,
+      aeContactNumber: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}ae_contact_number'])!,
+      aeContactEmail: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}ae_contact_email'])!,
+      servicesRequested: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}services_requested'])!,
+      expectedParticipation: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}expected_participation'])!,
+      nonMembers: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}non_members'])!,
+      passports: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}passports'])!,
+      nurses: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}nurses'])!,
+      coordinators: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}coordinators'])!,
+      multiplyPromoters: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}multiply_promoters'])!,
+      setUpTime: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}set_up_time'])!,
+      startTime: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}start_time'])!,
+      endTime: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}end_time'])!,
+      strikeDownTime: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}strike_down_time'])!,
+      mobileBooths: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}mobile_booths'])!,
+      medicalAid: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}medical_aid'])!,
+      description: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}description']),
+      status: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}status'])!,
+      actualStartTime: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}actual_start_time']),
+      actualEndTime: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}actual_end_time']),
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+    );
+  }
+
+  @override
+  $EventsTable createAlias(String alias) {
+    return $EventsTable(attachedDatabase, alias);
+  }
+}
+
+class EventEntity extends DataClass implements Insertable<EventEntity> {
+  final String id;
+  final String title;
+  final DateTime date;
+  final String venue;
+  final String address;
+  final String onsiteContactFirstName;
+  final String onsiteContactLastName;
+  final String onsiteContactNumber;
+  final String onsiteContactEmail;
+  final String aeContactFirstName;
+  final String aeContactLastName;
+  final String aeContactNumber;
+  final String aeContactEmail;
+  final String servicesRequested;
+  final int expectedParticipation;
+  final int nonMembers;
+  final int passports;
+  final int nurses;
+  final int coordinators;
+  final int multiplyPromoters;
+  final String setUpTime;
+  final String startTime;
+  final String endTime;
+  final String strikeDownTime;
+  final String mobileBooths;
+  final String medicalAid;
+  final String? description;
+  final String status;
+  final DateTime? actualStartTime;
+  final DateTime? actualEndTime;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const EventEntity(
+      {required this.id,
+      required this.title,
+      required this.date,
+      required this.venue,
+      required this.address,
+      required this.onsiteContactFirstName,
+      required this.onsiteContactLastName,
+      required this.onsiteContactNumber,
+      required this.onsiteContactEmail,
+      required this.aeContactFirstName,
+      required this.aeContactLastName,
+      required this.aeContactNumber,
+      required this.aeContactEmail,
+      required this.servicesRequested,
+      required this.expectedParticipation,
+      required this.nonMembers,
+      required this.passports,
+      required this.nurses,
+      required this.coordinators,
+      required this.multiplyPromoters,
+      required this.setUpTime,
+      required this.startTime,
+      required this.endTime,
+      required this.strikeDownTime,
+      required this.mobileBooths,
+      required this.medicalAid,
+      this.description,
+      required this.status,
+      this.actualStartTime,
+      this.actualEndTime,
+      required this.createdAt,
+      required this.updatedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['title'] = Variable<String>(title);
+    map['date'] = Variable<DateTime>(date);
+    map['venue'] = Variable<String>(venue);
+    map['address'] = Variable<String>(address);
+    map['onsite_contact_first_name'] = Variable<String>(onsiteContactFirstName);
+    map['onsite_contact_last_name'] = Variable<String>(onsiteContactLastName);
+    map['onsite_contact_number'] = Variable<String>(onsiteContactNumber);
+    map['onsite_contact_email'] = Variable<String>(onsiteContactEmail);
+    map['ae_contact_first_name'] = Variable<String>(aeContactFirstName);
+    map['ae_contact_last_name'] = Variable<String>(aeContactLastName);
+    map['ae_contact_number'] = Variable<String>(aeContactNumber);
+    map['ae_contact_email'] = Variable<String>(aeContactEmail);
+    map['services_requested'] = Variable<String>(servicesRequested);
+    map['expected_participation'] = Variable<int>(expectedParticipation);
+    map['non_members'] = Variable<int>(nonMembers);
+    map['passports'] = Variable<int>(passports);
+    map['nurses'] = Variable<int>(nurses);
+    map['coordinators'] = Variable<int>(coordinators);
+    map['multiply_promoters'] = Variable<int>(multiplyPromoters);
+    map['set_up_time'] = Variable<String>(setUpTime);
+    map['start_time'] = Variable<String>(startTime);
+    map['end_time'] = Variable<String>(endTime);
+    map['strike_down_time'] = Variable<String>(strikeDownTime);
+    map['mobile_booths'] = Variable<String>(mobileBooths);
+    map['medical_aid'] = Variable<String>(medicalAid);
+    if (!nullToAbsent || description != null) {
+      map['description'] = Variable<String>(description!);
+    }
+    map['status'] = Variable<String>(status);
+    if (!nullToAbsent || actualStartTime != null) {
+      map['actual_start_time'] = Variable<DateTime>(actualStartTime!);
+    }
+    if (!nullToAbsent || actualEndTime != null) {
+      map['actual_end_time'] = Variable<DateTime>(actualEndTime!);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  EventsCompanion toCompanion(bool nullToAbsent) {
+    return EventsCompanion(
+      id: Value(id),
+      title: Value(title),
+      date: Value(date),
+      venue: Value(venue),
+      address: Value(address),
+      onsiteContactFirstName: Value(onsiteContactFirstName),
+      onsiteContactLastName: Value(onsiteContactLastName),
+      onsiteContactNumber: Value(onsiteContactNumber),
+      onsiteContactEmail: Value(onsiteContactEmail),
+      aeContactFirstName: Value(aeContactFirstName),
+      aeContactLastName: Value(aeContactLastName),
+      aeContactNumber: Value(aeContactNumber),
+      aeContactEmail: Value(aeContactEmail),
+      servicesRequested: Value(servicesRequested),
+      expectedParticipation: Value(expectedParticipation),
+      nonMembers: Value(nonMembers),
+      passports: Value(passports),
+      nurses: Value(nurses),
+      coordinators: Value(coordinators),
+      multiplyPromoters: Value(multiplyPromoters),
+      setUpTime: Value(setUpTime),
+      startTime: Value(startTime),
+      endTime: Value(endTime),
+      strikeDownTime: Value(strikeDownTime),
+      mobileBooths: Value(mobileBooths),
+      medicalAid: Value(medicalAid),
+      description: Value(description),
+      status: Value(status),
+      actualStartTime: Value(actualStartTime),
+      actualEndTime: Value(actualEndTime),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory EventEntity.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return EventEntity(
+      id: serializer.fromJson<String>(json['id']),
+      title: serializer.fromJson<String>(json['title']),
+      date: serializer.fromJson<DateTime>(json['date']),
+      venue: serializer.fromJson<String>(json['venue']),
+      address: serializer.fromJson<String>(json['address']),
+      onsiteContactFirstName:
+          serializer.fromJson<String>(json['onsiteContactFirstName']),
+      onsiteContactLastName:
+          serializer.fromJson<String>(json['onsiteContactLastName']),
+      onsiteContactNumber:
+          serializer.fromJson<String>(json['onsiteContactNumber']),
+      onsiteContactEmail:
+          serializer.fromJson<String>(json['onsiteContactEmail']),
+      aeContactFirstName:
+          serializer.fromJson<String>(json['aeContactFirstName']),
+      aeContactLastName: serializer.fromJson<String>(json['aeContactLastName']),
+      aeContactNumber: serializer.fromJson<String>(json['aeContactNumber']),
+      aeContactEmail: serializer.fromJson<String>(json['aeContactEmail']),
+      servicesRequested: serializer.fromJson<String>(json['servicesRequested']),
+      expectedParticipation:
+          serializer.fromJson<int>(json['expectedParticipation']),
+      nonMembers: serializer.fromJson<int>(json['nonMembers']),
+      passports: serializer.fromJson<int>(json['passports']),
+      nurses: serializer.fromJson<int>(json['nurses']),
+      coordinators: serializer.fromJson<int>(json['coordinators']),
+      multiplyPromoters: serializer.fromJson<int>(json['multiplyPromoters']),
+      setUpTime: serializer.fromJson<String>(json['setUpTime']),
+      startTime: serializer.fromJson<String>(json['startTime']),
+      endTime: serializer.fromJson<String>(json['endTime']),
+      strikeDownTime: serializer.fromJson<String>(json['strikeDownTime']),
+      mobileBooths: serializer.fromJson<String>(json['mobileBooths']),
+      medicalAid: serializer.fromJson<String>(json['medicalAid']),
+      description: serializer.fromJson<String?>(json['description']),
+      status: serializer.fromJson<String>(json['status']),
+      actualStartTime: serializer.fromJson<DateTime?>(json['actualStartTime']),
+      actualEndTime: serializer.fromJson<DateTime?>(json['actualEndTime']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'title': serializer.toJson<String>(title),
+      'date': serializer.toJson<DateTime>(date),
+      'venue': serializer.toJson<String>(venue),
+      'address': serializer.toJson<String>(address),
+      'onsiteContactFirstName':
+          serializer.toJson<String>(onsiteContactFirstName),
+      'onsiteContactLastName': serializer.toJson<String>(onsiteContactLastName),
+      'onsiteContactNumber': serializer.toJson<String>(onsiteContactNumber),
+      'onsiteContactEmail': serializer.toJson<String>(onsiteContactEmail),
+      'aeContactFirstName': serializer.toJson<String>(aeContactFirstName),
+      'aeContactLastName': serializer.toJson<String>(aeContactLastName),
+      'aeContactNumber': serializer.toJson<String>(aeContactNumber),
+      'aeContactEmail': serializer.toJson<String>(aeContactEmail),
+      'servicesRequested': serializer.toJson<String>(servicesRequested),
+      'expectedParticipation': serializer.toJson<int>(expectedParticipation),
+      'nonMembers': serializer.toJson<int>(nonMembers),
+      'passports': serializer.toJson<int>(passports),
+      'nurses': serializer.toJson<int>(nurses),
+      'coordinators': serializer.toJson<int>(coordinators),
+      'multiplyPromoters': serializer.toJson<int>(multiplyPromoters),
+      'setUpTime': serializer.toJson<String>(setUpTime),
+      'startTime': serializer.toJson<String>(startTime),
+      'endTime': serializer.toJson<String>(endTime),
+      'strikeDownTime': serializer.toJson<String>(strikeDownTime),
+      'mobileBooths': serializer.toJson<String>(mobileBooths),
+      'medicalAid': serializer.toJson<String>(medicalAid),
+      'description': serializer.toJson<String?>(description),
+      'status': serializer.toJson<String>(status),
+      'actualStartTime': serializer.toJson<DateTime?>(actualStartTime),
+      'actualEndTime': serializer.toJson<DateTime?>(actualEndTime),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  EventEntity copyWith(
+          {String? id,
+          String? title,
+          DateTime? date,
+          String? venue,
+          String? address,
+          String? onsiteContactFirstName,
+          String? onsiteContactLastName,
+          String? onsiteContactNumber,
+          String? onsiteContactEmail,
+          String? aeContactFirstName,
+          String? aeContactLastName,
+          String? aeContactNumber,
+          String? aeContactEmail,
+          String? servicesRequested,
+          int? expectedParticipation,
+          int? nonMembers,
+          int? passports,
+          int? nurses,
+          int? coordinators,
+          int? multiplyPromoters,
+          String? setUpTime,
+          String? startTime,
+          String? endTime,
+          String? strikeDownTime,
+          String? mobileBooths,
+          String? medicalAid,
+          String? description,
+          String? status,
+          DateTime? actualStartTime,
+          DateTime? actualEndTime,
+          DateTime? createdAt,
+          DateTime? updatedAt}) =>
+      EventEntity(
+        id: id ?? this.id,
+        title: title ?? this.title,
+        date: date ?? this.date,
+        venue: venue ?? this.venue,
+        address: address ?? this.address,
+        onsiteContactFirstName:
+            onsiteContactFirstName ?? this.onsiteContactFirstName,
+        onsiteContactLastName:
+            onsiteContactLastName ?? this.onsiteContactLastName,
+        onsiteContactNumber: onsiteContactNumber ?? this.onsiteContactNumber,
+        onsiteContactEmail: onsiteContactEmail ?? this.onsiteContactEmail,
+        aeContactFirstName: aeContactFirstName ?? this.aeContactFirstName,
+        aeContactLastName: aeContactLastName ?? this.aeContactLastName,
+        aeContactNumber: aeContactNumber ?? this.aeContactNumber,
+        aeContactEmail: aeContactEmail ?? this.aeContactEmail,
+        servicesRequested: servicesRequested ?? this.servicesRequested,
+        expectedParticipation:
+            expectedParticipation ?? this.expectedParticipation,
+        nonMembers: nonMembers ?? this.nonMembers,
+        passports: passports ?? this.passports,
+        nurses: nurses ?? this.nurses,
+        coordinators: coordinators ?? this.coordinators,
+        multiplyPromoters: multiplyPromoters ?? this.multiplyPromoters,
+        setUpTime: setUpTime ?? this.setUpTime,
+        startTime: startTime ?? this.startTime,
+        endTime: endTime ?? this.endTime,
+        strikeDownTime: strikeDownTime ?? this.strikeDownTime,
+        mobileBooths: mobileBooths ?? this.mobileBooths,
+        medicalAid: medicalAid ?? this.medicalAid,
+        description: description ?? this.description,
+        status: status ?? this.status,
+        actualStartTime: actualStartTime ?? this.actualStartTime,
+        actualEndTime: actualEndTime ?? this.actualEndTime,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+  EventEntity copyWithCompanion(EventsCompanion data) {
+    return EventEntity(
+      id: data.id.present ? data.id.value : this.id,
+      title: data.title.present ? data.title.value : this.title,
+      date: data.date.present ? data.date.value : this.date,
+      venue: data.venue.present ? data.venue.value : this.venue,
+      address: data.address.present ? data.address.value : this.address,
+      onsiteContactFirstName: data.onsiteContactFirstName.present
+          ? data.onsiteContactFirstName.value
+          : this.onsiteContactFirstName,
+      onsiteContactLastName: data.onsiteContactLastName.present
+          ? data.onsiteContactLastName.value
+          : this.onsiteContactLastName,
+      onsiteContactNumber: data.onsiteContactNumber.present
+          ? data.onsiteContactNumber.value
+          : this.onsiteContactNumber,
+      onsiteContactEmail: data.onsiteContactEmail.present
+          ? data.onsiteContactEmail.value
+          : this.onsiteContactEmail,
+      aeContactFirstName: data.aeContactFirstName.present
+          ? data.aeContactFirstName.value
+          : this.aeContactFirstName,
+      aeContactLastName: data.aeContactLastName.present
+          ? data.aeContactLastName.value
+          : this.aeContactLastName,
+      aeContactNumber: data.aeContactNumber.present
+          ? data.aeContactNumber.value
+          : this.aeContactNumber,
+      aeContactEmail: data.aeContactEmail.present
+          ? data.aeContactEmail.value
+          : this.aeContactEmail,
+      servicesRequested: data.servicesRequested.present
+          ? data.servicesRequested.value
+          : this.servicesRequested,
+      expectedParticipation: data.expectedParticipation.present
+          ? data.expectedParticipation.value
+          : this.expectedParticipation,
+      nonMembers:
+          data.nonMembers.present ? data.nonMembers.value : this.nonMembers,
+      passports: data.passports.present ? data.passports.value : this.passports,
+      nurses: data.nurses.present ? data.nurses.value : this.nurses,
+      coordinators: data.coordinators.present
+          ? data.coordinators.value
+          : this.coordinators,
+      multiplyPromoters: data.multiplyPromoters.present
+          ? data.multiplyPromoters.value
+          : this.multiplyPromoters,
+      setUpTime: data.setUpTime.present ? data.setUpTime.value : this.setUpTime,
+      startTime: data.startTime.present ? data.startTime.value : this.startTime,
+      endTime: data.endTime.present ? data.endTime.value : this.endTime,
+      strikeDownTime: data.strikeDownTime.present
+          ? data.strikeDownTime.value
+          : this.strikeDownTime,
+      mobileBooths: data.mobileBooths.present
+          ? data.mobileBooths.value
+          : this.mobileBooths,
+      medicalAid:
+          data.medicalAid.present ? data.medicalAid.value : this.medicalAid,
+      description:
+          data.description.present ? data.description.value : this.description,
+      status: data.status.present ? data.status.value : this.status,
+      actualStartTime: data.actualStartTime.present
+          ? data.actualStartTime.value
+          : this.actualStartTime,
+      actualEndTime: data.actualEndTime.present
+          ? data.actualEndTime.value
+          : this.actualEndTime,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EventEntity(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('date: $date, ')
+          ..write('venue: $venue, ')
+          ..write('address: $address, ')
+          ..write('onsiteContactFirstName: $onsiteContactFirstName, ')
+          ..write('onsiteContactLastName: $onsiteContactLastName, ')
+          ..write('onsiteContactNumber: $onsiteContactNumber, ')
+          ..write('onsiteContactEmail: $onsiteContactEmail, ')
+          ..write('aeContactFirstName: $aeContactFirstName, ')
+          ..write('aeContactLastName: $aeContactLastName, ')
+          ..write('aeContactNumber: $aeContactNumber, ')
+          ..write('aeContactEmail: $aeContactEmail, ')
+          ..write('servicesRequested: $servicesRequested, ')
+          ..write('expectedParticipation: $expectedParticipation, ')
+          ..write('nonMembers: $nonMembers, ')
+          ..write('passports: $passports, ')
+          ..write('nurses: $nurses, ')
+          ..write('coordinators: $coordinators, ')
+          ..write('multiplyPromoters: $multiplyPromoters, ')
+          ..write('setUpTime: $setUpTime, ')
+          ..write('startTime: $startTime, ')
+          ..write('endTime: $endTime, ')
+          ..write('strikeDownTime: $strikeDownTime, ')
+          ..write('mobileBooths: $mobileBooths, ')
+          ..write('medicalAid: $medicalAid, ')
+          ..write('description: $description, ')
+          ..write('status: $status, ')
+          ..write('actualStartTime: $actualStartTime, ')
+          ..write('actualEndTime: $actualEndTime, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+        id,
+        title,
+        date,
+        venue,
+        address,
+        onsiteContactFirstName,
+        onsiteContactLastName,
+        onsiteContactNumber,
+        onsiteContactEmail,
+        aeContactFirstName,
+        aeContactLastName,
+        aeContactNumber,
+        aeContactEmail,
+        servicesRequested,
+        expectedParticipation,
+        nonMembers,
+        passports,
+        nurses,
+        coordinators,
+        multiplyPromoters,
+        setUpTime,
+        startTime,
+        endTime,
+        strikeDownTime,
+        mobileBooths,
+        medicalAid,
+        description,
+        status,
+        actualStartTime,
+        actualEndTime,
+        createdAt,
+        updatedAt
+      ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is EventEntity &&
+          other.id == this.id &&
+          other.title == this.title &&
+          other.date == this.date &&
+          other.venue == this.venue &&
+          other.address == this.address &&
+          other.onsiteContactFirstName == this.onsiteContactFirstName &&
+          other.onsiteContactLastName == this.onsiteContactLastName &&
+          other.onsiteContactNumber == this.onsiteContactNumber &&
+          other.onsiteContactEmail == this.onsiteContactEmail &&
+          other.aeContactFirstName == this.aeContactFirstName &&
+          other.aeContactLastName == this.aeContactLastName &&
+          other.aeContactNumber == this.aeContactNumber &&
+          other.aeContactEmail == this.aeContactEmail &&
+          other.servicesRequested == this.servicesRequested &&
+          other.expectedParticipation == this.expectedParticipation &&
+          other.nonMembers == this.nonMembers &&
+          other.passports == this.passports &&
+          other.nurses == this.nurses &&
+          other.coordinators == this.coordinators &&
+          other.multiplyPromoters == this.multiplyPromoters &&
+          other.setUpTime == this.setUpTime &&
+          other.startTime == this.startTime &&
+          other.endTime == this.endTime &&
+          other.strikeDownTime == this.strikeDownTime &&
+          other.mobileBooths == this.mobileBooths &&
+          other.medicalAid == this.medicalAid &&
+          other.description == this.description &&
+          other.status == this.status &&
+          other.actualStartTime == this.actualStartTime &&
+          other.actualEndTime == this.actualEndTime &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class EventsCompanion extends UpdateCompanion<EventEntity> {
+  final Value<String> id;
+  final Value<String> title;
+  final Value<DateTime> date;
+  final Value<String> venue;
+  final Value<String> address;
+  final Value<String> onsiteContactFirstName;
+  final Value<String> onsiteContactLastName;
+  final Value<String> onsiteContactNumber;
+  final Value<String> onsiteContactEmail;
+  final Value<String> aeContactFirstName;
+  final Value<String> aeContactLastName;
+  final Value<String> aeContactNumber;
+  final Value<String> aeContactEmail;
+  final Value<String> servicesRequested;
+  final Value<int> expectedParticipation;
+  final Value<int> nonMembers;
+  final Value<int> passports;
+  final Value<int> nurses;
+  final Value<int> coordinators;
+  final Value<int> multiplyPromoters;
+  final Value<String> setUpTime;
+  final Value<String> startTime;
+  final Value<String> endTime;
+  final Value<String> strikeDownTime;
+  final Value<String> mobileBooths;
+  final Value<String> medicalAid;
+  final Value<String?> description;
+  final Value<String> status;
+  final Value<DateTime?> actualStartTime;
+  final Value<DateTime?> actualEndTime;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const EventsCompanion({
+    this.id = const Value.absent(),
+    this.title = const Value.absent(),
+    this.date = const Value.absent(),
+    this.venue = const Value.absent(),
+    this.address = const Value.absent(),
+    this.onsiteContactFirstName = const Value.absent(),
+    this.onsiteContactLastName = const Value.absent(),
+    this.onsiteContactNumber = const Value.absent(),
+    this.onsiteContactEmail = const Value.absent(),
+    this.aeContactFirstName = const Value.absent(),
+    this.aeContactLastName = const Value.absent(),
+    this.aeContactNumber = const Value.absent(),
+    this.aeContactEmail = const Value.absent(),
+    this.servicesRequested = const Value.absent(),
+    this.expectedParticipation = const Value.absent(),
+    this.nonMembers = const Value.absent(),
+    this.passports = const Value.absent(),
+    this.nurses = const Value.absent(),
+    this.coordinators = const Value.absent(),
+    this.multiplyPromoters = const Value.absent(),
+    this.setUpTime = const Value.absent(),
+    this.startTime = const Value.absent(),
+    this.endTime = const Value.absent(),
+    this.strikeDownTime = const Value.absent(),
+    this.mobileBooths = const Value.absent(),
+    this.medicalAid = const Value.absent(),
+    this.description = const Value.absent(),
+    this.status = const Value.absent(),
+    this.actualStartTime = const Value.absent(),
+    this.actualEndTime = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  EventsCompanion.insert({
+    required String id,
+    required String title,
+    required DateTime date,
+    required String venue,
+    required String address,
+    required String onsiteContactFirstName,
+    required String onsiteContactLastName,
+    required String onsiteContactNumber,
+    required String onsiteContactEmail,
+    required String aeContactFirstName,
+    required String aeContactLastName,
+    required String aeContactNumber,
+    required String aeContactEmail,
+    required String servicesRequested,
+    this.expectedParticipation = const Value.absent(),
+    this.nonMembers = const Value.absent(),
+    this.passports = const Value.absent(),
+    this.nurses = const Value.absent(),
+    this.coordinators = const Value.absent(),
+    this.multiplyPromoters = const Value.absent(),
+    this.setUpTime = const Value.absent(),
+    this.startTime = const Value.absent(),
+    this.endTime = const Value.absent(),
+    this.strikeDownTime = const Value.absent(),
+    this.mobileBooths = const Value.absent(),
+    this.medicalAid = const Value.absent(),
+    this.description = const Value.absent(),
+    this.status = const Value.absent(),
+    this.actualStartTime = const Value.absent(),
+    this.actualEndTime = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        title = Value(title),
+        date = Value(date),
+        venue = Value(venue),
+        address = Value(address),
+        onsiteContactFirstName = Value(onsiteContactFirstName),
+        onsiteContactLastName = Value(onsiteContactLastName),
+        onsiteContactNumber = Value(onsiteContactNumber),
+        onsiteContactEmail = Value(onsiteContactEmail),
+        aeContactFirstName = Value(aeContactFirstName),
+        aeContactLastName = Value(aeContactLastName),
+        aeContactNumber = Value(aeContactNumber),
+        aeContactEmail = Value(aeContactEmail),
+        servicesRequested = Value(servicesRequested);
+  static Insertable<EventEntity> custom({
+    Expression<String>? id,
+    Expression<String>? title,
+    Expression<DateTime>? date,
+    Expression<String>? venue,
+    Expression<String>? address,
+    Expression<String>? onsiteContactFirstName,
+    Expression<String>? onsiteContactLastName,
+    Expression<String>? onsiteContactNumber,
+    Expression<String>? onsiteContactEmail,
+    Expression<String>? aeContactFirstName,
+    Expression<String>? aeContactLastName,
+    Expression<String>? aeContactNumber,
+    Expression<String>? aeContactEmail,
+    Expression<String>? servicesRequested,
+    Expression<int>? expectedParticipation,
+    Expression<int>? nonMembers,
+    Expression<int>? passports,
+    Expression<int>? nurses,
+    Expression<int>? coordinators,
+    Expression<int>? multiplyPromoters,
+    Expression<String>? setUpTime,
+    Expression<String>? startTime,
+    Expression<String>? endTime,
+    Expression<String>? strikeDownTime,
+    Expression<String>? mobileBooths,
+    Expression<String>? medicalAid,
+    Expression<String>? description,
+    Expression<String>? status,
+    Expression<DateTime>? actualStartTime,
+    Expression<DateTime>? actualEndTime,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (title != null) 'title': title,
+      if (date != null) 'date': date,
+      if (venue != null) 'venue': venue,
+      if (address != null) 'address': address,
+      if (onsiteContactFirstName != null)
+        'onsite_contact_first_name': onsiteContactFirstName,
+      if (onsiteContactLastName != null)
+        'onsite_contact_last_name': onsiteContactLastName,
+      if (onsiteContactNumber != null)
+        'onsite_contact_number': onsiteContactNumber,
+      if (onsiteContactEmail != null)
+        'onsite_contact_email': onsiteContactEmail,
+      if (aeContactFirstName != null)
+        'ae_contact_first_name': aeContactFirstName,
+      if (aeContactLastName != null) 'ae_contact_last_name': aeContactLastName,
+      if (aeContactNumber != null) 'ae_contact_number': aeContactNumber,
+      if (aeContactEmail != null) 'ae_contact_email': aeContactEmail,
+      if (servicesRequested != null) 'services_requested': servicesRequested,
+      if (expectedParticipation != null)
+        'expected_participation': expectedParticipation,
+      if (nonMembers != null) 'non_members': nonMembers,
+      if (passports != null) 'passports': passports,
+      if (nurses != null) 'nurses': nurses,
+      if (coordinators != null) 'coordinators': coordinators,
+      if (multiplyPromoters != null) 'multiply_promoters': multiplyPromoters,
+      if (setUpTime != null) 'set_up_time': setUpTime,
+      if (startTime != null) 'start_time': startTime,
+      if (endTime != null) 'end_time': endTime,
+      if (strikeDownTime != null) 'strike_down_time': strikeDownTime,
+      if (mobileBooths != null) 'mobile_booths': mobileBooths,
+      if (medicalAid != null) 'medical_aid': medicalAid,
+      if (description != null) 'description': description,
+      if (status != null) 'status': status,
+      if (actualStartTime != null) 'actual_start_time': actualStartTime,
+      if (actualEndTime != null) 'actual_end_time': actualEndTime,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  EventsCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? title,
+      Value<DateTime>? date,
+      Value<String>? venue,
+      Value<String>? address,
+      Value<String>? onsiteContactFirstName,
+      Value<String>? onsiteContactLastName,
+      Value<String>? onsiteContactNumber,
+      Value<String>? onsiteContactEmail,
+      Value<String>? aeContactFirstName,
+      Value<String>? aeContactLastName,
+      Value<String>? aeContactNumber,
+      Value<String>? aeContactEmail,
+      Value<String>? servicesRequested,
+      Value<int>? expectedParticipation,
+      Value<int>? nonMembers,
+      Value<int>? passports,
+      Value<int>? nurses,
+      Value<int>? coordinators,
+      Value<int>? multiplyPromoters,
+      Value<String>? setUpTime,
+      Value<String>? startTime,
+      Value<String>? endTime,
+      Value<String>? strikeDownTime,
+      Value<String>? mobileBooths,
+      Value<String>? medicalAid,
+      Value<String?>? description,
+      Value<String>? status,
+      Value<DateTime?>? actualStartTime,
+      Value<DateTime?>? actualEndTime,
+      Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt,
+      Value<int>? rowid}) {
+    return EventsCompanion(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      date: date ?? this.date,
+      venue: venue ?? this.venue,
+      address: address ?? this.address,
+      onsiteContactFirstName:
+          onsiteContactFirstName ?? this.onsiteContactFirstName,
+      onsiteContactLastName:
+          onsiteContactLastName ?? this.onsiteContactLastName,
+      onsiteContactNumber: onsiteContactNumber ?? this.onsiteContactNumber,
+      onsiteContactEmail: onsiteContactEmail ?? this.onsiteContactEmail,
+      aeContactFirstName: aeContactFirstName ?? this.aeContactFirstName,
+      aeContactLastName: aeContactLastName ?? this.aeContactLastName,
+      aeContactNumber: aeContactNumber ?? this.aeContactNumber,
+      aeContactEmail: aeContactEmail ?? this.aeContactEmail,
+      servicesRequested: servicesRequested ?? this.servicesRequested,
+      expectedParticipation:
+          expectedParticipation ?? this.expectedParticipation,
+      nonMembers: nonMembers ?? this.nonMembers,
+      passports: passports ?? this.passports,
+      nurses: nurses ?? this.nurses,
+      coordinators: coordinators ?? this.coordinators,
+      multiplyPromoters: multiplyPromoters ?? this.multiplyPromoters,
+      setUpTime: setUpTime ?? this.setUpTime,
+      startTime: startTime ?? this.startTime,
+      endTime: endTime ?? this.endTime,
+      strikeDownTime: strikeDownTime ?? this.strikeDownTime,
+      mobileBooths: mobileBooths ?? this.mobileBooths,
+      medicalAid: medicalAid ?? this.medicalAid,
+      description: description ?? this.description,
+      status: status ?? this.status,
+      actualStartTime: actualStartTime ?? this.actualStartTime,
+      actualEndTime: actualEndTime ?? this.actualEndTime,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (date.present) {
+      map['date'] = Variable<DateTime>(date.value);
+    }
+    if (venue.present) {
+      map['venue'] = Variable<String>(venue.value);
+    }
+    if (address.present) {
+      map['address'] = Variable<String>(address.value);
+    }
+    if (onsiteContactFirstName.present) {
+      map['onsite_contact_first_name'] =
+          Variable<String>(onsiteContactFirstName.value);
+    }
+    if (onsiteContactLastName.present) {
+      map['onsite_contact_last_name'] =
+          Variable<String>(onsiteContactLastName.value);
+    }
+    if (onsiteContactNumber.present) {
+      map['onsite_contact_number'] =
+          Variable<String>(onsiteContactNumber.value);
+    }
+    if (onsiteContactEmail.present) {
+      map['onsite_contact_email'] = Variable<String>(onsiteContactEmail.value);
+    }
+    if (aeContactFirstName.present) {
+      map['ae_contact_first_name'] = Variable<String>(aeContactFirstName.value);
+    }
+    if (aeContactLastName.present) {
+      map['ae_contact_last_name'] = Variable<String>(aeContactLastName.value);
+    }
+    if (aeContactNumber.present) {
+      map['ae_contact_number'] = Variable<String>(aeContactNumber.value);
+    }
+    if (aeContactEmail.present) {
+      map['ae_contact_email'] = Variable<String>(aeContactEmail.value);
+    }
+    if (servicesRequested.present) {
+      map['services_requested'] = Variable<String>(servicesRequested.value);
+    }
+    if (expectedParticipation.present) {
+      map['expected_participation'] =
+          Variable<int>(expectedParticipation.value);
+    }
+    if (nonMembers.present) {
+      map['non_members'] = Variable<int>(nonMembers.value);
+    }
+    if (passports.present) {
+      map['passports'] = Variable<int>(passports.value);
+    }
+    if (nurses.present) {
+      map['nurses'] = Variable<int>(nurses.value);
+    }
+    if (coordinators.present) {
+      map['coordinators'] = Variable<int>(coordinators.value);
+    }
+    if (multiplyPromoters.present) {
+      map['multiply_promoters'] = Variable<int>(multiplyPromoters.value);
+    }
+    if (setUpTime.present) {
+      map['set_up_time'] = Variable<String>(setUpTime.value);
+    }
+    if (startTime.present) {
+      map['start_time'] = Variable<String>(startTime.value);
+    }
+    if (endTime.present) {
+      map['end_time'] = Variable<String>(endTime.value);
+    }
+    if (strikeDownTime.present) {
+      map['strike_down_time'] = Variable<String>(strikeDownTime.value);
+    }
+    if (mobileBooths.present) {
+      map['mobile_booths'] = Variable<String>(mobileBooths.value);
+    }
+    if (medicalAid.present) {
+      map['medical_aid'] = Variable<String>(medicalAid.value);
+    }
+    if (description.present) {
+      final value = description.value;
+      map['description'] = value == null
+          ? const Variable<String>(null)
+          : Variable<String>(value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (actualStartTime.present) {
+      final value = actualStartTime.value;
+      map['actual_start_time'] = value == null
+          ? const Variable<DateTime>(null)
+          : Variable<DateTime>(value);
+    }
+    if (actualEndTime.present) {
+      final value = actualEndTime.value;
+      map['actual_end_time'] = value == null
+          ? const Variable<DateTime>(null)
+          : Variable<DateTime>(value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EventsCompanion(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('date: $date, ')
+          ..write('venue: $venue, ')
+          ..write('address: $address, ')
+          ..write('onsiteContactFirstName: $onsiteContactFirstName, ')
+          ..write('onsiteContactLastName: $onsiteContactLastName, ')
+          ..write('onsiteContactNumber: $onsiteContactNumber, ')
+          ..write('onsiteContactEmail: $onsiteContactEmail, ')
+          ..write('aeContactFirstName: $aeContactFirstName, ')
+          ..write('aeContactLastName: $aeContactLastName, ')
+          ..write('aeContactNumber: $aeContactNumber, ')
+          ..write('aeContactEmail: $aeContactEmail, ')
+          ..write('servicesRequested: $servicesRequested, ')
+          ..write('expectedParticipation: $expectedParticipation, ')
+          ..write('nonMembers: $nonMembers, ')
+          ..write('passports: $passports, ')
+          ..write('nurses: $nurses, ')
+          ..write('coordinators: $coordinators, ')
+          ..write('multiplyPromoters: $multiplyPromoters, ')
+          ..write('setUpTime: $setUpTime, ')
+          ..write('startTime: $startTime, ')
+          ..write('endTime: $endTime, ')
+          ..write('strikeDownTime: $strikeDownTime, ')
+          ..write('mobileBooths: $mobileBooths, ')
+          ..write('medicalAid: $medicalAid, ')
+          ..write('description: $description, ')
+          ..write('status: $status, ')
+          ..write('actualStartTime: $actualStartTime, ')
+          ..write('actualEndTime: $actualEndTime, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $UsersTable users = $UsersTable(this);
+  late final $EventsTable events = $EventsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [users];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [users, events];
 }
 
 typedef $$UsersTableCreateCompanionBuilder = UsersCompanion Function({

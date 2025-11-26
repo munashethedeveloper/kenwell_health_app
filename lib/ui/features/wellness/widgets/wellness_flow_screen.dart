@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 // Screens
@@ -16,10 +17,18 @@ import '../../tb_test/widgets/tb_testing_screen.dart';
 // ViewModel
 import '../../tb_test_nursing_intervention/widgets/tb_nursing_intervention_screen.dart';
 import '../view_model/wellness_flow_view_model.dart';
+import '../../../../domain/models/wellness_event.dart';
 
 class WellnessFlowScreen extends StatelessWidget {
   final VoidCallback onExitFlow;
-  const WellnessFlowScreen({super.key, required this.onExitFlow});
+  final VoidCallback? onFlowCompleted;
+  final WellnessEvent? event;
+  const WellnessFlowScreen({
+    super.key,
+    required this.onExitFlow,
+    this.onFlowCompleted,
+    this.event,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -121,18 +130,86 @@ class WellnessFlowScreen extends StatelessWidget {
           value: flowVM.surveyVM,
           child: SurveyScreen(
             onPrevious: flowVM.previousStep,
-            onSubmit: () => flowVM.submitAll(context),
+            onSubmit: () async {
+              await flowVM.submitAll(context);
+              onFlowCompleted?.call();
+            },
           ),
         );
         break;
       default:
         currentScreen = const Center(child: Text('Invalid step'));
     }
-    return AnimatedSwitcher(
+    final flowContent = AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
       child: KeyedSubtree(
         key: ValueKey<int>(flowVM.currentStep),
         child: currentScreen,
+      ),
+    );
+    return Column(
+      children: [
+        if (event != null)
+          _ActiveEventBanner(
+            title: event!.title,
+            date: event!.date,
+            startTime: event!.startTime,
+            venue: event!.venue,
+          ),
+        Expanded(child: flowContent),
+      ],
+    );
+  }
+}
+
+class _ActiveEventBanner extends StatelessWidget {
+  final String title;
+  final DateTime date;
+  final String startTime;
+  final String venue;
+
+  const _ActiveEventBanner({
+    required this.title,
+    required this.date,
+    required this.startTime,
+    required this.venue,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final subtitle = [
+      DateFormat.yMMMMd().format(date),
+      if (startTime.isNotEmpty) startTime,
+      if (venue.isNotEmpty) venue,
+    ].where((element) => element.isNotEmpty).join(' • ');
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF201C58),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            subtitle,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.9),
+            ),
+          ),
+        ],
       ),
     );
   }

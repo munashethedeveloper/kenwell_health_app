@@ -150,16 +150,18 @@ class EventDetailsScreen extends StatelessWidget {
       arguments: {
         'date': event.date,
         'existingEvent': event,
-        'onSave': (WellnessEvent updatedEvent) {
-          _updateEvent(context, updatedEvent);
+        'onSave': (WellnessEvent updatedEvent) async {
+          await _updateEvent(context, updatedEvent);
         },
       },
     );
   }
 
-  void _updateEvent(BuildContext context, WellnessEvent updatedEvent) {
-    final previousEvent = viewModel?.updateEvent(updatedEvent);
+  Future<void> _updateEvent(
+      BuildContext context, WellnessEvent updatedEvent) async {
+    final previousEvent = await viewModel?.updateEvent(updatedEvent);
     if (previousEvent != null) {
+      if (!context.mounted) return;
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -176,9 +178,10 @@ class EventDetailsScreen extends StatelessWidget {
     }
   }
 
-  void _deleteEvent(BuildContext context) {
-    final deletedEvent = viewModel?.deleteEvent(event.id);
+  Future<void> _deleteEvent(BuildContext context) async {
+    final deletedEvent = await viewModel?.deleteEvent(event.id);
     if (deletedEvent != null) {
+      if (!context.mounted) return;
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

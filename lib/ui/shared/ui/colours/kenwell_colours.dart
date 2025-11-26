@@ -58,11 +58,9 @@ class KenwellColors {
     onError: Colors.white,
     errorContainer: Color(0xFFFCDAD6),
     onErrorContainer: Color(0xFF370907),
-    background: neutralBackground,
-    onBackground: Color(0xFF1A1C1A),
     surface: neutralWhite,
     onSurface: Color(0xFF1A1C1A),
-    surfaceVariant: neutralSurface,
+    surfaceContainerHighest: neutralSurface,
     onSurfaceVariant: Color(0xFF42494F),
     outline: Color(0xFFD1D5DB),
     outlineVariant: neutralDivider,
@@ -77,7 +75,7 @@ class KenwellColors {
   // FULL MATERIAL 3 DARK COLOR SCHEME
   // ---------------------------------------------------------------------------
 
-  static final ColorScheme darkScheme = ColorScheme(
+  static const ColorScheme darkScheme = ColorScheme(
     brightness: Brightness.dark,
     primary: primaryGreenLight,
     onPrimary: Color(0xFF0E2000),
