@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/domain/models/wellness_event.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_checkbox_group.dart';
 import 'package:provider/provider.dart';
-import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_bullet_list.dart';
-import '../../../shared/ui/form/kenwell_checkbox_group.dart';
 import '../../../shared/ui/form/kenwell_checkbox_list_card.dart';
 import '../../../shared/ui/form/kenwell_date_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
@@ -16,16 +16,21 @@ import '../view_model/consent_screen_view_model.dart';
 class ConsentScreen extends StatelessWidget {
   final VoidCallback onNext;
   final VoidCallback onCancel;
+  final WellnessEvent event;
 
   const ConsentScreen({
     super.key,
     required this.onNext,
     required this.onCancel,
+    required this.event,
   });
 
   @override
   Widget build(BuildContext context) {
     final vm = Provider.of<ConsentScreenViewModel>(context);
+
+    // Initialise the VM with event data
+    vm.initialise(event);
 
     final steps = _buildFormSteps(vm);
 
@@ -82,6 +87,7 @@ class ConsentScreen extends StatelessWidget {
               KenwellTextField(
                 label: 'Venue',
                 controller: vm.venueController,
+                readOnly: true, // <-- make read-only
                 validator: (val) =>
                     (val == null || val.isEmpty) ? 'Please enter Venue' : null,
               ),
@@ -89,14 +95,12 @@ class ConsentScreen extends StatelessWidget {
               KenwellDateField(
                 label: 'Date',
                 controller: vm.dateController,
+                readOnly: true, // <-- make read-only
               ),
               const SizedBox(height: 16),
               KenwellTextField(
                 label: 'Name of Healthcare Practitioner',
                 controller: vm.practitionerController,
-                inputFormatters: AppTextInputFormatters.lettersOnly(
-                  allowHyphen: true,
-                ),
                 validator: (val) => (val == null || val.isEmpty)
                     ? 'Please enter Name of Healthcare Practitioner'
                     : null,

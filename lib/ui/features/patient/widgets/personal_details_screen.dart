@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/utils/validators.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
@@ -26,29 +27,36 @@ class PersonalDetailsScreen extends StatelessWidget {
     return ChangeNotifierProvider.value(
       value: viewModel,
       child: Consumer<PersonalDetailsViewModel>(
-        builder: (context, vm, _) => KenwellFormPage(
-          title: 'Personal Details Form',
-          sectionTitle: 'Section B: Personal Details',
-          formKey: vm.formKey,
-          children: [
-            KenwellFormCard(
-              title: 'Basic Information',
-              child: _buildPersonalInfoSection(vm),
-            ),
-            const SizedBox(height: 24),
-            KenwellFormCard(
-              title: 'Medical Aid Information',
-              child: _buildMedicalAidSection(vm),
-            ),
-            const SizedBox(height: 24),
-            KenwellFormCard(
-              title: 'Employment Details',
-              child: _buildWorkInfoSection(vm),
-            ),
-            const SizedBox(height: 24),
-            _buildNavigationButtons(context, vm),
-          ],
-        ),
+        builder: (context, vm, _) {
+          return KenwellFormPage(
+            title: 'Personal Details Form',
+            sectionTitle: 'Section B: Personal Details',
+            formKey: vm.formKey,
+            children: [
+              KenwellFormCard(
+                title: 'Basic Information',
+                child: _buildPersonalInfoSection(vm),
+              ),
+              const SizedBox(height: 24),
+              KenwellFormCard(
+                title: 'Identification Information',
+                child: _buildIdentificationInfoSection(vm),
+              ),
+              const SizedBox(height: 24),
+              KenwellFormCard(
+                title: 'Medical Aid Information',
+                child: _buildMedicalAidSection(vm),
+              ),
+              const SizedBox(height: 24),
+              KenwellFormCard(
+                title: 'Employment Information',
+                child: _buildWorkInfoSection(vm),
+              ),
+              const SizedBox(height: 24),
+              _buildNavigationButtons(context, vm),
+            ],
+          );
+        },
       ),
     );
   }
@@ -83,13 +91,6 @@ class PersonalDetailsScreen extends StatelessWidget {
           validator: (val) =>
               (val == null || val.isEmpty) ? 'Please enter Initials' : null,
         ),
-        KenwellDateField(
-          label: 'Date of Birth',
-          controller: vm.dobController,
-          validator: (val) => (val == null || val.isEmpty)
-              ? 'Please select Date of Birth'
-              : null,
-        ),
         KenwellDropdownField<String>(
           label: 'Marital Status',
           value: vm.maritalStatus,
@@ -98,14 +99,36 @@ class PersonalDetailsScreen extends StatelessWidget {
           validator: (val) =>
               (val == null || val.isEmpty) ? 'Select Marital Status' : null,
         ),
-        KenwellDropdownField<String>(
-          label: 'Gender',
-          value: vm.gender,
-          items: vm.genderOptions,
-          onChanged: vm.setGender,
-          validator: (val) =>
-              (val == null || val.isEmpty) ? 'Select Gender' : null,
+        KenwellTextField(
+          label: 'Email Address',
+          hintText: 'Enter email address',
+          controller: vm.emailController,
+          keyboardType: TextInputType.emailAddress,
+          validator: Validators.validateEmail,
         ),
+        KenwellTextField(
+          label: 'Cell Number',
+          hintText: 'Enter cell number',
+          controller: vm.cellNumberController,
+          keyboardType: TextInputType.phone,
+          inputFormatters: [AppTextInputFormatters.saPhoneNumberFormatter()],
+          validator: Validators.validateSouthAfricanPhoneNumber,
+        ),
+        KenwellTextField(
+          label: 'Alternate Contact Number',
+          hintText: 'Enter alternate contact number',
+          controller: vm.alternateContactNumberController,
+          keyboardType: TextInputType.phone,
+          inputFormatters: [AppTextInputFormatters.saPhoneNumberFormatter()],
+          validator: Validators.validateSouthAfricanPhoneNumber,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildIdentificationInfoSection(PersonalDetailsViewModel vm) {
+    return Column(
+      children: [
         KenwellDropdownField<String>(
           label: 'Identification Type',
           value: vm.idDocumentChoice,
@@ -121,8 +144,7 @@ class PersonalDetailsScreen extends StatelessWidget {
             hintText: 'Enter ID number',
             controller: vm.idNumberController,
             inputFormatters: AppTextInputFormatters.numbersOnly(),
-            validator: (val) =>
-                (val == null || val.isEmpty) ? 'Please enter ID Number' : null,
+            validator: Validators.validateSouthAfricanId,
           ),
         if (vm.showPassportField)
           KenwellTextField(
@@ -140,33 +162,23 @@ class PersonalDetailsScreen extends StatelessWidget {
           validator: (val) =>
               (val == null || val.isEmpty) ? 'Please enter Nationality' : null,
         ),
-        KenwellTextField(
-          label: 'Email Address',
-          hintText: 'Enter email address',
-          controller: vm.emailController,
-          keyboardType: TextInputType.emailAddress,
+        // Date of Birth is auto-populated from ID
+        KenwellDateField(
+          label: 'Date of Birth',
+          controller: vm.dobController,
           validator: (val) => (val == null || val.isEmpty)
-              ? 'Please enter Email Address'
+              ? 'Please select Date of Birth'
               : null,
+          readOnly: true,
         ),
-        KenwellTextField(
-          label: 'Cell Number',
-          hintText: 'Enter cell number',
-          controller: vm.cellNumberController,
-          keyboardType: TextInputType.phone,
-          inputFormatters: AppTextInputFormatters.numbersOnly(),
+        // Gender is auto-populated from ID
+        KenwellDropdownField<String>(
+          label: 'Gender',
+          value: vm.gender,
+          items: vm.genderOptions,
+          onChanged: vm.setGender,
           validator: (val) =>
-              (val == null || val.isEmpty) ? 'Please enter Cell Number' : null,
-        ),
-        KenwellTextField(
-          label: 'Alternate Contact Number',
-          hintText: 'Enter alternate contact number',
-          controller: vm.alternateContactNumberController,
-          keyboardType: TextInputType.phone,
-          inputFormatters: AppTextInputFormatters.numbersOnly(),
-          validator: (val) => (val == null || val.isEmpty)
-              ? 'Please enter Alternate Contact Number'
-              : null,
+              (val == null || val.isEmpty) ? 'Select Gender' : null,
         ),
       ],
     );

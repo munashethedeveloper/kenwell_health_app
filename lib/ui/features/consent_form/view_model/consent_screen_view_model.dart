@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:signature/signature.dart';
+import 'package:intl/intl.dart';
+import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 
 class ConsentScreenViewModel extends ChangeNotifier {
   // Form key for validation
@@ -34,6 +36,22 @@ class ConsentScreenViewModel extends ChangeNotifier {
       dateController.text.isNotEmpty &&
       practitionerController.text.isNotEmpty &&
       signatureController.isNotEmpty;
+
+  // Event for pre-filling fields
+  WellnessEvent? event;
+
+  // Initialise with event and pre-fill fields safely
+  void initialise(WellnessEvent e) {
+    if (event != null) return; // prevent multiple initializations
+    event = e;
+
+    // Schedule updates after build to avoid setState during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      venueController.text = e.venue;
+      dateController.text = DateFormat('yyyy-MM-dd').format(e.date);
+      notifyListeners();
+    });
+  }
 
   // Toggle screening checkbox
   void toggleCheckbox(String field, bool? value) {

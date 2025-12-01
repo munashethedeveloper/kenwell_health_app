@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 
 // Feature imports
 import '../../../features/calendar/widgets/calendar_screen.dart';
@@ -38,45 +39,63 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         index: _currentIndex,
         children: tabs,
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        type: BottomNavigationBarType.fixed,
-        //backgroundColor: const Color(0xFF90C048),
-        //selectedItemColor: const Color(0xFF201C58),
-        backgroundColor: const Color(0xFF201C58),
-        selectedItemColor: const Color(0xFF90C048),
-        unselectedItemColor: Colors.white,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today),
-            label: 'Planner',
+
+      // -------------------------------
+      //      FLOATING TOOLBAR
+      // -------------------------------
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 24),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(28),
+          child: NavigationBarTheme(
+            data: NavigationBarThemeData(
+              indicatorColor: KenwellColors.neutralWhite,
+              labelTextStyle: MaterialStateProperty.resolveWith((states) {
+                return const TextStyle(color: KenwellColors.secondaryNavy);
+              }),
+              iconTheme: MaterialStateProperty.resolveWith((states) {
+                return const IconThemeData(color: KenwellColors.secondaryNavy);
+              }),
+            ),
+            child: NavigationBar(
+              height: 65,
+              selectedIndex: _currentIndex,
+              onDestinationSelected: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+              backgroundColor: KenwellColors.primaryGreen,
+              elevation: 6,
+              destinations: const [
+                NavigationDestination(
+                  icon: Icon(Icons.calendar_today),
+                  label: 'Planner',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.person),
+                  label: 'Profile',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.settings),
+                  label: 'Settings',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.bar_chart),
+                  label: 'Stats',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.help),
+                  label: 'Help',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.event),
+                  label: 'Conduct',
+                ),
+              ],
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            label: 'Stats',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.help),
-            label: 'Help',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.event),
-            label: 'Conduct Event',
-          ),
-        ],
+        ),
       ),
     );
   }

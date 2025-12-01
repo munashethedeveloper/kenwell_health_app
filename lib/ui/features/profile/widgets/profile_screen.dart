@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
@@ -87,7 +88,47 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
   }
 
   Future<void> _saveProfile(ProfileViewModel vm) async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      // Collect field names that failed validation
+      final invalidFields = <String>[];
+
+      if (_firstNameController.text.isEmpty) invalidFields.add("First Name");
+      if (_lastNameController.text.isEmpty) invalidFields.add("Last Name");
+      if (_usernameController.text.isEmpty) invalidFields.add("Username");
+      if (_selectedRole == null || _selectedRole!.isEmpty)
+        invalidFields.add("Role");
+      if (_phoneController.text.isEmpty ||
+          Validators.validateSouthAfricanPhoneNumber(_phoneController.text) !=
+              null) {
+        invalidFields.add("Phone Number");
+      }
+      if (_emailController.text.isEmpty ||
+          Validators.validateEmail(_emailController.text) != null) {
+        invalidFields.add("Email");
+      }
+      if (_passwordController.text.isEmpty ||
+          Validators.validateStrongPassword(_passwordController.text) != null) {
+        invalidFields.add("Password");
+      }
+      if (_confirmPasswordController.text.isEmpty ||
+          _confirmPasswordController.text != _passwordController.text) {
+        invalidFields.add("Confirm Password");
+      }
+
+      // Show a single SnackBar with all invalid fields
+      if (invalidFields.isNotEmpty) {
+        final message = invalidFields.join(", ");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Please complete the following fields: $message"),
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+      return;
+    }
+
+    // Check password match
     if (_passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Passwords do not match')),
@@ -95,19 +136,12 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
       return;
     }
 
-    final role = _selectedRole;
-    if (role == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a role')),
-      );
-      return;
-    }
-
+    // Save profile
     vm
       ..firstName = _firstNameController.text.trim()
       ..lastName = _lastNameController.text.trim()
       ..username = _usernameController.text.trim()
-      ..role = role
+      ..role = _selectedRole!
       ..phoneNumber = _phoneController.text.trim()
       ..email = _emailController.text.trim()
       ..password = _passwordController.text.trim();
@@ -202,12 +236,13 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
                                   label: "Phone Number",
                                   controller: _phoneController,
                                   keyboardType: TextInputType.phone,
-                                  inputFormatters:
-                                      AppTextInputFormatters.numbersOnly(),
+                                  inputFormatters: [
+                                    AppTextInputFormatters
+                                        .saPhoneNumberFormatter()
+                                  ],
                                   padding: EdgeInsets.zero,
-                                  validator: (v) => (v == null || v.isEmpty)
-                                      ? "Enter Phone Number"
-                                      : null,
+                                  validator: Validators
+                                      .validateSouthAfricanPhoneNumber,
                                 ),
                                 const SizedBox(height: 24),
                                 KenwellTextField(
@@ -250,22 +285,48 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
                                     final message =
                                         Validators.validatePasswordPresence(v);
                                     if (message != null) return message;
-                                    if (v != _passwordController.text) {
+                                    if (v != _passwordController.text)
                                       return "Passwords do not match";
-                                    }
                                     return null;
                                   },
                                 ),
                               ],
                             ),
                           ),
-                          CustomPrimaryButton(
-                            label: "Save Profile",
-                            onPressed:
-                                (vm.isLoadingProfile || vm.isSavingProfile)
-                                    ? null
-                                    : () => _saveProfile(vm),
-                            isBusy: vm.isSavingProfile,
+                          // Replace the single CustomPrimaryButton at the bottom with this Row
+                          Row(
+                            children: [
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  style: OutlinedButton.styleFrom(
+                                    side: const BorderSide(
+                                        color: KenwellColors.primaryGreen,
+                                        width: 2),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16),
+                                  ),
+                                  child: const Text(
+                                    'Cancel',
+                                    style: TextStyle(
+                                      color: KenwellColors.primaryGreen,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: CustomPrimaryButton(
+                                  label: "Save Profile",
+                                  onPressed: (vm.isLoadingProfile ||
+                                          vm.isSavingProfile)
+                                      ? null
+                                      : () => _saveProfile(vm),
+                                  isBusy: vm.isSavingProfile,
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 16),
                         ],
@@ -279,9 +340,7 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
                   child: IgnorePointer(
                     child: ColoredBox(
                       color: Color(0x66FFFFFF),
-                      child: Center(
-                        child: CircularProgressIndicator(),
-                      ),
+                      child: Center(child: CircularProgressIndicator()),
                     ),
                   ),
                 ),

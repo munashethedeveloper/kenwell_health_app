@@ -96,7 +96,6 @@ class EventRepository {
       status: Value(event.status),
       actualStartTime: Value(event.actualStartTime),
       actualEndTime: Value(event.actualEndTime),
-      updatedAt: Value(DateTime.now()),
     );
   }
 }

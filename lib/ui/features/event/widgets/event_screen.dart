@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinbox/flutter_spinbox.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
+import 'package:kenwell_health_app/utils/validators.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/buttons/custom_primary_button.dart';
@@ -55,6 +56,119 @@ class _EventScreenState extends State<EventScreen> {
       widget.viewModel.dateController.text =
           "${widget.date.year}-${widget.date.month.toString().padLeft(2, '0')}-${widget.date.day.toString().padLeft(2, '0')}";
     }
+  }
+
+  Future<void> _validateAndSave() async {
+    final invalidFields = <String>[];
+
+    // Basic Info
+    if (_requiredField('Event Title', widget.viewModel.titleController.text) !=
+        null) invalidFields.add('Event Title');
+    if (_requiredField('Venue', widget.viewModel.venueController.text) != null)
+      invalidFields.add('Venue');
+    if (_requiredField('Address', widget.viewModel.addressController.text) !=
+        null) invalidFields.add('Address');
+
+    // Onsite Contact
+    if (_requiredField('Contact Person First Name',
+            widget.viewModel.onsiteContactFirstNameController.text) !=
+        null) invalidFields.add('Onsite Contact First Name');
+    if (_requiredField('Contact Person Last Name',
+            widget.viewModel.onsiteContactLastNameController.text) !=
+        null) invalidFields.add('Onsite Contact Last Name');
+    if (Validators.validateSouthAfricanPhoneNumber(
+            widget.viewModel.onsiteNumberController.text) !=
+        null) invalidFields.add('Onsite Contact Number');
+    if (Validators.validateEmail(widget.viewModel.onsiteEmailController.text) !=
+        null) invalidFields.add('Onsite Contact Email');
+
+    // AE Contact
+    if (_requiredField('AE Contact Person First Name',
+            widget.viewModel.aeContactFirstNameController.text) !=
+        null) invalidFields.add('AE Contact First Name');
+    if (_requiredField('AE Contact Person Last Name',
+            widget.viewModel.aeContactLastNameController.text) !=
+        null) invalidFields.add('AE Contact Last Name');
+    if (Validators.validateSouthAfricanPhoneNumber(
+            widget.viewModel.aeNumberController.text) !=
+        null) invalidFields.add('AE Contact Number');
+    if (Validators.validateEmail(widget.viewModel.aeEmailController.text) !=
+        null) invalidFields.add('AE Contact Email');
+
+    // Options
+    if (_requiredSelection('Medical Aid', widget.viewModel.medicalAid) != null)
+      invalidFields.add('Medical Aid');
+    if (_requiredSelection('Non-Members', widget.viewModel.nonMembers) != null)
+      invalidFields.add('Non-Members');
+    if (_requiredSelection('Coordinators', widget.viewModel.coordinators) !=
+        null) invalidFields.add('Coordinators');
+    if (_requiredSelection(
+            'Multiply Promoters', widget.viewModel.multiplyPromoters) !=
+        null) invalidFields.add('Multiply Promoters');
+    if (_requiredSelection('Mobile Booths', widget.viewModel.mobileBooths) !=
+        null) invalidFields.add('Mobile Booths');
+
+    if (widget.viewModel.selectedServices.isEmpty)
+      invalidFields.add('Services Requested');
+
+    // Time Details
+    if (_requiredField(
+            'Setup Time', widget.viewModel.setUpTimeController.text) !=
+        null) invalidFields.add('Setup Time');
+    if (_requiredField(
+            'Start Time', widget.viewModel.startTimeController.text) !=
+        null) invalidFields.add('Start Time');
+    if (_requiredField('End Time', widget.viewModel.endTimeController.text) !=
+        null) invalidFields.add('End Time');
+    if (_requiredField('Strike Down Time',
+            widget.viewModel.strikeDownTimeController.text) !=
+        null) invalidFields.add('Strike Down Time');
+
+    if (invalidFields.isNotEmpty) {
+      final message = invalidFields.join(', ');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Please complete the following fields: $message"),
+          duration: const Duration(seconds: 4),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(16),
+        ),
+      );
+      return;
+    }
+
+    // All fields valid, proceed to save
+    final eventDate =
+        DateTime.tryParse(widget.viewModel.dateController.text) ?? widget.date;
+    WellnessEvent eventToSave;
+    final isEditMode = widget.existingEvent != null;
+
+    if (isEditMode) {
+      eventToSave = widget.viewModel
+          .buildEvent(eventDate)
+          .copyWith(id: widget.existingEvent!.id);
+    } else {
+      eventToSave = widget.viewModel.buildEvent(eventDate);
+    }
+
+    await widget.onSave(eventToSave);
+
+    if (!mounted) return;
+    widget.viewModel.clearControllers();
+
+    // Show success SnackBar at the top
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(isEditMode
+            ? "Event updated successfully"
+            : "Event created successfully"),
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
+      ),
+    );
+
+    Navigator.pop(context);
   }
 
   @override
@@ -126,15 +240,17 @@ class _EventScreenState extends State<EventScreen> {
                   controller: widget.viewModel.onsiteNumberController,
                   padding: EdgeInsets.zero,
                   keyboardType: TextInputType.phone,
-                  inputFormatters: AppTextInputFormatters.numbersOnly(),
-                  validator: (value) => _requiredField('Contact Number', value),
+                  inputFormatters: [
+                    AppTextInputFormatters.saPhoneNumberFormatter()
+                  ],
+                  validator: Validators.validateSouthAfricanPhoneNumber,
                 ),
                 KenwellTextField(
                   label: 'Email',
                   controller: widget.viewModel.onsiteEmailController,
                   padding: EdgeInsets.zero,
                   keyboardType: TextInputType.emailAddress,
-                  validator: (value) => _requiredField('Email', value),
+                  validator: Validators.validateEmail,
                 ),
               ]),
               _buildSectionCard('AE Contact', [
@@ -161,15 +277,17 @@ class _EventScreenState extends State<EventScreen> {
                   controller: widget.viewModel.aeNumberController,
                   padding: EdgeInsets.zero,
                   keyboardType: TextInputType.phone,
-                  inputFormatters: AppTextInputFormatters.numbersOnly(),
-                  validator: (value) => _requiredField('Contact Number', value),
+                  inputFormatters: [
+                    AppTextInputFormatters.saPhoneNumberFormatter()
+                  ],
+                  validator: Validators.validateSouthAfricanPhoneNumber,
                 ),
                 KenwellTextField(
                   label: 'Email',
                   controller: widget.viewModel.aeEmailController,
                   padding: EdgeInsets.zero,
                   keyboardType: TextInputType.emailAddress,
-                  validator: (value) => _requiredField('Email', value),
+                  validator: Validators.validateEmail,
                 ),
               ]),
               _buildSectionCard('Participation & Numbers', [
@@ -287,27 +405,34 @@ class _EventScreenState extends State<EventScreen> {
                 ),
               ]),
               const SizedBox(height: 20),
-              CustomPrimaryButton(
-                label: 'Save Event',
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    final eventDate = DateTime.tryParse(
-                            widget.viewModel.dateController.text) ??
-                        widget.date;
-                    WellnessEvent eventToSave;
-                    if (isEditMode) {
-                      eventToSave = widget.viewModel
-                          .buildEvent(eventDate)
-                          .copyWith(id: eventToEdit.id);
-                    } else {
-                      eventToSave = widget.viewModel.buildEvent(eventDate);
-                    }
-                    await widget.onSave(eventToSave);
-                    if (!mounted) return;
-                    widget.viewModel.clearControllers();
-                    Navigator.pop(context);
-                  }
-                },
+              // Row with Cancel and Save buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(
+                            color: KenwellColors.primaryGreen, width: 2),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(
+                          color: KenwellColors.primaryGreen,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: CustomPrimaryButton(
+                      label: 'Save Event',
+                      onPressed: _validateAndSave,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 30),
             ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
@@ -30,6 +31,7 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
             appBar: const KenwellAppBar(
               title: 'Health Metrics Form',
               automaticallyImplyLeading: false,
+              backgroundColor: KenwellColors.primaryGreen,
             ),
             body: SingleChildScrollView(
               padding: const EdgeInsets.all(16),

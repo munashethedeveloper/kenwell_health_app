@@ -40,7 +40,7 @@ class WellnessFlowPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: KenwellAppBar(
-        title: 'Conduct ${event.title}',
+        title: 'Event Name: ${event.title}',
         backgroundColor: const Color(0xFF201C58),
         titleColor: Colors.white,
         automaticallyImplyLeading: true,

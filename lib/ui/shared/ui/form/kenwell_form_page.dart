@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 
 import '../app_bar/kenwell_app_bar.dart';
 import 'kenwell_section_header.dart';
@@ -60,6 +61,7 @@ class KenwellFormPage extends StatelessWidget {
     final preferredAppBar = appBar ??
         KenwellAppBar(
           title: title,
+          backgroundColor: KenwellColors.primaryGreen,
           automaticallyImplyLeading: automaticallyImplyLeading,
         );
 

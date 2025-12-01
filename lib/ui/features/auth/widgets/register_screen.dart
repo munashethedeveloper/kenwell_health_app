@@ -180,11 +180,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           label: "Phone Number",
                           controller: _phoneController,
                           keyboardType: TextInputType.phone,
-                          inputFormatters: AppTextInputFormatters.numbersOnly(),
+                          inputFormatters: [
+                            AppTextInputFormatters.saPhoneNumberFormatter()
+                          ],
                           padding: EdgeInsets.zero,
-                          validator: (v) => (v == null || v.isEmpty)
-                              ? "Enter Phone Number"
-                              : null,
+                          validator: Validators.validateSouthAfricanPhoneNumber,
                         ),
                       ],
                     ),

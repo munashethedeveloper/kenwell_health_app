@@ -211,6 +211,7 @@ class NurseInterventionForm extends StatelessWidget {
           KenwellDateField(
             label: 'Date',
             controller: viewModel.nurseDateController,
+            readOnly: true, // <-- pre-filled from WellnessEvent
             validator: (val) =>
                 (val == null || val.isEmpty) ? 'Please select Date' : null,
           ),

@@ -75,14 +75,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
       child: Scaffold(
         appBar: KenwellAppBar(
           title: 'Wellness Planner',
-          titleColor: Colors.white,
+          //titleColor: Colors.white,
           titleStyle: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 30,
           ),
           automaticallyImplyLeading: false,
-          backgroundColor: const Color(0xFF201C58),
+          //backgroundColor: const Color(0xFF201C58),
           actions: [
             IconButton(
               icon: const Icon(Icons.logout, color: Colors.white),

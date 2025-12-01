@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:signature/signature.dart';
+import 'package:intl/intl.dart';
+import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 
 enum NursingReferralOption {
   patientNotReferred,
@@ -81,6 +83,17 @@ mixin NurseInterventionFormMixin on ChangeNotifier {
   );
   final TextEditingController sancNumberController = TextEditingController();
   final TextEditingController nurseDateController = TextEditingController();
+
+  // --- New: initialise nurse date from event ---
+  WellnessEvent? event;
+  void initialiseWithEvent(WellnessEvent e) {
+    if (event != null) return; // prevent multiple initializations
+    event = e;
+    if (nurseDateController.text.isEmpty) {
+      nurseDateController.text = DateFormat('yyyy-MM-dd').format(e.date);
+      notifyListeners();
+    }
+  }
 
   void clearSignature() {
     signatureController.clear();

@@ -29,6 +29,7 @@ class HIVTestResultScreen extends StatelessWidget {
       appBar: const KenwellAppBar(
         title: 'HIV Test Results Form',
         automaticallyImplyLeading: false,
+        backgroundColor: KenwellColors.primaryGreen,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

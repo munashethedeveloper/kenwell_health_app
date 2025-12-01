@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/providers/theme_provider.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
@@ -73,10 +74,9 @@ class SettingsScreen extends StatelessWidget {
                       items: const [
                         DropdownMenuItem(
                             value: 'English', child: Text('English')),
+                        DropdownMenuItem(value: 'Zulu', child: Text('Zulu')),
                         DropdownMenuItem(
-                            value: 'French', child: Text('French')),
-                        DropdownMenuItem(
-                            value: 'Spanish', child: Text('Spanish')),
+                            value: 'Afrikaans', child: Text('Afrikaans')),
                       ],
                       onChanged: (value) {
                         if (value != null) viewModel.changeLanguage(value);
@@ -86,6 +86,7 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 CustomPrimaryButton(
+                  backgroundColor: KenwellColors.primaryGreen,
                   label: 'Save Settings',
                   onPressed: () async {
                     await viewModel.saveSettings();

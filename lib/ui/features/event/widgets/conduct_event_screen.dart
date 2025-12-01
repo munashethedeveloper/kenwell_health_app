@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../domain/models/wellness_event.dart';
@@ -24,85 +25,100 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
     final upcoming = eventVM.getUpcomingEvents();
 
     if (upcoming.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: const [
-              Icon(Icons.event_available, size: 64, color: Color(0xFF90C048)),
-              SizedBox(height: 16),
-              Text(
-                'No upcoming events ready to conduct.\nCreate an event or check back when it\'s time to start.',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16),
-              ),
-            ],
+      return const Scaffold(
+          appBar: KenwellAppBar(
+            title: 'Upcoming Events',
+            backgroundColor: Color(0xFF201C58),
+            titleColor: Colors.white,
+            automaticallyImplyLeading: true,
           ),
-        ),
-      );
+          body: Center(
+            child: Padding(
+              padding: EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.event_available,
+                      size: 64, color: Color(0xFF90C048)),
+                  SizedBox(height: 16),
+                  Text(
+                    'No upcoming events ready to conduct.\nCreate an event or check back when it\'s time to start.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ],
+              ),
+            ),
+          ));
     }
 
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: ListView.separated(
-        itemCount: upcoming.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
-        itemBuilder: (context, index) {
-          final event = upcoming[index];
-          final isStarting = _startingEventId == event.id;
-          return KenwellFormCard(
-            title: event.title,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  DateFormat.yMMMMd().add_jm().format(
-                        event.startDateTime ?? event.date,
-                      ),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  event.venue.isNotEmpty ? event.venue : event.address,
-                  style: const TextStyle(color: Colors.black54),
-                ),
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+    return Scaffold(
+        appBar: const KenwellAppBar(
+          title: 'Conduct Events',
+          backgroundColor: Color(0xFF201C58),
+          titleColor: Colors.white,
+          automaticallyImplyLeading: true,
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16),
+          child: ListView.separated(
+            itemCount: upcoming.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 12),
+            itemBuilder: (context, index) {
+              final event = upcoming[index];
+              final isStarting = _startingEventId == event.id;
+              return KenwellFormCard(
+                title: 'Upcoming Event: ${event.title}',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _infoChip(
-                        Icons.access_time,
-                        event.startTime.isEmpty
-                            ? 'Pending time'
-                            : event.startTime),
-                    if (event.servicesRequested.isNotEmpty)
-                      _infoChip(
-                          Icons.medical_services, event.servicesRequested),
-                    if (event.expectedParticipation > 0)
-                      _infoChip(Icons.people,
-                          '${event.expectedParticipation} expected'),
+                    Text(
+                      DateFormat.yMMMMd().add_jm().format(
+                            event.startDateTime ?? event.date,
+                          ),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      event.venue.isNotEmpty ? event.venue : event.address,
+                      style: const TextStyle(color: Colors.black54),
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        _infoChip(
+                            Icons.access_time,
+                            event.startTime.isEmpty
+                                ? 'Pending time'
+                                : event.startTime),
+                        if (event.servicesRequested.isNotEmpty)
+                          _infoChip(
+                              Icons.medical_services, event.servicesRequested),
+                        if (event.expectedParticipation > 0)
+                          _infoChip(Icons.people,
+                              '${event.expectedParticipation} expected'),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    CustomPrimaryButton(
+                      label: event.status == WellnessEventStatus.inProgress
+                          ? 'Resume Event'
+                          : 'Start Event',
+                      onPressed:
+                          isStarting ? null : () => _startEvent(context, event),
+                      isBusy: isStarting,
+                    ),
                   ],
                 ),
-                const SizedBox(height: 16),
-                CustomPrimaryButton(
-                  label: event.status == WellnessEventStatus.inProgress
-                      ? 'Resume Event'
-                      : 'Start Event',
-                  onPressed:
-                      isStarting ? null : () => _startEvent(context, event),
-                  isBusy: isStarting,
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
+              );
+            },
+          ),
+        ));
   }
 
   Future<void> _startEvent(BuildContext context, WellnessEvent event) async {

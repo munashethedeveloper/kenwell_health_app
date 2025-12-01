@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:kenwell_health_app/utils/validators.dart';
 
 class PersonalDetailsViewModel extends ChangeNotifier {
-  // Form key
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   // Controllers
@@ -23,7 +24,6 @@ class PersonalDetailsViewModel extends ChangeNotifier {
   final divisionController = TextEditingController();
   final positionController = TextEditingController();
   final employeeNumberController = TextEditingController();
-  // final regionController = TextEditingController();
 
   // Dropdown values
   String? maritalStatus;
@@ -62,11 +62,24 @@ class PersonalDetailsViewModel extends ChangeNotifier {
   final List<String> idDocumentOptions = ['ID', 'Passport'];
   final List<String> medicalAidStatusOptions = ['Yes', 'No'];
 
-  // Submission state
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
 
-  // Setters with notify
+  PersonalDetailsViewModel() {
+    idNumberController.addListener(_handleIdNumberInput);
+  }
+
+  void _handleIdNumberInput() {
+    final id = idNumberController.text;
+    if (id.length == 13 && Validators.validateSouthAfricanId(id) == null) {
+      dobController.text =
+          DateFormat('yyyy-MM-dd').format(Validators.getDateOfBirthFromId(id));
+      gender = Validators.getGenderFromId(id);
+      notifyListeners();
+    }
+  }
+
+  // --- Dropdown setters ---
   void setMaritalStatus(String? value) {
     if (maritalStatus != value) {
       maritalStatus = value;
@@ -98,11 +111,8 @@ class PersonalDetailsViewModel extends ChangeNotifier {
   void setIdDocumentChoice(String? value) {
     if (value == null || idDocumentChoice == value) return;
     idDocumentChoice = value;
-    if (idDocumentChoice == 'ID') {
-      passportNumberController.clear();
-    } else {
-      idNumberController.clear();
-    }
+    if (idDocumentChoice == 'ID') passportNumberController.clear();
+    if (idDocumentChoice == 'Passport') idNumberController.clear();
     notifyListeners();
   }
 
@@ -120,7 +130,6 @@ class PersonalDetailsViewModel extends ChangeNotifier {
   bool get showPassportField => idDocumentChoice == 'Passport';
   bool get showMedicalAidFields => medicalAidStatus == 'Yes';
 
-  // Form validation
   bool get isFormValid =>
       formKey.currentState?.validate() == true &&
       maritalStatus != null &&
@@ -135,7 +144,6 @@ class PersonalDetailsViewModel extends ChangeNotifier {
           (medicalAidNameController.text.isNotEmpty &&
               medicalAidNumberController.text.isNotEmpty));
 
-  // Convert to Map
   Map<String, dynamic> toMap() => {
         'screeningSite': screeningSiteController.text,
         'date': dateController.text,
@@ -163,7 +171,6 @@ class PersonalDetailsViewModel extends ChangeNotifier {
         'employmentStatus': employmentStatus,
       };
 
-  // Simulate saving
   Future<void> saveLocally() async {
     _isSubmitting = true;
     notifyListeners();
@@ -193,7 +200,6 @@ class PersonalDetailsViewModel extends ChangeNotifier {
       divisionController,
       positionController,
       employeeNumberController,
-      // regionController,
     ]) {
       c.dispose();
     }

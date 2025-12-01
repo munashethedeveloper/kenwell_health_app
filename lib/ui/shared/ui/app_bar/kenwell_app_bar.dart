@@ -27,8 +27,8 @@ class KenwellAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final Color resolvedBackground =
-        backgroundColor ?? KenwellColors.primaryGreen;
-    final Color resolvedTitleColor = titleColor ?? KenwellColors.secondaryNavy;
+        backgroundColor ?? KenwellColors.secondaryNavy;
+    final Color resolvedTitleColor = titleColor ?? KenwellColors.neutralWhite;
     final TextStyle resolvedTitleStyle = titleStyle ??
         TextStyle(
           color: resolvedTitleColor,

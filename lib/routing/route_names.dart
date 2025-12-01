@@ -18,4 +18,10 @@ class RouteNames {
   static const String tbTesting = '/tb-testing';
   static const String survey = '/survey';
   static const String statsReport = '/stats-report';
+
+  // NEW: standalone consent route so the app can navigate to ConsentScreen directly
+  static const String consent = '/consent';
+
+  // NEW: standalone personal details route
+  static const String personalDetails = '/personal-details';
 }

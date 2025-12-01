@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../colours/kenwell_colours.dart';
 
 class CustomPrimaryButton extends StatelessWidget {
   const CustomPrimaryButton({
@@ -32,24 +31,30 @@ class CustomPrimaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color resolvedBackground =
-        backgroundColor ?? KenwellColors.secondaryNavy;
-    final Color resolvedForeground = foregroundColor ?? Colors.white;
+        backgroundColor ?? Theme.of(context).colorScheme.primary;
+
+    final Color resolvedForeground =
+        foregroundColor ?? Theme.of(context).colorScheme.onPrimary;
+
     final bool isDisabled = onPressed == null || isBusy;
 
-    return ElevatedButton(
+    return FilledButton(
       onPressed: isDisabled ? null : onPressed,
-      style: ElevatedButton.styleFrom(
+      style: FilledButton.styleFrom(
         backgroundColor: resolvedBackground,
         foregroundColor: resolvedForeground,
         minimumSize: Size(fullWidth ? double.infinity : 0, minHeight),
         padding: padding,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12), // M3 standard radius
+        ),
       ),
       child: isBusy
           ? SizedBox(
               height: 20,
               width: 20,
               child: CircularProgressIndicator(
-                strokeWidth: 2.0,
+                strokeWidth: 2,
                 valueColor: AlwaysStoppedAnimation<Color>(resolvedForeground),
               ),
             )
@@ -74,6 +79,7 @@ class CustomPrimaryButton extends StatelessWidget {
         IconTheme(
           data: IconThemeData(color: resolvedForeground),
           child: leading!,
+          //suffixIcon: suffixIcon,
         ),
         SizedBox(width: iconGap),
         Flexible(child: textWidget),
