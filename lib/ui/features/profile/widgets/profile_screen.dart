@@ -224,6 +224,8 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
                                   label: "Role",
                                   value: _selectedRole,
                                   items: vm.availableRoles,
+                                  //readOnly: true,
+
                                   padding: EdgeInsets.zero,
                                   validator: (v) => (v == null || v.isEmpty)
                                       ? "Select Role"

@@ -51,15 +51,16 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Toggle Buttons for week selection
+            // Row with left toggle, centered date-range text, and right toggle
             Row(
               children: [
+                // Left single-button Toggle for "This week"
                 ToggleButtons(
-                  isSelected: [_selectedWeek == 0, _selectedWeek == 1],
+                  isSelected: [_selectedWeek == 0],
                   onPressed: (index) {
                     if (mounted) {
                       setState(() {
-                        _selectedWeek = index;
+                        _selectedWeek = 0;
                       });
                     }
                   },
@@ -67,26 +68,49 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
                   selectedColor: Colors.white,
                   color: const Color(0xFF201C58),
                   fillColor: const Color(0xFF201C58),
+                  constraints: const BoxConstraints(minWidth: 96),
                   children: const [
                     Padding(
                       padding:
                           EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       child: Text('This week'),
                     ),
+                  ],
+                ),
+
+                // Centered date range
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      '${DateFormat.yMMMMd().format(selectedStart)} - ${DateFormat.yMMMMd().format(selectedEnd)}',
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ),
+
+                // Right single-button Toggle for "Next week"
+                ToggleButtons(
+                  isSelected: [_selectedWeek == 1],
+                  onPressed: (index) {
+                    if (mounted) {
+                      setState(() {
+                        _selectedWeek = 1;
+                      });
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(6),
+                  selectedColor: Colors.white,
+                  color: const Color(0xFF201C58),
+                  fillColor: const Color(0xFF201C58),
+                  constraints: const BoxConstraints(minWidth: 96),
+                  children: const [
                     Padding(
                       padding:
                           EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       child: Text('Next week'),
                     ),
                   ],
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    '${DateFormat.yMMMMd().format(selectedStart)} - ${DateFormat.yMMMMd().format(selectedEnd)}',
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
                 ),
               ],
             ),
