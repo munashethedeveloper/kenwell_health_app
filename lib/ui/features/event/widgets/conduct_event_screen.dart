@@ -104,7 +104,7 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
                               '${event.expectedParticipation} expected'),
                         if (event.status == WellnessEventStatus.inProgress)
                           _infoChip(Icons.check_circle,
-                              '${event.screenedCount} screened'),
+                              '${event.screenedCount} participant${event.screenedCount == 1 ? '' : 's'} screened'),
                       ],
                     ),
                     const SizedBox(height: 16),

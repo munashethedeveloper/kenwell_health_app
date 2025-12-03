@@ -166,7 +166,7 @@ class WellnessFlowScreen extends StatelessWidget {
               if (active != null) {
                 await context.read<EventViewModel>().incrementScreened(active.id);
               }
-              if (context.mounted && Navigator.of(context).canPop()) {
+              if (context.mounted) {
                 Navigator.of(context).pop();
               }
             },
