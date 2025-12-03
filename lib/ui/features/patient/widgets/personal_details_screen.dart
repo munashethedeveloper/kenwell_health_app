@@ -140,8 +140,8 @@ class PersonalDetailsScreen extends StatelessWidget {
         ),
         if (vm.showIdField)
           KenwellTextField(
-            label: 'ID Number',
-            hintText: 'Enter ID number',
+            label: 'RSA ID Number',
+            hintText: 'Enter RSA ID number',
             controller: vm.idNumberController,
             inputFormatters: AppTextInputFormatters.numbersOnly(),
             validator: Validators.validateSouthAfricanId,

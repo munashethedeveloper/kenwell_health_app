@@ -37,13 +37,15 @@ class WellnessEvent {
   final String startTime;
   final String endTime;
   final String strikeDownTime;
-  //final String medicalAidOption;
   final String medicalAid;
   final String mobileBooths;
-  final String? description; // optional
+  final String? description;
   final String status;
   final DateTime? actualStartTime;
   final DateTime? actualEndTime;
+
+  /// Number of survey submissions (screened participants)
+  final int screenedCount;
 
   WellnessEvent({
     String? id,
@@ -70,21 +72,21 @@ class WellnessEvent {
     required this.startTime,
     required this.endTime,
     required this.strikeDownTime,
-    //required this.medicalAidOption,
     required this.mobileBooths,
     this.description,
     required this.medicalAid,
     String status = WellnessEventStatus.scheduled,
     DateTime? actualStartTime,
     DateTime? actualEndTime,
-  })  : id = id ?? const Uuid().v4(), // <-- auto-generate unique ID
+    this.screenedCount = 0,
+  })  : id = id ?? const Uuid().v4(),
         status = WellnessEventStatus.isValid(status)
             ? status
             : WellnessEventStatus.scheduled,
         actualStartTime = actualStartTime,
         actualEndTime = actualEndTime;
 
-  /// Convenience getters to keep compatibility with previous single fields.
+  /// Convenience getters
   String get onsiteContactPerson =>
       _joinNameParts(onsiteContactFirstName, onsiteContactLastName);
 
@@ -92,12 +94,9 @@ class WellnessEvent {
       _joinNameParts(aeContactFirstName, aeContactLastName);
 
   DateTime? get startDateTime => _combineDateWithTime(startTime);
-
   DateTime? get endDateTime => _combineDateWithTime(endTime);
-
   DateTime? get setUpDateTime => _combineDateWithTime(setUpTime);
 
-  /// Creates a copy of this event with the given fields replaced with new values
   WellnessEvent copyWith({
     String? id,
     String? title,
@@ -129,6 +128,7 @@ class WellnessEvent {
     String? status,
     DateTime? actualStartTime,
     DateTime? actualEndTime,
+    int? screenedCount,
   }) {
     return WellnessEvent(
       id: id ?? this.id,
@@ -164,6 +164,7 @@ class WellnessEvent {
       status: status ?? this.status,
       actualStartTime: actualStartTime ?? this.actualStartTime,
       actualEndTime: actualEndTime ?? this.actualEndTime,
+      screenedCount: screenedCount ?? this.screenedCount,
     );
   }
 
@@ -201,7 +202,8 @@ class WellnessEvent {
         other.medicalAid == medicalAid &&
         other.status == status &&
         other.actualStartTime == actualStartTime &&
-        other.actualEndTime == actualEndTime;
+        other.actualEndTime == actualEndTime &&
+        other.screenedCount == screenedCount;
   }
 
   @override
@@ -235,18 +237,15 @@ class WellnessEvent {
         medicalAid.hashCode ^
         status.hashCode ^
         actualStartTime.hashCode ^
-        actualEndTime.hashCode;
+        actualEndTime.hashCode ^
+        screenedCount.hashCode;
   }
 
   static String _joinNameParts(String first, String last) {
     final trimmedFirst = first.trim();
     final trimmedLast = last.trim();
-    if (trimmedFirst.isEmpty) {
-      return trimmedLast;
-    }
-    if (trimmedLast.isEmpty) {
-      return trimmedFirst;
-    }
+    if (trimmedFirst.isEmpty) return trimmedLast;
+    if (trimmedLast.isEmpty) return trimmedFirst;
     return '$trimmedFirst $trimmedLast';
   }
 
@@ -254,21 +253,13 @@ class WellnessEvent {
     final trimmed = rawTime.trim();
     if (trimmed.isEmpty) return null;
 
-    final formats = <DateFormat>[
-      DateFormat.Hm(),
-      DateFormat.jm(),
-    ];
+    final formats = <DateFormat>[DateFormat.Hm(), DateFormat.jm()];
 
     for (final format in formats) {
       try {
         final parsed = format.parse(trimmed);
         return DateTime(
-          date.year,
-          date.month,
-          date.day,
-          parsed.hour,
-          parsed.minute,
-        );
+            date.year, date.month, date.day, parsed.hour, parsed.minute);
       } catch (_) {
         continue;
       }

@@ -19,21 +19,13 @@ class WellnessFlowPage extends StatelessWidget {
   });
 
   Future<void> _handleExit(BuildContext context) async {
-    if (onExitEarly != null) {
-      await onExitEarly!();
-    }
-    if (context.mounted) {
-      Navigator.of(context).pop();
-    }
+    if (onExitEarly != null) await onExitEarly!();
+    if (context.mounted) Navigator.of(context).pop();
   }
 
   Future<void> _handleCompletion(BuildContext context) async {
-    if (onFlowCompleted != null) {
-      await onFlowCompleted!();
-    }
-    if (context.mounted) {
-      Navigator.of(context).pop();
-    }
+    if (onFlowCompleted != null) await onFlowCompleted!();
+    if (context.mounted) Navigator.of(context).pop();
   }
 
   @override

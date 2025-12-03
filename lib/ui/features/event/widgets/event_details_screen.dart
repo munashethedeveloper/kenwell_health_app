@@ -77,8 +77,8 @@ class EventDetailsScreen extends StatelessWidget {
             detailRow('Strike Down Time', event.strikeDownTime),
           ]),
           _buildSectionCard('Venue & Address', [
-            detailRow('Venue', event.venue),
             detailRow('Address', event.address),
+            detailRow('Venue', event.venue),
           ]),
           _buildSectionCard('Onsite Contact', [
             detailRow('Contact Person', event.onsiteContactPerson),

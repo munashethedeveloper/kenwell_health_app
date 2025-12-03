@@ -29,6 +29,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
   final tbTestVM = TBTestingViewModel();
   final tbNurseVM = TBNursingInterventionViewModel();
   final surveyVM = SurveyViewModel();
+
   WellnessEvent? activeEvent;
 
   int _currentStep = 0;
@@ -51,8 +52,6 @@ class WellnessFlowViewModel extends ChangeNotifier {
   void cancelFlow() {
     _currentStep = 0;
     notifyListeners();
-    //Navigator.popUntil(context, (route) => route.isFirst);
-    //Navigator.popUntil(context, (route) => route.settings.name == '/calendar');
   }
 
   Future<void> submitAll(BuildContext context) async {
@@ -69,7 +68,6 @@ class WellnessFlowViewModel extends ChangeNotifier {
     final tbNurseData = tbNurseVM.toMap();
     final surveyData = surveyVM.toMap();
 
-    // Example: send to repository or print
     debugPrint('Submitting full wellness flow data...');
     debugPrint('Consent: $consentData');
     debugPrint('Personal: $personalData');
@@ -85,9 +83,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
 
     await Future.delayed(const Duration(seconds: 2));
 
-    if (!context.mounted) {
-      return;
-    }
+    if (!context.mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('All data submitted successfully!')),
@@ -100,5 +96,31 @@ class WellnessFlowViewModel extends ChangeNotifier {
   void setActiveEvent(WellnessEvent event) {
     activeEvent = event;
     notifyListeners();
+  }
+
+  /// Increment the screened count by 1
+  void incrementScreenedCount() {
+    if (activeEvent != null) {
+      activeEvent = activeEvent!.copyWith(
+        screenedCount: activeEvent!.screenedCount + 1,
+      );
+      notifyListeners();
+    }
+  }
+
+  /// Return to the Conduct Event screen (step 0)
+  void returnToConductEventScreen() {
+    _currentStep = 0; // <- step 0 is Conduct Event screen
+    notifyListeners();
+  }
+
+  /// Call when survey is submitted
+  void submitSurvey(BuildContext context) {
+    incrementScreenedCount();
+    returnToConductEventScreen();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Survey saved and submitted!')),
+    );
   }
 }

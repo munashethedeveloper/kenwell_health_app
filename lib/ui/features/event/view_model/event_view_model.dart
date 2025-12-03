@@ -164,6 +164,30 @@ class EventViewModel extends ChangeNotifier {
     );
   }
 
+  Future<void> incrementScreened(String eventId) async {
+    try {
+      // Find the event in memory (adjust to your storage if different)
+      final idx = _events.indexWhere((e) => e.id == eventId);
+      if (idx == -1) {
+        debugPrint('incrementScreened: event not found: $eventId');
+        return;
+      }
+
+      final existing = _events[idx];
+      final current = existing.screenedCount ?? 0;
+      final updated = existing.copyWith(screenedCount: current + 1);
+
+      // Persist the update using your existing updateEvent(...) method so data source is consistent
+      await updateEvent(updated);
+
+      // Ensure local list is updated if updateEvent doesn't update the in-memory list
+      _events[idx] = updated;
+      notifyListeners();
+    } catch (e, st) {
+      debugPrint('incrementScreened failed for $eventId: $e\n$st');
+    }
+  }
+
   Future<void> addEvent(WellnessEvent event) async {
     _events.add(event);
     notifyListeners();

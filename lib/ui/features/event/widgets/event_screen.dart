@@ -204,16 +204,16 @@ class _EventScreenState extends State<EventScreen> {
                   validator: (value) => _requiredField('Event Title', value),
                 ),
                 KenwellTextField(
-                  label: 'Venue',
-                  controller: widget.viewModel.venueController,
-                  padding: EdgeInsets.zero,
-                  validator: (value) => _requiredField('Venue', value),
-                ),
-                KenwellTextField(
                   label: 'Address',
                   controller: widget.viewModel.addressController,
                   padding: EdgeInsets.zero,
                   validator: (value) => _requiredField('Address', value),
+                ),
+                KenwellTextField(
+                  label: 'Venue',
+                  controller: widget.viewModel.venueController,
+                  padding: EdgeInsets.zero,
+                  validator: (value) => _requiredField('Venue', value),
                 ),
               ]),
               _buildSectionCard('Onsite Contact', [

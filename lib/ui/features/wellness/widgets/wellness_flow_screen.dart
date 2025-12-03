@@ -1,23 +1,26 @@
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
+// SAFER submit handler: shows modal progress indicator, logs steps, avoids awaiting potentially
+// slow persistence when closing the flow so the UI doesn't freeze.
+// Replace the existing file at this path with the contents below (or merge the onSubmit part).
 
-// Screens
-import '../../consent_form/widgets/consent_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/domain/models/wellness_event.dart';
+import 'package:kenwell_health_app/ui/features/patient/widgets/personal_details_screen.dart';
+import 'package:provider/provider.dart';
+import '../../../shared/ui/form/kenwell_form_page.dart';
+import '../../event/view_model/event_view_model.dart';
 import '../../hiv_test_nursing_intervention/widgets/hiv_test_nursing_intervention_screen.dart';
 import '../../hiv_test_results/widgets/hiv_test_result_screen.dart';
 import '../../nurse_interventions/widgets/nurse_intervention_screen.dart';
-import '../../patient/widgets/personal_details_screen.dart';
+import '../../tb_test_nursing_intervention/widgets/tb_nursing_intervention_screen.dart';
+import '../view_model/wellness_flow_view_model.dart';
+import '../../consent_form/view_model/consent_screen_view_model.dart';
+import '../../survey/view_model/survey_view_model.dart';
+import '../../survey/widgets/survey_screen.dart';
+import '../../consent_form/widgets/consent_screen.dart';
 import '../../risk_assessment/widgets/personal_risk_assessment_screen.dart';
 import '../../screening_results/widgets/wellness_screening_results_screen.dart';
 import '../../hiv_test/widgets/hiv_test_screen.dart';
-import '../../survey/widgets/survey_screen.dart';
 import '../../tb_test/widgets/tb_testing_screen.dart';
-import '../../tb_test_nursing_intervention/widgets/tb_nursing_intervention_screen.dart';
-
-// ViewModel
-import '../view_model/wellness_flow_view_model.dart';
-import '../../../../domain/models/wellness_event.dart';
 
 class WellnessFlowScreen extends StatelessWidget {
   final VoidCallback onExitFlow;
@@ -155,13 +158,83 @@ class WellnessFlowScreen extends StatelessWidget {
         break;
 
       case 10:
+        // SURVEY STEP: submitAll -> increment screened -> POP flow (do NOT call onFlowCompleted)
         currentScreen = ChangeNotifierProvider.value(
           value: flowVM.surveyVM,
           child: SurveyScreen(
             onPrevious: flowVM.previousStep,
             onSubmit: () async {
-              await flowVM.submitAll(context);
-              onFlowCompleted?.call();
+              debugPrint('WellnessFlow: survey onSubmit started');
+
+              // Show a modal progress indicator to prevent UI interactions while submitting.
+              if (context.mounted) {
+                showDialog<void>(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (_) => const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
+
+              // 1) submit all flow data (existing behavior) — protect with try/catch
+              try {
+                debugPrint('WellnessFlow: calling flowVM.submitAll');
+                await flowVM.submitAll(context);
+                debugPrint('WellnessFlow: submitAll completed');
+              } catch (e, st) {
+                debugPrint('WellnessFlow: Error in submitAll: $e\n$st');
+                if (context.mounted) {
+                  // Close progress dialog if open
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to submit data: $e')),
+                  );
+                }
+                return;
+              }
+
+              // 2) increment the screened counter for the active event and persist
+              final active = flowVM.activeEvent;
+              if (active != null) {
+                try {
+                  // Fire-and-forget the increment so the UI can return immediately.
+                  // We do it in an unawaited microtask so any heavy persistence won't block the pop.
+                  final eventVM =
+                      Provider.of<EventViewModel>(context, listen: false);
+                  Future.microtask(() async {
+                    try {
+                      debugPrint(
+                          'WellnessFlow: incrementScreened (background) for ${active.id}');
+                      await eventVM.incrementScreened(active.id);
+                      debugPrint(
+                          'WellnessFlow: incrementScreened done for ${active.id}');
+                    } catch (e, st) {
+                      debugPrint(
+                          'WellnessFlow: incrementScreened failed: $e\n$st');
+                    }
+                  });
+                } catch (e, st) {
+                  debugPrint(
+                      'WellnessFlow: Failed triggering incrementScreened: $e\n$st');
+                }
+              } else {
+                debugPrint(
+                    'WellnessFlow: activeEvent is null; skipping incrementScreened');
+              }
+
+              // 3) Pop the progress dialog (if still open) and then pop the flow page
+              if (context.mounted) {
+                // Close progress dialog
+                Navigator.of(context).pop();
+                // Pop the WellnessFlowPage to return to ConductEventScreen
+                if (Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                }
+              }
+
+              debugPrint(
+                  'WellnessFlow: survey onSubmit finished (page popped)');
             },
           ),
         );
@@ -179,99 +252,8 @@ class WellnessFlowScreen extends StatelessWidget {
       ),
     );
 
-    return Column(
-      children: [
-        if (event != null)
-          _ActiveEventBanner(
-            title: event!.title,
-            date: event!.date,
-            startTime: event!.startTime,
-            endTime: event!.endTime,
-            expectedCount: event!.expectedParticipation,
-            venue: event!.venue,
-          ),
-        Expanded(child: flowContent),
-      ],
-    );
-  }
-}
-
-class _ActiveEventBanner extends StatelessWidget {
-  final String title;
-  final DateTime date;
-  final String startTime;
-  final String? endTime;
-  final int? expectedCount;
-  final String venue;
-
-  const _ActiveEventBanner({
-    required this.title,
-    required this.date,
-    required this.startTime,
-    required this.venue,
-    required this.endTime,
-    required this.expectedCount,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final formattedDate = DateFormat.yMMMMd().format(date);
-
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF201C58),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Current Stats for $title event:",
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  "Date: $formattedDate",
-                  style: TextStyle(color: Colors.white.withValues(alpha: 0.9)),
-                ),
-              ),
-              Expanded(
-                child: Text(
-                  "Start-Time: $startTime",
-                  style: TextStyle(color: Colors.white.withValues(alpha: 0.9)),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              Expanded(
-                child: endTime != null && endTime!.isNotEmpty
-                    ? Text(
-                        "End-Time: $endTime",
-                        style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.9)),
-                        textAlign: TextAlign.right,
-                      )
-                    : const SizedBox(),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          if (expectedCount != null)
-            Text(
-              "Expected: $expectedCount participants",
-              style: const TextStyle(color: Colors.white),
-            ),
-        ],
-      ),
+    return Scaffold(
+      body: SafeArea(child: flowContent),
     );
   }
 }
