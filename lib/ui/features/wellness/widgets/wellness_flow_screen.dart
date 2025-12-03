@@ -17,6 +17,7 @@ import '../../tb_test_nursing_intervention/widgets/tb_nursing_intervention_scree
 
 // ViewModel
 import '../view_model/wellness_flow_view_model.dart';
+import '../../event/view_model/event_view_model.dart';
 import '../../../../domain/models/wellness_event.dart';
 
 class WellnessFlowScreen extends StatelessWidget {
@@ -161,7 +162,13 @@ class WellnessFlowScreen extends StatelessWidget {
             onPrevious: flowVM.previousStep,
             onSubmit: () async {
               await flowVM.submitAll(context);
-              onFlowCompleted?.call();
+              final active = flowVM.activeEvent;
+              if (active != null) {
+                await context.read<EventViewModel>().incrementScreened(active.id);
+              }
+              if (context.mounted) {
+                Navigator.of(context).pop();
+              }
             },
           ),
         );
