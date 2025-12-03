@@ -18,39 +18,26 @@ class ConductEventScreen extends StatefulWidget {
 
 class _ConductEventScreenState extends State<ConductEventScreen> {
   String? _startingEventId;
+  int _selectedWeek = 0; // 0 = this week, 1 = next week
 
   @override
   Widget build(BuildContext context) {
     final eventVM = context.watch<EventViewModel>();
-    final upcoming = eventVM.getUpcomingEvents();
+    final allUpcoming = eventVM.getUpcomingEvents();
 
-    if (upcoming.isEmpty) {
-      return const Scaffold(
-        appBar: KenwellAppBar(
-          title: 'Upcoming Events',
-          backgroundColor: Color(0xFF201C58),
-          titleColor: Colors.white,
-          automaticallyImplyLeading: true,
-        ),
-        body: Center(
-          child: Padding(
-            padding: EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.event_available, size: 64, color: Color(0xFF90C048)),
-                SizedBox(height: 16),
-                Text(
-                  'No upcoming events ready to conduct.\nCreate an event or check back when it\'s time to start.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
+    // Compute week ranges
+    final now = DateTime.now();
+    final weekStart = _startOfWeek(now); // Sunday 00:00:00 of this week
+    final nextWeekStart = weekStart.add(const Duration(days: 7));
+
+    final selectedStart = _selectedWeek == 0 ? weekStart : nextWeekStart;
+    final selectedEnd = _endOfWeek(selectedStart);
+
+    // Filter events for the selected week (inclusive)
+    final weeklyEvents = allUpcoming.where((e) {
+      final ev = e.date.toLocal();
+      return !(ev.isBefore(selectedStart) || ev.isAfter(selectedEnd));
+    }).toList();
 
     return Scaffold(
       appBar: const KenwellAppBar(
@@ -61,173 +48,207 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: ListView.separated(
-          itemCount: upcoming.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 12),
-          itemBuilder: (context, index) {
-            final event = upcoming[index];
-            final isStarting = _startingEventId == event.id;
-
-            return KenwellFormCard(
-              title: 'Event Name: ${event.title}',
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Date:  ${DateFormat.yMMMMd().format(event.date)}',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black.withValues(alpha: 0.9)),
-                          textAlign: TextAlign.left,
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          'Start Time:  ${event.startTime}',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black.withValues(alpha: 0.9)),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      Expanded(
-                          child: Text(
-                        'End Time:  ${event.endTime}',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black.withValues(alpha: 0.9)),
-                        textAlign: TextAlign.right,
-                      )),
-                    ],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Toggle Buttons for week selection
+            Row(
+              children: [
+                ToggleButtons(
+                  isSelected: [_selectedWeek == 0, _selectedWeek == 1],
+                  onPressed: (index) {
+                    if (mounted) {
+                      setState(() {
+                        _selectedWeek = index;
+                      });
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(6),
+                  selectedColor: Colors.white,
+                  color: const Color(0xFF201C58),
+                  fillColor: const Color(0xFF201C58),
+                  children: const [
+                    Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      child: Text('This week'),
+                    ),
+                    Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      child: Text('Next week'),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    '${DateFormat.yMMMMd().format(selectedStart)} - ${DateFormat.yMMMMd().format(selectedEnd)}',
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w600),
                   ),
-
-                  //PART ONE
-                  /* Row(
-                      spacing: 20,
-                      //runSpacing: 8,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            // If no events for selected week, show friendly empty state
+            if (weeklyEvents.isEmpty)
+              Expanded(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
+                        const Icon(Icons.event_available,
+                            size: 64, color: Color(0xFF90C048)),
+                        const SizedBox(height: 16),
                         Text(
-                          'Start Time:  ${event.startTime}',
-                          // DateFormat.yMMMMd().add_jm().format(
-                          //      event.startDateTime ?? event.date,
-                          //  ),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                          ),
+                          'No events scheduled for the week of ${DateFormat.yMMMMd().format(selectedStart)} - ${DateFormat.yMMMMd().format(selectedEnd)}.\nCreate an event or switch weeks to see other events.',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 16),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'End Time:  ${event.endTime}',
-                          // DateFormat.yMMMMd().add_jm().format(
-                          //      event.startDateTime ?? event.date,
-                          //  ),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                      ]), */
-
-                  ////////////PART TWO
-                  /*  Text(
-                    'Start Time:  ${event.startTime}',
-                    // DateFormat.yMMMMd().add_jm().format(
-                    //      event.startDateTime ?? event.date,
-                    //  ),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'End Time:  ${event.endTime}',
-                    // DateFormat.yMMMMd().add_jm().format(
-                    //      event.startDateTime ?? event.date,
-                    //  ),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
-                  ), */
+                ),
+              )
+            else
+              // List of events for the selected week
+              Expanded(
+                child: ListView.separated(
+                  itemCount: weeklyEvents.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                    final event = weeklyEvents[index];
+                    final isStarting = _startingEventId == event.id;
 
-                  const SizedBox(height: 4),
-                  Text(
-                    event.venue.isNotEmpty ? event.venue : event.address,
-                    style: const TextStyle(color: Colors.black54),
-                  ),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      /*    _infoChip(
-                        Icons.access_time,
-                        event.startTime.isEmpty
-                            ? 'Pending time'
-                            : event.startTime,
-                      ), */
-                      if (event.servicesRequested.isNotEmpty)
-                        _infoChip(
-                            Icons.medical_services, event.servicesRequested),
-                      if (event.expectedParticipation > 0)
-                        _infoChip(Icons.people,
-                            '${event.expectedParticipation} expected'),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  // Inline Start + Finish buttons
-                  Row(
-                    children: [
-                      Expanded(
-                        child: CustomPrimaryButton(
-                          label: event.status == WellnessEventStatus.inProgress
-                              ? 'Resume Event'
-                              : 'Start Event',
-                          onPressed: isStarting
-                              ? null
-                              : () => _startEvent(context, event),
-                          isBusy: isStarting,
-                        ),
+                    return KenwellFormCard(
+                      title: 'Event Name: ${event.title}',
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  'Date:  ${DateFormat.yMMMMd().format(event.date)}',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color:
+                                          Colors.black.withValues(alpha: 0.9)),
+                                  textAlign: TextAlign.left,
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  'Start Time:  ${event.startTime}',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color:
+                                          Colors.black.withValues(alpha: 0.9)),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              Expanded(
+                                  child: Text(
+                                'End Time:  ${event.endTime}',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black.withValues(alpha: 0.9)),
+                                textAlign: TextAlign.right,
+                              )),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            event.venue.isNotEmpty
+                                ? event.venue
+                                : event.address,
+                            style: const TextStyle(color: Colors.black54),
+                          ),
+                          const SizedBox(height: 12),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              if (event.servicesRequested.isNotEmpty)
+                                _infoChip(Icons.medical_services,
+                                    event.servicesRequested),
+                              if (event.expectedParticipation > 0)
+                                _infoChip(Icons.people,
+                                    '${event.expectedParticipation} expected'),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          // Inline Start + Finish buttons
+                          Row(
+                            children: [
+                              Expanded(
+                                child: CustomPrimaryButton(
+                                  label: event.status ==
+                                          WellnessEventStatus.inProgress
+                                      ? 'Resume Event'
+                                      : 'Start Event',
+                                  onPressed: isStarting
+                                      ? null
+                                      : () => _startEvent(context, event),
+                                  isBusy: isStarting,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: CustomPrimaryButton(
+                                  label: 'Finish Event',
+                                  onPressed: () {
+                                    if (event.status ==
+                                        WellnessEventStatus.inProgress) {
+                                      _finishEvent(context, event);
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content:
+                                                Text('Start the event first')),
+                                      );
+                                    }
+                                  },
+                                  backgroundColor: Colors.red,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          // Screened counter
+                          Text(
+                            'Screened: ${event.screenedCount} participants',
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: CustomPrimaryButton(
-                          label: 'Finish Event',
-                          onPressed: () {
-                            if (event.status ==
-                                WellnessEventStatus.inProgress) {
-                              _finishEvent(context, event);
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('Start the event first')),
-                              );
-                            }
-                          },
-                          backgroundColor: Colors.red,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  // Screened counter
-                  Text(
-                    'Screened: ${event.screenedCount} participants',
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                ],
+                    );
+                  },
+                ),
               ),
-            );
-          },
+          ],
         ),
       ),
     );
+  }
+
+  DateTime _startOfWeek(DateTime date) {
+    // Week starts on Sunday. DateTime.weekday: Monday=1 ... Sunday=7
+    final int daysToSubtract =
+        date.weekday % 7; // Sunday -> 0, Monday -> 1, ...
+    final dt = DateTime(date.year, date.month, date.day)
+        .subtract(Duration(days: daysToSubtract));
+    return DateTime(dt.year, dt.month, dt.day); // midnight local
+  }
+
+  DateTime _endOfWeek(DateTime weekStart) {
+    final end = weekStart.add(const Duration(days: 6));
+    // make end inclusive up to the last millisecond of the day
+    return DateTime(end.year, end.month, end.day, 23, 59, 59, 999);
   }
 
   Future<void> _startEvent(BuildContext context, WellnessEvent event) async {
