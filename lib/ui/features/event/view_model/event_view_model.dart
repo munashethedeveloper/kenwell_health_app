@@ -252,6 +252,20 @@ class EventViewModel extends ChangeNotifier {
     return updated;
   }
 
+  Future<WellnessEvent?> incrementScreened(String eventId) async {
+    final index = _events.indexWhere((e) => e.id == eventId);
+    if (index == -1) {
+      debugPrint('incrementScreened: event $eventId not found');
+      return null;
+    }
+    final event = _events[index];
+    final updated = event.copyWith(
+      screenedCount: event.screenedCount + 1,
+    );
+    await updateEvent(updated);
+    return updated;
+  }
+
   void clearControllers() {
     titleController.clear();
     venueController.clear();

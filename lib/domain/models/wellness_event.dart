@@ -44,6 +44,7 @@ class WellnessEvent {
   final String status;
   final DateTime? actualStartTime;
   final DateTime? actualEndTime;
+  final int screenedCount;
 
   WellnessEvent({
     String? id,
@@ -77,12 +78,14 @@ class WellnessEvent {
     String status = WellnessEventStatus.scheduled,
     DateTime? actualStartTime,
     DateTime? actualEndTime,
+    int screenedCount = 0,
   })  : id = id ?? const Uuid().v4(), // <-- auto-generate unique ID
         status = WellnessEventStatus.isValid(status)
             ? status
             : WellnessEventStatus.scheduled,
         actualStartTime = actualStartTime,
-        actualEndTime = actualEndTime;
+        actualEndTime = actualEndTime,
+        screenedCount = screenedCount;
 
   /// Convenience getters to keep compatibility with previous single fields.
   String get onsiteContactPerson =>
@@ -129,6 +132,7 @@ class WellnessEvent {
     String? status,
     DateTime? actualStartTime,
     DateTime? actualEndTime,
+    int? screenedCount,
   }) {
     return WellnessEvent(
       id: id ?? this.id,
@@ -164,6 +168,7 @@ class WellnessEvent {
       status: status ?? this.status,
       actualStartTime: actualStartTime ?? this.actualStartTime,
       actualEndTime: actualEndTime ?? this.actualEndTime,
+      screenedCount: screenedCount ?? this.screenedCount,
     );
   }
 
@@ -201,7 +206,8 @@ class WellnessEvent {
         other.medicalAid == medicalAid &&
         other.status == status &&
         other.actualStartTime == actualStartTime &&
-        other.actualEndTime == actualEndTime;
+        other.actualEndTime == actualEndTime &&
+        other.screenedCount == screenedCount;
   }
 
   @override
@@ -235,7 +241,8 @@ class WellnessEvent {
         medicalAid.hashCode ^
         status.hashCode ^
         actualStartTime.hashCode ^
-        actualEndTime.hashCode;
+        actualEndTime.hashCode ^
+        screenedCount.hashCode;
   }
 
   static String _joinNameParts(String first, String last) {

@@ -46,6 +46,7 @@ class Events extends Table {
   IntColumn get nurses => integer().withDefault(const Constant(0))();
   IntColumn get coordinators => integer().withDefault(const Constant(0))();
   IntColumn get multiplyPromoters => integer().withDefault(const Constant(0))();
+  IntColumn get screenedCount => integer().withDefault(const Constant(0))();
   TextColumn get setUpTime => text().withDefault(const Constant(''))();
   TextColumn get startTime => text().withDefault(const Constant(''))();
   TextColumn get endTime => text().withDefault(const Constant(''))();
@@ -72,7 +73,7 @@ class AppDatabase extends _$AppDatabase {
   static final AppDatabase instance = AppDatabase._internal();
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -80,6 +81,9 @@ class AppDatabase extends _$AppDatabase {
         onUpgrade: (migrator, from, to) async {
           if (from < 2) {
             await migrator.createTable(events);
+          }
+          if (from < 3) {
+            await migrator.addColumn(events, events.screenedCount);
           }
         },
       );

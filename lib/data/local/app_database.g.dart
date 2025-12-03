@@ -137,11 +137,11 @@ class $EventsTable extends Events with TableInfo<$EventsTable, EventEntity> {
       type: DriftSqlType.int,
       requiredDuringInsert: false,
       defaultValue: const Constant(0));
-  static const VerificationMeta _processedCountMeta =
-      const VerificationMeta('processedCount');
+  static const VerificationMeta _screenedCountMeta =
+      const VerificationMeta('screenedCount');
   @override
-  late final GeneratedColumn<int> processedCount = GeneratedColumn<int>(
-      'processed_count', aliasedName, false,
+  late final GeneratedColumn<int> screenedCount = GeneratedColumn<int>(
+      'screened_count', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: false,
       defaultValue: const Constant(0));
@@ -240,7 +240,7 @@ class $EventsTable extends Events with TableInfo<$EventsTable, EventEntity> {
         nurses,
         coordinators,
         multiplyPromoters,
-        processedCount,
+        screenedCount,
         setUpTime,
         startTime,
         endTime,
@@ -393,11 +393,11 @@ class $EventsTable extends Events with TableInfo<$EventsTable, EventEntity> {
           multiplyPromoters.isAcceptableOrUnknown(
               data['multiply_promoters']!, _multiplyPromotersMeta));
     }
-    if (data.containsKey('processed_count')) {
+    if (data.containsKey('screened_count')) {
       context.handle(
-          _processedCountMeta,
-          processedCount.isAcceptableOrUnknown(
-              data['processed_count']!, _processedCountMeta));
+          _screenedCountMeta,
+          screenedCount.isAcceptableOrUnknown(
+              data['screened_count']!, _screenedCountMeta));
     }
     if (data.containsKey('set_up_time')) {
       context.handle(
@@ -505,8 +505,8 @@ class $EventsTable extends Events with TableInfo<$EventsTable, EventEntity> {
           .read(DriftSqlType.int, data['${effectivePrefix}coordinators'])!,
       multiplyPromoters: attachedDatabase.typeMapping.read(
           DriftSqlType.int, data['${effectivePrefix}multiply_promoters'])!,
-      processedCount: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}processed_count'])!,
+      screenedCount: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}screened_count'])!,
       setUpTime: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}set_up_time'])!,
       startTime: attachedDatabase.typeMapping
@@ -557,7 +557,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
   final int nurses;
   final int coordinators;
   final int multiplyPromoters;
-  final int processedCount;
+  final int screenedCount;
   final String setUpTime;
   final String startTime;
   final String endTime;
@@ -589,7 +589,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
       required this.nurses,
       required this.coordinators,
       required this.multiplyPromoters,
-      required this.processedCount,
+      required this.screenedCount,
       required this.setUpTime,
       required this.startTime,
       required this.endTime,
@@ -623,7 +623,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
     map['nurses'] = Variable<int>(nurses);
     map['coordinators'] = Variable<int>(coordinators);
     map['multiply_promoters'] = Variable<int>(multiplyPromoters);
-    map['processed_count'] = Variable<int>(processedCount);
+    map['screened_count'] = Variable<int>(screenedCount);
     map['set_up_time'] = Variable<String>(setUpTime);
     map['start_time'] = Variable<String>(startTime);
     map['end_time'] = Variable<String>(endTime);
@@ -665,7 +665,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
       nurses: Value(nurses),
       coordinators: Value(coordinators),
       multiplyPromoters: Value(multiplyPromoters),
-      processedCount: Value(processedCount),
+      screenedCount: Value(screenedCount),
       setUpTime: Value(setUpTime),
       startTime: Value(startTime),
       endTime: Value(endTime),
@@ -715,7 +715,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
       nurses: serializer.fromJson<int>(json['nurses']),
       coordinators: serializer.fromJson<int>(json['coordinators']),
       multiplyPromoters: serializer.fromJson<int>(json['multiplyPromoters']),
-      processedCount: serializer.fromJson<int>(json['processedCount']),
+      screenedCount: serializer.fromJson<int>(json['screenedCount']),
       setUpTime: serializer.fromJson<String>(json['setUpTime']),
       startTime: serializer.fromJson<String>(json['startTime']),
       endTime: serializer.fromJson<String>(json['endTime']),
@@ -753,7 +753,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
       'nurses': serializer.toJson<int>(nurses),
       'coordinators': serializer.toJson<int>(coordinators),
       'multiplyPromoters': serializer.toJson<int>(multiplyPromoters),
-      'processedCount': serializer.toJson<int>(processedCount),
+      'screenedCount': serializer.toJson<int>(screenedCount),
       'setUpTime': serializer.toJson<String>(setUpTime),
       'startTime': serializer.toJson<String>(startTime),
       'endTime': serializer.toJson<String>(endTime),
@@ -788,7 +788,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
           int? nurses,
           int? coordinators,
           int? multiplyPromoters,
-          int? processedCount,
+          int? screenedCount,
           String? setUpTime,
           String? startTime,
           String? endTime,
@@ -823,7 +823,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
         nurses: nurses ?? this.nurses,
         coordinators: coordinators ?? this.coordinators,
         multiplyPromoters: multiplyPromoters ?? this.multiplyPromoters,
-        processedCount: processedCount ?? this.processedCount,
+        screenedCount: screenedCount ?? this.screenedCount,
         setUpTime: setUpTime ?? this.setUpTime,
         startTime: startTime ?? this.startTime,
         endTime: endTime ?? this.endTime,
@@ -885,9 +885,9 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
       multiplyPromoters: data.multiplyPromoters.present
           ? data.multiplyPromoters.value
           : this.multiplyPromoters,
-      processedCount: data.processedCount.present
-          ? data.processedCount.value
-          : this.processedCount,
+      screenedCount: data.screenedCount.present
+          ? data.screenedCount.value
+          : this.screenedCount,
       setUpTime: data.setUpTime.present ? data.setUpTime.value : this.setUpTime,
       startTime: data.startTime.present ? data.startTime.value : this.startTime,
       endTime: data.endTime.present ? data.endTime.value : this.endTime,
@@ -934,7 +934,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
           ..write('nurses: $nurses, ')
           ..write('coordinators: $coordinators, ')
           ..write('multiplyPromoters: $multiplyPromoters, ')
-          ..write('processedCount: $processedCount, ')
+          ..write('screenedCount: $screenedCount, ')
           ..write('setUpTime: $setUpTime, ')
           ..write('startTime: $startTime, ')
           ..write('endTime: $endTime, ')
@@ -971,7 +971,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
         nurses,
         coordinators,
         multiplyPromoters,
-        processedCount,
+        screenedCount,
         setUpTime,
         startTime,
         endTime,
@@ -1007,7 +1007,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
           other.nurses == this.nurses &&
           other.coordinators == this.coordinators &&
           other.multiplyPromoters == this.multiplyPromoters &&
-          other.processedCount == this.processedCount &&
+          other.screenedCount == this.screenedCount &&
           other.setUpTime == this.setUpTime &&
           other.startTime == this.startTime &&
           other.endTime == this.endTime &&
@@ -1041,7 +1041,7 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
   final Value<int> nurses;
   final Value<int> coordinators;
   final Value<int> multiplyPromoters;
-  final Value<int> processedCount;
+  final Value<int> screenedCount;
   final Value<String> setUpTime;
   final Value<String> startTime;
   final Value<String> endTime;
@@ -1074,7 +1074,7 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
     this.nurses = const Value.absent(),
     this.coordinators = const Value.absent(),
     this.multiplyPromoters = const Value.absent(),
-    this.processedCount = const Value.absent(),
+    this.screenedCount = const Value.absent(),
     this.setUpTime = const Value.absent(),
     this.startTime = const Value.absent(),
     this.endTime = const Value.absent(),
@@ -1108,7 +1108,7 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
     this.nurses = const Value.absent(),
     this.coordinators = const Value.absent(),
     this.multiplyPromoters = const Value.absent(),
-    this.processedCount = const Value.absent(),
+    this.screenedCount = const Value.absent(),
     this.setUpTime = const Value.absent(),
     this.startTime = const Value.absent(),
     this.endTime = const Value.absent(),
@@ -1154,7 +1154,7 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
     Expression<int>? nurses,
     Expression<int>? coordinators,
     Expression<int>? multiplyPromoters,
-    Expression<int>? processedCount,
+    Expression<int>? screenedCount,
     Expression<String>? setUpTime,
     Expression<String>? startTime,
     Expression<String>? endTime,
@@ -1194,7 +1194,7 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
       if (nurses != null) 'nurses': nurses,
       if (coordinators != null) 'coordinators': coordinators,
       if (multiplyPromoters != null) 'multiply_promoters': multiplyPromoters,
-      if (processedCount != null) 'processed_count': processedCount,
+      if (screenedCount != null) 'screened_count': screenedCount,
       if (setUpTime != null) 'set_up_time': setUpTime,
       if (startTime != null) 'start_time': startTime,
       if (endTime != null) 'end_time': endTime,
@@ -1230,7 +1230,7 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
       Value<int>? nurses,
       Value<int>? coordinators,
       Value<int>? multiplyPromoters,
-      Value<int>? processedCount,
+      Value<int>? screenedCount,
       Value<String>? setUpTime,
       Value<String>? startTime,
       Value<String>? endTime,
@@ -1266,7 +1266,7 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
       nurses: nurses ?? this.nurses,
       coordinators: coordinators ?? this.coordinators,
       multiplyPromoters: multiplyPromoters ?? this.multiplyPromoters,
-      processedCount: processedCount ?? this.processedCount,
+      screenedCount: screenedCount ?? this.screenedCount,
       setUpTime: setUpTime ?? this.setUpTime,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
@@ -1348,8 +1348,8 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
     if (multiplyPromoters.present) {
       map['multiply_promoters'] = Variable<int>(multiplyPromoters.value);
     }
-    if (processedCount.present) {
-      map['processed_count'] = Variable<int>(processedCount.value);
+    if (screenedCount.present) {
+      map['screened_count'] = Variable<int>(screenedCount.value);
     }
     if (setUpTime.present) {
       map['set_up_time'] = Variable<String>(setUpTime.value);
@@ -1410,7 +1410,7 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
           ..write('nurses: $nurses, ')
           ..write('coordinators: $coordinators, ')
           ..write('multiplyPromoters: $multiplyPromoters, ')
-          ..write('processedCount: $processedCount, ')
+          ..write('screenedCount: $screenedCount, ')
           ..write('setUpTime: $setUpTime, ')
           ..write('startTime: $startTime, ')
           ..write('endTime: $endTime, ')
@@ -1958,7 +1958,7 @@ typedef $$EventsTableCreateCompanionBuilder = EventsCompanion Function({
   Value<int> nurses,
   Value<int> coordinators,
   Value<int> multiplyPromoters,
-  Value<int> processedCount,
+  Value<int> screenedCount,
   Value<String> setUpTime,
   Value<String> startTime,
   Value<String> endTime,
@@ -1992,7 +1992,7 @@ typedef $$EventsTableUpdateCompanionBuilder = EventsCompanion Function({
   Value<int> nurses,
   Value<int> coordinators,
   Value<int> multiplyPromoters,
-  Value<int> processedCount,
+  Value<int> screenedCount,
   Value<String> setUpTime,
   Value<String> startTime,
   Value<String> endTime,
@@ -2086,8 +2086,8 @@ class $$EventsTableFilterComposer
       column: $table.multiplyPromoters,
       builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get processedCount => $composableBuilder(
-      column: $table.processedCount,
+  ColumnFilters<int> get screenedCount => $composableBuilder(
+      column: $table.screenedCount,
       builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get setUpTime => $composableBuilder(
@@ -2204,8 +2204,8 @@ class $$EventsTableOrderingComposer
       column: $table.multiplyPromoters,
       builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get processedCount => $composableBuilder(
-      column: $table.processedCount,
+  ColumnOrderings<int> get screenedCount => $composableBuilder(
+      column: $table.screenedCount,
       builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get setUpTime => $composableBuilder(
@@ -2312,8 +2312,8 @@ class $$EventsTableAnnotationComposer
   GeneratedColumn<int> get multiplyPromoters => $composableBuilder(
       column: $table.multiplyPromoters, builder: (column) => column);
 
-  GeneratedColumn<int> get processedCount => $composableBuilder(
-      column: $table.processedCount, builder: (column) => column);
+  GeneratedColumn<int> get screenedCount => $composableBuilder(
+      column: $table.screenedCount, builder: (column) => column);
 
   GeneratedColumn<String> get setUpTime =>
       $composableBuilder(column: $table.setUpTime, builder: (column) => column);
@@ -2389,7 +2389,7 @@ class $$EventsTableTableManager extends RootTableManager<
             Value<int> nurses = const Value.absent(),
             Value<int> coordinators = const Value.absent(),
             Value<int> multiplyPromoters = const Value.absent(),
-            Value<int> processedCount = const Value.absent(),
+            Value<int> screenedCount = const Value.absent(),
             Value<String> setUpTime = const Value.absent(),
             Value<String> startTime = const Value.absent(),
             Value<String> endTime = const Value.absent(),
@@ -2423,7 +2423,7 @@ class $$EventsTableTableManager extends RootTableManager<
             nurses: nurses,
             coordinators: coordinators,
             multiplyPromoters: multiplyPromoters,
-            processedCount: processedCount,
+            screenedCount: screenedCount,
             setUpTime: setUpTime,
             startTime: startTime,
             endTime: endTime,
@@ -2457,7 +2457,7 @@ class $$EventsTableTableManager extends RootTableManager<
             Value<int> nurses = const Value.absent(),
             Value<int> coordinators = const Value.absent(),
             Value<int> multiplyPromoters = const Value.absent(),
-            Value<int> processedCount = const Value.absent(),
+            Value<int> screenedCount = const Value.absent(),
             Value<String> setUpTime = const Value.absent(),
             Value<String> startTime = const Value.absent(),
             Value<String> endTime = const Value.absent(),
@@ -2491,7 +2491,7 @@ class $$EventsTableTableManager extends RootTableManager<
             nurses: nurses,
             coordinators: coordinators,
             multiplyPromoters: multiplyPromoters,
-            processedCount: processedCount,
+            screenedCount: screenedCount,
             setUpTime: setUpTime,
             startTime: startTime,
             endTime: endTime,

@@ -102,17 +102,41 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
                         if (event.expectedParticipation > 0)
                           _infoChip(Icons.people,
                               '${event.expectedParticipation} expected'),
+                        if (event.status == WellnessEventStatus.inProgress)
+                          _infoChip(Icons.check_circle,
+                              '${event.screenedCount} screened'),
                       ],
                     ),
                     const SizedBox(height: 16),
-                    CustomPrimaryButton(
-                      label: event.status == WellnessEventStatus.inProgress
-                          ? 'Resume Event'
-                          : 'Start Event',
-                      onPressed:
-                          isStarting ? null : () => _startEvent(context, event),
-                      isBusy: isStarting,
-                    ),
+                    if (event.status == WellnessEventStatus.inProgress) ...[
+                      Row(
+                        children: [
+                          Expanded(
+                            child: CustomPrimaryButton(
+                              label: 'Resume Event',
+                              onPressed:
+                                  isStarting ? null : () => _startEvent(context, event),
+                              isBusy: isStarting,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: CustomPrimaryButton(
+                              label: 'Finish Event',
+                              onPressed: isStarting
+                                  ? null
+                                  : () => _finishEvent(context, event),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ] else
+                      CustomPrimaryButton(
+                        label: 'Start Event',
+                        onPressed:
+                            isStarting ? null : () => _startEvent(context, event),
+                        isBusy: isStarting,
+                      ),
                   ],
                 ),
               );
@@ -140,9 +164,6 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
                 ),
               );
             },
-            onFlowCompleted: () async {
-              await eventVM.markEventCompleted(updated.id);
-            },
           ),
         ),
       );
@@ -151,6 +172,11 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
         setState(() => _startingEventId = null);
       }
     }
+  }
+
+  Future<void> _finishEvent(BuildContext context, WellnessEvent event) async {
+    final eventVM = context.read<EventViewModel>();
+    await eventVM.markEventCompleted(event.id);
   }
 
   Widget _infoChip(IconData icon, String label) {

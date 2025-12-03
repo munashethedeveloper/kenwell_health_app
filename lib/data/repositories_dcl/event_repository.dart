@@ -61,6 +61,7 @@ class EventRepository {
       status: entity.status,
       actualStartTime: entity.actualStartTime,
       actualEndTime: entity.actualEndTime,
+      screenedCount: entity.screenedCount,
     );
   }
 
@@ -96,6 +97,7 @@ class EventRepository {
       status: Value(event.status),
       actualStartTime: Value(event.actualStartTime),
       actualEndTime: Value(event.actualEndTime),
+      screenedCount: Value(event.screenedCount),
     );
   }
 }
