@@ -253,6 +253,38 @@ class PersonalDetailsViewModel extends ChangeNotifier {
     "Zimbabwe"
   ];
 
+//DATE OF BIRTH PARSING AND AGE CALCULATION
+  DateTime? dob; // store parsed DOB
+
+  void setDob(String dobString) {
+    try {
+      dob = DateFormat('dd/MM/yyyy').parse(dobString);
+      dobController.text = dobString;
+      notifyListeners();
+    } catch (_) {
+      // handle or log error
+    }
+  }
+
+  int get userAge {
+    if (dob == null) return 0;
+
+    final today = DateTime.now();
+    int age = today.year - dob!.year;
+
+    // Adjust if birthday has not happened yet this year
+    if (today.month < dob!.month ||
+        (today.month == dob!.month && today.day < dob!.day)) {
+      age--;
+    }
+
+    return age;
+  }
+
+  bool get isMale => gender == "Male";
+  bool get isMaleOver40 => isMale && userAge >= 40;
+
+// Submission state
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
 
@@ -264,7 +296,7 @@ class PersonalDetailsViewModel extends ChangeNotifier {
     final id = idNumberController.text;
     if (id.length == 13 && Validators.validateSouthAfricanId(id) == null) {
       dobController.text =
-          DateFormat('yyyy-MM-dd').format(Validators.getDateOfBirthFromId(id));
+          DateFormat('dd/MM/yyyy').format(Validators.getDateOfBirthFromId(id));
       gender = Validators.getGenderFromId(id);
       notifyListeners();
     }

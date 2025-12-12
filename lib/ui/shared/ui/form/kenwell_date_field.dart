@@ -17,6 +17,7 @@ class KenwellDateField extends StatelessWidget {
     this.initialDate,
     this.dateFormat = 'dd/MM/yyyy',
     this.onDateSelected,
+    this.onChanged, // 🔥 NEW
     this.validator,
     this.enabled = true,
     this.readOnly = true,
@@ -30,6 +31,7 @@ class KenwellDateField extends StatelessWidget {
   final DateTime? initialDate;
   final String dateFormat;
   final ValueChanged<DateTime>? onDateSelected;
+  final ValueChanged<String>? onChanged; // 🔥 NEW
   final String? Function(String?)? validator;
   final bool enabled;
   final bool readOnly;
@@ -53,18 +55,29 @@ class KenwellDateField extends StatelessWidget {
       ),
       validator: validator ??
           (val) => (val == null || val.isEmpty) ? 'Please select $label' : null,
+
+      // 🔥 Forward onChanged for cases where text manually changes
+      onChanged: onChanged,
+
       onTap: enabled
           ? () async {
               FocusScope.of(context).requestFocus(FocusNode());
+
               final pickedDate = await showDatePicker(
                 context: context,
                 initialDate: initialDate ?? DateTime.now(),
                 firstDate: firstDate ?? DateTime(1900),
                 lastDate: lastDate ?? DateTime(4000),
               );
+
               if (pickedDate != null) {
-                controller.text = DateFormat(dateFormat).format(pickedDate);
+                final formatted = DateFormat(dateFormat).format(pickedDate);
+                controller.text = formatted;
+
                 onDateSelected?.call(pickedDate);
+
+                // 🔥 Trigger onChanged callback AFTER selecting date
+                onChanged?.call(formatted);
               }
             }
           : null,

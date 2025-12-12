@@ -213,6 +213,7 @@ class PersonalDetailsScreen extends StatelessWidget {
               ? 'Please select Date of Birth'
               : null,
           readOnly: true,
+          onChanged: (value) => vm.setDob(value), // <-- Add this
         ),
         KenwellDropdownField<String>(
           label: 'Gender',

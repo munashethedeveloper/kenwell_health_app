@@ -20,7 +20,7 @@ class MainNavigationScreen extends StatefulWidget {
 }
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
-  int _currentIndex = 2;
+  int _currentIndex = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +28,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     //Provider.of<ProfileViewModel>(context, listen: false).loadProfile();
 
     final List<Widget> tabs = [
-      const ProfileScreen(),
+      //const ProfileScreen(),
       const StatsReportScreen(),
       CalendarScreen(eventVM: eventVM),
       //const SettingsScreen(),
-      const HelpScreen(),
+      //const HelpScreen(),
       const ConductEventScreen(),
     ];
 
@@ -70,13 +70,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               backgroundColor: KenwellColors.primaryGreen,
               elevation: 6,
               destinations: const [
-                NavigationDestination(
-                  icon: Icon(Icons.person),
-                  label: 'Profile',
-                ),
+                // NavigationDestination(
+                // icon: Icon(Icons.person),
+                // label: 'Profile',
+                //),
                 NavigationDestination(
                   icon: Icon(Icons.bar_chart),
-                  label: 'Stats',
+                  label: 'Statistics',
                 ),
                 NavigationDestination(
                   icon: Icon(Icons.calendar_today),
@@ -87,13 +87,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 // label: 'Settings',
                 // ),
 
-                NavigationDestination(
-                  icon: Icon(Icons.help),
-                  label: 'Help',
-                ),
+                //NavigationDestination(
+                //  icon: Icon(Icons.help),
+                //  label: 'Help',
+                // ),
                 NavigationDestination(
                   icon: Icon(Icons.event),
-                  label: 'Conduct',
+                  label: 'Conduct Event',
                 ),
               ],
             ),

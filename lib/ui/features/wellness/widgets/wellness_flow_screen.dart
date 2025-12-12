@@ -68,6 +68,7 @@ class WellnessFlowScreen extends StatelessWidget {
           onPrevious: flowVM.previousStep,
           viewModel: flowVM.riskVM,
           isFemale: flowVM.personalVM.gender?.toLowerCase() == 'female',
+          age: flowVM.personalVM.userAge,
         );
         break;
 

@@ -6,6 +6,7 @@ class RouteNames {
   static const String profile = '/profile';
   static const String settings = '/settings';
   static const String event = '/event';
+  static const String help = '/help';
   static const String eventDetails = '/event-details'; // <-- NEW
 
   static const String forgotPassword = '/forgot-password';

@@ -69,6 +69,24 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
     }
   }
 
+  //NEW
+  // New fields to store personal details
+  String? gender; // 'Male' or 'Female'
+  int? age;
+
+  void setPersonalDetails({required String gender, required int age}) {
+    this.gender = gender;
+    this.age = age;
+    notifyListeners();
+  }
+
+  bool get isFemale => gender == 'Female';
+  bool get isMale => gender == 'Male';
+
+  bool get showFemaleQuestions => isFemale;
+  bool get showMaleQuestions => isMale && (age ?? 0) >= 40;
+  bool get showMammogramQuestion => isFemale && (age ?? 0) >= 40;
+
   void setDrinkingStatus(String? value) {
     if (drinkingStatus != value) {
       drinkingStatus = value;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/features/help/widgets/help_screen.dart';
 import 'package:kenwell_health_app/ui/features/nurse_interventions/view_model/nurse_intervention_form_mixin.dart';
 import 'package:provider/provider.dart';
 
@@ -229,6 +230,9 @@ class AppRouter {
 
       case RouteNames.settings:
         return MaterialPageRoute(builder: (_) => const SettingsScreen());
+
+      case RouteNames.help:
+        return MaterialPageRoute(builder: (_) => const HelpScreen());
 
       default:
         return MaterialPageRoute(

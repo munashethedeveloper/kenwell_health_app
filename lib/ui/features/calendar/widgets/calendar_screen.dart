@@ -84,12 +84,51 @@ class _CalendarScreenState extends State<CalendarScreen> {
           automaticallyImplyLeading: false,
           //backgroundColor: const Color(0xFF201C58),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.logout, color: Colors.white),
-              tooltip: 'Logout',
-              onPressed: _logout,
+            PopupMenuButton<int>(
+              icon: const Icon(Icons.more_vert, color: Colors.white),
+              onSelected: (value) async {
+                switch (value) {
+                  case 0: // Logout
+                    await _logout();
+                    break;
+                  case 1: // Help
+                    if (mounted) {
+                      Navigator.pushNamed(context, RouteNames.help);
+                    }
+                    break;
+                  case 2: // Profile
+                    if (mounted) {
+                      Navigator.pushNamed(context, RouteNames.profile);
+                    }
+                    break;
+                }
+              },
+              itemBuilder: (context) => [
+                const PopupMenuItem<int>(
+                  value: 0,
+                  child: ListTile(
+                    leading: Icon(Icons.logout, color: Colors.black),
+                    title: Text('Logout'),
+                  ),
+                ),
+                const PopupMenuItem<int>(
+                  value: 1,
+                  child: ListTile(
+                    leading: Icon(Icons.help_outline, color: Colors.black),
+                    title: Text('Help'),
+                  ),
+                ),
+                const PopupMenuItem<int>(
+                  value: 2,
+                  child: ListTile(
+                    leading: Icon(Icons.person, color: Colors.black),
+                    title: Text('Profile'),
+                  ),
+                ),
+              ],
             ),
           ],
+
           bottom: const TabBar(
             indicatorSize: TabBarIndicatorSize.tab,
             indicator: BoxDecoration(color: Color(0xFF90C048)),

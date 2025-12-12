@@ -18,11 +18,13 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
   final VoidCallback? onNext;
   final VoidCallback? onPrevious;
   final bool isFemale;
+  final int age;
 
   const PersonalRiskAssessmentScreen({
     super.key,
     required this.viewModel,
     required this.isFemale,
+    required this.age,
     this.onNext,
     this.onPrevious,
   });
@@ -222,7 +224,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                     const SizedBox(height: 24),
 
                     // ===== Section 5-7: Female Only =====
-                    if (isFemale)
+                    if (vm.showFemaleQuestions)
                       KenwellFormCard(
                         title: 'Female Only Questions',
                         child: Column(
@@ -246,21 +248,22 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                               noValue: false,
                               textStyle: const TextStyle(fontSize: 16),
                             ),
-                            KenwellYesNoQuestion<bool>(
-                              question:
-                                  '7. If older than 40, have you had a mammogram done?',
-                              value: vm.mammogram,
-                              onChanged: vm.setMammogram,
-                              yesValue: true,
-                              noValue: false,
-                              textStyle: const TextStyle(fontSize: 16),
-                            ),
+                            if (vm.showMammogramQuestion)
+                              KenwellYesNoQuestion<bool>(
+                                question:
+                                    '7. If older than 40, have you had a mammogram done?',
+                                value: vm.mammogram,
+                                onChanged: vm.setMammogram,
+                                yesValue: true,
+                                noValue: false,
+                                textStyle: const TextStyle(fontSize: 16),
+                              ),
                           ],
                         ),
                       ),
 
                     // ===== Section 8-9: Male Only =====
-                    if (!isFemale)
+                    if (vm.showMaleQuestions)
                       KenwellFormCard(
                         title: 'Male Only Questions',
                         child: Column(
