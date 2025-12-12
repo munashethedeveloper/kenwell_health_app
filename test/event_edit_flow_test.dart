@@ -1,6 +1,4 @@
-import 'package:drift/drift.dart';
 import 'package:kenwell_health_app/data/local/app_database.dart';
-import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 
 // EventEntity should be available through app_database.dart
 // If not, you may need to import the generated file directly:

@@ -30,6 +30,8 @@ class Events extends Table {
   DateTimeColumn get date => dateTime()();
   TextColumn get venue => text()();
   TextColumn get address => text()();
+  TextColumn get townCity => text()();
+  TextColumn get province => text().nullable()();
   TextColumn get onsiteContactFirstName => text()();
   TextColumn get onsiteContactLastName => text()();
   TextColumn get onsiteContactNumber => text()();
@@ -41,11 +43,8 @@ class Events extends Table {
   TextColumn get servicesRequested => text()();
   IntColumn get expectedParticipation =>
       integer().withDefault(const Constant(0))();
-  IntColumn get nonMembers => integer().withDefault(const Constant(0))();
-  IntColumn get passports => integer().withDefault(const Constant(0))();
   IntColumn get nurses => integer().withDefault(const Constant(0))();
   IntColumn get coordinators => integer().withDefault(const Constant(0))();
-  IntColumn get multiplyPromoters => integer().withDefault(const Constant(0))();
   TextColumn get setUpTime => text().withDefault(const Constant(''))();
   TextColumn get startTime => text().withDefault(const Constant(''))();
   TextColumn get endTime => text().withDefault(const Constant(''))();
@@ -72,17 +71,26 @@ class AppDatabase extends _$AppDatabase {
   static final AppDatabase instance = AppDatabase._internal();
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (migrator) => migrator.createAllTables(),
+        onCreate: (migrator) => migrator.createAll(),
+
+        // 🔥 Clean migration: rebuild table to drop removed columns safely
         onUpgrade: (migrator, from, to) async {
-          if (from < 2) {
-            await migrator.createTable(events);
+          if (from < 7) {
+            await migrator.alterTable(
+              TableMigration(
+                events,
+                // Drift auto-maps columns. No manual config needed.
+              ),
+            );
           }
         },
       );
+
+  // ----------------- USER CRUD -----------------
 
   Future<UserEntity> createUser({
     required String id,
@@ -158,6 +166,8 @@ class AppDatabase extends _$AppDatabase {
 
     return getUserById(id);
   }
+
+  // ----------------- EVENTS CRUD -----------------
 
   Future<List<EventEntity>> getAllEvents() => select(events).get();
 

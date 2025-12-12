@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/features/consent_form/widgets/consent_screen.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/custom_dropdown_field.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
@@ -86,19 +88,36 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
 
                     // ===== Section 2: Exercise =====
                     KenwellFormCard(
-                      title:
-                          '2. Over the past month, how many days per week have you exercised for 30 minutes or longer?',
-                      child: _buildStringRadioGroup(
-                        selected: vm.exerciseFrequency.isEmpty
-                            ? null
-                            : vm.exerciseFrequency,
-                        options: const [
-                          'Never',
-                          'Once/week',
-                          'Twice/week',
-                          'Three times/week or more',
+                      title: '2. Do you have any exercising habits?',
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          KenwellDropdownField(
+                            label: 'Do you Exercise?',
+                            value: vm.smokingStatus,
+                            items: vm.smokingStatusOptions,
+                            onChanged: vm.setSmokingStatus,
+                            validator: (val) => (val == null || val.isEmpty)
+                                ? 'Select Exercise Status'
+                                : null,
+                          ),
+                          if (vm.showSmokingFields) ...[
+                            const Text(
+                                '2.1 Over the past month, how many days per week have you exercised for 30 minutes or longer?',
+                                style: TextStyle(fontSize: 16)),
+                            _buildStringRadioGroup(
+                              selected: vm.exerciseFrequency.isEmpty
+                                  ? null
+                                  : vm.exerciseFrequency,
+                              options: const [
+                                'Once/week',
+                                'Twice/week',
+                                'Three times/week or more',
+                              ],
+                              onChanged: vm.setExerciseFrequency,
+                            ),
+                          ],
                         ],
-                        onChanged: vm.setExerciseFrequency,
                       ),
                     ),
 
@@ -106,34 +125,57 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
 
                     // ===== Section 3: Smoking =====
                     KenwellFormCard(
-                      title: '3. How much do you smoke per day?',
+                      title: '3. Do You Have Any Smoking Habits?',
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          KenwellTextField(
-                            label: 'Number per day',
-                            controller: vm.dailySmokeController,
-                            hintText: 'Enter number of cigarettes/day',
-                            keyboardType: TextInputType.number,
-                            inputFormatters:
-                                AppTextInputFormatters.numbersOnly(),
-                            decoration: KenwellFormStyles.decoration(
-                              label: 'Number per day',
-                              hint: 'Enter number of cigarettes/day',
-                            ),
-                            validator: (val) => val == null || val.isEmpty
-                                ? 'Please enter daily smoking amount'
+                          KenwellDropdownField(
+                            label: 'Do you smoke?',
+                            value: vm.smokingStatus,
+                            items: vm.smokingStatusOptions,
+                            onChanged: vm.setSmokingStatus,
+                            validator: (val) => (val == null || val.isEmpty)
+                                ? 'Select Smoking Status'
                                 : null,
                           ),
-                          const SizedBox(height: 8),
-                          const Text('3.1 What do you smoke?',
-                              style: TextStyle(fontSize: 16)),
-                          _buildStringRadioGroup(
-                            selected:
-                                vm.smokeType.isEmpty ? null : vm.smokeType,
-                            options: const ['Cigarette', 'Pipe', 'Dagga'],
-                            onChanged: vm.setSmokeType,
-                          ),
+                          if (vm.showSmokingFields) ...[
+                            const Text('3.1 What do you smoke?',
+                                style: TextStyle(fontSize: 16)),
+                            _buildStringRadioGroup(
+                              selected:
+                                  vm.smokeType.isEmpty ? null : vm.smokeType,
+                              options: const [
+                                'Cigarette',
+                                'Pipe',
+                                'Dagga',
+                                'Vape'
+                              ],
+                              onChanged: vm.setSmokeType,
+                            ),
+                            const SizedBox(
+                              height: 16,
+                            ),
+                            const Text('3.2 How much do you smoke per day?'),
+                            const SizedBox(
+                              height: 8,
+                            ),
+                            KenwellTextField(
+                              label: '3. How much do you smoke per day?',
+                              controller: vm.dailySmokeController,
+                              hintText:
+                                  'Please Enter Amount of Times You Smoke',
+                              keyboardType: TextInputType.number,
+                              inputFormatters:
+                                  AppTextInputFormatters.numbersOnly(),
+                              decoration: KenwellFormStyles.decoration(
+                                label: 'Number per day',
+                                hint: 'Please Enter Amount of Times You Smoke',
+                              ),
+                              validator: (val) => val == null || val.isEmpty
+                                  ? 'Please enter daily smoking amount'
+                                  : null,
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -142,19 +184,38 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
 
                     // ===== Section 4: Alcohol =====
                     KenwellFormCard(
-                      title: '4. How often do you use alcoholic beverages?',
-                      child: _buildStringRadioGroup(
-                        selected: vm.alcoholFrequency.isEmpty
-                            ? null
-                            : vm.alcoholFrequency,
-                        options: const [
-                          'Never',
-                          'On occasion',
-                          'Two-three drinks per day',
-                          'More than 3 drinks per day',
-                          'I often drink too much',
+                      title: '4. Do you have any drinking habits?',
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          KenwellDropdownField(
+                            label: 'Do you drink?',
+                            value: vm.drinkingStatus,
+                            items: vm.drinkingStatusOptions,
+                            onChanged: vm.setDrinkingStatus,
+                            validator: (val) => (val == null || val.isEmpty)
+                                ? 'Select Drinking Status'
+                                : null,
+                          ),
+                          if (vm.showDrinkingFields) ...[
+                            const SizedBox(height: 8),
+                            const Text(
+                                '4.1 How often do you use alcoholic beverages?',
+                                style: TextStyle(fontSize: 16)),
+                            _buildStringRadioGroup(
+                              selected: vm.alcoholFrequency.isEmpty
+                                  ? null
+                                  : vm.alcoholFrequency,
+                              options: const [
+                                'On occasion',
+                                'Two-three drinks per day',
+                                'More than 3 drinks per day',
+                                'I often drink too much',
+                              ],
+                              onChanged: vm.setAlcoholFrequency,
+                            ),
+                          ],
                         ],
-                        onChanged: vm.setAlcoholFrequency,
                       ),
                     ),
 

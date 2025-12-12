@@ -18,6 +18,8 @@ class WellnessEvent {
   final DateTime date;
   final String venue;
   final String address;
+  final String townCity;
+  final String province;
   final String onsiteContactFirstName;
   final String onsiteContactLastName;
   final String onsiteContactNumber;
@@ -28,11 +30,8 @@ class WellnessEvent {
   final String aeContactEmail;
   final String servicesRequested;
   final int expectedParticipation;
-  final int nonMembers;
-  final int passports;
   final int nurses;
   final int coordinators;
-  final int multiplyPromoters;
   final String setUpTime;
   final String startTime;
   final String endTime;
@@ -53,6 +52,8 @@ class WellnessEvent {
     required this.date,
     required this.venue,
     required this.address,
+    required this.townCity,
+    required this.province,
     required this.onsiteContactFirstName,
     required this.onsiteContactLastName,
     required this.onsiteContactNumber,
@@ -63,11 +64,8 @@ class WellnessEvent {
     required this.aeContactEmail,
     required this.servicesRequested,
     required this.expectedParticipation,
-    required this.nonMembers,
-    required this.passports,
     required this.nurses,
     required this.coordinators,
-    required this.multiplyPromoters,
     required this.setUpTime,
     required this.startTime,
     required this.endTime,
@@ -76,15 +74,13 @@ class WellnessEvent {
     this.description,
     required this.medicalAid,
     String status = WellnessEventStatus.scheduled,
-    DateTime? actualStartTime,
-    DateTime? actualEndTime,
+    this.actualStartTime,
+    this.actualEndTime,
     this.screenedCount = 0,
   })  : id = id ?? const Uuid().v4(),
         status = WellnessEventStatus.isValid(status)
             ? status
-            : WellnessEventStatus.scheduled,
-        actualStartTime = actualStartTime,
-        actualEndTime = actualEndTime;
+            : WellnessEventStatus.scheduled;
 
   /// Convenience getters
   String get onsiteContactPerson =>
@@ -103,6 +99,8 @@ class WellnessEvent {
     DateTime? date,
     String? venue,
     String? address,
+    String? townCity,
+    String? province,
     String? onsiteContactFirstName,
     String? onsiteContactLastName,
     String? onsiteContactNumber,
@@ -113,11 +111,8 @@ class WellnessEvent {
     String? aeContactEmail,
     String? servicesRequested,
     int? expectedParticipation,
-    int? nonMembers,
-    int? passports,
     int? nurses,
     int? coordinators,
-    int? multiplyPromoters,
     String? setUpTime,
     String? startTime,
     String? endTime,
@@ -135,7 +130,9 @@ class WellnessEvent {
       title: title ?? this.title,
       date: date ?? this.date,
       venue: venue ?? this.venue,
+      townCity: townCity ?? this.townCity,
       address: address ?? this.address,
+      province: province ?? this.province,
       onsiteContactFirstName:
           onsiteContactFirstName ?? this.onsiteContactFirstName,
       onsiteContactLastName:
@@ -149,11 +146,8 @@ class WellnessEvent {
       servicesRequested: servicesRequested ?? this.servicesRequested,
       expectedParticipation:
           expectedParticipation ?? this.expectedParticipation,
-      nonMembers: nonMembers ?? this.nonMembers,
-      passports: passports ?? this.passports,
       nurses: nurses ?? this.nurses,
       coordinators: coordinators ?? this.coordinators,
-      multiplyPromoters: multiplyPromoters ?? this.multiplyPromoters,
       setUpTime: setUpTime ?? this.setUpTime,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
@@ -178,6 +172,8 @@ class WellnessEvent {
         other.date == date &&
         other.venue == venue &&
         other.address == address &&
+        other.townCity == townCity &&
+        other.province == province &&
         other.onsiteContactFirstName == onsiteContactFirstName &&
         other.onsiteContactLastName == onsiteContactLastName &&
         other.onsiteContactNumber == onsiteContactNumber &&
@@ -188,11 +184,8 @@ class WellnessEvent {
         other.aeContactEmail == aeContactEmail &&
         other.servicesRequested == servicesRequested &&
         other.expectedParticipation == expectedParticipation &&
-        other.nonMembers == nonMembers &&
-        other.passports == passports &&
         other.nurses == nurses &&
         other.coordinators == coordinators &&
-        other.multiplyPromoters == multiplyPromoters &&
         other.setUpTime == setUpTime &&
         other.startTime == startTime &&
         other.endTime == endTime &&
@@ -213,6 +206,8 @@ class WellnessEvent {
         date.hashCode ^
         venue.hashCode ^
         address.hashCode ^
+        townCity.hashCode ^
+        province.hashCode ^
         onsiteContactFirstName.hashCode ^
         onsiteContactLastName.hashCode ^
         onsiteContactNumber.hashCode ^
@@ -223,11 +218,8 @@ class WellnessEvent {
         aeContactEmail.hashCode ^
         servicesRequested.hashCode ^
         expectedParticipation.hashCode ^
-        nonMembers.hashCode ^
-        passports.hashCode ^
         nurses.hashCode ^
         coordinators.hashCode ^
-        multiplyPromoters.hashCode ^
         setUpTime.hashCode ^
         startTime.hashCode ^
         endTime.hashCode ^

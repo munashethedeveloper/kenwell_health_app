@@ -68,17 +68,27 @@ class EventDetailsScreen extends StatelessWidget {
             title: 'Event Summary Details',
             uppercase: true,
           ),
-          _buildSectionCard('Event Details', [
+          /*   _buildSectionCard('Event Details', [
             detailRow('Category', event.servicesRequested),
             detailRow('Date', DateFormat.yMMMMd().format(event.date)),
             detailRow('Set Up Time', event.setUpTime),
             detailRow('Start Time', event.startTime),
             detailRow('End Time', event.endTime),
             detailRow('Strike Down Time', event.strikeDownTime),
+          ]), */
+          _buildSectionCard('Date & Time', [
+            //detailRow('Category', event.servicesRequested),
+            detailRow('Date', DateFormat.yMMMMd().format(event.date)),
+            detailRow('Set Up Time', event.setUpTime),
+            detailRow('Start Time', event.startTime),
+            detailRow('End Time', event.endTime),
+            detailRow('Strike Down Time', event.strikeDownTime),
           ]),
-          _buildSectionCard('Venue & Address', [
+          _buildSectionCard('Event Location', [
             detailRow('Address', event.address),
             detailRow('Venue', event.venue),
+            detailRow('Town/City', event.townCity),
+            detailRow('Province', event.province),
           ]),
           _buildSectionCard('Onsite Contact', [
             detailRow('Contact Person', event.onsiteContactPerson),
@@ -93,11 +103,8 @@ class EventDetailsScreen extends StatelessWidget {
           _buildSectionCard('Participation & Options', [
             detailRow('Expected Participation',
                 event.expectedParticipation.toString()),
-            detailRow('Non Members', event.nonMembers.toString()),
-            detailRow('Passports', event.passports.toString()),
             detailRow('Nurses', event.nurses.toString()),
             detailRow('Coordinators', event.coordinators.toString()),
-            detailRow('Multiply Promoters', event.multiplyPromoters.toString()),
             detailRow('Mobile Booths', event.mobileBooths),
             detailRow('Medical Aid Option', event.medicalAid),
             if (event.description != null && event.description!.isNotEmpty)

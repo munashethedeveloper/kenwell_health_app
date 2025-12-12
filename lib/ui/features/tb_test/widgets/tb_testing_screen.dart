@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/features/nurse_interventions/view_model/nurse_intervention_form_mixin.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_referral_card.dart';
 import 'package:provider/provider.dart';
 
 import '../../../shared/ui/form/kenwell_form_card.dart';
@@ -11,11 +13,13 @@ import '../view_model/tb_testing_view_model.dart';
 class TBTestingScreen extends StatelessWidget {
   final VoidCallback onNext;
   final VoidCallback onPrevious;
+  final NurseInterventionFormMixin nurseViewModel;
 
   const TBTestingScreen({
     super.key,
     required this.onNext,
     required this.onPrevious,
+    required this.nurseViewModel,
   });
 
   @override
@@ -136,11 +140,40 @@ class TBTestingScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
+        const SizedBox(height: 24),
+        _buildReferrals(),
         KenwellFormNavigation(
           onPrevious: onPrevious,
           onNext: () => viewModel.submitTBTest(context, onNext: onNext),
           isNextEnabled: viewModel.isFormValid && !viewModel.isSubmitting,
           isNextBusy: viewModel.isSubmitting,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildReferrals() {
+    return KenwellReferralCard<NursingReferralOption>(
+      title: 'Nursing Referrals',
+      selectedValue: nurseViewModel.nursingReferralSelection,
+      onChanged: nurseViewModel.setNursingReferralSelection,
+      reasonValidator: (val) =>
+          (val == null || val.isEmpty) ? 'Please enter a reason' : null,
+      options: [
+        KenwellReferralOption(
+          value: NursingReferralOption.patientNotReferred,
+          label: 'Patient not referred',
+          requiresReason: true,
+          reasonController: nurseViewModel.notReferredReasonController,
+          reasonLabel: 'Reason patient not referred',
+        ),
+        const KenwellReferralOption(
+          value: NursingReferralOption.referredToGP,
+          label: 'Patient referred to GP',
+        ),
+        const KenwellReferralOption(
+          value: NursingReferralOption.referredToStateClinic,
+          label: 'Patient referred to State HIV clinic',
         ),
       ],
     );

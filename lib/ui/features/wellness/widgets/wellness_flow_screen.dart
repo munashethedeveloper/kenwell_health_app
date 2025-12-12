@@ -6,15 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/features/patient/widgets/personal_details_screen.dart';
 import 'package:provider/provider.dart';
-import '../../../shared/ui/form/kenwell_form_page.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../hiv_test_nursing_intervention/widgets/hiv_test_nursing_intervention_screen.dart';
 import '../../hiv_test_results/widgets/hiv_test_result_screen.dart';
 import '../../nurse_interventions/widgets/nurse_intervention_screen.dart';
 import '../../tb_test_nursing_intervention/widgets/tb_nursing_intervention_screen.dart';
 import '../view_model/wellness_flow_view_model.dart';
-import '../../consent_form/view_model/consent_screen_view_model.dart';
-import '../../survey/view_model/survey_view_model.dart';
 import '../../survey/widgets/survey_screen.dart';
 import '../../consent_form/widgets/consent_screen.dart';
 import '../../risk_assessment/widgets/personal_risk_assessment_screen.dart';
@@ -79,6 +76,7 @@ class WellnessFlowScreen extends StatelessWidget {
           onNext: flowVM.nextStep,
           onPrevious: flowVM.previousStep,
           viewModel: flowVM.resultsVM,
+          nurseViewModel: flowVM.nurseVM,
         );
         break;
 
@@ -138,6 +136,7 @@ class WellnessFlowScreen extends StatelessWidget {
           child: TBTestingScreen(
             onNext: flowVM.nextStep,
             onPrevious: flowVM.previousStep,
+            nurseViewModel: flowVM.nurseVM,
           ),
         );
         break;

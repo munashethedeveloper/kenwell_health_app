@@ -23,6 +23,26 @@ class AppTextInputFormatters {
     return [FilteringTextInputFormatter.allow(RegExp(buffer.toString()))];
   }
 
+  /// South African ID number formatter.
+  /// - Allows digits only
+  /// - Max length: 13
+  static TextInputFormatter saIdNumberFormatter() {
+    return TextInputFormatter.withFunction((oldValue, newValue) {
+      // Strip all non-numeric characters
+      String digits = newValue.text.replaceAll(RegExp(r'\D'), '');
+
+      // Enforce 13-digit limit
+      if (digits.length > 13) {
+        digits = digits.substring(0, 13);
+      }
+
+      return TextEditingValue(
+        text: digits,
+        selection: TextSelection.collapsed(offset: digits.length),
+      );
+    });
+  }
+
   /// Live format South African phone numbers.
   /// Converts:
   /// - 0XXXXXXXXX -> +27 XX XXX XXXX
@@ -30,18 +50,21 @@ class AppTextInputFormatters {
     return TextInputFormatter.withFunction((oldValue, newValue) {
       String text = newValue.text.replaceAll(RegExp(r'\D'), '');
 
-      if (text.startsWith('0')) text = '27' + text.substring(1);
+      if (text.startsWith('0')) text = '27${text.substring(1)}';
 
       if (text.startsWith('27')) {
         String formatted = '+27 ';
-        if (text.length > 2)
+        if (text.length > 2) {
           formatted += text.substring(2, text.length >= 4 ? 4 : text.length);
-        if (text.length >= 5)
+        }
+        if (text.length >= 5) {
           formatted +=
               ' ${text.substring(4, text.length >= 7 ? 7 : text.length)}';
-        if (text.length >= 8)
+        }
+        if (text.length >= 8) {
           formatted +=
               ' ${text.substring(7, text.length >= 11 ? 11 : text.length)}';
+        }
         text = formatted;
       }
 

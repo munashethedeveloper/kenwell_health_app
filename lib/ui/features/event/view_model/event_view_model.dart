@@ -10,13 +10,23 @@ class EventViewModel extends ChangeNotifier {
     _initializationFuture = _loadPersistedEvents();
   }
 
-  static const List<String> _serviceOptions = ['HRA', 'VCT', 'HIV', 'TB'];
+  static const List<String> _serviceOptions = [
+    'Eye Test',
+    'HIV Test',
+    'HRA',
+    'Pap Smear',
+    'PSA',
+    'Psychological Screening',
+    'TB Test',
+    'VCT',
+  ];
   final EventRepository _repository;
   late final Future<void> _initializationFuture;
 
   // Controllers
   final titleController = TextEditingController();
   final venueController = TextEditingController();
+  final townCityController = TextEditingController();
   final addressController = TextEditingController();
   final onsiteContactFirstNameController = TextEditingController();
   final onsiteContactLastNameController = TextEditingController();
@@ -27,21 +37,58 @@ class EventViewModel extends ChangeNotifier {
   final aeNumberController = TextEditingController();
   final aeEmailController = TextEditingController();
   final expectedParticipationController = TextEditingController();
-  final passportsController = TextEditingController();
-  final nursesController = TextEditingController();
+  final nursesController = TextEditingController(); //nurses
   final setUpTimeController = TextEditingController();
   final startTimeController = TextEditingController();
   final endTimeController = TextEditingController();
   final strikeDownTimeController = TextEditingController();
-  //final medicalAidController = TextEditingController();
   final dateController = TextEditingController();
 
   // Dropdowns
-  String nonMembers = 'No';
   String coordinators = 'No';
-  String multiplyPromoters = 'No';
   String mobileBooths = 'No';
   String medicalAid = "No";
+
+  String? province;
+
+  //Healthcare Professional Dropdowns
+  //Nurses
+  String nurses = 'No';
+  String nursesOption = 'No';
+  int nursesCount = 0;
+
+  //occupational Therapists
+  String occupationalTherapists = 'No';
+  String occupationalTherapistsOption = 'No';
+  int occupationalTherapistsCount = 0;
+
+  //Dietician
+  String dieticians = 'No';
+  String dieticiansOption = 'No';
+  int dieticiansCount = 0;
+
+  //Psychologists
+  String psychologists = 'No';
+  String psychologistsOption = 'No';
+  int psychologistsCount = 0;
+
+  //Optometrist
+  String optometrists = 'No';
+  String optometristsOption = 'No';
+  int optometristsCount = 0;
+
+  //Dental Hygenists
+  String dentalHygenists = 'No';
+  String dentalHygenistsOption = 'No';
+  int dentalHygenistsCount = 0;
+
+  // NEW: Coordinators dropdown + number
+  String coordinatorsOption = 'No';
+  int coordinatorsCount = 0;
+
+// NEW: Mobile Booths dropdown + number
+  String mobileBoothsOption = 'No';
+  int mobileBoothsCount = 0;
 
   // Events
   final List<WellnessEvent> _events = [];
@@ -79,6 +126,7 @@ class EventViewModel extends ChangeNotifier {
     titleController.text = e.title;
     venueController.text = e.venue;
     addressController.text = e.address;
+    townCityController.text = e.townCity;
     onsiteContactFirstNameController.text = e.onsiteContactFirstName;
     onsiteContactLastNameController.text = e.onsiteContactLastName;
     onsiteNumberController.text = e.onsiteContactNumber;
@@ -88,20 +136,15 @@ class EventViewModel extends ChangeNotifier {
     aeNumberController.text = e.aeContactNumber;
     aeEmailController.text = e.aeContactEmail;
     expectedParticipationController.text = e.expectedParticipation.toString();
-    passportsController.text = e.passports.toString();
     nursesController.text = e.nurses.toString();
     setUpTimeController.text = e.setUpTime;
     startTimeController.text = e.startTime;
     endTimeController.text = e.endTime;
     strikeDownTimeController.text = e.strikeDownTime;
-    //medicalAidController.text = e.medicalAidOption;
 
     dateController.text =
         "${e.date.year}-${e.date.month.toString().padLeft(2, '0')}-${e.date.day.toString().padLeft(2, '0')}";
-
-    nonMembers = e.nonMembers == 1 ? 'Yes' : 'No';
     coordinators = e.coordinators == 1 ? 'Yes' : 'No';
-    multiplyPromoters = e.multiplyPromoters == 1 ? 'Yes' : 'No';
     mobileBooths = e.mobileBooths;
     _setServicesFromString(e.servicesRequested);
     medicalAid = e.medicalAid;
@@ -113,6 +156,11 @@ class EventViewModel extends ChangeNotifier {
   void setTime(
       TextEditingController controller, TimeOfDay time, BuildContext context) {
     controller.text = time.format(context);
+    notifyListeners();
+  }
+
+  void updateProvince(String value) {
+    province = value;
     notifyListeners();
   }
 
@@ -136,8 +184,10 @@ class EventViewModel extends ChangeNotifier {
     return WellnessEvent(
       title: titleController.text,
       date: date,
+      townCity: townCityController.text,
       venue: venueController.text,
       address: addressController.text,
+      province: province ?? '',
       onsiteContactFirstName: onsiteContactFirstNameController.text,
       onsiteContactLastName: onsiteContactLastNameController.text,
       onsiteContactNumber: onsiteNumberController.text,
@@ -149,16 +199,12 @@ class EventViewModel extends ChangeNotifier {
       servicesRequested: servicesRequested,
       expectedParticipation:
           int.tryParse(expectedParticipationController.text) ?? 0,
-      nonMembers: nonMembers == 'Yes' ? 1 : 0,
-      passports: int.tryParse(passportsController.text) ?? 0,
       nurses: int.tryParse(nursesController.text) ?? 0,
       coordinators: coordinators == 'Yes' ? 1 : 0,
-      multiplyPromoters: multiplyPromoters == 'Yes' ? 1 : 0,
       setUpTime: setUpTimeController.text,
       startTime: startTimeController.text,
       endTime: endTimeController.text,
       strikeDownTime: strikeDownTimeController.text,
-      //medicalAidOption: medicalAidController.text,
       mobileBooths: mobileBooths,
       medicalAid: medicalAid,
     );
@@ -280,6 +326,7 @@ class EventViewModel extends ChangeNotifier {
     titleController.clear();
     venueController.clear();
     addressController.clear();
+    townCityController.clear();
     onsiteContactFirstNameController.clear();
     onsiteContactLastNameController.clear();
     onsiteNumberController.clear();
@@ -289,13 +336,11 @@ class EventViewModel extends ChangeNotifier {
     aeNumberController.clear();
     aeEmailController.clear();
     expectedParticipationController.clear();
-    passportsController.clear();
     nursesController.clear();
     setUpTimeController.clear();
     startTimeController.clear();
     endTimeController.clear();
     strikeDownTimeController.clear();
-    //medicalAidController.clear();
     dateController.clear();
     _resetServiceSelections();
   }
@@ -305,6 +350,7 @@ class EventViewModel extends ChangeNotifier {
     titleController.dispose();
     venueController.dispose();
     addressController.dispose();
+    townCityController.dispose();
     onsiteContactFirstNameController.dispose();
     onsiteContactLastNameController.dispose();
     onsiteNumberController.dispose();
@@ -314,13 +360,11 @@ class EventViewModel extends ChangeNotifier {
     aeNumberController.dispose();
     aeEmailController.dispose();
     expectedParticipationController.dispose();
-    passportsController.dispose();
     nursesController.dispose();
     setUpTimeController.dispose();
     startTimeController.dispose();
     endTimeController.dispose();
     strikeDownTimeController.dispose();
-    //medicalAidController.dispose();
     dateController.dispose();
     super.dispose();
   }

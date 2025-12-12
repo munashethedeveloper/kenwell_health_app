@@ -95,8 +95,9 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
       if (_firstNameController.text.isEmpty) invalidFields.add("First Name");
       if (_lastNameController.text.isEmpty) invalidFields.add("Last Name");
       if (_usernameController.text.isEmpty) invalidFields.add("Username");
-      if (_selectedRole == null || _selectedRole!.isEmpty)
+      if (_selectedRole == null || _selectedRole!.isEmpty) {
         invalidFields.add("Role");
+      }
       if (_phoneController.text.isEmpty ||
           Validators.validateSouthAfricanPhoneNumber(_phoneController.text) !=
               null) {
@@ -224,8 +225,7 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
                                   label: "Role",
                                   value: _selectedRole,
                                   items: vm.availableRoles,
-                                  //readOnly: true,
-
+                                  enabled: false,
                                   padding: EdgeInsets.zero,
                                   validator: (v) => (v == null || v.isEmpty)
                                       ? "Select Role"
@@ -287,8 +287,9 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
                                     final message =
                                         Validators.validatePasswordPresence(v);
                                     if (message != null) return message;
-                                    if (v != _passwordController.text)
+                                    if (v != _passwordController.text) {
                                       return "Passwords do not match";
+                                    }
                                     return null;
                                   },
                                 ),

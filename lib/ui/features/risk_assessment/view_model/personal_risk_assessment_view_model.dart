@@ -3,6 +3,16 @@ import 'package:flutter/material.dart';
 class PersonalRiskAssessmentViewModel extends ChangeNotifier {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>(); // Add this
 
+  // Dropdown values
+  String? smokingStatus;
+  final List<String> smokingStatusOptions = ['Yes', 'No'];
+
+  String? drinkingStatus;
+  final List<String> drinkingStatusOptions = ['Yes', 'No'];
+
+  String? exerciseStatus;
+  final List<String> exerciseStatusOptions = ['Yes', 'No'];
+
   // Section 1: Chronic Health Conditions
   final Map<String, bool> chronicConditions = {
     'Heart Disease': false,
@@ -14,6 +24,7 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
     'Depression': false,
     'Epilepsy': false,
     'Asthma': false,
+    'None': false,
     'Other': false,
   };
 
@@ -49,6 +60,28 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
   bool? papSmear;
   bool? breastExam;
   bool? mammogram;
+
+  // --- Dropdown setters ---
+  void setSmokingStatus(String? value) {
+    if (smokingStatus != value) {
+      smokingStatus = value;
+      notifyListeners();
+    }
+  }
+
+  void setDrinkingStatus(String? value) {
+    if (drinkingStatus != value) {
+      drinkingStatus = value;
+      notifyListeners();
+    }
+  }
+
+  void setExerciseStatus(String? value) {
+    if (exerciseStatus != value) {
+      exerciseStatus = value;
+      notifyListeners();
+    }
+  }
 
   void setPapSmear(bool? value) {
     if (papSmear == value) return;
@@ -87,7 +120,26 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
   final bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
 
+  //Show Fields
+  bool get showSmokingFields => smokingStatus == 'Yes';
+  bool get showDrinkingFields => drinkingStatus == 'Yes';
+  bool get showExerciseFields => exerciseStatus == 'Yes';
+
   bool get isFormValid {
+    if (smokingStatus != null &&
+        (showSmokingFields
+            ? dailySmokeController.text.isNotEmpty
+            : smokeType.isNotEmpty)) {
+      return true;
+    }
+    if (drinkingStatus != null &&
+        (showDrinkingFields || alcoholFrequency.isNotEmpty)) {
+      return true;
+    }
+    if (exerciseStatus != null &&
+        (showExerciseFields || exerciseFrequency.isNotEmpty)) {
+      return true;
+    }
     if (!formKey.currentState!.validate()) return false;
     if (exerciseFrequency.isEmpty || alcoholFrequency.isEmpty) return false;
     return true;

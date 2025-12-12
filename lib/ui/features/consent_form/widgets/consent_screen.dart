@@ -12,6 +12,7 @@ import '../../../shared/ui/form/kenwell_form_step.dart';
 import '../../../shared/ui/form/kenwell_signature_actions.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/consent_screen_view_model.dart';
+import '../../profile/view_model/profile_view_model.dart';
 
 class ConsentScreen extends StatelessWidget {
   final VoidCallback onNext;
@@ -28,9 +29,16 @@ class ConsentScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final vm = Provider.of<ConsentScreenViewModel>(context);
+    final profileVm = Provider.of<ProfileViewModel>(context);
 
+    // Pass event & profile data into VM
+    vm.initialise(
+      event,
+      firstName: profileVm.firstName,
+      lastName: profileVm.lastName,
+    );
     // Initialise the VM with event data
-    vm.initialise(event);
+    //vm.initialise(event);
 
     final steps = _buildFormSteps(vm);
 
@@ -87,6 +95,7 @@ class ConsentScreen extends StatelessWidget {
               KenwellTextField(
                 label: 'Venue',
                 controller: vm.venueController,
+                enabled: false,
                 readOnly: true, // <-- make read-only
                 validator: (val) =>
                     (val == null || val.isEmpty) ? 'Please enter Venue' : null,
@@ -95,11 +104,13 @@ class ConsentScreen extends StatelessWidget {
               KenwellDateField(
                 label: 'Date',
                 controller: vm.dateController,
+                enabled: false,
                 readOnly: true, // <-- make read-only
               ),
               const SizedBox(height: 16),
               KenwellTextField(
                 label: 'Name of Healthcare Practitioner',
+                //enabled: false,
                 controller: vm.practitionerController,
                 validator: (val) => (val == null || val.isEmpty)
                     ? 'Please enter Name of Healthcare Practitioner'

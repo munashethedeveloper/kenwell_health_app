@@ -61,8 +61,9 @@ class Validators {
   static String? validateSouthAfricanId(String? id) {
     if (id == null || id.isEmpty) return 'Please enter ID Number';
     if (id.length != 13) return 'SA ID must be 13 digits';
-    if (!RegExp(r'^[0-9]{13}$').hasMatch(id))
+    if (!RegExp(r'^[0-9]{13}$').hasMatch(id)) {
       return 'SA ID must contain only digits';
+    }
 
     try {
       getDateOfBirthFromId(id); // Throws if invalid DOB

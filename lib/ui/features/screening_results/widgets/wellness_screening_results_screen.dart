@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/features/nurse_interventions/view_model/nurse_intervention_form_mixin.dart';
+import 'package:kenwell_health_app/ui/features/nurse_interventions/view_model/nurse_intervention_view_model.dart';
+import 'package:kenwell_health_app/ui/features/nurse_interventions/widgets/nurse_intervention_form.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_referral_card.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
@@ -11,6 +15,8 @@ import '../view_model/wellness_screening_results_view_model.dart';
 
 class WellnessScreeningResultsScreen extends StatelessWidget {
   final WellnessScreeningResultsViewModel viewModel;
+  final NurseInterventionFormMixin nurseViewModel;
+
   final VoidCallback onNext;
   final VoidCallback onPrevious;
 
@@ -19,10 +25,13 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
     required this.viewModel,
     required this.onNext,
     required this.onPrevious,
+    required this.nurseViewModel,
   });
 
   @override
   Widget build(BuildContext context) {
+    //final viewModel = context.watch<NurseInterventionViewModel>();
+
     return ChangeNotifierProvider.value(
       value: viewModel,
       child: Consumer<WellnessScreeningResultsViewModel>(
@@ -151,6 +160,17 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 24),
+                    _buildReferrals(),
+                    //NurseInterventionForm(
+                    //viewModel: viewModel,
+                    //title: 'HRA Nurse Intervention Form',
+                    //sectionTitle: 'Section E: HRA - Nurse Intervention',
+                    // onNext: onNext,
+                    // onPrevious: onPrevious,
+                    // ),
+                    const SizedBox(
+                      height: 24,
+                    ),
                     KenwellFormNavigation(
                       onPrevious: vm.isSubmitting ? null : onPrevious,
                       onNext: () => vm.submitResults(context, onNext: onNext),
@@ -164,6 +184,33 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+
+  Widget _buildReferrals() {
+    return KenwellReferralCard<NursingReferralOption>(
+      title: 'Nursing Referrals',
+      selectedValue: nurseViewModel.nursingReferralSelection,
+      onChanged: nurseViewModel.setNursingReferralSelection,
+      reasonValidator: (val) =>
+          (val == null || val.isEmpty) ? 'Please enter a reason' : null,
+      options: [
+        KenwellReferralOption(
+          value: NursingReferralOption.patientNotReferred,
+          label: 'Patient not referred',
+          requiresReason: true,
+          reasonController: nurseViewModel.notReferredReasonController,
+          reasonLabel: 'Reason patient not referred',
+        ),
+        const KenwellReferralOption(
+          value: NursingReferralOption.referredToGP,
+          label: 'Patient referred to GP',
+        ),
+        const KenwellReferralOption(
+          value: NursingReferralOption.referredToStateClinic,
+          label: 'Patient referred to State HIV clinic',
+        ),
+      ],
     );
   }
 

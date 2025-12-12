@@ -21,17 +21,16 @@ class PersonalDetailsViewModel extends ChangeNotifier {
   final cellNumberController = TextEditingController();
   final alternateContactNumberController = TextEditingController();
   final personalNumberController = TextEditingController();
-  final divisionController = TextEditingController();
-  final positionController = TextEditingController();
-  final employeeNumberController = TextEditingController();
 
   // Dropdown values
   String? maritalStatus;
   String? gender;
-  String? employmentStatus;
-  String? provinces;
   String idDocumentChoice = 'ID';
   String? medicalAidStatus;
+
+  // NEW: Alternate number
+  String? hasAlternateNumber;
+  final List<String> hasAlternateNumberOptions = ['Yes', 'No'];
 
   // Dropdown options
   final List<String> maritalStatusOptions = [
@@ -41,26 +40,218 @@ class PersonalDetailsViewModel extends ChangeNotifier {
     'Divorced'
   ];
 
-  final List<String> provinceOptions = [
-    'Gauteng',
-    'Western Cape',
-    'KwaZulu-Natal',
-    'Eastern Cape',
-    'Limpopo',
-    'Mpumalanga',
-    'North West',
-    'Free State',
-    'Northern Cape'
-  ];
-
   final List<String> genderOptions = ['Male', 'Female'];
-  final List<String> employmentStatusOptions = [
-    'Permanent fulltime',
-    'Contract – limited duration',
-    'Outside contractor'
-  ];
+
   final List<String> idDocumentOptions = ['ID', 'Passport'];
   final List<String> medicalAidStatusOptions = ['Yes', 'No'];
+
+  String? selectedNationality;
+
+  void setSelectedNationality(String? value) {
+    if (selectedNationality != value) {
+      selectedNationality = value;
+      //nationalityController.text = value ?? '';
+      notifyListeners();
+    }
+  }
+
+  final List<String> nationalityOptions = [
+    //List of All Countries in the World
+    "Afghanistan",
+    "Albania",
+    "Algeria",
+    "Andorra",
+    "Angola",
+    "Antigua and Barbuda",
+    "Argentina",
+    "Armenia",
+    "Australia",
+    "Austria",
+    "Azerbaijan",
+    "Bahamas",
+    "Bahrain",
+    "Bangladesh",
+    "Barbados",
+    "Belarus",
+    "Belgium",
+    "Belize",
+    "Benin",
+    "Bhutan",
+    "Bolivia",
+    "Bosnia and Herzegovina",
+    "Botswana",
+    "Brazil",
+    "Brunei",
+    "Bulgaria",
+    "Burkina Faso",
+    "Burundi",
+    "Cabo Verde",
+    "Cambodia",
+    "Cameroon",
+    "Canada",
+    "Central African Republic",
+    "Chad",
+    "Chile",
+    "China",
+    "Colombia",
+    "Comoros",
+    "Congo (Congo-Brazzaville)",
+    "Costa Rica",
+    "Croatia",
+    "Cuba",
+    "Cyprus",
+    "Czechia",
+    "Democratic Republic of the Congo",
+    "Denmark",
+    "Djibouti",
+    "Dominica",
+    "Dominican Republic",
+    "Ecuador",
+    "Egypt",
+    "El Salvador",
+    "Equatorial Guinea",
+    "Eritrea",
+    "Estonia",
+    "Eswatini",
+    "Ethiopia",
+    "Fiji",
+    "Finland",
+    "France",
+    "Gabon",
+    "Gambia",
+    "Georgia",
+    "Germany",
+    "Ghana",
+    "Greece",
+    "Grenada",
+    "Guatemala",
+    "Guinea",
+    "Guinea-Bissau",
+    "Guyana",
+    "Haiti",
+    "Honduras",
+    "Hungary",
+    "Iceland",
+    "India",
+    "Indonesia",
+    "Iran",
+    "Iraq",
+    "Ireland",
+    "Israel",
+    "Italy",
+    "Jamaica",
+    "Japan",
+    "Jordan",
+    "Kazakhstan",
+    "Kenya",
+    "Kiribati",
+    "Kuwait",
+    "Kyrgyzstan",
+    "Laos",
+    "Latvia",
+    "Lebanon",
+    "Lesotho",
+    "Liberia",
+    "Libya",
+    "Liechtenstein",
+    "Lithuania",
+    "Luxembourg",
+    "Madagascar",
+    "Malawi",
+    "Malaysia",
+    "Maldives",
+    "Mali",
+    "Malta",
+    "Marshall Islands",
+    "Mauritania",
+    "Mauritius",
+    "Mexico",
+    "Micronesia",
+    "Moldova",
+    "Monaco",
+    "Mongolia",
+    "Montenegro",
+    "Morocco",
+    "Mozambique",
+    "Myanmar",
+    "Namibia",
+    "Nauru",
+    "Nepal",
+    "Netherlands",
+    "New Zealand",
+    "Nicaragua",
+    "Niger",
+    "Nigeria",
+    "North Korea",
+    "North Macedonia",
+    "Norway",
+    "Oman",
+    "Pakistan",
+    "Palau",
+    "Panama",
+    "Papua New Guinea",
+    "Paraguay",
+    "Peru",
+    "Philippines",
+    "Poland",
+    "Portugal",
+    "Qatar",
+    "Romania",
+    "Russia",
+    "Rwanda",
+    "Saint Kitts and Nevis",
+    "Saint Lucia",
+    "Saint Vincent and the Grenadines",
+    "Samoa",
+    "San Marino",
+    "Sao Tome and Principe",
+    "Saudi Arabia",
+    "Senegal",
+    "Serbia",
+    "Seychelles",
+    "Sierra Leone",
+    "Singapore",
+    "Slovakia",
+    "Slovenia",
+    "Solomon Islands",
+    "Somalia",
+    "South Africa",
+    "South Korea",
+    "South Sudan",
+    "Spain",
+    "Sri Lanka",
+    "Sudan",
+    "Suriname",
+    "Sweden",
+    "Switzerland",
+    "Syria",
+    "Taiwan",
+    "Tajikistan",
+    "Tanzania",
+    "Thailand",
+    "Timor-Leste",
+    "Togo",
+    "Tonga",
+    "Trinidad and Tobago",
+    "Tunisia",
+    "Turkey",
+    "Turkmenistan",
+    "Tuvalu",
+    "Uganda",
+    "Ukraine",
+    "United Arab Emirates",
+    "United Kingdom",
+    "United States of America",
+    "Uruguay",
+    "Uzbekistan",
+    "Vanuatu",
+    "Vatican City",
+    "Venezuela",
+    "Vietnam",
+    "Yemen",
+    "Zambia",
+    "Zimbabwe"
+  ];
 
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
@@ -87,23 +278,9 @@ class PersonalDetailsViewModel extends ChangeNotifier {
     }
   }
 
-  void setProvince(String? value) {
-    if (provinces != value) {
-      provinces = value;
-      notifyListeners();
-    }
-  }
-
   void setGender(String? value) {
     if (gender != value) {
       gender = value;
-      notifyListeners();
-    }
-  }
-
-  void setEmploymentStatus(String? value) {
-    if (employmentStatus != value) {
-      employmentStatus = value;
       notifyListeners();
     }
   }
@@ -126,6 +303,21 @@ class PersonalDetailsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // NEW: Alternate Number setter
+  void setHasAlternateNumber(String? value) {
+    if (hasAlternateNumber == value) return;
+    hasAlternateNumber = value;
+
+    if (value == 'No') {
+      alternateContactNumberController.clear();
+    }
+
+    notifyListeners();
+  }
+
+  // NEW: Show/hide alternate contact number field
+  bool get showAlternateNumberField => hasAlternateNumber == 'Yes';
+
   bool get showIdField => idDocumentChoice == 'ID';
   bool get showPassportField => idDocumentChoice == 'Passport';
   bool get showMedicalAidFields => medicalAidStatus == 'Yes';
@@ -134,8 +326,6 @@ class PersonalDetailsViewModel extends ChangeNotifier {
       formKey.currentState?.validate() == true &&
       maritalStatus != null &&
       gender != null &&
-      employmentStatus != null &&
-      provinces != null &&
       medicalAidStatus != null &&
       (showIdField
           ? idNumberController.text.isNotEmpty
@@ -162,13 +352,9 @@ class PersonalDetailsViewModel extends ChangeNotifier {
         'cellNumber': cellNumberController.text,
         'alternateContactNumber': alternateContactNumberController.text,
         'personalNumber': personalNumberController.text,
-        'division': divisionController.text,
-        'position': positionController.text,
-        'employeeNumber': employeeNumberController.text,
-        'region': provinces,
         'maritalStatus': maritalStatus,
         'gender': gender,
-        'employmentStatus': employmentStatus,
+        'hasAlternateNumber': hasAlternateNumber,
       };
 
   Future<void> saveLocally() async {
@@ -197,9 +383,6 @@ class PersonalDetailsViewModel extends ChangeNotifier {
       cellNumberController,
       alternateContactNumberController,
       personalNumberController,
-      divisionController,
-      positionController,
-      employeeNumberController,
     ]) {
       c.dispose();
     }

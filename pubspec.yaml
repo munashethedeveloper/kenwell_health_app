@@ -9,6 +9,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_spinbox: ^0.13.1
+  dropdown_search: ^6.0.2
   table_calendar: ^3.2.0
   shared_preferences: ^2.5.3
   provider: ^6.1.5

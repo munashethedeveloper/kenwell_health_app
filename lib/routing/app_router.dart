@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/features/nurse_interventions/view_model/nurse_intervention_form_mixin.dart';
 import 'package:provider/provider.dart';
 
 import '../domain/models/wellness_event.dart';
@@ -49,6 +50,8 @@ import '../ui/features/tb_test_nursing_intervention/widgets/tb_nursing_intervent
 import 'route_names.dart';
 
 class AppRouter {
+  //final NurseInterventionFormMixin nurseViewModel;
+
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case RouteNames.login:
@@ -102,6 +105,7 @@ class AppRouter {
           builder: (_) => ChangeNotifierProvider(
             create: (_) => TBTestingViewModel(),
             child: TBTestingScreen(
+              nurseViewModel: NurseInterventionViewModel(),
               onPrevious: () {
                 Navigator.pop(_);
               },

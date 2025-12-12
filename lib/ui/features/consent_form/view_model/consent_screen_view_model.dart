@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 
 class ConsentScreenViewModel extends ChangeNotifier {
-  // Form key for validation
+  // Form key
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   // Controllers
@@ -16,17 +16,21 @@ class ConsentScreenViewModel extends ChangeNotifier {
   final TextEditingController dateController = TextEditingController();
   final TextEditingController practitionerController = TextEditingController();
 
-  // Screening checkboxes
+  // Checkbox states
   bool hra = false;
   bool vct = false;
   bool tb = false;
   bool hiv = false;
 
-  // Submission state
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
 
-  // Form validation
+  WellnessEvent? event;
+
+  // Profile names (passed in from ProfileViewModel)
+  String? userFirstName;
+  String? userLastName;
+
   bool get isFormValid =>
       hra &&
       vct &&
@@ -37,23 +41,30 @@ class ConsentScreenViewModel extends ChangeNotifier {
       practitionerController.text.isNotEmpty &&
       signatureController.isNotEmpty;
 
-  // Event for pre-filling fields
-  WellnessEvent? event;
+  // Initialise and pre-fill fields
+  void initialise(
+    WellnessEvent e, {
+    String? firstName,
+    String? lastName,
+  }) {
+    if (event != null) return; // prevent double init
 
-  // Initialise with event and pre-fill fields safely
-  void initialise(WellnessEvent e) {
-    if (event != null) return; // prevent multiple initializations
     event = e;
+    userFirstName = firstName;
+    userLastName = lastName;
 
-    // Schedule updates after build to avoid setState during build
     WidgetsBinding.instance.addPostFrameCallback((_) {
       venueController.text = e.venue;
       dateController.text = DateFormat('yyyy-MM-dd').format(e.date);
+
+      // Fill practitioner name from profile
+      practitionerController.text =
+          '${userFirstName ?? ''} ${userLastName ?? ''}'.trim();
+
       notifyListeners();
     });
   }
 
-  // Toggle screening checkbox
   void toggleCheckbox(String field, bool? value) {
     switch (field) {
       case 'hra':
@@ -72,13 +83,11 @@ class ConsentScreenViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Clear signature
   void clearSignature() {
     signatureController.clear();
     notifyListeners();
   }
 
-  // Submit consent
   Future<void> submitConsent() async {
     _isSubmitting = true;
     notifyListeners();
@@ -89,7 +98,6 @@ class ConsentScreenViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Convert data to Map
   Map<String, dynamic> toMap() => {
         'venue': venueController.text,
         'date': dateController.text,

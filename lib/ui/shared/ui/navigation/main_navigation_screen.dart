@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 
 // Feature imports
 import '../../../features/calendar/widgets/calendar_screen.dart';
 import '../../../features/profile/widgets/profile_screen.dart';
-import '../../../features/settings/widgets/settings_screen.dart';
+//import '../../../features/settings/widgets/settings_screen.dart';
 import '../../../features/stats_report/widgets/stats_report_screen.dart';
 import '../../../features/help/widgets/help_screen.dart';
 import '../../../features/event/view_model/event_view_model.dart';
@@ -19,17 +20,18 @@ class MainNavigationScreen extends StatefulWidget {
 }
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
-  int _currentIndex = 0;
+  int _currentIndex = 2;
 
   @override
   Widget build(BuildContext context) {
     final eventVM = Provider.of<EventViewModel>(context);
+    //Provider.of<ProfileViewModel>(context, listen: false).loadProfile();
 
     final List<Widget> tabs = [
-      CalendarScreen(eventVM: eventVM),
       const ProfileScreen(),
-      const SettingsScreen(),
       const StatsReportScreen(),
+      CalendarScreen(eventVM: eventVM),
+      //const SettingsScreen(),
       const HelpScreen(),
       const ConductEventScreen(),
     ];
@@ -50,10 +52,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           child: NavigationBarTheme(
             data: NavigationBarThemeData(
               indicatorColor: KenwellColors.neutralWhite,
-              labelTextStyle: MaterialStateProperty.resolveWith((states) {
+              labelTextStyle: WidgetStateProperty.resolveWith((states) {
                 return const TextStyle(color: KenwellColors.secondaryNavy);
               }),
-              iconTheme: MaterialStateProperty.resolveWith((states) {
+              iconTheme: WidgetStateProperty.resolveWith((states) {
                 return const IconThemeData(color: KenwellColors.secondaryNavy);
               }),
             ),
@@ -69,21 +71,22 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               elevation: 6,
               destinations: const [
                 NavigationDestination(
-                  icon: Icon(Icons.calendar_today),
-                  label: 'Planner',
-                ),
-                NavigationDestination(
                   icon: Icon(Icons.person),
                   label: 'Profile',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.settings),
-                  label: 'Settings',
                 ),
                 NavigationDestination(
                   icon: Icon(Icons.bar_chart),
                   label: 'Stats',
                 ),
+                NavigationDestination(
+                  icon: Icon(Icons.calendar_today),
+                  label: 'Planner',
+                ),
+                // NavigationDestination(
+                // icon: Icon(Icons.settings),
+                // label: 'Settings',
+                // ),
+
                 NavigationDestination(
                   icon: Icon(Icons.help),
                   label: 'Help',

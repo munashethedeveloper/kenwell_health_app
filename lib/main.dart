@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/features/consent_form/view_model/consent_screen_view_model.dart';
+import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/theme_provider.dart';
@@ -19,6 +21,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider<ProfileViewModel>(
+            create: (_) => ProfileViewModel()),
+        ChangeNotifierProvider<ConsentScreenViewModel>(
+            create: (_) => ConsentScreenViewModel()),
         ChangeNotifierProvider<AuthViewModel>(create: (_) => AuthViewModel()),
         ChangeNotifierProvider<CalendarViewModel>(
             create: (_) => CalendarViewModel()),

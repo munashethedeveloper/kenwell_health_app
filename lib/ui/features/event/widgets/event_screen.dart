@@ -63,66 +63,98 @@ class _EventScreenState extends State<EventScreen> {
 
     // Basic Info
     if (_requiredField('Event Title', widget.viewModel.titleController.text) !=
-        null) invalidFields.add('Event Title');
-    if (_requiredField('Venue', widget.viewModel.venueController.text) != null)
+        null) {
+      invalidFields.add('Event Title');
+    }
+    if (_requiredField('Venue', widget.viewModel.venueController.text) !=
+        null) {
       invalidFields.add('Venue');
+    }
     if (_requiredField('Address', widget.viewModel.addressController.text) !=
-        null) invalidFields.add('Address');
+        null) {
+      invalidFields.add('Address');
+    }
 
     // Onsite Contact
     if (_requiredField('Contact Person First Name',
             widget.viewModel.onsiteContactFirstNameController.text) !=
-        null) invalidFields.add('Onsite Contact First Name');
+        null) {
+      invalidFields.add('Onsite Contact First Name');
+    }
     if (_requiredField('Contact Person Last Name',
             widget.viewModel.onsiteContactLastNameController.text) !=
-        null) invalidFields.add('Onsite Contact Last Name');
+        null) {
+      invalidFields.add('Onsite Contact Last Name');
+    }
     if (Validators.validateSouthAfricanPhoneNumber(
             widget.viewModel.onsiteNumberController.text) !=
-        null) invalidFields.add('Onsite Contact Number');
+        null) {
+      invalidFields.add('Onsite Contact Number');
+    }
     if (Validators.validateEmail(widget.viewModel.onsiteEmailController.text) !=
-        null) invalidFields.add('Onsite Contact Email');
+        null) {
+      invalidFields.add('Onsite Contact Email');
+    }
 
     // AE Contact
     if (_requiredField('AE Contact Person First Name',
             widget.viewModel.aeContactFirstNameController.text) !=
-        null) invalidFields.add('AE Contact First Name');
+        null) {
+      invalidFields.add('AE Contact First Name');
+    }
     if (_requiredField('AE Contact Person Last Name',
             widget.viewModel.aeContactLastNameController.text) !=
-        null) invalidFields.add('AE Contact Last Name');
+        null) {
+      invalidFields.add('AE Contact Last Name');
+    }
     if (Validators.validateSouthAfricanPhoneNumber(
             widget.viewModel.aeNumberController.text) !=
-        null) invalidFields.add('AE Contact Number');
+        null) {
+      invalidFields.add('AE Contact Number');
+    }
     if (Validators.validateEmail(widget.viewModel.aeEmailController.text) !=
-        null) invalidFields.add('AE Contact Email');
+        null) {
+      invalidFields.add('AE Contact Email');
+    }
 
     // Options
-    if (_requiredSelection('Medical Aid', widget.viewModel.medicalAid) != null)
+    if (_requiredSelection('Medical Aid', widget.viewModel.medicalAid) !=
+        null) {
       invalidFields.add('Medical Aid');
-    if (_requiredSelection('Non-Members', widget.viewModel.nonMembers) != null)
-      invalidFields.add('Non-Members');
+    }
     if (_requiredSelection('Coordinators', widget.viewModel.coordinators) !=
-        null) invalidFields.add('Coordinators');
-    if (_requiredSelection(
-            'Multiply Promoters', widget.viewModel.multiplyPromoters) !=
-        null) invalidFields.add('Multiply Promoters');
+        null) {
+      invalidFields.add('Coordinators');
+    }
     if (_requiredSelection('Mobile Booths', widget.viewModel.mobileBooths) !=
-        null) invalidFields.add('Mobile Booths');
+        null) {
+      invalidFields.add('Mobile Booths');
+    }
 
-    if (widget.viewModel.selectedServices.isEmpty)
+    if (widget.viewModel.selectedServices.isEmpty) {
       invalidFields.add('Services Requested');
+    }
 
     // Time Details
     if (_requiredField(
             'Setup Time', widget.viewModel.setUpTimeController.text) !=
-        null) invalidFields.add('Setup Time');
+        null) {
+      invalidFields.add('Setup Time');
+    }
     if (_requiredField(
             'Start Time', widget.viewModel.startTimeController.text) !=
-        null) invalidFields.add('Start Time');
+        null) {
+      invalidFields.add('Start Time');
+    }
     if (_requiredField('End Time', widget.viewModel.endTimeController.text) !=
-        null) invalidFields.add('End Time');
+        null) {
+      invalidFields.add('End Time');
+    }
     if (_requiredField('Strike Down Time',
             widget.viewModel.strikeDownTimeController.text) !=
-        null) invalidFields.add('Strike Down Time');
+        null) {
+      invalidFields.add('Strike Down Time');
+    }
 
     if (invalidFields.isNotEmpty) {
       final message = invalidFields.join(', ');
@@ -190,24 +222,59 @@ class _EventScreenState extends State<EventScreen> {
                 subtitle:
                     'Complete the event details or update the event information',
               ),
-              _buildSectionCard('Basic Info', [
+              _buildSectionCard('Event Date', [
                 KenwellDateField(
                   label: 'Event Date',
                   controller: widget.viewModel.dateController,
                   dateFormat: 'yyyy-MM-dd',
                   initialDate: widget.date,
+                  enabled: false,
                 ),
+              ]),
+
+              _buildSectionCard('Event Title', [
                 KenwellTextField(
                   label: 'Event Title',
                   controller: widget.viewModel.titleController,
                   padding: EdgeInsets.zero,
                   validator: (value) => _requiredField('Event Title', value),
                 ),
+              ]),
+
+              _buildSectionCard('Event Location', [
                 KenwellTextField(
                   label: 'Address',
                   controller: widget.viewModel.addressController,
                   padding: EdgeInsets.zero,
                   validator: (value) => _requiredField('Address', value),
+                ),
+                KenwellTextField(
+                  label: 'Town/City',
+                  controller: widget.viewModel.townCityController,
+                  padding: EdgeInsets.zero,
+                  validator: (value) => _requiredField('Town/City', value),
+                ),
+                KenwellDropdownField<String>(
+                  label: 'Province',
+                  value: widget.viewModel.province,
+                  items: const [
+                    'Gauteng',
+                    'Western Cape',
+                    'KwaZulu-Natal',
+                    'Eastern Cape',
+                    'Limpopo',
+                    'Mpumalanga',
+                    'North West',
+                    'Free State',
+                    'Northern Cape'
+                  ],
+                  onChanged: (val) {
+                    if (val != null) widget.viewModel.updateProvince(val);
+                  },
+                  decoration: KenwellFormStyles.decoration(
+                    label: 'Province',
+                    hint: 'Select Province',
+                  ),
                 ),
                 KenwellTextField(
                   label: 'Venue',
@@ -216,7 +283,8 @@ class _EventScreenState extends State<EventScreen> {
                   validator: (value) => _requiredField('Venue', value),
                 ),
               ]),
-              _buildSectionCard('Onsite Contact', [
+
+              _buildSectionCard('Onsite Contact Person', [
                 KenwellTextField(
                   label: 'Contact Person First Name',
                   controller: widget.viewModel.onsiteContactFirstNameController,
@@ -253,7 +321,7 @@ class _EventScreenState extends State<EventScreen> {
                   validator: Validators.validateEmail,
                 ),
               ]),
-              _buildSectionCard('AE Contact', [
+              _buildSectionCard('AE Contact Person', [
                 KenwellTextField(
                   label: 'Contact Person First Name',
                   controller: widget.viewModel.aeContactFirstNameController,
@@ -290,65 +358,293 @@ class _EventScreenState extends State<EventScreen> {
                   validator: Validators.validateEmail,
                 ),
               ]),
-              _buildSectionCard('Participation & Numbers', [
+              _buildSectionCard('Medical Aid Option', [
+                // MEDICAL AID
+                KenwellDropdownField<String>(
+                  label: 'Do the Clients Have Medical Aid?',
+                  value: _nullableValue(widget.viewModel.medicalAid),
+                  items: const ['Yes', 'No'],
+                  onChanged: (val) {
+                    setState(() {
+                      widget.viewModel.medicalAid = val ?? '';
+                    });
+                  },
+                  padding: EdgeInsets.zero,
+                  validator: (val) => _requiredSelection('Medical Aid', val),
+                ),
+
+                // _buildServicesRequestedField(context),
+              ]),
+              _buildSectionCard('Participation Numbers', [
                 _buildSpinBoxField(
                   'Expected Participation',
                   widget.viewModel.expectedParticipationController,
                 ),
-                _buildSpinBoxField(
-                  'Passports',
-                  widget.viewModel.passportsController,
-                ),
-                _buildSpinBoxField(
+                /* _buildSpinBoxField(
                   'Nurses',
                   widget.viewModel.nursesController,
-                ),
+                ), */
               ]),
-              _buildSectionCard('Options', [
+
+              _buildSectionCard('Coordinators Option', [
+                // COORDINATORS — DROPDOWN + SPINBOX WHEN YES
                 KenwellDropdownField<String>(
-                  label: 'Medical Aid',
-                  value: _nullableValue(widget.viewModel.medicalAid),
+                  label: 'Do You Need Coordinators?',
+                  value: _nullableValue(widget.viewModel.coordinatorsOption),
                   items: const ['Yes', 'No'],
-                  onChanged: (val) => widget.viewModel.medicalAid = val ?? '',
-                  padding: EdgeInsets.zero,
-                  validator: (val) => _requiredSelection('Medical Aid', val),
-                ),
-                KenwellDropdownField<String>(
-                  label: 'Non-Members',
-                  value: _nullableValue(widget.viewModel.nonMembers),
-                  items: const ['Yes', 'No'],
-                  onChanged: (val) => widget.viewModel.nonMembers = val ?? '',
-                  padding: EdgeInsets.zero,
-                  validator: (val) => _requiredSelection('Non-Members', val),
-                ),
-                KenwellDropdownField<String>(
-                  label: 'Coordinators',
-                  value: _nullableValue(widget.viewModel.coordinators),
-                  items: const ['Yes', 'No'],
-                  onChanged: (val) => widget.viewModel.coordinators = val ?? '',
+                  onChanged: (val) {
+                    setState(() {
+                      widget.viewModel.coordinatorsOption = val ?? 'No';
+                      if (val == 'No') widget.viewModel.coordinatorsCount = 0;
+                    });
+                  },
                   padding: EdgeInsets.zero,
                   validator: (val) => _requiredSelection('Coordinators', val),
                 ),
+
+                if (widget.viewModel.coordinatorsOption == 'Yes')
+                  SpinBox(
+                    min: 0,
+                    max: 10,
+                    value: widget.viewModel.coordinatorsCount.toDouble(),
+                    decoration: KenwellFormStyles.decoration(
+                      label: 'Number of Coordinators Needed',
+                      hint: 'Please Enter Number',
+                    ),
+                    onChanged: (value) {
+                      setState(() =>
+                          widget.viewModel.coordinatorsCount = value.toInt());
+                    },
+                  ),
+              ]),
+
+              _buildSectionCard('Mobile Booths Option', [
+                // MOBILE BOOTHS — DROPDOWN + SPINBOX WHEN YES
                 KenwellDropdownField<String>(
-                  label: 'Multiply Promoters',
-                  value: _nullableValue(widget.viewModel.multiplyPromoters),
+                  label: 'Do You Need Mobile Booths?',
+                  value: _nullableValue(widget.viewModel.mobileBoothsOption),
                   items: const ['Yes', 'No'],
-                  onChanged: (val) =>
-                      widget.viewModel.multiplyPromoters = val ?? '',
-                  padding: EdgeInsets.zero,
-                  validator: (val) =>
-                      _requiredSelection('Multiply Promoters', val),
-                ),
-                KenwellDropdownField<String>(
-                  label: 'Mobile Booths',
-                  value: _nullableValue(widget.viewModel.mobileBooths),
-                  items: const ['Yes', 'No'],
-                  onChanged: (val) => widget.viewModel.mobileBooths = val ?? '',
+                  onChanged: (val) {
+                    setState(() {
+                      widget.viewModel.mobileBoothsOption = val ?? 'No';
+                      if (val == 'No') widget.viewModel.mobileBoothsCount = 0;
+                    });
+                  },
                   padding: EdgeInsets.zero,
                   validator: (val) => _requiredSelection('Mobile Booths', val),
                 ),
-                _buildServicesRequestedField(context),
+
+                if (widget.viewModel.mobileBoothsOption == 'Yes')
+                  SpinBox(
+                    min: 0,
+                    max: 20,
+                    value: widget.viewModel.mobileBoothsCount.toDouble(),
+                    decoration: KenwellFormStyles.decoration(
+                      label: 'Number of Mobile Booths Needed',
+                      hint: 'Please Enter Number',
+                    ),
+                    onChanged: (value) {
+                      setState(() =>
+                          widget.viewModel.mobileBoothsCount = value.toInt());
+                    },
+                  ),
               ]),
+
+              _buildSectionCard('Requested Services',
+                  [_buildServicesRequestedField(context)]),
+
+              _buildSectionCard('Healthcare Professionals Needed', [
+                //Dental Hygenists — DROPDOWN + SPINBOX WHEN YES
+                KenwellDropdownField<String>(
+                  label: 'Do You Need Dental Hygenists?',
+                  value: _nullableValue(widget.viewModel.dentalHygenistsOption),
+                  items: const ['Yes', 'No'],
+                  onChanged: (val) {
+                    setState(() {
+                      widget.viewModel.dentalHygenistsOption = val ?? 'No';
+                      if (val == 'No') {
+                        widget.viewModel.dentalHygenistsCount = 0;
+                      }
+                    });
+                  },
+                  padding: EdgeInsets.zero,
+                  validator: (val) =>
+                      _requiredSelection('Dental Hygenists', val),
+                ),
+
+                if (widget.viewModel.dentalHygenistsOption == 'Yes')
+                  SpinBox(
+                    min: 0,
+                    max: 20,
+                    value: widget.viewModel.dentalHygenistsCount.toDouble(),
+                    decoration: KenwellFormStyles.decoration(
+                      label: 'Number of Dental Hygenists Needed',
+                      hint: 'Please Enter Number',
+                    ),
+                    onChanged: (value) {
+                      setState(() => widget.viewModel.dentalHygenistsCount =
+                          value.toInt());
+                    },
+                  ),
+
+                //Dietician — DROPDOWN + SPINBOX WHEN YES
+                KenwellDropdownField<String>(
+                  label: 'Do You Need Dieticians?',
+                  value: _nullableValue(widget.viewModel.dieticiansOption),
+                  items: const ['Yes', 'No'],
+                  onChanged: (val) {
+                    setState(() {
+                      widget.viewModel.dieticiansOption = val ?? 'No';
+                      if (val == 'No') widget.viewModel.dieticiansCount = 0;
+                    });
+                  },
+                  padding: EdgeInsets.zero,
+                  validator: (val) => _requiredSelection('Dieticians', val),
+                ),
+
+                if (widget.viewModel.dieticiansOption == 'Yes')
+                  SpinBox(
+                    min: 0,
+                    max: 20,
+                    value: widget.viewModel.dieticiansCount.toDouble(),
+                    decoration: KenwellFormStyles.decoration(
+                      label: 'Number of Dieticians Needed',
+                      hint: 'Please Enter Number',
+                    ),
+                    onChanged: (value) {
+                      setState(() =>
+                          widget.viewModel.dieticiansCount = value.toInt());
+                    },
+                  ),
+
+                //Nurses — DROPDOWN + SPINBOX WHEN YES
+                KenwellDropdownField<String>(
+                  label: 'Do You Need Nurses?',
+                  value: _nullableValue(widget.viewModel.nursesOption),
+                  items: const ['Yes', 'No'],
+                  onChanged: (val) {
+                    setState(() {
+                      widget.viewModel.nursesOption = val ?? 'No';
+                      if (val == 'No') widget.viewModel.nursesCount = 0;
+                    });
+                  },
+                  padding: EdgeInsets.zero,
+                  validator: (val) => _requiredSelection('Nurses', val),
+                ),
+
+                if (widget.viewModel.nursesOption == 'Yes')
+                  SpinBox(
+                    min: 0,
+                    max: 20,
+                    value: widget.viewModel.nursesCount.toDouble(),
+                    decoration: KenwellFormStyles.decoration(
+                      label: 'Number of Nurses Needed',
+                      hint: 'Please Enter Number',
+                    ),
+                    onChanged: (value) {
+                      setState(
+                          () => widget.viewModel.nursesCount = value.toInt());
+                    },
+                  ),
+
+                //Optometrists — DROPDOWN + SPINBOX WHEN YES
+                KenwellDropdownField<String>(
+                  label: 'Do You Need Optometrists?',
+                  value: _nullableValue(widget.viewModel.optometristsOption),
+                  items: const ['Yes', 'No'],
+                  onChanged: (val) {
+                    setState(() {
+                      widget.viewModel.optometristsOption = val ?? 'No';
+                      if (val == 'No') {
+                        widget.viewModel.optometristsCount = 0;
+                      }
+                    });
+                  },
+                  padding: EdgeInsets.zero,
+                  validator: (val) => _requiredSelection('Optometrists', val),
+                ),
+
+                if (widget.viewModel.optometristsOption == 'Yes')
+                  SpinBox(
+                    min: 0,
+                    max: 20,
+                    value: widget.viewModel.optometristsCount.toDouble(),
+                    decoration: KenwellFormStyles.decoration(
+                      label: 'Number of Optometrists Needed',
+                      hint: 'Please Enter Number',
+                    ),
+                    onChanged: (value) {
+                      setState(() =>
+                          widget.viewModel.optometristsCount = value.toInt());
+                    },
+                  ),
+
+                //Occupational Therapists — DROPDOWN + SPINBOX WHEN YES
+                KenwellDropdownField<String>(
+                  label: 'Do You Need Occupational Therapists?',
+                  value: _nullableValue(
+                      widget.viewModel.occupationalTherapistsOption),
+                  items: const ['Yes', 'No'],
+                  onChanged: (val) {
+                    setState(() {
+                      widget.viewModel.occupationalTherapistsOption =
+                          val ?? 'No';
+                      if (val == 'No') {
+                        widget.viewModel.occupationalTherapistsCount = 0;
+                      }
+                    });
+                  },
+                  padding: EdgeInsets.zero,
+                  validator: (val) =>
+                      _requiredSelection('Occupational Therapists', val),
+                ),
+
+                if (widget.viewModel.occupationalTherapistsOption == 'Yes')
+                  SpinBox(
+                    min: 0,
+                    max: 20,
+                    value:
+                        widget.viewModel.occupationalTherapistsCount.toDouble(),
+                    decoration: KenwellFormStyles.decoration(
+                      label: 'Number of Occupational Therapists Needed',
+                      hint: 'Please Enter Number',
+                    ),
+                    onChanged: (value) {
+                      setState(() => widget.viewModel
+                          .occupationalTherapistsCount = value.toInt());
+                    },
+                  ),
+                //Psychologists — DROPDOWN + SPINBOX WHEN YES
+                KenwellDropdownField<String>(
+                  label: 'Do You Need Psychologists?',
+                  value: _nullableValue(widget.viewModel.psychologistsOption),
+                  items: const ['Yes', 'No'],
+                  onChanged: (val) {
+                    setState(() {
+                      widget.viewModel.psychologistsOption = val ?? 'No';
+                      if (val == 'No') widget.viewModel.psychologistsCount = 0;
+                    });
+                  },
+                  padding: EdgeInsets.zero,
+                  validator: (val) => _requiredSelection('Psychologists', val),
+                ),
+
+                if (widget.viewModel.psychologistsOption == 'Yes')
+                  SpinBox(
+                    min: 0,
+                    max: 20,
+                    value: widget.viewModel.psychologistsCount.toDouble(),
+                    decoration: KenwellFormStyles.decoration(
+                      label: 'Number of Psychologists Needed',
+                      hint: 'Please Enter Number',
+                    ),
+                    onChanged: (value) {
+                      setState(() =>
+                          widget.viewModel.psychologistsCount = value.toInt());
+                    },
+                  ),
+              ]),
+
               _buildSectionCard('Time Details', [
                 KenwellTextField(
                   label: 'Setup Time',
@@ -448,15 +744,15 @@ class _EventScreenState extends State<EventScreen> {
 
     return SpinBox(
       min: 0,
-      max: 100000,
+      max: 300,
       value: initialValue,
       step: 1,
       decimals: 0,
       keyboardType:
           const TextInputType.numberWithOptions(decimal: false, signed: false),
-      decoration:
-          KenwellFormStyles.decoration(label: label, hint: 'Enter $label'),
-      validator: (value) => value == null ? 'Enter $label' : null,
+      decoration: KenwellFormStyles.decoration(
+          label: label, hint: 'Please Enter $label'),
+      validator: (value) => value == null ? 'Please Enter $label' : null,
       onChanged: (value) {
         controller.text = value.round().toString();
       },
@@ -468,22 +764,22 @@ class _EventScreenState extends State<EventScreen> {
       initialValue: widget.viewModel.selectedServices,
       validator: (_) {
         if (widget.viewModel.selectedServices.isEmpty) {
-          return 'Select at least one service';
+          return 'Please select at least one service';
         }
         return null;
       },
       builder: (field) {
-        final labelStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            );
+        //final labelStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
+        //    fontWeight: FontWeight.w600,
+        //);
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Services Requested',
-              style: labelStyle,
-            ),
-            const SizedBox(height: 8),
+            //  Text(
+            // 'Services Requested',
+            // style: labelStyle,
+            //),
+            //const SizedBox(height: 8),
             KenwellCheckboxGroup(
               options: widget.viewModel.availableServiceOptions
                   .map(
@@ -539,7 +835,7 @@ Widget _buildSectionCard(String title, List<Widget> children) {
 String? _nullableValue(String value) => value.isEmpty ? null : value;
 
 String? _requiredField(String label, String? value) =>
-    (value == null || value.isEmpty) ? 'Enter $label' : null;
+    (value == null || value.isEmpty) ? 'Please Enter $label' : null;
 
 String? _requiredSelection(String label, String? value) =>
-    (value == null || value.isEmpty) ? 'Select $label' : null;
+    (value == null || value.isEmpty) ? 'Please Select $label' : null;
