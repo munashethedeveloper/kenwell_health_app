@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/features/help/widgets/help_screen.dart';
 import 'package:kenwell_health_app/ui/features/nurse_interventions/view_model/nurse_intervention_form_mixin.dart';
+import 'package:kenwell_health_app/ui/features/user_management/widgets/user_management_screen.dart';
+import 'package:kenwell_health_app/ui/features/user_management/widgets/user_management_screen_version_two.dart';
 import 'package:provider/provider.dart';
 
 import '../domain/models/wellness_event.dart';
@@ -233,6 +235,13 @@ class AppRouter {
 
       case RouteNames.help:
         return MaterialPageRoute(builder: (_) => const HelpScreen());
+
+      case RouteNames.userManagement:
+        return MaterialPageRoute(builder: (_) => const UserManagementScreen());
+
+      case RouteNames.userManagementVersionTwo:
+        return MaterialPageRoute(
+            builder: (_) => const UserManagementScreenVersionTwo());
 
       default:
         return MaterialPageRoute(

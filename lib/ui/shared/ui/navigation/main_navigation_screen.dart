@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
+import 'package:kenwell_health_app/ui/features/user_management/widgets/user_management_screen.dart';
+import 'package:kenwell_health_app/ui/features/user_management/widgets/user_management_screen_version_two.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 
@@ -20,7 +22,7 @@ class MainNavigationScreen extends StatefulWidget {
 }
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
-  int _currentIndex = 1;
+  int _currentIndex = 2;
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +30,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     //Provider.of<ProfileViewModel>(context, listen: false).loadProfile();
 
     final List<Widget> tabs = [
+      const UserManagementScreenVersionTwo(),
       //const ProfileScreen(),
       const StatsReportScreen(),
       CalendarScreen(eventVM: eventVM),
@@ -70,6 +73,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               backgroundColor: KenwellColors.primaryGreen,
               elevation: 6,
               destinations: const [
+                NavigationDestination(
+                  icon: Icon(Icons.person),
+                  label: 'User Management',
+                ),
                 // NavigationDestination(
                 // icon: Icon(Icons.person),
                 // label: 'Profile',
