@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/features/nurse_interventions/view_model/nurse_intervention_form_mixin.dart';
-import 'package:kenwell_health_app/ui/features/nurse_interventions/view_model/nurse_intervention_view_model.dart';
-import 'package:kenwell_health_app/ui/features/nurse_interventions/widgets/nurse_intervention_form.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_referral_card.dart';
 import 'package:provider/provider.dart';

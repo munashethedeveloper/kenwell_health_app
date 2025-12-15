@@ -1,37 +1,113 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/domain/constants/user_roles.dart';
+import 'package:kenwell_health_app/routing/route_names.dart';
 import 'package:kenwell_health_app/ui/features/auth/widgets/login_screen.dart';
+import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
 import '../../../../data/services/auth_service.dart';
-import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_section_header.dart';
 import '../../../shared/ui/logo/app_logo.dart';
 
-class UserManagementScreenVersionTwo extends StatelessWidget {
+class UserManagementScreenVersionTwo extends StatefulWidget {
   const UserManagementScreenVersionTwo({super.key});
+
+  @override
+  State<UserManagementScreenVersionTwo> createState() =>
+      _UserManagementScreenVersionTwoState();
+}
+
+class _UserManagementScreenVersionTwoState
+    extends State<UserManagementScreenVersionTwo> {
+  Future<void> _logout() async {
+    await AuthService().logout();
+
+    if (!mounted) return;
+
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+      (route) => false,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('User Management'),
+        appBar: KenwellAppBar(
+          title: 'User Management',
+          titleStyle: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 30,
+          ),
+          automaticallyImplyLeading: false,
           bottom: const TabBar(
+            indicatorSize: TabBarIndicatorSize.tab,
+            indicator: BoxDecoration(color: Color(0xFF90C048)),
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white,
             tabs: [
-              Tab(text: 'Create User'),
-              Tab(text: 'View Users'),
+              Tab(icon: Icon(Icons.person_add), text: 'Create User'),
+              Tab(icon: Icon(Icons.group), text: 'View Users'),
+              //Tab(text: 'Create User'),
+              //Tab(text: 'View Users'),
             ],
           ),
+          actions: [
+            PopupMenuButton<int>(
+              icon: const Icon(Icons.more_vert, color: Colors.white),
+              onSelected: (value) async {
+                switch (value) {
+                  case 0:
+                    if (mounted) {
+                      Navigator.pushNamed(context, RouteNames.profile);
+                    }
+                    break;
+                  case 1:
+                    if (mounted) {
+                      Navigator.pushNamed(context, RouteNames.help);
+                    }
+                    break;
+                  case 2:
+                    await _logout();
+                    break;
+                }
+              },
+              itemBuilder: (context) => const [
+                PopupMenuItem<int>(
+                  value: 0,
+                  child: ListTile(
+                    leading: Icon(Icons.person),
+                    title: Text('Profile'),
+                  ),
+                ),
+                PopupMenuItem<int>(
+                  value: 1,
+                  child: ListTile(
+                    leading: Icon(Icons.help_outline),
+                    title: Text('Help'),
+                  ),
+                ),
+                PopupMenuItem<int>(
+                  value: 2,
+                  child: ListTile(
+                    leading: Icon(Icons.logout),
+                    title: Text('Logout'),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
         body: const TabBarView(
           children: [
-            CreateUserTab(), // <-- full registration form
+            CreateUserTab(),
             ViewUsersTab(),
           ],
         ),
@@ -40,7 +116,7 @@ class UserManagementScreenVersionTwo extends StatelessWidget {
   }
 }
 
-// ---------------- Create User Tab (Full Registration Form) ----------------
+// ---------------- Create User Tab ----------------
 class CreateUserTab extends StatefulWidget {
   const CreateUserTab({super.key});
 
@@ -62,10 +138,10 @@ class _CreateUserTabState extends State<CreateUserTab> {
   String? _selectedRole;
   bool _isLoading = false;
   bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
 
   void _register() async {
     if (!_formKey.currentState!.validate()) return;
+
     if (_passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Passwords do not match')),
@@ -73,8 +149,7 @@ class _CreateUserTabState extends State<CreateUserTab> {
       return;
     }
 
-    final role = _selectedRole;
-    if (role == null) {
+    if (_selectedRole == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select a role')),
       );
@@ -87,7 +162,7 @@ class _CreateUserTabState extends State<CreateUserTab> {
       final user = await AuthService().register(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
-        role: role,
+        role: _selectedRole!,
         phoneNumber: _phoneController.text.trim(),
         username: _usernameController.text.trim(),
         firstName: _firstNameController.text.trim(),
@@ -98,17 +173,11 @@ class _CreateUserTabState extends State<CreateUserTab> {
 
       if (user != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Registration successful! Please log in.')),
-        );
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const LoginScreen()),
+          const SnackBar(content: Text('Registration successful!')),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Registration failed. Email may already exist.')),
+          const SnackBar(content: Text('Registration failed')),
         );
       }
     } catch (e) {
@@ -145,8 +214,9 @@ class _CreateUserTabState extends State<CreateUserTab> {
               const AppLogo(size: 200),
               const SizedBox(height: 24),
               const KenwellSectionHeader(
-                title: "Register Account",
-                subtitle: "Complete your details or continue with social media",
+                title: "Register User Account",
+                subtitle:
+                    "Complete the user's details below to create an account.",
               ),
               KenwellFormCard(
                 title: 'Personal Information',
@@ -156,32 +226,27 @@ class _CreateUserTabState extends State<CreateUserTab> {
                     KenwellTextField(
                       label: "First Name",
                       controller: _firstNameController,
-                      inputFormatters: AppTextInputFormatters.lettersOnly(
-                        allowHyphen: true,
-                      ),
-                      padding: EdgeInsets.zero,
+                      inputFormatters:
+                          AppTextInputFormatters.lettersOnly(allowHyphen: true),
                       validator: (v) =>
-                          (v == null || v.isEmpty) ? "Enter First Name" : null,
+                          v == null || v.isEmpty ? 'Enter First Name' : null,
                     ),
                     const SizedBox(height: 24),
                     KenwellTextField(
                       label: "Last Name",
                       controller: _lastNameController,
-                      inputFormatters: AppTextInputFormatters.lettersOnly(
-                        allowHyphen: true,
-                      ),
-                      padding: EdgeInsets.zero,
+                      inputFormatters:
+                          AppTextInputFormatters.lettersOnly(allowHyphen: true),
                       validator: (v) =>
-                          (v == null || v.isEmpty) ? "Enter Last Name" : null,
+                          v == null || v.isEmpty ? 'Enter Last Name' : null,
                     ),
                     const SizedBox(height: 24),
                     KenwellDropdownField<String>(
                       label: "Role",
                       value: _selectedRole,
                       items: UserRoles.values,
-                      padding: EdgeInsets.zero,
                       validator: (v) =>
-                          (v == null || v.isEmpty) ? "Select Role" : null,
+                          v == null || v.isEmpty ? 'Select Role' : null,
                       onChanged: (value) =>
                           setState(() => _selectedRole = value),
                     ),
@@ -193,7 +258,6 @@ class _CreateUserTabState extends State<CreateUserTab> {
                       inputFormatters: [
                         AppTextInputFormatters.saPhoneNumberFormatter()
                       ],
-                      padding: EdgeInsets.zero,
                       validator: Validators.validateSouthAfricanPhoneNumber,
                     ),
                   ],
@@ -208,7 +272,6 @@ class _CreateUserTabState extends State<CreateUserTab> {
                       label: "Email",
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
-                      padding: EdgeInsets.zero,
                       validator: Validators.validateEmail,
                     ),
                     const SizedBox(height: 24),
@@ -216,7 +279,6 @@ class _CreateUserTabState extends State<CreateUserTab> {
                       label: "Password",
                       controller: _passwordController,
                       obscureText: _obscurePassword,
-                      padding: EdgeInsets.zero,
                       suffixIcon: IconButton(
                         icon: Icon(_obscurePassword
                             ? Icons.visibility_off
@@ -226,7 +288,6 @@ class _CreateUserTabState extends State<CreateUserTab> {
                       ),
                       validator: Validators.validateStrongPassword,
                     ),
-                    const SizedBox(height: 24),
                   ],
                 ),
               ),
@@ -253,45 +314,35 @@ class ViewUsersTab extends StatelessWidget {
     {'email': 'user2@example.com'},
   ];
 
-  void _resetPassword(String email) {
-    // TODO: Implement password reset logic
-    print('Reset password for $email');
-  }
-
-  void _deleteUser(String email) {
-    // TODO: Implement delete logic
-    print('Deleted $email');
-  }
-
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16.0),
-      itemCount: users.length,
-      itemBuilder: (context, index) {
-        final user = users[index];
-        return Card(
-          margin: const EdgeInsets.symmetric(vertical: 8.0),
-          child: ListTile(
-            title: Text(user['email']!),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.refresh),
-                  tooltip: 'Reset Password',
-                  onPressed: () => _resetPassword(user['email']!),
+    return Column(
+      children: [
+        const SizedBox(height: 16),
+        const AppLogo(size: 200),
+        const SizedBox(height: 16),
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: users.length,
+            itemBuilder: (context, index) {
+              final user = users[index];
+              return Card(
+                child: ListTile(
+                  title: Text(user['email']!),
+                  trailing: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.refresh),
+                      Icon(Icons.delete),
+                    ],
+                  ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.delete),
-                  tooltip: 'Delete User',
-                  onPressed: () => _deleteUser(user['email']!),
-                ),
-              ],
-            ),
+              );
+            },
           ),
-        );
-      },
+        ),
+      ],
     );
   }
 }

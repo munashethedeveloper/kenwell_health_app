@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -75,31 +76,27 @@ class _CalendarScreenState extends State<CalendarScreen> {
       child: Scaffold(
         appBar: KenwellAppBar(
           title: 'Wellness Planner',
-          //titleColor: Colors.white,
           titleStyle: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 30,
           ),
           automaticallyImplyLeading: false,
-          //backgroundColor: const Color(0xFF201C58),
           actions: [
             PopupMenuButton<int>(
               icon: const Icon(Icons.more_vert, color: Colors.white),
               onSelected: (value) async {
                 switch (value) {
-                  case 0: // Logout
-                    await _logout();
-                    break;
-                  case 1: // Help
-                    if (mounted) {
-                      Navigator.pushNamed(context, RouteNames.help);
-                    }
-                    break;
-                  case 2: // Profile
+                  case 0:
                     if (mounted) {
                       Navigator.pushNamed(context, RouteNames.profile);
                     }
+                    break;
+                  case 1:
+                    if (mounted) Navigator.pushNamed(context, RouteNames.help);
+                    break;
+                  case 2:
+                    await _logout();
                     break;
                 }
               },
@@ -107,8 +104,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 const PopupMenuItem<int>(
                   value: 0,
                   child: ListTile(
-                    leading: Icon(Icons.logout, color: Colors.black),
-                    title: Text('Logout'),
+                    leading: Icon(Icons.person, color: Colors.black),
+                    title: Text('Profile'),
                   ),
                 ),
                 const PopupMenuItem<int>(
@@ -121,14 +118,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 const PopupMenuItem<int>(
                   value: 2,
                   child: ListTile(
-                    leading: Icon(Icons.person, color: Colors.black),
-                    title: Text('Profile'),
+                    leading: Icon(Icons.logout, color: Colors.black),
+                    title: Text('Logout'),
                   ),
                 ),
               ],
             ),
           ],
-
           bottom: const TabBar(
             indicatorSize: TabBarIndicatorSize.tab,
             indicator: BoxDecoration(color: Color(0xFF90C048)),
@@ -143,104 +139,110 @@ class _CalendarScreenState extends State<CalendarScreen> {
         body: TabBarView(
           children: [
             // ===== Calendar Tab =====
-            Column(
-              children: [
-                // const KenwellSectionHeader(
-                //  title: 'Calendar View',
-                //    uppercase: true,
-                //   ),
-                KenwellFormCard(
-                  child: TableCalendar(
-                    firstDay: DateTime.utc(2020, 1, 1),
-                    lastDay: DateTime.utc(3000, 12, 31),
-                    focusedDay: _focusedDay,
-                    selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-                    eventLoader: _getEventsForDay,
-                    headerStyle: const HeaderStyle(
-                      formatButtonVisible: false,
-                      titleCentered: true,
-                      titleTextStyle: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF201C58),
+            SingleChildScrollView(
+              child: Column(
+                children: [
+                  const SizedBox(height: 16),
+                  const AppLogo(size: 200),
+                  const SizedBox(height: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: KenwellFormCard(
+                      child: TableCalendar(
+                        firstDay: DateTime.utc(2020, 1, 1),
+                        lastDay: DateTime.utc(3000, 12, 31),
+                        focusedDay: _focusedDay,
+                        selectedDayPredicate: (day) =>
+                            isSameDay(_selectedDay, day),
+                        eventLoader: _getEventsForDay,
+                        headerStyle: const HeaderStyle(
+                          formatButtonVisible: false,
+                          titleCentered: true,
+                          titleTextStyle: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF201C58),
+                          ),
+                        ),
+                        daysOfWeekStyle: const DaysOfWeekStyle(
+                          weekdayStyle: TextStyle(fontWeight: FontWeight.bold),
+                          weekendStyle: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red,
+                          ),
+                        ),
+                        calendarStyle: CalendarStyle(
+                          weekendTextStyle: const TextStyle(color: Colors.red),
+                          todayDecoration: BoxDecoration(
+                            color: Colors.greenAccent.withValues(alpha: 0.5),
+                            shape: BoxShape.circle,
+                          ),
+                          selectedDecoration: const BoxDecoration(
+                            color: Color(0xFF90C048),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        onDaySelected: (selectedDay, focusedDay) async {
+                          setState(() {
+                            _selectedDay = selectedDay;
+                            _focusedDay = focusedDay;
+                          });
+                          final eventsForDay = _getEventsForDay(selectedDay);
+                          if (eventsForDay.isEmpty) {
+                            await _openEventForm(selectedDay);
+                          } else {
+                            _showDayActionsSheet(selectedDay, eventsForDay);
+                          }
+                        },
                       ),
                     ),
-                    daysOfWeekStyle: const DaysOfWeekStyle(
-                      weekdayStyle: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                      weekendStyle: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red,
-                      ),
-                    ),
-                    calendarStyle: CalendarStyle(
-                      weekendTextStyle: const TextStyle(color: Colors.red),
-                      todayDecoration: BoxDecoration(
-                        color: Colors.greenAccent.withValues(alpha: 0.5),
-                        shape: BoxShape.circle,
-                      ),
-                      selectedDecoration: const BoxDecoration(
-                        color: Color(0xFF90C048),
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    onDaySelected: (selectedDay, focusedDay) async {
-                      setState(() {
-                        _selectedDay = selectedDay;
-                        _focusedDay = focusedDay;
-                      });
-                      final eventsForDay = _getEventsForDay(selectedDay);
-                      if (eventsForDay.isEmpty) {
-                        await _openEventForm(selectedDay);
-                      } else {
-                        _showDayActionsSheet(selectedDay, eventsForDay);
-                      }
-                    },
                   ),
-                ),
-              ],
+                  const SizedBox(height: 16),
+                ],
+              ),
             ),
 
-            // ===== Events List Tab =====
-            Column(
-              children: [
-                //  const KenwellSectionHeader(
-                // title: 'Events List',
-                //   uppercase: true,
-                // ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.chevron_left),
-                        onPressed: _goToPreviousMonth,
-                      ),
-                      Text(
-                        DateFormat.yMMMM().format(_focusedDay),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF201C58),
+            // ===== Events List Tab (Scrollable) =====
+            SingleChildScrollView(
+              child: Column(
+                children: [
+                  const SizedBox(height: 16),
+                  const AppLogo(size: 200),
+                  const SizedBox(height: 16),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.chevron_left),
+                          onPressed: _goToPreviousMonth,
                         ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.chevron_right),
-                        onPressed: _goToNextMonth,
-                      ),
-                    ],
+                        Text(
+                          DateFormat.yMMMM().format(_focusedDay),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF201C58),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.chevron_right),
+                          onPressed: _goToNextMonth,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: Builder(
+                  Builder(
                     builder: (_) {
                       final eventsThisMonth = _getEventsForMonth(_focusedDay);
                       if (eventsThisMonth.isEmpty) {
                         return const Center(
-                          child: Text("No events for this month."),
+                          child: Padding(
+                            padding: EdgeInsets.all(24),
+                            child: Text("No events for this month."),
+                          ),
                         );
                       }
 
@@ -256,124 +258,108 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       final sortedDates = groupedEvents.keys.toList()
                         ..sort((a, b) => a.compareTo(b));
 
-                      return ListView.builder(
-                        itemCount: groupedEvents.length,
-                        itemBuilder: (context, index) {
-                          final day = sortedDates[index];
-                          final events = groupedEvents[day]!;
-
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8),
-                                child: KenwellFormCard(
-                                  title: DateFormat.yMMMMd().format(day),
-                                  child: Column(
-                                    children: [
-                                      for (int i = 0;
-                                          i < events.length;
-                                          i++) ...[
-                                        Dismissible(
-                                          key: Key(events[i].id),
-                                          direction:
-                                              DismissDirection.endToStart,
-                                          confirmDismiss: (direction) async {
-                                            return await showDialog(
-                                              context: context,
-                                              builder:
-                                                  (BuildContext dialogContext) {
-                                                return AlertDialog(
-                                                  title: const Text(
-                                                      'Delete Event'),
-                                                  content: const Text(
-                                                    'Are you sure you want to delete this event?',
-                                                  ),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () =>
-                                                          Navigator.of(
-                                                                  dialogContext)
-                                                              .pop(false),
-                                                      child:
-                                                          const Text('Cancel'),
-                                                    ),
-                                                    TextButton(
-                                                      onPressed: () =>
-                                                          Navigator.of(
-                                                                  dialogContext)
-                                                              .pop(true),
-                                                      style:
-                                                          TextButton.styleFrom(
-                                                              foregroundColor:
-                                                                  Colors.red),
-                                                      child:
-                                                          const Text('Delete'),
-                                                    ),
-                                                  ],
-                                                );
-                                              },
-                                            );
-                                          },
-                                          onDismissed: (direction) async {
-                                            final deletedEvent = await widget
-                                                .eventVM
-                                                .deleteEvent(events[i].id);
-                                            if (deletedEvent != null) {
-                                              if (!context.mounted) return;
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                  content: const Text(
-                                                      'Event deleted'),
-                                                  action: SnackBarAction(
-                                                    label: 'UNDO',
-                                                    onPressed: () {
-                                                      widget.eventVM
-                                                          .restoreEvent(
-                                                              deletedEvent);
-                                                    },
-                                                  ),
-                                                  duration: const Duration(
-                                                      seconds: 5),
+                      return Column(
+                        children: [
+                          for (var day in sortedDates) ...[
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              child: KenwellFormCard(
+                                title: DateFormat.yMMMMd().format(day),
+                                child: Column(
+                                  children: [
+                                    for (int i = 0;
+                                        i < groupedEvents[day]!.length;
+                                        i++) ...[
+                                      Dismissible(
+                                        key: Key(groupedEvents[day]![i].id),
+                                        direction: DismissDirection.endToStart,
+                                        confirmDismiss: (direction) async {
+                                          return await showDialog(
+                                            context: context,
+                                            builder: (dialogContext) =>
+                                                AlertDialog(
+                                              title: const Text('Delete Event'),
+                                              content: const Text(
+                                                'Are you sure you want to delete this event?',
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () => Navigator.of(
+                                                          dialogContext)
+                                                      .pop(false),
+                                                  child: const Text('Cancel'),
                                                 ),
-                                              );
-                                            }
-                                          },
-                                          background: Container(
-                                            alignment: Alignment.centerRight,
-                                            padding: const EdgeInsets.only(
-                                                right: 20),
-                                            color: Colors.red,
-                                            child: const Icon(
-                                              Icons.delete,
-                                              color: Colors.white,
+                                                TextButton(
+                                                  onPressed: () => Navigator.of(
+                                                          dialogContext)
+                                                      .pop(true),
+                                                  style: TextButton.styleFrom(
+                                                      foregroundColor:
+                                                          Colors.red),
+                                                  child: const Text('Delete'),
+                                                ),
+                                              ],
                                             ),
-                                          ),
-                                          child: Padding(
-                                            padding: EdgeInsets.only(
-                                              bottom: i == events.length - 1
-                                                  ? 0
-                                                  : 12,
-                                            ),
-                                            child: _buildModernEventCard(
-                                                events[i]),
+                                          );
+                                        },
+                                        onDismissed: (direction) async {
+                                          final deletedEvent =
+                                              await widget.eventVM.deleteEvent(
+                                                  groupedEvents[day]![i].id);
+                                          if (deletedEvent != null &&
+                                              context.mounted) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content:
+                                                    const Text('Event deleted'),
+                                                action: SnackBarAction(
+                                                  label: 'UNDO',
+                                                  onPressed: () {
+                                                    widget.eventVM.restoreEvent(
+                                                        deletedEvent);
+                                                  },
+                                                ),
+                                                duration:
+                                                    const Duration(seconds: 5),
+                                              ),
+                                            );
+                                          }
+                                        },
+                                        background: Container(
+                                          alignment: Alignment.centerRight,
+                                          padding:
+                                              const EdgeInsets.only(right: 20),
+                                          color: Colors.red,
+                                          child: const Icon(
+                                            Icons.delete,
+                                            color: Colors.white,
                                           ),
                                         ),
-                                      ],
+                                        child: Padding(
+                                          padding: EdgeInsets.only(
+                                              bottom: i ==
+                                                      groupedEvents[day]!
+                                                              .length -
+                                                          1
+                                                  ? 0
+                                                  : 12),
+                                          child: _buildModernEventCard(
+                                              groupedEvents[day]![i]),
+                                        ),
+                                      ),
                                     ],
-                                  ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          );
-                        },
+                            ),
+                          ],
+                        ],
                       );
                     },
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
@@ -416,7 +402,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
           boxShadow: [
             BoxShadow(
               color: gradient.last.withValues(alpha: 0.25),
-              // color: gradient.last.withOpacity(0.25),
               blurRadius: 10,
               offset: const Offset(0, 6),
             ),
@@ -456,8 +441,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
                             : (event.address.isNotEmpty ? event.address : ''),
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.85),
-
-                          //color: Colors.white.withOpacity(0.85),
                         ),
                       ),
                     ],
@@ -508,8 +491,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.2),
-
-        //color: Colors.white.withOpacity(0.2),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -538,9 +519,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   int _compareEvents(WellnessEvent a, WellnessEvent b) {
     final dateComparison = a.date.compareTo(b.date);
-    if (dateComparison != 0) {
-      return dateComparison;
-    }
+    if (dateComparison != 0) return dateComparison;
 
     final aMinutes = _timeStringToMinutes(a.startTime);
     final bMinutes = _timeStringToMinutes(b.startTime);
@@ -563,10 +542,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     if (raw.trim().isEmpty) return null;
     final timeText = raw.trim();
 
-    final formatters = <DateFormat>[
-      DateFormat.Hm(),
-      DateFormat.jm(),
-    ];
+    final formatters = <DateFormat>[DateFormat.Hm(), DateFormat.jm()];
 
     for (final formatter in formatters) {
       try {
@@ -672,15 +648,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
       if (event.startTime.isNotEmpty) event.startTime,
       if (event.endTime.isNotEmpty) event.endTime,
     ];
-    if (times.isNotEmpty) {
-      parts.add(times.join(' - '));
-    }
+    if (times.isNotEmpty) parts.add(times.join(' - '));
+
     final location = event.venue.isNotEmpty
         ? event.venue
         : (event.address.isNotEmpty ? event.address : '');
-    if (location.isNotEmpty) {
-      parts.add(location);
-    }
+    if (location.isNotEmpty) parts.add(location);
+
     return parts.isEmpty ? 'Tap to edit' : parts.join(' · ');
   }
 }

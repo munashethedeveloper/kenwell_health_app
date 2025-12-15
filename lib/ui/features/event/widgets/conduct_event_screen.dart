@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kenwell_health_app/data/services/auth_service.dart';
+import 'package:kenwell_health_app/routing/route_names.dart';
+import 'package:kenwell_health_app/ui/features/auth/widgets/login_screen.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
+import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../domain/models/wellness_event.dart';
@@ -19,6 +23,15 @@ class ConductEventScreen extends StatefulWidget {
 class _ConductEventScreenState extends State<ConductEventScreen> {
   String? _startingEventId;
   int _selectedWeek = 0; // 0 = this week, 1 = next week
+
+  // LOGOUT METHOD
+  Future<void> _logout() async {
+    await AuthService().logout();
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+      (route) => false,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,17 +53,67 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
     }).toList();
 
     return Scaffold(
-      appBar: const KenwellAppBar(
+      appBar: KenwellAppBar(
         title: 'Upcoming Events',
-        backgroundColor: Color(0xFF201C58),
+        backgroundColor: const Color(0xFF201C58),
         titleColor: Colors.white,
         automaticallyImplyLeading: true,
+        actions: [
+          // 🔹 Popup menu
+          PopupMenuButton<int>(
+            icon: const Icon(Icons.more_vert, color: Colors.white),
+            onSelected: (value) async {
+              switch (value) {
+                case 0: // Profile
+                  if (mounted) {
+                    Navigator.pushNamed(context, RouteNames.profile);
+                  }
+                  break;
+                case 1: // Help
+                  if (mounted) {
+                    Navigator.pushNamed(context, RouteNames.help);
+                  }
+                  break;
+                case 2: // Logout
+                  await _logout();
+                  break;
+              }
+            },
+            itemBuilder: (context) => const [
+              PopupMenuItem<int>(
+                value: 0,
+                child: ListTile(
+                  leading: Icon(Icons.person, color: Colors.black),
+                  title: Text('Profile'),
+                ),
+              ),
+              PopupMenuItem<int>(
+                value: 1,
+                child: ListTile(
+                  leading: Icon(Icons.help_outline, color: Colors.black),
+                  title: Text('Help'),
+                ),
+              ),
+              PopupMenuItem<int>(
+                value: 2,
+                child: ListTile(
+                  leading: Icon(Icons.logout, color: Colors.black),
+                  title: Text('Logout'),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(height: 16),
+            const AppLogo(size: 200),
+            const SizedBox(height: 16),
+
             // Row with left toggle, centered date-range text, and right toggle
             Row(
               children: [
@@ -115,39 +178,35 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
               ],
             ),
             const SizedBox(height: 12),
+
             // If no events for selected week, show friendly empty state
             if (weeklyEvents.isEmpty)
-              Expanded(
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.event_available,
-                            size: 64, color: Color(0xFF90C048)),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No events scheduled for the week of ${DateFormat.yMMMMd().format(selectedStart)} - ${DateFormat.yMMMMd().format(selectedEnd)}.\nCreate an event or switch weeks to see other events.',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ],
-                    ),
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.event_available,
+                          size: 64, color: Color(0xFF90C048)),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No events scheduled for the week of ${DateFormat.yMMMMd().format(selectedStart)} - ${DateFormat.yMMMMd().format(selectedEnd)}.\nCreate an event or switch weeks to see other events.',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
                   ),
                 ),
               )
             else
               // List of events for the selected week
-              Expanded(
-                child: ListView.separated(
-                  itemCount: weeklyEvents.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    final event = weeklyEvents[index];
-                    final isStarting = _startingEventId == event.id;
-
-                    return KenwellFormCard(
+              Column(
+                children: weeklyEvents.map((event) {
+                  final isStarting = _startingEventId == event.id;
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: KenwellFormCard(
                       title: 'Event Name: ${event.title}',
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -159,8 +218,7 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
                                   'Date:  ${DateFormat.yMMMMd().format(event.date)}',
                                   style: TextStyle(
                                       fontWeight: FontWeight.w600,
-                                      color:
-                                          Colors.black.withValues(alpha: 0.9)),
+                                      color: Colors.black.withOpacity(0.9)),
                                   textAlign: TextAlign.left,
                                 ),
                               ),
@@ -169,19 +227,19 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
                                   'Start Time:  ${event.startTime}',
                                   style: TextStyle(
                                       fontWeight: FontWeight.w600,
-                                      color:
-                                          Colors.black.withValues(alpha: 0.9)),
+                                      color: Colors.black.withOpacity(0.9)),
                                   textAlign: TextAlign.center,
                                 ),
                               ),
                               Expanded(
-                                  child: Text(
-                                'End Time:  ${event.endTime}',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black.withValues(alpha: 0.9)),
-                                textAlign: TextAlign.right,
-                              )),
+                                child: Text(
+                                  'End Time:  ${event.endTime}',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black.withOpacity(0.9)),
+                                  textAlign: TextAlign.right,
+                                ),
+                              ),
                             ],
                           ),
                           const SizedBox(height: 4),
@@ -250,9 +308,9 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
                           ),
                         ],
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                }).toList(),
               ),
           ],
         ),
@@ -261,17 +319,14 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
   }
 
   DateTime _startOfWeek(DateTime date) {
-    // Week starts on Sunday. DateTime.weekday: Monday=1 ... Sunday=7
-    final int daysToSubtract =
-        date.weekday % 7; // Sunday -> 0, Monday -> 1, ...
+    final int daysToSubtract = date.weekday % 7;
     final dt = DateTime(date.year, date.month, date.day)
         .subtract(Duration(days: daysToSubtract));
-    return DateTime(dt.year, dt.month, dt.day); // midnight local
+    return DateTime(dt.year, dt.month, dt.day);
   }
 
   DateTime _endOfWeek(DateTime weekStart) {
     final end = weekStart.add(const Duration(days: 6));
-    // make end inclusive up to the last millisecond of the day
     return DateTime(end.year, end.month, end.day, 23, 59, 59, 999);
   }
 
@@ -287,7 +342,6 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
           builder: (_) => WellnessFlowPage(
             event: updated,
             onExitEarly: () async {
-              // restore scheduled status if exiting early
               await eventVM.updateEvent(
                 updated.copyWith(
                   status: WellnessEventStatus.scheduled,
@@ -296,9 +350,6 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
                 ),
               );
             },
-            // NOTE: Do NOT provide onFlowCompleted here that auto-marks the event completed.
-            // The explicit Finish Event button in this screen should call:
-            // await eventVM.markEventCompleted(eventId);
           ),
         ),
       );
