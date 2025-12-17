@@ -35,16 +35,37 @@ class WellnessFlowScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final flowVM = context.watch<WellnessFlowViewModel>();
 
-    Widget currentScreen;
+    // Get current screen based on flow step name
+    Widget currentScreen = _buildScreenForStep(context, flowVM);
 
-    switch (flowVM.currentStep) {
-      case 0:
-        currentScreen = ChangeNotifierProvider.value(
+    final flowContent = AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      child: KeyedSubtree(
+        key: ValueKey<String>('flow_step_${flowVM.currentStepName}'),
+        child: currentScreen,
+      ),
+    );
+
+    return Scaffold(
+      body: SafeArea(child: flowContent),
+    );
+  }
+
+  Widget _buildScreenForStep(BuildContext context, WellnessFlowViewModel flowVM) {
+    final stepName = flowVM.currentStepName;
+
+    switch (stepName) {
+      case 'consent':
+        return ChangeNotifierProvider.value(
           value: flowVM.consentVM,
           child: event != null
               ? ConsentScreen(
                   event: event!,
-                  onNext: flowVM.nextStep,
+                  onNext: () {
+                    // Initialize flow based on selected checkboxes
+                    flowVM.initializeFlow(flowVM.consentVM.selectedScreenings);
+                    flowVM.nextStep();
+                  },
                   onCancel: () {
                     flowVM.cancelFlow();
                     onExitFlow();
@@ -52,87 +73,79 @@ class WellnessFlowScreen extends StatelessWidget {
                 )
               : const SizedBox(),
         );
-        break;
 
-      case 1:
-        currentScreen = PersonalDetailsScreen(
+      case 'personal_details':
+        return PersonalDetailsScreen(
           onNext: flowVM.nextStep,
           onPrevious: flowVM.previousStep,
           viewModel: flowVM.personalVM,
         );
-        break;
 
-      case 2:
-        currentScreen = PersonalRiskAssessmentScreen(
+      case 'risk_assessment':
+        return PersonalRiskAssessmentScreen(
           onNext: flowVM.nextStep,
           onPrevious: flowVM.previousStep,
           viewModel: flowVM.riskVM,
           isFemale: flowVM.personalVM.gender?.toLowerCase() == 'female',
           age: flowVM.personalVM.userAge,
         );
-        break;
 
-      case 3:
-        currentScreen = WellnessScreeningResultsScreen(
+      case 'screening_results':
+        return WellnessScreeningResultsScreen(
           onNext: flowVM.nextStep,
           onPrevious: flowVM.previousStep,
           viewModel: flowVM.resultsVM,
           nurseViewModel: flowVM.nurseVM,
         );
-        break;
 
-      case 4:
+      case 'nurse_intervention':
         if (event != null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             flowVM.nurseVM.initialiseWithEvent(event!);
           });
         }
-        currentScreen = ChangeNotifierProvider.value(
+        return ChangeNotifierProvider.value(
           value: flowVM.nurseVM,
           child: NurseInterventionScreen(
             onNext: flowVM.nextStep,
             onPrevious: flowVM.previousStep,
           ),
         );
-        break;
 
-      case 5:
-        currentScreen = ChangeNotifierProvider.value(
+      case 'hiv_test':
+        return ChangeNotifierProvider.value(
           value: flowVM.hivTestVM,
           child: HIVTestScreen(
             onNext: flowVM.nextStep,
             onPrevious: flowVM.previousStep,
           ),
         );
-        break;
 
-      case 6:
-        currentScreen = ChangeNotifierProvider.value(
+      case 'hiv_results':
+        return ChangeNotifierProvider.value(
           value: flowVM.hivResultsVM,
           child: HIVTestResultScreen(
             onNext: flowVM.nextStep,
             onPrevious: flowVM.previousStep,
           ),
         );
-        break;
 
-      case 7:
+      case 'hiv_nurse_intervention':
         if (event != null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             flowVM.hivNurseVM.initialiseWithEvent(event!);
           });
         }
-        currentScreen = ChangeNotifierProvider.value(
+        return ChangeNotifierProvider.value(
           value: flowVM.hivNurseVM,
           child: HIVTestNursingInterventionScreen(
             onNext: flowVM.nextStep,
             onPrevious: flowVM.previousStep,
           ),
         );
-        break;
 
-      case 8:
-        currentScreen = ChangeNotifierProvider.value(
+      case 'tb_test':
+        return ChangeNotifierProvider.value(
           value: flowVM.tbTestVM,
           child: TBTestingScreen(
             onNext: flowVM.nextStep,
@@ -140,26 +153,24 @@ class WellnessFlowScreen extends StatelessWidget {
             nurseViewModel: flowVM.nurseVM,
           ),
         );
-        break;
 
-      case 9:
+      case 'tb_nurse_intervention':
         if (event != null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             flowVM.tbNurseVM.initialiseWithEvent(event!);
           });
         }
-        currentScreen = ChangeNotifierProvider.value(
+        return ChangeNotifierProvider.value(
           value: flowVM.tbNurseVM,
           child: TBNursingInterventionScreen(
             onNext: flowVM.nextStep,
             onPrevious: flowVM.previousStep,
           ),
         );
-        break;
 
-      case 10:
+      case 'survey':
         // SURVEY STEP: submitAll -> increment screened -> POP flow (do NOT call onFlowCompleted)
-        currentScreen = ChangeNotifierProvider.value(
+        return ChangeNotifierProvider.value(
           value: flowVM.surveyVM,
           child: SurveyScreen(
             onPrevious: flowVM.previousStep,
@@ -238,22 +249,12 @@ class WellnessFlowScreen extends StatelessWidget {
             },
           ),
         );
-        break;
 
       default:
-        currentScreen = const Center(child: Text('Invalid step'));
+        return Center(
+          child: Text('Invalid step: ${flowVM.currentStepName}'),
+        );
     }
 
-    final flowContent = AnimatedSwitcher(
-      duration: const Duration(milliseconds: 300),
-      child: KeyedSubtree(
-        key: ValueKey<int>(flowVM.currentStep),
-        child: currentScreen,
-      ),
-    );
-
-    return Scaffold(
-      body: SafeArea(child: flowContent),
-    );
   }
 }

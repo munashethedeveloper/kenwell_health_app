@@ -66,6 +66,17 @@ class ConsentScreen extends StatelessWidget {
       previousLabel: 'Cancel',
       onPrevious: onCancel,
       onNext: () async {
+        if (!vm.hasAtLeastOneScreening) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Please select at least one screening option.',
+              ),
+            ),
+          );
+          return;
+        }
+        
         if (vm.formKey.currentState!.validate() && vm.isFormValid) {
           await vm.submitConsent();
           onNext();

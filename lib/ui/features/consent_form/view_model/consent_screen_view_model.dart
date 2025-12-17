@@ -32,14 +32,24 @@ class ConsentScreenViewModel extends ChangeNotifier {
   String? userLastName;
 
   bool get isFormValid =>
-      hra &&
-      vct &&
-      tb &&
-      hiv &&
+      (hra || vct || tb || hiv) && // At least one checkbox must be selected
       venueController.text.isNotEmpty &&
       dateController.text.isNotEmpty &&
       practitionerController.text.isNotEmpty &&
       signatureController.isNotEmpty;
+
+  // Helper to check if at least one screening is selected
+  bool get hasAtLeastOneScreening => hra || vct || tb || hiv;
+
+  // Get list of selected screenings
+  List<String> get selectedScreenings {
+    final List<String> selected = [];
+    if (hra) selected.add('hra');
+    if (vct) selected.add('vct');
+    if (tb) selected.add('tb');
+    if (hiv) selected.add('hiv');
+    return selected;
+  }
 
   // Initialise and pre-fill fields
   void initialise(
