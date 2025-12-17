@@ -96,6 +96,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
 
   void cancelFlow() {
     _currentStep = 0;
+    _flowSteps = ['consent']; // Reset flow to initial state
     notifyListeners();
   }
 
@@ -135,6 +136,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
     );
 
     _currentStep = 0;
+    _flowSteps = ['consent']; // Reset flow after submission
     notifyListeners();
   }
 
@@ -153,16 +155,17 @@ class WellnessFlowViewModel extends ChangeNotifier {
     }
   }
 
-  /// Return to the Conduct Event screen (step 0)
-  void returnToConductEventScreen() {
-    _currentStep = 0; // <- step 0 is Conduct Event screen
+  /// Reset the flow to consent screen (for reuse)
+  void resetFlow() {
+    _currentStep = 0;
+    _flowSteps = ['consent']; // Reset flow to initial state
     notifyListeners();
   }
 
   /// Call when survey is submitted
   void submitSurvey(BuildContext context) {
     incrementScreenedCount();
-    returnToConductEventScreen();
+    resetFlow();
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Survey saved and submitted!')),
