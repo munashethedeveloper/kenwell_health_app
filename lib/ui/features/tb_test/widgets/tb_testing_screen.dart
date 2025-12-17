@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/features/nurse_interventions/view_model/nurse_intervention_form_mixin.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_referral_card.dart';
+import 'package:kenwell_health_app/utils/input_formatters.dart';
 import 'package:provider/provider.dart';
 
+import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_page.dart';
 import '../../../shared/ui/form/kenwell_date_field.dart';
+import '../../../shared/ui/form/kenwell_form_styles.dart';
+import '../../../shared/ui/form/kenwell_signature_actions.dart';
 import '../../../shared/ui/form/kenwell_yes_no_list.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/tb_testing_view_model.dart';
@@ -13,13 +17,11 @@ import '../view_model/tb_testing_view_model.dart';
 class TBTestingScreen extends StatelessWidget {
   final VoidCallback onNext;
   final VoidCallback onPrevious;
-  final NurseInterventionFormMixin nurseViewModel;
 
   const TBTestingScreen({
     super.key,
     required this.onNext,
     required this.onPrevious,
-    required this.nurseViewModel,
   });
 
   @override
@@ -140,23 +142,30 @@ class TBTestingScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
+        _buildReferrals(viewModel),
         const SizedBox(height: 24),
-        _buildReferrals(),
-        KenwellFormNavigation(
-          onPrevious: onPrevious,
-          onNext: () => viewModel.submitTBTest(context, onNext: onNext),
-          isNextEnabled: viewModel.isFormValid && !viewModel.isSubmitting,
-          isNextBusy: viewModel.isSubmitting,
+        _buildNurseDetails(viewModel),
+        const SizedBox(height: 24),
+        KenwellSignatureActions(
+          title: 'Signature',
+          controller: viewModel.signatureController,
+          onClear: viewModel.clearSignature,
+          navigation: KenwellFormNavigation(
+            onPrevious: onPrevious,
+            onNext: () => viewModel.submitTBTest(context, onNext: onNext),
+            isNextEnabled: viewModel.isFormValid && !viewModel.isSubmitting,
+            isNextBusy: viewModel.isSubmitting,
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildReferrals() {
+  Widget _buildReferrals(TBTestingViewModel viewModel) {
     return KenwellReferralCard<NursingReferralOption>(
       title: 'Nursing Referrals',
-      selectedValue: nurseViewModel.nursingReferralSelection,
-      onChanged: nurseViewModel.setNursingReferralSelection,
+      selectedValue: viewModel.nursingReferralSelection,
+      onChanged: viewModel.setNursingReferralSelection,
       reasonValidator: (val) =>
           (val == null || val.isEmpty) ? 'Please enter a reason' : null,
       options: [
@@ -164,7 +173,7 @@ class TBTestingScreen extends StatelessWidget {
           value: NursingReferralOption.patientNotReferred,
           label: 'Patient not referred',
           requiresReason: true,
-          reasonController: nurseViewModel.notReferredReasonController,
+          reasonController: viewModel.notReferredReasonController,
           reasonLabel: 'Reason patient not referred',
         ),
         const KenwellReferralOption(
@@ -176,6 +185,66 @@ class TBTestingScreen extends StatelessWidget {
           label: 'Patient referred to State HIV clinic',
         ),
       ],
+    );
+  }
+
+  Widget _buildNurseDetails(TBTestingViewModel viewModel) {
+    return KenwellFormCard(
+      title: 'Nurse Details',
+      child: Column(
+        children: [
+          KenwellTextField(
+            controller: viewModel.nurseFirstNameController,
+            decoration: KenwellFormStyles.decoration(
+              label: 'Nurse First Name',
+              hint: 'Enter nurse first name',
+            ),
+            inputFormatters:
+                AppTextInputFormatters.lettersOnly(allowHyphen: true),
+            validator: (val) => (val == null || val.isEmpty)
+                ? 'Please enter Nurse First Name'
+                : null,
+          ),
+          KenwellTextField(
+            controller: viewModel.nurseLastNameController,
+            decoration: KenwellFormStyles.decoration(
+              label: 'Nurse Last Name',
+              hint: 'Enter nurse last name',
+            ),
+            inputFormatters:
+                AppTextInputFormatters.lettersOnly(allowHyphen: true),
+            validator: (val) => (val == null || val.isEmpty)
+                ? 'Please enter Nurse Last Name'
+                : null,
+          ),
+          KenwellTextField(
+            controller: viewModel.rankController,
+            decoration: KenwellFormStyles.decoration(
+              label: 'Rank',
+              hint: 'Enter nurse rank',
+            ),
+            validator: (val) =>
+                (val == null || val.isEmpty) ? 'Please enter Rank' : null,
+          ),
+          KenwellTextField(
+            controller: viewModel.sancNumberController,
+            decoration: KenwellFormStyles.decoration(
+              label: 'SANC No',
+              hint: 'Enter SANC number',
+            ),
+            inputFormatters: AppTextInputFormatters.numbersOnly(),
+            validator: (val) =>
+                (val == null || val.isEmpty) ? 'Please enter SANC No' : null,
+          ),
+          KenwellDateField(
+            label: 'Date',
+            controller: viewModel.nurseDateController,
+            readOnly: true,
+            validator: (val) =>
+                (val == null || val.isEmpty) ? 'Please select Date' : null,
+          ),
+        ],
+      ),
     );
   }
 }
