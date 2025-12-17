@@ -94,7 +94,7 @@ class AppRouter {
                 Navigator.pop(_);
               },
               onNext: () {
-                Navigator.pushNamed(_, RouteNames.hivNurseIntervention);
+                Navigator.pushNamed(_, RouteNames.tbTesting);
               },
             ),
           ),
