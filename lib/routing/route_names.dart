@@ -14,7 +14,7 @@ class RouteNames {
   static const String forgotPassword = '/forgot-password';
   static const String main = '/';
   static const String nurseIntervention = '/nurse';
-  // Note: hivNurseIntervention route removed - consolidated into hivTest screen
+  // Note: hivNurseIntervention route removed - consolidated into hivResults screen
   // static const String hivNurseIntervention = '/hiv-intervention';
   static const String tbNurseIntervention = '/tb-intervention';
   static const String hivTest = '/hiv-test';

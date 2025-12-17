@@ -113,11 +113,6 @@ class WellnessFlowScreen extends StatelessWidget {
         );
 
       case 'hiv_test':
-        if (event != null) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            flowVM.hivTestVM.initialiseWithEvent(event!);
-          });
-        }
         return ChangeNotifierProvider.value(
           value: flowVM.hivTestVM,
           child: HIVTestScreen(
@@ -127,6 +122,11 @@ class WellnessFlowScreen extends StatelessWidget {
         );
 
       case 'hiv_results':
+        if (event != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            flowVM.hivResultsVM.initialiseWithEvent(event!);
+          });
+        }
         return ChangeNotifierProvider.value(
           value: flowVM.hivResultsVM,
           child: HIVTestResultScreen(

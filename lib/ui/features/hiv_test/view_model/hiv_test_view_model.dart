@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../nurse_interventions/view_model/nurse_intervention_form_mixin.dart';
 
-class HIVTestViewModel extends ChangeNotifier
-    with NurseInterventionFormMixin {
-  // Note: formKey is provided by NurseInterventionFormMixin
+class HIVTestViewModel extends ChangeNotifier {
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   // --- 1. Questions ---
   String? firstHIVTest; // Yes/No
@@ -84,19 +82,12 @@ class HIVTestViewModel extends ChangeNotifier
     notifyListeners();
   }
 
-  @override
   bool get isFormValid {
-    // Validate both HIV test fields and nurse intervention fields
-    final baseFormValid = formKey.currentState?.validate() == true;
-    final nurseInterventionValid = super.isFormValid;
-    return baseFormValid && nurseInterventionValid;
+    return formKey.currentState?.validate() == true;
   }
 
-  Future<Map<String, dynamic>> toMap() async {
-    // Combine HIV test data with nurse intervention data
-    final nurseInterventionData = await super.toMap();
+  Map<String, dynamic> toMap() {
     return {
-      // HIV Test specific fields
       'firstHIVTest': firstHIVTest,
       'lastTestMonth': lastTestMonthController.text,
       'lastTestYear': lastTestYearController.text,
@@ -110,8 +101,6 @@ class HIVTestViewModel extends ChangeNotifier
       'knowPartnerStatus': knowPartnerStatus,
       'riskReasons': List<String>.from(riskReasons),
       'otherRiskReason': otherRiskReasonController.text,
-      // Merge nurse intervention data
-      ...nurseInterventionData,
     };
   }
 
@@ -121,22 +110,15 @@ class HIVTestViewModel extends ChangeNotifier
     _isSubmitting = true;
     notifyListeners();
 
-    try {
-      final data = await toMap();
-      debugPrint("✅ HIV Test Submitted:");
-      debugPrint(data.toString());
+    debugPrint("✅ HIV Test Submitted:");
+    debugPrint(toMap().toString());
 
-      await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(seconds: 1));
 
-      _isSubmitting = false;
-      notifyListeners();
+    _isSubmitting = false;
+    notifyListeners();
 
-      onNext?.call();
-    } catch (e) {
-      debugPrint("Error submitting HIV Test: $e");
-      _isSubmitting = false;
-      notifyListeners();
-    }
+    onNext?.call();
   }
 
   @override
@@ -145,7 +127,6 @@ class HIVTestViewModel extends ChangeNotifier
     lastTestYearController.dispose();
     noCondomReasonController.dispose();
     otherRiskReasonController.dispose();
-    disposeNurseInterventionFields();
     super.dispose();
   }
 }
