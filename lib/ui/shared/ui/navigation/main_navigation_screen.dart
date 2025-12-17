@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/features/profile/widgets/profile_screen.dart';
+import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
 import 'package:kenwell_health_app/ui/features/user_management/widgets/user_management_screen_version_two.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
@@ -21,9 +22,17 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _currentIndex = 2;
 
   @override
+  void initState() {
+    super.initState();
+    // Load profile data when the main navigation screen initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<ProfileViewModel>(context, listen: false).loadProfile();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final eventVM = Provider.of<EventViewModel>(context);
-    //Provider.of<ProfileViewModel>(context, listen: false).loadProfile();
 
     final List<Widget> tabs = [
       const UserManagementScreenVersionTwo(),
