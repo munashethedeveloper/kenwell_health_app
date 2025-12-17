@@ -43,10 +43,6 @@ import '../ui/features/survey/widgets/survey_screen.dart';
 import '../ui/features/profile/widgets/profile_screen.dart';
 import '../ui/features/settings/widgets/settings_screen.dart';
 
-// TB Intervention
-import '../ui/features/tb_test_nursing_intervention/view_model/tb_nursing_intervention_view_model.dart';
-import '../ui/features/tb_test_nursing_intervention/widgets/tb_nursing_intervention_screen.dart';
-
 import 'route_names.dart';
 
 class AppRouter {
@@ -105,12 +101,11 @@ class AppRouter {
           builder: (_) => ChangeNotifierProvider(
             create: (_) => TBTestingViewModel(),
             child: TBTestingScreen(
-              nurseViewModel: NurseInterventionViewModel(),
               onPrevious: () {
                 Navigator.pop(_);
               },
               onNext: () {
-                Navigator.pushNamed(_, RouteNames.tbNurseIntervention);
+                Navigator.pushNamed(_, RouteNames.survey);
               },
             ),
           ),
@@ -142,22 +137,6 @@ class AppRouter {
               },
               onNext: () {
                 Navigator.pushNamed(_, RouteNames.hivTest);
-              },
-            ),
-          ),
-        );
-
-      case RouteNames.tbNurseIntervention:
-        return MaterialPageRoute(
-          builder: (_) =>
-              ChangeNotifierProvider<TBNursingInterventionViewModel>(
-            create: (_) => TBNursingInterventionViewModel(),
-            child: TBNursingInterventionScreen(
-              onPrevious: () {
-                Navigator.pop(_);
-              },
-              onNext: () {
-                Navigator.pushNamed(_, RouteNames.survey);
               },
             ),
           ),

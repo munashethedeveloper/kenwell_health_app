@@ -9,7 +9,6 @@ import 'package:provider/provider.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../hiv_test_results/widgets/hiv_test_result_screen.dart';
 import '../../nurse_interventions/widgets/nurse_intervention_screen.dart';
-import '../../tb_test_nursing_intervention/widgets/tb_nursing_intervention_screen.dart';
 import '../view_model/wellness_flow_view_model.dart';
 import '../../survey/widgets/survey_screen.dart';
 import '../../consent_form/widgets/consent_screen.dart';
@@ -136,24 +135,14 @@ class WellnessFlowScreen extends StatelessWidget {
         );
 
       case 'tb_test':
-        return ChangeNotifierProvider.value(
-          value: flowVM.tbTestVM,
-          child: TBTestingScreen(
-            onNext: flowVM.nextStep,
-            onPrevious: flowVM.previousStep,
-            nurseViewModel: flowVM.nurseVM,
-          ),
-        );
-
-      case 'tb_nurse_intervention':
         if (event != null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            flowVM.tbNurseVM.initialiseWithEvent(event!);
+            flowVM.tbTestVM.initialiseWithEvent(event!);
           });
         }
         return ChangeNotifierProvider.value(
-          value: flowVM.tbNurseVM,
-          child: TBNursingInterventionScreen(
+          value: flowVM.tbTestVM,
+          child: TBTestingScreen(
             onNext: flowVM.nextStep,
             onPrevious: flowVM.previousStep,
           ),

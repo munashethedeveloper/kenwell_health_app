@@ -10,7 +10,6 @@ import '../../health_metrics/view_model/health_metrics_view_model.dart';
 import '../../hiv_test/view_model/hiv_test_view_model.dart';
 import '../../survey/view_model/survey_view_model.dart';
 import '../../tb_test/view_model/tb_testing_view_model.dart';
-import '../../tb_test_nursing_intervention/view_model/tb_nursing_intervention_view_model.dart';
 import '../../../../domain/models/wellness_event.dart';
 
 class WellnessFlowViewModel extends ChangeNotifier {
@@ -28,7 +27,6 @@ class WellnessFlowViewModel extends ChangeNotifier {
   final hivTestVM = HIVTestViewModel();
   final hivResultsVM = HIVTestResultViewModel();
   final tbTestVM = TBTestingViewModel();
-  final tbNurseVM = TBNursingInterventionViewModel();
   final surveyVM = SurveyViewModel();
 
   WellnessEvent? activeEvent;
@@ -61,7 +59,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
 
     // Add TB screens if selected
     if (selectedScreenings.contains('tb')) {
-      _flowSteps.addAll(['tb_test', 'tb_nurse_intervention']);
+      _flowSteps.add('tb_test');
     }
 
     // Survey is always included at the end
@@ -124,8 +122,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
     final nurseData = nurseVM.toMap();
     final hivTestData = hivTestVM.toMap();
     final hivResultsData = await hivResultsVM.toMap();
-    final tbTestData = tbTestVM.toMap();
-    final tbNurseData = tbNurseVM.toMap();
+    final tbTestData = await tbTestVM.toMap();
     final surveyData = surveyVM.toMap();
 
     debugPrint('Submitting full wellness flow data...');
@@ -137,7 +134,6 @@ class WellnessFlowViewModel extends ChangeNotifier {
     debugPrint('HIV Test: $hivTestData');
     debugPrint('HIV Results: $hivResultsData');
     debugPrint('TB Test: $tbTestData');
-    debugPrint('TB Nurse: $tbNurseData');
     debugPrint('Survey: $surveyData');
 
     await Future.delayed(const Duration(seconds: 2));
