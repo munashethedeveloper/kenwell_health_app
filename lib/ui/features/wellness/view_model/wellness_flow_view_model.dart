@@ -15,7 +15,10 @@ import '../../tb_test_nursing_intervention/view_model/tb_nursing_intervention_vi
 import '../../../../domain/models/wellness_event.dart';
 
 class WellnessFlowViewModel extends ChangeNotifier {
-  WellnessFlowViewModel({this.activeEvent});
+  WellnessFlowViewModel({this.activeEvent}) {
+    // Initialize with consent as the first step
+    _flowSteps = ['consent'];
+  }
 
   // ViewModels for each step
   final consentVM = ConsentScreenViewModel();
@@ -35,9 +38,45 @@ class WellnessFlowViewModel extends ChangeNotifier {
   int _currentStep = 0;
   int get currentStep => _currentStep;
 
+  // Dynamic flow based on selected checkboxes
+  List<String> _flowSteps = ['consent'];
+  List<String> get flowSteps => _flowSteps;
+
+  // Initialize flow based on consent selections
+  void initializeFlow(List<String> selectedScreenings) {
+    _flowSteps = ['consent'];
+
+    // Add HRA screens if selected
+    if (selectedScreenings.contains('hra')) {
+      _flowSteps.addAll(['personal_details', 'risk_assessment', 'screening_results']);
+    }
+
+    // Add general nurse intervention if any screening is selected
+    if (selectedScreenings.isNotEmpty) {
+      _flowSteps.add('nurse_intervention');
+    }
+
+    // Add HIV/VCT screens if selected (VCT and HIV are the same)
+    if (selectedScreenings.contains('hiv') || selectedScreenings.contains('vct')) {
+      _flowSteps.addAll(['hiv_test', 'hiv_results', 'hiv_nurse_intervention']);
+    }
+
+    // Add TB screens if selected
+    if (selectedScreenings.contains('tb')) {
+      _flowSteps.addAll(['tb_test', 'tb_nurse_intervention']);
+    }
+
+    // Survey is always included at the end
+    _flowSteps.add('survey');
+
+    debugPrint('Initialized flow with steps: $_flowSteps');
+    notifyListeners();
+  }
+
   void nextStep() {
-    if (_currentStep < 10) {
+    if (_currentStep < _flowSteps.length - 1) {
       _currentStep++;
+      debugPrint('Moving to step $_currentStep: ${_flowSteps[_currentStep]}');
       notifyListeners();
     }
   }
@@ -45,9 +84,15 @@ class WellnessFlowViewModel extends ChangeNotifier {
   void previousStep() {
     if (_currentStep > 0) {
       _currentStep--;
+      debugPrint('Moving back to step $_currentStep: ${_flowSteps[_currentStep]}');
       notifyListeners();
     }
   }
+
+  String get currentStepName => 
+    _flowSteps.isNotEmpty && _currentStep < _flowSteps.length 
+      ? _flowSteps[_currentStep] 
+      : 'unknown';
 
   void cancelFlow() {
     _currentStep = 0;
