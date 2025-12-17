@@ -7,7 +7,6 @@ import '../../hiv_test_results/view_model/hiv_test_result_view_model.dart';
 import '../../nurse_interventions/view_model/nurse_intervention_view_model.dart';
 import '../../patient/view_model/personal_details_view_model.dart';
 import '../../risk_assessment/view_model/personal_risk_assessment_view_model.dart';
-import '../../health_metrics/view_model/health_metrics_view_model.dart';
 import '../../hiv_test/view_model/hiv_test_view_model.dart';
 import '../../survey/view_model/survey_view_model.dart';
 import '../../tb_test/view_model/tb_testing_view_model.dart';
@@ -24,7 +23,6 @@ class WellnessFlowViewModel extends ChangeNotifier {
   final consentVM = ConsentScreenViewModel();
   final personalVM = PersonalDetailsViewModel();
   final riskVM = PersonalRiskAssessmentViewModel();
-  final healthMetricsVM = HealthMetricsViewModel();
   final nurseVM = NurseInterventionViewModel();
   final hivTestVM = HIVTestViewModel();
   final hivResultsVM = HIVTestResultViewModel();
@@ -51,9 +49,9 @@ class WellnessFlowViewModel extends ChangeNotifier {
       _flowSteps.add('personal_details');
     }
 
-    // Add HRA screens if selected
+    // Add HRA screens if selected (combined risk_assessment now includes health metrics)
     if (selectedScreenings.contains('hra')) {
-      _flowSteps.addAll(['risk_assessment', 'health_metrics']);
+      _flowSteps.add('risk_assessment');
     }
 
     // Add HIV/VCT screens if selected (VCT and HIV are the same)
@@ -121,8 +119,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
     // Collect all data from ViewModels
     final consentData = consentVM.toMap();
     final personalData = personalVM.toMap();
-    final riskData = riskVM.toMap();
-    final healthMetricsData = healthMetricsVM.toMap();
+    final riskData = riskVM.toMap(); // Now includes health metrics data
     final nurseData = nurseVM.toMap();
     final hivTestData = hivTestVM.toMap();
     final hivResultsData = hivResultsVM.toMap();
@@ -134,8 +131,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
     debugPrint('Submitting full wellness flow data...');
     debugPrint('Consent: $consentData');
     debugPrint('Personal: $personalData');
-    debugPrint('Risk: $riskData');
-    debugPrint('Health Metrics: $healthMetricsData');
+    debugPrint('Risk (includes Health Metrics): $riskData');
     debugPrint('Nurse Intervention: $nurseData');
     debugPrint('HIV Test: $hivTestData');
     debugPrint('HIV Results: $hivResultsData');
