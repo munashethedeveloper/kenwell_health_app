@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 // Import all view models
 import '../../consent_form/view_model/consent_screen_view_model.dart';
-import '../../hiv_test_nursing_intervention/view_model/hiv_test_nursing_intervention_view_model.dart';
 import '../../hiv_test_results/view_model/hiv_test_result_view_model.dart';
 import '../../nurse_interventions/view_model/nurse_intervention_view_model.dart';
 import '../../patient/view_model/personal_details_view_model.dart';
@@ -28,7 +27,6 @@ class WellnessFlowViewModel extends ChangeNotifier {
   final nurseVM = NurseInterventionViewModel();
   final hivTestVM = HIVTestViewModel();
   final hivResultsVM = HIVTestResultViewModel();
-  final hivNurseVM = HIVTestNursingInterventionViewModel();
   final tbTestVM = TBTestingViewModel();
   final tbNurseVM = TBNursingInterventionViewModel();
   final surveyVM = SurveyViewModel();
