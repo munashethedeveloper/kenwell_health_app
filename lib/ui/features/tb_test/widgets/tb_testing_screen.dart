@@ -194,8 +194,6 @@ class TBTestingScreen extends StatelessWidget {
       child: Column(
         children: [
           KenwellTextField(
-            label: 'Nurse First Name',
-            hintText: 'Enter nurse first name',
             controller: viewModel.nurseFirstNameController,
             decoration: KenwellFormStyles.decoration(
               label: 'Nurse First Name',
@@ -208,8 +206,6 @@ class TBTestingScreen extends StatelessWidget {
                 : null,
           ),
           KenwellTextField(
-            label: 'Nurse Last Name',
-            hintText: 'Enter nurse last name',
             controller: viewModel.nurseLastNameController,
             decoration: KenwellFormStyles.decoration(
               label: 'Nurse Last Name',
@@ -222,8 +218,6 @@ class TBTestingScreen extends StatelessWidget {
                 : null,
           ),
           KenwellTextField(
-            label: 'Rank',
-            hintText: 'Enter nurse rank',
             controller: viewModel.rankController,
             decoration: KenwellFormStyles.decoration(
               label: 'Rank',
@@ -233,8 +227,6 @@ class TBTestingScreen extends StatelessWidget {
                 (val == null || val.isEmpty) ? 'Please enter Rank' : null,
           ),
           KenwellTextField(
-            label: 'SANC No',
-            hintText: 'Enter SANC number',
             controller: viewModel.sancNumberController,
             decoration: KenwellFormStyles.decoration(
               label: 'SANC No',

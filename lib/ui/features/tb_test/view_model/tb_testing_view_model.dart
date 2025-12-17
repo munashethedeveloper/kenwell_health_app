@@ -149,12 +149,17 @@ class TBTestingViewModel extends ChangeNotifier
     _isSubmitting = true;
     notifyListeners();
 
+    debugPrint("✅ TB Test Submitting...");
+    
     try {
       final data = await toMap();
-      debugPrint("✅ TB Test Submitted:");
+      debugPrint("TB Test Data:");
       debugPrint(data.toString());
 
       await Future.delayed(const Duration(milliseconds: 800));
+      
+      debugPrint("✅ TB Test Submitted successfully");
+      
       _isSubmitting = false;
       notifyListeners();
 
@@ -165,7 +170,7 @@ class TBTestingViewModel extends ChangeNotifier
         onNext();
       }
     } catch (e) {
-      debugPrint("Error submitting TB Test: $e");
+      debugPrint("❌ Error submitting TB Test: $e");
       _isSubmitting = false;
       notifyListeners();
     }
