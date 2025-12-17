@@ -101,10 +101,11 @@ class WellnessFlowViewModel extends ChangeNotifier {
     }
   }
 
-  String get currentStepName => 
-    _flowSteps.isNotEmpty && _currentStep >= 0 && _currentStep < _flowSteps.length 
-      ? _flowSteps[_currentStep] 
-      : 'unknown';
+  // Helper to check if current step is valid
+  bool get _isValidCurrentStep =>
+      _flowSteps.isNotEmpty && _currentStep >= 0 && _currentStep < _flowSteps.length;
+
+  String get currentStepName => _isValidCurrentStep ? _flowSteps[_currentStep] : 'unknown';
 
   void cancelFlow() {
     _currentStep = 0;
