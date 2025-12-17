@@ -3,7 +3,7 @@ import '../../nurse_interventions/view_model/nurse_intervention_form_mixin.dart'
 
 class HIVTestViewModel extends ChangeNotifier
     with NurseInterventionFormMixin {
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  // Note: formKey is provided by NurseInterventionFormMixin
 
   // --- 1. Questions ---
   String? firstHIVTest; // Yes/No
@@ -84,12 +84,19 @@ class HIVTestViewModel extends ChangeNotifier
     notifyListeners();
   }
 
+  @override
   bool get isFormValid {
-    return formKey.currentState?.validate() == true;
+    // Validate both HIV test fields and nurse intervention fields
+    final baseFormValid = formKey.currentState?.validate() == true;
+    final nurseInterventionValid = super.isFormValid;
+    return baseFormValid && nurseInterventionValid;
   }
 
-  Map<String, dynamic> toMap() {
+  Future<Map<String, dynamic>> toMap() async {
+    // Combine HIV test data with nurse intervention data
+    final nurseInterventionData = await super.toMap();
     return {
+      // HIV Test specific fields
       'firstHIVTest': firstHIVTest,
       'lastTestMonth': lastTestMonthController.text,
       'lastTestYear': lastTestYearController.text,
@@ -103,6 +110,8 @@ class HIVTestViewModel extends ChangeNotifier
       'knowPartnerStatus': knowPartnerStatus,
       'riskReasons': List<String>.from(riskReasons),
       'otherRiskReason': otherRiskReasonController.text,
+      // Merge nurse intervention data
+      ...nurseInterventionData,
     };
   }
 
@@ -112,15 +121,22 @@ class HIVTestViewModel extends ChangeNotifier
     _isSubmitting = true;
     notifyListeners();
 
-    debugPrint("✅ HIV Test Submitted:");
-    debugPrint(toMap().toString());
+    try {
+      final data = await toMap();
+      debugPrint("✅ HIV Test Submitted:");
+      debugPrint(data.toString());
 
-    await Future.delayed(const Duration(seconds: 1));
+      await Future.delayed(const Duration(seconds: 1));
 
-    _isSubmitting = false;
-    notifyListeners();
+      _isSubmitting = false;
+      notifyListeners();
 
-    onNext?.call();
+      onNext?.call();
+    } catch (e) {
+      debugPrint("Error submitting HIV Test: $e");
+      _isSubmitting = false;
+      notifyListeners();
+    }
   }
 
   @override
