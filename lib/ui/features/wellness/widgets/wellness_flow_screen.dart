@@ -41,7 +41,7 @@ class WellnessFlowScreen extends StatelessWidget {
     final flowContent = AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
       child: KeyedSubtree(
-        key: ValueKey<String>(flowVM.currentStepName),
+        key: ValueKey<String>('flow_step_${flowVM.currentStepName}'),
         child: currentScreen,
       ),
     );
@@ -251,7 +251,9 @@ class WellnessFlowScreen extends StatelessWidget {
         );
 
       default:
-        return const Center(child: Text('Invalid step'));
+        return Center(
+          child: Text('Invalid step: ${flowVM.currentStepName}'),
+        );
     }
 
   }

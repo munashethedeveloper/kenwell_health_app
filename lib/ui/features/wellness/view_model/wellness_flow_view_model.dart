@@ -69,14 +69,22 @@ class WellnessFlowViewModel extends ChangeNotifier {
     // Survey is always included at the end
     _flowSteps.add('survey');
 
-    debugPrint('Initialized flow with steps: $_flowSteps');
+    // Debug logging for development
+    assert(() {
+      debugPrint('Initialized flow with steps: $_flowSteps');
+      return true;
+    }());
     notifyListeners();
   }
 
   void nextStep() {
     if (_currentStep < _flowSteps.length - 1) {
       _currentStep++;
-      debugPrint('Moving to step $_currentStep: ${_flowSteps[_currentStep]}');
+      // Debug logging for development
+      assert(() {
+        debugPrint('Moving to step $_currentStep: ${_flowSteps[_currentStep]}');
+        return true;
+      }());
       notifyListeners();
     }
   }
@@ -84,13 +92,17 @@ class WellnessFlowViewModel extends ChangeNotifier {
   void previousStep() {
     if (_currentStep > 0) {
       _currentStep--;
-      debugPrint('Moving back to step $_currentStep: ${_flowSteps[_currentStep]}');
+      // Debug logging for development
+      assert(() {
+        debugPrint('Moving back to step $_currentStep: ${_flowSteps[_currentStep]}');
+        return true;
+      }());
       notifyListeners();
     }
   }
 
   String get currentStepName => 
-    _flowSteps.isNotEmpty && _currentStep < _flowSteps.length 
+    _flowSteps.isNotEmpty && _currentStep >= 0 && _currentStep < _flowSteps.length 
       ? _flowSteps[_currentStep] 
       : 'unknown';
 
