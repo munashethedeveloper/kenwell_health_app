@@ -20,8 +20,6 @@ import '../ui/features/event/widgets/event_details_screen.dart';
 import '../ui/features/event/widgets/event_screen.dart';
 
 // Consent & Reports
-import '../ui/features/hiv_test_nursing_intervention/view_model/hiv_test_nursing_intervention_view_model.dart';
-import '../ui/features/hiv_test_nursing_intervention/widgets/hiv_test_nursing_intervention_screen.dart';
 import '../ui/features/hiv_test_results/view_model/hiv_test_result_view_model.dart';
 import '../ui/features/hiv_test_results/widgets/hiv_test_result_screen.dart';
 import '../ui/features/stats_report/view_model/stats_report_view_model.dart';
@@ -144,22 +142,6 @@ class AppRouter {
               },
               onNext: () {
                 Navigator.pushNamed(_, RouteNames.hivTest);
-              },
-            ),
-          ),
-        );
-
-      case RouteNames.hivNurseIntervention:
-        return MaterialPageRoute(
-          builder: (_) =>
-              ChangeNotifierProvider<HIVTestNursingInterventionViewModel>(
-            create: (_) => HIVTestNursingInterventionViewModel(),
-            child: HIVTestNursingInterventionScreen(
-              onPrevious: () {
-                Navigator.pop(_);
-              },
-              onNext: () {
-                Navigator.pushNamed(_, RouteNames.tbTesting);
               },
             ),
           ),

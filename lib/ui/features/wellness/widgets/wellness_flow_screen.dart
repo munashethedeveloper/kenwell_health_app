@@ -7,7 +7,6 @@ import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/features/patient/widgets/personal_details_screen.dart';
 import 'package:provider/provider.dart';
 import '../../event/view_model/event_view_model.dart';
-import '../../hiv_test_nursing_intervention/widgets/hiv_test_nursing_intervention_screen.dart';
 import '../../hiv_test_results/widgets/hiv_test_result_screen.dart';
 import '../../nurse_interventions/widgets/nurse_intervention_screen.dart';
 import '../../tb_test_nursing_intervention/widgets/tb_nursing_intervention_screen.dart';
@@ -114,6 +113,11 @@ class WellnessFlowScreen extends StatelessWidget {
         );
 
       case 'hiv_test':
+        if (event != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            flowVM.hivTestVM.initialiseWithEvent(event!);
+          });
+        }
         return ChangeNotifierProvider.value(
           value: flowVM.hivTestVM,
           child: HIVTestScreen(
@@ -126,20 +130,6 @@ class WellnessFlowScreen extends StatelessWidget {
         return ChangeNotifierProvider.value(
           value: flowVM.hivResultsVM,
           child: HIVTestResultScreen(
-            onNext: flowVM.nextStep,
-            onPrevious: flowVM.previousStep,
-          ),
-        );
-
-      case 'hiv_nurse_intervention':
-        if (event != null) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            flowVM.hivNurseVM.initialiseWithEvent(event!);
-          });
-        }
-        return ChangeNotifierProvider.value(
-          value: flowVM.hivNurseVM,
-          child: HIVTestNursingInterventionScreen(
             onNext: flowVM.nextStep,
             onPrevious: flowVM.previousStep,
           ),

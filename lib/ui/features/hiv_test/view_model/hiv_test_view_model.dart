@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../nurse_interventions/view_model/nurse_intervention_form_mixin.dart';
 
-class HIVTestViewModel extends ChangeNotifier {
+class HIVTestViewModel extends ChangeNotifier
+    with NurseInterventionFormMixin {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   // --- 1. Questions ---
@@ -127,6 +129,7 @@ class HIVTestViewModel extends ChangeNotifier {
     lastTestYearController.dispose();
     noCondomReasonController.dispose();
     otherRiskReasonController.dispose();
+    disposeNurseInterventionFields();
     super.dispose();
   }
 }
