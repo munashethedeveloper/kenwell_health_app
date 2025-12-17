@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../nurse_interventions/view_model/nurse_intervention_form_mixin.dart';
 
-class HIVTestResultViewModel extends ChangeNotifier {
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+class HIVTestResultViewModel extends ChangeNotifier
+    with NurseInterventionFormMixin {
+  // Note: formKey is provided by NurseInterventionFormMixin
 
   // --- Screening Test Controllers ---
   final TextEditingController screeningTestNameController =
@@ -65,12 +67,18 @@ class HIVTestResultViewModel extends ChangeNotifier {
   }
 
   // --- Form validation ---
+  @override
   bool get isFormValid {
-    return formKey.currentState?.validate() == true;
+    // Validate both HIV test result fields and nurse intervention fields
+    final baseFormValid = formKey.currentState?.validate() == true;
+    final nurseInterventionValid = super.isFormValid;
+    return baseFormValid && nurseInterventionValid;
   }
 
   /// Converts all HIV test result data to a Map
-  Map<String, dynamic> toMap() {
+  Future<Map<String, dynamic>> toMap() async {
+    // Combine HIV test result data with nurse intervention data
+    final nurseInterventionData = await super.toMap();
     return {
       'screeningTestName': screeningTestNameController.text,
       'screeningBatchNo': screeningBatchNoController.text,
@@ -81,6 +89,8 @@ class HIVTestResultViewModel extends ChangeNotifier {
       'confirmatoryExpiryDate': confirmatoryExpiryDateController.text,
       'confirmatoryResult': confirmatoryResult,
       'finalResult': finalResult,
+      // Merge nurse intervention data
+      ...nurseInterventionData,
     };
   }
 
@@ -91,15 +101,22 @@ class HIVTestResultViewModel extends ChangeNotifier {
     _isSubmitting = true;
     notifyListeners();
 
-    debugPrint('✅ HIV Test Result Saved:');
-    debugPrint(toMap().toString());
+    try {
+      final data = await toMap();
+      debugPrint('✅ HIV Test Result Saved:');
+      debugPrint(data.toString());
 
-    await Future.delayed(const Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 500));
 
-    _isSubmitting = false;
-    notifyListeners();
+      _isSubmitting = false;
+      notifyListeners();
 
-    onNext?.call();
+      onNext?.call();
+    } catch (e) {
+      debugPrint("Error submitting HIV Test Result: $e");
+      _isSubmitting = false;
+      notifyListeners();
+    }
   }
 
   @override
@@ -110,6 +127,7 @@ class HIVTestResultViewModel extends ChangeNotifier {
     confirmatoryTestNameController.dispose();
     confirmatoryBatchNoController.dispose();
     confirmatoryExpiryDateController.dispose();
+    disposeNurseInterventionFields();
     super.dispose();
   }
 }

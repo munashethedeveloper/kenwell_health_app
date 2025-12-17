@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:kenwell_health_app/utils/input_formatters.dart';
 
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/colours/kenwell_colours.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
+import '../../../shared/ui/form/kenwell_date_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_styles.dart';
+import '../../../shared/ui/form/kenwell_referral_card.dart';
 import '../../../shared/ui/form/kenwell_section_header.dart';
+import '../../../shared/ui/form/kenwell_signature_actions.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
+import '../../nurse_interventions/view_model/nurse_intervention_form_mixin.dart';
 import '../view_model/hiv_test_result_view_model.dart';
 
 class HIVTestResultScreen extends StatelessWidget {
@@ -126,11 +131,27 @@ class HIVTestResultScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              KenwellFormNavigation(
-                onPrevious: onPrevious,
-                onNext: () => viewModel.submitTestResult(onNext),
-                isNextBusy: viewModel.isSubmitting,
-                isNextEnabled: viewModel.isFormValid && !viewModel.isSubmitting,
+              _buildInitialAssessment(viewModel),
+              const SizedBox(height: 24),
+              _buildReferrals(viewModel),
+              const SizedBox(height: 24),
+              if (viewModel.windowPeriod == 'Yes') ...[
+                _buildFollowUpSection(viewModel),
+                const SizedBox(height: 24),
+              ],
+              _buildNurseDetails(viewModel),
+              const SizedBox(height: 24),
+              KenwellSignatureActions(
+                title: 'Signature',
+                controller: viewModel.signatureController,
+                onClear: viewModel.clearSignature,
+                navigation: KenwellFormNavigation(
+                  onPrevious: onPrevious,
+                  onNext: () => viewModel.submitTestResult(onNext),
+                  isNextBusy: viewModel.isSubmitting,
+                  isNextEnabled:
+                      viewModel.isFormValid && !viewModel.isSubmitting,
+                ),
               ),
             ],
           ),
@@ -202,6 +223,219 @@ class HIVTestResultScreen extends StatelessWidget {
       ),
       validator: (val) =>
           val == null || val.isEmpty ? 'This field is required' : null,
+    );
+  }
+
+  Widget _buildInitialAssessment(HIVTestResultViewModel viewModel) {
+    return KenwellFormCard(
+      title: 'Initial Assessment',
+      child: Column(
+        children: [
+          KenwellDropdownField<String>(
+            label: 'Window period risk assessment',
+            value: viewModel.windowPeriod,
+            items: viewModel.windowPeriodOptions,
+            onChanged: viewModel.setWindowPeriod,
+            decoration: KenwellFormStyles.decoration(
+              label: 'Window period risk assessment',
+              hint: 'Select window period risk assessment',
+            ),
+            validator: (val) => (val == null || val.isEmpty)
+                ? 'Please select Window period risk assessment'
+                : null,
+          ),
+          KenwellDropdownField<String>(
+            label: 'Did patient expect HIV (+) result?',
+            value: viewModel.expectedResult,
+            items: viewModel.expectedResultOptions,
+            onChanged: viewModel.setExpectedResult,
+            decoration: KenwellFormStyles.decoration(
+              label: 'Did patient expect HIV (+) result?',
+              hint: 'Select expected result',
+            ),
+            validator: (val) => (val == null || val.isEmpty)
+                ? 'Please select Did patient expect HIV (+) result?'
+                : null,
+          ),
+          KenwellDropdownField<String>(
+            label: 'Difficulty in dealing with result?',
+            value: viewModel.difficultyDealingResult,
+            items: viewModel.difficultyOptions,
+            onChanged: viewModel.setDifficultyDealingResult,
+            decoration: KenwellFormStyles.decoration(
+              label: 'Difficulty in dealing with result?',
+              hint: 'Select difficulty level',
+            ),
+            validator: (val) => (val == null || val.isEmpty)
+                ? 'Please select Difficulty in dealing with result?'
+                : null,
+          ),
+          KenwellDropdownField<String>(
+            label: 'Urgent psychosocial follow-up needed?',
+            value: viewModel.urgentPsychosocial,
+            items: viewModel.urgentOptions,
+            onChanged: viewModel.setUrgentPsychosocial,
+            decoration: KenwellFormStyles.decoration(
+              label: 'Urgent psychosocial follow-up needed?',
+              hint: 'Select urgent psychosocial status',
+            ),
+            validator: (val) => (val == null || val.isEmpty)
+                ? 'Please select Urgent psychosocial follow-up needed?'
+                : null,
+          ),
+          KenwellDropdownField<String>(
+            label: 'Committed to change behavior?',
+            value: viewModel.committedToChange,
+            items: viewModel.committedOptions,
+            onChanged: viewModel.setCommittedToChange,
+            decoration: KenwellFormStyles.decoration(
+              label: 'Committed to change behavior?',
+              hint: 'Select commitment status',
+            ),
+            validator: (val) => (val == null || val.isEmpty)
+                ? 'Please select Committed to change behavior?'
+                : null,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReferrals(HIVTestResultViewModel viewModel) {
+    return KenwellReferralCard<NursingReferralOption>(
+      title: 'Nursing Referrals',
+      selectedValue: viewModel.nursingReferralSelection,
+      onChanged: viewModel.setNursingReferralSelection,
+      reasonValidator: (val) =>
+          (val == null || val.isEmpty) ? 'Please enter a reason' : null,
+      options: [
+        KenwellReferralOption(
+          value: NursingReferralOption.patientNotReferred,
+          label: 'Patient not referred',
+          requiresReason: true,
+          reasonController: viewModel.notReferredReasonController,
+          reasonLabel: 'Reason patient not referred',
+        ),
+        const KenwellReferralOption(
+          value: NursingReferralOption.referredToGP,
+          label: 'Patient referred to GP',
+        ),
+        const KenwellReferralOption(
+          value: NursingReferralOption.referredToStateClinic,
+          label: 'Patient referred to State HIV clinic',
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFollowUpSection(HIVTestResultViewModel viewModel) {
+    return KenwellFormCard(
+      title: 'Follow-up',
+      child: Column(
+        children: [
+          KenwellDropdownField<String>(
+            label: 'Follow-up location',
+            value: viewModel.followUpLocation,
+            items: viewModel.followUpLocationOptions,
+            onChanged: viewModel.setFollowUpLocation,
+            decoration: KenwellFormStyles.decoration(
+              label: 'Follow-up location',
+              hint: 'Select follow-up location',
+            ),
+            validator: (val) => (val == null || val.isEmpty)
+                ? 'Please select Follow-up location'
+                : null,
+          ),
+          if (viewModel.followUpLocation == 'Other')
+            KenwellTextField(
+              label: 'Other location detail',
+              hintText: 'Specify other location',
+              controller: viewModel.followUpOtherController,
+              decoration: KenwellFormStyles.decoration(
+                label: 'Other location detail',
+                hint: 'Specify other location',
+              ),
+              validator: (val) => (val == null || val.isEmpty)
+                  ? 'Please enter Other location detail'
+                  : null,
+            ),
+          KenwellDateField(
+            label: 'Follow-up test date',
+            controller: viewModel.followUpDateController,
+            validator: (val) => (val == null || val.isEmpty)
+                ? 'Please select Follow-up test date'
+                : null,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNurseDetails(HIVTestResultViewModel viewModel) {
+    return KenwellFormCard(
+      title: 'Nurse Details',
+      child: Column(
+        children: [
+          KenwellTextField(
+            label: 'Nurse First Name',
+            hintText: 'Enter nurse first name',
+            controller: viewModel.nurseFirstNameController,
+            decoration: KenwellFormStyles.decoration(
+              label: 'Nurse First Name',
+              hint: 'Enter nurse first name',
+            ),
+            inputFormatters:
+                AppTextInputFormatters.lettersOnly(allowHyphen: true),
+            validator: (val) => (val == null || val.isEmpty)
+                ? 'Please enter Nurse First Name'
+                : null,
+          ),
+          KenwellTextField(
+            label: 'Nurse Last Name',
+            hintText: 'Enter nurse last name',
+            controller: viewModel.nurseLastNameController,
+            decoration: KenwellFormStyles.decoration(
+              label: 'Nurse Last Name',
+              hint: 'Enter nurse last name',
+            ),
+            inputFormatters:
+                AppTextInputFormatters.lettersOnly(allowHyphen: true),
+            validator: (val) => (val == null || val.isEmpty)
+                ? 'Please enter Nurse Last Name'
+                : null,
+          ),
+          KenwellTextField(
+            label: 'Rank',
+            hintText: 'Enter nurse rank',
+            controller: viewModel.rankController,
+            decoration: KenwellFormStyles.decoration(
+              label: 'Rank',
+              hint: 'Enter nurse rank',
+            ),
+            validator: (val) =>
+                (val == null || val.isEmpty) ? 'Please enter Rank' : null,
+          ),
+          KenwellTextField(
+            label: 'SANC No',
+            hintText: 'Enter SANC number',
+            controller: viewModel.sancNumberController,
+            decoration: KenwellFormStyles.decoration(
+              label: 'SANC No',
+              hint: 'Enter SANC number',
+            ),
+            inputFormatters: AppTextInputFormatters.numbersOnly(),
+            validator: (val) =>
+                (val == null || val.isEmpty) ? 'Please enter SANC No' : null,
+          ),
+          KenwellDateField(
+            label: 'Date',
+            controller: viewModel.nurseDateController,
+            readOnly: true,
+            validator: (val) =>
+                (val == null || val.isEmpty) ? 'Please select Date' : null,
+          ),
+        ],
+      ),
     );
   }
 }

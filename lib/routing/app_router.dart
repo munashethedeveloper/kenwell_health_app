@@ -20,8 +20,6 @@ import '../ui/features/event/widgets/event_details_screen.dart';
 import '../ui/features/event/widgets/event_screen.dart';
 
 // Consent & Reports
-import '../ui/features/hiv_test_nursing_intervention/view_model/hiv_test_nursing_intervention_view_model.dart';
-import '../ui/features/hiv_test_nursing_intervention/widgets/hiv_test_nursing_intervention_screen.dart';
 import '../ui/features/hiv_test_results/view_model/hiv_test_result_view_model.dart';
 import '../ui/features/hiv_test_results/widgets/hiv_test_result_screen.dart';
 import '../ui/features/stats_report/view_model/stats_report_view_model.dart';
@@ -44,10 +42,6 @@ import '../ui/features/survey/widgets/survey_screen.dart';
 // Profile & Settings
 import '../ui/features/profile/widgets/profile_screen.dart';
 import '../ui/features/settings/widgets/settings_screen.dart';
-
-// TB Intervention
-import '../ui/features/tb_test_nursing_intervention/view_model/tb_nursing_intervention_view_model.dart';
-import '../ui/features/tb_test_nursing_intervention/widgets/tb_nursing_intervention_screen.dart';
 
 import 'route_names.dart';
 
@@ -96,7 +90,7 @@ class AppRouter {
                 Navigator.pop(_);
               },
               onNext: () {
-                Navigator.pushNamed(_, RouteNames.hivNurseIntervention);
+                Navigator.pushNamed(_, RouteNames.tbTesting);
               },
             ),
           ),
@@ -107,12 +101,11 @@ class AppRouter {
           builder: (_) => ChangeNotifierProvider(
             create: (_) => TBTestingViewModel(),
             child: TBTestingScreen(
-              nurseViewModel: NurseInterventionViewModel(),
               onPrevious: () {
                 Navigator.pop(_);
               },
               onNext: () {
-                Navigator.pushNamed(_, RouteNames.tbNurseIntervention);
+                Navigator.pushNamed(_, RouteNames.survey);
               },
             ),
           ),
@@ -144,38 +137,6 @@ class AppRouter {
               },
               onNext: () {
                 Navigator.pushNamed(_, RouteNames.hivTest);
-              },
-            ),
-          ),
-        );
-
-      case RouteNames.hivNurseIntervention:
-        return MaterialPageRoute(
-          builder: (_) =>
-              ChangeNotifierProvider<HIVTestNursingInterventionViewModel>(
-            create: (_) => HIVTestNursingInterventionViewModel(),
-            child: HIVTestNursingInterventionScreen(
-              onPrevious: () {
-                Navigator.pop(_);
-              },
-              onNext: () {
-                Navigator.pushNamed(_, RouteNames.tbTesting);
-              },
-            ),
-          ),
-        );
-
-      case RouteNames.tbNurseIntervention:
-        return MaterialPageRoute(
-          builder: (_) =>
-              ChangeNotifierProvider<TBNursingInterventionViewModel>(
-            create: (_) => TBNursingInterventionViewModel(),
-            child: TBNursingInterventionScreen(
-              onPrevious: () {
-                Navigator.pop(_);
-              },
-              onNext: () {
-                Navigator.pushNamed(_, RouteNames.survey);
               },
             ),
           ),

@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import '../../nurse_interventions/view_model/nurse_intervention_form_mixin.dart';
 
-class TBTestingViewModel extends ChangeNotifier {
+class TBTestingViewModel extends ChangeNotifier
+    with NurseInterventionFormMixin {
+  // Note: formKey is provided by NurseInterventionFormMixin
+  @override
+  bool get showInitialAssessment => false;
   // --- TB screening questions ---
   String? coughTwoWeeks;
   String? sputumColour;
@@ -90,8 +95,10 @@ class TBTestingViewModel extends ChangeNotifier {
   bool get isSubmitting => _isSubmitting;
 
   // --- Form validation ---
+  @override
   bool get isFormValid {
-    return coughTwoWeeks != null &&
+    // Validate both TB test fields and nurse intervention fields
+    final baseTBValid = coughTwoWeeks != null &&
         sputumColour != null &&
         bloodInSputum != null &&
         weightLoss != null &&
@@ -103,10 +110,14 @@ class TBTestingViewModel extends ChangeNotifier {
         completedTreatment != null &&
         contactWithTB != null &&
         (treatedBefore == 'Yes' ? treatedDateController.text.isNotEmpty : true);
+    final nurseInterventionValid = super.isFormValid;
+    return baseTBValid && nurseInterventionValid;
   }
 
   /// ✅ Converts all TB Test data to a Map
-  Map<String, dynamic> toMap() {
+  Future<Map<String, dynamic>> toMap() async {
+    // Combine TB test data with nurse intervention data
+    final nurseInterventionData = await super.toMap();
     return {
       'coughTwoWeeks': coughTwoWeeks,
       'sputumColour': sputumColour,
@@ -120,6 +131,8 @@ class TBTestingViewModel extends ChangeNotifier {
       'treatedDate': treatedDateController.text,
       'completedTreatment': completedTreatment,
       'contactWithTB': contactWithTB,
+      // Merge nurse intervention data
+      ...nurseInterventionData,
     };
   }
 
@@ -136,24 +149,37 @@ class TBTestingViewModel extends ChangeNotifier {
     _isSubmitting = true;
     notifyListeners();
 
-    debugPrint("✅ TB Test Submitted:");
-    debugPrint(toMap().toString());
+    debugPrint("✅ TB Test Submitting...");
 
-    await Future.delayed(const Duration(milliseconds: 800));
-    _isSubmitting = false;
-    notifyListeners();
+    try {
+      final data = await toMap();
+      debugPrint("TB Test Data:");
+      debugPrint(data.toString());
 
-    if (!context.mounted) return;
+      await Future.delayed(const Duration(milliseconds: 800));
 
-    // ✅ Callback for workflow navigation
-    if (onNext != null) {
-      onNext();
+      debugPrint("✅ TB Test Submitted successfully");
+
+      _isSubmitting = false;
+      notifyListeners();
+
+      if (!context.mounted) return;
+
+      // ✅ Callback for workflow navigation
+      if (onNext != null) {
+        onNext();
+      }
+    } catch (e) {
+      debugPrint("❌ Error submitting TB Test: $e");
+      _isSubmitting = false;
+      notifyListeners();
     }
   }
 
   @override
   void dispose() {
     treatedDateController.dispose();
+    disposeNurseInterventionFields();
     super.dispose();
   }
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 // Import all view models
 import '../../consent_form/view_model/consent_screen_view_model.dart';
-import '../../hiv_test_nursing_intervention/view_model/hiv_test_nursing_intervention_view_model.dart';
 import '../../hiv_test_results/view_model/hiv_test_result_view_model.dart';
 import '../../nurse_interventions/view_model/nurse_intervention_view_model.dart';
 import '../../patient/view_model/personal_details_view_model.dart';
@@ -11,7 +10,6 @@ import '../../health_metrics/view_model/health_metrics_view_model.dart';
 import '../../hiv_test/view_model/hiv_test_view_model.dart';
 import '../../survey/view_model/survey_view_model.dart';
 import '../../tb_test/view_model/tb_testing_view_model.dart';
-import '../../tb_test_nursing_intervention/view_model/tb_nursing_intervention_view_model.dart';
 import '../../../../domain/models/wellness_event.dart';
 
 class WellnessFlowViewModel extends ChangeNotifier {
@@ -28,9 +26,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
   final nurseVM = NurseInterventionViewModel();
   final hivTestVM = HIVTestViewModel();
   final hivResultsVM = HIVTestResultViewModel();
-  final hivNurseVM = HIVTestNursingInterventionViewModel();
   final tbTestVM = TBTestingViewModel();
-  final tbNurseVM = TBNursingInterventionViewModel();
   final surveyVM = SurveyViewModel();
 
   WellnessEvent? activeEvent;
@@ -58,12 +54,12 @@ class WellnessFlowViewModel extends ChangeNotifier {
 
     // Add HIV/VCT screens if selected (VCT and HIV are the same)
     if (selectedScreenings.contains('hivVct')) {
-      _flowSteps.addAll(['hiv_test', 'hiv_results', 'hiv_nurse_intervention']);
+      _flowSteps.addAll(['hiv_test', 'hiv_results']);
     }
 
     // Add TB screens if selected
     if (selectedScreenings.contains('tb')) {
-      _flowSteps.addAll(['tb_test', 'tb_nurse_intervention']);
+      _flowSteps.add('tb_test');
     }
 
     // Survey is always included at the end
@@ -125,10 +121,8 @@ class WellnessFlowViewModel extends ChangeNotifier {
     final healthMetricsData = healthMetricsVM.toMap();
     final nurseData = nurseVM.toMap();
     final hivTestData = hivTestVM.toMap();
-    final hivResultsData = hivResultsVM.toMap();
-    final hivNurseData = hivNurseVM.toMap();
-    final tbTestData = tbTestVM.toMap();
-    final tbNurseData = tbNurseVM.toMap();
+    final hivResultsData = await hivResultsVM.toMap();
+    final tbTestData = await tbTestVM.toMap();
     final surveyData = surveyVM.toMap();
 
     debugPrint('Submitting full wellness flow data...');
@@ -139,9 +133,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
     debugPrint('Nurse Intervention: $nurseData');
     debugPrint('HIV Test: $hivTestData');
     debugPrint('HIV Results: $hivResultsData');
-    debugPrint('HIV Nurse: $hivNurseData');
     debugPrint('TB Test: $tbTestData');
-    debugPrint('TB Nurse: $tbNurseData');
     debugPrint('Survey: $surveyData');
 
     await Future.delayed(const Duration(seconds: 2));
