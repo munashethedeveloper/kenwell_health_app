@@ -84,8 +84,9 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
   bool get isMale => gender == 'Male';
 
   bool get showFemaleQuestions => isFemale;
-  bool get showMaleQuestions => isMale && (age ?? 0) >= 40;
+  bool get showMaleQuestions => isMale;
   bool get showMammogramQuestion => isFemale && (age ?? 0) >= 40;
+  bool get showProstateCheckQuestion => isMale && (age ?? 0) >= 40;
 
   void setDrinkingStatus(String? value) {
     if (drinkingStatus != value) {

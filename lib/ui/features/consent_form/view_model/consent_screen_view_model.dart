@@ -18,9 +18,10 @@ class ConsentScreenViewModel extends ChangeNotifier {
 
   // Checkbox states
   bool hra = false;
-  bool vct = false;
+  //bool vct = false;
+  bool hivVct = false;
   bool tb = false;
-  bool hiv = false;
+  //bool hiv = false;
 
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
@@ -32,14 +33,29 @@ class ConsentScreenViewModel extends ChangeNotifier {
   String? userLastName;
 
   bool get isFormValid =>
-      hra &&
-      vct &&
-      tb &&
-      hiv &&
+      //(hra || vct || tb || hiv) && // At least one checkbox must be selected
+      (hra || hivVct || tb) && // At least one checkbox must be selected
       venueController.text.isNotEmpty &&
       dateController.text.isNotEmpty &&
       practitionerController.text.isNotEmpty &&
       signatureController.isNotEmpty;
+
+  // Helper to check if at least one screening is selected
+  //bool get hasAtLeastOneScreening => hra || vct || tb || hiv;
+
+  // Helper to check if at least one screening is selected
+  bool get hasAtLeastOneScreening => hra || hivVct || tb;
+
+  // Get list of selected screenings
+  List<String> get selectedScreenings {
+    final List<String> selected = [];
+    if (hra) selected.add('hra');
+    if (hivVct) selected.add('hivVct');
+    //if (vct) selected.add('vct');
+    if (tb) selected.add('tb');
+    //if (hiv) selected.add('hiv');
+    return selected;
+  }
 
   // Initialise and pre-fill fields
   void initialise(
@@ -70,15 +86,18 @@ class ConsentScreenViewModel extends ChangeNotifier {
       case 'hra':
         hra = value ?? false;
         break;
-      case 'vct':
-        vct = value ?? false;
+      //case 'vct':
+      //vct = value ?? false;
+      // break;
+      case 'hivVct':
+        hivVct = value ?? false;
         break;
       case 'tb':
         tb = value ?? false;
         break;
-      case 'hiv':
-        hiv = value ?? false;
-        break;
+      //case 'hiv':
+      // hiv = value ?? false;
+      //break;
     }
     notifyListeners();
   }
@@ -103,9 +122,10 @@ class ConsentScreenViewModel extends ChangeNotifier {
         'date': dateController.text,
         'practitioner': practitionerController.text,
         'hra': hra,
-        'vct': vct,
+        'hivVct': hivVct,
+        // 'vct': vct,
         'tb': tb,
-        'hiv': hiv,
+        //'hiv': hiv,
         'hasSignature': signatureController.isNotEmpty,
       };
 

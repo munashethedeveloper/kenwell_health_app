@@ -9,16 +9,16 @@ import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_section_header.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
-import '../view_model/wellness_screening_results_view_model.dart';
+import '../view_model/health_metrics_view_model.dart';
 
-class WellnessScreeningResultsScreen extends StatelessWidget {
-  final WellnessScreeningResultsViewModel viewModel;
+class HealthMetricsScreen extends StatelessWidget {
+  final HealthMetricsViewModel viewModel;
   final NurseInterventionFormMixin nurseViewModel;
 
   final VoidCallback onNext;
   final VoidCallback onPrevious;
 
-  const WellnessScreeningResultsScreen({
+  const HealthMetricsScreen({
     super.key,
     required this.viewModel,
     required this.onNext,
@@ -32,7 +32,7 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
 
     return ChangeNotifierProvider.value(
       value: viewModel,
-      child: Consumer<WellnessScreeningResultsViewModel>(
+      child: Consumer<HealthMetricsViewModel>(
         builder: (context, vm, _) {
           return Scaffold(
             appBar: const KenwellAppBar(
@@ -55,6 +55,17 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
                       title: 'Measurements',
                       child: Column(
                         children: [
+                          KenwellTextField(
+                            label: 'Waist Circumference (cm)',
+                            hintText: 'e.g., 80',
+                            controller: vm.waistController,
+                            keyboardType: TextInputType.number,
+                            inputFormatters:
+                                AppTextInputFormatters.numbersOnly(),
+                            validator: (val) => _validateRequired(
+                                val, 'Waist Circumference (cm)'),
+                          ),
+                          const SizedBox(height: 12),
                           KenwellTextField(
                             label: 'Height (cm)',
                             hintText: 'Enter your height in centimeters',
@@ -142,17 +153,6 @@ class WellnessScreeningResultsScreen extends StatelessWidget {
                                 allowDecimal: true),
                             validator: (val) =>
                                 _validateRequired(val, 'Blood Sugar (mmol/L)'),
-                          ),
-                          const SizedBox(height: 12),
-                          KenwellTextField(
-                            label: 'Waist Circumference (cm)',
-                            hintText: 'e.g., 80',
-                            controller: vm.waistController,
-                            keyboardType: TextInputType.number,
-                            inputFormatters:
-                                AppTextInputFormatters.numbersOnly(),
-                            validator: (val) => _validateRequired(
-                                val, 'Waist Circumference (cm)'),
                           ),
                         ],
                       ),

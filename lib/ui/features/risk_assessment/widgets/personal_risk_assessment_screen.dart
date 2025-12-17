@@ -30,6 +30,14 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Initialize the view model with gender and age data
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      viewModel.setPersonalDetails(
+        gender: isFemale ? 'Female' : 'Male',
+        age: age,
+      );
+    });
+
     return ChangeNotifierProvider.value(
       value: viewModel,
       child: Consumer<PersonalRiskAssessmentViewModel>(
@@ -268,15 +276,16 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            KenwellYesNoQuestion<bool>(
-                              question:
-                                  '8. If > than 40, have you had your prostate checked?',
-                              value: vm.prostateCheck,
-                              onChanged: vm.setProstateCheck,
-                              yesValue: true,
-                              noValue: false,
-                              textStyle: const TextStyle(fontSize: 16),
-                            ),
+                            if (vm.showProstateCheckQuestion)
+                              KenwellYesNoQuestion<bool>(
+                                question:
+                                    '8. If > than 40, have you had your prostate checked?',
+                                value: vm.prostateCheck,
+                                onChanged: vm.setProstateCheck,
+                                yesValue: true,
+                                noValue: false,
+                                textStyle: const TextStyle(fontSize: 16),
+                              ),
                             KenwellYesNoQuestion<bool>(
                               question:
                                   '9. Have you been tested for prostate cancer?',

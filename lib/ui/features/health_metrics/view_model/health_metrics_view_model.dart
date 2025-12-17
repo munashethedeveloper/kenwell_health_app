@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 
-class WellnessScreeningResultsViewModel extends ChangeNotifier {
+class HealthMetricsViewModel extends ChangeNotifier {
   final formKey = GlobalKey<FormState>();
 
   final TextEditingController heightController = TextEditingController();
@@ -16,7 +16,7 @@ class WellnessScreeningResultsViewModel extends ChangeNotifier {
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
 
-  WellnessScreeningResultsViewModel() {
+  HealthMetricsViewModel() {
     heightController.addListener(_calculateBMI);
     weightController.addListener(_calculateBMI);
   }

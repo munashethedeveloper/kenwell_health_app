@@ -66,6 +66,17 @@ class ConsentScreen extends StatelessWidget {
       previousLabel: 'Cancel',
       onPrevious: onCancel,
       onNext: () async {
+        if (!vm.hasAtLeastOneScreening) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Please select at least one screening option.',
+              ),
+            ),
+          );
+          return;
+        }
+
         if (vm.formKey.currentState!.validate() && vm.isFormValid) {
           await vm.submitConsent();
           onNext();
@@ -164,10 +175,12 @@ class ConsentScreen extends StatelessWidget {
 
   List<KenwellCheckboxOption> _screeningOptions(ConsentScreenViewModel vm) {
     final screenings = [
+      {'label': 'HIV/VCT', 'value': vm.hivVct, 'field': 'hivVct'},
       {'label': 'HRA', 'value': vm.hra, 'field': 'hra'},
-      {'label': 'VCT', 'value': vm.vct, 'field': 'vct'},
+      //{'label': 'HIV/VCT', 'value': vm.vct, 'field': 'vct'},
       {'label': 'TB', 'value': vm.tb, 'field': 'tb'},
-      {'label': 'HIV', 'value': vm.hiv, 'field': 'hiv'},
+
+      //{'label': 'HIV', 'value': vm.hiv, 'field': 'hiv'},
     ];
 
     return screenings
