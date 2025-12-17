@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/routing/route_names.dart';
+import 'package:kenwell_health_app/ui/features/auth/view_models/auth_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
@@ -87,6 +90,13 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
     super.dispose();
   }
 
+  Future<void> _logout() async {
+    final authVM = context.read<AuthViewModel>();
+    await authVM.logout();
+    if (!mounted) return;
+    Navigator.pushReplacementNamed(context, RouteNames.login);
+  }
+
   Future<void> _saveProfile(ProfileViewModel vm) async {
     if (!_formKey.currentState!.validate()) {
       // Collect field names that failed validation
@@ -161,9 +171,52 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
     return Consumer<ProfileViewModel>(
       builder: (context, vm, _) => Scaffold(
         backgroundColor: Colors.white,
-        appBar: const KenwellAppBar(
+        appBar: KenwellAppBar(
           title: 'User Profile',
           automaticallyImplyLeading: false,
+          actions: [
+            PopupMenuButton<int>(
+              icon: const Icon(Icons.more_vert, color: Colors.white),
+              onSelected: (value) async {
+                switch (value) {
+                  /*  case 0:
+                    if (mounted) {
+                      Navigator.pushNamed(context, RouteNames.profile);
+                    }
+                    break; */
+                  case 0:
+                    if (mounted) Navigator.pushNamed(context, RouteNames.help);
+                    break;
+                  case 1:
+                    await _logout();
+                    break;
+                }
+              },
+              itemBuilder: (context) => const [
+                /* const PopupMenuItem<int>(
+                  value: 0,
+                  child: ListTile(
+                    leading: Icon(Icons.person, color: Colors.black),
+                    title: Text('Profile'),
+                  ),
+                ), */
+                PopupMenuItem<int>(
+                  value: 0,
+                  child: ListTile(
+                    leading: Icon(Icons.help_outline, color: Colors.black),
+                    title: Text('Help'),
+                  ),
+                ),
+                PopupMenuItem<int>(
+                  value: 1,
+                  child: ListTile(
+                    leading: Icon(Icons.logout, color: Colors.black),
+                    title: Text('Logout'),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
         body: SafeArea(
           child: Stack(
@@ -178,6 +231,9 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          const SizedBox(height: 16),
+                          const AppLogo(size: 200),
+                          const SizedBox(height: 16),
                           const KenwellSectionHeader(
                             title: 'Update Profile',
                             subtitle:

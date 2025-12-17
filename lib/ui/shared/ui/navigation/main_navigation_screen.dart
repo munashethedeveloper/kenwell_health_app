@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/features/profile/widgets/profile_screen.dart';
 import 'package:kenwell_health_app/ui/features/user_management/widgets/user_management_screen_version_two.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
@@ -26,9 +27,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
     final List<Widget> tabs = [
       const UserManagementScreenVersionTwo(),
-      //const ProfileScreen(),
       const StatsReportScreen(),
       CalendarScreen(eventVM: eventVM),
+      const ProfileScreen(),
+
       //const SettingsScreen(),
       //const HelpScreen(),
       const ConductEventScreen(),
@@ -72,10 +74,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   icon: Icon(Icons.person),
                   label: 'User Management',
                 ),
-                // NavigationDestination(
-                // icon: Icon(Icons.person),
-                // label: 'Profile',
-                //),
+
                 NavigationDestination(
                   icon: Icon(Icons.bar_chart),
                   label: 'Statistics',
@@ -83,6 +82,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 NavigationDestination(
                   icon: Icon(Icons.calendar_today),
                   label: 'Planner',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.person),
+                  label: 'Profile',
                 ),
                 // NavigationDestination(
                 // icon: Icon(Icons.settings),

@@ -55,8 +55,6 @@ class _UserManagementScreenVersionTwoState
             tabs: [
               Tab(icon: Icon(Icons.person_add), text: 'Create User'),
               Tab(icon: Icon(Icons.group), text: 'View Users'),
-              //Tab(text: 'Create User'),
-              //Tab(text: 'View Users'),
             ],
           ),
           actions: [

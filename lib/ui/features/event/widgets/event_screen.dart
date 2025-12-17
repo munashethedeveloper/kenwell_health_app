@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinbox/flutter_spinbox.dart';
+import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
 import '../../../../domain/models/wellness_event.dart';
@@ -217,6 +218,9 @@ class _EventScreenState extends State<EventScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const SizedBox(height: 16),
+              const AppLogo(size: 200),
+              const SizedBox(height: 16),
               KenwellSectionHeader(
                 title: isEditMode ? 'Edit Event' : 'Add New Event',
                 subtitle:

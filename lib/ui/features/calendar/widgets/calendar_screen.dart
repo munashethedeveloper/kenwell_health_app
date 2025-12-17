@@ -87,36 +87,36 @@ class _CalendarScreenState extends State<CalendarScreen> {
               icon: const Icon(Icons.more_vert, color: Colors.white),
               onSelected: (value) async {
                 switch (value) {
-                  case 0:
+                  /*  case 0:
                     if (mounted) {
                       Navigator.pushNamed(context, RouteNames.profile);
                     }
-                    break;
-                  case 1:
+                    break; */
+                  case 0:
                     if (mounted) Navigator.pushNamed(context, RouteNames.help);
                     break;
-                  case 2:
+                  case 1:
                     await _logout();
                     break;
                 }
               },
               itemBuilder: (context) => [
-                const PopupMenuItem<int>(
+                /* const PopupMenuItem<int>(
                   value: 0,
                   child: ListTile(
                     leading: Icon(Icons.person, color: Colors.black),
                     title: Text('Profile'),
                   ),
-                ),
+                ), */
                 const PopupMenuItem<int>(
-                  value: 1,
+                  value: 0,
                   child: ListTile(
                     leading: Icon(Icons.help_outline, color: Colors.black),
                     title: Text('Help'),
                   ),
                 ),
                 const PopupMenuItem<int>(
-                  value: 2,
+                  value: 1,
                   child: ListTile(
                     leading: Icon(Icons.logout, color: Colors.black),
                     title: Text('Logout'),
@@ -344,7 +344,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                                           1
                                                   ? 0
                                                   : 12),
-                                          child: _buildModernEventCard(
+                                          // child: _buildModernEventCard(
+                                          child: _buildFormEventCard(
                                               groupedEvents[day]![i]),
                                         ),
                                       ),
@@ -376,7 +377,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
-  Widget _buildModernEventCard(WellnessEvent event) {
+  /*Widget _buildModernEventCard(WellnessEvent event) {
     final gradient = _eventGradient(event.servicesRequested);
 
     return InkWell(
@@ -482,6 +483,82 @@ class _CalendarScreenState extends State<CalendarScreen> {
             ),
           ],
         ),
+      ),
+    );
+  } */
+
+  Widget _buildFormEventCard(WellnessEvent event) {
+    return KenwellFormCard(
+      title: 'Event Name: ${event.title}',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Date: ${DateFormat.yMMMMd().format(event.date)}',
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  'Start Time: ${event.startTime}',
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  'End Time: ${event.endTime}',
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                  textAlign: TextAlign.right,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Address: ${event.address.isNotEmpty ? event.address : event.venue}',
+            style: const TextStyle(color: Colors.black54),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              if (event.servicesRequested.isNotEmpty)
+                _infoChip(Icons.medical_services, event.servicesRequested),
+              if (event.expectedParticipation > 0)
+                _infoChip(
+                    Icons.people, '${event.expectedParticipation} expected'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _infoChip(IconData icon, String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEFF6EE),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: const Color(0xFF201C58)),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Color(0xFF201C58),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
     );
   }

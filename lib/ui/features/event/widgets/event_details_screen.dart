@@ -21,6 +21,8 @@ class EventDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String _fullName(String first, String last) => '$first $last';
+
     Widget detailRow(String label, String value) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
@@ -41,7 +43,7 @@ class EventDetailsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: KenwellAppBar(
-        title: '${event.title} Event Summary',
+        title: '${event.title} Summary',
         automaticallyImplyLeading: true,
         backgroundColor: const Color(0xFF201C58),
         titleColor: Colors.white,
@@ -68,16 +70,7 @@ class EventDetailsScreen extends StatelessWidget {
             title: 'Event Summary Details',
             uppercase: true,
           ),
-          /*   _buildSectionCard('Event Details', [
-            detailRow('Category', event.servicesRequested),
-            detailRow('Date', DateFormat.yMMMMd().format(event.date)),
-            detailRow('Set Up Time', event.setUpTime),
-            detailRow('Start Time', event.startTime),
-            detailRow('End Time', event.endTime),
-            detailRow('Strike Down Time', event.strikeDownTime),
-          ]), */
           _buildSectionCard('Date & Time', [
-            //detailRow('Category', event.servicesRequested),
             detailRow('Date', DateFormat.yMMMMd().format(event.date)),
             detailRow('Set Up Time', event.setUpTime),
             detailRow('Start Time', event.startTime),
@@ -91,12 +84,16 @@ class EventDetailsScreen extends StatelessWidget {
             detailRow('Province', event.province),
           ]),
           _buildSectionCard('Onsite Contact', [
-            detailRow('Contact Person', event.onsiteContactPerson),
+            detailRow(
+                'Contact Person',
+                _fullName(
+                    event.onsiteContactFirstName, event.onsiteContactLastName)),
             detailRow('Contact Number', event.onsiteContactNumber),
             detailRow('Email', event.onsiteContactEmail),
           ]),
           _buildSectionCard('AE Contact', [
-            detailRow('Contact Person', event.aeContactPerson),
+            detailRow('Contact Person',
+                _fullName(event.aeContactFirstName, event.aeContactLastName)),
             detailRow('Contact Number', event.aeContactNumber),
             detailRow('Email', event.aeContactEmail),
           ]),
@@ -122,8 +119,7 @@ class EventDetailsScreen extends StatelessWidget {
         return AlertDialog(
           title: const Text('Delete Event'),
           content: const Text(
-            'Are you sure you want to delete this event? You can undo this action.',
-          ),
+              'Are you sure you want to delete this event? You can undo this action.'),
           actions: [
             CustomSecondaryButton(
               label: 'Cancel',
@@ -157,52 +153,18 @@ class EventDetailsScreen extends StatelessWidget {
       arguments: {
         'date': event.date,
         'existingEvent': event,
-        'onSave': (WellnessEvent updatedEvent) async {
-          await _updateEvent(context, updatedEvent);
-        },
       },
     );
   }
 
-  Future<void> _updateEvent(
-      BuildContext context, WellnessEvent updatedEvent) async {
-    final previousEvent = await viewModel?.updateEvent(updatedEvent);
-    if (previousEvent != null) {
-      if (!context.mounted) return;
-      Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Event updated'),
-          action: SnackBarAction(
-            label: 'UNDO',
-            onPressed: () {
-              viewModel?.updateEvent(previousEvent);
-            },
-          ),
-          duration: const Duration(seconds: 5),
-        ),
-      );
-    }
-  }
-
   Future<void> _deleteEvent(BuildContext context) async {
-    final deletedEvent = await viewModel?.deleteEvent(event.id);
-    if (deletedEvent != null) {
-      if (!context.mounted) return;
-      Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Event deleted'),
-          action: SnackBarAction(
-            label: 'UNDO',
-            onPressed: () {
-              viewModel?.restoreEvent(deletedEvent);
-            },
-          ),
-          duration: const Duration(seconds: 5),
-        ),
-      );
-    }
+    if (viewModel == null) return;
+    await viewModel!.deleteEvent(event.id); // implement deleteEvent in VM
+    if (!context.mounted) return;
+    Navigator.of(context).pop();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Event deleted')),
+    );
   }
 
   Widget _buildSectionCard(String title, List<Widget> children) {

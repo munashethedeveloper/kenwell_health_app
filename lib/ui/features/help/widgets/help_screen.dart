@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
@@ -22,6 +23,9 @@ class HelpScreen extends StatelessWidget {
             return ListView(
               padding: const EdgeInsets.all(16),
               children: [
+                const SizedBox(height: 16),
+                const AppLogo(size: 200),
+                const SizedBox(height: 16),
                 KenwellFormCard(
                   margin: EdgeInsets.zero,
                   padding:
