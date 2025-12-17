@@ -51,12 +51,15 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
     weightController.addListener(_calculateBMI);
   }
 
+  // Height threshold to determine if input is in centimeters (> 3) or meters
+  static const double _heightCmThreshold = 3.0;
+
   void _calculateBMI() {
     double? height = double.tryParse(heightController.text);
     double? weight = double.tryParse(weightController.text);
 
-    // Convert cm to meters if entered > 3
-    if (height != null && height > 3) {
+    // Convert cm to meters if entered > threshold
+    if (height != null && height > _heightCmThreshold) {
       height = height / 100;
     }
 
