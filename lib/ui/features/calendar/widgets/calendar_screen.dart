@@ -336,17 +336,29 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                             color: Colors.white,
                                           ),
                                         ),
-                                        child: Padding(
-                                          padding: EdgeInsets.only(
-                                              bottom: i ==
-                                                      groupedEvents[day]!
-                                                              .length -
-                                                          1
-                                                  ? 0
-                                                  : 12),
-                                          // child: _buildModernEventCard(
-                                          child: _buildFormEventCard(
-                                              groupedEvents[day]![i]),
+                                        child: InkWell(
+                                          onTap: () {
+                                            Navigator.pushNamed(
+                                              context,
+                                              RouteNames.eventDetails,
+                                              arguments: {
+                                                'event': groupedEvents[day]![i],
+                                                'viewModel': widget.eventVM,
+                                              },
+                                            );
+                                          },
+                                          child: Padding(
+                                            padding: EdgeInsets.only(
+                                                bottom: i ==
+                                                        groupedEvents[day]!
+                                                                .length -
+                                                            1
+                                                    ? 0
+                                                    : 12),
+                                            // child: _buildModernEventCard(
+                                            child: _buildFormEventCard(
+                                                groupedEvents[day]![i]),
+                                          ),
                                         ),
                                       ),
                                     ],
