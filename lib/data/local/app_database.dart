@@ -41,6 +41,8 @@ class Events extends Table {
   TextColumn get aeContactNumber => text()();
   TextColumn get aeContactEmail => text()();
   TextColumn get servicesRequested => text()();
+  TextColumn get additionalServicesRequested =>
+      text().withDefault(const Constant(''))();
   IntColumn get expectedParticipation =>
       integer().withDefault(const Constant(0))();
   IntColumn get nurses => integer().withDefault(const Constant(0))();

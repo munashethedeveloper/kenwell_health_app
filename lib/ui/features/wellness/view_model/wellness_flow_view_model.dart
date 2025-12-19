@@ -49,7 +49,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
 
     // Add HRA screens if selected
     if (selectedScreenings.contains('hra')) {
-      _flowSteps.addAll(['risk_assessment', 'health_metrics']);
+      _flowSteps.addAll(['risk_assessment']);
     }
 
     // Add HIV/VCT screens if selected (VCT and HIV are the same)
@@ -118,8 +118,8 @@ class WellnessFlowViewModel extends ChangeNotifier {
     final consentData = consentVM.toMap();
     final personalData = personalVM.toMap();
     final riskData = riskVM.toMap();
-    final healthMetricsData = healthMetricsVM.toMap();
-    final nurseData = nurseVM.toMap();
+    // final healthMetricsData = healthMetricsVM.toMap();
+    //final nurseData = nurseVM.toMap();
     final hivTestData = hivTestVM.toMap();
     final hivResultsData = await hivResultsVM.toMap();
     final tbTestData = await tbTestVM.toMap();
@@ -129,8 +129,8 @@ class WellnessFlowViewModel extends ChangeNotifier {
     debugPrint('Consent: $consentData');
     debugPrint('Personal: $personalData');
     debugPrint('Risk: $riskData');
-    debugPrint('Health Metrics: $healthMetricsData');
-    debugPrint('Nurse Intervention: $nurseData');
+    //debugPrint('Health Metrics: $healthMetricsData');
+    //debugPrint('Nurse Intervention: $nurseData');
     debugPrint('HIV Test: $hivTestData');
     debugPrint('HIV Results: $hivResultsData');
     debugPrint('TB Test: $tbTestData');

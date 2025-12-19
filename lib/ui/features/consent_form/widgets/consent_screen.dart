@@ -121,7 +121,8 @@ class ConsentScreen extends StatelessWidget {
               const SizedBox(height: 16),
               KenwellTextField(
                 label: 'Name of Healthcare Practitioner',
-                //enabled: false,
+                enabled: false,
+                readOnly: true,
                 controller: vm.practitionerController,
                 validator: (val) => (val == null || val.isEmpty)
                     ? 'Please enter Name of Healthcare Practitioner'

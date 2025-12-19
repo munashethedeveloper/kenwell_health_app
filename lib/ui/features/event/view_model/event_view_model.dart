@@ -11,15 +11,28 @@ class EventViewModel extends ChangeNotifier {
   }
 
   static const List<String> _serviceOptions = [
+    'Breast Screening',
+    'Dental Screening',
     'Eye Test',
+    'HCT',
     'HIV Test',
     'HRA',
     'Pap Smear',
+    'Psychological Assessment',
+    'Posture Screening',
     'PSA',
     'Psychological Screening',
     'TB Test',
-    'VCT',
   ];
+
+  static const List<String> _additionalServiceOptions = [
+    'Massage Therapy',
+    'Pediatric Care',
+    'Smoothie Bar',
+    'Event Setup Assistance',
+    'Event Management',
+  ];
+
   final EventRepository _repository;
   late final Future<void> _initializationFuture;
 
@@ -96,15 +109,23 @@ class EventViewModel extends ChangeNotifier {
 
   Future<void> get initialized => _initializationFuture;
 
+//Services Selection
   final Set<String> _selectedServices = {};
+  final Set<String> _selectedAdditionalServices = {};
 
   List<String> get availableServiceOptions =>
       List<String>.unmodifiable(_serviceOptions);
+  List<String> get availableAdditionalServiceOptions =>
+      List<String>.unmodifiable(_additionalServiceOptions);
 
   Set<String> get selectedServices =>
       Set<String>.unmodifiable(_selectedServices);
+  Set<String> get selectedAdditionalServices =>
+      Set<String>.unmodifiable(_selectedAdditionalServices);
 
   bool isServiceSelected(String service) => _selectedServices.contains(service);
+  bool isAdditionalServiceSelected(String service) =>
+      _selectedAdditionalServices.contains(service);
 
   void toggleServiceSelection(String service, bool shouldSelect) {
     if (!_serviceOptions.contains(service)) return;
@@ -116,8 +137,21 @@ class EventViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void toggleAdditionalServiceSelection(String service, bool shouldSelect) {
+    if (!_additionalServiceOptions.contains(service)) return;
+    if (shouldSelect) {
+      _selectedAdditionalServices.add(service);
+    } else {
+      _selectedAdditionalServices.remove(service);
+    }
+    notifyListeners();
+  }
+
   String get servicesRequested =>
       _selectedServices.isEmpty ? '' : _selectedServices.join(', ');
+  String get additionalServicesRequested => _selectedAdditionalServices.isEmpty
+      ? ''
+      : _selectedAdditionalServices.join(', ');
 
   // Load existing event for editing
   void loadExistingEvent(WellnessEvent? e) {
@@ -147,6 +181,7 @@ class EventViewModel extends ChangeNotifier {
     coordinators = e.coordinators == 1 ? 'Yes' : 'No';
     mobileBooths = e.mobileBooths;
     _setServicesFromString(e.servicesRequested);
+    _setAdditionalServicesFromString(e.additionalServicesRequested);
     medicalAid = e.medicalAid;
 
     notifyListeners();
@@ -197,6 +232,7 @@ class EventViewModel extends ChangeNotifier {
       aeContactNumber: aeNumberController.text,
       aeContactEmail: aeEmailController.text,
       servicesRequested: servicesRequested,
+      additionalServicesRequested: additionalServicesRequested,
       expectedParticipation:
           int.tryParse(expectedParticipationController.text) ?? 0,
       nurses: int.tryParse(nursesController.text) ?? 0,
@@ -343,6 +379,7 @@ class EventViewModel extends ChangeNotifier {
     strikeDownTimeController.clear();
     dateController.clear();
     _resetServiceSelections();
+    _resetAdditionalServiceSelections();
   }
 
   @override
@@ -384,10 +421,29 @@ class EventViewModel extends ChangeNotifier {
     }
   }
 
+  void _setAdditionalServicesFromString(String raw) {
+    final parsed = raw.split(',').map((value) => value.trim()).where((value) =>
+        value.isNotEmpty && _additionalServiceOptions.contains(value));
+
+    _selectedAdditionalServices
+      ..clear()
+      ..addAll(parsed);
+
+    if (_selectedAdditionalServices.isEmpty) {
+      _resetAdditionalServiceSelections();
+    }
+  }
+
   void _resetServiceSelections() {
     _selectedServices
       ..clear()
       ..add(_serviceOptions.first);
+  }
+
+  void _resetAdditionalServiceSelections() {
+    _selectedAdditionalServices
+      ..clear()
+      ..add(_additionalServiceOptions.first);
   }
 
   Future<void> _loadPersistedEvents() async {

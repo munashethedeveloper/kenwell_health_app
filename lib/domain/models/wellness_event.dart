@@ -29,6 +29,7 @@ class WellnessEvent {
   final String aeContactNumber;
   final String aeContactEmail;
   final String servicesRequested;
+  final String additionalServicesRequested;
   final int expectedParticipation;
   final int nurses;
   final int coordinators;
@@ -63,6 +64,7 @@ class WellnessEvent {
     required this.aeContactNumber,
     required this.aeContactEmail,
     required this.servicesRequested,
+    required this.additionalServicesRequested,
     required this.expectedParticipation,
     required this.nurses,
     required this.coordinators,
@@ -110,6 +112,7 @@ class WellnessEvent {
     String? aeContactNumber,
     String? aeContactEmail,
     String? servicesRequested,
+    String? additionalServicesRequested,
     int? expectedParticipation,
     int? nurses,
     int? coordinators,
@@ -144,6 +147,8 @@ class WellnessEvent {
       aeContactNumber: aeContactNumber ?? this.aeContactNumber,
       aeContactEmail: aeContactEmail ?? this.aeContactEmail,
       servicesRequested: servicesRequested ?? this.servicesRequested,
+      additionalServicesRequested:
+          additionalServicesRequested ?? this.additionalServicesRequested,
       expectedParticipation:
           expectedParticipation ?? this.expectedParticipation,
       nurses: nurses ?? this.nurses,
@@ -183,6 +188,7 @@ class WellnessEvent {
         other.aeContactNumber == aeContactNumber &&
         other.aeContactEmail == aeContactEmail &&
         other.servicesRequested == servicesRequested &&
+        other.additionalServicesRequested == additionalServicesRequested &&
         other.expectedParticipation == expectedParticipation &&
         other.nurses == nurses &&
         other.coordinators == coordinators &&
@@ -217,6 +223,7 @@ class WellnessEvent {
         aeContactNumber.hashCode ^
         aeContactEmail.hashCode ^
         servicesRequested.hashCode ^
+        additionalServicesRequested.hashCode ^
         expectedParticipation.hashCode ^
         nurses.hashCode ^
         coordinators.hashCode ^

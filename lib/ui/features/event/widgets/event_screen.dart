@@ -457,6 +457,9 @@ class _EventScreenState extends State<EventScreen> {
               _buildSectionCard('Requested Services',
                   [_buildServicesRequestedField(context)]),
 
+              _buildSectionCard('Additional Services Requested',
+                  [_buildAdditionalServicesRequestedField(context)]),
+
               _buildSectionCard('Healthcare Professionals Needed', [
                 //Dental Hygenists — DROPDOWN + SPINBOX WHEN YES
                 KenwellDropdownField<String>(
@@ -739,6 +742,57 @@ class _EventScreenState extends State<EventScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildAdditionalServicesRequestedField(BuildContext context) {
+    return FormField<Set<String>>(
+      initialValue: widget.viewModel.selectedAdditionalServices,
+      validator: (_) {
+        if (widget.viewModel.selectedAdditionalServices.isEmpty) {
+          return 'Please select at least one service';
+        }
+        return null;
+      },
+      builder: (field) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            KenwellCheckboxGroup(
+              options: widget.viewModel.availableAdditionalServiceOptions
+                  .map(
+                    (service) => KenwellCheckboxOption(
+                      label: service,
+                      value:
+                          widget.viewModel.isAdditionalServiceSelected(service),
+                      onChanged: (checked) {
+                        setState(() {
+                          widget.viewModel.toggleAdditionalServiceSelection(
+                            service,
+                            checked ?? false,
+                          );
+                          field.didChange(
+                              widget.viewModel.selectedAdditionalServices);
+                        });
+                      },
+                    ),
+                  )
+                  .toList(),
+            ),
+            if (field.hasError)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  field.errorText!,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.error,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 

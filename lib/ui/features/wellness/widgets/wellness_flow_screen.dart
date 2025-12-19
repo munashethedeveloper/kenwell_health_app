@@ -8,12 +8,12 @@ import 'package:kenwell_health_app/ui/features/patient/widgets/personal_details_
 import 'package:provider/provider.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../hiv_test_results/widgets/hiv_test_result_screen.dart';
-import '../../nurse_interventions/widgets/nurse_intervention_screen.dart';
+//import '../../nurse_interventions/widgets/nurse_intervention_screen.dart';
 import '../view_model/wellness_flow_view_model.dart';
 import '../../survey/widgets/survey_screen.dart';
 import '../../consent_form/widgets/consent_screen.dart';
 import '../../risk_assessment/widgets/personal_risk_assessment_screen.dart';
-import '../../health_metrics/widgets/health_metrics_screen.dart';
+//import '../../health_metrics/widgets/health_metrics_screen.dart';
 import '../../hiv_test/widgets/hiv_test_screen.dart';
 import '../../tb_test/widgets/tb_testing_screen.dart';
 
@@ -90,15 +90,15 @@ class WellnessFlowScreen extends StatelessWidget {
           age: flowVM.personalVM.userAge,
         );
 
-      case 'health_metrics':
+      /*   case 'health_metrics':
         return HealthMetricsScreen(
           onNext: flowVM.nextStep,
           onPrevious: flowVM.previousStep,
           viewModel: flowVM.healthMetricsVM,
           nurseViewModel: flowVM.nurseVM,
-        );
+        ); */
 
-      case 'nurse_intervention':
+      /*  case 'nurse_intervention':
         if (event != null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             flowVM.nurseVM.initialiseWithEvent(event!);
@@ -110,7 +110,7 @@ class WellnessFlowScreen extends StatelessWidget {
             onNext: flowVM.nextStep,
             onPrevious: flowVM.previousStep,
           ),
-        );
+        ); */
 
       case 'hiv_test':
         return ChangeNotifierProvider.value(

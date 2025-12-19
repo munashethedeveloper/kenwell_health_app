@@ -47,6 +47,7 @@ class EventRepository {
       aeContactNumber: entity.aeContactNumber,
       aeContactEmail: entity.aeContactEmail,
       servicesRequested: entity.servicesRequested,
+      additionalServicesRequested: entity.additionalServicesRequested,
       expectedParticipation: entity.expectedParticipation,
       nurses: entity.nurses,
       coordinators: entity.coordinators,
