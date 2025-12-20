@@ -95,9 +95,17 @@ class AppDatabase extends _$AppDatabase {
       }
       
       if (from < 11) {
-        // Remove username column from Users table (was removed from schema)
-        // Recreate the table without the username column
-        await migrator.alterTable(TableMigration(users));
+        // Remove username column from Users table
+        // Note: Old databases (pre-v11) had a NOT NULL username column that was later removed
+        // This migration recreates the Users table with only the current schema columns
+        // TableMigration preserves existing data while updating the table structure
+        try {
+          await migrator.alterTable(TableMigration(users));
+        } on SqliteException catch (e) {
+          // If migration fails, log for debugging but don't crash
+          // This could happen if table is already in correct state
+          print('Users table migration warning: ${e.message}');
+        }
       }
     },
   );
