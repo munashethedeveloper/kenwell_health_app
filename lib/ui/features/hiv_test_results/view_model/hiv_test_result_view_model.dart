@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:signature/signature.dart';
+import 'package:kenwell_health_app/domain/models/wellness_event.dart';
+import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
 
 class HIVTestResultViewModel extends ChangeNotifier {
   // Note: formKey is defined here
@@ -13,6 +16,93 @@ class HIVTestResultViewModel extends ChangeNotifier {
   final TextEditingController screeningExpiryDateController =
       TextEditingController();
   String screeningResult = 'Negative';
+
+  // --- Initial Assessment ---
+  String? windowPeriod; // 'N/A', 'Yes', 'No'
+  final List<String> windowPeriodOptions = ['N/A', 'Yes', 'No'];
+
+  String? expectedResult; // 'N/A', 'Yes', 'No'
+  final List<String> expectedResultOptions = ['N/A', 'Yes', 'No'];
+
+  String? difficultyDealingResult; // 'N/A', 'Yes', 'No'
+  final List<String> difficultyOptions = ['N/A', 'Yes', 'No'];
+
+  String? urgentPsychosocial; // 'N/A', 'Yes', 'No'
+  final List<String> urgentOptions = ['N/A', 'Yes', 'No'];
+
+  String? committedToChange; // 'N/A', 'Yes', 'No'
+  final List<String> committedOptions = ['N/A', 'Yes', 'No'];
+
+  void setWindowPeriod(String? value) => _setValue(() => windowPeriod = value);
+  void setExpectedResult(String? value) =>
+      _setValue(() => expectedResult = value);
+  void setDifficultyDealingResult(String? value) =>
+      _setValue(() => difficultyDealingResult = value);
+  void setUrgentPsychosocial(String? value) =>
+      _setValue(() => urgentPsychosocial = value);
+  void setCommittedToChange(String? value) =>
+      _setValue(() => committedToChange = value);
+
+  // --- Follow-up ---
+  String? followUpLocation; // 'State clinic', 'Private doctor', 'Other'
+  final List<String> followUpLocationOptions = [
+    'Referred to State clinic',
+    'Referred to Private doctor',
+    'Other',
+    'No follow-up needed',
+  ];
+  final TextEditingController followUpOtherController = TextEditingController();
+  final TextEditingController followUpDateController = TextEditingController();
+
+  void setFollowUpLocation(String? value) {
+    if (followUpLocation == value) return;
+    followUpLocation = value;
+    if (value != 'Other') followUpOtherController.clear();
+    notifyListeners();
+  }
+
+  // --- Referral Nursing Interventions ---
+  NursingReferralOption? nursingReferralSelection;
+  final TextEditingController notReferredReasonController =
+      TextEditingController();
+
+  void setNursingReferralSelection(NursingReferralOption? value) {
+    if (nursingReferralSelection == value) return;
+    nursingReferralSelection = value;
+    if (value != NursingReferralOption.patientNotReferred) {
+      notReferredReasonController.clear();
+    }
+    notifyListeners();
+  }
+
+  // --- Nurse Details ---
+  final TextEditingController nurseFirstNameController =
+      TextEditingController();
+  final TextEditingController nurseLastNameController = TextEditingController();
+  final TextEditingController rankController = TextEditingController();
+  final SignatureController signatureController = SignatureController(
+    penStrokeWidth: 2,
+    penColor: Colors.black,
+    exportBackgroundColor: Colors.white,
+  );
+  final TextEditingController sancNumberController = TextEditingController();
+  final TextEditingController nurseDateController = TextEditingController();
+
+  // --- New: initialise nurse date from event ---
+  WellnessEvent? event;
+  void initialiseWithEvent(WellnessEvent e) {
+    if (event != null) return; // prevent multiple initializations
+    event = e;
+    if (nurseDateController.text.isEmpty) {
+      nurseDateController.text = DateFormat('yyyy-MM-dd').format(e.date);
+      notifyListeners();
+    }
+  }
+
+  void clearSignature() {
+    signatureController.clear();
+    notifyListeners();
+  }
 
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
@@ -50,11 +140,32 @@ class HIVTestResultViewModel extends ChangeNotifier {
 
   /// Converts all HIV test result data to a Map
   Future<Map<String, dynamic>> toMap() async {
+    final signatureBytes = await signatureController.toPngBytes();
     return {
       'screeningTestName': screeningTestNameController.text,
       'screeningBatchNo': screeningBatchNoController.text,
       'screeningExpiryDate': screeningExpiryDateController.text,
       'screeningResult': screeningResult,
+      // Nursing intervention data
+      'windowPeriod': windowPeriod,
+      'followUpLocation': followUpLocation,
+      'followUpOther': followUpOtherController.text,
+      'followUpDate': followUpDateController.text,
+      'expectedResult': expectedResult,
+      'difficultyDealingResult': difficultyDealingResult,
+      'urgentPsychosocial': urgentPsychosocial,
+      'committedToChange': committedToChange,
+      'nursingReferralSelection': nursingReferralSelection?.name,
+      'notReferredReason': notReferredReasonController.text,
+      'hivTestingNurseFirstName': nurseFirstNameController.text,
+      'hivTestingNurseLastName': nurseLastNameController.text,
+      'hivTestingNurse':
+          '${nurseFirstNameController.text} ${nurseLastNameController.text}'
+              .trim(),
+      'rank': rankController.text,
+      'signature': signatureBytes,
+      'sancNumber': sancNumberController.text,
+      'nurseDate': nurseDateController.text,
     };
   }
 
@@ -83,11 +194,26 @@ class HIVTestResultViewModel extends ChangeNotifier {
     }
   }
 
+  void _setValue(VoidCallback setter) {
+    setter();
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     screeningTestNameController.dispose();
     screeningBatchNoController.dispose();
     screeningExpiryDateController.dispose();
+    // Dispose nursing intervention fields
+    followUpOtherController.dispose();
+    followUpDateController.dispose();
+    notReferredReasonController.dispose();
+    nurseFirstNameController.dispose();
+    nurseLastNameController.dispose();
+    rankController.dispose();
+    signatureController.dispose();
+    sancNumberController.dispose();
+    nurseDateController.dispose();
     super.dispose();
   }
 }
