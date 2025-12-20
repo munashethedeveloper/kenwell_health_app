@@ -83,11 +83,13 @@ class AppDatabase extends _$AppDatabase {
     onUpgrade: (migrator, from, to) async {
       if (from < 10) {
         // Add the additional_services_requested column if upgrading from v7, v8, or v9
-        // This handles databases that were at v7 when the column was added but schema wasn't bumped
+        // Note: Column was added to schema in v8 but schema version wasn't incremented
+        // So databases upgraded from v7 to v8/v9 don't have this column
+        // Databases created fresh at v8/v9 will have it via onCreate
         try {
           await migrator.addColumn(events, events.additionalServicesRequested);
         } on SqliteException catch (_) {
-          // Column may already exist if database was created at v8 or v9
+          // Column already exists (database was created fresh at v8 or v9)
           // This is expected and can be safely ignored
         }
       }
