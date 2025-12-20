@@ -84,8 +84,8 @@ class WellnessFlowScreen extends StatelessWidget {
                     flowVM.nextStep();
                   },
                   onCancel: () {
-                    flowVM.cancelFlow();
-                    onExitFlow();
+                    // Go back to current event details instead of exiting
+                    flowVM.resetFlow();
                   },
                 )
               : const SizedBox(),
