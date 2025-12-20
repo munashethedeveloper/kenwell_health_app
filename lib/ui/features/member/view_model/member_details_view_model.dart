@@ -27,6 +27,9 @@ class MemberDetailsViewModel extends ChangeNotifier {
   String? gender;
   String idDocumentChoice = 'ID';
   String? medicalAidStatus;
+  
+  // Citizenship status
+  String? citizenshipStatus;
 
   // NEW: Alternate number
   //String? hasAlternateNumber;
@@ -44,6 +47,12 @@ class MemberDetailsViewModel extends ChangeNotifier {
 
   final List<String> idDocumentOptions = ['ID', 'Passport'];
   final List<String> medicalAidStatusOptions = ['Yes', 'No'];
+  
+  final List<String> citizenshipOptions = [
+    'SA Citizen',
+    'Permanent Resident',
+    'Other Nationality'
+  ];
 
   String? selectedNationality;
 
@@ -51,6 +60,26 @@ class MemberDetailsViewModel extends ChangeNotifier {
     if (selectedNationality != value) {
       selectedNationality = value;
       //nationalityController.text = value ?? '';
+      notifyListeners();
+    }
+  }
+  
+  void setCitizenshipStatus(String? value) {
+    if (citizenshipStatus != value) {
+      citizenshipStatus = value;
+      
+      // Auto-set nationality for SA Citizen
+      if (value == 'SA Citizen') {
+        selectedNationality = 'South Africa';
+      } else if (value == 'Permanent Resident') {
+        // Keep current nationality or allow user to select
+      } else if (value == 'Other Nationality') {
+        // Clear nationality for user to select
+        if (selectedNationality == 'South Africa') {
+          selectedNationality = null;
+        }
+      }
+      
       notifyListeners();
     }
   }
@@ -353,12 +382,14 @@ class MemberDetailsViewModel extends ChangeNotifier {
   bool get showIdField => idDocumentChoice == 'ID';
   bool get showPassportField => idDocumentChoice == 'Passport';
   bool get showMedicalAidFields => medicalAidStatus == 'Yes';
+  bool get showIdentificationFields => citizenshipStatus != null;
 
   bool get isFormValid =>
       formKey.currentState?.validate() == true &&
       maritalStatus != null &&
       gender != null &&
       medicalAidStatus != null &&
+      citizenshipStatus != null &&
       (showIdField
           ? idNumberController.text.isNotEmpty
           : passportNumberController.text.isNotEmpty) &&
@@ -376,7 +407,10 @@ class MemberDetailsViewModel extends ChangeNotifier {
         'idNumber': idNumberController.text,
         'passportNumber': passportNumberController.text,
         'idDocumentChoice': idDocumentChoice,
-        'nationality': nationalityController.text,
+        'nationality': citizenshipStatus == 'SA Citizen' 
+            ? 'South Africa' 
+            : selectedNationality ?? '',
+        'citizenshipStatus': citizenshipStatus,
         'medicalAidName': medicalAidNameController.text,
         'medicalAidNumber': medicalAidNumberController.text,
         'medicalAidStatus': medicalAidStatus,
