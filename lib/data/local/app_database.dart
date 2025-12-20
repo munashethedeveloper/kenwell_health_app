@@ -73,13 +73,13 @@ class AppDatabase extends _$AppDatabase {
   static final AppDatabase instance = AppDatabase._internal();
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 11;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (migrator) => migrator.createAll(),
 
-    // Migration to add missing column for databases at schema v7-9
+    // Migration to handle schema changes
     onUpgrade: (migrator, from, to) async {
       if (from < 10) {
         // Add the additional_services_requested column if upgrading from v7, v8, or v9
@@ -92,6 +92,12 @@ class AppDatabase extends _$AppDatabase {
           // Column already exists (database was created fresh at v8 or v9)
           // This is expected and can be safely ignored
         }
+      }
+      
+      if (from < 11) {
+        // Remove username column from Users table (was removed from schema)
+        // Recreate the table without the username column
+        await migrator.alterTable(TableMigration(users));
       }
     },
   );
