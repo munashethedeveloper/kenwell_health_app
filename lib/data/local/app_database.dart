@@ -102,8 +102,8 @@ class AppDatabase extends _$AppDatabase {
         try {
           await migrator.alterTable(TableMigration(users));
         } on SqliteException catch (_) {
-          // If migration fails, it might already be in correct state
-          // Silently continue - table recreation is handled by Drift
+          // If TableMigration fails, the table likely already matches current schema
+          // Safe to continue - app will function with existing table structure
         }
       }
     },
