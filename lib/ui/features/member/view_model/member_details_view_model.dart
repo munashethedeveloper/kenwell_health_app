@@ -320,15 +320,15 @@ class MemberDetailsViewModel extends ChangeNotifier {
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
 
-  PersonalDetailsViewModel() {
+  MemberDetailsViewModel() {
     idNumberController.addListener(_handleIdNumberInput);
   }
 
   void _handleIdNumberInput() {
     final id = idNumberController.text;
     if (id.length == 13 && Validators.validateSouthAfricanId(id) == null) {
-      dobController.text =
-          DateFormat('dd/MM/yyyy').format(Validators.getDateOfBirthFromId(id));
+      dob = Validators.getDateOfBirthFromId(id);
+      dobController.text = DateFormat('dd/MM/yyyy').format(dob!);
       gender = Validators.getGenderFromId(id);
       notifyListeners();
     }
