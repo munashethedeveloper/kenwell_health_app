@@ -36,7 +36,9 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
       );
       return;
     }
-    // Handle search logic here
+    // TODO: Implement member search functionality
+    // This should search for existing members by name or ID
+    // and display results for selection
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Searching for: $searchQuery'),

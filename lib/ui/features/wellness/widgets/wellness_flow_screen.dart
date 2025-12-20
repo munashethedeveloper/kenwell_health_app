@@ -168,11 +168,6 @@ class WellnessFlowScreen extends StatelessWidget {
         );
 
       case 'survey':
-        // Determine if this is a standalone survey or part of a screening flow
-        final isStandaloneSurvey = flowVM.flowSteps.length == 2 && 
-                                   flowVM.flowSteps[0] == 'current_event_details' &&
-                                   flowVM.flowSteps[1] == 'survey';
-        
         return ChangeNotifierProvider.value(
           value: flowVM.surveyVM,
           child: SurveyScreen(
@@ -242,7 +237,7 @@ class WellnessFlowScreen extends StatelessWidget {
                 // Close progress dialog
                 Navigator.of(context).pop();
                 
-                if (isStandaloneSurvey) {
+                if (flowVM.isStandaloneSurvey) {
                   // For standalone survey, return to CurrentEventDetailsScreen
                   flowVM.resetFlow();
                 } else {
@@ -254,7 +249,7 @@ class WellnessFlowScreen extends StatelessWidget {
               }
 
               debugPrint(
-                  'WellnessFlow: survey onSubmit finished (isStandalone: $isStandaloneSurvey)');
+                  'WellnessFlow: survey onSubmit finished (isStandalone: ${flowVM.isStandaloneSurvey})');
             },
           ),
         );

@@ -196,9 +196,17 @@ class WellnessFlowViewModel extends ChangeNotifier {
   }
 
   /// Navigate from member registration to personal details
+  /// This allows users to create a new member or proceed after selecting a member from search
   void navigateToPersonalDetails() {
     _flowSteps = ['current_event_details', 'member_registration', 'personal_details'];
     _currentStep = 2;
     notifyListeners();
+  }
+
+  /// Check if the current survey is standalone (accessed directly) or part of a screening flow
+  bool get isStandaloneSurvey {
+    return _flowSteps.length == 2 && 
+           _flowSteps[0] == 'current_event_details' &&
+           _flowSteps[1] == 'survey';
   }
 }
