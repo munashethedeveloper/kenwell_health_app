@@ -5,6 +5,8 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/features/member/widgets/member_details_screen.dart';
+import 'package:kenwell_health_app/ui/features/wellness/widgets/current_event_details_screen.dart';
+import 'package:kenwell_health_app/ui/features/wellness/widgets/member_registration_screen.dart';
 import 'package:provider/provider.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../hiv_test_results/widgets/hiv_test_result_screen.dart';
@@ -54,6 +56,22 @@ class WellnessFlowScreen extends StatelessWidget {
     final stepName = flowVM.currentStepName;
 
     switch (stepName) {
+      case 'current_event_details':
+        return event != null
+            ? CurrentEventDetailsScreen(
+                event: event!,
+                onSectionTap: (section) {
+                  flowVM.navigateToSection(section);
+                },
+              )
+            : const SizedBox();
+
+      case 'member_registration':
+        return MemberRegistrationScreen(
+          onGoToMemberDetails: flowVM.navigateToPersonalDetails,
+          onPrevious: flowVM.previousStep,
+        );
+
       case 'consent':
         return ChangeNotifierProvider.value(
           value: flowVM.consentVM,

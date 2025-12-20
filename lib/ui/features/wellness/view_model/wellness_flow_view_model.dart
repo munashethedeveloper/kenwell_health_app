@@ -14,8 +14,8 @@ import '../../../../domain/models/wellness_event.dart';
 
 class WellnessFlowViewModel extends ChangeNotifier {
   WellnessFlowViewModel({this.activeEvent}) {
-    // Initialize with consent as the first step
-    _flowSteps = ['consent'];
+    // Initialize with current event details as the first step
+    _flowSteps = ['current_event_details'];
   }
 
   // ViewModels for each step
@@ -35,7 +35,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
   int get currentStep => _currentStep;
 
   // Dynamic flow based on selected checkboxes
-  List<String> _flowSteps = ['consent'];
+  List<String> _flowSteps = ['current_event_details'];
   List<String> get flowSteps => _flowSteps;
 
   // Initialize flow based on consent selections
@@ -109,7 +109,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
 
   void cancelFlow() {
     _currentStep = 0;
-    _flowSteps = ['consent']; // Reset flow to initial state
+    _flowSteps = ['current_event_details']; // Reset flow to initial state
     notifyListeners();
   }
 
@@ -145,7 +145,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
     );
 
     _currentStep = 0;
-    _flowSteps = ['consent']; // Reset flow after submission
+    _flowSteps = ['current_event_details']; // Reset flow after submission
     notifyListeners();
   }
 
@@ -164,10 +164,41 @@ class WellnessFlowViewModel extends ChangeNotifier {
     }
   }
 
-  /// Reset the flow to consent screen (for reuse)
+  /// Reset the flow to current event details screen (for reuse)
   void resetFlow() {
     _currentStep = 0;
-    _flowSteps = ['consent']; // Reset flow to initial state
+    _flowSteps = ['current_event_details']; // Reset flow to initial state
+    notifyListeners();
+  }
+
+  /// Navigate to a specific section from the current event details screen
+  void navigateToSection(String section) {
+    switch (section) {
+      case 'consent':
+        _flowSteps = ['current_event_details', 'consent'];
+        _currentStep = 1;
+        break;
+      case 'member_registration':
+        _flowSteps = ['current_event_details', 'member_registration'];
+        _currentStep = 1;
+        break;
+      case 'health_screenings':
+        // For health screenings, we show consent first to select which screenings
+        _flowSteps = ['current_event_details', 'consent'];
+        _currentStep = 1;
+        break;
+      case 'survey':
+        _flowSteps = ['current_event_details', 'survey'];
+        _currentStep = 1;
+        break;
+    }
+    notifyListeners();
+  }
+
+  /// Navigate from member registration to personal details
+  void navigateToPersonalDetails() {
+    _flowSteps = ['current_event_details', 'member_registration', 'personal_details'];
+    _currentStep = 2;
     notifyListeners();
   }
 
