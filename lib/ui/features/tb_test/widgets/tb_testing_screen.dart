@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/features/nurse_interventions/view_model/nurse_intervention_form_mixin.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_referral_card.dart';
-import 'package:kenwell_health_app/utils/input_formatters.dart';
 import 'package:provider/provider.dart';
-
-import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_page.dart';
 import '../../../shared/ui/form/kenwell_date_field.dart';
-import '../../../shared/ui/form/kenwell_form_styles.dart';
 import '../../../shared/ui/form/kenwell_signature_actions.dart';
 import '../../../shared/ui/form/kenwell_yes_no_list.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
@@ -79,21 +75,21 @@ class TBTestingScreen extends StatelessWidget {
                 yesValue: 'Yes',
                 noValue: 'No',
               ),
-              KenwellYesNoItem(
-                question:
-                    'Have you experienced chest pains or difficulty breathing?',
-                value: viewModel.chestPain,
-                onChanged: viewModel.setChestPain,
-                yesValue: 'Yes',
-                noValue: 'No',
-              ),
-              KenwellYesNoItem(
-                question: 'Do you have swellings in the neck or armpits?',
-                value: viewModel.swellings,
-                onChanged: viewModel.setSwellings,
-                yesValue: 'Yes',
-                noValue: 'No',
-              ),
+              //     KenwellYesNoItem(
+              //      question:
+              //            'Have you experienced chest pains or difficulty breathing?',
+              //       value: viewModel.chestPain,
+              //       onChanged: viewModel.setChestPain,
+              //       yesValue: 'Yes',
+              //       noValue: 'No',
+              //     ),
+              // KenwellYesNoItem(
+              //   question: 'Do you have swellings in the neck or armpits?',
+              //   value: viewModel.swellings,
+              //   onChanged: viewModel.setSwellings,
+              //   yesValue: 'Yes',
+              //   noValue: 'No',
+              //  ),
             ],
           ),
         ),
@@ -143,8 +139,8 @@ class TBTestingScreen extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         _buildReferrals(viewModel),
-        const SizedBox(height: 24),
-        _buildNurseDetails(viewModel),
+        // const SizedBox(height: 24),
+        // _buildNurseDetails(viewModel),
         const SizedBox(height: 24),
         KenwellSignatureActions(
           title: 'Signature',
@@ -188,55 +184,55 @@ class TBTestingScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNurseDetails(TBTestingViewModel viewModel) {
-    return KenwellFormCard(
-      title: 'Nurse Details',
-      child: Column(
-        children: [
-          KenwellTextField(
-            label: 'Nurse First Name',
-            hintText: 'Enter nurse first name',
-            controller: viewModel.nurseFirstNameController,
-            inputFormatters:
-                AppTextInputFormatters.lettersOnly(allowHyphen: true),
-            validator: (val) => (val == null || val.isEmpty)
-                ? 'Please enter Nurse First Name'
-                : null,
-          ),
-          KenwellTextField(
-            label: 'Nurse Last Name',
-            hintText: 'Enter nurse last name',
-            controller: viewModel.nurseLastNameController,
-            inputFormatters:
-                AppTextInputFormatters.lettersOnly(allowHyphen: true),
-            validator: (val) => (val == null || val.isEmpty)
-                ? 'Please enter Nurse Last Name'
-                : null,
-          ),
-          KenwellTextField(
-            label: 'Rank',
-            hintText: 'Enter nurse rank',
-            controller: viewModel.rankController,
-            validator: (val) =>
-                (val == null || val.isEmpty) ? 'Please enter Rank' : null,
-          ),
-          KenwellTextField(
-            label: 'SANC No',
-            hintText: 'Enter SANC number',
-            controller: viewModel.sancNumberController,
-            inputFormatters: AppTextInputFormatters.numbersOnly(),
-            validator: (val) =>
-                (val == null || val.isEmpty) ? 'Please enter SANC No' : null,
-          ),
-          KenwellDateField(
-            label: 'Date',
-            controller: viewModel.nurseDateController,
-            readOnly: true, // <-- pre-filled from WellnessEvent
-            validator: (val) =>
-                (val == null || val.isEmpty) ? 'Please select Date' : null,
-          ),
-        ],
-      ),
-    );
-  }
+  //Widget _buildNurseDetails(TBTestingViewModel viewModel) {
+  //   return KenwellFormCard(
+  //    title: 'Nurse Details',
+  //   child: Column(
+  //     children: [
+  //      KenwellTextField(
+  //   label: 'Nurse First Name',
+  //    hintText: 'Enter nurse first name',
+  //    controller: viewModel.nurseFirstNameController,
+  //    inputFormatters:
+  //        AppTextInputFormatters.lettersOnly(allowHyphen: true),
+  //     validator: (val) => (val == null || val.isEmpty)
+  //         ? 'Please enter Nurse First Name'
+  //         : null,
+  //   ),
+  //    KenwellTextField(
+  //      label: 'Nurse Last Name',
+  //      hintText: 'Enter nurse last name',
+  //      controller: viewModel.nurseLastNameController,
+  //      inputFormatters:
+  //          AppTextInputFormatters.lettersOnly(allowHyphen: true),
+  //      validator: (val) => (val == null || val.isEmpty)
+  //          ? 'Please enter Nurse Last Name'
+  //          : null,
+  //    ),
+  //     KenwellTextField(
+  //       label: 'Rank',
+  //      hintText: 'Enter nurse rank',
+  //       controller: viewModel.rankController,
+  //       validator: (val) =>
+  //           (val == null || val.isEmpty) ? 'Please enter Rank' : null,
+  //     ),
+  //    KenwellTextField(
+  //      label: 'SANC No',
+  //      hintText: 'Enter SANC number',
+  //      controller: viewModel.sancNumberController,
+  //      inputFormatters: AppTextInputFormatters.numbersOnly(),
+  //      validator: (val) =>
+  //          (val == null || val.isEmpty) ? 'Please enter SANC No' : null,
+  //    ),
+  //    KenwellDateField(
+  //      label: 'Date',
+  //      controller: viewModel.nurseDateController,
+  //      readOnly: true, // <-- pre-filled from WellnessEvent
+  //      validator: (val) =>
+  //          (val == null || val.isEmpty) ? 'Please select Date' : null,
+  //    ),
+  //  ],
+  // ),
+  // );
+  //}
 }

@@ -17,8 +17,8 @@ class HIVTestViewModel extends ChangeNotifier {
   TextEditingController noCondomReasonController = TextEditingController();
 
   String? knowPartnerStatus; // Yes/No
-  List<String> riskReasons = [];
-  TextEditingController otherRiskReasonController = TextEditingController();
+  // List<String> riskReasons = [];
+  // TextEditingController otherRiskReasonController = TextEditingController();
 
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
@@ -73,14 +73,14 @@ class HIVTestViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void toggleRiskReason(String reason) {
-    if (riskReasons.contains(reason)) {
-      riskReasons.remove(reason);
-    } else {
-      riskReasons.add(reason);
-    }
-    notifyListeners();
-  }
+  //void toggleRiskReason(String reason) {
+  //if (riskReasons.contains(reason)) {
+  //riskReasons.remove(reason);
+  //} else {
+  //riskReasons.add(reason);
+  // }
+  //notifyListeners();
+  // }
 
   bool get isFormValid {
     return formKey.currentState?.validate() == true;
@@ -99,8 +99,8 @@ class HIVTestViewModel extends ChangeNotifier {
       'noCondomUse': noCondomUse,
       'noCondomReason': noCondomReasonController.text,
       'knowPartnerStatus': knowPartnerStatus,
-      'riskReasons': List<String>.from(riskReasons),
-      'otherRiskReason': otherRiskReasonController.text,
+      //'riskReasons': List<String>.from(riskReasons),
+      //'otherRiskReason': otherRiskReasonController.text,
     };
   }
 
@@ -126,7 +126,7 @@ class HIVTestViewModel extends ChangeNotifier {
     lastTestMonthController.dispose();
     lastTestYearController.dispose();
     noCondomReasonController.dispose();
-    otherRiskReasonController.dispose();
+    //otherRiskReasonController.dispose();
     super.dispose();
   }
 }

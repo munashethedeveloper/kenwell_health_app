@@ -162,7 +162,7 @@ class _CreateUserTabState extends State<CreateUserTab> {
         password: _passwordController.text.trim(),
         role: _selectedRole!,
         phoneNumber: _phoneController.text.trim(),
-        username: _usernameController.text.trim(),
+        // username: _usernameController.text.trim(),
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
       );

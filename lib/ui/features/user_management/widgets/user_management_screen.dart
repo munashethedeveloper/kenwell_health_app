@@ -26,7 +26,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _usernameController = TextEditingController();
+  //final _usernameController = TextEditingController();
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
 
@@ -60,7 +60,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
         password: _passwordController.text.trim(),
         role: role,
         phoneNumber: _phoneController.text.trim(),
-        username: _usernameController.text.trim(),
+        //  username: _usernameController.text.trim(),
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
       );
@@ -96,7 +96,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     _phoneController.dispose();
-    _usernameController.dispose();
+    // _usernameController.dispose();
     _firstNameController.dispose();
     _lastNameController.dispose();
     super.dispose();
@@ -155,15 +155,15 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                               ? "Enter Last Name"
                               : null,
                         ),
-                        const SizedBox(height: 24),
-                        KenwellTextField(
-                          label: "Username",
-                          controller: _usernameController,
-                          padding: EdgeInsets.zero,
-                          validator: (v) => (v == null || v.isEmpty)
-                              ? "Enter Username"
-                              : null,
-                        ),
+                        // const SizedBox(height: 24),
+                        //  KenwellTextField(
+                        //    label: "Username",
+                        //    controller: _usernameController,
+                        //    padding: EdgeInsets.zero,
+                        //     validator: (v) => (v == null || v.isEmpty)
+                        //         ? "Enter Username"
+                        //         : null,
+                        //   ),
                         const SizedBox(height: 24),
                         KenwellDropdownField<String>(
                           label: "Role",

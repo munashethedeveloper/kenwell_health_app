@@ -13,7 +13,7 @@ class ProfileViewModel extends ChangeNotifier {
   String password = '';
   String role = '';
   String phoneNumber = '';
-  String username = '';
+  // String username = '';
   String firstName = '';
   String lastName = '';
 
@@ -35,7 +35,7 @@ class ProfileViewModel extends ChangeNotifier {
         email = user!.email;
         role = UserRoles.ifValid(user!.role) ?? '';
         phoneNumber = user!.phoneNumber;
-        username = user!.username;
+        // username = user!.username;
         firstName = user!.firstName;
         lastName = user!.lastName;
       }
@@ -62,7 +62,7 @@ class ProfileViewModel extends ChangeNotifier {
         password: password,
         role: UserRoles.normalize(role),
         phoneNumber: phoneNumber,
-        username: username,
+        // username: username,
         firstName: firstName,
         lastName: lastName,
       );

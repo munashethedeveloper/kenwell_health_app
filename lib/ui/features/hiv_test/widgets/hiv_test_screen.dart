@@ -4,7 +4,6 @@ import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/custom_yes_no_question.dart';
-import '../../../shared/ui/form/kenwell_checkbox_group.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_page.dart';
 import '../../../shared/ui/form/kenwell_form_styles.dart';
@@ -161,14 +160,14 @@ class HIVTestScreen extends StatelessWidget {
                 noValue: 'No',
               ),
               const SizedBox(height: 12),
-              const Text(
+              /*   const Text(
                 'Reasons that may have put you at risk:',
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF201C58),
                     fontSize: 16),
-              ),
-              KenwellCheckboxGroup(
+              ), */
+              /*     KenwellCheckboxGroup(
                 separator: const Divider(height: 0),
                 options: _riskReasonOptions(viewModel),
               ),
@@ -180,7 +179,7 @@ class HIVTestScreen extends StatelessWidget {
                   label: 'Other risk reason',
                   hint: 'Specify if "Other"',
                 ),
-              ),
+              ), */
             ],
           ),
         ),
@@ -195,7 +194,7 @@ class HIVTestScreen extends StatelessWidget {
     );
   }
 
-  List<KenwellCheckboxOption> _riskReasonOptions(HIVTestViewModel vm) {
+  /* List<KenwellCheckboxOption> _riskReasonOptions(HIVTestViewModel vm) {
     const reasons = [
       'Partner has been unfaithful',
       'Exposed to another person’s body fluids while assisting with an injury',
@@ -213,5 +212,5 @@ class HIVTestScreen extends StatelessWidget {
           ),
         )
         .toList();
-  }
+  } */
 }

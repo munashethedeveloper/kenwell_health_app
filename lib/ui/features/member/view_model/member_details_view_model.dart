@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
 
-class PersonalDetailsViewModel extends ChangeNotifier {
+class MemberDetailsViewModel extends ChangeNotifier {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   // Controllers
@@ -10,7 +10,7 @@ class PersonalDetailsViewModel extends ChangeNotifier {
   final dateController = TextEditingController();
   final nameController = TextEditingController();
   final surnameController = TextEditingController();
-  final initialsController = TextEditingController();
+  // final initialsController = TextEditingController();
   final dobController = TextEditingController();
   final idNumberController = TextEditingController();
   final passportNumberController = TextEditingController();
@@ -19,7 +19,7 @@ class PersonalDetailsViewModel extends ChangeNotifier {
   final medicalAidNumberController = TextEditingController();
   final emailController = TextEditingController();
   final cellNumberController = TextEditingController();
-  final alternateContactNumberController = TextEditingController();
+  // final alternateContactNumberController = TextEditingController();
   final personalNumberController = TextEditingController();
 
   // Dropdown values
@@ -29,8 +29,8 @@ class PersonalDetailsViewModel extends ChangeNotifier {
   String? medicalAidStatus;
 
   // NEW: Alternate number
-  String? hasAlternateNumber;
-  final List<String> hasAlternateNumberOptions = ['Yes', 'No'];
+  //String? hasAlternateNumber;
+  //final List<String> hasAlternateNumberOptions = ['Yes', 'No'];
 
   // Dropdown options
   final List<String> maritalStatusOptions = [
@@ -336,19 +336,19 @@ class PersonalDetailsViewModel extends ChangeNotifier {
   }
 
   // NEW: Alternate Number setter
-  void setHasAlternateNumber(String? value) {
-    if (hasAlternateNumber == value) return;
-    hasAlternateNumber = value;
+  //void setHasAlternateNumber(String? value) {
+  //if (hasAlternateNumber == value) return;
+  // hasAlternateNumber = value;
 
-    if (value == 'No') {
-      alternateContactNumberController.clear();
-    }
+  // if (value == 'No') {
+  //   alternateContactNumberController.clear();
+  // }
 
-    notifyListeners();
-  }
+  // notifyListeners();
+  //}
 
   // NEW: Show/hide alternate contact number field
-  bool get showAlternateNumberField => hasAlternateNumber == 'Yes';
+  // bool get showAlternateNumberField => hasAlternateNumber == 'Yes';
 
   bool get showIdField => idDocumentChoice == 'ID';
   bool get showPassportField => idDocumentChoice == 'Passport';
@@ -371,7 +371,7 @@ class PersonalDetailsViewModel extends ChangeNotifier {
         'date': dateController.text,
         'name': nameController.text,
         'surname': surnameController.text,
-        'initials': initialsController.text,
+        // 'initials': initialsController.text,
         'dateOfBirth': dobController.text,
         'idNumber': idNumberController.text,
         'passportNumber': passportNumberController.text,
@@ -382,11 +382,11 @@ class PersonalDetailsViewModel extends ChangeNotifier {
         'medicalAidStatus': medicalAidStatus,
         'email': emailController.text,
         'cellNumber': cellNumberController.text,
-        'alternateContactNumber': alternateContactNumberController.text,
+        //  'alternateContactNumber': alternateContactNumberController.text,
         'personalNumber': personalNumberController.text,
         'maritalStatus': maritalStatus,
         'gender': gender,
-        'hasAlternateNumber': hasAlternateNumber,
+        // 'hasAlternateNumber': hasAlternateNumber,
       };
 
   Future<void> saveLocally() async {
@@ -404,7 +404,7 @@ class PersonalDetailsViewModel extends ChangeNotifier {
       dateController,
       nameController,
       surnameController,
-      initialsController,
+      //initialsController,
       dobController,
       idNumberController,
       passportNumberController,
@@ -413,7 +413,7 @@ class PersonalDetailsViewModel extends ChangeNotifier {
       medicalAidNumberController,
       emailController,
       cellNumberController,
-      alternateContactNumberController,
+      //alternateContactNumberController,
       personalNumberController,
     ]) {
       c.dispose();

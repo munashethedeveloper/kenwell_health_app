@@ -11,7 +11,6 @@ import '../../event/view_model/event_view_model.dart';
 import '../../event/widgets/event_screen.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/buttons/custom_primary_button.dart';
-import '../../../shared/ui/colours/kenwell_colours.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 
 class CalendarScreen extends StatefulWidget {
@@ -573,37 +572,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
         ],
       ),
     );
-  }
-
-  Widget _buildInfoChip({required IconData icon, required String label}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16, color: Colors.white),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  List<Color> _eventGradient(String _) {
-    return const [
-      KenwellColors.primaryGreenLight,
-      KenwellColors.primaryGreen,
-    ];
   }
 
   int _compareEvents(WellnessEvent a, WellnessEvent b) {

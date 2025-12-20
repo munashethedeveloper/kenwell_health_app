@@ -15,7 +15,7 @@ class AuthRepository {
     required String password,
     required String role,
     required String phoneNumber,
-    required String username,
+    //required String username,
     required String firstName,
     required String lastName,
   }) {
@@ -24,7 +24,7 @@ class AuthRepository {
       password: password,
       role: role,
       phoneNumber: phoneNumber,
-      username: username,
+      // username: username,
       firstName: firstName,
       lastName: lastName,
     );

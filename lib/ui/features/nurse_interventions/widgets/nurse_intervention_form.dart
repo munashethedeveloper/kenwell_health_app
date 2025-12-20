@@ -110,7 +110,7 @@ class NurseInterventionForm extends StatelessWidget {
 
   Widget _buildReferrals() {
     return KenwellReferralCard<NursingReferralOption>(
-      title: 'Nursing Referrals',
+      title: 'Clinical Outcomes',
       selectedValue: viewModel.nursingReferralSelection,
       onChanged: viewModel.setNursingReferralSelection,
       reasonValidator: (val) =>
@@ -118,18 +118,18 @@ class NurseInterventionForm extends StatelessWidget {
       options: [
         KenwellReferralOption(
           value: NursingReferralOption.patientNotReferred,
-          label: 'Patient not referred',
+          label: 'Member not referred',
           requiresReason: true,
           reasonController: viewModel.notReferredReasonController,
-          reasonLabel: 'Reason patient not referred',
+          reasonLabel: 'Reason member not referred',
         ),
         const KenwellReferralOption(
           value: NursingReferralOption.referredToGP,
-          label: 'Patient referred to GP',
+          label: 'Member referred to GP',
         ),
         const KenwellReferralOption(
           value: NursingReferralOption.referredToStateClinic,
-          label: 'Patient referred to State HIV clinic',
+          label: 'Member referred to State HIV clinic',
         ),
       ],
     );

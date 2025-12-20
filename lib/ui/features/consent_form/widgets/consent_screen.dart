@@ -176,7 +176,7 @@ class ConsentScreen extends StatelessWidget {
 
   List<KenwellCheckboxOption> _screeningOptions(ConsentScreenViewModel vm) {
     final screenings = [
-      {'label': 'HIV/VCT', 'value': vm.hivVct, 'field': 'hivVct'},
+      {'label': 'HIV', 'value': vm.hiv, 'field': 'hiv'},
       {'label': 'HRA', 'value': vm.hra, 'field': 'hra'},
       //{'label': 'HIV/VCT', 'value': vm.vct, 'field': 'vct'},
       {'label': 'TB', 'value': vm.tb, 'field': 'tb'},

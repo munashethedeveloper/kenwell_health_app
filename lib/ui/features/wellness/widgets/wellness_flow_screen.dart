@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
-import 'package:kenwell_health_app/ui/features/patient/widgets/personal_details_screen.dart';
+import 'package:kenwell_health_app/ui/features/member/widgets/member_details_screen.dart';
 import 'package:provider/provider.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../hiv_test_results/widgets/hiv_test_result_screen.dart';
@@ -74,10 +74,10 @@ class WellnessFlowScreen extends StatelessWidget {
         );
 
       case 'personal_details':
-        return PersonalDetailsScreen(
+        return MemberDetailsScreen(
           onNext: flowVM.nextStep,
           onPrevious: flowVM.previousStep,
-          viewModel: flowVM.personalVM,
+          viewModel: flowVM.memberDetailsVM,
         );
 
       case 'risk_assessment':
@@ -86,8 +86,8 @@ class WellnessFlowScreen extends StatelessWidget {
           onPrevious: flowVM.previousStep,
           viewModel: flowVM.riskVM,
           nurseViewModel: flowVM.nurseVM,
-          isFemale: flowVM.personalVM.gender?.toLowerCase() == 'female',
-          age: flowVM.personalVM.userAge,
+          isFemale: flowVM.memberDetailsVM.gender?.toLowerCase() == 'female',
+          age: flowVM.memberDetailsVM.userAge,
         );
 
       /*   case 'health_metrics':

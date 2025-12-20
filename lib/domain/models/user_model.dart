@@ -3,7 +3,7 @@ class UserModel {
   final String email;
   final String role;
   final String phoneNumber;
-  final String username;
+  //final String username;
   final String firstName;
   final String lastName;
 
@@ -12,7 +12,7 @@ class UserModel {
     required this.email,
     required this.role,
     required this.phoneNumber,
-    required this.username,
+    //required this.username,
     required this.firstName,
     required this.lastName,
   });
@@ -23,7 +23,7 @@ class UserModel {
       email: data['email'],
       role: data['role'],
       phoneNumber: data['phoneNumber'],
-      username: data['username'],
+      //username: data['username'],
       firstName: data['firstName'],
       lastName: data['lastName'],
     );
@@ -34,7 +34,7 @@ class UserModel {
         'email': email,
         'role': role,
         'phoneNumber': phoneNumber,
-        'username': username,
+        //  'username': username,
         'firstName': firstName,
         'lastName': lastName,
       };

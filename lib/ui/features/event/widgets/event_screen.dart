@@ -750,7 +750,7 @@ class _EventScreenState extends State<EventScreen> {
       initialValue: widget.viewModel.selectedAdditionalServices,
       validator: (_) {
         if (widget.viewModel.selectedAdditionalServices.isEmpty) {
-          return 'Please select at least one service';
+          return 'Please select at least one additional service';
         }
         return null;
       },

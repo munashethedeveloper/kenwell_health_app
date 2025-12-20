@@ -19,7 +19,7 @@ class ConsentScreenViewModel extends ChangeNotifier {
   // Checkbox states
   bool hra = false;
   //bool vct = false;
-  bool hivVct = false;
+  bool hiv = false;
   bool tb = false;
   //bool hiv = false;
 
@@ -34,7 +34,7 @@ class ConsentScreenViewModel extends ChangeNotifier {
 
   bool get isFormValid =>
       //(hra || vct || tb || hiv) && // At least one checkbox must be selected
-      (hra || hivVct || tb) && // At least one checkbox must be selected
+      (hra || hiv || tb) && // At least one checkbox must be selected
       venueController.text.isNotEmpty &&
       dateController.text.isNotEmpty &&
       practitionerController.text.isNotEmpty &&
@@ -44,13 +44,13 @@ class ConsentScreenViewModel extends ChangeNotifier {
   //bool get hasAtLeastOneScreening => hra || vct || tb || hiv;
 
   // Helper to check if at least one screening is selected
-  bool get hasAtLeastOneScreening => hra || hivVct || tb;
+  bool get hasAtLeastOneScreening => hra || hiv || tb;
 
   // Get list of selected screenings
   List<String> get selectedScreenings {
     final List<String> selected = [];
     if (hra) selected.add('hra');
-    if (hivVct) selected.add('hivVct');
+    if (hiv) selected.add('hiv');
     //if (vct) selected.add('vct');
     if (tb) selected.add('tb');
     //if (hiv) selected.add('hiv');
@@ -89,8 +89,8 @@ class ConsentScreenViewModel extends ChangeNotifier {
       //case 'vct':
       //vct = value ?? false;
       // break;
-      case 'hivVct':
-        hivVct = value ?? false;
+      case 'hiv':
+        hiv = value ?? false;
         break;
       case 'tb':
         tb = value ?? false;
@@ -122,7 +122,7 @@ class ConsentScreenViewModel extends ChangeNotifier {
         'date': dateController.text,
         'practitioner': practitionerController.text,
         'hra': hra,
-        'hivVct': hivVct,
+        'hiv': hiv,
         // 'vct': vct,
         'tb': tb,
         //'hiv': hiv,

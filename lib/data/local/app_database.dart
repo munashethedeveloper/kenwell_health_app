@@ -13,7 +13,6 @@ class Users extends Table {
   TextColumn get password => text()();
   TextColumn get role => text()();
   TextColumn get phoneNumber => text()();
-  TextColumn get username => text()();
   TextColumn get firstName => text()();
   TextColumn get lastName => text()();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
@@ -73,24 +72,24 @@ class AppDatabase extends _$AppDatabase {
   static final AppDatabase instance = AppDatabase._internal();
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (migrator) => migrator.createAll(),
+    onCreate: (migrator) => migrator.createAll(),
 
-        // 🔥 Clean migration: rebuild table to drop removed columns safely
-        onUpgrade: (migrator, from, to) async {
-          if (from < 7) {
-            await migrator.alterTable(
-              TableMigration(
-                events,
-                // Drift auto-maps columns. No manual config needed.
-              ),
-            );
-          }
-        },
-      );
+    // 🔥 Clean migration: rebuild table to drop removed columns safely
+    onUpgrade: (migrator, from, to) async {
+      if (from < 9) {
+        await migrator.alterTable(
+          TableMigration(
+            events,
+            // Drift auto-maps columns. No manual config needed.
+          ),
+        );
+      }
+    },
+  );
 
   // ----------------- USER CRUD -----------------
 
@@ -100,7 +99,6 @@ class AppDatabase extends _$AppDatabase {
     required String password,
     required String role,
     required String phoneNumber,
-    required String username,
     required String firstName,
     required String lastName,
   }) {
@@ -110,7 +108,6 @@ class AppDatabase extends _$AppDatabase {
       password: Value(password),
       role: Value(role),
       phoneNumber: Value(phoneNumber),
-      username: Value(username),
       firstName: Value(firstName),
       lastName: Value(lastName),
     );
@@ -119,18 +116,15 @@ class AppDatabase extends _$AppDatabase {
   }
 
   Future<UserEntity?> getUserByEmail(String email) {
-    return (select(users)..where((tbl) => tbl.email.equals(email)))
-        .getSingleOrNull();
+    return (select(
+      users,
+    )..where((tbl) => tbl.email.equals(email))).getSingleOrNull();
   }
 
-  Future<UserEntity?> getUserByCredentials(
-    String email,
-    String password,
-  ) {
-    return (select(users)
-          ..where(
-            (tbl) => tbl.email.equals(email) & tbl.password.equals(password),
-          ))
+  Future<UserEntity?> getUserByCredentials(String email, String password) {
+    return (select(users)..where(
+          (tbl) => tbl.email.equals(email) & tbl.password.equals(password),
+        ))
         .getSingleOrNull();
   }
 
@@ -144,7 +138,6 @@ class AppDatabase extends _$AppDatabase {
     required String password,
     required String role,
     required String phoneNumber,
-    required String username,
     required String firstName,
     required String lastName,
   }) async {
@@ -153,14 +146,14 @@ class AppDatabase extends _$AppDatabase {
       password: Value(password),
       role: Value(role),
       phoneNumber: Value(phoneNumber),
-      username: Value(username),
       firstName: Value(firstName),
       lastName: Value(lastName),
       updatedAt: Value(DateTime.now()),
     );
 
-    final rowsUpdated =
-        await (update(users)..where((tbl) => tbl.id.equals(id))).write(updates);
+    final rowsUpdated = await (update(
+      users,
+    )..where((tbl) => tbl.id.equals(id))).write(updates);
 
     if (rowsUpdated == 0) {
       return null;
@@ -176,8 +169,9 @@ class AppDatabase extends _$AppDatabase {
   Stream<List<EventEntity>> watchAllEvents() => select(events).watch();
 
   Future<EventEntity?> getEventById(String id) {
-    return (select(events)..where((tbl) => tbl.id.equals(id)))
-        .getSingleOrNull();
+    return (select(
+      events,
+    )..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
   }
 
   Future<void> upsertEvent(EventsCompanion entry) async {
@@ -193,9 +187,6 @@ LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final directory = await getApplicationSupportDirectory();
     final file = File(p.join(directory.path, 'kenwell.db'));
-    return NativeDatabase.createInBackground(
-      file,
-      logStatements: false,
-    );
+    return NativeDatabase.createInBackground(file, logStatements: false);
   });
 }

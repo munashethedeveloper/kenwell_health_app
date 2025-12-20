@@ -13,8 +13,8 @@ class TBTestingViewModel extends ChangeNotifier
   String? weightLoss;
   String? nightSweats;
   String? feverChills;
-  String? chestPain;
-  String? swellings;
+  // String? chestPain;
+  // String? swellings;
 
   void setCoughTwoWeeks(String? value) {
     if (coughTwoWeeks == value) return;
@@ -52,17 +52,17 @@ class TBTestingViewModel extends ChangeNotifier
     notifyListeners();
   }
 
-  void setChestPain(String? value) {
-    if (chestPain == value) return;
-    chestPain = value;
-    notifyListeners();
-  }
+  //void setChestPain(String? value) {
+  // if (chestPain == value) return;
+  // chestPain = value;
+  // notifyListeners();
+  //}
 
-  void setSwellings(String? value) {
-    if (swellings == value) return;
-    swellings = value;
-    notifyListeners();
-  }
+  //void setSwellings(String? value) {
+  // if (swellings == value) return;
+  //  swellings = value;
+  //  notifyListeners();
+  //}
 
   // --- TB history ---
   String? treatedBefore;
@@ -104,8 +104,8 @@ class TBTestingViewModel extends ChangeNotifier
         weightLoss != null &&
         nightSweats != null &&
         feverChills != null &&
-        chestPain != null &&
-        swellings != null &&
+        // chestPain != null &&
+        // swellings != null &&
         treatedBefore != null &&
         completedTreatment != null &&
         contactWithTB != null &&
@@ -125,8 +125,8 @@ class TBTestingViewModel extends ChangeNotifier
       'weightLoss': weightLoss,
       'nightSweats': nightSweats,
       'feverChills': feverChills,
-      'chestPain': chestPain,
-      'swellings': swellings,
+      // 'chestPain': chestPain,
+      // 'swellings': swellings,
       'treatedBefore': treatedBefore,
       'treatedDate': treatedDateController.text,
       'completedTreatment': completedTreatment,

@@ -21,7 +21,7 @@ class AuthService {
     required String password,
     required String role,
     required String phoneNumber,
-    required String username,
+    //required String username,
     required String firstName,
     required String lastName,
   }) async {
@@ -29,7 +29,7 @@ class AuthService {
     final sanitizedPassword = password.trim();
     final sanitizedRole = role.trim();
     final sanitizedPhone = phoneNumber.trim();
-    final sanitizedUsername = username.trim();
+    //final sanitizedUsername = username.trim();
     final sanitizedFirstName = firstName.trim();
     final sanitizedLastName = lastName.trim();
 
@@ -44,7 +44,7 @@ class AuthService {
       password: sanitizedPassword,
       role: sanitizedRole,
       phoneNumber: sanitizedPhone,
-      username: sanitizedUsername,
+      //username: sanitizedUsername,
       firstName: sanitizedFirstName,
       lastName: sanitizedLastName,
     );
@@ -82,7 +82,7 @@ class AuthService {
     required String password,
     required String role,
     required String phoneNumber,
-    required String username,
+    //required String username,
     required String firstName,
     required String lastName,
   }) async {
@@ -90,7 +90,7 @@ class AuthService {
     final sanitizedPassword = password.trim();
     final sanitizedRole = role.trim();
     final sanitizedPhone = phoneNumber.trim();
-    final sanitizedUsername = username.trim();
+    // final sanitizedUsername = username.trim();
     final sanitizedFirstName = firstName.trim();
     final sanitizedLastName = lastName.trim();
 
@@ -105,7 +105,7 @@ class AuthService {
       password: sanitizedPassword,
       role: sanitizedRole,
       phoneNumber: sanitizedPhone,
-      username: sanitizedUsername,
+      // username: sanitizedUsername,
       firstName: sanitizedFirstName,
       lastName: sanitizedLastName,
     );
@@ -117,7 +117,7 @@ class AuthService {
           password: sanitizedPassword,
           role: sanitizedRole,
           phoneNumber: sanitizedPhone,
-          username: sanitizedUsername,
+          //    username: sanitizedUsername,
           firstName: sanitizedFirstName,
           lastName: sanitizedLastName,
         );
@@ -150,7 +150,7 @@ class AuthService {
       email: entity.email,
       role: entity.role,
       phoneNumber: entity.phoneNumber,
-      username: entity.username,
+      // username: entity.username,
       firstName: entity.firstName,
       lastName: entity.lastName,
     );

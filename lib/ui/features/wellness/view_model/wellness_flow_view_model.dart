@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../../consent_form/view_model/consent_screen_view_model.dart';
 import '../../hiv_test_results/view_model/hiv_test_result_view_model.dart';
 import '../../nurse_interventions/view_model/nurse_intervention_view_model.dart';
-import '../../patient/view_model/personal_details_view_model.dart';
+import '../../member/view_model/member_details_view_model.dart';
 import '../../risk_assessment/view_model/personal_risk_assessment_view_model.dart';
 import '../../health_metrics/view_model/health_metrics_view_model.dart';
 import '../../hiv_test/view_model/hiv_test_view_model.dart';
@@ -20,7 +20,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
 
   // ViewModels for each step
   final consentVM = ConsentScreenViewModel();
-  final personalVM = PersonalDetailsViewModel();
+  final memberDetailsVM = MemberDetailsViewModel();
   final riskVM = PersonalRiskAssessmentViewModel();
   final healthMetricsVM = HealthMetricsViewModel();
   final nurseVM = NurseInterventionViewModel();
@@ -53,7 +53,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
     }
 
     // Add HIV/VCT screens if selected (VCT and HIV are the same)
-    if (selectedScreenings.contains('hivVct')) {
+    if (selectedScreenings.contains('hiv')) {
       _flowSteps.addAll(['hiv_test', 'hiv_results']);
     }
 
@@ -116,7 +116,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
   Future<void> submitAll(BuildContext context) async {
     // Collect all data from ViewModels
     final consentData = consentVM.toMap();
-    final personalData = personalVM.toMap();
+    final memberData = memberDetailsVM.toMap();
     final riskData = riskVM.toMap();
     // final healthMetricsData = healthMetricsVM.toMap();
     //final nurseData = nurseVM.toMap();
@@ -127,7 +127,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
 
     debugPrint('Submitting full wellness flow data...');
     debugPrint('Consent: $consentData');
-    debugPrint('Personal: $personalData');
+    debugPrint('Member: $memberData');
     debugPrint('Risk: $riskData');
     //debugPrint('Health Metrics: $healthMetricsData');
     //debugPrint('Nurse Intervention: $nurseData');

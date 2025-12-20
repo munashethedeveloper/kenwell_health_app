@@ -9,14 +9,14 @@ import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_page.dart';
 import '../../../shared/ui/form/kenwell_date_field.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
-import '../view_model/personal_details_view_model.dart';
+import '../view_model/member_details_view_model.dart';
 
-class PersonalDetailsScreen extends StatelessWidget {
-  final PersonalDetailsViewModel viewModel;
+class MemberDetailsScreen extends StatelessWidget {
+  final MemberDetailsViewModel viewModel;
   final VoidCallback onNext;
   final VoidCallback onPrevious;
 
-  const PersonalDetailsScreen({
+  const MemberDetailsScreen({
     super.key,
     required this.viewModel,
     required this.onNext,
@@ -27,7 +27,7 @@ class PersonalDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
       value: viewModel,
-      child: Consumer<PersonalDetailsViewModel>(
+      child: Consumer<MemberDetailsViewModel>(
         builder: (context, vm, _) {
           return KenwellFormPage(
             title: 'Personal Details Form',
@@ -63,7 +63,7 @@ class PersonalDetailsScreen extends StatelessWidget {
   }
 
   // ===== Sections =====
-  Widget _buildPersonalInfoSection(PersonalDetailsViewModel vm) {
+  Widget _buildPersonalInfoSection(MemberDetailsViewModel vm) {
     return Column(children: [
       KenwellTextField(
         label: 'Name',
@@ -81,14 +81,14 @@ class PersonalDetailsScreen extends StatelessWidget {
         validator: (val) =>
             (val == null || val.isEmpty) ? 'Please enter Surname' : null,
       ),
-      KenwellTextField(
-        label: 'Initials',
-        hintText: 'Enter initials',
-        controller: vm.initialsController,
-        inputFormatters: AppTextInputFormatters.lettersOnly(),
-        validator: (val) =>
-            (val == null || val.isEmpty) ? 'Please enter Initials' : null,
-      ),
+      //  KenwellTextField(
+      //   label: 'Initials',
+      //   hintText: 'Enter initials',
+      //   controller: vm.initialsController,
+      //    inputFormatters: AppTextInputFormatters.lettersOnly(),
+      //    validator: (val) =>
+      //        (val == null || val.isEmpty) ? 'Please enter Initials' : null,
+      //  ),
       KenwellDropdownField<String>(
         label: 'Marital Status',
         value: vm.maritalStatus,
@@ -100,7 +100,7 @@ class PersonalDetailsScreen extends StatelessWidget {
     ]);
   }
 
-  Widget _buildContactInfoSection(PersonalDetailsViewModel vm) {
+  Widget _buildContactInfoSection(MemberDetailsViewModel vm) {
     return Column(
       children: [
         KenwellTextField(
@@ -120,29 +120,29 @@ class PersonalDetailsScreen extends StatelessWidget {
         ),
 
         // 🔥 NEW DROPDOWN + CONDITIONAL TEXTFIELD
-        KenwellDropdownField<String>(
-          label: 'Do you have an alternative contact number?',
-          value: vm.hasAlternateNumber,
-          items: vm.hasAlternateNumberOptions,
-          onChanged: vm.setHasAlternateNumber,
-          validator: (val) =>
-              (val == null || val.isEmpty) ? 'Please select an option' : null,
-        ),
+        // KenwellDropdownField<String>(
+        //   label: 'Do you have an alternative contact number?',
+        //   value: vm.hasAlternateNumber,
+        //   items: vm.hasAlternateNumberOptions,
+        //   onChanged: vm.setHasAlternateNumber,
+        //   validator: (val) =>
+        //       (val == null || val.isEmpty) ? 'Please select an option' : null,
+        // ),
 
-        if (vm.showAlternateNumberField)
-          KenwellTextField(
-            label: 'Alternative Contact Number',
-            hintText: 'Enter alternative contact number',
-            controller: vm.alternateContactNumberController,
-            keyboardType: TextInputType.phone,
-            inputFormatters: [AppTextInputFormatters.saPhoneNumberFormatter()],
-            validator: Validators.validateSouthAfricanPhoneNumber,
-          ),
+        // if (vm.showAlternateNumberField)
+        //   KenwellTextField(
+        //     label: 'Alternative Contact Number',
+        //     hintText: 'Enter alternative contact number',
+        //     controller: vm.alternateContactNumberController,
+        //     keyboardType: TextInputType.phone,
+        //     inputFormatters: [AppTextInputFormatters.saPhoneNumberFormatter()],
+        // validator: Validators.validateSouthAfricanPhoneNumber,
+        // ),
       ],
     );
   }
 
-  Widget _buildIdentificationInfoSection(PersonalDetailsViewModel vm) {
+  Widget _buildIdentificationInfoSection(MemberDetailsViewModel vm) {
     return Column(
       children: [
         KenwellDropdownField<String>(
@@ -227,7 +227,7 @@ class PersonalDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMedicalAidSection(PersonalDetailsViewModel vm) {
+  Widget _buildMedicalAidSection(MemberDetailsViewModel vm) {
     return Column(
       children: [
         KenwellDropdownField<String>(
@@ -262,7 +262,7 @@ class PersonalDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildNavigationButtons(
-      BuildContext context, PersonalDetailsViewModel vm) {
+      BuildContext context, MemberDetailsViewModel vm) {
     return KenwellFormNavigation(
       onPrevious: onPrevious,
       onNext: () async {

@@ -37,12 +37,6 @@ class $UsersTable extends Users with TableInfo<$UsersTable, UserEntity> {
   late final GeneratedColumn<String> phoneNumber = GeneratedColumn<String>(
       'phone_number', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _usernameMeta =
-      const VerificationMeta('username');
-  @override
-  late final GeneratedColumn<String> username = GeneratedColumn<String>(
-      'username', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _firstNameMeta =
       const VerificationMeta('firstName');
   @override
@@ -78,7 +72,6 @@ class $UsersTable extends Users with TableInfo<$UsersTable, UserEntity> {
         password,
         role,
         phoneNumber,
-        username,
         firstName,
         lastName,
         createdAt,
@@ -125,12 +118,6 @@ class $UsersTable extends Users with TableInfo<$UsersTable, UserEntity> {
     } else if (isInserting) {
       context.missing(_phoneNumberMeta);
     }
-    if (data.containsKey('username')) {
-      context.handle(_usernameMeta,
-          username.isAcceptableOrUnknown(data['username']!, _usernameMeta));
-    } else if (isInserting) {
-      context.missing(_usernameMeta);
-    }
     if (data.containsKey('first_name')) {
       context.handle(_firstNameMeta,
           firstName.isAcceptableOrUnknown(data['first_name']!, _firstNameMeta));
@@ -170,8 +157,6 @@ class $UsersTable extends Users with TableInfo<$UsersTable, UserEntity> {
           .read(DriftSqlType.string, data['${effectivePrefix}role'])!,
       phoneNumber: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}phone_number'])!,
-      username: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}username'])!,
       firstName: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}first_name'])!,
       lastName: attachedDatabase.typeMapping
@@ -195,7 +180,6 @@ class UserEntity extends DataClass implements Insertable<UserEntity> {
   final String password;
   final String role;
   final String phoneNumber;
-  final String username;
   final String firstName;
   final String lastName;
   final DateTime createdAt;
@@ -206,7 +190,6 @@ class UserEntity extends DataClass implements Insertable<UserEntity> {
       required this.password,
       required this.role,
       required this.phoneNumber,
-      required this.username,
       required this.firstName,
       required this.lastName,
       required this.createdAt,
@@ -219,7 +202,6 @@ class UserEntity extends DataClass implements Insertable<UserEntity> {
     map['password'] = Variable<String>(password);
     map['role'] = Variable<String>(role);
     map['phone_number'] = Variable<String>(phoneNumber);
-    map['username'] = Variable<String>(username);
     map['first_name'] = Variable<String>(firstName);
     map['last_name'] = Variable<String>(lastName);
     map['created_at'] = Variable<DateTime>(createdAt);
@@ -234,7 +216,6 @@ class UserEntity extends DataClass implements Insertable<UserEntity> {
       password: Value(password),
       role: Value(role),
       phoneNumber: Value(phoneNumber),
-      username: Value(username),
       firstName: Value(firstName),
       lastName: Value(lastName),
       createdAt: Value(createdAt),
@@ -251,7 +232,6 @@ class UserEntity extends DataClass implements Insertable<UserEntity> {
       password: serializer.fromJson<String>(json['password']),
       role: serializer.fromJson<String>(json['role']),
       phoneNumber: serializer.fromJson<String>(json['phoneNumber']),
-      username: serializer.fromJson<String>(json['username']),
       firstName: serializer.fromJson<String>(json['firstName']),
       lastName: serializer.fromJson<String>(json['lastName']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -267,7 +247,6 @@ class UserEntity extends DataClass implements Insertable<UserEntity> {
       'password': serializer.toJson<String>(password),
       'role': serializer.toJson<String>(role),
       'phoneNumber': serializer.toJson<String>(phoneNumber),
-      'username': serializer.toJson<String>(username),
       'firstName': serializer.toJson<String>(firstName),
       'lastName': serializer.toJson<String>(lastName),
       'createdAt': serializer.toJson<DateTime>(createdAt),
@@ -281,7 +260,6 @@ class UserEntity extends DataClass implements Insertable<UserEntity> {
           String? password,
           String? role,
           String? phoneNumber,
-          String? username,
           String? firstName,
           String? lastName,
           DateTime? createdAt,
@@ -292,7 +270,6 @@ class UserEntity extends DataClass implements Insertable<UserEntity> {
         password: password ?? this.password,
         role: role ?? this.role,
         phoneNumber: phoneNumber ?? this.phoneNumber,
-        username: username ?? this.username,
         firstName: firstName ?? this.firstName,
         lastName: lastName ?? this.lastName,
         createdAt: createdAt ?? this.createdAt,
@@ -306,7 +283,6 @@ class UserEntity extends DataClass implements Insertable<UserEntity> {
       role: data.role.present ? data.role.value : this.role,
       phoneNumber:
           data.phoneNumber.present ? data.phoneNumber.value : this.phoneNumber,
-      username: data.username.present ? data.username.value : this.username,
       firstName: data.firstName.present ? data.firstName.value : this.firstName,
       lastName: data.lastName.present ? data.lastName.value : this.lastName,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -322,7 +298,6 @@ class UserEntity extends DataClass implements Insertable<UserEntity> {
           ..write('password: $password, ')
           ..write('role: $role, ')
           ..write('phoneNumber: $phoneNumber, ')
-          ..write('username: $username, ')
           ..write('firstName: $firstName, ')
           ..write('lastName: $lastName, ')
           ..write('createdAt: $createdAt, ')
@@ -333,7 +308,7 @@ class UserEntity extends DataClass implements Insertable<UserEntity> {
 
   @override
   int get hashCode => Object.hash(id, email, password, role, phoneNumber,
-      username, firstName, lastName, createdAt, updatedAt);
+      firstName, lastName, createdAt, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -343,7 +318,6 @@ class UserEntity extends DataClass implements Insertable<UserEntity> {
           other.password == this.password &&
           other.role == this.role &&
           other.phoneNumber == this.phoneNumber &&
-          other.username == this.username &&
           other.firstName == this.firstName &&
           other.lastName == this.lastName &&
           other.createdAt == this.createdAt &&
@@ -356,7 +330,6 @@ class UsersCompanion extends UpdateCompanion<UserEntity> {
   final Value<String> password;
   final Value<String> role;
   final Value<String> phoneNumber;
-  final Value<String> username;
   final Value<String> firstName;
   final Value<String> lastName;
   final Value<DateTime> createdAt;
@@ -368,7 +341,6 @@ class UsersCompanion extends UpdateCompanion<UserEntity> {
     this.password = const Value.absent(),
     this.role = const Value.absent(),
     this.phoneNumber = const Value.absent(),
-    this.username = const Value.absent(),
     this.firstName = const Value.absent(),
     this.lastName = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -381,7 +353,6 @@ class UsersCompanion extends UpdateCompanion<UserEntity> {
     required String password,
     required String role,
     required String phoneNumber,
-    required String username,
     required String firstName,
     required String lastName,
     this.createdAt = const Value.absent(),
@@ -392,7 +363,6 @@ class UsersCompanion extends UpdateCompanion<UserEntity> {
         password = Value(password),
         role = Value(role),
         phoneNumber = Value(phoneNumber),
-        username = Value(username),
         firstName = Value(firstName),
         lastName = Value(lastName);
   static Insertable<UserEntity> custom({
@@ -401,7 +371,6 @@ class UsersCompanion extends UpdateCompanion<UserEntity> {
     Expression<String>? password,
     Expression<String>? role,
     Expression<String>? phoneNumber,
-    Expression<String>? username,
     Expression<String>? firstName,
     Expression<String>? lastName,
     Expression<DateTime>? createdAt,
@@ -414,7 +383,6 @@ class UsersCompanion extends UpdateCompanion<UserEntity> {
       if (password != null) 'password': password,
       if (role != null) 'role': role,
       if (phoneNumber != null) 'phone_number': phoneNumber,
-      if (username != null) 'username': username,
       if (firstName != null) 'first_name': firstName,
       if (lastName != null) 'last_name': lastName,
       if (createdAt != null) 'created_at': createdAt,
@@ -429,7 +397,6 @@ class UsersCompanion extends UpdateCompanion<UserEntity> {
       Value<String>? password,
       Value<String>? role,
       Value<String>? phoneNumber,
-      Value<String>? username,
       Value<String>? firstName,
       Value<String>? lastName,
       Value<DateTime>? createdAt,
@@ -441,7 +408,6 @@ class UsersCompanion extends UpdateCompanion<UserEntity> {
       password: password ?? this.password,
       role: role ?? this.role,
       phoneNumber: phoneNumber ?? this.phoneNumber,
-      username: username ?? this.username,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
       createdAt: createdAt ?? this.createdAt,
@@ -467,9 +433,6 @@ class UsersCompanion extends UpdateCompanion<UserEntity> {
     }
     if (phoneNumber.present) {
       map['phone_number'] = Variable<String>(phoneNumber.value);
-    }
-    if (username.present) {
-      map['username'] = Variable<String>(username.value);
     }
     if (firstName.present) {
       map['first_name'] = Variable<String>(firstName.value);
@@ -497,7 +460,6 @@ class UsersCompanion extends UpdateCompanion<UserEntity> {
           ..write('password: $password, ')
           ..write('role: $role, ')
           ..write('phoneNumber: $phoneNumber, ')
-          ..write('username: $username, ')
           ..write('firstName: $firstName, ')
           ..write('lastName: $lastName, ')
           ..write('createdAt: $createdAt, ')
@@ -605,6 +567,15 @@ class $EventsTable extends Events with TableInfo<$EventsTable, EventEntity> {
   late final GeneratedColumn<String> servicesRequested =
       GeneratedColumn<String>('services_requested', aliasedName, false,
           type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _additionalServicesRequestedMeta =
+      const VerificationMeta('additionalServicesRequested');
+  @override
+  late final GeneratedColumn<String> additionalServicesRequested =
+      GeneratedColumn<String>(
+          'additional_services_requested', aliasedName, false,
+          type: DriftSqlType.string,
+          requiredDuringInsert: false,
+          defaultValue: const Constant(''));
   static const VerificationMeta _expectedParticipationMeta =
       const VerificationMeta('expectedParticipation');
   @override
@@ -735,6 +706,7 @@ class $EventsTable extends Events with TableInfo<$EventsTable, EventEntity> {
         aeContactNumber,
         aeContactEmail,
         servicesRequested,
+        additionalServicesRequested,
         expectedParticipation,
         nurses,
         coordinators,
@@ -872,6 +844,13 @@ class $EventsTable extends Events with TableInfo<$EventsTable, EventEntity> {
     } else if (isInserting) {
       context.missing(_servicesRequestedMeta);
     }
+    if (data.containsKey('additional_services_requested')) {
+      context.handle(
+          _additionalServicesRequestedMeta,
+          additionalServicesRequested.isAcceptableOrUnknown(
+              data['additional_services_requested']!,
+              _additionalServicesRequestedMeta));
+    }
     if (data.containsKey('expected_participation')) {
       context.handle(
           _expectedParticipationMeta,
@@ -994,6 +973,9 @@ class $EventsTable extends Events with TableInfo<$EventsTable, EventEntity> {
           DriftSqlType.string, data['${effectivePrefix}ae_contact_email'])!,
       servicesRequested: attachedDatabase.typeMapping.read(
           DriftSqlType.string, data['${effectivePrefix}services_requested'])!,
+      additionalServicesRequested: attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}additional_services_requested'])!,
       expectedParticipation: attachedDatabase.typeMapping.read(
           DriftSqlType.int, data['${effectivePrefix}expected_participation'])!,
       nurses: attachedDatabase.typeMapping
@@ -1050,6 +1032,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
   final String aeContactNumber;
   final String aeContactEmail;
   final String servicesRequested;
+  final String additionalServicesRequested;
   final int expectedParticipation;
   final int nurses;
   final int coordinators;
@@ -1082,6 +1065,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
       required this.aeContactNumber,
       required this.aeContactEmail,
       required this.servicesRequested,
+      required this.additionalServicesRequested,
       required this.expectedParticipation,
       required this.nurses,
       required this.coordinators,
@@ -1118,6 +1102,8 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
     map['ae_contact_number'] = Variable<String>(aeContactNumber);
     map['ae_contact_email'] = Variable<String>(aeContactEmail);
     map['services_requested'] = Variable<String>(servicesRequested);
+    map['additional_services_requested'] =
+        Variable<String>(additionalServicesRequested);
     map['expected_participation'] = Variable<int>(expectedParticipation);
     map['nurses'] = Variable<int>(nurses);
     map['coordinators'] = Variable<int>(coordinators);
@@ -1162,6 +1148,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
       aeContactNumber: Value(aeContactNumber),
       aeContactEmail: Value(aeContactEmail),
       servicesRequested: Value(servicesRequested),
+      additionalServicesRequested: Value(additionalServicesRequested),
       expectedParticipation: Value(expectedParticipation),
       nurses: Value(nurses),
       coordinators: Value(coordinators),
@@ -1211,6 +1198,8 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
       aeContactNumber: serializer.fromJson<String>(json['aeContactNumber']),
       aeContactEmail: serializer.fromJson<String>(json['aeContactEmail']),
       servicesRequested: serializer.fromJson<String>(json['servicesRequested']),
+      additionalServicesRequested:
+          serializer.fromJson<String>(json['additionalServicesRequested']),
       expectedParticipation:
           serializer.fromJson<int>(json['expectedParticipation']),
       nurses: serializer.fromJson<int>(json['nurses']),
@@ -1250,6 +1239,8 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
       'aeContactNumber': serializer.toJson<String>(aeContactNumber),
       'aeContactEmail': serializer.toJson<String>(aeContactEmail),
       'servicesRequested': serializer.toJson<String>(servicesRequested),
+      'additionalServicesRequested':
+          serializer.toJson<String>(additionalServicesRequested),
       'expectedParticipation': serializer.toJson<int>(expectedParticipation),
       'nurses': serializer.toJson<int>(nurses),
       'coordinators': serializer.toJson<int>(coordinators),
@@ -1285,6 +1276,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
           String? aeContactNumber,
           String? aeContactEmail,
           String? servicesRequested,
+          String? additionalServicesRequested,
           int? expectedParticipation,
           int? nurses,
           int? coordinators,
@@ -1319,6 +1311,8 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
         aeContactNumber: aeContactNumber ?? this.aeContactNumber,
         aeContactEmail: aeContactEmail ?? this.aeContactEmail,
         servicesRequested: servicesRequested ?? this.servicesRequested,
+        additionalServicesRequested:
+            additionalServicesRequested ?? this.additionalServicesRequested,
         expectedParticipation:
             expectedParticipation ?? this.expectedParticipation,
         nurses: nurses ?? this.nurses,
@@ -1375,6 +1369,9 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
       servicesRequested: data.servicesRequested.present
           ? data.servicesRequested.value
           : this.servicesRequested,
+      additionalServicesRequested: data.additionalServicesRequested.present
+          ? data.additionalServicesRequested.value
+          : this.additionalServicesRequested,
       expectedParticipation: data.expectedParticipation.present
           ? data.expectedParticipation.value
           : this.expectedParticipation,
@@ -1426,6 +1423,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
           ..write('aeContactNumber: $aeContactNumber, ')
           ..write('aeContactEmail: $aeContactEmail, ')
           ..write('servicesRequested: $servicesRequested, ')
+          ..write('additionalServicesRequested: $additionalServicesRequested, ')
           ..write('expectedParticipation: $expectedParticipation, ')
           ..write('nurses: $nurses, ')
           ..write('coordinators: $coordinators, ')
@@ -1463,6 +1461,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
         aeContactNumber,
         aeContactEmail,
         servicesRequested,
+        additionalServicesRequested,
         expectedParticipation,
         nurses,
         coordinators,
@@ -1499,6 +1498,8 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
           other.aeContactNumber == this.aeContactNumber &&
           other.aeContactEmail == this.aeContactEmail &&
           other.servicesRequested == this.servicesRequested &&
+          other.additionalServicesRequested ==
+              this.additionalServicesRequested &&
           other.expectedParticipation == this.expectedParticipation &&
           other.nurses == this.nurses &&
           other.coordinators == this.coordinators &&
@@ -1533,6 +1534,7 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
   final Value<String> aeContactNumber;
   final Value<String> aeContactEmail;
   final Value<String> servicesRequested;
+  final Value<String> additionalServicesRequested;
   final Value<int> expectedParticipation;
   final Value<int> nurses;
   final Value<int> coordinators;
@@ -1566,6 +1568,7 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
     this.aeContactNumber = const Value.absent(),
     this.aeContactEmail = const Value.absent(),
     this.servicesRequested = const Value.absent(),
+    this.additionalServicesRequested = const Value.absent(),
     this.expectedParticipation = const Value.absent(),
     this.nurses = const Value.absent(),
     this.coordinators = const Value.absent(),
@@ -1600,6 +1603,7 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
     required String aeContactNumber,
     required String aeContactEmail,
     required String servicesRequested,
+    this.additionalServicesRequested = const Value.absent(),
     this.expectedParticipation = const Value.absent(),
     this.nurses = const Value.absent(),
     this.coordinators = const Value.absent(),
@@ -1648,6 +1652,7 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
     Expression<String>? aeContactNumber,
     Expression<String>? aeContactEmail,
     Expression<String>? servicesRequested,
+    Expression<String>? additionalServicesRequested,
     Expression<int>? expectedParticipation,
     Expression<int>? nurses,
     Expression<int>? coordinators,
@@ -1687,6 +1692,8 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
       if (aeContactNumber != null) 'ae_contact_number': aeContactNumber,
       if (aeContactEmail != null) 'ae_contact_email': aeContactEmail,
       if (servicesRequested != null) 'services_requested': servicesRequested,
+      if (additionalServicesRequested != null)
+        'additional_services_requested': additionalServicesRequested,
       if (expectedParticipation != null)
         'expected_participation': expectedParticipation,
       if (nurses != null) 'nurses': nurses,
@@ -1724,6 +1731,7 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
       Value<String>? aeContactNumber,
       Value<String>? aeContactEmail,
       Value<String>? servicesRequested,
+      Value<String>? additionalServicesRequested,
       Value<int>? expectedParticipation,
       Value<int>? nurses,
       Value<int>? coordinators,
@@ -1759,6 +1767,8 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
       aeContactNumber: aeContactNumber ?? this.aeContactNumber,
       aeContactEmail: aeContactEmail ?? this.aeContactEmail,
       servicesRequested: servicesRequested ?? this.servicesRequested,
+      additionalServicesRequested:
+          additionalServicesRequested ?? this.additionalServicesRequested,
       expectedParticipation:
           expectedParticipation ?? this.expectedParticipation,
       nurses: nurses ?? this.nurses,
@@ -1833,6 +1843,10 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
     if (servicesRequested.present) {
       map['services_requested'] = Variable<String>(servicesRequested.value);
     }
+    if (additionalServicesRequested.present) {
+      map['additional_services_requested'] =
+          Variable<String>(additionalServicesRequested.value);
+    }
     if (expectedParticipation.present) {
       map['expected_participation'] =
           Variable<int>(expectedParticipation.value);
@@ -1904,6 +1918,7 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
           ..write('aeContactNumber: $aeContactNumber, ')
           ..write('aeContactEmail: $aeContactEmail, ')
           ..write('servicesRequested: $servicesRequested, ')
+          ..write('additionalServicesRequested: $additionalServicesRequested, ')
           ..write('expectedParticipation: $expectedParticipation, ')
           ..write('nurses: $nurses, ')
           ..write('coordinators: $coordinators, ')
@@ -1943,7 +1958,6 @@ typedef $$UsersTableCreateCompanionBuilder = UsersCompanion Function({
   required String password,
   required String role,
   required String phoneNumber,
-  required String username,
   required String firstName,
   required String lastName,
   Value<DateTime> createdAt,
@@ -1956,7 +1970,6 @@ typedef $$UsersTableUpdateCompanionBuilder = UsersCompanion Function({
   Value<String> password,
   Value<String> role,
   Value<String> phoneNumber,
-  Value<String> username,
   Value<String> firstName,
   Value<String> lastName,
   Value<DateTime> createdAt,
@@ -1986,9 +1999,6 @@ class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
 
   ColumnFilters<String> get phoneNumber => $composableBuilder(
       column: $table.phoneNumber, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get username => $composableBuilder(
-      column: $table.username, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get firstName => $composableBuilder(
       column: $table.firstName, builder: (column) => ColumnFilters(column));
@@ -2027,9 +2037,6 @@ class $$UsersTableOrderingComposer
   ColumnOrderings<String> get phoneNumber => $composableBuilder(
       column: $table.phoneNumber, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get username => $composableBuilder(
-      column: $table.username, builder: (column) => ColumnOrderings(column));
-
   ColumnOrderings<String> get firstName => $composableBuilder(
       column: $table.firstName, builder: (column) => ColumnOrderings(column));
 
@@ -2066,9 +2073,6 @@ class $$UsersTableAnnotationComposer
 
   GeneratedColumn<String> get phoneNumber => $composableBuilder(
       column: $table.phoneNumber, builder: (column) => column);
-
-  GeneratedColumn<String> get username =>
-      $composableBuilder(column: $table.username, builder: (column) => column);
 
   GeneratedColumn<String> get firstName =>
       $composableBuilder(column: $table.firstName, builder: (column) => column);
@@ -2111,7 +2115,6 @@ class $$UsersTableTableManager extends RootTableManager<
             Value<String> password = const Value.absent(),
             Value<String> role = const Value.absent(),
             Value<String> phoneNumber = const Value.absent(),
-            Value<String> username = const Value.absent(),
             Value<String> firstName = const Value.absent(),
             Value<String> lastName = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
@@ -2124,7 +2127,6 @@ class $$UsersTableTableManager extends RootTableManager<
             password: password,
             role: role,
             phoneNumber: phoneNumber,
-            username: username,
             firstName: firstName,
             lastName: lastName,
             createdAt: createdAt,
@@ -2137,7 +2139,6 @@ class $$UsersTableTableManager extends RootTableManager<
             required String password,
             required String role,
             required String phoneNumber,
-            required String username,
             required String firstName,
             required String lastName,
             Value<DateTime> createdAt = const Value.absent(),
@@ -2150,7 +2151,6 @@ class $$UsersTableTableManager extends RootTableManager<
             password: password,
             role: role,
             phoneNumber: phoneNumber,
-            username: username,
             firstName: firstName,
             lastName: lastName,
             createdAt: createdAt,
@@ -2193,6 +2193,7 @@ typedef $$EventsTableCreateCompanionBuilder = EventsCompanion Function({
   required String aeContactNumber,
   required String aeContactEmail,
   required String servicesRequested,
+  Value<String> additionalServicesRequested,
   Value<int> expectedParticipation,
   Value<int> nurses,
   Value<int> coordinators,
@@ -2227,6 +2228,7 @@ typedef $$EventsTableUpdateCompanionBuilder = EventsCompanion Function({
   Value<String> aeContactNumber,
   Value<String> aeContactEmail,
   Value<String> servicesRequested,
+  Value<String> additionalServicesRequested,
   Value<int> expectedParticipation,
   Value<int> nurses,
   Value<int> coordinators,
@@ -2309,6 +2311,10 @@ class $$EventsTableFilterComposer
 
   ColumnFilters<String> get servicesRequested => $composableBuilder(
       column: $table.servicesRequested,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get additionalServicesRequested => $composableBuilder(
+      column: $table.additionalServicesRequested,
       builder: (column) => ColumnFilters(column));
 
   ColumnFilters<int> get expectedParticipation => $composableBuilder(
@@ -2426,6 +2432,10 @@ class $$EventsTableOrderingComposer
       column: $table.servicesRequested,
       builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get additionalServicesRequested => $composableBuilder(
+      column: $table.additionalServicesRequested,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<int> get expectedParticipation => $composableBuilder(
       column: $table.expectedParticipation,
       builder: (column) => ColumnOrderings(column));
@@ -2535,6 +2545,9 @@ class $$EventsTableAnnotationComposer
   GeneratedColumn<String> get servicesRequested => $composableBuilder(
       column: $table.servicesRequested, builder: (column) => column);
 
+  GeneratedColumn<String> get additionalServicesRequested => $composableBuilder(
+      column: $table.additionalServicesRequested, builder: (column) => column);
+
   GeneratedColumn<int> get expectedParticipation => $composableBuilder(
       column: $table.expectedParticipation, builder: (column) => column);
 
@@ -2620,6 +2633,7 @@ class $$EventsTableTableManager extends RootTableManager<
             Value<String> aeContactNumber = const Value.absent(),
             Value<String> aeContactEmail = const Value.absent(),
             Value<String> servicesRequested = const Value.absent(),
+            Value<String> additionalServicesRequested = const Value.absent(),
             Value<int> expectedParticipation = const Value.absent(),
             Value<int> nurses = const Value.absent(),
             Value<int> coordinators = const Value.absent(),
@@ -2654,6 +2668,7 @@ class $$EventsTableTableManager extends RootTableManager<
             aeContactNumber: aeContactNumber,
             aeContactEmail: aeContactEmail,
             servicesRequested: servicesRequested,
+            additionalServicesRequested: additionalServicesRequested,
             expectedParticipation: expectedParticipation,
             nurses: nurses,
             coordinators: coordinators,
@@ -2688,6 +2703,7 @@ class $$EventsTableTableManager extends RootTableManager<
             required String aeContactNumber,
             required String aeContactEmail,
             required String servicesRequested,
+            Value<String> additionalServicesRequested = const Value.absent(),
             Value<int> expectedParticipation = const Value.absent(),
             Value<int> nurses = const Value.absent(),
             Value<int> coordinators = const Value.absent(),
@@ -2722,6 +2738,7 @@ class $$EventsTableTableManager extends RootTableManager<
             aeContactNumber: aeContactNumber,
             aeContactEmail: aeContactEmail,
             servicesRequested: servicesRequested,
+            additionalServicesRequested: additionalServicesRequested,
             expectedParticipation: expectedParticipation,
             nurses: nurses,
             coordinators: coordinators,
