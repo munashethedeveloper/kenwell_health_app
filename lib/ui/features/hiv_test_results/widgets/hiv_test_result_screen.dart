@@ -13,7 +13,7 @@ import '../../../shared/ui/form/kenwell_referral_card.dart';
 import '../../../shared/ui/form/kenwell_section_header.dart';
 import '../../../shared/ui/form/kenwell_signature_actions.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
-import '../../nurse_interventions/view_model/nurse_intervention_form_mixin.dart';
+import '../../../shared/models/nursing_referral_option.dart';
 import '../view_model/hiv_test_result_view_model.dart';
 
 class HIVTestResultScreen extends StatelessWidget {
@@ -100,10 +100,20 @@ class HIVTestResultScreen extends StatelessWidget {
                 onClear: viewModel.clearSignature,
                 navigation: KenwellFormNavigation(
                   onPrevious: onPrevious,
-                  onNext: () => viewModel.submitTestResult(onNext),
+                  onNext: () {
+                    if (!viewModel.isFormValid) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Please complete all required fields'),
+                          duration: Duration(seconds: 3),
+                        ),
+                      );
+                      return;
+                    }
+                    viewModel.submitTestResult(onNext);
+                  },
                   isNextBusy: viewModel.isSubmitting,
-                  isNextEnabled:
-                      viewModel.isFormValid && !viewModel.isSubmitting,
+                  isNextEnabled: !viewModel.isSubmitting,
                 ),
               ),
             ],
@@ -281,12 +291,13 @@ class HIVTestResultScreen extends StatelessWidget {
         children: [
           KenwellTextField(
             label: 'Nurse First Name',
-            hintText: 'Enter nurse first name',
+            hintText: 'Auto-filled from profile',
             controller: viewModel.nurseFirstNameController,
             decoration: KenwellFormStyles.decoration(
               label: 'Nurse First Name',
-              hint: 'Enter nurse first name',
+              hint: 'Auto-filled from profile',
             ),
+            readOnly: true,
             inputFormatters:
                 AppTextInputFormatters.lettersOnly(allowHyphen: true),
             validator: (val) => (val == null || val.isEmpty)
@@ -295,12 +306,13 @@ class HIVTestResultScreen extends StatelessWidget {
           ),
           KenwellTextField(
             label: 'Nurse Last Name',
-            hintText: 'Enter nurse last name',
+            hintText: 'Auto-filled from profile',
             controller: viewModel.nurseLastNameController,
             decoration: KenwellFormStyles.decoration(
               label: 'Nurse Last Name',
-              hint: 'Enter nurse last name',
+              hint: 'Auto-filled from profile',
             ),
+            readOnly: true,
             inputFormatters:
                 AppTextInputFormatters.lettersOnly(allowHyphen: true),
             validator: (val) => (val == null || val.isEmpty)
