@@ -230,7 +230,7 @@ class MemberDetailsScreen extends StatelessWidget {
             KenwellTextField(
               label: 'Nationality',
               hintText: 'South Africa',
-              controller: TextEditingController(text: 'South Africa'),
+              controller: vm.sacitizenNationalityController,
               readOnly: true,
               enabled: false,
             )

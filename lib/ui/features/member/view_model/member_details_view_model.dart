@@ -14,13 +14,16 @@ class MemberDetailsViewModel extends ChangeNotifier {
   final dobController = TextEditingController();
   final idNumberController = TextEditingController();
   final passportNumberController = TextEditingController();
-  final nationalityController = TextEditingController();
+  // nationalityController removed - now using selectedNationality String
   final medicalAidNameController = TextEditingController();
   final medicalAidNumberController = TextEditingController();
   final emailController = TextEditingController();
   final cellNumberController = TextEditingController();
   // final alternateContactNumberController = TextEditingController();
   final personalNumberController = TextEditingController();
+  
+  // Read-only controller for SA Citizen nationality display
+  final sacitizenNationalityController = TextEditingController(text: 'South Africa');
 
   // Dropdown values
   String? maritalStatus;
@@ -442,7 +445,8 @@ class MemberDetailsViewModel extends ChangeNotifier {
       dobController,
       idNumberController,
       passportNumberController,
-      nationalityController,
+      // nationalityController removed
+      sacitizenNationalityController,
       medicalAidNameController,
       medicalAidNumberController,
       emailController,
