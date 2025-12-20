@@ -40,7 +40,8 @@ class WellnessFlowViewModel extends ChangeNotifier {
 
   // Initialize flow based on consent selections
   void initializeFlow(List<String> selectedScreenings) {
-    _flowSteps = ['consent'];
+    // Preserve current_event_details and consent as the first steps
+    _flowSteps = ['current_event_details', 'consent'];
 
     // Add the personal details screen as the first screen if any screening is selected
     if (selectedScreenings.isNotEmpty) {
@@ -204,9 +205,22 @@ class WellnessFlowViewModel extends ChangeNotifier {
   }
 
   /// Check if the current survey is standalone (accessed directly) or part of a screening flow
+  /// A survey is standalone if:
+  /// 1. The flow only has current_event_details and survey (direct access)
+  /// 2. The flow doesn't contain screening steps (consent, risk_assessment, hiv_test, tb_test)
   bool get isStandaloneSurvey {
-    return _flowSteps.length == 2 && 
-           _flowSteps[0] == 'current_event_details' &&
-           _flowSteps[1] == 'survey';
+    // Check for direct access: only current_event_details and survey
+    if (_flowSteps.length == 2 && 
+        _flowSteps[0] == 'current_event_details' &&
+        _flowSteps[1] == 'survey') {
+      return true;
+    }
+    
+    // Check if flow contains any screening steps
+    const screeningSteps = ['consent', 'risk_assessment', 'hiv_test', 'hiv_results', 'tb_test'];
+    final hasScreeningSteps = _flowSteps.any((step) => screeningSteps.contains(step));
+    
+    // If no screening steps, consider it standalone even if member registration was used
+    return !hasScreeningSteps;
   }
 }
