@@ -13,7 +13,7 @@ import '../../../shared/ui/form/kenwell_referral_card.dart';
 import '../../../shared/ui/form/kenwell_section_header.dart';
 import '../../../shared/ui/form/kenwell_signature_actions.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
-import '../../nurse_interventions/view_model/nurse_intervention_form_mixin.dart';
+import '../../../shared/models/nursing_referral_option.dart';
 import '../view_model/hiv_test_result_view_model.dart';
 
 class HIVTestResultScreen extends StatelessWidget {

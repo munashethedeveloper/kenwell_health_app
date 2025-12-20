@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:kenwell_health_app/ui/features/nurse_interventions/view_model/nurse_intervention_form_mixin.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/custom_dropdown_field.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_referral_card.dart';
+import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
@@ -16,7 +16,7 @@ import '../view_model/personal_risk_assessment_view_model.dart';
 
 class PersonalRiskAssessmentScreen extends StatelessWidget {
   final PersonalRiskAssessmentViewModel viewModel;
-  final NurseInterventionFormMixin nurseViewModel;
+  final dynamic nurseViewModel;
   final VoidCallback? onNext;
   final VoidCallback? onPrevious;
   final bool isFemale;

@@ -9,10 +9,14 @@ import '../../../shared/ui/form/kenwell_form_page.dart';
 import '../../../shared/ui/form/kenwell_signature_actions.dart';
 import '../../../shared/ui/form/kenwell_referral_card.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
-import '../view_model/nurse_intervention_form_mixin.dart';
+import '../../../shared/models/nursing_referral_option.dart';
 
+/// A reusable form widget for nursing interventions.
+/// Uses dynamic typing for viewModel to avoid inheritance/mixin dependencies.
+/// The viewModel is expected to have properties like: formKey, showInitialAssessment,
+/// windowPeriod, expectedResult, nursingReferralSelection, signatureController, etc.
 class NurseInterventionForm extends StatelessWidget {
-  final NurseInterventionFormMixin viewModel;
+  final dynamic viewModel;
   final String title;
   final String sectionTitle;
   final VoidCallback? onNext;
