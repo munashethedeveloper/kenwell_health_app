@@ -8,6 +8,7 @@ import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_page.dart';
 import '../../../shared/ui/form/kenwell_date_field.dart';
+import '../../../shared/ui/form/kenwell_form_styles.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/member_details_view_model.dart';
 
@@ -144,85 +145,140 @@ class MemberDetailsScreen extends StatelessWidget {
 
   Widget _buildIdentificationInfoSection(MemberDetailsViewModel vm) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        KenwellDropdownField<String>(
-          label: 'Identification Type',
-          value: vm.idDocumentChoice,
-          items: vm.idDocumentOptions,
-          onChanged: vm.setIdDocumentChoice,
-          validator: (val) => (val == null || val.isEmpty)
-              ? 'Select Identification Type'
-              : null,
+        // Radio buttons for citizenship status
+        const Text(
+          'Citizenship Status',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
         ),
-        if (vm.showIdField)
-          KenwellTextField(
-            label: 'RSA ID Number',
-            hintText: 'Enter RSA ID number',
-            controller: vm.idNumberController,
-            inputFormatters: [
-              AppTextInputFormatters.saIdNumberFormatter(),
-            ],
-            validator: Validators.validateSouthAfricanId,
-          ),
-        if (vm.showPassportField)
-          KenwellTextField(
-            label: 'Passport Number',
-            hintText: 'Enter passport number',
-            controller: vm.passportNumberController,
-            validator: (val) => (val == null || val.isEmpty)
-                ? 'Please enter Passport Number'
-                : null,
-          ),
-        //  KenwellTextField(
-        //label: 'Nationality',
-        //  hintText: 'Enter nationality',
-        //  controller: vm.nationalityController,
-        //  validator: (val) =>
-        //      (val == null || val.isEmpty) ? 'Please enter Nationality' : null,
-        //  ),
-        const SizedBox(height: 16),
-
-        DropdownSearch<String>(
-          items: (filter, infiniteScrollProps) async => vm.nationalityOptions,
-          selectedItem: vm.selectedNationality,
-          popupProps: const PopupProps.dialog(
-            showSearchBox: true,
-            searchFieldProps: TextFieldProps(
-              decoration: InputDecoration(
-                labelText: 'Search Nationality',
-                prefixIcon: Icon(Icons.search),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: RadioListTile<String>(
+                contentPadding: EdgeInsets.zero,
+                dense: true,
+                title: const Text('SA Citizen', style: TextStyle(fontSize: 14)),
+                value: 'SA Citizen',
+                groupValue: vm.citizenshipStatus,
+                onChanged: vm.setCitizenshipStatus,
               ),
             ),
-          ),
-          decoratorProps: const DropDownDecoratorProps(
-            decoration: InputDecoration(
-              labelText: 'Nationality',
-              border: OutlineInputBorder(),
+            Expanded(
+              child: RadioListTile<String>(
+                contentPadding: EdgeInsets.zero,
+                dense: true,
+                title: const Text('Permanent Resident', 
+                    style: TextStyle(fontSize: 14)),
+                value: 'Permanent Resident',
+                groupValue: vm.citizenshipStatus,
+                onChanged: vm.setCitizenshipStatus,
+              ),
             ),
-          ),
-          onChanged: (value) => vm.setSelectedNationality(value),
-          validator: (val) =>
-              (val == null || val.isEmpty) ? 'Please select Nationality' : null,
+            Expanded(
+              child: RadioListTile<String>(
+                contentPadding: EdgeInsets.zero,
+                dense: true,
+                title: const Text('Other Nationality', 
+                    style: TextStyle(fontSize: 14)),
+                value: 'Other Nationality',
+                groupValue: vm.citizenshipStatus,
+                onChanged: vm.setCitizenshipStatus,
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 16),
+        
+        // Show fields only after citizenship status is selected
+        if (vm.showIdentificationFields) ...[
+          KenwellDropdownField<String>(
+            label: 'Identification Type',
+            value: vm.idDocumentChoice,
+            items: vm.idDocumentOptions,
+            onChanged: vm.setIdDocumentChoice,
+            validator: (val) => (val == null || val.isEmpty)
+                ? 'Select Identification Type'
+                : null,
+          ),
+          if (vm.showIdField)
+            KenwellTextField(
+              label: 'RSA ID Number',
+              hintText: 'Enter RSA ID number',
+              controller: vm.idNumberController,
+              inputFormatters: [
+                AppTextInputFormatters.saIdNumberFormatter(),
+              ],
+              validator: Validators.validateSouthAfricanId,
+            ),
+          if (vm.showPassportField)
+            KenwellTextField(
+              label: 'Passport Number',
+              hintText: 'Enter passport number',
+              controller: vm.passportNumberController,
+              validator: (val) => (val == null || val.isEmpty)
+                  ? 'Please enter Passport Number'
+                  : null,
+            ),
+          const SizedBox(height: 16),
 
-        KenwellDateField(
-          label: 'Date of Birth',
-          controller: vm.dobController,
-          validator: (val) => (val == null || val.isEmpty)
-              ? 'Please select Date of Birth'
-              : null,
-          readOnly: true,
-          onChanged: (value) => vm.setDob(value), // <-- Add this
-        ),
-        KenwellDropdownField<String>(
-          label: 'Gender',
-          value: vm.gender,
-          items: vm.genderOptions,
-          onChanged: vm.setGender,
-          validator: (val) =>
-              (val == null || val.isEmpty) ? 'Select Gender' : null,
-        ),
+          // Nationality field - read-only for SA Citizens, editable for others
+          if (vm.citizenshipStatus == 'SA Citizen')
+            KenwellTextField(
+              label: 'Nationality',
+              hintText: 'South Africa',
+              controller: vm.sacitizenNationalityController,
+              readOnly: true,
+              enabled: false,
+            )
+          else
+            DropdownSearch<String>(
+              items: (filter, infiniteScrollProps) async => vm.nationalityOptions,
+              selectedItem: vm.selectedNationality,
+              popupProps: const PopupProps.dialog(
+                showSearchBox: true,
+                searchFieldProps: TextFieldProps(
+                  decoration: InputDecoration(
+                    labelText: 'Search Nationality',
+                    prefixIcon: Icon(Icons.search),
+                  ),
+                ),
+              ),
+              decoratorProps: DropDownDecoratorProps(
+                decoration: KenwellFormStyles.decoration(
+                  label: 'Nationality',
+                  hint: 'Select Nationality',
+                ),
+              ),
+              onChanged: (value) => vm.setSelectedNationality(value),
+              validator: (val) => (val == null || val.isEmpty) 
+                  ? 'Please select Nationality' 
+                  : null,
+            ),
+          const SizedBox(height: 16),
+
+          KenwellDateField(
+            label: 'Date of Birth',
+            controller: vm.dobController,
+            validator: (val) => (val == null || val.isEmpty)
+                ? 'Please select Date of Birth'
+                : null,
+            readOnly: true,
+            onChanged: (value) => vm.setDob(value), // <-- Add this
+          ),
+          KenwellDropdownField<String>(
+            label: 'Gender',
+            value: vm.gender,
+            items: vm.genderOptions,
+            onChanged: vm.setGender,
+            validator: (val) =>
+                (val == null || val.isEmpty) ? 'Select Gender' : null,
+          ),
+        ],
       ],
     );
   }

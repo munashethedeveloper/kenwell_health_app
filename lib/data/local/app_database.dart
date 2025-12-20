@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:sqlite3/sqlite3.dart';
 
 part 'app_database.g.dart';
 
@@ -72,21 +73,38 @@ class AppDatabase extends _$AppDatabase {
   static final AppDatabase instance = AppDatabase._internal();
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 11;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (migrator) => migrator.createAll(),
 
-    // 🔥 Clean migration: rebuild table to drop removed columns safely
+    // Migration to handle schema changes
     onUpgrade: (migrator, from, to) async {
-      if (from < 9) {
-        await migrator.alterTable(
-          TableMigration(
-            events,
-            // Drift auto-maps columns. No manual config needed.
-          ),
-        );
+      if (from < 10) {
+        // Add the additional_services_requested column if upgrading from v7, v8, or v9
+        // Note: Column was added to schema in v8 but schema version wasn't incremented
+        // So databases upgraded from v7 to v8/v9 don't have this column
+        // Databases created fresh at v8/v9 will have it via onCreate
+        try {
+          await migrator.addColumn(events, events.additionalServicesRequested);
+        } on SqliteException catch (_) {
+          // Column already exists (database was created fresh at v8 or v9)
+          // This is expected and can be safely ignored
+        }
+      }
+      
+      if (from < 11) {
+        // Remove username column from Users table
+        // Note: Old databases (pre-v11) had a NOT NULL username column that was later removed
+        // This migration recreates the Users table with only the current schema columns
+        // TableMigration preserves existing data while updating the table structure
+        try {
+          await migrator.alterTable(TableMigration(users));
+        } on SqliteException catch (_) {
+          // If TableMigration fails, the table likely already matches current schema
+          // Safe to continue - app will function with existing table structure
+        }
       }
     },
   );

@@ -14,19 +14,25 @@ class MemberDetailsViewModel extends ChangeNotifier {
   final dobController = TextEditingController();
   final idNumberController = TextEditingController();
   final passportNumberController = TextEditingController();
-  final nationalityController = TextEditingController();
+  // nationalityController removed - now using selectedNationality String
   final medicalAidNameController = TextEditingController();
   final medicalAidNumberController = TextEditingController();
   final emailController = TextEditingController();
   final cellNumberController = TextEditingController();
   // final alternateContactNumberController = TextEditingController();
   final personalNumberController = TextEditingController();
+  
+  // Read-only controller for SA Citizen nationality display
+  final sacitizenNationalityController = TextEditingController(text: 'South Africa');
 
   // Dropdown values
   String? maritalStatus;
   String? gender;
   String idDocumentChoice = 'ID';
   String? medicalAidStatus;
+  
+  // Citizenship status
+  String? citizenshipStatus;
 
   // NEW: Alternate number
   //String? hasAlternateNumber;
@@ -44,6 +50,12 @@ class MemberDetailsViewModel extends ChangeNotifier {
 
   final List<String> idDocumentOptions = ['ID', 'Passport'];
   final List<String> medicalAidStatusOptions = ['Yes', 'No'];
+  
+  final List<String> citizenshipOptions = [
+    'SA Citizen',
+    'Permanent Resident',
+    'Other Nationality'
+  ];
 
   String? selectedNationality;
 
@@ -51,6 +63,26 @@ class MemberDetailsViewModel extends ChangeNotifier {
     if (selectedNationality != value) {
       selectedNationality = value;
       //nationalityController.text = value ?? '';
+      notifyListeners();
+    }
+  }
+  
+  void setCitizenshipStatus(String? value) {
+    if (citizenshipStatus != value) {
+      citizenshipStatus = value;
+      
+      // Auto-set nationality for SA Citizen
+      if (value == 'SA Citizen') {
+        selectedNationality = 'South Africa';
+      } else if (value == 'Permanent Resident') {
+        // Keep current nationality or allow user to select
+      } else if (value == 'Other Nationality') {
+        // Clear nationality for user to select
+        if (selectedNationality == 'South Africa') {
+          selectedNationality = null;
+        }
+      }
+      
       notifyListeners();
     }
   }
@@ -288,15 +320,15 @@ class MemberDetailsViewModel extends ChangeNotifier {
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
 
-  PersonalDetailsViewModel() {
+  MemberDetailsViewModel() {
     idNumberController.addListener(_handleIdNumberInput);
   }
 
   void _handleIdNumberInput() {
     final id = idNumberController.text;
     if (id.length == 13 && Validators.validateSouthAfricanId(id) == null) {
-      dobController.text =
-          DateFormat('dd/MM/yyyy').format(Validators.getDateOfBirthFromId(id));
+      dob = Validators.getDateOfBirthFromId(id);
+      dobController.text = DateFormat('dd/MM/yyyy').format(dob!);
       gender = Validators.getGenderFromId(id);
       notifyListeners();
     }
@@ -353,12 +385,14 @@ class MemberDetailsViewModel extends ChangeNotifier {
   bool get showIdField => idDocumentChoice == 'ID';
   bool get showPassportField => idDocumentChoice == 'Passport';
   bool get showMedicalAidFields => medicalAidStatus == 'Yes';
+  bool get showIdentificationFields => citizenshipStatus != null;
 
   bool get isFormValid =>
       formKey.currentState?.validate() == true &&
       maritalStatus != null &&
       gender != null &&
       medicalAidStatus != null &&
+      citizenshipStatus != null &&
       (showIdField
           ? idNumberController.text.isNotEmpty
           : passportNumberController.text.isNotEmpty) &&
@@ -376,7 +410,10 @@ class MemberDetailsViewModel extends ChangeNotifier {
         'idNumber': idNumberController.text,
         'passportNumber': passportNumberController.text,
         'idDocumentChoice': idDocumentChoice,
-        'nationality': nationalityController.text,
+        'nationality': citizenshipStatus == 'SA Citizen' 
+            ? 'South Africa' 
+            : selectedNationality ?? '',
+        'citizenshipStatus': citizenshipStatus,
         'medicalAidName': medicalAidNameController.text,
         'medicalAidNumber': medicalAidNumberController.text,
         'medicalAidStatus': medicalAidStatus,
@@ -408,7 +445,8 @@ class MemberDetailsViewModel extends ChangeNotifier {
       dobController,
       idNumberController,
       passportNumberController,
-      nationalityController,
+      // nationalityController removed
+      sacitizenNationalityController,
       medicalAidNameController,
       medicalAidNumberController,
       emailController,
