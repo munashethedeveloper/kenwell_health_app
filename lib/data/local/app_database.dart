@@ -72,21 +72,23 @@ class AppDatabase extends _$AppDatabase {
   static final AppDatabase instance = AppDatabase._internal();
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (migrator) => migrator.createAll(),
 
-    // 🔥 Clean migration: rebuild table to drop removed columns safely
+    // Migration to add missing column for databases at schema v7-9
     onUpgrade: (migrator, from, to) async {
-      if (from < 9) {
-        await migrator.alterTable(
-          TableMigration(
-            events,
-            // Drift auto-maps columns. No manual config needed.
-          ),
-        );
+      if (from < 10) {
+        // Add the additional_services_requested column if upgrading from v9 or earlier
+        // This handles databases that were at v7 when the column was added but schema wasn't bumped
+        try {
+          await migrator.addColumn(events, events.additionalServicesRequested);
+        } catch (e) {
+          // Column may already exist if database was created at v8 or v9
+          // This is expected and can be safely ignored
+        }
       }
     },
   );
