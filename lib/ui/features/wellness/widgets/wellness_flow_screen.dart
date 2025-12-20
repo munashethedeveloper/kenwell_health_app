@@ -56,7 +56,7 @@ class WellnessFlowScreen extends StatelessWidget {
     final stepName = flowVM.currentStepName;
 
     switch (stepName) {
-      case 'current_event_details':
+      case WellnessFlowViewModel.stepCurrentEventDetails:
         return event != null
             ? CurrentEventDetailsScreen(
                 event: event!,
@@ -66,13 +66,13 @@ class WellnessFlowScreen extends StatelessWidget {
               )
             : const SizedBox();
 
-      case 'member_registration':
+      case WellnessFlowViewModel.stepMemberRegistration:
         return MemberRegistrationScreen(
           onGoToMemberDetails: flowVM.navigateToPersonalDetails,
           onPrevious: flowVM.previousStep,
         );
 
-      case 'consent':
+      case WellnessFlowViewModel.stepConsent:
         return ChangeNotifierProvider.value(
           value: flowVM.consentVM,
           child: event != null
@@ -91,14 +91,14 @@ class WellnessFlowScreen extends StatelessWidget {
               : const SizedBox(),
         );
 
-      case 'personal_details':
+      case WellnessFlowViewModel.stepPersonalDetails:
         return MemberDetailsScreen(
           onNext: flowVM.nextStep,
           onPrevious: flowVM.previousStep,
           viewModel: flowVM.memberDetailsVM,
         );
 
-      case 'risk_assessment':
+      case WellnessFlowViewModel.stepRiskAssessment:
         return PersonalRiskAssessmentScreen(
           onNext: flowVM.nextStep,
           onPrevious: flowVM.previousStep,
@@ -130,7 +130,7 @@ class WellnessFlowScreen extends StatelessWidget {
           ),
         ); */
 
-      case 'hiv_test':
+      case WellnessFlowViewModel.stepHivTest:
         return ChangeNotifierProvider.value(
           value: flowVM.hivTestVM,
           child: HIVTestScreen(
@@ -139,7 +139,7 @@ class WellnessFlowScreen extends StatelessWidget {
           ),
         );
 
-      case 'hiv_results':
+      case WellnessFlowViewModel.stepHivResults:
         if (event != null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             flowVM.hivResultsVM.initialiseWithEvent(event!);
@@ -153,7 +153,7 @@ class WellnessFlowScreen extends StatelessWidget {
           ),
         );
 
-      case 'tb_test':
+      case WellnessFlowViewModel.stepTbTest:
         if (event != null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             flowVM.tbTestVM.initialiseWithEvent(event!);
@@ -167,7 +167,7 @@ class WellnessFlowScreen extends StatelessWidget {
           ),
         );
 
-      case 'survey':
+      case WellnessFlowViewModel.stepSurvey:
         return ChangeNotifierProvider.value(
           value: flowVM.surveyVM,
           child: SurveyScreen(
