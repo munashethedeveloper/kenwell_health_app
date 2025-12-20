@@ -2,12 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:signature/signature.dart';
 import 'package:intl/intl.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
-
-enum NursingReferralOption {
-  patientNotReferred,
-  referredToGP,
-  referredToStateClinic,
-}
+import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
 
 class TBNursingInterventionViewModel extends ChangeNotifier {
   /// Controls whether the Initial Assessment card (and related validations) show.

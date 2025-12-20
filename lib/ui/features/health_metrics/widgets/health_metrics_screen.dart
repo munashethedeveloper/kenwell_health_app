@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:kenwell_health_app/ui/features/nurse_interventions/view_model/nurse_intervention_form_mixin.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_referral_card.dart';
+import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
@@ -13,7 +13,7 @@ import '../view_model/health_metrics_view_model.dart';
 
 class HealthMetricsScreen extends StatelessWidget {
   final HealthMetricsViewModel viewModel;
-  final NurseInterventionFormMixin nurseViewModel;
+  final dynamic nurseViewModel;
 
   final VoidCallback onNext;
   final VoidCallback onPrevious;

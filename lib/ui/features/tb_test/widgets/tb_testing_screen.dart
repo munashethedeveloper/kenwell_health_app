@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_referral_card.dart';
+import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_page.dart';
@@ -8,12 +9,6 @@ import '../../../shared/ui/form/kenwell_signature_actions.dart';
 import '../../../shared/ui/form/kenwell_yes_no_list.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/tb_testing_view_model.dart';
-
-enum NursingReferralOption {
-  patientNotReferred,
-  referredToGP,
-  referredToStateClinic,
-}
 
 class TBTestingScreen extends StatelessWidget {
   final VoidCallback onNext;

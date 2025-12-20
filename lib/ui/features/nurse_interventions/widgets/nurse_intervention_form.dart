@@ -9,12 +9,7 @@ import '../../../shared/ui/form/kenwell_form_page.dart';
 import '../../../shared/ui/form/kenwell_signature_actions.dart';
 import '../../../shared/ui/form/kenwell_referral_card.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
-
-enum NursingReferralOption {
-  patientNotReferred,
-  referredToGP,
-  referredToStateClinic,
-}
+import '../../../shared/models/nursing_referral_option.dart';
 
 class NurseInterventionForm extends StatelessWidget {
   final dynamic viewModel;

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../nurse_interventions/view_model/nurse_intervention_form_mixin.dart';
 
-class HIVTestResultViewModel extends ChangeNotifier
-    with NurseInterventionFormMixin {
-  // Note: formKey is provided by NurseInterventionFormMixin
+class HIVTestResultViewModel extends ChangeNotifier {
+  // Note: formKey is defined here
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   // --- Screening Test Controllers ---
   final TextEditingController screeningTestNameController =
@@ -43,25 +42,19 @@ class HIVTestResultViewModel extends ChangeNotifier
   }
 
   // --- Form validation ---
-  @override
   bool get isFormValid {
-    // Validate both HIV test result fields and nurse intervention fields
+    // Validate HIV test result fields
     final baseFormValid = formKey.currentState?.validate() == true;
-    // final nurseInterventionValid = super.isFormValid;
-    return baseFormValid; //&& nurseInterventionValid;
+    return baseFormValid;
   }
 
   /// Converts all HIV test result data to a Map
   Future<Map<String, dynamic>> toMap() async {
-    // Combine HIV test result data with nurse intervention data
-    //final nurseInterventionData = await super.toMap();
     return {
       'screeningTestName': screeningTestNameController.text,
       'screeningBatchNo': screeningBatchNoController.text,
       'screeningExpiryDate': screeningExpiryDateController.text,
       'screeningResult': screeningResult,
-      // Merge nurse intervention data
-      //...nurseInterventionData,
     };
   }
 
@@ -95,7 +88,6 @@ class HIVTestResultViewModel extends ChangeNotifier
     screeningTestNameController.dispose();
     screeningBatchNoController.dispose();
     screeningExpiryDateController.dispose();
-    //disposeNurseInterventionFields();
     super.dispose();
   }
 }
