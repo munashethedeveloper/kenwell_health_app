@@ -101,10 +101,9 @@ class AppDatabase extends _$AppDatabase {
         // TableMigration preserves existing data while updating the table structure
         try {
           await migrator.alterTable(TableMigration(users));
-        } on SqliteException catch (e) {
-          // If migration fails, log for debugging but don't crash
-          // This could happen if table is already in correct state
-          print('Users table migration warning: ${e.message}');
+        } on SqliteException catch (_) {
+          // If migration fails, it might already be in correct state
+          // Silently continue - table recreation is handled by Drift
         }
       }
     },
