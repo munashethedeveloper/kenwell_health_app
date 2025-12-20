@@ -8,6 +8,7 @@ import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_page.dart';
 import '../../../shared/ui/form/kenwell_date_field.dart';
+import '../../../shared/ui/form/kenwell_form_styles.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/member_details_view_model.dart';
 
@@ -247,10 +248,10 @@ class MemberDetailsScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              decoratorProps: const DropDownDecoratorProps(
-                decoration: InputDecoration(
-                  labelText: 'Nationality',
-                  border: OutlineInputBorder(),
+              decoratorProps: DropDownDecoratorProps(
+                decoration: KenwellFormStyles.decoration(
+                  label: 'Nationality',
+                  hint: 'Select Nationality',
                 ),
               ),
               onChanged: (value) => vm.setSelectedNationality(value),
