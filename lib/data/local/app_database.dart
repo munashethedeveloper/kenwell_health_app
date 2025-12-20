@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:sqlite3/sqlite3.dart';
 
 part 'app_database.g.dart';
 
@@ -81,11 +82,11 @@ class AppDatabase extends _$AppDatabase {
     // Migration to add missing column for databases at schema v7-9
     onUpgrade: (migrator, from, to) async {
       if (from < 10) {
-        // Add the additional_services_requested column if upgrading from v9 or earlier
+        // Add the additional_services_requested column if upgrading from v7, v8, or v9
         // This handles databases that were at v7 when the column was added but schema wasn't bumped
         try {
           await migrator.addColumn(events, events.additionalServicesRequested);
-        } catch (e) {
+        } on SqliteException catch (_) {
           // Column may already exist if database was created at v8 or v9
           // This is expected and can be safely ignored
         }
