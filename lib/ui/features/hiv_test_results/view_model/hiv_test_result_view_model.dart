@@ -3,8 +3,15 @@ import 'package:intl/intl.dart';
 import 'package:signature/signature.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
+import 'package:kenwell_health_app/data/services/auth_service.dart';
 
 class HIVTestResultViewModel extends ChangeNotifier {
+  HIVTestResultViewModel() {
+    _loadCurrentUserProfile();
+  }
+
+  final AuthService _authService = AuthService();
+
   // Note: formKey is defined here
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
@@ -99,6 +106,20 @@ class HIVTestResultViewModel extends ChangeNotifier {
     }
   }
 
+  /// Load current user profile to pre-populate nurse details
+  Future<void> _loadCurrentUserProfile() async {
+    try {
+      final user = await _authService.getCurrentUser();
+      if (user != null) {
+        nurseFirstNameController.text = user.firstName;
+        nurseLastNameController.text = user.lastName;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint("Error loading user profile: $e");
+    }
+  }
+
   void clearSignature() {
     signatureController.clear();
     notifyListeners();
@@ -133,9 +154,51 @@ class HIVTestResultViewModel extends ChangeNotifier {
 
   // --- Form validation ---
   bool get isFormValid {
-    // Validate HIV test result fields
-    final baseFormValid = formKey.currentState?.validate() == true;
-    return baseFormValid;
+    // Validate form fields
+    if (formKey.currentState?.validate() != true) {
+      return false;
+    }
+
+    // Validate screening test fields
+    if (screeningTestNameController.text.isEmpty ||
+        screeningBatchNoController.text.isEmpty ||
+        screeningExpiryDateController.text.isEmpty) {
+      return false;
+    }
+
+    // Validate initial assessment fields
+    if (windowPeriod == null ||
+        urgentPsychosocial == null ||
+        committedToChange == null) {
+      return false;
+    }
+
+    // Validate nursing referral
+    if (nursingReferralSelection == null) {
+      return false;
+    }
+
+    // Validate referral reason if patient not referred
+    if (nursingReferralSelection == NursingReferralOption.patientNotReferred &&
+        notReferredReasonController.text.isEmpty) {
+      return false;
+    }
+
+    // Validate nurse details
+    if (nurseFirstNameController.text.isEmpty ||
+        nurseLastNameController.text.isEmpty ||
+        rankController.text.isEmpty ||
+        sancNumberController.text.isEmpty ||
+        nurseDateController.text.isEmpty) {
+      return false;
+    }
+
+    // Validate signature
+    if (signatureController.isEmpty) {
+      return false;
+    }
+
+    return true;
   }
 
   /// Converts all HIV test result data to a Map
@@ -171,7 +234,10 @@ class HIVTestResultViewModel extends ChangeNotifier {
 
   // --- Save & continue ---
   Future<void> submitTestResult(VoidCallback? onNext) async {
-    if (!isFormValid) return;
+    if (!isFormValid) {
+      debugPrint("Form validation failed");
+      return;
+    }
 
     _isSubmitting = true;
     notifyListeners();
