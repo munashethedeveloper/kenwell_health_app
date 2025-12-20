@@ -24,6 +24,12 @@ class WellnessFlowViewModel extends ChangeNotifier {
   static const String stepTbTest = 'tb_test';
   static const String stepSurvey = 'survey';
   
+  // Section identifiers (used by UI cards to identify which section was tapped)
+  static const String sectionConsent = 'consent';
+  static const String sectionMemberRegistration = 'member_registration';
+  static const String sectionHealthScreenings = 'health_screenings';
+  static const String sectionSurvey = 'survey';
+  
   // Screening steps (used for detecting screening flows)
   static const List<String> screeningSteps = [
     stepConsent,
@@ -195,20 +201,20 @@ class WellnessFlowViewModel extends ChangeNotifier {
   /// Navigate to a specific section from the current event details screen
   void navigateToSection(String section) {
     switch (section) {
-      case 'consent':
+      case sectionConsent:
         _flowSteps = [stepCurrentEventDetails, stepConsent];
         _currentStep = 1;
         break;
-      case 'member_registration':
+      case sectionMemberRegistration:
         _flowSteps = [stepCurrentEventDetails, stepMemberRegistration];
         _currentStep = 1;
         break;
-      case 'health_screenings':
+      case sectionHealthScreenings:
         // For health screenings, we show consent first to select which screenings
         _flowSteps = [stepCurrentEventDetails, stepConsent];
         _currentStep = 1;
         break;
-      case 'survey':
+      case sectionSurvey:
         _flowSteps = [stepCurrentEventDetails, stepSurvey];
         _currentStep = 1;
         break;

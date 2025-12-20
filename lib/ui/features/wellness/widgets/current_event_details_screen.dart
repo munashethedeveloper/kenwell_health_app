@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
+import 'package:kenwell_health_app/ui/features/wellness/view_model/wellness_flow_view_model.dart';
 
 class CurrentEventDetailsScreen extends StatelessWidget {
   final WellnessEvent event;
@@ -35,25 +36,25 @@ class CurrentEventDetailsScreen extends StatelessWidget {
                 context,
                 'Consent',
                 Icons.assignment,
-                () => onSectionTap('consent'),
+                () => onSectionTap(WellnessFlowViewModel.sectionConsent),
               ),
               _buildSectionCard(
                 context,
                 'Member Registration',
                 Icons.person_add,
-                () => onSectionTap('member_registration'),
+                () => onSectionTap(WellnessFlowViewModel.sectionMemberRegistration),
               ),
               _buildSectionCard(
                 context,
                 'Health Screenings',
                 Icons.medical_services,
-                () => onSectionTap('health_screenings'),
+                () => onSectionTap(WellnessFlowViewModel.sectionHealthScreenings),
               ),
               _buildSectionCard(
                 context,
                 'Survey',
                 Icons.assignment_turned_in,
-                () => onSectionTap('survey'),
+                () => onSectionTap(WellnessFlowViewModel.sectionSurvey),
               ),
             ],
           ),
