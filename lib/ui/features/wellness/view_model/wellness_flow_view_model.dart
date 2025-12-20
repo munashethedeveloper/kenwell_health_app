@@ -201,14 +201,4 @@ class WellnessFlowViewModel extends ChangeNotifier {
     _currentStep = 2;
     notifyListeners();
   }
-
-  /// Call when survey is submitted
-  void submitSurvey(BuildContext context) {
-    incrementScreenedCount();
-    resetFlow();
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Survey saved and submitted!')),
-    );
-  }
 }

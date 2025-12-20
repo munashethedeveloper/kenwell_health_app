@@ -168,7 +168,11 @@ class WellnessFlowScreen extends StatelessWidget {
         );
 
       case 'survey':
-        // SURVEY STEP: submitAll -> increment screened -> POP flow (do NOT call onFlowCompleted)
+        // Determine if this is a standalone survey or part of a screening flow
+        final isStandaloneSurvey = flowVM.flowSteps.length == 2 && 
+                                   flowVM.flowSteps[0] == 'current_event_details' &&
+                                   flowVM.flowSteps[1] == 'survey';
+        
         return ChangeNotifierProvider.value(
           value: flowVM.surveyVM,
           child: SurveyScreen(
@@ -233,18 +237,24 @@ class WellnessFlowScreen extends StatelessWidget {
                     'WellnessFlow: activeEvent is null; skipping incrementScreened');
               }
 
-              // 3) Pop the progress dialog (if still open) and then pop the flow page
+              // 3) Handle navigation based on whether this is standalone or part of a flow
               if (context.mounted) {
                 // Close progress dialog
                 Navigator.of(context).pop();
-                // Pop the WellnessFlowPage to return to ConductEventScreen
-                if (Navigator.of(context).canPop()) {
-                  Navigator.of(context).pop();
+                
+                if (isStandaloneSurvey) {
+                  // For standalone survey, return to CurrentEventDetailsScreen
+                  flowVM.resetFlow();
+                } else {
+                  // For survey at end of screening flow, pop the entire WellnessFlowPage
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  }
                 }
               }
 
               debugPrint(
-                  'WellnessFlow: survey onSubmit finished (page popped)');
+                  'WellnessFlow: survey onSubmit finished (isStandalone: $isStandaloneSurvey)');
             },
           ),
         );
