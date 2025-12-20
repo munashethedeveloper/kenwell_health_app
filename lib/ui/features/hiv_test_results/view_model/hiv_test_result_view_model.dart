@@ -15,18 +15,6 @@ class HIVTestResultViewModel extends ChangeNotifier
       TextEditingController();
   String screeningResult = 'Negative';
 
-  // --- Confirmatory Test Controllers ---
-  final TextEditingController confirmatoryTestNameController =
-      TextEditingController();
-  final TextEditingController confirmatoryBatchNoController =
-      TextEditingController();
-  final TextEditingController confirmatoryExpiryDateController =
-      TextEditingController();
-  String confirmatoryResult = 'Negative';
-
-  // --- Final HIV Result ---
-  String finalResult = 'Negative';
-
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
 
@@ -43,8 +31,6 @@ class HIVTestResultViewModel extends ChangeNotifier
       String formattedDate = DateFormat('yyyy-MM-dd').format(picked);
       if (isScreening) {
         screeningExpiryDateController.text = formattedDate;
-      } else {
-        confirmatoryExpiryDateController.text = formattedDate;
       }
       notifyListeners();
     }
@@ -56,41 +42,26 @@ class HIVTestResultViewModel extends ChangeNotifier
     notifyListeners();
   }
 
-  void setConfirmatoryResult(String value) {
-    confirmatoryResult = value;
-    notifyListeners();
-  }
-
-  void setFinalResult(String value) {
-    finalResult = value;
-    notifyListeners();
-  }
-
   // --- Form validation ---
   @override
   bool get isFormValid {
     // Validate both HIV test result fields and nurse intervention fields
     final baseFormValid = formKey.currentState?.validate() == true;
-    final nurseInterventionValid = super.isFormValid;
-    return baseFormValid && nurseInterventionValid;
+    // final nurseInterventionValid = super.isFormValid;
+    return baseFormValid; //&& nurseInterventionValid;
   }
 
   /// Converts all HIV test result data to a Map
   Future<Map<String, dynamic>> toMap() async {
     // Combine HIV test result data with nurse intervention data
-    final nurseInterventionData = await super.toMap();
+    //final nurseInterventionData = await super.toMap();
     return {
       'screeningTestName': screeningTestNameController.text,
       'screeningBatchNo': screeningBatchNoController.text,
       'screeningExpiryDate': screeningExpiryDateController.text,
       'screeningResult': screeningResult,
-      'confirmatoryTestName': confirmatoryTestNameController.text,
-      'confirmatoryBatchNo': confirmatoryBatchNoController.text,
-      'confirmatoryExpiryDate': confirmatoryExpiryDateController.text,
-      'confirmatoryResult': confirmatoryResult,
-      'finalResult': finalResult,
       // Merge nurse intervention data
-      ...nurseInterventionData,
+      //...nurseInterventionData,
     };
   }
 
@@ -124,10 +95,7 @@ class HIVTestResultViewModel extends ChangeNotifier
     screeningTestNameController.dispose();
     screeningBatchNoController.dispose();
     screeningExpiryDateController.dispose();
-    confirmatoryTestNameController.dispose();
-    confirmatoryBatchNoController.dispose();
-    confirmatoryExpiryDateController.dispose();
-    disposeNurseInterventionFields();
+    //disposeNurseInterventionFields();
     super.dispose();
   }
 }

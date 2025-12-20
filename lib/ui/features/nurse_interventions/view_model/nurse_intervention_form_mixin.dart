@@ -43,9 +43,10 @@ mixin NurseInterventionFormMixin on ChangeNotifier {
   // --- Follow-up ---
   String? followUpLocation; // 'State clinic', 'Private doctor', 'Other'
   final List<String> followUpLocationOptions = [
-    'State clinic',
-    'Private doctor',
-    'Other'
+    'Referred to State clinic',
+    'Referred to Private doctor',
+    'Other',
+    'No follow-up needed',
   ];
   final TextEditingController followUpOtherController = TextEditingController();
   final TextEditingController followUpDateController = TextEditingController();

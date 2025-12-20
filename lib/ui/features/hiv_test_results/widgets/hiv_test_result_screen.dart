@@ -84,61 +84,14 @@ class HIVTestResultScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              KenwellFormCard(
-                title: 'Confirmatory Test',
-                child: Column(
-                  children: [
-                    _buildTextField(
-                      label: 'Name of Test',
-                      controller: viewModel.confirmatoryTestNameController,
-                      hint: 'Enter test name',
-                    ),
-                    const SizedBox(height: 12),
-                    _buildTextField(
-                      label: 'Batch No',
-                      controller: viewModel.confirmatoryBatchNoController,
-                      hint: 'Enter batch number',
-                    ),
-                    const SizedBox(height: 12),
-                    _buildTextField(
-                      label: 'Expiry Date',
-                      controller: viewModel.confirmatoryExpiryDateController,
-                      readOnly: true,
-                      hint: 'Select expiry date',
-                      suffixIcon: const Icon(Icons.calendar_today,
-                          color: KenwellColors.primaryGreenDark),
-                      onTap: () =>
-                          viewModel.pickExpiryDate(context, isScreening: false),
-                    ),
-                    const SizedBox(height: 12),
-                    _buildDropdown(
-                      'Test Result',
-                      ['Negative', 'Positive'],
-                      viewModel.confirmatoryResult,
-                      viewModel.setConfirmatoryResult,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              KenwellFormCard(
-                title: 'Final HIV Test Result',
-                child: _buildDropdown(
-                  'Final Result',
-                  ['Negative', 'Positive'],
-                  viewModel.finalResult,
-                  viewModel.setFinalResult,
-                ),
-              ),
-              const SizedBox(height: 24),
               _buildInitialAssessment(viewModel),
               const SizedBox(height: 24),
               _buildReferrals(viewModel),
               const SizedBox(height: 24),
-              if (viewModel.windowPeriod == 'Yes') ...[
-                _buildFollowUpSection(viewModel),
-                const SizedBox(height: 24),
-              ],
+              // if (viewModel.windowPeriod == 'Yes') ...[
+              //  _buildFollowUpSection(viewModel),
+              //   const SizedBox(height: 24),
+              //  ],
               _buildNurseDetails(viewModel),
               const SizedBox(height: 24),
               KenwellSignatureActions(
@@ -159,30 +112,6 @@ class HIVTestResultScreen extends StatelessWidget {
       ),
     );
   }
-
-  // Widget _buildCard({required String title, required Widget child}) {
-  // return Card(
-  //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-  //   elevation: 3,
-  //   shadowColor: Colors.grey.shade300,
-  //   color: Colors.white,
-  //   child: Padding(
-  //     padding: const EdgeInsets.all(16),
-  //    child: Column(
-  //    crossAxisAlignment: CrossAxisAlignment.start,
-  //    children: [
-  //      Text(title,
-  //          style: const TextStyle(
-  //              fontSize: 16,
-  //               fontWeight: FontWeight.bold,
-  //               color: Color(0xFF201C58))),
-  //        const SizedBox(height: 12),
-  //        child,
-  //      ],
-  //    ),
-  //  ),
-  //  );
-  //}
 
   Widget _buildTextField({
     required String label,
@@ -245,32 +174,6 @@ class HIVTestResultScreen extends StatelessWidget {
                 : null,
           ),
           KenwellDropdownField<String>(
-            label: 'Did patient expect HIV (+) result?',
-            value: viewModel.expectedResult,
-            items: viewModel.expectedResultOptions,
-            onChanged: viewModel.setExpectedResult,
-            decoration: KenwellFormStyles.decoration(
-              label: 'Did patient expect HIV (+) result?',
-              hint: 'Select expected result',
-            ),
-            validator: (val) => (val == null || val.isEmpty)
-                ? 'Please select Did patient expect HIV (+) result?'
-                : null,
-          ),
-          KenwellDropdownField<String>(
-            label: 'Difficulty in dealing with result?',
-            value: viewModel.difficultyDealingResult,
-            items: viewModel.difficultyOptions,
-            onChanged: viewModel.setDifficultyDealingResult,
-            decoration: KenwellFormStyles.decoration(
-              label: 'Difficulty in dealing with result?',
-              hint: 'Select difficulty level',
-            ),
-            validator: (val) => (val == null || val.isEmpty)
-                ? 'Please select Difficulty in dealing with result?'
-                : null,
-          ),
-          KenwellDropdownField<String>(
             label: 'Urgent psychosocial follow-up needed?',
             value: viewModel.urgentPsychosocial,
             items: viewModel.urgentOptions,
@@ -322,54 +225,54 @@ class HIVTestResultScreen extends StatelessWidget {
         ),
         const KenwellReferralOption(
           value: NursingReferralOption.referredToStateClinic,
-          label: 'Patient referred to State HIV clinic',
+          label: 'Patient referred to State Clinic',
         ),
       ],
     );
   }
 
-  Widget _buildFollowUpSection(HIVTestResultViewModel viewModel) {
-    return KenwellFormCard(
-      title: 'Follow-up',
-      child: Column(
-        children: [
-          KenwellDropdownField<String>(
-            label: 'Follow-up location',
-            value: viewModel.followUpLocation,
-            items: viewModel.followUpLocationOptions,
-            onChanged: viewModel.setFollowUpLocation,
-            decoration: KenwellFormStyles.decoration(
-              label: 'Follow-up location',
-              hint: 'Select follow-up location',
-            ),
-            validator: (val) => (val == null || val.isEmpty)
-                ? 'Please select Follow-up location'
-                : null,
-          ),
-          if (viewModel.followUpLocation == 'Other')
-            KenwellTextField(
-              label: 'Other location detail',
-              hintText: 'Specify other location',
-              controller: viewModel.followUpOtherController,
-              decoration: KenwellFormStyles.decoration(
-                label: 'Other location detail',
-                hint: 'Specify other location',
-              ),
-              validator: (val) => (val == null || val.isEmpty)
-                  ? 'Please enter Other location detail'
-                  : null,
-            ),
-          KenwellDateField(
-            label: 'Follow-up test date',
-            controller: viewModel.followUpDateController,
-            validator: (val) => (val == null || val.isEmpty)
-                ? 'Please select Follow-up test date'
-                : null,
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildFollowUpSection(HIVTestResultViewModel viewModel) {
+  // return KenwellFormCard(
+  //   title: 'Follow-up',
+  //   child: Column(
+  //    children: [
+  //      KenwellDropdownField<String>(
+  //       label: 'Follow-up location',
+  //        value: viewModel.followUpLocation,
+  //        items: viewModel.followUpLocationOptions,
+  //        onChanged: viewModel.setFollowUpLocation,
+  //        decoration: KenwellFormStyles.decoration(
+  //          label: 'Follow-up location',
+  //          hint: 'Select follow-up location',
+  //        ),
+  //        validator: (val) => (val == null || val.isEmpty)
+  //            ? 'Please select Follow-up location'
+  //            : null,
+  //      ),
+  //      if (viewModel.followUpLocation == 'Other')
+  //        KenwellTextField(
+  //          label: 'Other location detail',
+  //          hintText: 'Specify other location',
+  //          controller: viewModel.followUpOtherController,
+  //          decoration: KenwellFormStyles.decoration(
+  //           label: 'Other location detail',
+  //           hint: 'Specify other location',
+  //          ),
+  //         validator: (val) => (val == null || val.isEmpty)
+  //             ? 'Please enter Other location detail'
+  //              : null,
+  //       ),
+  //   KenwellDateField(
+  //    label: 'Follow-up test date',
+  //    controller: viewModel.followUpDateController,
+  //     validator: (val) => (val == null || val.isEmpty)
+  //         ? 'Please select Follow-up test date'
+  //         : null,
+  //      ),
+  //    ],
+  //   ),
+  // );
+//  }
 
   Widget _buildNurseDetails(HIVTestResultViewModel viewModel) {
     return KenwellFormCard(

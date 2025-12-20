@@ -107,14 +107,14 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                         children: [
                           KenwellDropdownField(
                             label: 'Do you Exercise?',
-                            value: vm.smokingStatus,
-                            items: vm.smokingStatusOptions,
-                            onChanged: vm.setSmokingStatus,
+                            value: vm.exerciseStatus,
+                            items: vm.exerciseStatusOptions,
+                            onChanged: vm.setExerciseStatus,
                             validator: (val) => (val == null || val.isEmpty)
                                 ? 'Select Exercise Status'
                                 : null,
                           ),
-                          if (vm.showSmokingFields) ...[
+                          if (vm.showExerciseFields) ...[
                             const Text(
                                 '2.1 Over the past month, how many days per week have you exercised for 30 minutes or longer?',
                                 style: TextStyle(fontSize: 16)),

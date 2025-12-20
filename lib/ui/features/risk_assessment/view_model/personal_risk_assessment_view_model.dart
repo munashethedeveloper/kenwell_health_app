@@ -185,22 +185,34 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
   bool get showExerciseFields => exerciseStatus == 'Yes';
 
   bool get isFormValid {
-    if (smokingStatus != null &&
-        (showSmokingFields
-            ? dailySmokeController.text.isNotEmpty
-            : smokeType.isNotEmpty)) {
-      return true;
+    // Check form field validation
+    if (formKey.currentState?.validate() != true) return false;
+
+    // Check smoking status and related fields
+    if (smokingStatus == null) return false;
+    if (showSmokingFields) {
+      if (smokeType.isEmpty) return false;
+      if (dailySmokeController.text.isEmpty) return false;
     }
-    if (drinkingStatus != null &&
-        (showDrinkingFields || alcoholFrequency.isNotEmpty)) {
-      return true;
+
+    // Check drinking status and related fields
+    if (drinkingStatus == null) return false;
+    if (showDrinkingFields && alcoholFrequency.isEmpty) return false;
+
+    // Check exercise status and related fields
+    if (exerciseStatus == null) return false;
+    if (showExerciseFields && exerciseFrequency.isEmpty) return false;
+
+    // Check female-specific questions if applicable
+    if (showFemaleQuestions) {
+      if (papSmear == null) return false;
+      if (breastExam == null) return false;
+      if (showMammogramQuestion && mammogram == null) return false;
     }
-    if (exerciseStatus != null &&
-        (showExerciseFields || exerciseFrequency.isNotEmpty)) {
-      return true;
-    }
-    if (!formKey.currentState!.validate()) return false;
-    if (exerciseFrequency.isEmpty || alcoholFrequency.isEmpty) return false;
+
+    // Check male-specific questions if applicable
+    if (showProstateCheckQuestion && prostateCheck == null) return false;
+
     return true;
   }
 

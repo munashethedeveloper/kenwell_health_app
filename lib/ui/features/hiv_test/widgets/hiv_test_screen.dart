@@ -110,38 +110,8 @@ class HIVTestScreen extends StatelessWidget {
                     yesValue: 'Yes',
                     noValue: 'No',
                   ),
-                  KenwellYesNoItem(
-                    question:
-                        'Have you been diagnosed/treated for TB in the last 12 months?',
-                    value: viewModel.treatedTB,
-                    onChanged: viewModel.setTreatedTB,
-                    yesValue: 'Yes',
-                    noValue: 'No',
-                  ),
-                  KenwellYesNoItem(
-                    question: 'Do you sometimes not use a condom?',
-                    value: viewModel.noCondomUse,
-                    onChanged: viewModel.setNoCondomUse,
-                    yesValue: 'Yes',
-                    noValue: 'No',
-                  ),
                 ],
               ),
-              if (viewModel.noCondomUse == 'Yes')
-                Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: KenwellTextField(
-                    label: 'Reason for not using a condom',
-                    hintText: 'Explain why',
-                    controller: viewModel.noCondomReasonController,
-                    decoration: KenwellFormStyles.decoration(
-                      label: 'Reason for not using a condom',
-                      hint: 'Explain why',
-                    ),
-                    validator: (val) =>
-                        val == null || val.isEmpty ? 'Required' : null,
-                  ),
-                ),
             ],
           ),
         ),
@@ -160,26 +130,6 @@ class HIVTestScreen extends StatelessWidget {
                 noValue: 'No',
               ),
               const SizedBox(height: 12),
-              /*   const Text(
-                'Reasons that may have put you at risk:',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF201C58),
-                    fontSize: 16),
-              ), */
-              /*     KenwellCheckboxGroup(
-                separator: const Divider(height: 0),
-                options: _riskReasonOptions(viewModel),
-              ),
-              KenwellTextField(
-                label: 'Other risk reason',
-                hintText: 'Specify if "Other"',
-                controller: viewModel.otherRiskReasonController,
-                decoration: KenwellFormStyles.decoration(
-                  label: 'Other risk reason',
-                  hint: 'Specify if "Other"',
-                ),
-              ), */
             ],
           ),
         ),
@@ -193,24 +143,4 @@ class HIVTestScreen extends StatelessWidget {
       ],
     );
   }
-
-  /* List<KenwellCheckboxOption> _riskReasonOptions(HIVTestViewModel vm) {
-    const reasons = [
-      'Partner has been unfaithful',
-      'Exposed to another person’s body fluids while assisting with an injury',
-      'A partner who had a sexually transmitted infection',
-      'A partner who injects drugs and shares needles with other people',
-      'Rape',
-      'Other (specify below)',
-    ];
-    return reasons
-        .map(
-          (reason) => KenwellCheckboxOption(
-            label: reason,
-            value: vm.riskReasons.contains(reason),
-            onChanged: (_) => vm.toggleRiskReason(reason),
-          ),
-        )
-        .toList();
-  } */
 }
