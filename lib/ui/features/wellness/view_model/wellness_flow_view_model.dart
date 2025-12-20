@@ -13,9 +13,35 @@ import '../../tb_test/view_model/tb_testing_view_model.dart';
 import '../../../../domain/models/wellness_event.dart';
 
 class WellnessFlowViewModel extends ChangeNotifier {
+  // Step name constants
+  static const String stepCurrentEventDetails = 'current_event_details';
+  static const String stepConsent = 'consent';
+  static const String stepMemberRegistration = 'member_registration';
+  static const String stepPersonalDetails = 'personal_details';
+  static const String stepRiskAssessment = 'risk_assessment';
+  static const String stepHivTest = 'hiv_test';
+  static const String stepHivResults = 'hiv_results';
+  static const String stepTbTest = 'tb_test';
+  static const String stepSurvey = 'survey';
+  
+  // Section identifiers (used by UI cards to identify which section was tapped)
+  static const String sectionConsent = 'consent';
+  static const String sectionMemberRegistration = 'member_registration';
+  static const String sectionHealthScreenings = 'health_screenings';
+  static const String sectionSurvey = 'survey';
+  
+  // Screening steps (used for detecting screening flows)
+  static const List<String> screeningSteps = [
+    stepConsent,
+    stepRiskAssessment,
+    stepHivTest,
+    stepHivResults,
+    stepTbTest,
+  ];
+
   WellnessFlowViewModel({this.activeEvent}) {
-    // Initialize with consent as the first step
-    _flowSteps = ['consent'];
+    // Initialize with current event details as the first step
+    _flowSteps = [stepCurrentEventDetails];
   }
 
   // ViewModels for each step
@@ -35,35 +61,36 @@ class WellnessFlowViewModel extends ChangeNotifier {
   int get currentStep => _currentStep;
 
   // Dynamic flow based on selected checkboxes
-  List<String> _flowSteps = ['consent'];
+  List<String> _flowSteps = [stepCurrentEventDetails];
   List<String> get flowSteps => _flowSteps;
 
   // Initialize flow based on consent selections
   void initializeFlow(List<String> selectedScreenings) {
-    _flowSteps = ['consent'];
+    // Preserve current_event_details and consent as the first steps
+    _flowSteps = [stepCurrentEventDetails, stepConsent];
 
     // Add the personal details screen as the first screen if any screening is selected
     if (selectedScreenings.isNotEmpty) {
-      _flowSteps.add('personal_details');
+      _flowSteps.add(stepPersonalDetails);
     }
 
     // Add HRA screens if selected
     if (selectedScreenings.contains('hra')) {
-      _flowSteps.addAll(['risk_assessment']);
+      _flowSteps.addAll([stepRiskAssessment]);
     }
 
     // Add HIV/VCT screens if selected (VCT and HIV are the same)
     if (selectedScreenings.contains('hiv')) {
-      _flowSteps.addAll(['hiv_test', 'hiv_results']);
+      _flowSteps.addAll([stepHivTest, stepHivResults]);
     }
 
     // Add TB screens if selected
     if (selectedScreenings.contains('tb')) {
-      _flowSteps.add('tb_test');
+      _flowSteps.add(stepTbTest);
     }
 
     // Survey is always included at the end
-    _flowSteps.add('survey');
+    _flowSteps.add(stepSurvey);
 
     // Debug logging for development
     assert(() {
@@ -109,7 +136,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
 
   void cancelFlow() {
     _currentStep = 0;
-    _flowSteps = ['consent']; // Reset flow to initial state
+    _flowSteps = [stepCurrentEventDetails]; // Reset flow to initial state
     notifyListeners();
   }
 
@@ -145,7 +172,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
     );
 
     _currentStep = 0;
-    _flowSteps = ['consent']; // Reset flow after submission
+    _flowSteps = [stepCurrentEventDetails]; // Reset flow after submission
     notifyListeners();
   }
 
@@ -164,20 +191,61 @@ class WellnessFlowViewModel extends ChangeNotifier {
     }
   }
 
-  /// Reset the flow to consent screen (for reuse)
+  /// Reset the flow to current event details screen (for reuse)
   void resetFlow() {
     _currentStep = 0;
-    _flowSteps = ['consent']; // Reset flow to initial state
+    _flowSteps = [stepCurrentEventDetails]; // Reset flow to initial state
     notifyListeners();
   }
 
-  /// Call when survey is submitted
-  void submitSurvey(BuildContext context) {
-    incrementScreenedCount();
-    resetFlow();
+  /// Navigate to a specific section from the current event details screen
+  void navigateToSection(String section) {
+    switch (section) {
+      case sectionConsent:
+        _flowSteps = [stepCurrentEventDetails, stepConsent];
+        _currentStep = 1;
+        break;
+      case sectionMemberRegistration:
+        _flowSteps = [stepCurrentEventDetails, stepMemberRegistration];
+        _currentStep = 1;
+        break;
+      case sectionHealthScreenings:
+        // For health screenings, we show consent first to select which screenings
+        _flowSteps = [stepCurrentEventDetails, stepConsent];
+        _currentStep = 1;
+        break;
+      case sectionSurvey:
+        _flowSteps = [stepCurrentEventDetails, stepSurvey];
+        _currentStep = 1;
+        break;
+    }
+    notifyListeners();
+  }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Survey saved and submitted!')),
-    );
+  /// Navigate from member registration to personal details
+  /// This allows users to create a new member or proceed after selecting a member from search
+  void navigateToPersonalDetails() {
+    _flowSteps = [stepCurrentEventDetails, stepMemberRegistration, stepPersonalDetails];
+    _currentStep = 2;
+    notifyListeners();
+  }
+
+  /// Check if the current survey is standalone (accessed directly) or part of a screening flow
+  /// A survey is standalone if:
+  /// 1. The flow only has current_event_details and survey (direct access)
+  /// 2. The flow doesn't contain screening steps (consent, risk_assessment, hiv_test, tb_test)
+  bool get isStandaloneSurvey {
+    // Check for direct access: only current_event_details and survey
+    if (_flowSteps.length == 2 && 
+        _flowSteps[0] == stepCurrentEventDetails &&
+        _flowSteps[1] == stepSurvey) {
+      return true;
+    }
+    
+    // Check if flow contains any screening steps
+    final hasScreeningSteps = _flowSteps.any((step) => screeningSteps.contains(step));
+    
+    // If no screening steps, consider it standalone even if member registration was used
+    return !hasScreeningSteps;
   }
 }
