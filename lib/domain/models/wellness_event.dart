@@ -94,6 +94,7 @@ class WellnessEvent {
   DateTime? get startDateTime => _combineDateWithTime(startTime);
   DateTime? get endDateTime => _combineDateWithTime(endTime);
   DateTime? get setUpDateTime => _combineDateWithTime(setUpTime);
+  DateTime? get strikeDownDateTime => _combineDateWithTime(strikeDownTime);
 
   WellnessEvent copyWith({
     String? id,
