@@ -80,6 +80,8 @@ class TBTestingViewModel extends ChangeNotifier {
     treatedBefore = value;
     if (value != 'Yes') {
       treatedDateController.clear();
+      completedTreatment = null;
+      contactWithTB = null;
     }
     notifyListeners();
   }
@@ -200,9 +202,11 @@ class TBTestingViewModel extends ChangeNotifier {
         // chestPain != null &&
         // swellings != null &&
         treatedBefore != null &&
-        completedTreatment != null &&
-        contactWithTB != null &&
-        (treatedBefore == 'Yes' ? treatedDateController.text.isNotEmpty : true);
+        (treatedBefore == 'Yes' 
+            ? (completedTreatment != null && 
+               contactWithTB != null && 
+               treatedDateController.text.isNotEmpty) 
+            : true);
 
     // Nurse intervention validation
     final requiresInitialAssessment = showInitialAssessment;
@@ -221,16 +225,11 @@ class TBTestingViewModel extends ChangeNotifier {
             (followUpLocation != 'Other' ||
                 followUpOtherController.text.isNotEmpty));
 
-    final nurseInterventionValid = formKey.currentState?.validate() == true &&
-        initialAssessmentValid &&
+    final nurseInterventionValid = initialAssessmentValid &&
         followUpValid &&
+        nursingReferralSelection != null &&
         (nursingReferralSelection != NursingReferralOption.patientNotReferred ||
             notReferredReasonController.text.isNotEmpty) &&
-        nurseFirstNameController.text.isNotEmpty &&
-        nurseLastNameController.text.isNotEmpty &&
-        rankController.text.isNotEmpty &&
-        sancNumberController.text.isNotEmpty &&
-        nurseDateController.text.isNotEmpty &&
         signatureController.isNotEmpty;
 
     return baseTBValid && nurseInterventionValid;
