@@ -152,6 +152,8 @@ class AppDatabase extends _$AppDatabase {
     return (select(users)..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
   }
 
+  Future<List<UserEntity>> getAllUsers() => select(users).get();
+
   Future<UserEntity?> updateUser({
     required String id,
     required String email,
