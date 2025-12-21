@@ -108,23 +108,30 @@ class TBTestingScreen extends StatelessWidget {
                     yesValue: 'Yes',
                     noValue: 'No',
                   ),
-                  KenwellYesNoItem(
-                    question: 'Did you complete the treatment?',
-                    value: viewModel.completedTreatment,
-                    onChanged: viewModel.setCompletedTreatment,
-                    yesValue: 'Yes',
-                    noValue: 'No',
-                  ),
-                  KenwellYesNoItem(
-                    question:
-                        'Were you in contact with someone diagnosed with Tuberculosis in the past year?',
-                    value: viewModel.contactWithTB,
-                    onChanged: viewModel.setContactWithTB,
-                    yesValue: 'Yes',
-                    noValue: 'No',
-                  ),
                 ],
               ),
+              if (viewModel.treatedBefore == 'Yes') ...[
+                const SizedBox(height: 12),
+                KenwellYesNoList<String>(
+                  items: [
+                    KenwellYesNoItem(
+                      question: 'Did you complete the treatment?',
+                      value: viewModel.completedTreatment,
+                      onChanged: viewModel.setCompletedTreatment,
+                      yesValue: 'Yes',
+                      noValue: 'No',
+                    ),
+                    //    KenwellYesNoItem(
+                    //      question:
+                    //          'Were you in contact with someone diagnosed with Tuberculosis in the past year?',
+                    //      value: viewModel.contactWithTB,
+                    //      onChanged: viewModel.setContactWithTB,
+                    //      yesValue: 'Yes',
+                    //      noValue: 'No',
+                    //    ),
+                  ],
+                ),
+              ],
               if (viewModel.treatedBefore == 'Yes')
                 Padding(
                   padding: const EdgeInsets.only(top: 16),

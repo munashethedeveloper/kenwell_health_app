@@ -272,9 +272,10 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
                                           WellnessEventStatus.inProgress
                                       ? 'Resume Event'
                                       : 'Start Event',
-                                  onPressed: isStarting
-                                      ? null
-                                      : () => _startEvent(context, event),
+                                  onPressed:
+                                      isStarting || !_canStartEvent(event)
+                                          ? null
+                                          : () => _startEvent(context, event),
                                   isBusy: isStarting,
                                 ),
                               ),
@@ -328,6 +329,24 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
   DateTime _endOfWeek(DateTime weekStart) {
     final end = weekStart.add(const Duration(days: 6));
     return DateTime(end.year, end.month, end.day, 23, 59, 59, 999);
+  }
+
+  bool _canStartEvent(WellnessEvent event) {
+    // Allow resuming events that are already in progress
+    if (event.status == WellnessEventStatus.inProgress) {
+      return true;
+    }
+
+    // Check if start time has been reached
+    final startTime = event.startDateTime;
+    if (startTime == null) {
+      // If no start time is set, allow starting the event
+      return true;
+    }
+
+    final now = DateTime.now();
+    // Allow starting the event at or after the start time
+    return !now.isBefore(startTime);
   }
 
   Future<void> _startEvent(BuildContext context, WellnessEvent event) async {

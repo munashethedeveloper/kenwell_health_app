@@ -325,10 +325,17 @@ class EventViewModel extends ChangeNotifier {
   List<WellnessEvent> getUpcomingEvents({DateTime? from}) {
     final reference = from ?? DateTime.now();
     final eventsCopy = _events.where((event) {
-      final start = event.startDateTime;
-      if (start == null) return false;
+      // Don't show completed events
       if (event.status == WellnessEventStatus.completed) return false;
-      return !start.isBefore(reference.subtract(const Duration(minutes: 30)));
+
+      // Keep events until strike down time has elapsed
+      final strikeDown = event.strikeDownDateTime;
+      if (strikeDown != null && reference.isAfter(strikeDown)) {
+        return false;
+      }
+
+      // Show all events that haven't passed their strike down time
+      return true;
     }).toList();
     eventsCopy.sort(_compareEventsByStartTime);
     return eventsCopy;
