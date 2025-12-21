@@ -342,15 +342,26 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                                   ),
                                 ),
                                 child: InkWell(
-                                  onTap: () {
-                                    Navigator.pushNamed(
+                                  onTap: () async {
+                                    // Create EventViewModel for event details
+                                    final eventViewModel = EventViewModel();
+                                    await eventViewModel.initializationFuture;
+                                    
+                                    if (!context.mounted) return;
+                                    
+                                    await Navigator.pushNamed(
                                       context,
                                       RouteNames.eventDetails,
                                       arguments: {
                                         'event': groupedEvents[day]![i],
-                                        'calendarViewModel': viewModel,
+                                        'viewModel': eventViewModel,
                                       },
                                     );
+                                    
+                                    // Reload events after returning from details screen
+                                    if (context.mounted) {
+                                      await viewModel.loadEvents();
+                                    }
                                   },
                                   child: Padding(
                                     padding: EdgeInsets.only(

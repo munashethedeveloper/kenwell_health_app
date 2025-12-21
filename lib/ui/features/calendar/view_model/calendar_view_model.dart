@@ -47,8 +47,13 @@ class CalendarViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setSelectedDay(DateTime? day) {
+  void setSelectedDay(DateTime day) {
     _selectedDay = day;
+    notifyListeners();
+  }
+
+  void clearSelectedDay() {
+    _selectedDay = null;
     notifyListeners();
   }
 
@@ -80,7 +85,9 @@ class CalendarViewModel extends ChangeNotifier {
   Future<void> addEvent(WellnessEvent event) async {
     try {
       await _repository.addEvent(event);
-      await loadEvents(); // Reload to ensure consistency
+      // Update local list instead of full reload
+      _events = [..._events, event];
+      notifyListeners();
     } catch (e) {
       _error = 'Failed to add event: $e';
       debugPrint(_error);
@@ -92,7 +99,16 @@ class CalendarViewModel extends ChangeNotifier {
   Future<void> updateEvent(WellnessEvent event) async {
     try {
       await _repository.updateEvent(event);
-      await loadEvents(); // Reload to ensure consistency
+      // Update local list instead of full reload
+      final index = _events.indexWhere((e) => e.id == event.id);
+      if (index != -1) {
+        _events[index] = event;
+        _events = [..._events]; // Create new list to trigger rebuild
+        notifyListeners();
+      } else {
+        // Event not found locally, reload to sync
+        await loadEvents();
+      }
     } catch (e) {
       _error = 'Failed to update event: $e';
       debugPrint(_error);
@@ -105,12 +121,16 @@ class CalendarViewModel extends ChangeNotifier {
     try {
       final event = _events.firstWhere((e) => e.id == eventId);
       await _repository.deleteEvent(eventId);
-      await loadEvents(); // Reload to ensure consistency
+      // Update local list instead of full reload
+      _events = _events.where((e) => e.id != eventId).toList();
+      notifyListeners();
       return event; // Return for undo functionality
     } catch (e) {
       _error = 'Failed to delete event: $e';
       debugPrint(_error);
       notifyListeners();
+      // Reload to ensure consistency if delete failed
+      await loadEvents();
       return null;
     }
   }
