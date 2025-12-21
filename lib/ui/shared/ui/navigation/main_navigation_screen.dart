@@ -32,16 +32,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final eventVM = Provider.of<EventViewModel>(context);
-
     final List<Widget> tabs = [
       const UserManagementScreenVersionTwo(),
       const StatsReportScreen(),
-      CalendarScreen(eventVM: eventVM),
+      const CalendarScreen(),
       const ProfileScreen(),
-
-      //const SettingsScreen(),
-      //const HelpScreen(),
       const ConductEventScreen(),
     ];
 
