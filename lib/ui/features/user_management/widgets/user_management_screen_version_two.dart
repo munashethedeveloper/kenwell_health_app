@@ -395,18 +395,29 @@ class _ViewUsersTabState extends State<ViewUsersTab> {
                         itemCount: users.length,
                         itemBuilder: (context, index) {
                           final user = users[index];
+                          final firstName = user['firstName'] ?? '';
+                          final lastName = user['lastName'] ?? '';
+                          final email = user['email'] ?? '';
+                          final role = user['role'] ?? '';
+                          final phoneNumber = user['phoneNumber'] ?? '';
+                          
+                          // Create initials safely
+                          final firstInitial = firstName.isNotEmpty ? firstName[0].toUpperCase() : '';
+                          final lastInitial = lastName.isNotEmpty ? lastName[0].toUpperCase() : '';
+                          final initials = firstInitial + lastInitial;
+                          
                           return Card(
                             margin: const EdgeInsets.only(bottom: 8),
                             child: ListTile(
                               leading: CircleAvatar(
                                 backgroundColor: const Color(0xFF201C58),
                                 child: Text(
-                                  '${user['firstName']![0]}${user['lastName']![0]}',
+                                  initials.isNotEmpty ? initials : '?',
                                   style: const TextStyle(color: Colors.white),
                                 ),
                               ),
                               title: Text(
-                                '${user['firstName']} ${user['lastName']}',
+                                '$firstName $lastName',
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -414,9 +425,9 @@ class _ViewUsersTabState extends State<ViewUsersTab> {
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(user['email']!),
+                                  Text(email),
                                   Text(
-                                    '${user['role']} • ${user['phoneNumber']}',
+                                    '$role • $phoneNumber',
                                     style: const TextStyle(fontSize: 12),
                                   ),
                                 ],
