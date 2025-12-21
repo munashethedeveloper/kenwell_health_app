@@ -21,7 +21,7 @@ class EventDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String _fullName(String first, String last) => '$first $last';
+    String fullName(String first, String last) => '$first $last';
 
     Widget detailRow(String label, String value) {
       return Padding(
@@ -86,14 +86,14 @@ class EventDetailsScreen extends StatelessWidget {
           _buildSectionCard('Onsite Contact', [
             detailRow(
                 'Contact Person',
-                _fullName(
+                fullName(
                     event.onsiteContactFirstName, event.onsiteContactLastName)),
             detailRow('Contact Number', event.onsiteContactNumber),
             detailRow('Email', event.onsiteContactEmail),
           ]),
           _buildSectionCard('AE Contact', [
             detailRow('Contact Person',
-                _fullName(event.aeContactFirstName, event.aeContactLastName)),
+                fullName(event.aeContactFirstName, event.aeContactLastName)),
             detailRow('Contact Number', event.aeContactNumber),
             detailRow('Email', event.aeContactEmail),
           ]),

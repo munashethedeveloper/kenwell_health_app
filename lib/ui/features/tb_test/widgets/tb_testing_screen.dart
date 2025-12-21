@@ -39,13 +39,13 @@ class TBTestingScreen extends StatelessWidget {
                 yesValue: 'Yes',
                 noValue: 'No',
               ),
-              KenwellYesNoItem(
-                question: 'Is your sputum coloured when coughing?',
-                value: viewModel.sputumColour,
-                onChanged: viewModel.setSputumColour,
-                yesValue: 'Yes',
-                noValue: 'No',
-              ),
+              //   KenwellYesNoItem(
+              //       question: 'Is your sputum coloured when coughing?',
+              //      value: viewModel.sputumColour,
+              //      onChanged: viewModel.setSputumColour,
+              //      yesValue: 'Yes',
+              //     noValue: 'No',
+              //    ),
               KenwellYesNoItem(
                 question: 'Is there blood in your sputum when you cough?',
                 value: viewModel.bloodInSputum,
@@ -67,14 +67,14 @@ class TBTestingScreen extends StatelessWidget {
                 yesValue: 'Yes',
                 noValue: 'No',
               ),
-              KenwellYesNoItem(
-                question:
-                    'Have you had recurrent fever/chills lasting more than three days?',
-                value: viewModel.feverChills,
-                onChanged: viewModel.setFeverChills,
-                yesValue: 'Yes',
-                noValue: 'No',
-              ),
+              // KenwellYesNoItem(
+              //    question:
+              //        'Have you had recurrent fever/chills lasting more than three days?',
+              //     value: viewModel.feverChills,
+              //     onChanged: viewModel.setFeverChills,
+              //     yesValue: 'Yes',
+              //    noValue: 'No',
+              //   ),
               //     KenwellYesNoItem(
               //      question:
               //            'Have you experienced chest pains or difficulty breathing?',

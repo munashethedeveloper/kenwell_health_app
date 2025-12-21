@@ -13,11 +13,11 @@ class TBTestingViewModel extends ChangeNotifier {
 
   // --- TB screening questions ---
   String? coughTwoWeeks;
-  String? sputumColour;
+  //String? sputumColour;
   String? bloodInSputum;
   String? weightLoss;
   String? nightSweats;
-  String? feverChills;
+  //String? feverChills;
   // String? chestPain;
   // String? swellings;
 
@@ -27,11 +27,11 @@ class TBTestingViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setSputumColour(String? value) {
-    if (sputumColour == value) return;
-    sputumColour = value;
-    notifyListeners();
-  }
+  //void setSputumColour(String? value) {
+  //  if (sputumColour == value) return;
+  //  sputumColour = value;
+  //  notifyListeners();
+  // }
 
   void setBloodInSputum(String? value) {
     if (bloodInSputum == value) return;
@@ -51,11 +51,11 @@ class TBTestingViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setFeverChills(String? value) {
-    if (feverChills == value) return;
-    feverChills = value;
-    notifyListeners();
-  }
+  //void setFeverChills(String? value) {
+  // if (feverChills == value) return;
+  //  feverChills = value;
+  //  notifyListeners();
+  //}
 
   //void setChestPain(String? value) {
   // if (chestPain == value) return;
@@ -192,11 +192,11 @@ class TBTestingViewModel extends ChangeNotifier {
   bool get isFormValid {
     // Validate both TB test fields and nurse intervention fields
     final baseTBValid = coughTwoWeeks != null &&
-        sputumColour != null &&
+        //sputumColour != null &&
         bloodInSputum != null &&
         weightLoss != null &&
         nightSweats != null &&
-        feverChills != null &&
+        // feverChills != null &&
         // chestPain != null &&
         // swellings != null &&
         treatedBefore != null &&
@@ -244,11 +244,11 @@ class TBTestingViewModel extends ChangeNotifier {
     // Combine TB test data with nurse intervention data
     return {
       'coughTwoWeeks': coughTwoWeeks,
-      'sputumColour': sputumColour,
+      //  'sputumColour': sputumColour,
       'bloodInSputum': bloodInSputum,
       'weightLoss': weightLoss,
       'nightSweats': nightSweats,
-      'feverChills': feverChills,
+      // 'feverChills': feverChills,
       // 'chestPain': chestPain,
       // 'swellings': swellings,
       'treatedBefore': treatedBefore,

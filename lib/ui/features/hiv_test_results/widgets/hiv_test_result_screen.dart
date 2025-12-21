@@ -292,6 +292,7 @@ class HIVTestResultScreen extends StatelessWidget {
           KenwellTextField(
             label: 'Nurse First Name',
             hintText: 'Auto-filled from profile',
+            enabled: false,
             controller: viewModel.nurseFirstNameController,
             decoration: KenwellFormStyles.decoration(
               label: 'Nurse First Name',
@@ -307,6 +308,7 @@ class HIVTestResultScreen extends StatelessWidget {
           KenwellTextField(
             label: 'Nurse Last Name',
             hintText: 'Auto-filled from profile',
+            enabled: false,
             controller: viewModel.nurseLastNameController,
             decoration: KenwellFormStyles.decoration(
               label: 'Nurse Last Name',
@@ -346,6 +348,7 @@ class HIVTestResultScreen extends StatelessWidget {
             label: 'Date',
             controller: viewModel.nurseDateController,
             readOnly: true,
+            enabled: false,
             validator: (val) =>
                 (val == null || val.isEmpty) ? 'Please select Date' : null,
           ),

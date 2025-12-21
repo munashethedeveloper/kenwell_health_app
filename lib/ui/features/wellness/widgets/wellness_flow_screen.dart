@@ -5,6 +5,8 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/features/member/widgets/member_details_screen.dart';
+import 'package:kenwell_health_app/ui/features/wellness/widgets/current_event_details_screen.dart';
+import 'package:kenwell_health_app/ui/features/wellness/widgets/member_registration_screen.dart';
 import 'package:provider/provider.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../hiv_test_results/widgets/hiv_test_result_screen.dart';
@@ -54,7 +56,23 @@ class WellnessFlowScreen extends StatelessWidget {
     final stepName = flowVM.currentStepName;
 
     switch (stepName) {
-      case 'consent':
+      case WellnessFlowViewModel.stepCurrentEventDetails:
+        return event != null
+            ? CurrentEventDetailsScreen(
+                event: event!,
+                onSectionTap: (section) {
+                  flowVM.navigateToSection(section);
+                },
+              )
+            : const SizedBox();
+
+      case WellnessFlowViewModel.stepMemberRegistration:
+        return MemberRegistrationScreen(
+          onGoToMemberDetails: flowVM.navigateToPersonalDetails,
+          onPrevious: flowVM.previousStep,
+        );
+
+      case WellnessFlowViewModel.stepConsent:
         return ChangeNotifierProvider.value(
           value: flowVM.consentVM,
           child: event != null
@@ -66,21 +84,21 @@ class WellnessFlowScreen extends StatelessWidget {
                     flowVM.nextStep();
                   },
                   onCancel: () {
-                    flowVM.cancelFlow();
-                    onExitFlow();
+                    // Go back to current event details instead of exiting
+                    flowVM.resetFlow();
                   },
                 )
               : const SizedBox(),
         );
 
-      case 'personal_details':
+      case WellnessFlowViewModel.stepPersonalDetails:
         return MemberDetailsScreen(
           onNext: flowVM.nextStep,
           onPrevious: flowVM.previousStep,
           viewModel: flowVM.memberDetailsVM,
         );
 
-      case 'risk_assessment':
+      case WellnessFlowViewModel.stepRiskAssessment:
         return PersonalRiskAssessmentScreen(
           onNext: flowVM.nextStep,
           onPrevious: flowVM.previousStep,
@@ -112,7 +130,7 @@ class WellnessFlowScreen extends StatelessWidget {
           ),
         ); */
 
-      case 'hiv_test':
+      case WellnessFlowViewModel.stepHivTest:
         return ChangeNotifierProvider.value(
           value: flowVM.hivTestVM,
           child: HIVTestScreen(
@@ -121,7 +139,7 @@ class WellnessFlowScreen extends StatelessWidget {
           ),
         );
 
-      case 'hiv_results':
+      case WellnessFlowViewModel.stepHivResults:
         if (event != null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             flowVM.hivResultsVM.initialiseWithEvent(event!);
@@ -135,7 +153,7 @@ class WellnessFlowScreen extends StatelessWidget {
           ),
         );
 
-      case 'tb_test':
+      case WellnessFlowViewModel.stepTbTest:
         if (event != null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             flowVM.tbTestVM.initialiseWithEvent(event!);
@@ -149,8 +167,7 @@ class WellnessFlowScreen extends StatelessWidget {
           ),
         );
 
-      case 'survey':
-        // SURVEY STEP: submitAll -> increment screened -> POP flow (do NOT call onFlowCompleted)
+      case WellnessFlowViewModel.stepSurvey:
         return ChangeNotifierProvider.value(
           value: flowVM.surveyVM,
           child: SurveyScreen(
@@ -215,18 +232,24 @@ class WellnessFlowScreen extends StatelessWidget {
                     'WellnessFlow: activeEvent is null; skipping incrementScreened');
               }
 
-              // 3) Pop the progress dialog (if still open) and then pop the flow page
+              // 3) Handle navigation based on whether this is standalone or part of a flow
               if (context.mounted) {
                 // Close progress dialog
                 Navigator.of(context).pop();
-                // Pop the WellnessFlowPage to return to ConductEventScreen
-                if (Navigator.of(context).canPop()) {
-                  Navigator.of(context).pop();
+
+                if (flowVM.isStandaloneSurvey) {
+                  // For standalone survey, return to CurrentEventDetailsScreen
+                  flowVM.resetFlow();
+                } else {
+                  // For survey at end of screening flow, pop the entire WellnessFlowPage
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  }
                 }
               }
 
               debugPrint(
-                  'WellnessFlow: survey onSubmit finished (page popped)');
+                  'WellnessFlow: survey onSubmit finished (isStandalone: ${flowVM.isStandaloneSurvey})');
             },
           ),
         );
