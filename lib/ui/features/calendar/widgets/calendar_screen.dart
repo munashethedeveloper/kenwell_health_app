@@ -345,7 +345,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                                   onTap: () async {
                                     // Create EventViewModel for event details
                                     final eventViewModel = EventViewModel();
-                                    await eventViewModel.initializationFuture;
+                                    await eventViewModel.initialized;
                                     
                                     if (!context.mounted) return;
                                     
@@ -580,7 +580,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
       {WellnessEvent? existingEvent}) async {
     // Create EventViewModel for the form
     final eventViewModel = EventViewModel();
-    await eventViewModel.initializationFuture;
+    await eventViewModel.initialized;
 
     if (!context.mounted) return;
 
