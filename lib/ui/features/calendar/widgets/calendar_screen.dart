@@ -114,26 +114,42 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
             ),
             body: viewModel.isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : viewModel.error != null
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                : Column(
+                    children: [
+                      // Show error banner if there's an error, but still show calendar
+                      if (viewModel.error != null)
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          color: Colors.orange.shade100,
+                          child: Row(
+                            children: [
+                              Icon(Icons.warning, color: Colors.orange.shade900),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  viewModel.error!,
+                                  style: TextStyle(color: Colors.orange.shade900),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () => viewModel.loadEvents(),
+                                child: const Text('Retry'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      // Always show the calendar and events list
+                      Expanded(
+                        child: TabBarView(
                           children: [
-                            Text(viewModel.error!),
-                            const SizedBox(height: 16),
-                            ElevatedButton(
-                              onPressed: () => viewModel.loadEvents(),
-                              child: const Text('Retry'),
-                            ),
+                            _buildCalendarTab(viewModel),
+                            _buildEventsListTab(viewModel),
                           ],
                         ),
-                      )
-                    : TabBarView(
-                        children: [
-                          _buildCalendarTab(viewModel),
-                          _buildEventsListTab(viewModel),
-                        ],
                       ),
+                    ],
+                  ),
             floatingActionButton: FloatingActionButton.extended(
               backgroundColor: const Color(0xFF90C048),
               icon: const Icon(Icons.add, color: Colors.white),

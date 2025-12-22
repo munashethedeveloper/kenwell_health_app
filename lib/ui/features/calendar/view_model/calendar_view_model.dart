@@ -32,9 +32,11 @@ class CalendarViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _events = await _repository.fetchAllEvents();
+      final fetchedEvents = await _repository.fetchAllEvents();
+      _events = fetchedEvents ?? [];
     } catch (e) {
       _error = 'Failed to load events: $e';
+      _events = []; // Ensure events list is always initialized
       debugPrint(_error);
     } finally {
       _isLoading = false;
@@ -119,7 +121,11 @@ class CalendarViewModel extends ChangeNotifier {
 
   Future<WellnessEvent?> deleteEvent(String eventId) async {
     try {
-      final event = _events.firstWhere((e) => e.id == eventId);
+      // Use firstWhere with orElse to avoid StateError
+      final event = _events.firstWhere(
+        (e) => e.id == eventId,
+        orElse: () => throw Exception('Event not found'),
+      );
       await _repository.deleteEvent(eventId);
       // Update local list instead of full reload
       _events = _events.where((e) => e.id != eventId).toList();
