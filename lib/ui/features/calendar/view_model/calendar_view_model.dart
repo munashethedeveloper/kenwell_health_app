@@ -89,6 +89,7 @@ class CalendarViewModel extends ChangeNotifier {
       await _repository.addEvent(event);
       // Update local list instead of full reload
       _events = [..._events, event];
+      _error = null; // Clear any previous errors on success
       notifyListeners();
     } catch (e) {
       _error = 'Failed to add event: $e';
@@ -106,6 +107,7 @@ class CalendarViewModel extends ChangeNotifier {
       if (index != -1) {
         _events[index] = event;
         _events = [..._events]; // Create new list to trigger rebuild
+        _error = null; // Clear any previous errors on success
         notifyListeners();
       } else {
         // Event not found locally, reload to sync
@@ -232,5 +234,10 @@ class CalendarViewModel extends ChangeNotifier {
     if (location.isNotEmpty) parts.add(location);
 
     return parts.isEmpty ? 'Tap to edit' : parts.join(' · ');
+  }
+
+  void clearError() {
+    _error = null;
+    notifyListeners();
   }
 }

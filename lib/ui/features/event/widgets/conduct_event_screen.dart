@@ -24,6 +24,15 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
   String? _startingEventId;
   int _selectedWeek = 0; // 0 = this week, 1 = next week
 
+  @override
+  void initState() {
+    super.initState();
+    // Reload events when screen is displayed to ensure latest data
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<EventViewModel>().reloadEvents();
+    });
+  }
+
   // LOGOUT METHOD using AuthViewModel
   Future<void> _logout() async {
     final authVM = context.read<AuthViewModel>();

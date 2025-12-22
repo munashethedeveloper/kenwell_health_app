@@ -136,6 +136,12 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                                 onPressed: () => viewModel.loadEvents(),
                                 child: const Text('Retry'),
                               ),
+                              IconButton(
+                                icon: const Icon(Icons.close),
+                                onPressed: () => viewModel.clearError(),
+                                color: Colors.orange.shade900,
+                                tooltip: 'Dismiss',
+                              ),
                             ],
                           ),
                         ),

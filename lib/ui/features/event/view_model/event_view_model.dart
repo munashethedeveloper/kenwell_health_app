@@ -465,6 +465,11 @@ class EventViewModel extends ChangeNotifier {
     }
   }
 
+  /// Reload events from repository (useful when returning to screens)
+  Future<void> reloadEvents() async {
+    await _loadPersistedEvents();
+  }
+
   int _compareEventsByStartTime(WellnessEvent a, WellnessEvent b) {
     final aStart = a.startDateTime ?? a.date;
     final bStart = b.startDateTime ?? b.date;
