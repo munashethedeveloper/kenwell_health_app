@@ -48,6 +48,8 @@ class MemberRepository {
     return _entityToModel(entity);
   }
 
+  /// Updates an existing member or creates it if it doesn't exist (upsert behavior).
+  /// If you need strict update-only behavior, check if the member exists first.
   Future<void> updateMember(Member member) async {
     final companion = MembersCompanion(
       id: Value(member.id),

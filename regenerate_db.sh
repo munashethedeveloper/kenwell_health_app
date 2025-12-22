@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # This script regenerates the Drift database code after schema changes
 # Run this script after modifying the app_database.dart file

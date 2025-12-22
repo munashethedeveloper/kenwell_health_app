@@ -71,7 +71,9 @@ class _MemberRegistrationScreenState extends State<MemberRegistrationScreen> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error searching: $e')),
+          const SnackBar(
+            content: Text('Unable to search for member. Please try again.'),
+          ),
         );
       }
     }
