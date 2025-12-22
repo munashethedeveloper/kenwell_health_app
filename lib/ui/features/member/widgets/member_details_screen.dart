@@ -11,6 +11,7 @@ import '../../../shared/ui/form/kenwell_date_field.dart';
 import '../../../shared/ui/form/kenwell_form_styles.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/member_details_view_model.dart';
+import '../../wellness/view_model/wellness_flow_view_model.dart';
 
 class MemberDetailsScreen extends StatelessWidget {
   final MemberDetailsViewModel viewModel;
@@ -323,8 +324,24 @@ class MemberDetailsScreen extends StatelessWidget {
       onPrevious: onPrevious,
       onNext: () async {
         if (vm.isFormValid) {
-          await vm.saveLocally();
-          onNext();
+          try {
+            await vm.saveLocally();
+            
+            // Update the flow view model with the saved member
+            final flowVM = context.read<WellnessFlowViewModel>();
+            if (vm.savedMember != null) {
+              flowVM.setCurrentMember(vm.savedMember!);
+              flowVM.navigateToEventDetails();
+            } else {
+              onNext();
+            }
+          } catch (e) {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Error saving member: $e')),
+              );
+            }
+          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(

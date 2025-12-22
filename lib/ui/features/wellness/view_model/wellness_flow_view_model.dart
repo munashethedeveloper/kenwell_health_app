@@ -11,12 +11,13 @@ import '../../hiv_test/view_model/hiv_test_view_model.dart';
 import '../../survey/view_model/survey_view_model.dart';
 import '../../tb_test/view_model/tb_testing_view_model.dart';
 import '../../../../domain/models/wellness_event.dart';
+import '../../../../domain/models/member.dart';
 
 class WellnessFlowViewModel extends ChangeNotifier {
   // Step name constants
+  static const String stepMemberRegistration = 'member_registration';
   static const String stepCurrentEventDetails = 'current_event_details';
   static const String stepConsent = 'consent';
-  static const String stepMemberRegistration = 'member_registration';
   static const String stepPersonalDetails = 'personal_details';
   static const String stepRiskAssessment = 'risk_assessment';
   static const String stepHivTest = 'hiv_test';
@@ -40,8 +41,8 @@ class WellnessFlowViewModel extends ChangeNotifier {
   ];
 
   WellnessFlowViewModel({this.activeEvent}) {
-    // Initialize with current event details as the first step
-    _flowSteps = [stepCurrentEventDetails];
+    // Initialize with member registration as the first step
+    _flowSteps = [stepMemberRegistration];
   }
 
   // ViewModels for each step
@@ -56,18 +57,25 @@ class WellnessFlowViewModel extends ChangeNotifier {
   final surveyVM = SurveyViewModel();
 
   WellnessEvent? activeEvent;
+  Member? currentMember;
+
+  // Track completion status for different sections
+  bool consentCompleted = false;
+  bool memberRegistrationCompleted = false;
+  bool screeningsCompleted = false;
+  bool surveyCompleted = false;
 
   int _currentStep = 0;
   int get currentStep => _currentStep;
 
   // Dynamic flow based on selected checkboxes
-  List<String> _flowSteps = [stepCurrentEventDetails];
+  List<String> _flowSteps = [stepMemberRegistration];
   List<String> get flowSteps => _flowSteps;
 
   // Initialize flow based on consent selections
   void initializeFlow(List<String> selectedScreenings) {
-    // Preserve current_event_details and consent as the first steps
-    _flowSteps = [stepCurrentEventDetails, stepConsent];
+    // Preserve member registration and consent as the first steps
+    _flowSteps = [stepMemberRegistration, stepConsent];
 
     // Add the personal details screen as the first screen if any screening is selected
     if (selectedScreenings.isNotEmpty) {
@@ -136,7 +144,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
 
   void cancelFlow() {
     _currentStep = 0;
-    _flowSteps = [stepCurrentEventDetails]; // Reset flow to initial state
+    _flowSteps = [stepMemberRegistration]; // Reset flow to initial state
     notifyListeners();
   }
 
@@ -191,10 +199,29 @@ class WellnessFlowViewModel extends ChangeNotifier {
     }
   }
 
-  /// Reset the flow to current event details screen (for reuse)
+  /// Reset the flow to member registration screen (for reuse)
   void resetFlow() {
     _currentStep = 0;
-    _flowSteps = [stepCurrentEventDetails]; // Reset flow to initial state
+    _flowSteps = [stepMemberRegistration]; // Reset flow to initial state
+    currentMember = null;
+    consentCompleted = false;
+    memberRegistrationCompleted = false;
+    screeningsCompleted = false;
+    surveyCompleted = false;
+    notifyListeners();
+  }
+
+  /// Set the current member
+  void setCurrentMember(Member member) {
+    currentMember = member;
+    memberRegistrationCompleted = true;
+    notifyListeners();
+  }
+
+  /// Navigate to current event details screen after member registration
+  void navigateToEventDetails() {
+    _flowSteps = [stepMemberRegistration, stepCurrentEventDetails];
+    _currentStep = 1;
     notifyListeners();
   }
 
@@ -202,21 +229,21 @@ class WellnessFlowViewModel extends ChangeNotifier {
   void navigateToSection(String section) {
     switch (section) {
       case sectionConsent:
-        _flowSteps = [stepCurrentEventDetails, stepConsent];
-        _currentStep = 1;
+        _flowSteps = [stepMemberRegistration, stepCurrentEventDetails, stepConsent];
+        _currentStep = 2;
         break;
       case sectionMemberRegistration:
-        _flowSteps = [stepCurrentEventDetails, stepMemberRegistration];
-        _currentStep = 1;
+        _flowSteps = [stepMemberRegistration];
+        _currentStep = 0;
         break;
       case sectionHealthScreenings:
         // For health screenings, we show consent first to select which screenings
-        _flowSteps = [stepCurrentEventDetails, stepConsent];
-        _currentStep = 1;
+        _flowSteps = [stepMemberRegistration, stepCurrentEventDetails, stepConsent];
+        _currentStep = 2;
         break;
       case sectionSurvey:
-        _flowSteps = [stepCurrentEventDetails, stepSurvey];
-        _currentStep = 1;
+        _flowSteps = [stepMemberRegistration, stepCurrentEventDetails, stepSurvey];
+        _currentStep = 2;
         break;
     }
     notifyListeners();
@@ -226,23 +253,23 @@ class WellnessFlowViewModel extends ChangeNotifier {
   /// This allows users to create a new member or proceed after selecting a member from search
   void navigateToPersonalDetails() {
     _flowSteps = [
-      stepCurrentEventDetails,
       stepMemberRegistration,
       stepPersonalDetails
     ];
-    _currentStep = 2;
+    _currentStep = 1;
     notifyListeners();
   }
 
   /// Check if the current survey is standalone (accessed directly) or part of a screening flow
   /// A survey is standalone if:
-  /// 1. The flow only has current_event_details and survey (direct access)
+  /// 1. The flow only has member_registration, current_event_details and survey (direct access)
   /// 2. The flow doesn't contain screening steps (consent, risk_assessment, hiv_test, tb_test)
   bool get isStandaloneSurvey {
-    // Check for direct access: only current_event_details and survey
-    if (_flowSteps.length == 2 &&
-        _flowSteps[0] == stepCurrentEventDetails &&
-        _flowSteps[1] == stepSurvey) {
+    // Check for direct access: only member_registration, current_event_details and survey
+    if (_flowSteps.length == 3 &&
+        _flowSteps[0] == stepMemberRegistration &&
+        _flowSteps[1] == stepCurrentEventDetails &&
+        _flowSteps[2] == stepSurvey) {
       return true;
     }
 
