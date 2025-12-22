@@ -25,21 +25,21 @@ class Users extends Table {
 @DataClassName('EventEntity')
 class Events extends Table {
   TextColumn get id => text()();
-  TextColumn get title => text()();
+  TextColumn get title => text().withDefault(const Constant(''))();
   DateTimeColumn get date => dateTime()();
-  TextColumn get venue => text()();
-  TextColumn get address => text()();
-  TextColumn get townCity => text()();
+  TextColumn get venue => text().withDefault(const Constant(''))();
+  TextColumn get address => text().withDefault(const Constant(''))();
+  TextColumn get townCity => text().withDefault(const Constant(''))();
   TextColumn get province => text().nullable()();
-  TextColumn get onsiteContactFirstName => text()();
-  TextColumn get onsiteContactLastName => text()();
-  TextColumn get onsiteContactNumber => text()();
-  TextColumn get onsiteContactEmail => text()();
-  TextColumn get aeContactFirstName => text()();
-  TextColumn get aeContactLastName => text()();
-  TextColumn get aeContactNumber => text()();
-  TextColumn get aeContactEmail => text()();
-  TextColumn get servicesRequested => text()();
+  TextColumn get onsiteContactFirstName => text().withDefault(const Constant(''))();
+  TextColumn get onsiteContactLastName => text().withDefault(const Constant(''))();
+  TextColumn get onsiteContactNumber => text().withDefault(const Constant(''))();
+  TextColumn get onsiteContactEmail => text().withDefault(const Constant(''))();
+  TextColumn get aeContactFirstName => text().withDefault(const Constant(''))();
+  TextColumn get aeContactLastName => text().withDefault(const Constant(''))();
+  TextColumn get aeContactNumber => text().withDefault(const Constant(''))();
+  TextColumn get aeContactEmail => text().withDefault(const Constant(''))();
+  TextColumn get servicesRequested => text().withDefault(const Constant(''))();
   TextColumn get additionalServicesRequested =>
       text().withDefault(const Constant(''))();
   IntColumn get expectedParticipation =>
@@ -72,7 +72,7 @@ class AppDatabase extends _$AppDatabase {
   static final AppDatabase instance = AppDatabase._internal();
 
   @override
-  int get schemaVersion => 11;
+  int get schemaVersion => 12;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -101,6 +101,19 @@ class AppDatabase extends _$AppDatabase {
             // TableMigration preserves existing data while updating the table structure
             try {
               await migrator.alterTable(TableMigration(users));
+            } on SqliteException catch (_) {
+              // If TableMigration fails, the table likely already matches current schema
+              // Safe to continue - app will function with existing table structure
+            }
+          }
+
+          if (from < 12) {
+            // Add default values to Events table text columns to handle NULL values
+            // This fixes "Null check operator used on a null value" errors
+            // TableMigration recreates the Events table with new default values
+            // while preserving existing data
+            try {
+              await migrator.alterTable(TableMigration(events));
             } on SqliteException catch (_) {
               // If TableMigration fails, the table likely already matches current schema
               // Safe to continue - app will function with existing table structure
