@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import '../../domain/models/member.dart';
 import '../local/app_database.dart';
 
