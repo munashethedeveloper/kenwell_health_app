@@ -60,7 +60,7 @@ class UserManagementViewModel extends ChangeNotifier {
         _errorMessage = 'Registration failed. Email may already exist.';
       }
     } catch (e) {
-      _errorMessage = 'Registration error: $e';
+      _errorMessage = 'Registration failed. Please try again.';
       debugPrint('Registration error: $e');
     } finally {
       _isLoading = false;

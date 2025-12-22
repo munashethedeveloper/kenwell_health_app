@@ -32,7 +32,7 @@ class LoginViewModel extends ChangeNotifier {
         _errorMessage = 'Invalid email or password';
       }
     } catch (e) {
-      _errorMessage = 'Login error: $e';
+      _errorMessage = 'Login failed. Please try again.';
       debugPrint('Login error: $e');
     } finally {
       _isLoading = false;
