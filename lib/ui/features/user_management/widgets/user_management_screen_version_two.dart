@@ -23,6 +23,8 @@ class UserManagementScreenVersionTwo extends StatefulWidget {
 
 class _UserManagementScreenVersionTwoState
     extends State<UserManagementScreenVersionTwo> {
+  final GlobalKey<_ViewUsersTabState> _viewUsersKey = GlobalKey();
+
   Future<void> _logout() async {
     await AuthService().logout();
 
@@ -103,10 +105,14 @@ class _UserManagementScreenVersionTwoState
             ),
           ],
         ),
-        body: const TabBarView(
+        body: TabBarView(
           children: [
-            CreateUserTab(),
-            ViewUsersTab(),
+            CreateUserTab(
+              onUserCreated: () {
+                _viewUsersKey.currentState?.refreshUsers();
+              },
+            ),
+            ViewUsersTab(key: _viewUsersKey),
           ],
         ),
       ),
@@ -116,7 +122,9 @@ class _UserManagementScreenVersionTwoState
 
 // ---------------- Create User Tab ----------------
 class CreateUserTab extends StatefulWidget {
-  const CreateUserTab({super.key});
+  final VoidCallback? onUserCreated;
+
+  const CreateUserTab({super.key, this.onUserCreated});
 
   @override
   State<CreateUserTab> createState() => _CreateUserTabState();
@@ -173,6 +181,16 @@ class _CreateUserTabState extends State<CreateUserTab> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Registration successful!')),
         );
+        // Clear the form
+        _emailController.clear();
+        _passwordController.clear();
+        _confirmPasswordController.clear();
+        _phoneController.clear();
+        _firstNameController.clear();
+        _lastNameController.clear();
+        setState(() => _selectedRole = null);
+        // Notify parent to refresh user list
+        widget.onUserCreated?.call();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Registration failed')),
@@ -304,13 +322,54 @@ class _CreateUserTabState extends State<CreateUserTab> {
 }
 
 // ---------------- View Users Tab ----------------
-class ViewUsersTab extends StatelessWidget {
+class ViewUsersTab extends StatefulWidget {
   const ViewUsersTab({super.key});
 
-  final List<Map<String, String>> users = const [
-    {'email': 'user1@example.com'},
-    {'email': 'user2@example.com'},
-  ];
+  @override
+  State<ViewUsersTab> createState() => _ViewUsersTabState();
+}
+
+class _ViewUsersTabState extends State<ViewUsersTab> {
+  final AuthService _authService = AuthService();
+  List<Map<String, String>> users = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUsers();
+  }
+
+  Future<void> _loadUsers() async {
+    setState(() => _isLoading = true);
+    try {
+      final fetchedUsers = await _authService.getAllUsers();
+      setState(() {
+        users = fetchedUsers
+            .map((user) => {
+                  'id': user.id,
+                  'email': user.email,
+                  'firstName': user.firstName,
+                  'lastName': user.lastName,
+                  'role': user.role,
+                  'phoneNumber': user.phoneNumber,
+                })
+            .toList();
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading users: $e')),
+        );
+      }
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  void refreshUsers() {
+    _loadUsers();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -320,25 +379,69 @@ class ViewUsersTab extends StatelessWidget {
         const AppLogo(size: 200),
         const SizedBox(height: 16),
         Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: users.length,
-            itemBuilder: (context, index) {
-              final user = users[index];
-              return Card(
-                child: ListTile(
-                  title: Text(user['email']!),
-                  trailing: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.refresh),
-                      Icon(Icons.delete),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : users.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'No users registered yet',
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                    )
+                  : RefreshIndicator(
+                      onRefresh: _loadUsers,
+                      child: ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: users.length,
+                        itemBuilder: (context, index) {
+                          final user = users[index];
+                          final firstName = user['firstName'] ?? '';
+                          final lastName = user['lastName'] ?? '';
+                          final email = user['email'] ?? '';
+                          final role = user['role'] ?? '';
+                          final phoneNumber = user['phoneNumber'] ?? '';
+
+                          // Create initials safely
+                          final firstInitial = firstName.isNotEmpty
+                              ? firstName[0].toUpperCase()
+                              : '';
+                          final lastInitial = lastName.isNotEmpty
+                              ? lastName[0].toUpperCase()
+                              : '';
+                          final initials = firstInitial + lastInitial;
+
+                          return Card(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            child: ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor: const Color(0xFF201C58),
+                                child: Text(
+                                  initials.isNotEmpty ? initials : '?',
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              ),
+                              title: Text(
+                                '$firstName $lastName',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(email),
+                                  Text(
+                                    '$role • $phoneNumber',
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
+                                ],
+                              ),
+                              isThreeLine: true,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
         ),
       ],
     );

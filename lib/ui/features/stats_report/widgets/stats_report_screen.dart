@@ -4,7 +4,7 @@ import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 
-import '../../../../data/services/auth_service.dart';
+import '../../auth/view_models/auth_view_model.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/buttons/custom_primary_button.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
@@ -24,7 +24,8 @@ class StatsReportScreen extends StatefulWidget {
 
 class _StatsReportScreenState extends State<StatsReportScreen> {
   Future<void> _logout() async {
-    await AuthService().logout();
+    final authVM = context.read<AuthViewModel>();
+    await authVM.logout();
 
     if (!mounted) return;
 

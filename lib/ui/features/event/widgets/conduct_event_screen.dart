@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:kenwell_health_app/data/services/auth_service.dart';
 import 'package:kenwell_health_app/routing/route_names.dart';
+import 'package:kenwell_health_app/ui/features/auth/view_models/auth_view_model.dart';
 import 'package:kenwell_health_app/ui/features/auth/widgets/login_screen.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
@@ -24,9 +24,20 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
   String? _startingEventId;
   int _selectedWeek = 0; // 0 = this week, 1 = next week
 
-  // LOGOUT METHOD
+  @override
+  void initState() {
+    super.initState();
+    // Reload events when screen is displayed to ensure latest data
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<EventViewModel>().reloadEvents();
+    });
+  }
+
+  // LOGOUT METHOD using AuthViewModel
   Future<void> _logout() async {
-    await AuthService().logout();
+    final authVM = context.read<AuthViewModel>();
+    await authVM.logout();
+    if (!mounted) return;
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const LoginScreen()),
       (route) => false,
@@ -37,6 +48,9 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
   Widget build(BuildContext context) {
     final eventVM = context.watch<EventViewModel>();
     final allUpcoming = eventVM.getUpcomingEvents();
+
+    debugPrint(
+        'ConductEventScreen: Total upcoming events = ${allUpcoming.length}');
 
     // Compute week ranges
     final now = DateTime.now();
@@ -51,6 +65,9 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
       final ev = e.date.toLocal();
       return !(ev.isBefore(selectedStart) || ev.isAfter(selectedEnd));
     }).toList();
+
+    debugPrint(
+        'ConductEventScreen: Events in selected week = ${weeklyEvents.length}');
 
     return Scaffold(
       appBar: KenwellAppBar(
@@ -181,21 +198,36 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
 
             // If no events for selected week, show friendly empty state
             if (weeklyEvents.isEmpty)
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.event_available,
-                          size: 64, color: Color(0xFF90C048)),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No events scheduled for the week of ${DateFormat.yMMMMd().format(selectedStart)} - ${DateFormat.yMMMMd().format(selectedEnd)}.\nCreate an event or switch weeks to see other events.',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ],
+              Expanded(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.event_available,
+                            size: 64, color: Color(0xFF90C048)),
+                        const SizedBox(height: 16),
+                        Text(
+                          allUpcoming.isEmpty
+                              ? 'No upcoming events.\nCreate an event to get started!'
+                              : 'No events scheduled for the week of ${DateFormat.yMMMMd().format(selectedStart)} - ${DateFormat.yMMMMd().format(selectedEnd)}.\nSwitch weeks to see other events.',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        if (allUpcoming.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 16),
+                            child: Text(
+                              '${allUpcoming.length} event(s) total',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               )

@@ -25,21 +25,24 @@ class Users extends Table {
 @DataClassName('EventEntity')
 class Events extends Table {
   TextColumn get id => text()();
-  TextColumn get title => text()();
+  TextColumn get title => text().withDefault(const Constant(''))();
   DateTimeColumn get date => dateTime()();
-  TextColumn get venue => text()();
-  TextColumn get address => text()();
-  TextColumn get townCity => text()();
+  TextColumn get venue => text().withDefault(const Constant(''))();
+  TextColumn get address => text().withDefault(const Constant(''))();
+  TextColumn get townCity => text().withDefault(const Constant(''))();
   TextColumn get province => text().nullable()();
-  TextColumn get onsiteContactFirstName => text()();
-  TextColumn get onsiteContactLastName => text()();
-  TextColumn get onsiteContactNumber => text()();
-  TextColumn get onsiteContactEmail => text()();
-  TextColumn get aeContactFirstName => text()();
-  TextColumn get aeContactLastName => text()();
-  TextColumn get aeContactNumber => text()();
-  TextColumn get aeContactEmail => text()();
-  TextColumn get servicesRequested => text()();
+  TextColumn get onsiteContactFirstName =>
+      text().withDefault(const Constant(''))();
+  TextColumn get onsiteContactLastName =>
+      text().withDefault(const Constant(''))();
+  TextColumn get onsiteContactNumber =>
+      text().withDefault(const Constant(''))();
+  TextColumn get onsiteContactEmail => text().withDefault(const Constant(''))();
+  TextColumn get aeContactFirstName => text().withDefault(const Constant(''))();
+  TextColumn get aeContactLastName => text().withDefault(const Constant(''))();
+  TextColumn get aeContactNumber => text().withDefault(const Constant(''))();
+  TextColumn get aeContactEmail => text().withDefault(const Constant(''))();
+  TextColumn get servicesRequested => text().withDefault(const Constant(''))();
   TextColumn get additionalServicesRequested =>
       text().withDefault(const Constant(''))();
   IntColumn get expectedParticipation =>
@@ -72,7 +75,7 @@ class AppDatabase extends _$AppDatabase {
   static final AppDatabase instance = AppDatabase._internal();
 
   @override
-  int get schemaVersion => 11;
+  int get schemaVersion => 12;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -104,6 +107,107 @@ class AppDatabase extends _$AppDatabase {
             } on SqliteException catch (_) {
               // If TableMigration fails, the table likely already matches current schema
               // Safe to continue - app will function with existing table structure
+            }
+          }
+
+          if (from < 12) {
+            // Add default values to Events table text columns to handle NULL values
+            // This fixes "Null check operator used on a null value" errors
+            // Custom migration to handle NULL values during data copy
+            try {
+              await customStatement('''
+                CREATE TABLE IF NOT EXISTS new_events (
+                  id TEXT NOT NULL PRIMARY KEY,
+                  title TEXT NOT NULL DEFAULT '',
+                  date INTEGER NOT NULL,
+                  venue TEXT NOT NULL DEFAULT '',
+                  address TEXT NOT NULL DEFAULT '',
+                  town_city TEXT NOT NULL DEFAULT '',
+                  province TEXT,
+                  onsite_contact_first_name TEXT NOT NULL DEFAULT '',
+                  onsite_contact_last_name TEXT NOT NULL DEFAULT '',
+                  onsite_contact_number TEXT NOT NULL DEFAULT '',
+                  onsite_contact_email TEXT NOT NULL DEFAULT '',
+                  ae_contact_first_name TEXT NOT NULL DEFAULT '',
+                  ae_contact_last_name TEXT NOT NULL DEFAULT '',
+                  ae_contact_number TEXT NOT NULL DEFAULT '',
+                  ae_contact_email TEXT NOT NULL DEFAULT '',
+                  services_requested TEXT NOT NULL DEFAULT '',
+                  additional_services_requested TEXT NOT NULL DEFAULT '',
+                  expected_participation INTEGER NOT NULL DEFAULT 0,
+                  nurses INTEGER NOT NULL DEFAULT 0,
+                  coordinators INTEGER NOT NULL DEFAULT 0,
+                  set_up_time TEXT NOT NULL DEFAULT '',
+                  start_time TEXT NOT NULL DEFAULT '',
+                  end_time TEXT NOT NULL DEFAULT '',
+                  strike_down_time TEXT NOT NULL DEFAULT '',
+                  mobile_booths TEXT NOT NULL DEFAULT '',
+                  medical_aid TEXT NOT NULL DEFAULT '',
+                  description TEXT,
+                  status TEXT NOT NULL DEFAULT 'scheduled',
+                  actual_start_time INTEGER,
+                  actual_end_time INTEGER,
+                  created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+                  updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+                );
+              ''');
+
+              // Copy data with COALESCE to provide defaults for NULL values
+              await customStatement('''
+                INSERT INTO new_events (
+                  id, title, date, venue, address, town_city, province,
+                  onsite_contact_first_name, onsite_contact_last_name,
+                  onsite_contact_number, onsite_contact_email,
+                  ae_contact_first_name, ae_contact_last_name,
+                  ae_contact_number, ae_contact_email,
+                  services_requested, additional_services_requested,
+                  expected_participation, nurses, coordinators,
+                  set_up_time, start_time, end_time, strike_down_time,
+                  mobile_booths, medical_aid, description, status,
+                  actual_start_time, actual_end_time, created_at, updated_at
+                )
+                SELECT 
+                  id,
+                  COALESCE(title, ''),
+                  date,
+                  COALESCE(venue, ''),
+                  COALESCE(address, ''),
+                  COALESCE(town_city, ''),
+                  province,
+                  COALESCE(onsite_contact_first_name, ''),
+                  COALESCE(onsite_contact_last_name, ''),
+                  COALESCE(onsite_contact_number, ''),
+                  COALESCE(onsite_contact_email, ''),
+                  COALESCE(ae_contact_first_name, ''),
+                  COALESCE(ae_contact_last_name, ''),
+                  COALESCE(ae_contact_number, ''),
+                  COALESCE(ae_contact_email, ''),
+                  COALESCE(services_requested, ''),
+                  COALESCE(additional_services_requested, ''),
+                  COALESCE(expected_participation, 0),
+                  COALESCE(nurses, 0),
+                  COALESCE(coordinators, 0),
+                  COALESCE(set_up_time, ''),
+                  COALESCE(start_time, ''),
+                  COALESCE(end_time, ''),
+                  COALESCE(strike_down_time, ''),
+                  COALESCE(mobile_booths, ''),
+                  COALESCE(medical_aid, ''),
+                  description,
+                  COALESCE(status, 'scheduled'),
+                  actual_start_time,
+                  actual_end_time,
+                  created_at,
+                  updated_at
+                FROM events;
+              ''');
+
+              // Drop old table and rename new one
+              await customStatement('DROP TABLE events;');
+              await customStatement('ALTER TABLE new_events RENAME TO events;');
+            } on SqliteException catch (e) {
+              // Log error but don't crash - app can still function
+              print('Migration v11->v12 error: $e');
             }
           }
         },
@@ -151,6 +255,8 @@ class AppDatabase extends _$AppDatabase {
   Future<UserEntity?> getUserById(String id) {
     return (select(users)..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
   }
+
+  Future<List<UserEntity>> getAllUsers() => select(users).get();
 
   Future<UserEntity?> updateUser({
     required String id,

@@ -484,7 +484,9 @@ class $EventsTable extends Events with TableInfo<$EventsTable, EventEntity> {
   @override
   late final GeneratedColumn<String> title = GeneratedColumn<String>(
       'title', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
   static const VerificationMeta _dateMeta = const VerificationMeta('date');
   @override
   late final GeneratedColumn<DateTime> date = GeneratedColumn<DateTime>(
@@ -494,19 +496,25 @@ class $EventsTable extends Events with TableInfo<$EventsTable, EventEntity> {
   @override
   late final GeneratedColumn<String> venue = GeneratedColumn<String>(
       'venue', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
   static const VerificationMeta _addressMeta =
       const VerificationMeta('address');
   @override
   late final GeneratedColumn<String> address = GeneratedColumn<String>(
       'address', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
   static const VerificationMeta _townCityMeta =
       const VerificationMeta('townCity');
   @override
   late final GeneratedColumn<String> townCity = GeneratedColumn<String>(
       'town_city', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
   static const VerificationMeta _provinceMeta =
       const VerificationMeta('province');
   @override
@@ -518,55 +526,73 @@ class $EventsTable extends Events with TableInfo<$EventsTable, EventEntity> {
   @override
   late final GeneratedColumn<String> onsiteContactFirstName =
       GeneratedColumn<String>('onsite_contact_first_name', aliasedName, false,
-          type: DriftSqlType.string, requiredDuringInsert: true);
+          type: DriftSqlType.string,
+          requiredDuringInsert: false,
+          defaultValue: const Constant(''));
   static const VerificationMeta _onsiteContactLastNameMeta =
       const VerificationMeta('onsiteContactLastName');
   @override
   late final GeneratedColumn<String> onsiteContactLastName =
       GeneratedColumn<String>('onsite_contact_last_name', aliasedName, false,
-          type: DriftSqlType.string, requiredDuringInsert: true);
+          type: DriftSqlType.string,
+          requiredDuringInsert: false,
+          defaultValue: const Constant(''));
   static const VerificationMeta _onsiteContactNumberMeta =
       const VerificationMeta('onsiteContactNumber');
   @override
   late final GeneratedColumn<String> onsiteContactNumber =
       GeneratedColumn<String>('onsite_contact_number', aliasedName, false,
-          type: DriftSqlType.string, requiredDuringInsert: true);
+          type: DriftSqlType.string,
+          requiredDuringInsert: false,
+          defaultValue: const Constant(''));
   static const VerificationMeta _onsiteContactEmailMeta =
       const VerificationMeta('onsiteContactEmail');
   @override
   late final GeneratedColumn<String> onsiteContactEmail =
       GeneratedColumn<String>('onsite_contact_email', aliasedName, false,
-          type: DriftSqlType.string, requiredDuringInsert: true);
+          type: DriftSqlType.string,
+          requiredDuringInsert: false,
+          defaultValue: const Constant(''));
   static const VerificationMeta _aeContactFirstNameMeta =
       const VerificationMeta('aeContactFirstName');
   @override
   late final GeneratedColumn<String> aeContactFirstName =
       GeneratedColumn<String>('ae_contact_first_name', aliasedName, false,
-          type: DriftSqlType.string, requiredDuringInsert: true);
+          type: DriftSqlType.string,
+          requiredDuringInsert: false,
+          defaultValue: const Constant(''));
   static const VerificationMeta _aeContactLastNameMeta =
       const VerificationMeta('aeContactLastName');
   @override
   late final GeneratedColumn<String> aeContactLastName =
       GeneratedColumn<String>('ae_contact_last_name', aliasedName, false,
-          type: DriftSqlType.string, requiredDuringInsert: true);
+          type: DriftSqlType.string,
+          requiredDuringInsert: false,
+          defaultValue: const Constant(''));
   static const VerificationMeta _aeContactNumberMeta =
       const VerificationMeta('aeContactNumber');
   @override
   late final GeneratedColumn<String> aeContactNumber = GeneratedColumn<String>(
       'ae_contact_number', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
   static const VerificationMeta _aeContactEmailMeta =
       const VerificationMeta('aeContactEmail');
   @override
   late final GeneratedColumn<String> aeContactEmail = GeneratedColumn<String>(
       'ae_contact_email', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
   static const VerificationMeta _servicesRequestedMeta =
       const VerificationMeta('servicesRequested');
   @override
   late final GeneratedColumn<String> servicesRequested =
       GeneratedColumn<String>('services_requested', aliasedName, false,
-          type: DriftSqlType.string, requiredDuringInsert: true);
+          type: DriftSqlType.string,
+          requiredDuringInsert: false,
+          defaultValue: const Constant(''));
   static const VerificationMeta _additionalServicesRequestedMeta =
       const VerificationMeta('additionalServicesRequested');
   @override
@@ -741,8 +767,6 @@ class $EventsTable extends Events with TableInfo<$EventsTable, EventEntity> {
     if (data.containsKey('title')) {
       context.handle(
           _titleMeta, title.isAcceptableOrUnknown(data['title']!, _titleMeta));
-    } else if (isInserting) {
-      context.missing(_titleMeta);
     }
     if (data.containsKey('date')) {
       context.handle(
@@ -753,20 +777,14 @@ class $EventsTable extends Events with TableInfo<$EventsTable, EventEntity> {
     if (data.containsKey('venue')) {
       context.handle(
           _venueMeta, venue.isAcceptableOrUnknown(data['venue']!, _venueMeta));
-    } else if (isInserting) {
-      context.missing(_venueMeta);
     }
     if (data.containsKey('address')) {
       context.handle(_addressMeta,
           address.isAcceptableOrUnknown(data['address']!, _addressMeta));
-    } else if (isInserting) {
-      context.missing(_addressMeta);
     }
     if (data.containsKey('town_city')) {
       context.handle(_townCityMeta,
           townCity.isAcceptableOrUnknown(data['town_city']!, _townCityMeta));
-    } else if (isInserting) {
-      context.missing(_townCityMeta);
     }
     if (data.containsKey('province')) {
       context.handle(_provinceMeta,
@@ -777,72 +795,54 @@ class $EventsTable extends Events with TableInfo<$EventsTable, EventEntity> {
           _onsiteContactFirstNameMeta,
           onsiteContactFirstName.isAcceptableOrUnknown(
               data['onsite_contact_first_name']!, _onsiteContactFirstNameMeta));
-    } else if (isInserting) {
-      context.missing(_onsiteContactFirstNameMeta);
     }
     if (data.containsKey('onsite_contact_last_name')) {
       context.handle(
           _onsiteContactLastNameMeta,
           onsiteContactLastName.isAcceptableOrUnknown(
               data['onsite_contact_last_name']!, _onsiteContactLastNameMeta));
-    } else if (isInserting) {
-      context.missing(_onsiteContactLastNameMeta);
     }
     if (data.containsKey('onsite_contact_number')) {
       context.handle(
           _onsiteContactNumberMeta,
           onsiteContactNumber.isAcceptableOrUnknown(
               data['onsite_contact_number']!, _onsiteContactNumberMeta));
-    } else if (isInserting) {
-      context.missing(_onsiteContactNumberMeta);
     }
     if (data.containsKey('onsite_contact_email')) {
       context.handle(
           _onsiteContactEmailMeta,
           onsiteContactEmail.isAcceptableOrUnknown(
               data['onsite_contact_email']!, _onsiteContactEmailMeta));
-    } else if (isInserting) {
-      context.missing(_onsiteContactEmailMeta);
     }
     if (data.containsKey('ae_contact_first_name')) {
       context.handle(
           _aeContactFirstNameMeta,
           aeContactFirstName.isAcceptableOrUnknown(
               data['ae_contact_first_name']!, _aeContactFirstNameMeta));
-    } else if (isInserting) {
-      context.missing(_aeContactFirstNameMeta);
     }
     if (data.containsKey('ae_contact_last_name')) {
       context.handle(
           _aeContactLastNameMeta,
           aeContactLastName.isAcceptableOrUnknown(
               data['ae_contact_last_name']!, _aeContactLastNameMeta));
-    } else if (isInserting) {
-      context.missing(_aeContactLastNameMeta);
     }
     if (data.containsKey('ae_contact_number')) {
       context.handle(
           _aeContactNumberMeta,
           aeContactNumber.isAcceptableOrUnknown(
               data['ae_contact_number']!, _aeContactNumberMeta));
-    } else if (isInserting) {
-      context.missing(_aeContactNumberMeta);
     }
     if (data.containsKey('ae_contact_email')) {
       context.handle(
           _aeContactEmailMeta,
           aeContactEmail.isAcceptableOrUnknown(
               data['ae_contact_email']!, _aeContactEmailMeta));
-    } else if (isInserting) {
-      context.missing(_aeContactEmailMeta);
     }
     if (data.containsKey('services_requested')) {
       context.handle(
           _servicesRequestedMeta,
           servicesRequested.isAcceptableOrUnknown(
               data['services_requested']!, _servicesRequestedMeta));
-    } else if (isInserting) {
-      context.missing(_servicesRequestedMeta);
     }
     if (data.containsKey('additional_services_requested')) {
       context.handle(
@@ -1588,21 +1588,21 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
   });
   EventsCompanion.insert({
     required String id,
-    required String title,
+    this.title = const Value.absent(),
     required DateTime date,
-    required String venue,
-    required String address,
-    required String townCity,
+    this.venue = const Value.absent(),
+    this.address = const Value.absent(),
+    this.townCity = const Value.absent(),
     this.province = const Value.absent(),
-    required String onsiteContactFirstName,
-    required String onsiteContactLastName,
-    required String onsiteContactNumber,
-    required String onsiteContactEmail,
-    required String aeContactFirstName,
-    required String aeContactLastName,
-    required String aeContactNumber,
-    required String aeContactEmail,
-    required String servicesRequested,
+    this.onsiteContactFirstName = const Value.absent(),
+    this.onsiteContactLastName = const Value.absent(),
+    this.onsiteContactNumber = const Value.absent(),
+    this.onsiteContactEmail = const Value.absent(),
+    this.aeContactFirstName = const Value.absent(),
+    this.aeContactLastName = const Value.absent(),
+    this.aeContactNumber = const Value.absent(),
+    this.aeContactEmail = const Value.absent(),
+    this.servicesRequested = const Value.absent(),
     this.additionalServicesRequested = const Value.absent(),
     this.expectedParticipation = const Value.absent(),
     this.nurses = const Value.absent(),
@@ -1621,20 +1621,7 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : id = Value(id),
-        title = Value(title),
-        date = Value(date),
-        venue = Value(venue),
-        address = Value(address),
-        townCity = Value(townCity),
-        onsiteContactFirstName = Value(onsiteContactFirstName),
-        onsiteContactLastName = Value(onsiteContactLastName),
-        onsiteContactNumber = Value(onsiteContactNumber),
-        onsiteContactEmail = Value(onsiteContactEmail),
-        aeContactFirstName = Value(aeContactFirstName),
-        aeContactLastName = Value(aeContactLastName),
-        aeContactNumber = Value(aeContactNumber),
-        aeContactEmail = Value(aeContactEmail),
-        servicesRequested = Value(servicesRequested);
+        date = Value(date);
   static Insertable<EventEntity> custom({
     Expression<String>? id,
     Expression<String>? title,
@@ -2178,21 +2165,21 @@ typedef $$UsersTableProcessedTableManager = ProcessedTableManager<
     PrefetchHooks Function()>;
 typedef $$EventsTableCreateCompanionBuilder = EventsCompanion Function({
   required String id,
-  required String title,
+  Value<String> title,
   required DateTime date,
-  required String venue,
-  required String address,
-  required String townCity,
+  Value<String> venue,
+  Value<String> address,
+  Value<String> townCity,
   Value<String?> province,
-  required String onsiteContactFirstName,
-  required String onsiteContactLastName,
-  required String onsiteContactNumber,
-  required String onsiteContactEmail,
-  required String aeContactFirstName,
-  required String aeContactLastName,
-  required String aeContactNumber,
-  required String aeContactEmail,
-  required String servicesRequested,
+  Value<String> onsiteContactFirstName,
+  Value<String> onsiteContactLastName,
+  Value<String> onsiteContactNumber,
+  Value<String> onsiteContactEmail,
+  Value<String> aeContactFirstName,
+  Value<String> aeContactLastName,
+  Value<String> aeContactNumber,
+  Value<String> aeContactEmail,
+  Value<String> servicesRequested,
   Value<String> additionalServicesRequested,
   Value<int> expectedParticipation,
   Value<int> nurses,
@@ -2688,21 +2675,21 @@ class $$EventsTableTableManager extends RootTableManager<
           ),
           createCompanionCallback: ({
             required String id,
-            required String title,
+            Value<String> title = const Value.absent(),
             required DateTime date,
-            required String venue,
-            required String address,
-            required String townCity,
+            Value<String> venue = const Value.absent(),
+            Value<String> address = const Value.absent(),
+            Value<String> townCity = const Value.absent(),
             Value<String?> province = const Value.absent(),
-            required String onsiteContactFirstName,
-            required String onsiteContactLastName,
-            required String onsiteContactNumber,
-            required String onsiteContactEmail,
-            required String aeContactFirstName,
-            required String aeContactLastName,
-            required String aeContactNumber,
-            required String aeContactEmail,
-            required String servicesRequested,
+            Value<String> onsiteContactFirstName = const Value.absent(),
+            Value<String> onsiteContactLastName = const Value.absent(),
+            Value<String> onsiteContactNumber = const Value.absent(),
+            Value<String> onsiteContactEmail = const Value.absent(),
+            Value<String> aeContactFirstName = const Value.absent(),
+            Value<String> aeContactLastName = const Value.absent(),
+            Value<String> aeContactNumber = const Value.absent(),
+            Value<String> aeContactEmail = const Value.absent(),
+            Value<String> servicesRequested = const Value.absent(),
             Value<String> additionalServicesRequested = const Value.absent(),
             Value<int> expectedParticipation = const Value.absent(),
             Value<int> nurses = const Value.absent(),
