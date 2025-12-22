@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:flutter/foundation.dart';
 import 'package:kenwell_health_app/data/local/app_database.dart';
 import '../../../domain/models/wellness_event.dart';
 
@@ -9,8 +10,15 @@ class EventRepository {
   final AppDatabase _database;
 
   Future<List<WellnessEvent>> fetchAllEvents() async {
-    final entities = await _database.getAllEvents();
-    return entities.map(_mapEntityToDomain).toList();
+    try {
+      final entities = await _database.getAllEvents();
+      debugPrint('EventRepository: Fetched ${entities.length} event entities from database');
+      return entities.map(_mapEntityToDomain).toList();
+    } catch (e, stackTrace) {
+      debugPrint('EventRepository: Error fetching events: $e');
+      debugPrint('EventRepository: Stack trace: $stackTrace');
+      rethrow;
+    }
   }
 
   Future<WellnessEvent?> fetchEventById(String id) async {
@@ -32,33 +40,33 @@ class EventRepository {
   WellnessEvent _mapEntityToDomain(EventEntity entity) {
     return WellnessEvent(
       id: entity.id,
-      title: entity.title,
+      title: entity.title ?? 'Untitled Event',
       date: entity.date,
-      venue: entity.venue,
-      address: entity.address,
-      townCity: entity.townCity,
+      venue: entity.venue ?? '',
+      address: entity.address ?? '',
+      townCity: entity.townCity ?? '',
       province: entity.province ?? '',
-      onsiteContactFirstName: entity.onsiteContactFirstName,
-      onsiteContactLastName: entity.onsiteContactLastName,
-      onsiteContactNumber: entity.onsiteContactNumber,
-      onsiteContactEmail: entity.onsiteContactEmail,
-      aeContactFirstName: entity.aeContactFirstName,
-      aeContactLastName: entity.aeContactLastName,
-      aeContactNumber: entity.aeContactNumber,
-      aeContactEmail: entity.aeContactEmail,
-      servicesRequested: entity.servicesRequested,
-      additionalServicesRequested: entity.additionalServicesRequested,
-      expectedParticipation: entity.expectedParticipation,
-      nurses: entity.nurses,
-      coordinators: entity.coordinators,
-      setUpTime: entity.setUpTime,
-      startTime: entity.startTime,
-      endTime: entity.endTime,
-      strikeDownTime: entity.strikeDownTime,
-      mobileBooths: entity.mobileBooths,
+      onsiteContactFirstName: entity.onsiteContactFirstName ?? '',
+      onsiteContactLastName: entity.onsiteContactLastName ?? '',
+      onsiteContactNumber: entity.onsiteContactNumber ?? '',
+      onsiteContactEmail: entity.onsiteContactEmail ?? '',
+      aeContactFirstName: entity.aeContactFirstName ?? '',
+      aeContactLastName: entity.aeContactLastName ?? '',
+      aeContactNumber: entity.aeContactNumber ?? '',
+      aeContactEmail: entity.aeContactEmail ?? '',
+      servicesRequested: entity.servicesRequested ?? '',
+      additionalServicesRequested: entity.additionalServicesRequested ?? '',
+      expectedParticipation: entity.expectedParticipation ?? 0,
+      nurses: entity.nurses ?? 0,
+      coordinators: entity.coordinators ?? 0,
+      setUpTime: entity.setUpTime ?? '',
+      startTime: entity.startTime ?? '',
+      endTime: entity.endTime ?? '',
+      strikeDownTime: entity.strikeDownTime ?? '',
+      mobileBooths: entity.mobileBooths ?? '',
       description: entity.description,
-      medicalAid: entity.medicalAid,
-      status: entity.status,
+      medicalAid: entity.medicalAid ?? '',
+      status: entity.status ?? 'scheduled',
       actualStartTime: entity.actualStartTime,
       actualEndTime: entity.actualEndTime,
     );
@@ -82,6 +90,7 @@ class EventRepository {
       aeContactNumber: Value(event.aeContactNumber),
       aeContactEmail: Value(event.aeContactEmail),
       servicesRequested: Value(event.servicesRequested),
+      additionalServicesRequested: Value(event.additionalServicesRequested),
       expectedParticipation: Value(event.expectedParticipation),
       nurses: Value(event.nurses),
       coordinators: Value(event.coordinators),

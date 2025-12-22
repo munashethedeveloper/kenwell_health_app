@@ -144,6 +144,11 @@ class AuthService {
     return user != null;
   }
 
+  Future<List<UserModel>> getAllUsers() async {
+    final entities = await _database.getAllUsers();
+    return entities.map(_mapToUserModel).toList();
+  }
+
   UserModel _mapToUserModel(UserEntity entity) {
     return UserModel(
       id: entity.id,

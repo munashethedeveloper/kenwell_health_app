@@ -12,41 +12,39 @@ import '../../event/widgets/event_screen.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/buttons/custom_primary_button.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
+import '../view_model/calendar_view_model.dart';
 
-class CalendarScreen extends StatefulWidget {
-  final EventViewModel eventVM;
-
-  const CalendarScreen({super.key, required this.eventVM});
+class CalendarScreen extends StatelessWidget {
+  const CalendarScreen({super.key});
 
   @override
-  State<CalendarScreen> createState() => _CalendarScreenState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => CalendarViewModel(),
+      child: const _CalendarScreenBody(),
+    );
+  }
 }
 
-class _CalendarScreenState extends State<CalendarScreen> {
-  DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
+class _CalendarScreenBody extends StatefulWidget {
+  const _CalendarScreenBody();
+
+  @override
+  State<_CalendarScreenBody> createState() => _CalendarScreenBodyState();
+}
+
+class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
+  @override
+  void initState() {
+    super.initState();
+    // Load events when screen initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<CalendarViewModel>().loadEvents();
+    });
+  }
 
   DateTime _normalizeDate(DateTime date) =>
       DateTime(date.year, date.month, date.day);
-
-  List<WellnessEvent> _getEventsForDay(DateTime day) =>
-      widget.eventVM.getEventsForDate(day);
-
-  List<WellnessEvent> _getEventsForMonth(DateTime month) =>
-      widget.eventVM.events
-          .where((event) =>
-              event.date.year == month.year && event.date.month == month.month)
-          .toList();
-
-  void _goToPreviousMonth() {
-    setState(() =>
-        _focusedDay = DateTime(_focusedDay.year, _focusedDay.month - 1, 1));
-  }
-
-  void _goToNextMonth() {
-    setState(() =>
-        _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + 1, 1));
-  }
 
   Future<void> _logout() async {
     final authVM = context.read<AuthViewModel>();
@@ -55,335 +53,360 @@ class _CalendarScreenState extends State<CalendarScreen> {
     Navigator.pushReplacementNamed(context, RouteNames.login);
   }
 
-  Color _categoryColor(String category) {
-    switch (category.toLowerCase()) {
-      case 'screening':
-        return Colors.orange;
-      case 'wellness':
-        return Colors.green;
-      case 'workshop':
-        return Colors.purple;
-      default:
-        return Colors.grey;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: KenwellAppBar(
-          title: 'Wellness Planner',
-          titleStyle: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 30,
-          ),
-          automaticallyImplyLeading: false,
-          actions: [
-            PopupMenuButton<int>(
-              icon: const Icon(Icons.more_vert, color: Colors.white),
-              onSelected: (value) async {
-                switch (value) {
-                  /*  case 0:
-                    if (mounted) {
-                      Navigator.pushNamed(context, RouteNames.profile);
+    return Consumer<CalendarViewModel>(
+      builder: (context, viewModel, _) {
+        return DefaultTabController(
+          length: 2,
+          child: Scaffold(
+            appBar: KenwellAppBar(
+              title: 'Wellness Planner',
+              titleStyle: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 30,
+              ),
+              automaticallyImplyLeading: false,
+              actions: [
+                PopupMenuButton<int>(
+                  icon: const Icon(Icons.more_vert, color: Colors.white),
+                  onSelected: (value) async {
+                    switch (value) {
+                      case 0:
+                        if (mounted) {
+                          Navigator.pushNamed(context, RouteNames.help);
+                        }
+                        break;
+                      case 1:
+                        await _logout();
+                        break;
                     }
-                    break; */
-                  case 0:
-                    if (mounted) Navigator.pushNamed(context, RouteNames.help);
-                    break;
-                  case 1:
-                    await _logout();
-                    break;
-                }
-              },
-              itemBuilder: (context) => [
-                /* const PopupMenuItem<int>(
-                  value: 0,
-                  child: ListTile(
-                    leading: Icon(Icons.person, color: Colors.black),
-                    title: Text('Profile'),
+                  },
+                  itemBuilder: (context) => const [
+                    PopupMenuItem<int>(
+                      value: 0,
+                      child: ListTile(
+                        leading: Icon(Icons.help_outline, color: Colors.black),
+                        title: Text('Help'),
+                      ),
+                    ),
+                    PopupMenuItem<int>(
+                      value: 1,
+                      child: ListTile(
+                        leading: Icon(Icons.logout, color: Colors.black),
+                        title: Text('Logout'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+              bottom: const TabBar(
+                indicatorSize: TabBarIndicatorSize.tab,
+                indicator: BoxDecoration(color: Color(0xFF90C048)),
+                labelColor: Colors.white,
+                unselectedLabelColor: Colors.white,
+                tabs: [
+                  Tab(icon: Icon(Icons.calendar_today), text: 'Events Calendar'),
+                  Tab(icon: Icon(Icons.list), text: 'Events List'),
+                ],
+              ),
+            ),
+            body: viewModel.isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : Column(
+                    children: [
+                      // Show error banner if there's an error, but still show calendar
+                      if (viewModel.error != null)
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          color: Colors.orange.shade100,
+                          child: Row(
+                            children: [
+                              Icon(Icons.warning, color: Colors.orange.shade900),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  viewModel.error!,
+                                  style: TextStyle(color: Colors.orange.shade900),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () => viewModel.loadEvents(),
+                                child: const Text('Retry'),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.close),
+                                onPressed: () => viewModel.clearError(),
+                                color: Colors.orange.shade900,
+                                tooltip: 'Dismiss',
+                              ),
+                            ],
+                          ),
+                        ),
+                      // Always show the calendar and events list
+                      Expanded(
+                        child: TabBarView(
+                          children: [
+                            _buildCalendarTab(viewModel),
+                            _buildEventsListTab(viewModel),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ), */
-                const PopupMenuItem<int>(
-                  value: 0,
-                  child: ListTile(
-                    leading: Icon(Icons.help_outline, color: Colors.black),
-                    title: Text('Help'),
+            floatingActionButton: FloatingActionButton.extended(
+              backgroundColor: const Color(0xFF90C048),
+              icon: const Icon(Icons.add, color: Colors.white),
+              label:
+                  const Text('Add Event', style: TextStyle(color: Colors.white)),
+              onPressed: () {
+                final targetDate =
+                    viewModel.selectedDay ?? viewModel.focusedDay;
+                _openEventForm(context, viewModel, targetDate);
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildCalendarTab(CalendarViewModel viewModel) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          const SizedBox(height: 16),
+          const AppLogo(size: 200),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: KenwellFormCard(
+              child: TableCalendar(
+                firstDay: DateTime.utc(2020, 1, 1),
+                lastDay: DateTime.utc(3000, 12, 31),
+                focusedDay: viewModel.focusedDay,
+                selectedDayPredicate: (day) =>
+                    isSameDay(viewModel.selectedDay, day),
+                eventLoader: (day) => viewModel.getEventsForDay(day),
+                headerStyle: const HeaderStyle(
+                  formatButtonVisible: false,
+                  titleCentered: true,
+                  titleTextStyle: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF201C58),
                   ),
                 ),
-                const PopupMenuItem<int>(
-                  value: 1,
-                  child: ListTile(
-                    leading: Icon(Icons.logout, color: Colors.black),
-                    title: Text('Logout'),
+                daysOfWeekStyle: const DaysOfWeekStyle(
+                  weekdayStyle: TextStyle(fontWeight: FontWeight.bold),
+                  weekendStyle: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red,
                   ),
+                ),
+                calendarStyle: CalendarStyle(
+                  weekendTextStyle: const TextStyle(color: Colors.red),
+                  todayDecoration: BoxDecoration(
+                    color: Colors.greenAccent.withValues(alpha: 0.5),
+                    shape: BoxShape.circle,
+                  ),
+                  selectedDecoration: const BoxDecoration(
+                    color: Color(0xFF90C048),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                onDaySelected: (selectedDay, focusedDay) async {
+                  viewModel.setSelectedDay(selectedDay);
+                  viewModel.setFocusedDay(focusedDay);
+                  final eventsForDay = viewModel.getEventsForDay(selectedDay);
+                  if (eventsForDay.isEmpty) {
+                    await _openEventForm(context, viewModel, selectedDay);
+                  } else {
+                    _showDayActionsSheet(
+                        context, viewModel, selectedDay, eventsForDay);
+                  }
+                },
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEventsListTab(CalendarViewModel viewModel) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          const SizedBox(height: 16),
+          const AppLogo(size: 200),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.chevron_left),
+                  onPressed: () => viewModel.goToPreviousMonth(),
+                ),
+                Text(
+                  DateFormat.yMMMM().format(viewModel.focusedDay),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF201C58),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.chevron_right),
+                  onPressed: () => viewModel.goToNextMonth(),
                 ),
               ],
             ),
-          ],
-          bottom: const TabBar(
-            indicatorSize: TabBarIndicatorSize.tab,
-            indicator: BoxDecoration(color: Color(0xFF90C048)),
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white,
-            tabs: [
-              Tab(icon: Icon(Icons.calendar_today), text: 'Events Calendar'),
-              Tab(icon: Icon(Icons.list), text: 'Events List'),
-            ],
           ),
-        ),
-        body: TabBarView(
-          children: [
-            // ===== Calendar Tab =====
-            SingleChildScrollView(
-              child: Column(
-                children: [
-                  const SizedBox(height: 16),
-                  const AppLogo(size: 200),
-                  const SizedBox(height: 16),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: KenwellFormCard(
-                      child: TableCalendar(
-                        firstDay: DateTime.utc(2020, 1, 1),
-                        lastDay: DateTime.utc(3000, 12, 31),
-                        focusedDay: _focusedDay,
-                        selectedDayPredicate: (day) =>
-                            isSameDay(_selectedDay, day),
-                        eventLoader: _getEventsForDay,
-                        headerStyle: const HeaderStyle(
-                          formatButtonVisible: false,
-                          titleCentered: true,
-                          titleTextStyle: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF201C58),
-                          ),
-                        ),
-                        daysOfWeekStyle: const DaysOfWeekStyle(
-                          weekdayStyle: TextStyle(fontWeight: FontWeight.bold),
-                          weekendStyle: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.red,
-                          ),
-                        ),
-                        calendarStyle: CalendarStyle(
-                          weekendTextStyle: const TextStyle(color: Colors.red),
-                          todayDecoration: BoxDecoration(
-                            color: Colors.greenAccent.withValues(alpha: 0.5),
-                            shape: BoxShape.circle,
-                          ),
-                          selectedDecoration: const BoxDecoration(
-                            color: Color(0xFF90C048),
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        onDaySelected: (selectedDay, focusedDay) async {
-                          setState(() {
-                            _selectedDay = selectedDay;
-                            _focusedDay = focusedDay;
-                          });
-                          final eventsForDay = _getEventsForDay(selectedDay);
-                          if (eventsForDay.isEmpty) {
-                            await _openEventForm(selectedDay);
-                          } else {
-                            _showDayActionsSheet(selectedDay, eventsForDay);
-                          }
-                        },
-                      ),
-                    ),
+          Builder(
+            builder: (_) {
+              final eventsThisMonth =
+                  viewModel.getEventsForMonth(viewModel.focusedDay);
+              if (eventsThisMonth.isEmpty) {
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(24),
+                    child: Text("No events for this month."),
                   ),
-                  const SizedBox(height: 16),
-                ],
-              ),
-            ),
+                );
+              }
 
-            // ===== Events List Tab (Scrollable) =====
-            SingleChildScrollView(
-              child: Column(
+              eventsThisMonth.sort(viewModel.compareEvents);
+
+              final Map<DateTime, List<WellnessEvent>> groupedEvents = {};
+              for (var event in eventsThisMonth) {
+                final dayKey = _normalizeDate(event.date);
+                groupedEvents.putIfAbsent(dayKey, () => []).add(event);
+              }
+
+              final sortedDates = groupedEvents.keys.toList()
+                ..sort((a, b) => a.compareTo(b));
+
+              return Column(
                 children: [
-                  const SizedBox(height: 16),
-                  const AppLogo(size: 200),
-                  const SizedBox(height: 16),
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.chevron_left),
-                          onPressed: _goToPreviousMonth,
-                        ),
-                        Text(
-                          DateFormat.yMMMM().format(_focusedDay),
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF201C58),
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.chevron_right),
-                          onPressed: _goToNextMonth,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Builder(
-                    builder: (_) {
-                      final eventsThisMonth = _getEventsForMonth(_focusedDay);
-                      if (eventsThisMonth.isEmpty) {
-                        return const Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(24),
-                            child: Text("No events for this month."),
-                          ),
-                        );
-                      }
-
-                      eventsThisMonth.sort(_compareEvents);
-
-                      final Map<DateTime, List<WellnessEvent>> groupedEvents =
-                          {};
-                      for (var event in eventsThisMonth) {
-                        final dayKey = _normalizeDate(event.date);
-                        groupedEvents.putIfAbsent(dayKey, () => []).add(event);
-                      }
-
-                      final sortedDates = groupedEvents.keys.toList()
-                        ..sort((a, b) => a.compareTo(b));
-
-                      return Column(
-                        children: [
-                          for (var day in sortedDates) ...[
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                              child: KenwellFormCard(
-                                title: DateFormat.yMMMMd().format(day),
-                                child: Column(
-                                  children: [
-                                    for (int i = 0;
-                                        i < groupedEvents[day]!.length;
-                                        i++) ...[
-                                      Dismissible(
-                                        key: Key(groupedEvents[day]![i].id),
-                                        direction: DismissDirection.endToStart,
-                                        confirmDismiss: (direction) async {
-                                          return await showDialog(
-                                            context: context,
-                                            builder: (dialogContext) =>
-                                                AlertDialog(
-                                              title: const Text('Delete Event'),
-                                              content: const Text(
-                                                'Are you sure you want to delete this event?',
-                                              ),
-                                              actions: [
-                                                TextButton(
-                                                  onPressed: () => Navigator.of(
-                                                          dialogContext)
-                                                      .pop(false),
-                                                  child: const Text('Cancel'),
-                                                ),
-                                                TextButton(
-                                                  onPressed: () => Navigator.of(
-                                                          dialogContext)
-                                                      .pop(true),
-                                                  style: TextButton.styleFrom(
-                                                      foregroundColor:
-                                                          Colors.red),
-                                                  child: const Text('Delete'),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                        onDismissed: (direction) async {
-                                          final deletedEvent =
-                                              await widget.eventVM.deleteEvent(
-                                                  groupedEvents[day]![i].id);
-                                          if (deletedEvent != null &&
-                                              context.mounted) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              SnackBar(
-                                                content:
-                                                    const Text('Event deleted'),
-                                                action: SnackBarAction(
-                                                  label: 'UNDO',
-                                                  onPressed: () {
-                                                    widget.eventVM.restoreEvent(
-                                                        deletedEvent);
-                                                  },
-                                                ),
-                                                duration:
-                                                    const Duration(seconds: 5),
-                                              ),
-                                            );
-                                          }
-                                        },
-                                        background: Container(
-                                          alignment: Alignment.centerRight,
-                                          padding:
-                                              const EdgeInsets.only(right: 20),
-                                          color: Colors.red,
-                                          child: const Icon(
-                                            Icons.delete,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        child: InkWell(
-                                          onTap: () {
-                                            Navigator.pushNamed(
-                                              context,
-                                              RouteNames.eventDetails,
-                                              arguments: {
-                                                'event': groupedEvents[day]![i],
-                                                'viewModel': widget.eventVM,
-                                              },
-                                            );
-                                          },
-                                          child: Padding(
-                                            padding: EdgeInsets.only(
-                                                bottom: i ==
-                                                        groupedEvents[day]!
-                                                                .length -
-                                                            1
-                                                    ? 0
-                                                    : 12),
-                                            // child: _buildModernEventCard(
-                                            child: _buildFormEventCard(
-                                                groupedEvents[day]![i]),
-                                          ),
-                                        ),
+                  for (var day in sortedDates) ...[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: KenwellFormCard(
+                        title: DateFormat.yMMMMd().format(day),
+                        child: Column(
+                          children: [
+                            for (int i = 0;
+                                i < groupedEvents[day]!.length;
+                                i++) ...[
+                              Dismissible(
+                                key: Key(groupedEvents[day]![i].id),
+                                direction: DismissDirection.endToStart,
+                                confirmDismiss: (direction) async {
+                                  return await showDialog(
+                                    context: context,
+                                    builder: (dialogContext) => AlertDialog(
+                                      title: const Text('Delete Event'),
+                                      content: const Text(
+                                        'Are you sure you want to delete this event?',
                                       ),
-                                    ],
-                                  ],
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.of(dialogContext)
+                                                  .pop(false),
+                                          child: const Text('Cancel'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.of(dialogContext)
+                                                  .pop(true),
+                                          style: TextButton.styleFrom(
+                                              foregroundColor: Colors.red),
+                                          child: const Text('Delete'),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                                onDismissed: (direction) async {
+                                  final deletedEvent =
+                                      await viewModel.deleteEvent(
+                                          groupedEvents[day]![i].id);
+                                  if (deletedEvent != null && context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: const Text('Event deleted'),
+                                        action: SnackBarAction(
+                                          label: 'UNDO',
+                                          onPressed: () {
+                                            viewModel
+                                                .restoreEvent(deletedEvent);
+                                          },
+                                        ),
+                                        duration: const Duration(seconds: 5),
+                                      ),
+                                    );
+                                  }
+                                },
+                                background: Container(
+                                  alignment: Alignment.centerRight,
+                                  padding: const EdgeInsets.only(right: 20),
+                                  color: Colors.red,
+                                  child: const Icon(
+                                    Icons.delete,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                child: InkWell(
+                                  onTap: () async {
+                                    // Create EventViewModel for event details
+                                    final eventViewModel = EventViewModel();
+                                    await eventViewModel.initialized;
+                                    
+                                    if (!context.mounted) return;
+                                    
+                                    await Navigator.pushNamed(
+                                      context,
+                                      RouteNames.eventDetails,
+                                      arguments: {
+                                        'event': groupedEvents[day]![i],
+                                        'viewModel': eventViewModel,
+                                      },
+                                    );
+                                    
+                                    // Reload events after returning from details screen
+                                    if (context.mounted) {
+                                      await viewModel.loadEvents();
+                                    }
+                                  },
+                                  child: Padding(
+                                    padding: EdgeInsets.only(
+                                        bottom: i ==
+                                                groupedEvents[day]!.length - 1
+                                            ? 0
+                                            : 12),
+                                    child: _buildFormEventCard(
+                                        viewModel, groupedEvents[day]![i]),
+                                  ),
                                 ),
                               ),
-                            ),
+                            ],
                           ],
-                        ],
-                      );
-                    },
-                  ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
-              ),
-            ),
-          ],
-        ),
-        floatingActionButton: FloatingActionButton.extended(
-          backgroundColor: const Color(0xFF90C048),
-          icon: const Icon(Icons.add, color: Colors.white),
-          label: const Text('Add Event', style: TextStyle(color: Colors.white)),
-          onPressed: () {
-            final targetDate = _selectedDay ?? _focusedDay;
-            _openEventForm(targetDate);
-          },
-        ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
@@ -498,7 +521,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   } */
 
-  Widget _buildFormEventCard(WellnessEvent event) {
+  Widget _buildFormEventCard(CalendarViewModel viewModel, WellnessEvent event) {
     return KenwellFormCard(
       title: 'Event Name: ${event.title}',
       child: Column(
@@ -574,57 +597,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
-  int _compareEvents(WellnessEvent a, WellnessEvent b) {
-    final dateComparison = a.date.compareTo(b.date);
-    if (dateComparison != 0) return dateComparison;
-
-    final aMinutes = _timeStringToMinutes(a.startTime);
-    final bMinutes = _timeStringToMinutes(b.startTime);
-
-    if (aMinutes != null && bMinutes != null) {
-      final timeComparison = aMinutes.compareTo(bMinutes);
-      if (timeComparison != 0) {
-        return timeComparison;
-      }
-    } else if (aMinutes != null) {
-      return -1;
-    } else if (bMinutes != null) {
-      return 1;
-    }
-
-    return a.title.toLowerCase().compareTo(b.title.toLowerCase());
-  }
-
-  int? _timeStringToMinutes(String raw) {
-    if (raw.trim().isEmpty) return null;
-    final timeText = raw.trim();
-
-    final formatters = <DateFormat>[DateFormat.Hm(), DateFormat.jm()];
-
-    for (final formatter in formatters) {
-      try {
-        final parsed = formatter.parse(timeText);
-        return parsed.hour * 60 + parsed.minute;
-      } catch (_) {
-        continue;
-      }
-    }
-
-    final match =
-        RegExp(r'^(?<hour>\d{1,2}):(?<minute>\d{2})').firstMatch(timeText);
-    if (match != null) {
-      final hour = int.tryParse(match.namedGroup('hour') ?? '');
-      final minute = int.tryParse(match.namedGroup('minute') ?? '');
-      if (hour != null && minute != null && hour < 24 && minute < 60) {
-        return hour * 60 + minute;
-      }
-    }
-
-    return null;
-  }
-
-  Future<void> _openEventForm(DateTime date,
+  Future<void> _openEventForm(
+      BuildContext context, CalendarViewModel viewModel, DateTime date,
       {WellnessEvent? existingEvent}) async {
+    // Create EventViewModel for the form
+    final eventViewModel = EventViewModel();
+    await eventViewModel.initialized;
+
+    if (!context.mounted) return;
+
     await Navigator.push(
       context,
       MaterialPageRoute(
@@ -633,21 +614,20 @@ class _CalendarScreenState extends State<CalendarScreen> {
           existingEvent: existingEvent,
           onSave: (event) async {
             if (existingEvent == null) {
-              await widget.eventVM.addEvent(event);
+              await viewModel.addEvent(event);
             } else {
-              await widget.eventVM.updateEvent(event);
+              await viewModel.updateEvent(event);
             }
           },
-          viewModel: widget.eventVM,
+          viewModel: eventViewModel,
         ),
       ),
     );
-    if (!mounted) return;
-    setState(() {});
   }
 
-  void _showDayActionsSheet(DateTime selectedDay, List<WellnessEvent> events) {
-    final dayEvents = [...events]..sort(_compareEvents);
+  void _showDayActionsSheet(BuildContext context, CalendarViewModel viewModel,
+      DateTime selectedDay, List<WellnessEvent> events) {
+    final dayEvents = [...events]..sort(viewModel.compareEvents);
 
     showModalBottomSheet(
       context: context,
@@ -670,14 +650,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ...dayEvents.map(
                   (event) => ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: _categoryColor(event.servicesRequested),
+                      backgroundColor:
+                          viewModel.getCategoryColor(event.servicesRequested),
                     ),
                     title: Text(event.title),
-                    subtitle: Text(_eventSubtitle(event)),
+                    subtitle: Text(viewModel.getEventSubtitle(event)),
                     trailing: const Icon(Icons.edit_outlined),
                     onTap: () {
                       Navigator.pop(ctx);
-                      _openEventForm(selectedDay, existingEvent: event);
+                      _openEventForm(context, viewModel, selectedDay,
+                          existingEvent: event);
                     },
                   ),
                 ),
@@ -688,7 +670,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   minHeight: 48,
                   onPressed: () {
                     Navigator.pop(ctx);
-                    _openEventForm(selectedDay);
+                    _openEventForm(context, viewModel, selectedDay);
                   },
                 ),
               ],
@@ -697,21 +679,5 @@ class _CalendarScreenState extends State<CalendarScreen> {
         );
       },
     );
-  }
-
-  String _eventSubtitle(WellnessEvent event) {
-    final parts = <String>[];
-    final times = [
-      if (event.startTime.isNotEmpty) event.startTime,
-      if (event.endTime.isNotEmpty) event.endTime,
-    ];
-    if (times.isNotEmpty) parts.add(times.join(' - '));
-
-    final location = event.venue.isNotEmpty
-        ? event.venue
-        : (event.address.isNotEmpty ? event.address : '');
-    if (location.isNotEmpty) parts.add(location);
-
-    return parts.isEmpty ? 'Tap to edit' : parts.join(' · ');
   }
 }

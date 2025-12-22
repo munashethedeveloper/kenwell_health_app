@@ -1,19 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/logo/app_logo.dart';
+import '../../../shared/ui/navigation/main_navigation_screen.dart';
 import '../../auth/widgets/auth_wrapper.dart';
 import '../../auth/view_models/auth_view_model.dart';
-import '../../event/view_model/event_view_model.dart';
-import '../../calendar/widgets/calendar_screen.dart';
+import '../view_model/splash_view_model.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
   @override
-  SplashScreenState createState() => SplashScreenState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => SplashViewModel(),
+      child: const _SplashScreenBody(),
+    );
+  }
 }
 
-class SplashScreenState extends State<SplashScreen>
+class _SplashScreenBody extends StatefulWidget {
+  const _SplashScreenBody();
+
+  @override
+  State<_SplashScreenBody> createState() => _SplashScreenBodyState();
+}
+
+class _SplashScreenBodyState extends State<_SplashScreenBody>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _animation;
@@ -30,36 +42,12 @@ class SplashScreenState extends State<SplashScreen>
     _animation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
     _controller.forward();
 
-    _startSplash();
-  }
-
-  Future<void> _startSplash() async {
-    await Future.delayed(const Duration(seconds: 3));
-
-    if (!mounted) return;
-
-    final authVM = Provider.of<AuthViewModel>(context, listen: false);
-    await authVM.checkLoginStatus(); // checks if user is logged in
-
-    if (!mounted) return;
-    final isLoggedIn = authVM.isLoggedIn;
-
-    if (isLoggedIn) {
-      // Navigate to CalendarScreen and pass the EventViewModel
-      final eventVM = Provider.of<EventViewModel>(context, listen: false);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => CalendarScreen(eventVM: eventVM),
-        ),
-      );
-    } else {
-      // Navigate to AuthWrapper if not logged in
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const AuthWrapper()),
-      );
-    }
+    // Initialize app through ViewModel
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final splashVM = context.read<SplashViewModel>();
+      final authVM = context.read<AuthViewModel>();
+      splashVM.initializeApp(authVM);
+    });
   }
 
   @override
@@ -70,12 +58,43 @@ class SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.blueAccent,
-      body: FadeTransition(
-        opacity: _animation,
-        child: const Center(child: AppLogo(size: 150)),
-      ),
+    return Consumer<SplashViewModel>(
+      builder: (context, viewModel, _) {
+        // Handle navigation when target is determined
+        if (viewModel.navigationTarget != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
+
+            final target = viewModel.navigationTarget!;
+            viewModel.clearNavigationTarget();
+
+            switch (target) {
+              case SplashNavigationTarget.mainNavigation:
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const MainNavigationScreen(),
+                  ),
+                );
+                break;
+              case SplashNavigationTarget.authWrapper:
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AuthWrapper()),
+                );
+                break;
+            }
+          });
+        }
+
+        return Scaffold(
+          backgroundColor: Colors.blueAccent,
+          body: FadeTransition(
+            opacity: _animation,
+            child: const Center(child: AppLogo(size: 150)),
+          ),
+        );
+      },
     );
   }
 }

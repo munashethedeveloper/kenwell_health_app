@@ -146,8 +146,7 @@ class AppRouter {
         return MaterialPageRoute(
           settings: const RouteSettings(name: RouteNames.calendar),
           builder: (context) {
-            final eventVM = Provider.of<EventViewModel>(context, listen: false);
-            return CalendarScreen(eventVM: eventVM);
+            return const CalendarScreen();
           },
         );
 
