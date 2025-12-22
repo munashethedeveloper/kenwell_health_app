@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:kenwell_health_app/data/services/auth_service.dart';
 import 'package:kenwell_health_app/routing/route_names.dart';
+import 'package:kenwell_health_app/ui/features/auth/view_models/auth_view_model.dart';
 import 'package:kenwell_health_app/ui/features/auth/widgets/login_screen.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
@@ -24,9 +24,11 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
   String? _startingEventId;
   int _selectedWeek = 0; // 0 = this week, 1 = next week
 
-  // LOGOUT METHOD
+  // LOGOUT METHOD using AuthViewModel
   Future<void> _logout() async {
-    await AuthService().logout();
+    final authVM = context.read<AuthViewModel>();
+    await authVM.logout();
+    if (!mounted) return;
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const LoginScreen()),
       (route) => false,
