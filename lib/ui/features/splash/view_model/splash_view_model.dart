@@ -1,25 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../calendar/widgets/calendar_screen.dart';
-import '../../event/view_model/event_view_model.dart';
+import '../../auth/view_models/auth_view_model.dart';
+
+enum SplashNavigationTarget { authWrapper, mainNavigation }
 
 class SplashViewModel extends ChangeNotifier {
-  Future<void> initializeApp(BuildContext context) async {
+  bool _isInitializing = true;
+  SplashNavigationTarget? _navigationTarget;
+
+  bool get isInitializing => _isInitializing;
+  SplashNavigationTarget? get navigationTarget => _navigationTarget;
+
+  Future<void> initializeApp(AuthViewModel authViewModel) async {
+    _isInitializing = true;
+    notifyListeners();
+
+    // Simulate splash delay
     await Future.delayed(const Duration(seconds: 3));
-    if (!context.mounted) {
-      return;
-    }
-    navigateToCalendar(context); // call public method
+
+    // Check login status
+    await authViewModel.checkLoginStatus();
+
+    // Determine navigation target based on auth status
+    _navigationTarget = authViewModel.isLoggedIn
+        ? SplashNavigationTarget.mainNavigation
+        : SplashNavigationTarget.authWrapper;
+
+    _isInitializing = false;
+    notifyListeners();
   }
 
-  void navigateToCalendar(BuildContext context) {
-    final eventVM = Provider.of<EventViewModel>(context, listen: false);
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => CalendarScreen(eventVM: eventVM),
-      ),
-    );
+  void clearNavigationTarget() {
+    _navigationTarget = null;
   }
 }
