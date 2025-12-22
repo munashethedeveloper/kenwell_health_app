@@ -460,13 +460,16 @@ class EventViewModel extends ChangeNotifier {
         ..clear()
         ..addAll(stored);
       notifyListeners();
-    } catch (_) {
-      // Ignore and keep in-memory list empty
+      debugPrint('EventViewModel: Loaded ${stored.length} events from repository');
+    } catch (e) {
+      // Log error but keep in-memory list empty
+      debugPrint('EventViewModel: Error loading events: $e');
     }
   }
 
   /// Reload events from repository (useful when returning to screens)
   Future<void> reloadEvents() async {
+    debugPrint('EventViewModel: Reloading events...');
     await _loadPersistedEvents();
   }
 

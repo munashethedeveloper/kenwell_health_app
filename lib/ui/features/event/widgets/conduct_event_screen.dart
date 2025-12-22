@@ -49,6 +49,8 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
     final eventVM = context.watch<EventViewModel>();
     final allUpcoming = eventVM.getUpcomingEvents();
 
+    debugPrint('ConductEventScreen: Total upcoming events = ${allUpcoming.length}');
+
     // Compute week ranges
     final now = DateTime.now();
     final weekStart = _startOfWeek(now); // Sunday 00:00:00 of this week
@@ -62,6 +64,8 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
       final ev = e.date.toLocal();
       return !(ev.isBefore(selectedStart) || ev.isAfter(selectedEnd));
     }).toList();
+
+    debugPrint('ConductEventScreen: Events in selected week = ${weeklyEvents.length}');
 
     return Scaffold(
       appBar: KenwellAppBar(
@@ -192,21 +196,36 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
 
             // If no events for selected week, show friendly empty state
             if (weeklyEvents.isEmpty)
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.event_available,
-                          size: 64, color: Color(0xFF90C048)),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No events scheduled for the week of ${DateFormat.yMMMMd().format(selectedStart)} - ${DateFormat.yMMMMd().format(selectedEnd)}.\nCreate an event or switch weeks to see other events.',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ],
+              Expanded(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.event_available,
+                            size: 64, color: Color(0xFF90C048)),
+                        const SizedBox(height: 16),
+                        Text(
+                          allUpcoming.isEmpty
+                              ? 'No upcoming events.\nCreate an event to get started!'
+                              : 'No events scheduled for the week of ${DateFormat.yMMMMd().format(selectedStart)} - ${DateFormat.yMMMMd().format(selectedEnd)}.\nSwitch weeks to see other events.',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        if (allUpcoming.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 16),
+                            child: Text(
+                              '${allUpcoming.length} event(s) total',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               )

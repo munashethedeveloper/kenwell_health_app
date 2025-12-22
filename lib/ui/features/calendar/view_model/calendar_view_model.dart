@@ -34,7 +34,9 @@ class CalendarViewModel extends ChangeNotifier {
     try {
       final fetchedEvents = await _repository.fetchAllEvents();
       _events = fetchedEvents ?? [];
+      // Don't set error if list is empty - that's a valid state
     } catch (e) {
+      // Only set error for actual failures (network, database errors, etc.)
       _error = 'Failed to load events: $e';
       _events = []; // Ensure events list is always initialized
       debugPrint(_error);
