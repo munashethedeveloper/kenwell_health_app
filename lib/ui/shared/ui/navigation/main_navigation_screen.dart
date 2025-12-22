@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:kenwell_health_app/ui/features/profile/widgets/profile_screen.dart';
-import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
+import 'package:kenwell_health_app/ui/features/profile/widgets/my_profile_menu_screen.dart';
 import 'package:kenwell_health_app/ui/features/user_management/widgets/user_management_screen_version_two.dart';
-import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 
 // Feature imports
 import '../../../features/calendar/widgets/calendar_screen.dart';
 import '../../../features/stats_report/widgets/stats_report_screen.dart';
-import '../../../features/event/view_model/event_view_model.dart';
 import '../../../features/event/widgets/conduct_event_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
@@ -24,10 +21,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   @override
   void initState() {
     super.initState();
-    // Load profile data when the main navigation screen initializes
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<ProfileViewModel>(context, listen: false).loadProfile();
-    });
   }
 
   @override
@@ -36,7 +29,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       const UserManagementScreenVersionTwo(),
       const StatsReportScreen(),
       const CalendarScreen(),
-      const ProfileScreen(),
+      const MyProfileMenuScreen(),
       const ConductEventScreen(),
     ];
 
