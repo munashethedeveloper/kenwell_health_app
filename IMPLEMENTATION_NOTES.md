@@ -109,11 +109,12 @@ The database will automatically migrate to schema version 13 on first app launch
 
 ## Future Enhancements
 
-1. **Member Update Flow**: Allow editing existing member information
-2. **Search History**: Show recently searched members
-3. **Offline Sync**: Handle cases where database queries fail
-4. **Validation**: Add more robust validation for ID numbers and passport formats
-5. **Member List**: Add a screen to view all registered members
+1. **Dependency Injection**: Refactor to inject MemberRepository instead of creating instances directly in view models and widgets
+2. **Member Update Flow**: Allow editing existing member information
+3. **Search History**: Show recently searched members
+4. **Offline Sync**: Handle cases where database queries fail
+5. **Validation**: Add more robust validation for ID numbers and passport formats
+6. **Member List**: Add a screen to view all registered members
 
 ## Database Schema
 

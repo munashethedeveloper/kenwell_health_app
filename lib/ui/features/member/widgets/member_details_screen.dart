@@ -327,14 +327,20 @@ class MemberDetailsScreen extends StatelessWidget {
           try {
             await vm.saveLocally();
             
+            // Verify member was saved successfully before proceeding
+            if (vm.savedMember == null) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Error: Member was not saved properly')),
+                );
+              }
+              return;
+            }
+            
             // Update the flow view model with the saved member
             final flowVM = context.read<WellnessFlowViewModel>();
-            if (vm.savedMember != null) {
-              flowVM.setCurrentMember(vm.savedMember!);
-              flowVM.navigateToEventDetails();
-            } else {
-              onNext();
-            }
+            flowVM.setCurrentMember(vm.savedMember!);
+            flowVM.navigateToEventDetails();
           } catch (e) {
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(

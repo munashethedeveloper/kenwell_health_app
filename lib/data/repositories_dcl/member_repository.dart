@@ -49,13 +49,13 @@ class MemberRepository {
   }
 
   Future<void> updateMember(Member member) async {
-    final companion = MembersCompanion.insert(
-      id: member.id,
-      name: member.name,
-      surname: member.surname,
+    final companion = MembersCompanion(
+      id: Value(member.id),
+      name: Value(member.name),
+      surname: Value(member.surname),
       idNumber: Value(member.idNumber),
       passportNumber: Value(member.passportNumber),
-      idDocumentType: member.idDocumentType,
+      idDocumentType: Value(member.idDocumentType),
       dateOfBirth: Value(member.dateOfBirth),
       gender: Value(member.gender),
       maritalStatus: Value(member.maritalStatus),

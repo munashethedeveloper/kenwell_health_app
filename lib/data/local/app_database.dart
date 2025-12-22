@@ -240,8 +240,10 @@ class AppDatabase extends _$AppDatabase {
             // Add Members table
             try {
               await migrator.createTable(members);
-            } on SqliteException catch (_) {
+              debugPrint('Successfully created Members table');
+            } on SqliteException catch (e) {
               // Table already exists - this is expected and can be safely ignored
+              debugPrint('Members table migration: ${e.message} (likely already exists)');
             }
           }
         },
@@ -406,8 +408,8 @@ class AppDatabase extends _$AppDatabase {
           ..where((tbl) =>
               tbl.name.contains(query) |
               tbl.surname.contains(query) |
-              tbl.idNumber.contains(query) |
-              tbl.passportNumber.contains(query)))
+              (tbl.idNumber.isNotNull() & tbl.idNumber.contains(query)) |
+              (tbl.passportNumber.isNotNull() & tbl.passportNumber.contains(query))))
         .get();
   }
 
