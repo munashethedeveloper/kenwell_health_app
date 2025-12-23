@@ -59,6 +59,7 @@ class Events extends Table {
   TextColumn get status => text().withDefault(const Constant('scheduled'))();
   DateTimeColumn get actualStartTime => dateTime().nullable()();
   DateTimeColumn get actualEndTime => dateTime().nullable()();
+  IntColumn get screenedCount => integer().withDefault(const Constant(0))();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 
@@ -75,7 +76,7 @@ class AppDatabase extends _$AppDatabase {
   static final AppDatabase instance = AppDatabase._internal();
 
   @override
-  int get schemaVersion => 12;
+  int get schemaVersion => 13;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -208,6 +209,16 @@ class AppDatabase extends _$AppDatabase {
             } on SqliteException catch (e) {
               // Log error but don't crash - app can still function
               print('Migration v11->v12 error: $e');
+            }
+          }
+
+          if (from < 13) {
+            // Add screenedCount column to Events table
+            try {
+              await migrator.addColumn(events, events.screenedCount);
+            } on SqliteException catch (_) {
+              // Column already exists (database was created fresh at v13)
+              // This is expected and can be safely ignored
             }
           }
         },

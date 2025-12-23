@@ -70,6 +70,7 @@ class EventRepository {
       status: entity.status ?? 'scheduled',
       actualStartTime: entity.actualStartTime,
       actualEndTime: entity.actualEndTime,
+      screenedCount: entity.screenedCount ?? 0,
     );
   }
 
@@ -105,6 +106,7 @@ class EventRepository {
       status: Value(event.status),
       actualStartTime: Value(event.actualStartTime),
       actualEndTime: Value(event.actualEndTime),
+      screenedCount: Value(event.screenedCount),
     );
   }
 }

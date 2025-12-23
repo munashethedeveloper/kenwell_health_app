@@ -63,7 +63,8 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
     // Filter events for the selected week (inclusive)
     final weeklyEvents = allUpcoming.where((e) {
       final ev = e.date.toLocal();
-      return !(ev.isBefore(selectedStart) || ev.isAfter(selectedEnd));
+      return (ev.isAfter(selectedStart) || ev.isAtSameMomentAs(selectedStart)) &&
+             (ev.isBefore(selectedEnd) || ev.isAtSameMomentAs(selectedEnd));
     }).toList();
 
     debugPrint(
