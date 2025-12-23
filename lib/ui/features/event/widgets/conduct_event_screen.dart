@@ -23,14 +23,35 @@ class ConductEventScreen extends StatefulWidget {
 class _ConductEventScreenState extends State<ConductEventScreen> {
   String? _startingEventId;
   int _selectedWeek = 0; // 0 = this week, 1 = next week
+  DateTime? _lastReloadTime;
 
   @override
   void initState() {
     super.initState();
-    // Reload events when screen is displayed to ensure latest data
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<EventViewModel>().reloadEvents();
-    });
+    // Initial load of events
+    _reloadEventsIfNeeded();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Reload events when screen becomes visible again
+    _reloadEventsIfNeeded();
+  }
+
+  void _reloadEventsIfNeeded() {
+    // Only reload if it's been more than 2 seconds since last reload
+    // This prevents excessive reloads while still keeping data fresh
+    final now = DateTime.now();
+    if (_lastReloadTime == null ||
+        now.difference(_lastReloadTime!) > const Duration(seconds: 2)) {
+      _lastReloadTime = now;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          context.read<EventViewModel>().reloadEvents();
+        }
+      });
+    }
   }
 
   // LOGOUT METHOD using AuthViewModel
