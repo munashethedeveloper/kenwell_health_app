@@ -24,6 +24,9 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
   String? _startingEventId;
   int _selectedWeek = 0; // 0 = this week, 1 = next week
   DateTime? _lastReloadTime;
+  
+  // Debounce duration to prevent excessive reloads
+  static const Duration _reloadDebounce = Duration(milliseconds: 500);
 
   @override
   void initState() {
@@ -40,11 +43,11 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
   }
 
   void _reloadEventsIfNeeded() {
-    // Only reload if it's been more than 2 seconds since last reload
+    // Only reload if it's been more than the debounce duration since last reload
     // This prevents excessive reloads while still keeping data fresh
     final now = DateTime.now();
     if (_lastReloadTime == null ||
-        now.difference(_lastReloadTime!) > const Duration(seconds: 2)) {
+        now.difference(_lastReloadTime!) > _reloadDebounce) {
       _lastReloadTime = now;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
@@ -83,11 +86,7 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
 
     // Filter events for the selected week (inclusive)
     final weeklyEvents = allUpcoming.where((e) {
-      final eventDate = _normalizeDate(e.date);
-      final weekStartDate = _normalizeDate(selectedStart);
-      final weekEndDate = _normalizeDate(selectedEnd);
-      return (eventDate.isAfter(weekStartDate) || eventDate.isAtSameMomentAs(weekStartDate)) &&
-             (eventDate.isBefore(weekEndDate) || eventDate.isAtSameMomentAs(weekEndDate));
+      return _isDateInRange(e.date, selectedStart, selectedEnd);
     }).toList();
 
     debugPrint(
@@ -388,6 +387,15 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
   // Normalize date to midnight for comparison
   DateTime _normalizeDate(DateTime date) {
     return DateTime(date.year, date.month, date.day, 0, 0, 0, 0);
+  }
+
+  // Check if a date falls within a range (inclusive)
+  bool _isDateInRange(DateTime date, DateTime start, DateTime end) {
+    final eventDate = _normalizeDate(date);
+    final weekStartDate = _normalizeDate(start);
+    final weekEndDate = _normalizeDate(end);
+    return (eventDate.isAfter(weekStartDate) || eventDate.isAtSameMomentAs(weekStartDate)) &&
+           (eventDate.isBefore(weekEndDate) || eventDate.isAtSameMomentAs(weekEndDate));
   }
 
   bool _canStartEvent(WellnessEvent event) {
