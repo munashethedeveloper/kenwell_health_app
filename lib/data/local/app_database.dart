@@ -240,10 +240,10 @@ class AppDatabase extends _$AppDatabase {
             // Add Members table
             try {
               await migrator.createTable(members);
-              debugPrint('Successfully created Members table');
+              print('Successfully created Members table');
             } on SqliteException catch (e) {
               // Table already exists - this is expected and can be safely ignored
-              debugPrint('Members table migration: ${e.message} (likely already exists)');
+              print('Members table migration: ${e.message} (likely already exists)');
             }
           }
         },
