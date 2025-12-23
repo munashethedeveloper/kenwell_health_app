@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
+import 'package:kenwell_health_app/data/repositories_dcl/member_repository.dart';
+import 'package:kenwell_health_app/data/local/app_database.dart';
+import 'package:kenwell_health_app/domain/models/member.dart';
 
 class MemberDetailsViewModel extends ChangeNotifier {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final MemberRepository _memberRepository = MemberRepository(AppDatabase.instance);
+
+  Member? savedMember;
 
   // Controllers
   final screeningSiteController = TextEditingController();
@@ -430,9 +436,37 @@ class MemberDetailsViewModel extends ChangeNotifier {
   Future<void> saveLocally() async {
     _isSubmitting = true;
     notifyListeners();
-    await Future.delayed(const Duration(milliseconds: 500));
-    _isSubmitting = false;
-    notifyListeners();
+    
+    try {
+      // Create a Member object from the form data
+      final member = Member(
+        name: nameController.text,
+        surname: surnameController.text,
+        idNumber: idDocumentChoice == 'ID' ? idNumberController.text : null,
+        passportNumber: idDocumentChoice == 'Passport' ? passportNumberController.text : null,
+        idDocumentType: idDocumentChoice,
+        dateOfBirth: dobController.text,
+        gender: gender,
+        maritalStatus: maritalStatus,
+        nationality: citizenshipStatus == 'SA Citizen' ? 'South Africa' : selectedNationality,
+        citizenshipStatus: citizenshipStatus,
+        email: emailController.text.isEmpty ? null : emailController.text,
+        cellNumber: cellNumberController.text,
+        medicalAidStatus: medicalAidStatus,
+        medicalAidName: medicalAidStatus == 'Yes' ? medicalAidNameController.text : null,
+        medicalAidNumber: medicalAidStatus == 'Yes' ? medicalAidNumberController.text : null,
+      );
+
+      // Save to database
+      savedMember = await _memberRepository.createMember(member);
+      debugPrint('Member saved to database: ${savedMember!.id}');
+    } catch (e) {
+      debugPrint('Error saving member: $e');
+      rethrow;
+    } finally {
+      _isSubmitting = false;
+      notifyListeners();
+    }
   }
 
   @override
