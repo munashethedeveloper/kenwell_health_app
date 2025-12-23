@@ -62,9 +62,11 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
 
     // Filter events for the selected week (inclusive)
     final weeklyEvents = allUpcoming.where((e) {
-      final ev = e.date.toLocal();
-      return (ev.isAfter(selectedStart) || ev.isAtSameMomentAs(selectedStart)) &&
-             (ev.isBefore(selectedEnd) || ev.isAtSameMomentAs(selectedEnd));
+      final eventDate = _normalizeDate(e.date);
+      final weekStartDate = _normalizeDate(selectedStart);
+      final weekEndDate = _normalizeDate(selectedEnd);
+      return (eventDate.isAfter(weekStartDate) || eventDate.isAtSameMomentAs(weekStartDate)) &&
+             (eventDate.isBefore(weekEndDate) || eventDate.isAtSameMomentAs(weekEndDate));
     }).toList();
 
     debugPrint(
@@ -199,37 +201,33 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
 
             // If no events for selected week, show friendly empty state
             if (weeklyEvents.isEmpty)
-              Expanded(
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.event_available,
-                            size: 64, color: Color(0xFF90C048)),
-                        const SizedBox(height: 16),
-                        Text(
-                          allUpcoming.isEmpty
-                              ? 'No upcoming events.\nCreate an event to get started!'
-                              : 'No events scheduled for the week of ${DateFormat.yMMMMd().format(selectedStart)} - ${DateFormat.yMMMMd().format(selectedEnd)}.\nSwitch weeks to see other events.',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                        if (allUpcoming.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 16),
-                            child: Text(
-                              '${allUpcoming.length} event(s) total',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ),
-                      ],
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.event_available,
+                        size: 64, color: Color(0xFF90C048)),
+                    const SizedBox(height: 16),
+                    Text(
+                      allUpcoming.isEmpty
+                          ? 'No upcoming events.\nCreate an event to get started!'
+                          : 'No events scheduled for the week of ${DateFormat.yMMMMd().format(selectedStart)} - ${DateFormat.yMMMMd().format(selectedEnd)}.\nSwitch weeks to see other events.',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 16),
                     ),
-                  ),
+                    if (allUpcoming.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: Text(
+                          '${allUpcoming.length} event(s) total',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               )
             else
@@ -353,15 +351,22 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
   }
 
   DateTime _startOfWeek(DateTime date) {
+    // weekday: 1=Monday, 7=Sunday
+    // To start week on Sunday: if Sunday (7), subtract 0 days; if Monday (1), subtract 1 day, etc.
     final int daysToSubtract = date.weekday % 7;
     final dt = DateTime(date.year, date.month, date.day)
         .subtract(Duration(days: daysToSubtract));
-    return DateTime(dt.year, dt.month, dt.day);
+    return DateTime(dt.year, dt.month, dt.day, 0, 0, 0, 0);
   }
 
   DateTime _endOfWeek(DateTime weekStart) {
     final end = weekStart.add(const Duration(days: 6));
     return DateTime(end.year, end.month, end.day, 23, 59, 59, 999);
+  }
+
+  // Normalize date to midnight for comparison
+  DateTime _normalizeDate(DateTime date) {
+    return DateTime(date.year, date.month, date.day, 0, 0, 0, 0);
   }
 
   bool _canStartEvent(WellnessEvent event) {
