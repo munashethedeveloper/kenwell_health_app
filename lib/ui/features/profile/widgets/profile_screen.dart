@@ -49,6 +49,13 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
+  // Store original values to detect changes
+  String _originalFirstName = '';
+  String _originalLastName = '';
+  String _originalPhone = '';
+  String _originalEmail = '';
+  String _originalPassword = '';
+
   @override
   void initState() {
     super.initState();
@@ -63,6 +70,12 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
     if (!mounted) return;
     setState(() {
       _syncControllersWithViewModel(vm);
+      // Store original values
+      _originalFirstName = vm.firstName;
+      _originalLastName = vm.lastName;
+      _originalPhone = vm.phoneNumber;
+      _originalEmail = vm.email;
+      _originalPassword = vm.password;
     });
   }
 
@@ -77,6 +90,38 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
     _selectedRole = vm.role.isNotEmpty && vm.availableRoles.contains(vm.role)
         ? vm.role
         : null;
+  }
+
+  /// Check if profile has unsaved changes
+  bool _hasUnsavedChanges() {
+    return _firstNameController.text != _originalFirstName ||
+        _lastNameController.text != _originalLastName ||
+        _phoneController.text != _originalPhone ||
+        _emailController.text != _originalEmail ||
+        _passwordController.text != _originalPassword;
+  }
+
+  /// Handle cancel with unsaved changes confirmation
+  Future<void> _handleCancel() async {
+    if (!_hasUnsavedChanges()) {
+      Navigator.pop(context);
+      return;
+    }
+
+    final confirmed = await ConfirmationDialog.show(
+      context,
+      title: 'Discard Changes?',
+      message:
+          'You have unsaved changes to your profile. Are you sure you want to discard them?',
+      confirmText: 'Discard',
+      cancelText: 'Keep Editing',
+      confirmColor: Colors.orange,
+      icon: Icons.warning,
+    );
+
+    if (confirmed && mounted) {
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -378,7 +423,7 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
                             children: [
                               Expanded(
                                 child: OutlinedButton(
-                                  onPressed: () => Navigator.pop(context),
+                                  onPressed: _handleCancel,
                                   style: OutlinedButton.styleFrom(
                                     side: const BorderSide(
                                         color: KenwellColors.primaryGreen,

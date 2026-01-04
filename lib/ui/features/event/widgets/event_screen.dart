@@ -14,6 +14,7 @@ import '../../../shared/ui/form/kenwell_date_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_styles.dart';
 import '../../../shared/ui/form/kenwell_section_header.dart';
+import '../../../shared/ui/dialogs/confirmation_dialog.dart';
 import '../view_model/event_view_model.dart';
 
 class EventScreen extends StatefulWidget {
@@ -56,6 +57,38 @@ class _EventScreenState extends State<EventScreen> {
     } else {
       widget.viewModel.dateController.text =
           "${widget.date.year}-${widget.date.month.toString().padLeft(2, '0')}-${widget.date.day.toString().padLeft(2, '0')}";
+    }
+  }
+
+  /// Check if the form has any data entered
+  bool _hasUnsavedChanges() {
+    return widget.viewModel.titleController.text.isNotEmpty ||
+        widget.viewModel.venueController.text.isNotEmpty ||
+        widget.viewModel.addressController.text.isNotEmpty ||
+        widget.viewModel.onsiteContactFirstNameController.text.isNotEmpty ||
+        widget.viewModel.aeContactFirstNameController.text.isNotEmpty;
+  }
+
+  /// Handle cancel with unsaved changes confirmation
+  Future<void> _handleCancel() async {
+    if (!_hasUnsavedChanges()) {
+      Navigator.pop(context);
+      return;
+    }
+
+    final confirmed = await ConfirmationDialog.show(
+      context,
+      title: 'Discard Changes?',
+      message:
+          'You have unsaved changes. Are you sure you want to discard them?',
+      confirmText: 'Discard',
+      cancelText: 'Keep Editing',
+      confirmColor: Colors.orange,
+      icon: Icons.warning,
+    );
+
+    if (confirmed && mounted) {
+      Navigator.pop(context);
     }
   }
 
@@ -713,7 +746,7 @@ class _EventScreenState extends State<EventScreen> {
                 children: [
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: _handleCancel,
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(
                             color: KenwellColors.primaryGreen, width: 2),
