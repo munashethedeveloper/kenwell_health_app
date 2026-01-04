@@ -111,6 +111,67 @@ class FirebaseAuthService {
     return UserModel.fromMap(doc.data()!);
   }
 
+  /// Update user profile in Firestore
+  Future<UserModel?> updateUserProfile({
+    required String id,
+    required String email,
+    required String role,
+    required String phoneNumber,
+    required String firstName,
+    required String lastName,
+  }) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null || user.uid != id) {
+        debugPrint('User not authenticated or ID mismatch');
+        return null;
+      }
+
+      // Update email if changed
+      if (user.email != email) {
+        await user.updateEmail(email);
+      }
+
+      // Create updated UserModel
+      final userModel = UserModel(
+        id: id,
+        email: email,
+        role: role,
+        firstName: firstName,
+        lastName: lastName,
+        phoneNumber: phoneNumber,
+      );
+
+      // Update Firestore document
+      await _firestore.collection('users').doc(id).update(userModel.toMap());
+
+      return userModel;
+    } catch (e, stackTrace) {
+      debugPrint('Update profile error: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      return null;
+    }
+  }
+
+  /// Update user password
+  Future<bool> updatePassword(String newPassword) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) {
+        debugPrint('No user logged in');
+        return false;
+      }
+
+      await user.updatePassword(newPassword);
+      debugPrint('Password updated successfully');
+      return true;
+    } catch (e, stackTrace) {
+      debugPrint('Update password error: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      return false;
+    }
+  }
+
   /// Send password reset email
   Future<bool> sendPasswordResetEmail(String email) async {
     try {
@@ -123,4 +184,24 @@ class FirebaseAuthService {
       return false;
     }
   }
+
+  /// Check if user is logged in
+  bool isLoggedIn() {
+    return _auth.currentUser != null;
+  }
+
+  /// Get all users (admin function)
+  Future<List<UserModel>> getAllUsers() async {
+    try {
+      final querySnapshot = await _firestore.collection('users').get();
+      return querySnapshot.docs
+          .map((doc) => UserModel.fromMap(doc.data()))
+          .toList();
+    } catch (e, stackTrace) {
+      debugPrint('Get all users error: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      return [];
+    }
+  }
 }
+

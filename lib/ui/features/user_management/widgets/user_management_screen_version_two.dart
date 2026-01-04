@@ -6,7 +6,7 @@ import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
-import '../../../../data/services/auth_service.dart';
+import '../../../../data/services/firebase_auth_service.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
@@ -26,7 +26,7 @@ class _UserManagementScreenVersionTwoState
   final GlobalKey<_ViewUsersTabState> _viewUsersKey = GlobalKey();
 
   Future<void> _logout() async {
-    await AuthService().logout();
+    await FirebaseAuthService().logout();
 
     if (!mounted) return;
 
@@ -165,7 +165,7 @@ class _CreateUserTabState extends State<CreateUserTab> {
     setState(() => _isLoading = true);
 
     try {
-      final user = await AuthService().register(
+      final user = await FirebaseAuthService().register(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
         role: _selectedRole!,
@@ -330,7 +330,7 @@ class ViewUsersTab extends StatefulWidget {
 }
 
 class _ViewUsersTabState extends State<ViewUsersTab> {
-  final AuthService _authService = AuthService();
+  final FirebaseAuthService _authService = FirebaseAuthService();
   List<Map<String, String>> users = [];
   bool _isLoading = true;
 

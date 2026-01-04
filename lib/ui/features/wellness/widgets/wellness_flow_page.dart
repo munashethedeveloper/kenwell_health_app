@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/routing/route_names.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../data/services/auth_service.dart';
+import '../../../../data/services/firebase_auth_service.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/wellness_flow_view_model.dart';
@@ -27,7 +27,7 @@ class WellnessFlowPage extends StatefulWidget {
 
 class _WellnessFlowPageState extends State<WellnessFlowPage> {
   Future<void> _logout() async {
-    await AuthService().logout();
+    await FirebaseAuthService().logout();
 
     if (!mounted) return;
 

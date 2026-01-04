@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:kenwell_health_app/data/services/auth_service.dart';
+import 'package:kenwell_health_app/data/services/firebase_auth_service.dart';
 import 'package:kenwell_health_app/domain/constants/user_roles.dart';
 import '../../../../domain/models/user_model.dart';
 
 class ProfileViewModel extends ChangeNotifier {
   ProfileViewModel();
 
-  final AuthService _authService = AuthService();
+  final FirebaseAuthService _authService = FirebaseAuthService();
 
   // User fields
   String email = '';
@@ -28,8 +28,7 @@ class ProfileViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      user = await _authService.getCurrentUser();
-      password = await _authService.getStoredPassword() ?? '';
+      user = await _authService.currentUser();
 
       if (user != null) {
         email = user!.email;
@@ -54,18 +53,27 @@ class ProfileViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final id = user?.id ?? DateTime.now().millisecondsSinceEpoch.toString();
+      final id = user?.id;
+      if (id == null) {
+        debugPrint("No user ID found");
+        return;
+      }
 
-      user = await _authService.saveUser(
+      // Update profile in Firestore
+      user = await _authService.updateUserProfile(
         id: id,
         email: email,
-        password: password,
         role: UserRoles.normalize(role),
         phoneNumber: phoneNumber,
         // username: username,
         firstName: firstName,
         lastName: lastName,
       );
+
+      // Update password if changed
+      if (password.isNotEmpty) {
+        await _authService.updatePassword(password);
+      }
 
       debugPrint("Profile updated successfully");
     } catch (e) {
