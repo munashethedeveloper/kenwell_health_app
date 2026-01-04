@@ -112,6 +112,7 @@ class FirebaseAuthService {
   }
 
   /// Update user profile in Firestore
+  /// Note: Email updates may require recent authentication
   Future<UserModel?> updateUserProfile({
     required String id,
     required String email,
@@ -127,9 +128,17 @@ class FirebaseAuthService {
         return null;
       }
 
-      // Update email if changed
+      // Update email if changed - may require recent authentication
       if (user.email != email) {
-        await user.updateEmail(email);
+        try {
+          await user.updateEmail(email);
+        } on FirebaseAuthException catch (e) {
+          if (e.code == 'requires-recent-login') {
+            debugPrint('Email update requires recent login. User needs to re-authenticate.');
+            rethrow; // Re-throw so caller can handle re-authentication
+          }
+          rethrow;
+        }
       }
 
       // Create updated UserModel
@@ -154,6 +163,7 @@ class FirebaseAuthService {
   }
 
   /// Update user password
+  /// Note: May require recent authentication for security
   Future<bool> updatePassword(String newPassword) async {
     try {
       final user = _auth.currentUser;
@@ -162,11 +172,43 @@ class FirebaseAuthService {
         return false;
       }
 
-      await user.updatePassword(newPassword);
-      debugPrint('Password updated successfully');
-      return true;
+      try {
+        await user.updatePassword(newPassword);
+        debugPrint('Password updated successfully');
+        return true;
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'requires-recent-login') {
+          debugPrint('Password update requires recent login. User needs to re-authenticate.');
+        }
+        rethrow;
+      }
     } catch (e, stackTrace) {
       debugPrint('Update password error: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      return false;
+    }
+  }
+
+  /// Re-authenticate user with their current password
+  /// Required before sensitive operations like email/password changes
+  Future<bool> reauthenticateUser(String password) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null || user.email == null) {
+        debugPrint('No user logged in or email is null');
+        return false;
+      }
+
+      final credential = EmailAuthProvider.credential(
+        email: user.email!,
+        password: password,
+      );
+
+      await user.reauthenticateWithCredential(credential);
+      debugPrint('Re-authentication successful');
+      return true;
+    } catch (e, stackTrace) {
+      debugPrint('Re-authentication error: $e');
       debugPrintStack(stackTrace: stackTrace);
       return false;
     }
