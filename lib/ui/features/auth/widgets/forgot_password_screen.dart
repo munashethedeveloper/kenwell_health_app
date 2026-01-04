@@ -3,7 +3,7 @@ import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
 
-import '../../../../data/services/auth_service.dart';
+import '../../../../data/services/firebase_auth_service.dart';
 import '../../../shared/ui/colours/kenwell_colours.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
@@ -29,7 +29,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final bool success = await AuthService().forgotPassword(
+      final bool success = await FirebaseAuthService().sendPasswordResetEmail(
         _emailController.text.trim(),
       );
 
@@ -48,7 +48,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('No account found with this email.'),
+            content: Text('Failed to send reset email. Please try again.'),
           ),
         );
       }

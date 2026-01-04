@@ -110,4 +110,17 @@ class FirebaseAuthService {
     }
     return UserModel.fromMap(doc.data()!);
   }
+
+  /// Send password reset email
+  Future<bool> sendPasswordResetEmail(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email.trim());
+      debugPrint('Password reset email sent to: $email');
+      return true;
+    } catch (e, stackTrace) {
+      debugPrint('Password reset error: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      return false;
+    }
+  }
 }

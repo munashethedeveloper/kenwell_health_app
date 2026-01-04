@@ -1,8 +1,8 @@
-import '../services/auth_service.dart';
+import '../services/firebase_auth_service.dart';
 import '../../domain/models/user_model.dart';
 
 class AuthRepository {
-  final AuthService _authService = AuthService();
+  final FirebaseAuthService _authService = FirebaseAuthService();
 
   /// Login user
   Future<UserModel?> login(String email, String password) {
@@ -32,4 +32,7 @@ class AuthRepository {
 
   /// Logout user
   Future<void> logout() => _authService.logout();
+
+  /// Get current user
+  Future<UserModel?> getCurrentUser() => _authService.currentUser();
 }
