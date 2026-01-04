@@ -4,6 +4,8 @@
 
 This document describes the comprehensive snackbar and dialog message improvements added to the Kenwell Health App to enhance user feedback and experience.
 
+> **Note:** For permission-specific dialogs, see [PERMISSION_DIALOG_GUIDE.md](PERMISSION_DIALOG_GUIDE.md) which provides Material Design compliant permission request patterns.
+
 ## New Components Added
 
 ### 1. ConfirmationDialog Widget
@@ -57,7 +59,43 @@ await InfoDialog.show(
 );
 ```
 
-### 3. AppSnackbar Utility Class
+### 3. PermissionDialog Widget
+**Location:** `lib/ui/shared/ui/dialogs/permission_dialog.dart`
+
+A Material Design compliant dialog for requesting app permissions from users.
+
+**Features:**
+- Large icon for visual recognition
+- Clear title and description
+- Benefit explanation with highlighted box
+- Allow/Deny buttons with proper styling
+- Non-dismissible (user must choose)
+- Pre-configured helpers for common permissions
+
+**Usage Example:**
+```dart
+// Request notification permission
+final granted = await CommonPermissions.requestNotification(context);
+
+if (granted) {
+  // User agreed, proceed with system permission request
+  final systemGranted = await requestSystemPermission();
+}
+
+// Custom permission
+final granted = await PermissionDialog.show(
+  context,
+  permissionName: 'Camera',
+  title: 'Use Camera?',
+  description: 'Take photos for your profile or scan documents.',
+  benefit: 'Quickly capture and attach health documents.',
+  icon: Icons.camera_alt,
+);
+```
+
+**See also:** [PERMISSION_DIALOG_GUIDE.md](PERMISSION_DIALOG_GUIDE.md) for complete integration guide.
+
+### 4. AppSnackbar Utility Class
 **Location:** `lib/ui/shared/ui/snackbars/app_snackbar.dart`
 
 A utility class for displaying consistent snackbars throughout the app.
