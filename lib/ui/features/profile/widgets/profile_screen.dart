@@ -4,6 +4,7 @@ import 'package:kenwell_health_app/ui/features/auth/view_models/auth_view_model.
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
+import 'package:kenwell_health_app/ui/shared/ui/dialogs/confirmation_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
@@ -48,6 +49,13 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
+  // Store original values to detect changes
+  String _originalFirstName = '';
+  String _originalLastName = '';
+  String _originalPhone = '';
+  String _originalEmail = '';
+  String _originalPassword = '';
+
   @override
   void initState() {
     super.initState();
@@ -62,6 +70,12 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
     if (!mounted) return;
     setState(() {
       _syncControllersWithViewModel(vm);
+      // Store original values
+      _originalFirstName = vm.firstName;
+      _originalLastName = vm.lastName;
+      _originalPhone = vm.phoneNumber;
+      _originalEmail = vm.email;
+      _originalPassword = vm.password;
     });
   }
 
@@ -78,6 +92,38 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
         : null;
   }
 
+  /// Check if profile has unsaved changes
+  bool _hasUnsavedChanges() {
+    return _firstNameController.text != _originalFirstName ||
+        _lastNameController.text != _originalLastName ||
+        _phoneController.text != _originalPhone ||
+        _emailController.text != _originalEmail ||
+        _passwordController.text != _originalPassword;
+  }
+
+  /// Handle cancel with unsaved changes confirmation
+  Future<void> _handleCancel() async {
+    if (!_hasUnsavedChanges()) {
+      Navigator.pop(context);
+      return;
+    }
+
+    final confirmed = await ConfirmationDialog.show(
+      context,
+      title: 'Discard Changes?',
+      message:
+          'You have unsaved changes to your profile. Are you sure you want to discard them?',
+      confirmText: 'Discard',
+      cancelText: 'Keep Editing',
+      confirmColor: Colors.orange,
+      icon: Icons.warning,
+    );
+
+    if (confirmed && mounted) {
+      Navigator.pop(context);
+    }
+  }
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -91,9 +137,29 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
   }
 
   Future<void> _logout() async {
+    final confirmed = await ConfirmationDialog.show(
+      context,
+      title: 'Logout',
+      message: 'Are you sure you want to logout?',
+      confirmText: 'Logout',
+      cancelText: 'Cancel',
+      confirmColor: Colors.orange,
+      icon: Icons.logout,
+    );
+
+    if (!confirmed) return;
+
     final authVM = context.read<AuthViewModel>();
     await authVM.logout();
     if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Successfully logged out'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+
     Navigator.pushReplacementNamed(context, RouteNames.login);
   }
 
@@ -357,7 +423,7 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
                             children: [
                               Expanded(
                                 child: OutlinedButton(
-                                  onPressed: () => Navigator.pop(context),
+                                  onPressed: _handleCancel,
                                   style: OutlinedButton.styleFrom(
                                     side: const BorderSide(
                                         color: KenwellColors.primaryGreen,

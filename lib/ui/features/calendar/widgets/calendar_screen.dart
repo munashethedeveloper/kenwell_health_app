@@ -12,6 +12,7 @@ import '../../event/widgets/event_screen.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/buttons/custom_primary_button.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
+import '../../../shared/ui/dialogs/confirmation_dialog.dart';
 import '../view_model/calendar_view_model.dart';
 
 class CalendarScreen extends StatelessWidget {
@@ -47,9 +48,29 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
       DateTime(date.year, date.month, date.day);
 
   Future<void> _logout() async {
+    final confirmed = await ConfirmationDialog.show(
+      context,
+      title: 'Logout',
+      message: 'Are you sure you want to logout?',
+      confirmText: 'Logout',
+      cancelText: 'Cancel',
+      confirmColor: Colors.orange,
+      icon: Icons.logout,
+    );
+
+    if (!confirmed) return;
+
     final authVM = context.read<AuthViewModel>();
     await authVM.logout();
     if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Successfully logged out'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+
     Navigator.pushReplacementNamed(context, RouteNames.login);
   }
 

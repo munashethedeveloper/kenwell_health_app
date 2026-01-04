@@ -5,6 +5,7 @@ import 'package:kenwell_health_app/ui/features/auth/view_models/auth_view_model.
 import 'package:kenwell_health_app/ui/features/auth/widgets/login_screen.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
+import 'package:kenwell_health_app/ui/shared/ui/dialogs/confirmation_dialog.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../domain/models/wellness_event.dart';
@@ -35,9 +36,29 @@ class _ConductEventScreenState extends State<ConductEventScreen> {
 
   // LOGOUT METHOD using AuthViewModel
   Future<void> _logout() async {
+    final confirmed = await ConfirmationDialog.show(
+      context,
+      title: 'Logout',
+      message: 'Are you sure you want to logout?',
+      confirmText: 'Logout',
+      cancelText: 'Cancel',
+      confirmColor: Colors.orange,
+      icon: Icons.logout,
+    );
+
+    if (!confirmed) return;
+
     final authVM = context.read<AuthViewModel>();
     await authVM.logout();
     if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Successfully logged out'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const LoginScreen()),
       (route) => false,
