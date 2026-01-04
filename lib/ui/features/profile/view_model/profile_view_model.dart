@@ -55,7 +55,8 @@ class ProfileViewModel extends ChangeNotifier {
     try {
       final id = user?.id;
       if (id == null) {
-        debugPrint("No user ID found");
+        debugPrint("Cannot update profile: User not logged in");
+        // In a real app, you might want to notify the UI about this error
         return;
       }
 
@@ -70,14 +71,25 @@ class ProfileViewModel extends ChangeNotifier {
         lastName: lastName,
       );
 
-      // Update password if changed
+      // Update password if changed and not empty
       if (password.isNotEmpty) {
-        await _authService.updatePassword(password);
+        try {
+          final success = await _authService.updatePassword(password);
+          if (!success) {
+            debugPrint("Password update failed - may require re-authentication");
+            // In production, you should handle this by prompting user to re-authenticate
+          }
+        } catch (e) {
+          debugPrint("Password update error: $e");
+          // Handle re-authentication requirement here if needed
+          rethrow;
+        }
       }
 
       debugPrint("Profile updated successfully");
     } catch (e) {
       debugPrint("Error updating profile: $e");
+      rethrow; // Re-throw so UI can display appropriate error message
     } finally {
       isSavingProfile = false;
       notifyListeners();

@@ -48,13 +48,27 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Failed to send reset email. Please try again.'),
+            content: Text(
+              'Failed to send reset email. Please check the email address and try again.',
+            ),
           ),
         );
       }
     } catch (e) {
+      if (!mounted) return;
+      
+      // Provide more specific error messages
+      String errorMessage = 'An error occurred. Please try again.';
+      if (e.toString().contains('network')) {
+        errorMessage = 'Network error. Please check your internet connection.';
+      } else if (e.toString().contains('user-not-found')) {
+        errorMessage = 'No account found with this email address.';
+      } else if (e.toString().contains('invalid-email')) {
+        errorMessage = 'Invalid email address format.';
+      }
+      
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error: $e')));
+          .showSnackBar(SnackBar(content: Text(errorMessage)));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
