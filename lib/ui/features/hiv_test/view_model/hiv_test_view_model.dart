@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 class HIVTestViewModel extends ChangeNotifier {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -104,21 +105,46 @@ class HIVTestViewModel extends ChangeNotifier {
     };
   }
 
-  Future<void> submitHIVTest(VoidCallback? onNext) async {
-    if (!isFormValid) return;
+  Future<void> submitHIVTest(
+    BuildContext context, {
+    VoidCallback? onNext,
+  }) async {
+    if (!isFormValid) {
+      AppSnackbar.showWarning(
+        context,
+        'Please complete all required fields',
+      );
+      return;
+    }
 
     _isSubmitting = true;
     notifyListeners();
 
-    debugPrint("✅ HIV Test Submitted:");
-    debugPrint(toMap().toString());
+    try {
+      debugPrint("✅ HIV Test Submitted:");
+      debugPrint(toMap().toString());
 
-    await Future.delayed(const Duration(seconds: 1));
+      await Future.delayed(const Duration(seconds: 1));
 
-    _isSubmitting = false;
-    notifyListeners();
+      if (!context.mounted) return;
 
-    onNext?.call();
+      AppSnackbar.showSuccess(
+        context,
+        'HIV screening saved successfully',
+      );
+
+      onNext?.call();
+    } catch (e) {
+      if (context.mounted) {
+        AppSnackbar.showError(
+          context,
+          'Error saving HIV screening: $e',
+        );
+      }
+    } finally {
+      _isSubmitting = false;
+      notifyListeners();
+    }
   }
 
   @override

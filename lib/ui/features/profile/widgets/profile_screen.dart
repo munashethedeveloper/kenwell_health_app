@@ -4,6 +4,7 @@ import 'package:kenwell_health_app/ui/features/auth/view_models/auth_view_model.
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
+import 'package:kenwell_health_app/ui/shared/ui/dialogs/confirmation_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
@@ -91,9 +92,29 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
   }
 
   Future<void> _logout() async {
+    final confirmed = await ConfirmationDialog.show(
+      context,
+      title: 'Logout',
+      message: 'Are you sure you want to logout?',
+      confirmText: 'Logout',
+      cancelText: 'Cancel',
+      confirmColor: Colors.orange,
+      icon: Icons.logout,
+    );
+
+    if (!confirmed) return;
+
     final authVM = context.read<AuthViewModel>();
     await authVM.logout();
     if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Successfully logged out'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+
     Navigator.pushReplacementNamed(context, RouteNames.login);
   }
 

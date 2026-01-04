@@ -3,6 +3,7 @@ import 'package:signature/signature.dart';
 import 'package:intl/intl.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 class TBTestingViewModel extends ChangeNotifier {
   // Note: formKey is now defined here
@@ -281,8 +282,9 @@ class TBTestingViewModel extends ChangeNotifier {
   Future<void> submitTBTest(BuildContext context,
       {VoidCallback? onNext}) async {
     if (!isFormValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please complete all required fields.')),
+      AppSnackbar.showWarning(
+        context,
+        'Please complete all required fields',
       );
       return;
     }
@@ -306,6 +308,11 @@ class TBTestingViewModel extends ChangeNotifier {
 
       if (!context.mounted) return;
 
+      AppSnackbar.showSuccess(
+        context,
+        'TB screening saved successfully',
+      );
+
       // ✅ Callback for workflow navigation
       if (onNext != null) {
         onNext();
@@ -314,6 +321,13 @@ class TBTestingViewModel extends ChangeNotifier {
       debugPrint("❌ Error submitting TB Test: $e");
       _isSubmitting = false;
       notifyListeners();
+
+      if (context.mounted) {
+        AppSnackbar.showError(
+          context,
+          'Error saving TB screening: $e',
+        );
+      }
     }
   }
 
