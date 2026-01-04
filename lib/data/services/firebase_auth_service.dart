@@ -110,4 +110,140 @@ class FirebaseAuthService {
     }
     return UserModel.fromMap(doc.data()!);
   }
+
+  /// Update user profile in Firestore
+  /// Note: Email updates may require recent authentication
+  Future<UserModel?> updateUserProfile({
+    required String id,
+    required String email,
+    required String role,
+    required String phoneNumber,
+    required String firstName,
+    required String lastName,
+  }) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null || user.uid != id) {
+        debugPrint('User not authenticated or ID mismatch');
+        return null;
+      }
+
+      // Update email if changed - may require recent authentication
+      if (user.email != email) {
+        try {
+          await user.updateEmail(email);
+        } on FirebaseAuthException catch (e) {
+          if (e.code == 'requires-recent-login') {
+            debugPrint('Email update requires recent login. User needs to re-authenticate.');
+            rethrow; // Re-throw so caller can handle re-authentication
+          }
+          rethrow;
+        }
+      }
+
+      // Create updated UserModel
+      final userModel = UserModel(
+        id: id,
+        email: email,
+        role: role,
+        firstName: firstName,
+        lastName: lastName,
+        phoneNumber: phoneNumber,
+      );
+
+      // Update Firestore document
+      await _firestore.collection('users').doc(id).update(userModel.toMap());
+
+      return userModel;
+    } catch (e, stackTrace) {
+      debugPrint('Update profile error: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      return null;
+    }
+  }
+
+  /// Update user password
+  /// Note: May require recent authentication for security
+  Future<bool> updatePassword(String newPassword) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) {
+        debugPrint('No user logged in');
+        return false;
+      }
+
+      try {
+        await user.updatePassword(newPassword);
+        debugPrint('Password updated successfully');
+        return true;
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'requires-recent-login') {
+          debugPrint('Password update requires recent login. User needs to re-authenticate.');
+        }
+        rethrow;
+      }
+    } catch (e, stackTrace) {
+      debugPrint('Update password error: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      return false;
+    }
+  }
+
+  /// Re-authenticate user with their current password
+  /// Required before sensitive operations like email/password changes
+  Future<bool> reauthenticateUser(String password) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null || user.email == null) {
+        debugPrint('No user logged in or email is null');
+        return false;
+      }
+
+      final credential = EmailAuthProvider.credential(
+        email: user.email!,
+        password: password,
+      );
+
+      await user.reauthenticateWithCredential(credential);
+      debugPrint('Re-authentication successful');
+      return true;
+    } catch (e, stackTrace) {
+      debugPrint('Re-authentication error: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      return false;
+    }
+  }
+
+  /// Send password reset email
+  Future<bool> sendPasswordResetEmail(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email.trim());
+      debugPrint('Password reset email sent to: $email');
+      return true;
+    } catch (e, stackTrace) {
+      debugPrint('Password reset error: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      return false;
+    }
+  }
+
+  /// Check if user is logged in
+  bool isLoggedIn() {
+    return _auth.currentUser != null;
+  }
+
+  /// Get all users (admin function)
+  Future<List<UserModel>> getAllUsers() async {
+    try {
+      final querySnapshot = await _firestore.collection('users').get();
+      return querySnapshot.docs
+          .map((doc) => UserModel.fromMap(doc.data()))
+          .toList();
+    } catch (e, stackTrace) {
+      debugPrint('Get all users error: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      return [];
+    }
+  }
 }
+

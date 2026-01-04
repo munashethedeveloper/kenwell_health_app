@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:kenwell_health_app/data/services/auth_service.dart';
+import 'package:kenwell_health_app/data/services/firebase_auth_service.dart';
 import 'package:kenwell_health_app/domain/constants/user_roles.dart';
 import '../../../../domain/models/user_model.dart';
 
 class ProfileViewModel extends ChangeNotifier {
   ProfileViewModel();
 
-  final AuthService _authService = AuthService();
+  final FirebaseAuthService _authService = FirebaseAuthService();
 
   // User fields
   String email = '';
@@ -28,8 +28,7 @@ class ProfileViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      user = await _authService.getCurrentUser();
-      password = await _authService.getStoredPassword() ?? '';
+      user = await _authService.currentUser();
 
       if (user != null) {
         email = user!.email;
@@ -54,12 +53,17 @@ class ProfileViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final id = user?.id ?? DateTime.now().millisecondsSinceEpoch.toString();
+      final id = user?.id;
+      if (id == null) {
+        debugPrint("Cannot update profile: User not logged in");
+        // In a real app, you might want to notify the UI about this error
+        return;
+      }
 
-      user = await _authService.saveUser(
+      // Update profile in Firestore
+      user = await _authService.updateUserProfile(
         id: id,
         email: email,
-        password: password,
         role: UserRoles.normalize(role),
         phoneNumber: phoneNumber,
         // username: username,
@@ -67,9 +71,25 @@ class ProfileViewModel extends ChangeNotifier {
         lastName: lastName,
       );
 
+      // Update password if changed and not empty
+      if (password.isNotEmpty) {
+        try {
+          final success = await _authService.updatePassword(password);
+          if (!success) {
+            debugPrint("Password update failed - may require re-authentication");
+            // In production, you should handle this by prompting user to re-authenticate
+          }
+        } catch (e) {
+          debugPrint("Password update error: $e");
+          // Handle re-authentication requirement here if needed
+          rethrow;
+        }
+      }
+
       debugPrint("Profile updated successfully");
     } catch (e) {
       debugPrint("Error updating profile: $e");
+      rethrow; // Re-throw so UI can display appropriate error message
     } finally {
       isSavingProfile = false;
       notifyListeners();

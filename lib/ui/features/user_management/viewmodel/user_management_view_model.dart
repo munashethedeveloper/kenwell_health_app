@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../../../data/services/auth_service.dart';
+import '../../../../data/services/firebase_auth_service.dart';
 import '../../../../domain/constants/user_roles.dart';
 
 enum UserManagementNavigationTarget { loginScreen }
 
 class UserManagementViewModel extends ChangeNotifier {
-  final AuthService _authService;
+  final FirebaseAuthService _authService;
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -18,8 +18,8 @@ class UserManagementViewModel extends ChangeNotifier {
   UserManagementNavigationTarget? get navigationTarget => _navigationTarget;
   List<String> get availableRoles => UserRoles.values;
 
-  UserManagementViewModel({AuthService? authService})
-      : _authService = authService ?? AuthService();
+  UserManagementViewModel({FirebaseAuthService? authService})
+      : _authService = authService ?? FirebaseAuthService();
 
   Future<void> registerUser({
     required String email,

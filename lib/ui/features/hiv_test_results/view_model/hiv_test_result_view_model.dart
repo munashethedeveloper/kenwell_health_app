@@ -3,14 +3,14 @@ import 'package:intl/intl.dart';
 import 'package:signature/signature.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
-import 'package:kenwell_health_app/data/services/auth_service.dart';
+import 'package:kenwell_health_app/data/services/firebase_auth_service.dart';
 
 class HIVTestResultViewModel extends ChangeNotifier {
   HIVTestResultViewModel() {
     _loadCurrentUserProfile();
   }
 
-  final AuthService _authService = AuthService();
+  final FirebaseAuthService _authService = FirebaseAuthService();
 
   // Note: formKey is defined here
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -109,7 +109,7 @@ class HIVTestResultViewModel extends ChangeNotifier {
   /// Load current user profile to pre-populate nurse details
   Future<void> _loadCurrentUserProfile() async {
     try {
-      final user = await _authService.getCurrentUser();
+      final user = await _authService.currentUser();
       if (user != null) {
         nurseFirstNameController.text = user.firstName;
         nurseLastNameController.text = user.lastName;
