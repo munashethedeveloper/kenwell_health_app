@@ -19,11 +19,13 @@ import '../view_model/hiv_test_result_view_model.dart';
 class HIVTestResultScreen extends StatelessWidget {
   final VoidCallback onNext;
   final VoidCallback onPrevious;
+  final PreferredSizeWidget? appBar;
 
   const HIVTestResultScreen({
     super.key,
     required this.onNext,
     required this.onPrevious,
+    this.appBar,
   });
 
   @override
@@ -31,11 +33,12 @@ class HIVTestResultScreen extends StatelessWidget {
     final viewModel = context.watch<HIVTestResultViewModel>();
 
     return Scaffold(
-      appBar: const KenwellAppBar(
-        title: 'HIV Test Results Form',
-        automaticallyImplyLeading: false,
-        backgroundColor: KenwellColors.primaryGreen,
-      ),
+      appBar: appBar ??
+          const KenwellAppBar(
+            title: 'HIV Test Results Form',
+            automaticallyImplyLeading: false,
+            backgroundColor: KenwellColors.primaryGreen,
+          ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -110,10 +113,11 @@ class HIVTestResultScreen extends StatelessWidget {
                       );
                       return;
                     }
-                    viewModel.submitTestResult(onNext);
+                    viewModel.submitTestResult(context, onNext: onNext);
                   },
                   isNextBusy: viewModel.isSubmitting,
                   isNextEnabled: !viewModel.isSubmitting,
+                  nextLabel: 'Submit',
                 ),
               ),
             ],

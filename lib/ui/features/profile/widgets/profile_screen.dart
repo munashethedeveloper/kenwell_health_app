@@ -1,28 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:kenwell_health_app/routing/route_names.dart';
-import 'package:kenwell_health_app/ui/features/auth/view_models/auth_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
-import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
-import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
-import 'package:kenwell_health_app/utils/input_formatters.dart';
-import 'package:kenwell_health_app/utils/validators.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
-import '../../../shared/ui/form/custom_dropdown_field.dart';
-import '../../../shared/ui/form/custom_text_field.dart';
-import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_section_header.dart';
+import '../../../shared/ui/logo/app_logo.dart';
 import '../view_model/profile_view_model.dart';
+import 'sections/profile_form_section.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => ProfileViewModel(),
-      child: const _ProfileScreenBody(),
-    );
+    return const _ProfileScreenBody();
   }
 }
 
@@ -37,16 +27,13 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
   final _formKey = GlobalKey<FormState>();
 
   final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _usernameController = TextEditingController();
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
 
   String? _selectedRole;
-  bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
+
+  // Store original values to detect changes
 
   @override
   void initState() {
@@ -60,17 +47,22 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
     final vm = context.read<ProfileViewModel>();
     await vm.loadProfile();
     if (!mounted) return;
+
     setState(() {
       _syncControllersWithViewModel(vm);
     });
+
+    // Show error if load failed
+    if (vm.errorMessage != null && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(vm.errorMessage!)),
+      );
+    }
   }
 
   void _syncControllersWithViewModel(ProfileViewModel vm) {
     _emailController.text = vm.email;
-    _passwordController.text = vm.password;
-    _confirmPasswordController.text = vm.password;
     _phoneController.text = vm.phoneNumber;
-    // _usernameController.text = vm.username;
     _firstNameController.text = vm.firstName;
     _lastNameController.text = vm.lastName;
     _selectedRole = vm.role.isNotEmpty && vm.availableRoles.contains(vm.role)
@@ -78,92 +70,47 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
         : null;
   }
 
+  /// Check if profile has unsaved changes
+
+  /// Handle cancel with unsaved changes confirmation
+
   @override
   void dispose() {
     _emailController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
     _phoneController.dispose();
-    _usernameController.dispose();
     _firstNameController.dispose();
     _lastNameController.dispose();
     super.dispose();
   }
 
-  Future<void> _logout() async {
-    final authVM = context.read<AuthViewModel>();
-    await authVM.logout();
-    if (!mounted) return;
-    Navigator.pushReplacementNamed(context, RouteNames.login);
-  }
-
-  Future<void> _saveProfile(ProfileViewModel vm) async {
+  Future<void> _saveProfile() async {
     if (!_formKey.currentState!.validate()) {
-      // Collect field names that failed validation
-      final invalidFields = <String>[];
-
-      if (_firstNameController.text.isEmpty) invalidFields.add("First Name");
-      if (_lastNameController.text.isEmpty) invalidFields.add("Last Name");
-      // if (_usernameController.text.isEmpty) invalidFields.add("Username");
-      if (_selectedRole == null || _selectedRole!.isEmpty) {
-        invalidFields.add("Role");
-      }
-      if (_phoneController.text.isEmpty ||
-          Validators.validateSouthAfricanPhoneNumber(_phoneController.text) !=
-              null) {
-        invalidFields.add("Phone Number");
-      }
-      if (_emailController.text.isEmpty ||
-          Validators.validateEmail(_emailController.text) != null) {
-        invalidFields.add("Email");
-      }
-      if (_passwordController.text.isEmpty ||
-          Validators.validateStrongPassword(_passwordController.text) != null) {
-        invalidFields.add("Password");
-      }
-      if (_confirmPasswordController.text.isEmpty ||
-          _confirmPasswordController.text != _passwordController.text) {
-        invalidFields.add("Confirm Password");
-      }
-
-      // Show a single SnackBar with all invalid fields
-      if (invalidFields.isNotEmpty) {
-        final message = invalidFields.join(", ");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Please complete the following fields: $message"),
-            duration: const Duration(seconds: 4),
-          ),
-        );
-      }
       return;
     }
 
-    // Check password match
-    if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Passwords do not match')),
-      );
-      return;
-    }
+    final vm = context.read<ProfileViewModel>();
 
-    // Save profile
-    vm
-      ..firstName = _firstNameController.text.trim()
-      ..lastName = _lastNameController.text.trim()
-      //  ..username = _usernameController.text.trim()
-      ..role = _selectedRole!
-      ..phoneNumber = _phoneController.text.trim()
-      ..email = _emailController.text.trim()
-      ..password = _passwordController.text.trim();
-
-    await vm.updateProfile();
+    final success = await vm.updateProfile(
+      firstName: _firstNameController.text,
+      lastName: _lastNameController.text,
+      phoneNumber: _phoneController.text,
+      email: _emailController.text,
+    );
 
     if (!mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Profile updated successfully')),
-    );
+    if (success) {
+      // No original values to update after successful save
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(vm.successMessage ?? 'Profile updated successfully')),
+      );
+    } else if (vm.errorMessage != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(vm.errorMessage!)),
+      );
+    }
   }
 
   @override
@@ -172,49 +119,39 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
       builder: (context, vm, _) => Scaffold(
         backgroundColor: Colors.white,
         appBar: KenwellAppBar(
-          title: 'User Profile',
-          automaticallyImplyLeading: false,
+          title: 'Edit Profile',
+          titleColor: const Color(0xFF201C58),
+          titleStyle: const TextStyle(
+            color: Color(0xFF201C58),
+            fontWeight: FontWeight.bold,
+          ),
           actions: [
-            PopupMenuButton<int>(
-              icon: const Icon(Icons.more_vert, color: Colors.white),
-              onSelected: (value) async {
-                switch (value) {
-                  /*  case 0:
-                    if (mounted) {
-                      Navigator.pushNamed(context, RouteNames.profile);
-                    }
-                    break; */
-                  case 0:
-                    if (mounted) Navigator.pushNamed(context, RouteNames.help);
-                    break;
-                  case 1:
-                    await _logout();
-                    break;
+            IconButton(
+              tooltip: 'Refresh',
+              icon: const Icon(Icons.refresh, color: Color(0xFF201C58)),
+              onPressed: () async {
+                await _loadAndPopulateProfile();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Profile refreshed'),
+                      duration: Duration(seconds: 1),
+                    ),
+                  );
                 }
               },
-              itemBuilder: (context) => const [
-                /* const PopupMenuItem<int>(
-                  value: 0,
-                  child: ListTile(
-                    leading: Icon(Icons.person, color: Colors.black),
-                    title: Text('Profile'),
-                  ),
-                ), */
-                PopupMenuItem<int>(
-                  value: 0,
-                  child: ListTile(
-                    leading: Icon(Icons.help_outline, color: Colors.black),
-                    title: Text('Help'),
-                  ),
-                ),
-                PopupMenuItem<int>(
-                  value: 1,
-                  child: ListTile(
-                    leading: Icon(Icons.logout, color: Colors.black),
-                    title: Text('Logout'),
-                  ),
-                ),
-              ],
+            ),
+            TextButton.icon(
+              onPressed: () {
+                if (mounted) {
+                  Navigator.pushNamed(context, '/help');
+                }
+              },
+              icon: const Icon(Icons.help_outline, color: Color(0xFF201C58)),
+              label: const Text(
+                'Help',
+                style: TextStyle(color: Color(0xFF201C58)),
+              ),
             ),
           ],
         ),
@@ -224,7 +161,7 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: AbsorbPointer(
-                  absorbing: vm.isSavingProfile || vm.isLoadingProfile,
+                  absorbing: vm.isLoading,
                   child: SingleChildScrollView(
                     child: Form(
                       key: _formKey,
@@ -233,159 +170,25 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
                         children: [
                           const SizedBox(height: 16),
                           const AppLogo(size: 200),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 24),
                           const KenwellSectionHeader(
                             title: 'Update Profile',
                             subtitle:
                                 'Complete your details or update your information',
                           ),
-                          KenwellFormCard(
-                            title: 'Personal Information',
-                            margin: const EdgeInsets.only(bottom: 24),
-                            child: Column(
-                              children: [
-                                KenwellTextField(
-                                  label: "First Name",
-                                  controller: _firstNameController,
-                                  inputFormatters:
-                                      AppTextInputFormatters.lettersOnly(
-                                          allowHyphen: true),
-                                  padding: EdgeInsets.zero,
-                                  validator: (v) => (v == null || v.isEmpty)
-                                      ? "Enter First Name"
-                                      : null,
-                                ),
-                                const SizedBox(height: 24),
-                                KenwellTextField(
-                                  label: "Last Name",
-                                  controller: _lastNameController,
-                                  inputFormatters:
-                                      AppTextInputFormatters.lettersOnly(
-                                          allowHyphen: true),
-                                  padding: EdgeInsets.zero,
-                                  validator: (v) => (v == null || v.isEmpty)
-                                      ? "Enter Last Name"
-                                      : null,
-                                ),
-                                //  const SizedBox(height: 24),
-                                //  KenwellTextField(
-                                //    label: "Username",
-                                //    controller: _usernameController,
-                                //    padding: EdgeInsets.zero,
-                                //    validator: (v) => (v == null || v.isEmpty)
-                                //        ? "Enter Username"
-                                //         : null,
-                                //   ),
-                                const SizedBox(height: 24),
-                                KenwellDropdownField<String>(
-                                  label: "Role",
-                                  value: _selectedRole,
-                                  items: vm.availableRoles,
-                                  enabled: false,
-                                  padding: EdgeInsets.zero,
-                                  validator: (v) => (v == null || v.isEmpty)
-                                      ? "Select Role"
-                                      : null,
-                                  onChanged: (value) =>
-                                      setState(() => _selectedRole = value),
-                                ),
-                                const SizedBox(height: 24),
-                                KenwellTextField(
-                                  label: "Phone Number",
-                                  controller: _phoneController,
-                                  keyboardType: TextInputType.phone,
-                                  inputFormatters: [
-                                    AppTextInputFormatters
-                                        .saPhoneNumberFormatter()
-                                  ],
-                                  padding: EdgeInsets.zero,
-                                  validator: Validators
-                                      .validateSouthAfricanPhoneNumber,
-                                ),
-                                const SizedBox(height: 24),
-                                KenwellTextField(
-                                  label: "Email",
-                                  controller: _emailController,
-                                  keyboardType: TextInputType.emailAddress,
-                                  padding: EdgeInsets.zero,
-                                  validator: Validators.validateEmail,
-                                ),
-                                const SizedBox(height: 24),
-                                KenwellTextField(
-                                  label: "Password",
-                                  controller: _passwordController,
-                                  obscureText: _obscurePassword,
-                                  padding: EdgeInsets.zero,
-                                  suffixIcon: IconButton(
-                                    icon: Icon(_obscurePassword
-                                        ? Icons.visibility_off
-                                        : Icons.visibility),
-                                    onPressed: () => setState(() =>
-                                        _obscurePassword = !_obscurePassword),
-                                  ),
-                                  validator: Validators.validateStrongPassword,
-                                ),
-                                const SizedBox(height: 24),
-                                KenwellTextField(
-                                  label: "Confirm Password",
-                                  controller: _confirmPasswordController,
-                                  obscureText: _obscureConfirmPassword,
-                                  padding: EdgeInsets.zero,
-                                  suffixIcon: IconButton(
-                                    icon: Icon(_obscureConfirmPassword
-                                        ? Icons.visibility_off
-                                        : Icons.visibility),
-                                    onPressed: () => setState(() =>
-                                        _obscureConfirmPassword =
-                                            !_obscureConfirmPassword),
-                                  ),
-                                  validator: (v) {
-                                    final message =
-                                        Validators.validatePasswordPresence(v);
-                                    if (message != null) return message;
-                                    if (v != _passwordController.text) {
-                                      return "Passwords do not match";
-                                    }
-                                    return null;
-                                  },
-                                ),
-                              ],
-                            ),
+                          ProfileFormSection(
+                            firstNameController: _firstNameController,
+                            lastNameController: _lastNameController,
+                            phoneController: _phoneController,
+                            emailController: _emailController,
+                            selectedRole: _selectedRole,
+                            onRoleChanged: (value) =>
+                                setState(() => _selectedRole = value),
                           ),
-                          // Replace the single CustomPrimaryButton at the bottom with this Row
-                          Row(
-                            children: [
-                              Expanded(
-                                child: OutlinedButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  style: OutlinedButton.styleFrom(
-                                    side: const BorderSide(
-                                        color: KenwellColors.primaryGreen,
-                                        width: 2),
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 16),
-                                  ),
-                                  child: const Text(
-                                    'Cancel',
-                                    style: TextStyle(
-                                      color: KenwellColors.primaryGreen,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: CustomPrimaryButton(
-                                  label: "Save Profile",
-                                  onPressed: (vm.isLoadingProfile ||
-                                          vm.isSavingProfile)
-                                      ? null
-                                      : () => _saveProfile(vm),
-                                  isBusy: vm.isSavingProfile,
-                                ),
-                              ),
-                            ],
+                          CustomPrimaryButton(
+                            label: "Save Profile",
+                            onPressed: vm.isLoading ? null : _saveProfile,
+                            isBusy: vm.isLoading,
                           ),
                           const SizedBox(height: 16),
                         ],
@@ -394,7 +197,7 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
                   ),
                 ),
               ),
-              if (vm.isLoadingProfile)
+              if (vm.isLoading)
                 const Positioned.fill(
                   child: IgnorePointer(
                     child: ColoredBox(

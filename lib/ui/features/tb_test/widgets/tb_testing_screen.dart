@@ -13,11 +13,13 @@ import '../view_model/tb_testing_view_model.dart';
 class TBTestingScreen extends StatelessWidget {
   final VoidCallback onNext;
   final VoidCallback onPrevious;
+  final PreferredSizeWidget? appBar;
 
   const TBTestingScreen({
     super.key,
     required this.onNext,
     required this.onPrevious,
+    this.appBar,
   });
 
   @override
@@ -27,6 +29,7 @@ class TBTestingScreen extends StatelessWidget {
     return KenwellFormPage(
       title: 'TB Test Screening Form',
       sectionTitle: 'Section I: TB Screening',
+      appBar: appBar,
       children: [
         KenwellFormCard(
           title: 'TB Symptom Screening',

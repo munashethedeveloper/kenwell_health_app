@@ -122,4 +122,44 @@ class Validators {
     int checkDigit = (10 - (sum % 10)) % 10;
     return checkDigit == int.parse(id[12]);
   }
+
+  // ------------------ Generic required field validators ------------------
+  static String? validateRequired(String? value, [String? fieldName]) {
+    if (value == null || value.trim().isEmpty) {
+      return '${fieldName ?? 'This field'} is required';
+    }
+    return null;
+  }
+
+  static String? validateRequiredWithMessage(
+      String? value, String errorMessage) {
+    if (value == null || value.trim().isEmpty) {
+      return errorMessage;
+    }
+    return null;
+  }
+
+  // ------------------ Password match validator ------------------
+  static String? validatePasswordMatch(String? value, String? passwordToMatch) {
+    final message = validatePasswordPresence(value);
+    if (message != null) return message;
+    if (value != passwordToMatch) {
+      return 'Passwords do not match';
+    }
+    return null;
+  }
+
+  // ------------------ Name validators ------------------
+  static String? validateName(String? value, [String fieldName = 'Name']) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Enter $fieldName';
+    }
+    return null;
+  }
+
+  static String? validateFirstName(String? value) =>
+      validateName(value, 'First Name');
+
+  static String? validateLastName(String? value) =>
+      validateName(value, 'Last Name');
 }

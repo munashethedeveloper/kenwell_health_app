@@ -91,8 +91,9 @@ class _KenwellRadioTile<T> extends StatelessWidget {
       title: Text(label),
       value: value,
       groupValue: groupValue,
-      onChanged: onChanged,
+      onChanged: (val) => onChanged?.call(val),
       dense: true,
+      toggleable: false,
     );
   }
 }

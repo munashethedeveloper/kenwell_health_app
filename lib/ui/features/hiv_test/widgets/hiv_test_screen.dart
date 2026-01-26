@@ -14,8 +14,9 @@ import '../view_model/hiv_test_view_model.dart';
 class HIVTestScreen extends StatelessWidget {
   final VoidCallback? onNext;
   final VoidCallback? onPrevious;
+  final PreferredSizeWidget? appBar;
 
-  const HIVTestScreen({super.key, this.onNext, this.onPrevious});
+  const HIVTestScreen({super.key, this.onNext, this.onPrevious, this.appBar});
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +26,7 @@ class HIVTestScreen extends StatelessWidget {
       title: 'HIV Test Screening Form',
       sectionTitle: 'Section F: HIV Screening',
       formKey: viewModel.formKey,
+      appBar: appBar,
       children: [
         KenwellFormCard(
           title: 'HIV Testing History',
@@ -136,7 +138,7 @@ class HIVTestScreen extends StatelessWidget {
         const SizedBox(height: 24),
         KenwellFormNavigation(
           onPrevious: onPrevious,
-          onNext: () => viewModel.submitHIVTest(onNext),
+          onNext: () => viewModel.submitHIVTest(context, onNext: onNext),
           isNextEnabled: viewModel.isFormValid && !viewModel.isSubmitting,
           isNextBusy: viewModel.isSubmitting,
         ),

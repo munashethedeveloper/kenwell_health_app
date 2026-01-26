@@ -4,7 +4,7 @@ import 'package:kenwell_health_app/ui/features/auth/widgets/login_screen.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
-import '../../../../data/services/auth_service.dart';
+import '../../../../data/repositories_dcl/auth_repository_dcl.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
@@ -55,7 +55,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final user = await AuthService().register(
+      final user = await AuthRepository().register(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
         role: role,

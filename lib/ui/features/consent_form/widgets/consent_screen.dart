@@ -13,17 +13,18 @@ import '../../../shared/ui/form/kenwell_signature_actions.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/consent_screen_view_model.dart';
 import '../../profile/view_model/profile_view_model.dart';
+import '../../wellness/view_model/wellness_flow_view_model.dart';
 
 class ConsentScreen extends StatelessWidget {
   final VoidCallback onNext;
-  final VoidCallback onCancel;
   final WellnessEvent event;
+  final PreferredSizeWidget? appBar;
 
   const ConsentScreen({
     super.key,
     required this.onNext,
-    required this.onCancel,
     required this.event,
+    this.appBar,
   });
 
   @override
@@ -31,11 +32,24 @@ class ConsentScreen extends StatelessWidget {
     final vm = Provider.of<ConsentScreenViewModel>(context);
     final profileVm = Provider.of<ProfileViewModel>(context);
 
+    // Get memberId and eventId from WellnessFlowViewModel if available
+    String? memberId;
+    String? eventId = event.id;
+    try {
+      final wellnessFlowVm =
+          Provider.of<WellnessFlowViewModel>(context, listen: false);
+      memberId = wellnessFlowVm.currentMember?.id;
+    } catch (e) {
+      // WellnessFlowViewModel not available in this context
+    }
+
     // Pass event & profile data into VM
     vm.initialise(
       event,
       firstName: profileVm.firstName,
       lastName: profileVm.lastName,
+      memberId: memberId,
+      eventId: eventId,
     );
     // Initialise the VM with event data
     //vm.initialise(event);
@@ -44,8 +58,9 @@ class ConsentScreen extends StatelessWidget {
 
     return KenwellFormPage(
       title: 'Consent Form',
-      sectionTitle: 'Section A: Informed Consent',
+      sectionTitle: 'Section B: Informed Consent',
       formKey: vm.formKey,
+      appBar: appBar,
       children: [
         for (final step in steps) ...[
           step.builder(context),
@@ -63,8 +78,7 @@ class ConsentScreen extends StatelessWidget {
 
   Widget _buildActionButtons(BuildContext context, ConsentScreenViewModel vm) {
     return KenwellFormNavigation(
-      previousLabel: 'Cancel',
-      onPrevious: onCancel,
+      nextLabel: 'Submit',
       onNext: () async {
         if (!vm.hasAtLeastOneScreening) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -79,6 +93,12 @@ class ConsentScreen extends StatelessWidget {
 
         if (vm.formKey.currentState!.validate() && vm.isFormValid) {
           await vm.submitConsent();
+          // Immediate update: mark consent as completed in the parent ViewModel
+          try {
+            final wellnessFlowVm =
+                Provider.of<WellnessFlowViewModel>(context, listen: false);
+            wellnessFlowVm.markConsentCompleted();
+          } catch (e) {}
           onNext();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -178,10 +198,7 @@ class ConsentScreen extends StatelessWidget {
     final screenings = [
       {'label': 'HIV', 'value': vm.hiv, 'field': 'hiv'},
       {'label': 'HRA', 'value': vm.hra, 'field': 'hra'},
-      //{'label': 'HIV/VCT', 'value': vm.vct, 'field': 'vct'},
       {'label': 'TB', 'value': vm.tb, 'field': 'tb'},
-
-      //{'label': 'HIV', 'value': vm.hiv, 'field': 'hiv'},
     ];
 
     return screenings

@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:kenwell_health_app/routing/route_names.dart';
-import 'package:provider/provider.dart';
-
-import '../../../../data/services/auth_service.dart';
 import '../../../../domain/models/wellness_event.dart';
-import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
-import '../view_model/wellness_flow_view_model.dart';
-import 'wellness_flow_screen.dart';
-import '../../auth/widgets/login_screen.dart';
+import '../navigation/wellness_navigator.dart';
 
+/// Entry point for the wellness event flow
+/// Now uses proper screen-to-screen navigation instead of IndexedStack
 class WellnessFlowPage extends StatefulWidget {
   final WellnessEvent event;
   final Future<void> Function()? onFlowCompleted;
@@ -26,98 +21,55 @@ class WellnessFlowPage extends StatefulWidget {
 }
 
 class _WellnessFlowPageState extends State<WellnessFlowPage> {
-  Future<void> _logout() async {
-    await AuthService().logout();
+  @override
+  void initState() {
+    super.initState();
+    // Start the wellness flow after the widget is built
+    WidgetsBinding.instance.addPostFrameCallback((_) => _startFlow());
+  }
 
+  Future<void> _startFlow() async {
     if (!mounted) return;
 
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const LoginScreen()),
-      (route) => false,
+    final navigator = WellnessNavigator(
+      context: context,
+      event: widget.event,
     );
-  }
 
-  Future<void> _handleExit(BuildContext context) async {
-    if (widget.onExitEarly != null) {
-      await widget.onExitEarly!();
-    }
-    if (context.mounted) Navigator.of(context).pop();
-  }
+    await navigator.startFlow();
 
-  Future<void> _handleCompletion(BuildContext context) async {
-    if (widget.onFlowCompleted != null) {
-      await widget.onFlowCompleted!();
+    // Flow completed or exited
+    if (mounted) {
+      if (widget.onFlowCompleted != null) {
+        await widget.onFlowCompleted!();
+      }
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
     }
-    if (context.mounted) Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Show a simple loading screen while navigation initializes
     return Scaffold(
-      appBar: KenwellAppBar(
-        title: 'Event Name: ${widget.event.title}',
-        backgroundColor: const Color(0xFF201C58),
-        titleColor: Colors.white,
-        automaticallyImplyLeading: true,
-        actions: [
-          // 🔹 Popup menu
-          PopupMenuButton<int>(
-            icon: const Icon(Icons.more_vert, color: Colors.white),
-            onSelected: (value) async {
-              switch (value) {
-                case 0: // Profile
-                  if (mounted) {
-                    Navigator.pushNamed(context, RouteNames.profile);
-                  }
-                  break;
-                case 1: // Help
-                  if (mounted) {
-                    Navigator.pushNamed(context, RouteNames.help);
-                  }
-                  break;
-                case 2: // Logout
-                  await _logout();
-                  break;
-              }
-            },
-            itemBuilder: (context) => const [
-              PopupMenuItem<int>(
-                value: 0,
-                child: ListTile(
-                  leading: Icon(Icons.person, color: Colors.black),
-                  title: Text('Profile'),
-                ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(
+              color: Color(0xFF90C048),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Starting ${widget.event.title}',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF201C58),
               ),
-              PopupMenuItem<int>(
-                value: 1,
-                child: ListTile(
-                  leading: Icon(Icons.help_outline, color: Colors.black),
-                  title: Text('Help'),
-                ),
-              ),
-              PopupMenuItem<int>(
-                value: 2,
-                child: ListTile(
-                  leading: Icon(Icons.logout, color: Colors.black),
-                  title: Text('Logout'),
-                ),
-              ),
-            ],
-          ),
-
-          // 🔹 Existing close button (kept)
-          IconButton(
-            icon: const Icon(Icons.close, color: Colors.white),
-            onPressed: () => _handleExit(context),
-          ),
-        ],
-      ),
-      body: ChangeNotifierProvider<WellnessFlowViewModel>(
-        create: (_) => WellnessFlowViewModel(activeEvent: widget.event),
-        child: WellnessFlowScreen(
-          event: widget.event,
-          onExitFlow: () => _handleExit(context),
-          onFlowCompleted: () => _handleCompletion(context),
+            ),
+          ],
         ),
       ),
     );

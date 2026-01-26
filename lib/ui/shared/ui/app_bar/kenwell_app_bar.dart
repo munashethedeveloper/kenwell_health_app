@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../colours/kenwell_colours.dart';
 
 /// AppBar with Kenwell default styling and sensible customization hooks.
 class KenwellAppBar extends StatelessWidget implements PreferredSizeWidget {
   const KenwellAppBar({
     super.key,
     required this.title,
+    this.subtitle,
     this.centerTitle = true,
     this.automaticallyImplyLeading = true,
     this.backgroundColor,
@@ -16,6 +16,7 @@ class KenwellAppBar extends StatelessWidget implements PreferredSizeWidget {
   });
 
   final String title;
+  final String? subtitle;
   final bool centerTitle;
   final bool automaticallyImplyLeading;
   final Color? backgroundColor;
@@ -26,26 +27,38 @@ class KenwellAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color resolvedBackground =
-        backgroundColor ?? KenwellColors.secondaryNavy;
-    final Color resolvedTitleColor = titleColor ?? KenwellColors.neutralWhite;
-    final TextStyle resolvedTitleStyle = titleStyle ??
-        TextStyle(
-          color: resolvedTitleColor,
-          fontWeight: FontWeight.bold,
-        );
-
     return AppBar(
-      title: Text(
-        title,
-        style: resolvedTitleStyle,
-      ),
+      title: subtitle != null
+          ? Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: centerTitle
+                  ? CrossAxisAlignment.center
+                  : CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: titleStyle,
+                ),
+                Text(
+                  subtitle!,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.normal,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            )
+          : Text(
+              title,
+              style: titleStyle,
+            ),
       centerTitle: centerTitle,
       automaticallyImplyLeading: automaticallyImplyLeading,
-      backgroundColor: resolvedBackground,
+      backgroundColor: backgroundColor,
+      foregroundColor: titleColor,
       actions: actions,
       bottom: bottom,
-      iconTheme: IconThemeData(color: resolvedTitleColor),
     );
   }
 

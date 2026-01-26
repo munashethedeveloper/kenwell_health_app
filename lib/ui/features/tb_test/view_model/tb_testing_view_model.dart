@@ -3,10 +3,26 @@ import 'package:signature/signature.dart';
 import 'package:intl/intl.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
+import 'package:kenwell_health_app/data/repositories_dcl/firestore_tb_screening_repository.dart';
+import 'package:kenwell_health_app/domain/models/tb_screening.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
+import 'package:uuid/uuid.dart';
+import 'dart:convert';
+import 'package:kenwell_health_app/domain/constants/enums.dart';
 
 class TBTestingViewModel extends ChangeNotifier {
   // Note: formKey is now defined here
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final FirestoreTbScreeningRepository _repository =
+      FirestoreTbScreeningRepository();
+
+  String? _memberId;
+  String? _eventId;
+
+  void setMemberAndEventId(String memberId, String eventId) {
+    _memberId = memberId;
+    _eventId = eventId;
+  }
 
   /// Controls whether the Initial Assessment card (and related validations) show.
   bool get showInitialAssessment => false;
@@ -102,19 +118,19 @@ class TBTestingViewModel extends ChangeNotifier {
 
   // --- Initial Assessment ---
   String? windowPeriod; // 'N/A', 'Yes', 'No'
-  final List<String> windowPeriodOptions = ['N/A', 'Yes', 'No'];
+  final List<String> windowPeriodOptions = YesNoNA.values.labels;
 
   String? expectedResult; // 'N/A', 'Yes', 'No'
-  final List<String> expectedResultOptions = ['N/A', 'Yes', 'No'];
+  final List<String> expectedResultOptions = YesNoNA.values.labels;
 
   String? difficultyDealingResult; // 'N/A', 'Yes', 'No'
-  final List<String> difficultyOptions = ['N/A', 'Yes', 'No'];
+  final List<String> difficultyOptions = YesNoNA.values.labels;
 
   String? urgentPsychosocial; // 'N/A', 'Yes', 'No'
-  final List<String> urgentOptions = ['N/A', 'Yes', 'No'];
+  final List<String> urgentOptions = YesNoNA.values.labels;
 
   String? committedToChange; // 'N/A', 'Yes', 'No'
-  final List<String> committedOptions = ['N/A', 'Yes', 'No'];
+  final List<String> committedOptions = YesNoNA.values.labels;
 
   void setWindowPeriod(String? value) => _setValue(() => windowPeriod = value);
   void setExpectedResult(String? value) =>
@@ -128,12 +144,7 @@ class TBTestingViewModel extends ChangeNotifier {
 
   // --- Follow-up ---
   String? followUpLocation; // 'State clinic', 'Private doctor', 'Other'
-  final List<String> followUpLocationOptions = [
-    'Referred to State clinic',
-    'Referred to Private doctor',
-    'Other',
-    'No follow-up needed',
-  ];
+  final List<String> followUpLocationOptions = FollowUpLocation.values.labels;
   final TextEditingController followUpOtherController = TextEditingController();
   final TextEditingController followUpDateController = TextEditingController();
 
@@ -281,8 +292,17 @@ class TBTestingViewModel extends ChangeNotifier {
   Future<void> submitTBTest(BuildContext context,
       {VoidCallback? onNext}) async {
     if (!isFormValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please complete all required fields.')),
+      AppSnackbar.showWarning(
+        context,
+        'Please complete all required fields',
+      );
+      return;
+    }
+
+    if (_memberId == null || _eventId == null) {
+      AppSnackbar.showError(
+        context,
+        'Missing member or event information',
       );
       return;
     }
@@ -290,28 +310,70 @@ class TBTestingViewModel extends ChangeNotifier {
     _isSubmitting = true;
     notifyListeners();
 
-    debugPrint("✅ TB Test Submitting...");
-
     try {
-      final data = await toMap();
-      debugPrint("TB Test Data:");
-      debugPrint(data.toString());
+      // Convert signature to base64
+      final signatureBytes = await signatureController.toPngBytes();
+      final signatureBase64 =
+          signatureBytes != null ? base64Encode(signatureBytes) : null;
 
-      await Future.delayed(const Duration(milliseconds: 800));
+      final screening = TbScreening(
+        id: const Uuid().v4(),
+        memberId: _memberId!,
+        eventId: _eventId!,
+        coughTwoWeeks: coughTwoWeeks,
+        bloodInSputum: bloodInSputum,
+        weightLoss: weightLoss,
+        nightSweats: nightSweats,
+        treatedBefore: treatedBefore,
+        treatedDate: treatedDateController.text.isEmpty
+            ? null
+            : treatedDateController.text,
+        completedTreatment: completedTreatment,
+        contactWithTB: contactWithTB,
+        windowPeriod: windowPeriod,
+        expectedResult: expectedResult,
+        difficultyDealingResult: difficultyDealingResult,
+        urgentPsychosocial: urgentPsychosocial,
+        committedToChange: committedToChange,
+        followUpLocation: followUpLocation,
+        followUpOther: followUpOtherController.text.isEmpty
+            ? null
+            : followUpOtherController.text,
+        followUpDate: followUpDateController.text.isEmpty
+            ? null
+            : followUpDateController.text,
+        nursingReferral: nursingReferralSelection?.name,
+        notReferredReason: notReferredReasonController.text.isEmpty
+            ? null
+            : notReferredReasonController.text,
+        nurseFirstName: nurseFirstNameController.text,
+        nurseLastName: nurseLastNameController.text,
+        rank: rankController.text,
+        sancNumber: sancNumberController.text,
+        nurseDate: nurseDateController.text,
+        signatureData: signatureBase64,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
 
-      debugPrint("✅ TB Test Submitted successfully");
-
-      _isSubmitting = false;
-      notifyListeners();
+      await _repository.addTbScreening(screening);
 
       if (!context.mounted) return;
 
-      // ✅ Callback for workflow navigation
-      if (onNext != null) {
-        onNext();
-      }
+      AppSnackbar.showSuccess(
+        context,
+        'TB screening saved successfully',
+      );
+
+      onNext?.call();
     } catch (e) {
-      debugPrint("❌ Error submitting TB Test: $e");
+      if (context.mounted) {
+        AppSnackbar.showError(
+          context,
+          'Error saving TB screening: $e',
+        );
+      }
+    } finally {
       _isSubmitting = false;
       notifyListeners();
     }

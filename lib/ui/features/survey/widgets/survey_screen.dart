@@ -11,11 +11,13 @@ import '../view_model/survey_view_model.dart';
 class SurveyScreen extends StatelessWidget {
   final VoidCallback onPrevious;
   final VoidCallback onSubmit;
+  final PreferredSizeWidget? appBar;
 
   const SurveyScreen({
     super.key,
     required this.onPrevious,
     required this.onSubmit,
+    this.appBar,
   });
 
   @override
@@ -25,6 +27,7 @@ class SurveyScreen extends StatelessWidget {
     return KenwellFormPage(
       title: 'Survey Form',
       sectionTitle: 'Section K: Survey',
+      appBar: appBar,
       children: [
         const Center(
           child: Text(
@@ -147,6 +150,7 @@ class SurveyScreen extends StatelessWidget {
               onChanged: (val) {
                 if (val != null) vm.updateHeardAbout(val);
               },
+              toggleable: false,
             ),
           )
           .toList(),
@@ -173,6 +177,7 @@ class SurveyScreen extends StatelessWidget {
                   onChanged: (val) {
                     if (val != null) vm.updateRating(key, val);
                   },
+                  toggleable: false,
                 ),
               ),
             ),

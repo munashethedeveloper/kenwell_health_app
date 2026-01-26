@@ -1,12 +1,9 @@
-// SAFER submit handler: shows modal progress indicator, logs steps, avoids awaiting potentially
-// slow persistence when closing the flow so the UI doesn't freeze.
-// Replace the existing file at this path with the contents below (or merge the onSubmit part).
-
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
-import 'package:kenwell_health_app/ui/features/member/widgets/member_details_screen.dart';
-import 'package:kenwell_health_app/ui/features/wellness/widgets/current_event_details_screen.dart';
-import 'package:kenwell_health_app/ui/features/wellness/widgets/member_registration_screen.dart';
+import 'package:kenwell_health_app/ui/features/member/widgets/member_registration_screen.dart';
+import 'package:kenwell_health_app/ui/features/wellness/widgets/current_event_home_screen.dart';
+import 'package:kenwell_health_app/ui/features/wellness/widgets/member_search_screen.dart';
+import 'package:kenwell_health_app/ui/features/wellness/widgets/health_screenings_screen.dart';
 import 'package:provider/provider.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../hiv_test_results/widgets/hiv_test_result_screen.dart';
@@ -14,7 +11,7 @@ import '../../hiv_test_results/widgets/hiv_test_result_screen.dart';
 import '../view_model/wellness_flow_view_model.dart';
 import '../../survey/widgets/survey_screen.dart';
 import '../../consent_form/widgets/consent_screen.dart';
-import '../../risk_assessment/widgets/personal_risk_assessment_screen.dart';
+import '../../health_risk_assessment/widgets/health_risk_assessment_screen.dart';
 //import '../../health_metrics/widgets/health_metrics_screen.dart';
 import '../../hiv_test/widgets/hiv_test_screen.dart';
 import '../../tb_test/widgets/tb_testing_screen.dart';
@@ -58,18 +55,29 @@ class WellnessFlowScreen extends StatelessWidget {
     switch (stepName) {
       case WellnessFlowViewModel.stepCurrentEventDetails:
         return event != null
-            ? CurrentEventDetailsScreen(
+            ? CurrentEventHomeScreen(
                 event: event!,
                 onSectionTap: (section) {
                   flowVM.navigateToSection(section);
                 },
+                onBackToSearch: () => flowVM.resetToMemberSearch(),
               )
             : const SizedBox();
 
       case WellnessFlowViewModel.stepMemberRegistration:
-        return MemberRegistrationScreen(
+        return MemberSearchScreen(
           onGoToMemberDetails: flowVM.navigateToPersonalDetails,
-          onPrevious: flowVM.previousStep,
+          onMemberFound: (member) {
+            // Set the found member, load all completion flags, and navigate to event details
+            flowVM.setCurrentMember(member);
+            // Only check event for null, member is always non-null
+            final eventId = event?.id;
+            if (eventId != null) {
+              flowVM.loadAllCompletionFlags(member.id, eventId);
+            }
+            flowVM.navigateToEventDetails();
+          },
+          onPrevious: flowVM.currentStep > 0 ? flowVM.previousStep : null,
         );
 
       case WellnessFlowViewModel.stepConsent:
@@ -79,29 +87,74 @@ class WellnessFlowScreen extends StatelessWidget {
               ? ConsentScreen(
                   event: event!,
                   onNext: () {
-                    // Initialize flow based on selected checkboxes
+                    // Mark consent as completed and update UI immediately
+                    flowVM.markConsentCompleted();
+                    if (flowVM.consentVM.selectedScreenings.isNotEmpty) {
+                      flowVM.markScreeningsInProgress();
+                    }
                     flowVM.initializeFlow(flowVM.consentVM.selectedScreenings);
-                    flowVM.nextStep();
-                  },
-                  onCancel: () {
-                    // Go back to current event details instead of exiting
-                    flowVM.resetFlow();
+                    // Ensure UI updates before navigating
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      flowVM.navigateToEventDetails();
+                    });
                   },
                 )
               : const SizedBox(),
         );
 
+      case WellnessFlowViewModel.stepHealthScreeningsMenu:
+        // Show health screenings menu with enabled/disabled cards based on consent
+        final consentVM = flowVM.consentVM;
+        return HealthScreeningsScreen(
+          hraEnabled: consentVM.hra,
+          hivEnabled: consentVM.hiv,
+          tbEnabled: consentVM.tb,
+          hraCompleted: flowVM.hraCompleted,
+          hivCompleted: flowVM.hivCompleted,
+          tbCompleted: flowVM.tbCompleted,
+          onHraTap: () => flowVM.navigateToHraScreening(),
+          onHivTap: () => flowVM.navigateToHivScreening(),
+          onTbTap: () => flowVM.navigateToTbScreening(),
+          onSubmitAll: () {
+            // Mark screenings as completed and update UI immediately
+            flowVM.markScreeningsCompleted();
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              flowVM.navigateToSection(WellnessFlowViewModel.sectionSurvey);
+            });
+          },
+        );
+
       case WellnessFlowViewModel.stepPersonalDetails:
+        // Set event ID before showing the member details screen
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          flowVM.memberDetailsVM.setEventId(event?.id);
+        });
         return MemberDetailsScreen(
           onNext: flowVM.nextStep,
-          onPrevious: flowVM.previousStep,
           viewModel: flowVM.memberDetailsVM,
         );
 
       case WellnessFlowViewModel.stepRiskAssessment:
+        // Set member and event IDs before showing the screen
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          flowVM.riskVM.setMemberAndEventId(
+            flowVM.currentMember?.id,
+            event?.id,
+          );
+        });
         return PersonalRiskAssessmentScreen(
-          onNext: flowVM.nextStep,
-          onPrevious: flowVM.previousStep,
+          onNext: () {
+            // Immediate update: mark HRA as completed in the parent ViewModel
+            flowVM.markHraCompleted();
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              flowVM.navigateToSection(
+                  WellnessFlowViewModel.sectionHealthScreenings);
+            });
+          },
+          onPrevious: () {
+            flowVM.navigateToSection(
+                WellnessFlowViewModel.sectionHealthScreenings);
+          },
           viewModel: flowVM.riskVM,
           nurseViewModel: flowVM.nurseVM,
           isFemale: flowVM.memberDetailsVM.gender?.toLowerCase() == 'female',
@@ -131,11 +184,22 @@ class WellnessFlowScreen extends StatelessWidget {
         ); */
 
       case WellnessFlowViewModel.stepHivTest:
+        // Set member and event IDs before showing the screen
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          flowVM.hivTestVM.setMemberAndEventId(
+            flowVM.currentMember?.id ?? '',
+            event?.id ?? '',
+          );
+        });
         return ChangeNotifierProvider.value(
           value: flowVM.hivTestVM,
           child: HIVTestScreen(
             onNext: flowVM.nextStep,
-            onPrevious: flowVM.previousStep,
+            onPrevious: () {
+              // Return to health screenings menu
+              flowVM.navigateToSection(
+                  WellnessFlowViewModel.sectionHealthScreenings);
+            },
           ),
         );
 
@@ -143,12 +207,23 @@ class WellnessFlowScreen extends StatelessWidget {
         if (event != null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             flowVM.hivResultsVM.initialiseWithEvent(event!);
+            flowVM.hivResultsVM.setMemberAndEventId(
+              flowVM.currentMember?.id ?? '',
+              event!.id,
+            );
           });
         }
         return ChangeNotifierProvider.value(
           value: flowVM.hivResultsVM,
           child: HIVTestResultScreen(
-            onNext: flowVM.nextStep,
+            onNext: () {
+              // Immediate update: mark HIV as completed in the parent ViewModel
+              flowVM.markHivCompleted();
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                flowVM.navigateToSection(
+                    WellnessFlowViewModel.sectionHealthScreenings);
+              });
+            },
             onPrevious: flowVM.previousStep,
           ),
         );
@@ -157,13 +232,27 @@ class WellnessFlowScreen extends StatelessWidget {
         if (event != null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             flowVM.tbTestVM.initialiseWithEvent(event!);
+            flowVM.tbTestVM.setMemberAndEventId(
+              flowVM.currentMember?.id ?? '',
+              event!.id,
+            );
           });
         }
         return ChangeNotifierProvider.value(
           value: flowVM.tbTestVM,
           child: TBTestingScreen(
-            onNext: flowVM.nextStep,
-            onPrevious: flowVM.previousStep,
+            onNext: () {
+              // Immediate update: mark TB as completed in the parent ViewModel
+              flowVM.markTbCompleted();
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                flowVM.navigateToSection(
+                    WellnessFlowViewModel.sectionHealthScreenings);
+              });
+            },
+            onPrevious: () {
+              flowVM.navigateToSection(
+                  WellnessFlowViewModel.sectionHealthScreenings);
+            },
           ),
         );
 
@@ -190,6 +279,8 @@ class WellnessFlowScreen extends StatelessWidget {
               try {
                 debugPrint('WellnessFlow: calling flowVM.submitAll');
                 await flowVM.submitAll(context);
+                // Mark survey as completed and update UI immediately
+                flowVM.markSurveyCompleted();
                 debugPrint('WellnessFlow: submitAll completed');
               } catch (e, st) {
                 debugPrint('WellnessFlow: Error in submitAll: $e\n$st');
@@ -205,7 +296,7 @@ class WellnessFlowScreen extends StatelessWidget {
 
               // 2) increment the screened counter for the active event and persist
               final active = flowVM.activeEvent;
-              if (active != null) {
+              if (active != null && context.mounted) {
                 try {
                   // Fire-and-forget the increment so the UI can return immediately.
                   // We do it in an unawaited microtask so any heavy persistence won't block the pop.
@@ -214,10 +305,10 @@ class WellnessFlowScreen extends StatelessWidget {
                   Future.microtask(() async {
                     try {
                       debugPrint(
-                          'WellnessFlow: incrementScreened (background) for ${active.id}');
+                          'WellnessFlow: incrementScreened (background) for \\${active.id}');
                       await eventVM.incrementScreened(active.id);
                       debugPrint(
-                          'WellnessFlow: incrementScreened done for ${active.id}');
+                          'WellnessFlow: incrementScreened done for \\${active.id}');
                     } catch (e, st) {
                       debugPrint(
                           'WellnessFlow: incrementScreened failed: $e\n$st');
@@ -249,7 +340,7 @@ class WellnessFlowScreen extends StatelessWidget {
               }
 
               debugPrint(
-                  'WellnessFlow: survey onSubmit finished (isStandalone: ${flowVM.isStandaloneSurvey})');
+                  'WellnessFlow: survey onSubmit finished (isStandalone: \\${flowVM.isStandaloneSurvey})');
             },
           ),
         );

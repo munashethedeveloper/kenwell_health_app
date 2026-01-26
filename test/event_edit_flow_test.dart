@@ -5,10 +5,7 @@ import 'package:kenwell_health_app/data/local/app_database.dart';
 // import 'package:kenwell_health_app/data/local/app_database.g.dart';
 
 class EventRepository {
-  EventRepository({AppDatabase? database})
-      : _database = database ?? AppDatabase.instance;
-
-  final AppDatabase _database;
+  EventRepository({AppDatabase? database});
 
   //Future<List<WellnessEvent>> fetchAllEvents() async {
   //  final entities = await _database.getAllEvents();

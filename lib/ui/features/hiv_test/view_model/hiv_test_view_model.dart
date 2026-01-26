@@ -1,7 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
+import 'package:kenwell_health_app/data/repositories_dcl/firestore_hiv_screening_repository.dart';
+import 'package:kenwell_health_app/domain/models/hiv_screening.dart';
+import 'package:uuid/uuid.dart';
 
 class HIVTestViewModel extends ChangeNotifier {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final FirestoreHivScreeningRepository _repository =
+      FirestoreHivScreeningRepository();
+
+  String? _memberId;
+  String? _eventId;
+
+  void setMemberAndEventId(String memberId, String eventId) {
+    _memberId = memberId;
+    _eventId = eventId;
+  }
 
   // --- 1. Questions ---
   String? firstHIVTest; // Yes/No
@@ -104,21 +118,71 @@ class HIVTestViewModel extends ChangeNotifier {
     };
   }
 
-  Future<void> submitHIVTest(VoidCallback? onNext) async {
-    if (!isFormValid) return;
+  Future<void> submitHIVTest(
+    BuildContext context, {
+    VoidCallback? onNext,
+  }) async {
+    if (!isFormValid) {
+      AppSnackbar.showWarning(
+        context,
+        'Please complete all required fields',
+      );
+      return;
+    }
+
+    if (_memberId == null || _eventId == null) {
+      AppSnackbar.showError(
+        context,
+        'Missing member or event information',
+      );
+      return;
+    }
 
     _isSubmitting = true;
     notifyListeners();
 
-    debugPrint("✅ HIV Test Submitted:");
-    debugPrint(toMap().toString());
+    try {
+      final screening = HivScreening(
+        id: const Uuid().v4(),
+        memberId: _memberId!,
+        eventId: _eventId!,
+        firstHivTest: firstHIVTest,
+        lastTestMonth: lastTestMonthController.text.isEmpty
+            ? null
+            : lastTestMonthController.text,
+        lastTestYear: lastTestYearController.text.isEmpty
+            ? null
+            : lastTestYearController.text,
+        lastTestResult: lastTestResult,
+        sharedNeedles: sharedNeedles,
+        unprotectedSex: unprotectedSex,
+        treatedSTI: treatedSTI,
+        knowPartnerStatus: knowPartnerStatus,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
 
-    await Future.delayed(const Duration(seconds: 1));
+      await _repository.addHivScreening(screening);
 
-    _isSubmitting = false;
-    notifyListeners();
+      if (!context.mounted) return;
 
-    onNext?.call();
+      AppSnackbar.showSuccess(
+        context,
+        'HIV screening saved successfully',
+      );
+
+      onNext?.call();
+    } catch (e) {
+      if (context.mounted) {
+        AppSnackbar.showError(
+          context,
+          'Error saving HIV screening: $e',
+        );
+      }
+    } finally {
+      _isSubmitting = false;
+      notifyListeners();
+    }
   }
 
   @override

@@ -1,37 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../data/repositories_dcl/event_repository.dart';
+import '../../../../domain/enums/service_type.dart';
+import '../../../../domain/enums/additional_service_type.dart';
 
 class EventViewModel extends ChangeNotifier {
   EventViewModel({EventRepository? repository})
       : _repository = repository ?? EventRepository() {
-    _resetServiceSelections();
     _initializationFuture = _loadPersistedEvents();
   }
-
-  static const List<String> _serviceOptions = [
-    'Breast Screening',
-    'Dental Screening',
-    'Eye Test',
-    'HCT',
-    'HIV Test',
-    'HRA',
-    'Pap Smear',
-    'Psychological Assessment',
-    'Posture Screening',
-    'PSA',
-    'Psychological Screening',
-    'TB Test',
-  ];
-
-  static const List<String> _additionalServiceOptions = [
-    'Massage Therapy',
-    'Pediatric Care',
-    'Smoothie Bar',
-    'Event Setup Assistance',
-    'Event Management',
-  ];
 
   final EventRepository _repository;
   late final Future<void> _initializationFuture;
@@ -58,50 +37,39 @@ class EventViewModel extends ChangeNotifier {
   final dateController = TextEditingController();
 
   // Dropdowns
-  String coordinators = 'No';
-  String mobileBooths = 'No';
   String medicalAid = "No";
-
   String? province;
 
-  //Healthcare Professional Dropdowns
-  //Nurses
-  String nurses = 'No';
-  String nursesOption = 'No';
-  int nursesCount = 0;
-
-  //occupational Therapists
-  String occupationalTherapists = 'No';
-  String occupationalTherapistsOption = 'No';
-  int occupationalTherapistsCount = 0;
-
-  //Dietician
-  String dieticians = 'No';
-  String dieticiansOption = 'No';
-  int dieticiansCount = 0;
-
-  //Psychologists
-  String psychologists = 'No';
-  String psychologistsOption = 'No';
-  int psychologistsCount = 0;
-
-  //Optometrist
-  String optometrists = 'No';
-  String optometristsOption = 'No';
-  int optometristsCount = 0;
-
-  //Dental Hygenists
-  String dentalHygenists = 'No';
-  String dentalHygenistsOption = 'No';
-  int dentalHygenistsCount = 0;
-
-  // NEW: Coordinators dropdown + number
+  // Coordinators
   String coordinatorsOption = 'No';
   int coordinatorsCount = 0;
 
-// NEW: Mobile Booths dropdown + number
+  // Mobile Booths
   String mobileBoothsOption = 'No';
   int mobileBoothsCount = 0;
+
+  // Healthcare Professionals
+  String nursesOption = 'No';
+  int nursesCount = 0;
+
+  String occupationalTherapistsOption = 'No';
+  int occupationalTherapistsCount = 0;
+
+  String dieticiansOption = 'No';
+  int dieticiansCount = 0;
+
+  String psychologistsOption = 'No';
+  int psychologistsCount = 0;
+
+  String optometristsOption = 'No';
+  int optometristsCount = 0;
+
+  String dentalHygenistsOption = 'No';
+  int dentalHygenistsCount = 0;
+
+  // Getters for backward compatibility
+  String get coordinators => coordinatorsOption;
+  String get mobileBooths => mobileBoothsOption;
 
   // Events
   final List<WellnessEvent> _events = [];
@@ -109,49 +77,102 @@ class EventViewModel extends ChangeNotifier {
 
   Future<void> get initialized => _initializationFuture;
 
-//Services Selection
-  final Set<String> _selectedServices = {};
-  final Set<String> _selectedAdditionalServices = {};
+  // Loading and Error States
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+
+  String? _errorMessage;
+  String? get errorMessage => _errorMessage;
+
+  void _setLoading(bool loading) {
+    _isLoading = loading;
+    notifyListeners();
+  }
+
+  void _setError(String? error) {
+    _errorMessage = error;
+    notifyListeners();
+  }
+
+  void clearError() {
+    _errorMessage = null;
+    notifyListeners();
+  }
+
+  // Input Validation and Sanitization
+  String _sanitizeString(String? input) {
+    return input?.trim() ?? '';
+  }
+
+  int _sanitizeInt(String? input, {int defaultValue = 0}) {
+    if (input == null || input.isEmpty) return defaultValue;
+    return int.tryParse(input.trim()) ?? defaultValue;
+  }
+
+  // Validation helpers (available for future use)
+  // ignore: unused_element
+  bool _isValidEmail(String email) {
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return emailRegex.hasMatch(email);
+  }
+
+  // ignore: unused_element
+  bool _isValidPhoneNumber(String phone) {
+    final phoneRegex = RegExp(r'^\+?[0-9]{10,15}$');
+    return phoneRegex.hasMatch(phone.replaceAll(RegExp(r'[\s-]'), ''));
+  }
+
+  // Services Selection (using enums)
+  final Set<ServiceType> _selectedServices = {};
+  final Set<AdditionalServiceType> _selectedAdditionalServices = {};
 
   List<String> get availableServiceOptions =>
-      List<String>.unmodifiable(_serviceOptions);
+      ServiceTypeExtension.allDisplayNames;
   List<String> get availableAdditionalServiceOptions =>
-      List<String>.unmodifiable(_additionalServiceOptions);
+      AdditionalServiceTypeExtension.allDisplayNames;
 
   Set<String> get selectedServices =>
-      Set<String>.unmodifiable(_selectedServices);
+      _selectedServices.map((e) => e.displayName).toSet();
   Set<String> get selectedAdditionalServices =>
-      Set<String>.unmodifiable(_selectedAdditionalServices);
+      _selectedAdditionalServices.map((e) => e.displayName).toSet();
 
-  bool isServiceSelected(String service) => _selectedServices.contains(service);
-  bool isAdditionalServiceSelected(String service) =>
-      _selectedAdditionalServices.contains(service);
+  bool isServiceSelected(String service) {
+    return _selectedServices.any((s) => s.displayName == service);
+  }
+
+  bool isAdditionalServiceSelected(String service) {
+    return _selectedAdditionalServices.any((s) => s.displayName == service);
+  }
 
   void toggleServiceSelection(String service, bool shouldSelect) {
-    if (!_serviceOptions.contains(service)) return;
+    final serviceType = ServiceTypeExtension.fromString(service);
+    if (serviceType == null) return;
+
     if (shouldSelect) {
-      _selectedServices.add(service);
+      _selectedServices.add(serviceType);
     } else {
-      _selectedServices.remove(service);
+      _selectedServices.remove(serviceType);
     }
     notifyListeners();
   }
 
   void toggleAdditionalServiceSelection(String service, bool shouldSelect) {
-    if (!_additionalServiceOptions.contains(service)) return;
+    final serviceType = AdditionalServiceTypeExtension.fromString(service);
+    if (serviceType == null) return;
+
     if (shouldSelect) {
-      _selectedAdditionalServices.add(service);
+      _selectedAdditionalServices.add(serviceType);
     } else {
-      _selectedAdditionalServices.remove(service);
+      _selectedAdditionalServices.remove(serviceType);
     }
     notifyListeners();
   }
 
   String get servicesRequested =>
-      _selectedServices.isEmpty ? '' : _selectedServices.join(', ');
-  String get additionalServicesRequested => _selectedAdditionalServices.isEmpty
-      ? ''
-      : _selectedAdditionalServices.join(', ');
+      ServiceTypeConverter.toStorageString(_selectedServices);
+  String get additionalServicesRequested =>
+      AdditionalServiceTypeConverter.toStorageString(
+          _selectedAdditionalServices);
 
   // Load existing event for editing
   void loadExistingEvent(WellnessEvent? e) {
@@ -178,8 +199,11 @@ class EventViewModel extends ChangeNotifier {
 
     dateController.text =
         "${e.date.year}-${e.date.month.toString().padLeft(2, '0')}-${e.date.day.toString().padLeft(2, '0')}";
-    coordinators = e.coordinators == 1 ? 'Yes' : 'No';
-    mobileBooths = e.mobileBooths;
+    coordinatorsOption = e.coordinators > 0 ? 'Yes' : 'No';
+    coordinatorsCount = e.coordinators;
+    mobileBoothsOption = e.mobileBooths;
+    nursesCount = e.nurses;
+    nursesOption = e.nurses > 0 ? 'Yes' : 'No';
     _setServicesFromString(e.servicesRequested);
     _setAdditionalServicesFromString(e.additionalServicesRequested);
     medicalAid = e.medicalAid;
@@ -217,90 +241,129 @@ class EventViewModel extends ChangeNotifier {
   // Build event model
   WellnessEvent buildEvent(DateTime date) {
     return WellnessEvent(
-      title: titleController.text,
+      title: _sanitizeString(titleController.text),
       date: date,
-      townCity: townCityController.text,
-      venue: venueController.text,
-      address: addressController.text,
-      province: province ?? '',
-      onsiteContactFirstName: onsiteContactFirstNameController.text,
-      onsiteContactLastName: onsiteContactLastNameController.text,
-      onsiteContactNumber: onsiteNumberController.text,
-      onsiteContactEmail: onsiteEmailController.text,
-      aeContactFirstName: aeContactFirstNameController.text,
-      aeContactLastName: aeContactLastNameController.text,
-      aeContactNumber: aeNumberController.text,
-      aeContactEmail: aeEmailController.text,
+      townCity: _sanitizeString(townCityController.text),
+      venue: _sanitizeString(venueController.text),
+      address: _sanitizeString(addressController.text),
+      province: _sanitizeString(province),
+      onsiteContactFirstName:
+          _sanitizeString(onsiteContactFirstNameController.text),
+      onsiteContactLastName:
+          _sanitizeString(onsiteContactLastNameController.text),
+      onsiteContactNumber: _sanitizeString(onsiteNumberController.text),
+      onsiteContactEmail: _sanitizeString(onsiteEmailController.text),
+      aeContactFirstName: _sanitizeString(aeContactFirstNameController.text),
+      aeContactLastName: _sanitizeString(aeContactLastNameController.text),
+      aeContactNumber: _sanitizeString(aeNumberController.text),
+      aeContactEmail: _sanitizeString(aeEmailController.text),
       servicesRequested: servicesRequested,
       additionalServicesRequested: additionalServicesRequested,
-      expectedParticipation:
-          int.tryParse(expectedParticipationController.text) ?? 0,
-      nurses: int.tryParse(nursesController.text) ?? 0,
-      coordinators: coordinators == 'Yes' ? 1 : 0,
-      setUpTime: setUpTimeController.text,
-      startTime: startTimeController.text,
-      endTime: endTimeController.text,
-      strikeDownTime: strikeDownTimeController.text,
-      mobileBooths: mobileBooths,
+      expectedParticipation: _sanitizeInt(expectedParticipationController.text),
+      nurses: nursesCount,
+      coordinators: coordinatorsOption == 'Yes' ? coordinatorsCount : 0,
+      setUpTime: _sanitizeString(setUpTimeController.text),
+      startTime: _sanitizeString(startTimeController.text),
+      endTime: _sanitizeString(endTimeController.text),
+      strikeDownTime: _sanitizeString(strikeDownTimeController.text),
+      mobileBooths: mobileBoothsOption,
       medicalAid: medicalAid,
     );
   }
 
   Future<void> incrementScreened(String eventId) async {
     try {
-      // Find the event in memory (adjust to your storage if different)
       final idx = _events.indexWhere((e) => e.id == eventId);
       if (idx == -1) {
         debugPrint('incrementScreened: event not found: $eventId');
+        _setError('Event not found');
         return;
       }
 
       final existing = _events[idx];
-      final current = existing.screenedCount ?? 0;
+      final current = existing.screenedCount;
       final updated = existing.copyWith(screenedCount: current + 1);
 
-      // Persist the update using your existing updateEvent(...) method so data source is consistent
       await updateEvent(updated);
 
-      // Ensure local list is updated if updateEvent doesn't update the in-memory list
       _events[idx] = updated;
       notifyListeners();
     } catch (e, st) {
       debugPrint('incrementScreened failed for $eventId: $e\n$st');
+      _setError('Failed to update screened count: ${e.toString()}');
+      rethrow;
     }
   }
 
   Future<void> addEvent(WellnessEvent event) async {
-    _events.add(event);
-    notifyListeners();
-    await _repository.addEvent(event);
+    _setLoading(true);
+    _setError(null);
+    try {
+      debugPrint('EventViewModel: Adding event "${event.title}"');
+      _events.add(event);
+      notifyListeners();
+      await _repository.addEvent(event);
+      debugPrint('EventViewModel: Event added successfully');
+    } catch (e, stackTrace) {
+      debugPrint('EventViewModel: ERROR adding event: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      _setError('Failed to add event: ${e.toString()}');
+      // Remove from local list if save failed
+      _events.removeWhere((ev) => ev.id == event.id);
+      notifyListeners();
+      rethrow;
+    } finally {
+      _setLoading(false);
+    }
   }
 
   /// Deletes an event by removing it from the list
   /// Returns the deleted event for potential undo operation
   Future<WellnessEvent?> deleteEvent(String eventId) async {
-    final index = _events.indexWhere((e) => e.id == eventId);
-    if (index != -1) {
-      final deletedEvent = _events.removeAt(index);
-      notifyListeners();
-      await _repository.deleteEvent(eventId);
-      return deletedEvent;
+    _setLoading(true);
+    _setError(null);
+    try {
+      final index = _events.indexWhere((e) => e.id == eventId);
+      if (index != -1) {
+        final deletedEvent = _events.removeAt(index);
+        notifyListeners();
+        await _repository.deleteEvent(eventId);
+        return deletedEvent;
+      }
+      return null;
+    } catch (e, stackTrace) {
+      debugPrint('EventViewModel: ERROR deleting event: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      _setError('Failed to delete event: ${e.toString()}');
+      rethrow;
+    } finally {
+      _setLoading(false);
     }
-    return null;
   }
 
   /// Updates an existing event in the list
   /// Returns the previous version of the event for potential undo operation
   Future<WellnessEvent?> updateEvent(WellnessEvent updatedEvent) async {
-    final index = _events.indexWhere((e) => e.id == updatedEvent.id);
-    if (index != -1) {
-      final previousEvent = _events[index];
-      _events[index] = updatedEvent;
-      notifyListeners();
-      await _repository.updateEvent(updatedEvent);
-      return previousEvent;
+    _setLoading(true);
+    _setError(null);
+    try {
+      final index = _events.indexWhere((e) => e.id == updatedEvent.id);
+      if (index != -1) {
+        final previousEvent = _events[index];
+        _events[index] = updatedEvent;
+        notifyListeners();
+        await _repository.updateEvent(updatedEvent);
+        return previousEvent;
+      }
+      return null;
+    } catch (e, stackTrace) {
+      debugPrint('EventViewModel: ERROR updating event: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      _setError('Failed to update event: ${e.toString()}');
+      rethrow;
+    } finally {
+      _setLoading(false);
     }
-    return null;
   }
 
   /// Restores a previously deleted event (undo functionality)
@@ -323,19 +386,11 @@ class EventViewModel extends ChangeNotifier {
   }
 
   List<WellnessEvent> getUpcomingEvents({DateTime? from}) {
-    final reference = from ?? DateTime.now();
+    // Show all events that are not completed
+    // The conduct_event_screen will filter by week range
     final eventsCopy = _events.where((event) {
-      // Don't show completed events
-      if (event.status == WellnessEventStatus.completed) return false;
-
-      // Keep events until strike down time has elapsed
-      final strikeDown = event.strikeDownDateTime;
-      if (strikeDown != null && reference.isAfter(strikeDown)) {
-        return false;
-      }
-
-      // Show all events that haven't passed their strike down time
-      return true;
+      // Only filter out completed events
+      return event.status != WellnessEventStatus.completed;
     }).toList();
     eventsCopy.sort(_compareEventsByStartTime);
     return eventsCopy;
@@ -414,46 +469,27 @@ class EventViewModel extends ChangeNotifier {
   }
 
   void _setServicesFromString(String raw) {
-    final parsed = raw
-        .split(',')
-        .map((value) => value.trim())
-        .where((value) => value.isNotEmpty && _serviceOptions.contains(value));
-
-    _selectedServices
-      ..clear()
-      ..addAll(parsed);
-
-    if (_selectedServices.isEmpty) {
-      _resetServiceSelections();
-    }
+    _selectedServices.clear();
+    _selectedServices.addAll(ServiceTypeConverter.fromStorageString(raw));
   }
 
   void _setAdditionalServicesFromString(String raw) {
-    final parsed = raw.split(',').map((value) => value.trim()).where((value) =>
-        value.isNotEmpty && _additionalServiceOptions.contains(value));
-
+    _selectedAdditionalServices.clear();
     _selectedAdditionalServices
-      ..clear()
-      ..addAll(parsed);
-
-    if (_selectedAdditionalServices.isEmpty) {
-      _resetAdditionalServiceSelections();
-    }
+        .addAll(AdditionalServiceTypeConverter.fromStorageString(raw));
   }
 
   void _resetServiceSelections() {
-    _selectedServices
-      ..clear()
-      ..add(_serviceOptions.first);
+    _selectedServices.clear();
   }
 
   void _resetAdditionalServiceSelections() {
-    _selectedAdditionalServices
-      ..clear()
-      ..add(_additionalServiceOptions.first);
+    _selectedAdditionalServices.clear();
   }
 
   Future<void> _loadPersistedEvents() async {
+    _setLoading(true);
+    _setError(null);
     try {
       final stored = await _repository.fetchAllEvents();
       _events
@@ -462,21 +498,39 @@ class EventViewModel extends ChangeNotifier {
       notifyListeners();
       debugPrint(
           'EventViewModel: Loaded ${stored.length} events from repository');
-    } catch (e) {
-      // Log error but keep in-memory list empty
+    } catch (e, stackTrace) {
       debugPrint('EventViewModel: Error loading events: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      _setError('Failed to load events: ${e.toString()}');
+      // Keep in-memory list empty on error
+    } finally {
+      _setLoading(false);
     }
   }
 
   /// Reload events from repository (useful when returning to screens)
   Future<void> reloadEvents() async {
     debugPrint('EventViewModel: Reloading events...');
-    await _loadPersistedEvents();
+    try {
+      await _loadPersistedEvents();
+    } catch (e) {
+      debugPrint('EventViewModel: Error reloading events: $e');
+      _setError('Failed to reload events: ${e.toString()}');
+    }
   }
 
   int _compareEventsByStartTime(WellnessEvent a, WellnessEvent b) {
     final aStart = a.startDateTime ?? a.date;
     final bStart = b.startDateTime ?? b.date;
     return aStart.compareTo(bStart);
+  }
+
+  // ------------------ Formatting Methods ------------------
+  String formatEventDateLong(DateTime date) {
+    return DateFormat.yMMMMd().format(date);
+  }
+
+  String formatDateRange(DateTime start, DateTime end) {
+    return '${formatEventDateLong(start)} - ${formatEventDateLong(end)}';
   }
 }

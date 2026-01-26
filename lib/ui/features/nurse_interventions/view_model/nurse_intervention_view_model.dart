@@ -3,6 +3,7 @@ import 'package:signature/signature.dart';
 import 'package:intl/intl.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
+import 'package:kenwell_health_app/domain/constants/enums.dart';
 
 class NurseInterventionViewModel extends ChangeNotifier {
   /// Controls whether the Initial Assessment card (and related validations) show.
@@ -11,19 +12,19 @@ class NurseInterventionViewModel extends ChangeNotifier {
 
   // --- Initial Assessment ---
   String? windowPeriod; // 'N/A', 'Yes', 'No'
-  final List<String> windowPeriodOptions = ['N/A', 'Yes', 'No'];
+  final List<String> windowPeriodOptions = YesNoNA.values.labels;
 
   String? expectedResult; // 'N/A', 'Yes', 'No'
-  final List<String> expectedResultOptions = ['N/A', 'Yes', 'No'];
+  final List<String> expectedResultOptions = YesNoNA.values.labels;
 
   String? difficultyDealingResult; // 'N/A', 'Yes', 'No'
-  final List<String> difficultyOptions = ['N/A', 'Yes', 'No'];
+  final List<String> difficultyOptions = YesNoNA.values.labels;
 
   String? urgentPsychosocial; // 'N/A', 'Yes', 'No'
-  final List<String> urgentOptions = ['N/A', 'Yes', 'No'];
+  final List<String> urgentOptions = YesNoNA.values.labels;
 
   String? committedToChange; // 'N/A', 'Yes', 'No'
-  final List<String> committedOptions = ['N/A', 'Yes', 'No'];
+  final List<String> committedOptions = YesNoNA.values.labels;
 
   void setWindowPeriod(String? value) => _setValue(() => windowPeriod = value);
   void setExpectedResult(String? value) =>
@@ -37,12 +38,7 @@ class NurseInterventionViewModel extends ChangeNotifier {
 
   // --- Follow-up ---
   String? followUpLocation; // 'State clinic', 'Private doctor', 'Other'
-  final List<String> followUpLocationOptions = [
-    'Referred to State clinic',
-    'Referred to Private doctor',
-    'Other',
-    'No follow-up needed',
-  ];
+  final List<String> followUpLocationOptions = FollowUpLocation.values.labels;
   final TextEditingController followUpOtherController = TextEditingController();
   final TextEditingController followUpDateController = TextEditingController();
 

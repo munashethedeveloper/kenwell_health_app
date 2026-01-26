@@ -1,13 +1,13 @@
 import 'package:flutter/foundation.dart';
-import 'package:kenwell_health_app/data/services/auth_service.dart';
+import 'package:kenwell_health_app/data/services/firebase_auth_service.dart';
 
 class AuthViewModel extends ChangeNotifier {
-  AuthViewModel({AuthService? authService})
-      : _authService = authService ?? AuthService() {
+  AuthViewModel({FirebaseAuthService? authService})
+      : _authService = authService ?? FirebaseAuthService() {
     _checkLoginStatus();
   }
 
-  final AuthService _authService;
+  final FirebaseAuthService _authService;
 
   bool _isLoggedIn = false;
   bool _isLoading = true;
@@ -18,7 +18,7 @@ class AuthViewModel extends ChangeNotifier {
   Future<void> _checkLoginStatus() async {
     _setLoading(true);
     try {
-      _isLoggedIn = await _authService.isLoggedIn();
+      _isLoggedIn = _authService.isLoggedIn();
     } finally {
       _setLoading(false);
     }

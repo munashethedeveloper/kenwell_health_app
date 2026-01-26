@@ -7,7 +7,9 @@ import '../../../shared/ui/buttons/custom_primary_button.dart';
 import '../../../shared/ui/buttons/custom_secondary_button.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_section_header.dart';
+import '../../../shared/ui/logo/app_logo.dart';
 import '../view_model/event_view_model.dart';
+import 'allocate_event_screen.dart';
 
 class EventDetailsScreen extends StatelessWidget {
   final WellnessEvent event;
@@ -21,33 +23,20 @@ class EventDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     String fullName(String first, String last) => '$first $last';
-
-    Widget detailRow(String label, String value) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(label,
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Colors.black87)),
-            const SizedBox(height: 4),
-            Text(value, style: const TextStyle(fontSize: 15)),
-          ],
-        ),
-      );
-    }
 
     return Scaffold(
       appBar: KenwellAppBar(
-        title: '${event.title} Summary',
+        title: 'Event Details',
+        titleColor: Colors.white,
+        titleStyle: const TextStyle(
+          color: Colors.white,
+          //fontWeight: FontWeight.bold,
+        ),
         automaticallyImplyLeading: true,
         backgroundColor: const Color(0xFF201C58),
-        titleColor: Colors.white,
-        centerTitle: false,
+        centerTitle: true,
         actions: [
           if (viewModel != null)
             IconButton(
@@ -66,47 +55,97 @@ class EventDetailsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          const SizedBox(height: 16),
+          const AppLogo(size: 200),
+          const SizedBox(height: 24),
           const KenwellSectionHeader(
             title: 'Event Summary Details',
             uppercase: true,
           ),
+          _buildSectionCard('Client Organization', [
+            _buildDetailRow('Event Title', event.title, theme),
+          ]),
           _buildSectionCard('Date & Time', [
-            detailRow('Date', DateFormat.yMMMMd().format(event.date)),
-            detailRow('Set Up Time', event.setUpTime),
-            detailRow('Start Time', event.startTime),
-            detailRow('End Time', event.endTime),
-            detailRow('Strike Down Time', event.strikeDownTime),
+            _buildDetailRow(
+                'Date', DateFormat.yMMMMd().format(event.date), theme),
+            const Divider(),
+            _buildDetailRow('Set Up Time', event.setUpTime, theme),
+            const Divider(),
+            _buildDetailRow('Start Time', event.startTime, theme),
+            const Divider(),
+            _buildDetailRow('End Time', event.endTime, theme),
+            const Divider(),
+            _buildDetailRow('Strike Down Time', event.strikeDownTime, theme),
           ]),
           _buildSectionCard('Event Location', [
-            detailRow('Address', event.address),
-            detailRow('Venue', event.venue),
-            detailRow('Town/City', event.townCity),
-            detailRow('Province', event.province),
+            _buildDetailRow('Venue', event.venue, theme),
+            const Divider(),
+            _buildDetailRow('Address', event.address, theme),
+            const Divider(),
+            _buildDetailRow('Town/City', event.townCity, theme),
+            const Divider(),
+            _buildDetailRow('Province', event.province, theme),
           ]),
           _buildSectionCard('Onsite Contact', [
-            detailRow(
+            _buildDetailRow(
                 'Contact Person',
                 fullName(
-                    event.onsiteContactFirstName, event.onsiteContactLastName)),
-            detailRow('Contact Number', event.onsiteContactNumber),
-            detailRow('Email', event.onsiteContactEmail),
+                    event.onsiteContactFirstName, event.onsiteContactLastName),
+                theme),
+            const Divider(),
+            _buildDetailRow('Contact Number', event.onsiteContactNumber, theme),
+            const Divider(),
+            _buildDetailRow('Email', event.onsiteContactEmail, theme),
           ]),
           _buildSectionCard('AE Contact', [
-            detailRow('Contact Person',
-                fullName(event.aeContactFirstName, event.aeContactLastName)),
-            detailRow('Contact Number', event.aeContactNumber),
-            detailRow('Email', event.aeContactEmail),
+            _buildDetailRow(
+                'Contact Person',
+                fullName(event.aeContactFirstName, event.aeContactLastName),
+                theme),
+            const Divider(),
+            _buildDetailRow('Contact Number', event.aeContactNumber, theme),
+            const Divider(),
+            _buildDetailRow('Email', event.aeContactEmail, theme),
           ]),
           _buildSectionCard('Participation & Options', [
-            detailRow('Expected Participation',
-                event.expectedParticipation.toString()),
-            detailRow('Nurses', event.nurses.toString()),
-            detailRow('Coordinators', event.coordinators.toString()),
-            detailRow('Mobile Booths', event.mobileBooths),
-            detailRow('Medical Aid Option', event.medicalAid),
-            if (event.description != null && event.description!.isNotEmpty)
-              detailRow('Description', event.description!),
+            _buildDetailRow('Expected Participation',
+                event.expectedParticipation.toString(), theme),
+            const Divider(),
+            _buildDetailRow('Nurses', event.nurses.toString(), theme),
+            const Divider(),
+            _buildDetailRow(
+                'Coordinators', event.coordinators.toString(), theme),
+            const Divider(),
+            _buildDetailRow('Mobile Booths', event.mobileBooths, theme),
+            const Divider(),
+            _buildDetailRow('Medical Aid Option', event.medicalAid, theme),
+            if (event.description != null && event.description!.isNotEmpty) ...[
+              const Divider(),
+              _buildDetailRow('Description', event.description!, theme),
+            ],
           ]),
+          const SizedBox(height: 24),
+          CustomPrimaryButton(
+            label: 'Allocate Event',
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => AllocateEventScreen(
+                    onAllocate: (assignedUserIds) {
+                      // TODO: Handle assignment logic
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              'Assigned to: ' + assignedUserIds.join(', ')),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              );
+            },
+          ),
         ],
       ),
     );
@@ -164,6 +203,33 @@ class EventDetailsScreen extends StatelessWidget {
     Navigator.of(context).pop();
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Event deleted')),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value, ThemeData theme) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 120,
+            child: Text(
+              label,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[700],
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: theme.textTheme.bodyMedium,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

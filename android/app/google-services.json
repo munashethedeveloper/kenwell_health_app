@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "195093019449",
+    "project_id": "kenwellmobileapp",
+    "storage_bucket": "kenwellmobileapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:195093019449:android:80c5c09ca6b7f409e8c6e8",
+        "android_client_info": {
+          "package_name": "com.example.kenwell_health_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8bEj_N6z-kqFGBS0pDHomRGO5NaGVEzU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

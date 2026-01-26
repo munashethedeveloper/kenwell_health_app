@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:signature/signature.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
+import 'package:kenwell_health_app/domain/models/consent.dart';
+import 'package:kenwell_health_app/data/repositories_dcl/firestore_consent_repository.dart';
+import 'package:kenwell_health_app/utils/logger.dart';
+import 'dart:convert';
+import 'dart:typed_data';
 
 class ConsentScreenViewModel extends ChangeNotifier {
+  final FirestoreConsentRepository _consentRepository =
+      FirestoreConsentRepository();
+
   // Form key
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
@@ -27,6 +36,8 @@ class ConsentScreenViewModel extends ChangeNotifier {
   bool get isSubmitting => _isSubmitting;
 
   WellnessEvent? event;
+  String? _memberId;
+  String? _eventId;
 
   // Profile names (passed in from ProfileViewModel)
   String? userFirstName;
@@ -62,12 +73,16 @@ class ConsentScreenViewModel extends ChangeNotifier {
     WellnessEvent e, {
     String? firstName,
     String? lastName,
+    String? memberId,
+    String? eventId,
   }) {
     if (event != null) return; // prevent double init
 
     event = e;
     userFirstName = firstName;
     userLastName = lastName;
+    _memberId = memberId;
+    _eventId = eventId ?? e.id;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       venueController.text = e.venue;
@@ -111,10 +126,76 @@ class ConsentScreenViewModel extends ChangeNotifier {
     _isSubmitting = true;
     notifyListeners();
 
-    await Future.delayed(const Duration(milliseconds: 600));
+    try {
+      // Convert signature to base64 if available
+      String? signatureBase64;
+      if (signatureController.isNotEmpty) {
+        final Uint8List? signatureBytes =
+            await signatureController.toPngBytes();
+        if (signatureBytes != null) {
+          signatureBase64 = base64Encode(signatureBytes);
+        }
+      }
 
-    _isSubmitting = false;
-    notifyListeners();
+      // Create consent object
+      final consent = Consent(
+        id: '${DateTime.now().millisecondsSinceEpoch}', // Simple timestamp-based ID
+        memberId: _memberId,
+        eventId: _eventId,
+        venue: venueController.text,
+        date: DateFormat('yyyy-MM-dd').parse(dateController.text),
+        practitioner: practitionerController.text,
+        hra: hra,
+        hiv: hiv,
+        tb: tb,
+        signatureData: signatureBase64,
+        createdAt: DateTime.now(),
+      );
+
+      // Save to Firestore consents collection
+      await _consentRepository.addConsent(consent);
+      AppLogger.info('Consent saved to consents collection');
+
+      // Also save to survey_results collection for analytics/reporting
+      await _saveToSurveyResults(consent);
+      AppLogger.info('Consent saved to survey_results collection');
+    } catch (e) {
+      AppLogger.error('Failed to save consent', e);
+      // Continue with flow even if Firestore save fails
+    } finally {
+      _isSubmitting = false;
+      notifyListeners();
+    }
+  }
+
+  /// Save consent data to survey_results collection
+  Future<void> _saveToSurveyResults(Consent consent) async {
+    try {
+      final surveyData = {
+        'id': consent.id,
+        'memberId': consent.memberId,
+        'eventId': consent.eventId,
+        'type': 'consent', // Identify this as a consent survey
+        'venue': consent.venue,
+        'date': consent.date.toIso8601String(),
+        'practitioner': consent.practitioner,
+        'screenings': {
+          'hra': consent.hra,
+          'hiv': consent.hiv,
+          'tb': consent.tb,
+        },
+        'signatureProvided': consent.signatureData != null,
+        'createdAt': consent.createdAt.toIso8601String(),
+      };
+
+      await FirebaseFirestore.instance
+          .collection('survey_results')
+          .doc(consent.id)
+          .set(surveyData);
+    } catch (e) {
+      AppLogger.error('Failed to save consent to survey_results', e);
+      // Don't rethrow - this is a secondary save operation
+    }
   }
 
   Map<String, dynamic> toMap() => {

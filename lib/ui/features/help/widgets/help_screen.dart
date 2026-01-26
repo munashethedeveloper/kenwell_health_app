@@ -16,6 +16,11 @@ class HelpScreen extends StatelessWidget {
       child: Scaffold(
         appBar: const KenwellAppBar(
           title: 'Help & Support',
+          titleColor: Color(0xFF201C58),
+          titleStyle: TextStyle(
+            color: Color(0xFF201C58),
+            fontWeight: FontWeight.bold,
+          ),
           automaticallyImplyLeading: false,
         ),
         body: Consumer<HelpScreenViewModel>(

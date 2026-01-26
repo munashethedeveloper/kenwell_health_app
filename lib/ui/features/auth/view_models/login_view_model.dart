@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import "../../../../data/repositories_dcl/auth_repository_dcl.dart";
-import '../../../../domain/models/user_model.dart';
 
 enum LoginNavigationTarget { mainNavigation }
 

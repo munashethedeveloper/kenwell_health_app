@@ -93,6 +93,7 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
               child: Form(
                 key: _formKey,
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 16),

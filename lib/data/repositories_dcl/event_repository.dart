@@ -1,20 +1,22 @@
-import 'package:drift/drift.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-import 'package:kenwell_health_app/data/local/app_database.dart';
 import '../../../domain/models/wellness_event.dart';
 
 class EventRepository {
-  EventRepository({AppDatabase? database})
-      : _database = database ?? AppDatabase.instance;
+  EventRepository({FirebaseFirestore? firestore})
+      : _firestore = firestore ?? FirebaseFirestore.instance;
 
-  final AppDatabase _database;
+  final FirebaseFirestore _firestore;
+  static const String _collectionName = 'events';
 
   Future<List<WellnessEvent>> fetchAllEvents() async {
     try {
-      final entities = await _database.getAllEvents();
+      final snapshot = await _firestore.collection(_collectionName).get();
       debugPrint(
-          'EventRepository: Fetched ${entities.length} event entities from database');
-      return entities.map(_mapEntityToDomain).toList();
+          'EventRepository: Fetched ${snapshot.docs.length} events from Firestore');
+      return snapshot.docs
+          .map((doc) => _mapFirestoreToDomain(doc.id, doc.data()))
+          .toList();
     } catch (e, stackTrace) {
       debugPrint('EventRepository: Error fetching events: $e');
       debugPrint('EventRepository: Stack trace: $stackTrace');
@@ -23,88 +25,114 @@ class EventRepository {
   }
 
   Future<WellnessEvent?> fetchEventById(String id) async {
-    final entity = await _database.getEventById(id);
-    return entity == null ? null : _mapEntityToDomain(entity);
+    try {
+      final doc = await _firestore.collection(_collectionName).doc(id).get();
+      if (!doc.exists) return null;
+      return _mapFirestoreToDomain(doc.id, doc.data()!);
+    } catch (e) {
+      debugPrint('EventRepository: Error fetching event by id: $e');
+      rethrow;
+    }
   }
 
   Future<void> addEvent(WellnessEvent event) => upsertEvent(event);
 
-  Future<void> deleteEvent(String id) => _database.deleteEventById(id);
+  Future<void> deleteEvent(String id) async {
+    await _firestore.collection(_collectionName).doc(id).delete();
+  }
 
   Future<void> updateEvent(WellnessEvent updatedEvent) =>
       upsertEvent(updatedEvent);
 
   Future<void> upsertEvent(WellnessEvent event) async {
-    await _database.upsertEvent(_mapDomainToCompanion(event));
+    try {
+      debugPrint(
+          'EventRepository: Saving event "${event.title}" with id: ${event.id}');
+      final eventData = _mapDomainToFirestore(event);
+      debugPrint('EventRepository: Event data: $eventData');
+
+      await _firestore.collection(_collectionName).doc(event.id).set(eventData);
+
+      debugPrint('EventRepository: Event saved successfully');
+    } catch (e, stackTrace) {
+      debugPrint('EventRepository: ERROR saving event: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      rethrow;
+    }
   }
 
-  WellnessEvent _mapEntityToDomain(EventEntity entity) {
+  WellnessEvent _mapFirestoreToDomain(String id, Map<String, dynamic> data) {
     return WellnessEvent(
-      id: entity.id,
-      title: entity.title ?? 'Untitled Event',
-      date: entity.date,
-      venue: entity.venue ?? '',
-      address: entity.address ?? '',
-      townCity: entity.townCity ?? '',
-      province: entity.province ?? '',
-      onsiteContactFirstName: entity.onsiteContactFirstName ?? '',
-      onsiteContactLastName: entity.onsiteContactLastName ?? '',
-      onsiteContactNumber: entity.onsiteContactNumber ?? '',
-      onsiteContactEmail: entity.onsiteContactEmail ?? '',
-      aeContactFirstName: entity.aeContactFirstName ?? '',
-      aeContactLastName: entity.aeContactLastName ?? '',
-      aeContactNumber: entity.aeContactNumber ?? '',
-      aeContactEmail: entity.aeContactEmail ?? '',
-      servicesRequested: entity.servicesRequested ?? '',
-      additionalServicesRequested: entity.additionalServicesRequested ?? '',
-      expectedParticipation: entity.expectedParticipation ?? 0,
-      nurses: entity.nurses ?? 0,
-      coordinators: entity.coordinators ?? 0,
-      setUpTime: entity.setUpTime ?? '',
-      startTime: entity.startTime ?? '',
-      endTime: entity.endTime ?? '',
-      strikeDownTime: entity.strikeDownTime ?? '',
-      mobileBooths: entity.mobileBooths ?? '',
-      description: entity.description,
-      medicalAid: entity.medicalAid ?? '',
-      status: entity.status ?? 'scheduled',
-      actualStartTime: entity.actualStartTime,
-      actualEndTime: entity.actualEndTime,
+      id: id,
+      title: data['title'] ?? '',
+      date: (data['date'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      venue: data['venue'] ?? '',
+      address: data['address'] ?? '',
+      townCity: data['townCity'] ?? '',
+      province: data['province'] ?? '',
+      onsiteContactFirstName: data['onsiteContactFirstName'] ?? '',
+      onsiteContactLastName: data['onsiteContactLastName'] ?? '',
+      onsiteContactNumber: data['onsiteContactNumber'] ?? '',
+      onsiteContactEmail: data['onsiteContactEmail'] ?? '',
+      aeContactFirstName: data['aeContactFirstName'] ?? '',
+      aeContactLastName: data['aeContactLastName'] ?? '',
+      aeContactNumber: data['aeContactNumber'] ?? '',
+      aeContactEmail: data['aeContactEmail'] ?? '',
+      servicesRequested: data['servicesRequested'] ?? '',
+      additionalServicesRequested: data['additionalServicesRequested'] ?? '',
+      expectedParticipation: data['expectedParticipation'] ?? 0,
+      nurses: data['nurses'] ?? 0,
+      coordinators: data['coordinators'] ?? 0,
+      setUpTime: data['setUpTime'] ?? '',
+      startTime: data['startTime'] ?? '',
+      endTime: data['endTime'] ?? '',
+      strikeDownTime: data['strikeDownTime'] ?? '',
+      mobileBooths: data['mobileBooths'] ?? 0,
+      description: data['description'] ?? '',
+      medicalAid: data['medicalAid'] ?? '',
+      status: data['status'] ?? '',
+      actualStartTime: (data['actualStartTime'] as Timestamp?)?.toDate(),
+      actualEndTime: (data['actualEndTime'] as Timestamp?)?.toDate(),
+      screenedCount: data['screenedCount'] ?? 0,
     );
   }
 
-  EventsCompanion _mapDomainToCompanion(WellnessEvent event) {
-    return EventsCompanion(
-      id: Value(event.id),
-      title: Value(event.title),
-      date: Value(event.date),
-      venue: Value(event.venue),
-      address: Value(event.address),
-      townCity: Value(event.townCity),
-      province: Value(event.province),
-      onsiteContactFirstName: Value(event.onsiteContactFirstName),
-      onsiteContactLastName: Value(event.onsiteContactLastName),
-      onsiteContactNumber: Value(event.onsiteContactNumber),
-      onsiteContactEmail: Value(event.onsiteContactEmail),
-      aeContactFirstName: Value(event.aeContactFirstName),
-      aeContactLastName: Value(event.aeContactLastName),
-      aeContactNumber: Value(event.aeContactNumber),
-      aeContactEmail: Value(event.aeContactEmail),
-      servicesRequested: Value(event.servicesRequested),
-      additionalServicesRequested: Value(event.additionalServicesRequested),
-      expectedParticipation: Value(event.expectedParticipation),
-      nurses: Value(event.nurses),
-      coordinators: Value(event.coordinators),
-      setUpTime: Value(event.setUpTime),
-      startTime: Value(event.startTime),
-      endTime: Value(event.endTime),
-      strikeDownTime: Value(event.strikeDownTime),
-      mobileBooths: Value(event.mobileBooths),
-      medicalAid: Value(event.medicalAid),
-      description: Value(event.description),
-      status: Value(event.status),
-      actualStartTime: Value(event.actualStartTime),
-      actualEndTime: Value(event.actualEndTime),
-    );
+  Map<String, dynamic> _mapDomainToFirestore(WellnessEvent event) {
+    return {
+      'title': event.title,
+      'date': Timestamp.fromDate(event.date),
+      'venue': event.venue,
+      'address': event.address,
+      'townCity': event.townCity,
+      'province': event.province,
+      'onsiteContactFirstName': event.onsiteContactFirstName,
+      'onsiteContactLastName': event.onsiteContactLastName,
+      'onsiteContactNumber': event.onsiteContactNumber,
+      'onsiteContactEmail': event.onsiteContactEmail,
+      'aeContactFirstName': event.aeContactFirstName,
+      'aeContactLastName': event.aeContactLastName,
+      'aeContactNumber': event.aeContactNumber,
+      'aeContactEmail': event.aeContactEmail,
+      'servicesRequested': event.servicesRequested,
+      'additionalServicesRequested': event.additionalServicesRequested,
+      'expectedParticipation': event.expectedParticipation,
+      'nurses': event.nurses,
+      'coordinators': event.coordinators,
+      'setUpTime': event.setUpTime,
+      'startTime': event.startTime,
+      'endTime': event.endTime,
+      'strikeDownTime': event.strikeDownTime,
+      'mobileBooths': event.mobileBooths,
+      'medicalAid': event.medicalAid,
+      'description': event.description,
+      'status': event.status,
+      'actualStartTime': event.actualStartTime != null
+          ? Timestamp.fromDate(event.actualStartTime!)
+          : null,
+      'actualEndTime': event.actualEndTime != null
+          ? Timestamp.fromDate(event.actualEndTime!)
+          : null,
+      'screenedCount': event.screenedCount,
+    };
   }
 }

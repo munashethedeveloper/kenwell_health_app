@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'form_input_borders.dart';
+import '../colours/kenwell_colours.dart';
 
 /// Central place for common form styling primitives.
 class KenwellFormStyles {
@@ -28,7 +29,10 @@ class KenwellFormStyles {
       border: authOutlineInputBorder,
       enabledBorder: authOutlineInputBorder,
       focusedBorder: authOutlineInputBorder.copyWith(
-        borderSide: const BorderSide(color: Color(0xFFFF7643)),
+        borderSide: const BorderSide(
+          color: KenwellColors.secondaryNavy,
+          width: 2,
+        ),
       ),
       prefixIcon: prefixIcon,
       suffixIcon: suffixIcon,

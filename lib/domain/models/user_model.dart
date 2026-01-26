@@ -19,13 +19,13 @@ class UserModel {
 
   factory UserModel.fromMap(Map<String, dynamic> data) {
     return UserModel(
-      id: data['id'],
-      email: data['email'],
-      role: data['role'],
-      phoneNumber: data['phoneNumber'],
-      //username: data['username'],
-      firstName: data['firstName'],
-      lastName: data['lastName'],
+      id: data['id'] ?? '',
+      email: data['email'] ?? '',
+      role: data['role'] ?? '',
+      phoneNumber: data['phoneNumber'] ?? '',
+      //username: data['username'] ?? '',
+      firstName: data['firstName'] ?? '',
+      lastName: data['lastName'] ?? '',
     );
   }
 

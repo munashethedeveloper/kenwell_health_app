@@ -698,6 +698,14 @@ class $EventsTable extends Events with TableInfo<$EventsTable, EventEntity> {
   late final GeneratedColumn<DateTime> actualEndTime =
       GeneratedColumn<DateTime>('actual_end_time', aliasedName, true,
           type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _screenedCountMeta =
+      const VerificationMeta('screenedCount');
+  @override
+  late final GeneratedColumn<int> screenedCount = GeneratedColumn<int>(
+      'screened_count', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -746,6 +754,7 @@ class $EventsTable extends Events with TableInfo<$EventsTable, EventEntity> {
         status,
         actualStartTime,
         actualEndTime,
+        screenedCount,
         createdAt,
         updatedAt
       ];
@@ -921,6 +930,12 @@ class $EventsTable extends Events with TableInfo<$EventsTable, EventEntity> {
           actualEndTime.isAcceptableOrUnknown(
               data['actual_end_time']!, _actualEndTimeMeta));
     }
+    if (data.containsKey('screened_count')) {
+      context.handle(
+          _screenedCountMeta,
+          screenedCount.isAcceptableOrUnknown(
+              data['screened_count']!, _screenedCountMeta));
+    }
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
@@ -1002,6 +1017,8 @@ class $EventsTable extends Events with TableInfo<$EventsTable, EventEntity> {
           DriftSqlType.dateTime, data['${effectivePrefix}actual_start_time']),
       actualEndTime: attachedDatabase.typeMapping.read(
           DriftSqlType.dateTime, data['${effectivePrefix}actual_end_time']),
+      screenedCount: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}screened_count'])!,
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
@@ -1046,6 +1063,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
   final String status;
   final DateTime? actualStartTime;
   final DateTime? actualEndTime;
+  final int screenedCount;
   final DateTime createdAt;
   final DateTime updatedAt;
   const EventEntity(
@@ -1079,6 +1097,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
       required this.status,
       this.actualStartTime,
       this.actualEndTime,
+      required this.screenedCount,
       required this.createdAt,
       required this.updatedAt});
   @override
@@ -1123,6 +1142,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
     if (!nullToAbsent || actualEndTime != null) {
       map['actual_end_time'] = Variable<DateTime>(actualEndTime);
     }
+    map['screened_count'] = Variable<int>(screenedCount);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
@@ -1168,6 +1188,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
       actualEndTime: actualEndTime == null && nullToAbsent
           ? const Value.absent()
           : Value(actualEndTime),
+      screenedCount: Value(screenedCount),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -1214,6 +1235,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
       status: serializer.fromJson<String>(json['status']),
       actualStartTime: serializer.fromJson<DateTime?>(json['actualStartTime']),
       actualEndTime: serializer.fromJson<DateTime?>(json['actualEndTime']),
+      screenedCount: serializer.fromJson<int>(json['screenedCount']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -1254,6 +1276,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
       'status': serializer.toJson<String>(status),
       'actualStartTime': serializer.toJson<DateTime?>(actualStartTime),
       'actualEndTime': serializer.toJson<DateTime?>(actualEndTime),
+      'screenedCount': serializer.toJson<int>(screenedCount),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
@@ -1290,6 +1313,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
           String? status,
           Value<DateTime?> actualStartTime = const Value.absent(),
           Value<DateTime?> actualEndTime = const Value.absent(),
+          int? screenedCount,
           DateTime? createdAt,
           DateTime? updatedAt}) =>
       EventEntity(
@@ -1330,6 +1354,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
             : this.actualStartTime,
         actualEndTime:
             actualEndTime.present ? actualEndTime.value : this.actualEndTime,
+        screenedCount: screenedCount ?? this.screenedCount,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
       );
@@ -1399,6 +1424,9 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
       actualEndTime: data.actualEndTime.present
           ? data.actualEndTime.value
           : this.actualEndTime,
+      screenedCount: data.screenedCount.present
+          ? data.screenedCount.value
+          : this.screenedCount,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -1437,6 +1465,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
           ..write('status: $status, ')
           ..write('actualStartTime: $actualStartTime, ')
           ..write('actualEndTime: $actualEndTime, ')
+          ..write('screenedCount: $screenedCount, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -1475,6 +1504,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
         status,
         actualStartTime,
         actualEndTime,
+        screenedCount,
         createdAt,
         updatedAt
       ]);
@@ -1513,6 +1543,7 @@ class EventEntity extends DataClass implements Insertable<EventEntity> {
           other.status == this.status &&
           other.actualStartTime == this.actualStartTime &&
           other.actualEndTime == this.actualEndTime &&
+          other.screenedCount == this.screenedCount &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -1548,6 +1579,7 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
   final Value<String> status;
   final Value<DateTime?> actualStartTime;
   final Value<DateTime?> actualEndTime;
+  final Value<int> screenedCount;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
@@ -1582,6 +1614,7 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
     this.status = const Value.absent(),
     this.actualStartTime = const Value.absent(),
     this.actualEndTime = const Value.absent(),
+    this.screenedCount = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -1617,6 +1650,7 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
     this.status = const Value.absent(),
     this.actualStartTime = const Value.absent(),
     this.actualEndTime = const Value.absent(),
+    this.screenedCount = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -1653,6 +1687,7 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
     Expression<String>? status,
     Expression<DateTime>? actualStartTime,
     Expression<DateTime>? actualEndTime,
+    Expression<int>? screenedCount,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
@@ -1695,6 +1730,7 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
       if (status != null) 'status': status,
       if (actualStartTime != null) 'actual_start_time': actualStartTime,
       if (actualEndTime != null) 'actual_end_time': actualEndTime,
+      if (screenedCount != null) 'screened_count': screenedCount,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
@@ -1732,6 +1768,7 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
       Value<String>? status,
       Value<DateTime?>? actualStartTime,
       Value<DateTime?>? actualEndTime,
+      Value<int>? screenedCount,
       Value<DateTime>? createdAt,
       Value<DateTime>? updatedAt,
       Value<int>? rowid}) {
@@ -1770,6 +1807,7 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
       status: status ?? this.status,
       actualStartTime: actualStartTime ?? this.actualStartTime,
       actualEndTime: actualEndTime ?? this.actualEndTime,
+      screenedCount: screenedCount ?? this.screenedCount,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
@@ -1874,6 +1912,9 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
     if (actualEndTime.present) {
       map['actual_end_time'] = Variable<DateTime>(actualEndTime.value);
     }
+    if (screenedCount.present) {
+      map['screened_count'] = Variable<int>(screenedCount.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -1919,6 +1960,885 @@ class EventsCompanion extends UpdateCompanion<EventEntity> {
           ..write('status: $status, ')
           ..write('actualStartTime: $actualStartTime, ')
           ..write('actualEndTime: $actualEndTime, ')
+          ..write('screenedCount: $screenedCount, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $MembersTable extends Members
+    with TableInfo<$MembersTable, MemberEntity> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MembersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _surnameMeta =
+      const VerificationMeta('surname');
+  @override
+  late final GeneratedColumn<String> surname = GeneratedColumn<String>(
+      'surname', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _idNumberMeta =
+      const VerificationMeta('idNumber');
+  @override
+  late final GeneratedColumn<String> idNumber = GeneratedColumn<String>(
+      'id_number', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _passportNumberMeta =
+      const VerificationMeta('passportNumber');
+  @override
+  late final GeneratedColumn<String> passportNumber = GeneratedColumn<String>(
+      'passport_number', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _idDocumentTypeMeta =
+      const VerificationMeta('idDocumentType');
+  @override
+  late final GeneratedColumn<String> idDocumentType = GeneratedColumn<String>(
+      'id_document_type', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _dateOfBirthMeta =
+      const VerificationMeta('dateOfBirth');
+  @override
+  late final GeneratedColumn<String> dateOfBirth = GeneratedColumn<String>(
+      'date_of_birth', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _genderMeta = const VerificationMeta('gender');
+  @override
+  late final GeneratedColumn<String> gender = GeneratedColumn<String>(
+      'gender', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _maritalStatusMeta =
+      const VerificationMeta('maritalStatus');
+  @override
+  late final GeneratedColumn<String> maritalStatus = GeneratedColumn<String>(
+      'marital_status', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _nationalityMeta =
+      const VerificationMeta('nationality');
+  @override
+  late final GeneratedColumn<String> nationality = GeneratedColumn<String>(
+      'nationality', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _citizenshipStatusMeta =
+      const VerificationMeta('citizenshipStatus');
+  @override
+  late final GeneratedColumn<String> citizenshipStatus =
+      GeneratedColumn<String>('citizenship_status', aliasedName, true,
+          type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _emailMeta = const VerificationMeta('email');
+  @override
+  late final GeneratedColumn<String> email = GeneratedColumn<String>(
+      'email', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _cellNumberMeta =
+      const VerificationMeta('cellNumber');
+  @override
+  late final GeneratedColumn<String> cellNumber = GeneratedColumn<String>(
+      'cell_number', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _medicalAidStatusMeta =
+      const VerificationMeta('medicalAidStatus');
+  @override
+  late final GeneratedColumn<String> medicalAidStatus = GeneratedColumn<String>(
+      'medical_aid_status', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _medicalAidNameMeta =
+      const VerificationMeta('medicalAidName');
+  @override
+  late final GeneratedColumn<String> medicalAidName = GeneratedColumn<String>(
+      'medical_aid_name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _medicalAidNumberMeta =
+      const VerificationMeta('medicalAidNumber');
+  @override
+  late final GeneratedColumn<String> medicalAidNumber = GeneratedColumn<String>(
+      'medical_aid_number', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        name,
+        surname,
+        idNumber,
+        passportNumber,
+        idDocumentType,
+        dateOfBirth,
+        gender,
+        maritalStatus,
+        nationality,
+        citizenshipStatus,
+        email,
+        cellNumber,
+        medicalAidStatus,
+        medicalAidName,
+        medicalAidNumber,
+        createdAt,
+        updatedAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'members';
+  @override
+  VerificationContext validateIntegrity(Insertable<MemberEntity> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('surname')) {
+      context.handle(_surnameMeta,
+          surname.isAcceptableOrUnknown(data['surname']!, _surnameMeta));
+    } else if (isInserting) {
+      context.missing(_surnameMeta);
+    }
+    if (data.containsKey('id_number')) {
+      context.handle(_idNumberMeta,
+          idNumber.isAcceptableOrUnknown(data['id_number']!, _idNumberMeta));
+    }
+    if (data.containsKey('passport_number')) {
+      context.handle(
+          _passportNumberMeta,
+          passportNumber.isAcceptableOrUnknown(
+              data['passport_number']!, _passportNumberMeta));
+    }
+    if (data.containsKey('id_document_type')) {
+      context.handle(
+          _idDocumentTypeMeta,
+          idDocumentType.isAcceptableOrUnknown(
+              data['id_document_type']!, _idDocumentTypeMeta));
+    } else if (isInserting) {
+      context.missing(_idDocumentTypeMeta);
+    }
+    if (data.containsKey('date_of_birth')) {
+      context.handle(
+          _dateOfBirthMeta,
+          dateOfBirth.isAcceptableOrUnknown(
+              data['date_of_birth']!, _dateOfBirthMeta));
+    }
+    if (data.containsKey('gender')) {
+      context.handle(_genderMeta,
+          gender.isAcceptableOrUnknown(data['gender']!, _genderMeta));
+    }
+    if (data.containsKey('marital_status')) {
+      context.handle(
+          _maritalStatusMeta,
+          maritalStatus.isAcceptableOrUnknown(
+              data['marital_status']!, _maritalStatusMeta));
+    }
+    if (data.containsKey('nationality')) {
+      context.handle(
+          _nationalityMeta,
+          nationality.isAcceptableOrUnknown(
+              data['nationality']!, _nationalityMeta));
+    }
+    if (data.containsKey('citizenship_status')) {
+      context.handle(
+          _citizenshipStatusMeta,
+          citizenshipStatus.isAcceptableOrUnknown(
+              data['citizenship_status']!, _citizenshipStatusMeta));
+    }
+    if (data.containsKey('email')) {
+      context.handle(
+          _emailMeta, email.isAcceptableOrUnknown(data['email']!, _emailMeta));
+    }
+    if (data.containsKey('cell_number')) {
+      context.handle(
+          _cellNumberMeta,
+          cellNumber.isAcceptableOrUnknown(
+              data['cell_number']!, _cellNumberMeta));
+    }
+    if (data.containsKey('medical_aid_status')) {
+      context.handle(
+          _medicalAidStatusMeta,
+          medicalAidStatus.isAcceptableOrUnknown(
+              data['medical_aid_status']!, _medicalAidStatusMeta));
+    }
+    if (data.containsKey('medical_aid_name')) {
+      context.handle(
+          _medicalAidNameMeta,
+          medicalAidName.isAcceptableOrUnknown(
+              data['medical_aid_name']!, _medicalAidNameMeta));
+    }
+    if (data.containsKey('medical_aid_number')) {
+      context.handle(
+          _medicalAidNumberMeta,
+          medicalAidNumber.isAcceptableOrUnknown(
+              data['medical_aid_number']!, _medicalAidNumberMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MemberEntity map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MemberEntity(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      surname: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}surname'])!,
+      idNumber: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id_number']),
+      passportNumber: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}passport_number']),
+      idDocumentType: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}id_document_type'])!,
+      dateOfBirth: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}date_of_birth']),
+      gender: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}gender']),
+      maritalStatus: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}marital_status']),
+      nationality: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}nationality']),
+      citizenshipStatus: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}citizenship_status']),
+      email: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}email']),
+      cellNumber: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}cell_number']),
+      medicalAidStatus: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}medical_aid_status']),
+      medicalAidName: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}medical_aid_name']),
+      medicalAidNumber: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}medical_aid_number']),
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+    );
+  }
+
+  @override
+  $MembersTable createAlias(String alias) {
+    return $MembersTable(attachedDatabase, alias);
+  }
+}
+
+class MemberEntity extends DataClass implements Insertable<MemberEntity> {
+  final String id;
+  final String name;
+  final String surname;
+  final String? idNumber;
+  final String? passportNumber;
+  final String idDocumentType;
+  final String? dateOfBirth;
+  final String? gender;
+  final String? maritalStatus;
+  final String? nationality;
+  final String? citizenshipStatus;
+  final String? email;
+  final String? cellNumber;
+  final String? medicalAidStatus;
+  final String? medicalAidName;
+  final String? medicalAidNumber;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const MemberEntity(
+      {required this.id,
+      required this.name,
+      required this.surname,
+      this.idNumber,
+      this.passportNumber,
+      required this.idDocumentType,
+      this.dateOfBirth,
+      this.gender,
+      this.maritalStatus,
+      this.nationality,
+      this.citizenshipStatus,
+      this.email,
+      this.cellNumber,
+      this.medicalAidStatus,
+      this.medicalAidName,
+      this.medicalAidNumber,
+      required this.createdAt,
+      required this.updatedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    map['surname'] = Variable<String>(surname);
+    if (!nullToAbsent || idNumber != null) {
+      map['id_number'] = Variable<String>(idNumber);
+    }
+    if (!nullToAbsent || passportNumber != null) {
+      map['passport_number'] = Variable<String>(passportNumber);
+    }
+    map['id_document_type'] = Variable<String>(idDocumentType);
+    if (!nullToAbsent || dateOfBirth != null) {
+      map['date_of_birth'] = Variable<String>(dateOfBirth);
+    }
+    if (!nullToAbsent || gender != null) {
+      map['gender'] = Variable<String>(gender);
+    }
+    if (!nullToAbsent || maritalStatus != null) {
+      map['marital_status'] = Variable<String>(maritalStatus);
+    }
+    if (!nullToAbsent || nationality != null) {
+      map['nationality'] = Variable<String>(nationality);
+    }
+    if (!nullToAbsent || citizenshipStatus != null) {
+      map['citizenship_status'] = Variable<String>(citizenshipStatus);
+    }
+    if (!nullToAbsent || email != null) {
+      map['email'] = Variable<String>(email);
+    }
+    if (!nullToAbsent || cellNumber != null) {
+      map['cell_number'] = Variable<String>(cellNumber);
+    }
+    if (!nullToAbsent || medicalAidStatus != null) {
+      map['medical_aid_status'] = Variable<String>(medicalAidStatus);
+    }
+    if (!nullToAbsent || medicalAidName != null) {
+      map['medical_aid_name'] = Variable<String>(medicalAidName);
+    }
+    if (!nullToAbsent || medicalAidNumber != null) {
+      map['medical_aid_number'] = Variable<String>(medicalAidNumber);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  MembersCompanion toCompanion(bool nullToAbsent) {
+    return MembersCompanion(
+      id: Value(id),
+      name: Value(name),
+      surname: Value(surname),
+      idNumber: idNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(idNumber),
+      passportNumber: passportNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(passportNumber),
+      idDocumentType: Value(idDocumentType),
+      dateOfBirth: dateOfBirth == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dateOfBirth),
+      gender:
+          gender == null && nullToAbsent ? const Value.absent() : Value(gender),
+      maritalStatus: maritalStatus == null && nullToAbsent
+          ? const Value.absent()
+          : Value(maritalStatus),
+      nationality: nationality == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nationality),
+      citizenshipStatus: citizenshipStatus == null && nullToAbsent
+          ? const Value.absent()
+          : Value(citizenshipStatus),
+      email:
+          email == null && nullToAbsent ? const Value.absent() : Value(email),
+      cellNumber: cellNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cellNumber),
+      medicalAidStatus: medicalAidStatus == null && nullToAbsent
+          ? const Value.absent()
+          : Value(medicalAidStatus),
+      medicalAidName: medicalAidName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(medicalAidName),
+      medicalAidNumber: medicalAidNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(medicalAidNumber),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory MemberEntity.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MemberEntity(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      surname: serializer.fromJson<String>(json['surname']),
+      idNumber: serializer.fromJson<String?>(json['idNumber']),
+      passportNumber: serializer.fromJson<String?>(json['passportNumber']),
+      idDocumentType: serializer.fromJson<String>(json['idDocumentType']),
+      dateOfBirth: serializer.fromJson<String?>(json['dateOfBirth']),
+      gender: serializer.fromJson<String?>(json['gender']),
+      maritalStatus: serializer.fromJson<String?>(json['maritalStatus']),
+      nationality: serializer.fromJson<String?>(json['nationality']),
+      citizenshipStatus:
+          serializer.fromJson<String?>(json['citizenshipStatus']),
+      email: serializer.fromJson<String?>(json['email']),
+      cellNumber: serializer.fromJson<String?>(json['cellNumber']),
+      medicalAidStatus: serializer.fromJson<String?>(json['medicalAidStatus']),
+      medicalAidName: serializer.fromJson<String?>(json['medicalAidName']),
+      medicalAidNumber: serializer.fromJson<String?>(json['medicalAidNumber']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'surname': serializer.toJson<String>(surname),
+      'idNumber': serializer.toJson<String?>(idNumber),
+      'passportNumber': serializer.toJson<String?>(passportNumber),
+      'idDocumentType': serializer.toJson<String>(idDocumentType),
+      'dateOfBirth': serializer.toJson<String?>(dateOfBirth),
+      'gender': serializer.toJson<String?>(gender),
+      'maritalStatus': serializer.toJson<String?>(maritalStatus),
+      'nationality': serializer.toJson<String?>(nationality),
+      'citizenshipStatus': serializer.toJson<String?>(citizenshipStatus),
+      'email': serializer.toJson<String?>(email),
+      'cellNumber': serializer.toJson<String?>(cellNumber),
+      'medicalAidStatus': serializer.toJson<String?>(medicalAidStatus),
+      'medicalAidName': serializer.toJson<String?>(medicalAidName),
+      'medicalAidNumber': serializer.toJson<String?>(medicalAidNumber),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  MemberEntity copyWith(
+          {String? id,
+          String? name,
+          String? surname,
+          Value<String?> idNumber = const Value.absent(),
+          Value<String?> passportNumber = const Value.absent(),
+          String? idDocumentType,
+          Value<String?> dateOfBirth = const Value.absent(),
+          Value<String?> gender = const Value.absent(),
+          Value<String?> maritalStatus = const Value.absent(),
+          Value<String?> nationality = const Value.absent(),
+          Value<String?> citizenshipStatus = const Value.absent(),
+          Value<String?> email = const Value.absent(),
+          Value<String?> cellNumber = const Value.absent(),
+          Value<String?> medicalAidStatus = const Value.absent(),
+          Value<String?> medicalAidName = const Value.absent(),
+          Value<String?> medicalAidNumber = const Value.absent(),
+          DateTime? createdAt,
+          DateTime? updatedAt}) =>
+      MemberEntity(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        surname: surname ?? this.surname,
+        idNumber: idNumber.present ? idNumber.value : this.idNumber,
+        passportNumber:
+            passportNumber.present ? passportNumber.value : this.passportNumber,
+        idDocumentType: idDocumentType ?? this.idDocumentType,
+        dateOfBirth: dateOfBirth.present ? dateOfBirth.value : this.dateOfBirth,
+        gender: gender.present ? gender.value : this.gender,
+        maritalStatus:
+            maritalStatus.present ? maritalStatus.value : this.maritalStatus,
+        nationality: nationality.present ? nationality.value : this.nationality,
+        citizenshipStatus: citizenshipStatus.present
+            ? citizenshipStatus.value
+            : this.citizenshipStatus,
+        email: email.present ? email.value : this.email,
+        cellNumber: cellNumber.present ? cellNumber.value : this.cellNumber,
+        medicalAidStatus: medicalAidStatus.present
+            ? medicalAidStatus.value
+            : this.medicalAidStatus,
+        medicalAidName:
+            medicalAidName.present ? medicalAidName.value : this.medicalAidName,
+        medicalAidNumber: medicalAidNumber.present
+            ? medicalAidNumber.value
+            : this.medicalAidNumber,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+  MemberEntity copyWithCompanion(MembersCompanion data) {
+    return MemberEntity(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      surname: data.surname.present ? data.surname.value : this.surname,
+      idNumber: data.idNumber.present ? data.idNumber.value : this.idNumber,
+      passportNumber: data.passportNumber.present
+          ? data.passportNumber.value
+          : this.passportNumber,
+      idDocumentType: data.idDocumentType.present
+          ? data.idDocumentType.value
+          : this.idDocumentType,
+      dateOfBirth:
+          data.dateOfBirth.present ? data.dateOfBirth.value : this.dateOfBirth,
+      gender: data.gender.present ? data.gender.value : this.gender,
+      maritalStatus: data.maritalStatus.present
+          ? data.maritalStatus.value
+          : this.maritalStatus,
+      nationality:
+          data.nationality.present ? data.nationality.value : this.nationality,
+      citizenshipStatus: data.citizenshipStatus.present
+          ? data.citizenshipStatus.value
+          : this.citizenshipStatus,
+      email: data.email.present ? data.email.value : this.email,
+      cellNumber:
+          data.cellNumber.present ? data.cellNumber.value : this.cellNumber,
+      medicalAidStatus: data.medicalAidStatus.present
+          ? data.medicalAidStatus.value
+          : this.medicalAidStatus,
+      medicalAidName: data.medicalAidName.present
+          ? data.medicalAidName.value
+          : this.medicalAidName,
+      medicalAidNumber: data.medicalAidNumber.present
+          ? data.medicalAidNumber.value
+          : this.medicalAidNumber,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MemberEntity(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('surname: $surname, ')
+          ..write('idNumber: $idNumber, ')
+          ..write('passportNumber: $passportNumber, ')
+          ..write('idDocumentType: $idDocumentType, ')
+          ..write('dateOfBirth: $dateOfBirth, ')
+          ..write('gender: $gender, ')
+          ..write('maritalStatus: $maritalStatus, ')
+          ..write('nationality: $nationality, ')
+          ..write('citizenshipStatus: $citizenshipStatus, ')
+          ..write('email: $email, ')
+          ..write('cellNumber: $cellNumber, ')
+          ..write('medicalAidStatus: $medicalAidStatus, ')
+          ..write('medicalAidName: $medicalAidName, ')
+          ..write('medicalAidNumber: $medicalAidNumber, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id,
+      name,
+      surname,
+      idNumber,
+      passportNumber,
+      idDocumentType,
+      dateOfBirth,
+      gender,
+      maritalStatus,
+      nationality,
+      citizenshipStatus,
+      email,
+      cellNumber,
+      medicalAidStatus,
+      medicalAidName,
+      medicalAidNumber,
+      createdAt,
+      updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MemberEntity &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.surname == this.surname &&
+          other.idNumber == this.idNumber &&
+          other.passportNumber == this.passportNumber &&
+          other.idDocumentType == this.idDocumentType &&
+          other.dateOfBirth == this.dateOfBirth &&
+          other.gender == this.gender &&
+          other.maritalStatus == this.maritalStatus &&
+          other.nationality == this.nationality &&
+          other.citizenshipStatus == this.citizenshipStatus &&
+          other.email == this.email &&
+          other.cellNumber == this.cellNumber &&
+          other.medicalAidStatus == this.medicalAidStatus &&
+          other.medicalAidName == this.medicalAidName &&
+          other.medicalAidNumber == this.medicalAidNumber &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class MembersCompanion extends UpdateCompanion<MemberEntity> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<String> surname;
+  final Value<String?> idNumber;
+  final Value<String?> passportNumber;
+  final Value<String> idDocumentType;
+  final Value<String?> dateOfBirth;
+  final Value<String?> gender;
+  final Value<String?> maritalStatus;
+  final Value<String?> nationality;
+  final Value<String?> citizenshipStatus;
+  final Value<String?> email;
+  final Value<String?> cellNumber;
+  final Value<String?> medicalAidStatus;
+  final Value<String?> medicalAidName;
+  final Value<String?> medicalAidNumber;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const MembersCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.surname = const Value.absent(),
+    this.idNumber = const Value.absent(),
+    this.passportNumber = const Value.absent(),
+    this.idDocumentType = const Value.absent(),
+    this.dateOfBirth = const Value.absent(),
+    this.gender = const Value.absent(),
+    this.maritalStatus = const Value.absent(),
+    this.nationality = const Value.absent(),
+    this.citizenshipStatus = const Value.absent(),
+    this.email = const Value.absent(),
+    this.cellNumber = const Value.absent(),
+    this.medicalAidStatus = const Value.absent(),
+    this.medicalAidName = const Value.absent(),
+    this.medicalAidNumber = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  MembersCompanion.insert({
+    required String id,
+    required String name,
+    required String surname,
+    this.idNumber = const Value.absent(),
+    this.passportNumber = const Value.absent(),
+    required String idDocumentType,
+    this.dateOfBirth = const Value.absent(),
+    this.gender = const Value.absent(),
+    this.maritalStatus = const Value.absent(),
+    this.nationality = const Value.absent(),
+    this.citizenshipStatus = const Value.absent(),
+    this.email = const Value.absent(),
+    this.cellNumber = const Value.absent(),
+    this.medicalAidStatus = const Value.absent(),
+    this.medicalAidName = const Value.absent(),
+    this.medicalAidNumber = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        name = Value(name),
+        surname = Value(surname),
+        idDocumentType = Value(idDocumentType);
+  static Insertable<MemberEntity> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<String>? surname,
+    Expression<String>? idNumber,
+    Expression<String>? passportNumber,
+    Expression<String>? idDocumentType,
+    Expression<String>? dateOfBirth,
+    Expression<String>? gender,
+    Expression<String>? maritalStatus,
+    Expression<String>? nationality,
+    Expression<String>? citizenshipStatus,
+    Expression<String>? email,
+    Expression<String>? cellNumber,
+    Expression<String>? medicalAidStatus,
+    Expression<String>? medicalAidName,
+    Expression<String>? medicalAidNumber,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (surname != null) 'surname': surname,
+      if (idNumber != null) 'id_number': idNumber,
+      if (passportNumber != null) 'passport_number': passportNumber,
+      if (idDocumentType != null) 'id_document_type': idDocumentType,
+      if (dateOfBirth != null) 'date_of_birth': dateOfBirth,
+      if (gender != null) 'gender': gender,
+      if (maritalStatus != null) 'marital_status': maritalStatus,
+      if (nationality != null) 'nationality': nationality,
+      if (citizenshipStatus != null) 'citizenship_status': citizenshipStatus,
+      if (email != null) 'email': email,
+      if (cellNumber != null) 'cell_number': cellNumber,
+      if (medicalAidStatus != null) 'medical_aid_status': medicalAidStatus,
+      if (medicalAidName != null) 'medical_aid_name': medicalAidName,
+      if (medicalAidNumber != null) 'medical_aid_number': medicalAidNumber,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  MembersCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? name,
+      Value<String>? surname,
+      Value<String?>? idNumber,
+      Value<String?>? passportNumber,
+      Value<String>? idDocumentType,
+      Value<String?>? dateOfBirth,
+      Value<String?>? gender,
+      Value<String?>? maritalStatus,
+      Value<String?>? nationality,
+      Value<String?>? citizenshipStatus,
+      Value<String?>? email,
+      Value<String?>? cellNumber,
+      Value<String?>? medicalAidStatus,
+      Value<String?>? medicalAidName,
+      Value<String?>? medicalAidNumber,
+      Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt,
+      Value<int>? rowid}) {
+    return MembersCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      surname: surname ?? this.surname,
+      idNumber: idNumber ?? this.idNumber,
+      passportNumber: passportNumber ?? this.passportNumber,
+      idDocumentType: idDocumentType ?? this.idDocumentType,
+      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+      gender: gender ?? this.gender,
+      maritalStatus: maritalStatus ?? this.maritalStatus,
+      nationality: nationality ?? this.nationality,
+      citizenshipStatus: citizenshipStatus ?? this.citizenshipStatus,
+      email: email ?? this.email,
+      cellNumber: cellNumber ?? this.cellNumber,
+      medicalAidStatus: medicalAidStatus ?? this.medicalAidStatus,
+      medicalAidName: medicalAidName ?? this.medicalAidName,
+      medicalAidNumber: medicalAidNumber ?? this.medicalAidNumber,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (surname.present) {
+      map['surname'] = Variable<String>(surname.value);
+    }
+    if (idNumber.present) {
+      map['id_number'] = Variable<String>(idNumber.value);
+    }
+    if (passportNumber.present) {
+      map['passport_number'] = Variable<String>(passportNumber.value);
+    }
+    if (idDocumentType.present) {
+      map['id_document_type'] = Variable<String>(idDocumentType.value);
+    }
+    if (dateOfBirth.present) {
+      map['date_of_birth'] = Variable<String>(dateOfBirth.value);
+    }
+    if (gender.present) {
+      map['gender'] = Variable<String>(gender.value);
+    }
+    if (maritalStatus.present) {
+      map['marital_status'] = Variable<String>(maritalStatus.value);
+    }
+    if (nationality.present) {
+      map['nationality'] = Variable<String>(nationality.value);
+    }
+    if (citizenshipStatus.present) {
+      map['citizenship_status'] = Variable<String>(citizenshipStatus.value);
+    }
+    if (email.present) {
+      map['email'] = Variable<String>(email.value);
+    }
+    if (cellNumber.present) {
+      map['cell_number'] = Variable<String>(cellNumber.value);
+    }
+    if (medicalAidStatus.present) {
+      map['medical_aid_status'] = Variable<String>(medicalAidStatus.value);
+    }
+    if (medicalAidName.present) {
+      map['medical_aid_name'] = Variable<String>(medicalAidName.value);
+    }
+    if (medicalAidNumber.present) {
+      map['medical_aid_number'] = Variable<String>(medicalAidNumber.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MembersCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('surname: $surname, ')
+          ..write('idNumber: $idNumber, ')
+          ..write('passportNumber: $passportNumber, ')
+          ..write('idDocumentType: $idDocumentType, ')
+          ..write('dateOfBirth: $dateOfBirth, ')
+          ..write('gender: $gender, ')
+          ..write('maritalStatus: $maritalStatus, ')
+          ..write('nationality: $nationality, ')
+          ..write('citizenshipStatus: $citizenshipStatus, ')
+          ..write('email: $email, ')
+          ..write('cellNumber: $cellNumber, ')
+          ..write('medicalAidStatus: $medicalAidStatus, ')
+          ..write('medicalAidName: $medicalAidName, ')
+          ..write('medicalAidNumber: $medicalAidNumber, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
@@ -1932,11 +2852,12 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $UsersTable users = $UsersTable(this);
   late final $EventsTable events = $EventsTable(this);
+  late final $MembersTable members = $MembersTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [users, events];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [users, events, members];
 }
 
 typedef $$UsersTableCreateCompanionBuilder = UsersCompanion Function({
@@ -2194,6 +3115,7 @@ typedef $$EventsTableCreateCompanionBuilder = EventsCompanion Function({
   Value<String> status,
   Value<DateTime?> actualStartTime,
   Value<DateTime?> actualEndTime,
+  Value<int> screenedCount,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
   Value<int> rowid,
@@ -2229,6 +3151,7 @@ typedef $$EventsTableUpdateCompanionBuilder = EventsCompanion Function({
   Value<String> status,
   Value<DateTime?> actualStartTime,
   Value<DateTime?> actualEndTime,
+  Value<int> screenedCount,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
   Value<int> rowid,
@@ -2345,6 +3268,9 @@ class $$EventsTableFilterComposer
 
   ColumnFilters<DateTime> get actualEndTime => $composableBuilder(
       column: $table.actualEndTime, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get screenedCount => $composableBuilder(
+      column: $table.screenedCount, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
@@ -2468,6 +3394,10 @@ class $$EventsTableOrderingComposer
       column: $table.actualEndTime,
       builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<int> get screenedCount => $composableBuilder(
+      column: $table.screenedCount,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
@@ -2574,6 +3504,9 @@ class $$EventsTableAnnotationComposer
   GeneratedColumn<DateTime> get actualEndTime => $composableBuilder(
       column: $table.actualEndTime, builder: (column) => column);
 
+  GeneratedColumn<int> get screenedCount => $composableBuilder(
+      column: $table.screenedCount, builder: (column) => column);
+
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
@@ -2634,6 +3567,7 @@ class $$EventsTableTableManager extends RootTableManager<
             Value<String> status = const Value.absent(),
             Value<DateTime?> actualStartTime = const Value.absent(),
             Value<DateTime?> actualEndTime = const Value.absent(),
+            Value<int> screenedCount = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
@@ -2669,6 +3603,7 @@ class $$EventsTableTableManager extends RootTableManager<
             status: status,
             actualStartTime: actualStartTime,
             actualEndTime: actualEndTime,
+            screenedCount: screenedCount,
             createdAt: createdAt,
             updatedAt: updatedAt,
             rowid: rowid,
@@ -2704,6 +3639,7 @@ class $$EventsTableTableManager extends RootTableManager<
             Value<String> status = const Value.absent(),
             Value<DateTime?> actualStartTime = const Value.absent(),
             Value<DateTime?> actualEndTime = const Value.absent(),
+            Value<int> screenedCount = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
@@ -2739,6 +3675,7 @@ class $$EventsTableTableManager extends RootTableManager<
             status: status,
             actualStartTime: actualStartTime,
             actualEndTime: actualEndTime,
+            screenedCount: screenedCount,
             createdAt: createdAt,
             updatedAt: updatedAt,
             rowid: rowid,
@@ -2762,6 +3699,379 @@ typedef $$EventsTableProcessedTableManager = ProcessedTableManager<
     (EventEntity, BaseReferences<_$AppDatabase, $EventsTable, EventEntity>),
     EventEntity,
     PrefetchHooks Function()>;
+typedef $$MembersTableCreateCompanionBuilder = MembersCompanion Function({
+  required String id,
+  required String name,
+  required String surname,
+  Value<String?> idNumber,
+  Value<String?> passportNumber,
+  required String idDocumentType,
+  Value<String?> dateOfBirth,
+  Value<String?> gender,
+  Value<String?> maritalStatus,
+  Value<String?> nationality,
+  Value<String?> citizenshipStatus,
+  Value<String?> email,
+  Value<String?> cellNumber,
+  Value<String?> medicalAidStatus,
+  Value<String?> medicalAidName,
+  Value<String?> medicalAidNumber,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<int> rowid,
+});
+typedef $$MembersTableUpdateCompanionBuilder = MembersCompanion Function({
+  Value<String> id,
+  Value<String> name,
+  Value<String> surname,
+  Value<String?> idNumber,
+  Value<String?> passportNumber,
+  Value<String> idDocumentType,
+  Value<String?> dateOfBirth,
+  Value<String?> gender,
+  Value<String?> maritalStatus,
+  Value<String?> nationality,
+  Value<String?> citizenshipStatus,
+  Value<String?> email,
+  Value<String?> cellNumber,
+  Value<String?> medicalAidStatus,
+  Value<String?> medicalAidName,
+  Value<String?> medicalAidNumber,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<int> rowid,
+});
+
+class $$MembersTableFilterComposer
+    extends Composer<_$AppDatabase, $MembersTable> {
+  $$MembersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get surname => $composableBuilder(
+      column: $table.surname, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get idNumber => $composableBuilder(
+      column: $table.idNumber, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get passportNumber => $composableBuilder(
+      column: $table.passportNumber,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get idDocumentType => $composableBuilder(
+      column: $table.idDocumentType,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get dateOfBirth => $composableBuilder(
+      column: $table.dateOfBirth, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get gender => $composableBuilder(
+      column: $table.gender, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get maritalStatus => $composableBuilder(
+      column: $table.maritalStatus, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get nationality => $composableBuilder(
+      column: $table.nationality, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get citizenshipStatus => $composableBuilder(
+      column: $table.citizenshipStatus,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get email => $composableBuilder(
+      column: $table.email, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get cellNumber => $composableBuilder(
+      column: $table.cellNumber, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get medicalAidStatus => $composableBuilder(
+      column: $table.medicalAidStatus,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get medicalAidName => $composableBuilder(
+      column: $table.medicalAidName,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get medicalAidNumber => $composableBuilder(
+      column: $table.medicalAidNumber,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$MembersTableOrderingComposer
+    extends Composer<_$AppDatabase, $MembersTable> {
+  $$MembersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get surname => $composableBuilder(
+      column: $table.surname, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get idNumber => $composableBuilder(
+      column: $table.idNumber, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get passportNumber => $composableBuilder(
+      column: $table.passportNumber,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get idDocumentType => $composableBuilder(
+      column: $table.idDocumentType,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get dateOfBirth => $composableBuilder(
+      column: $table.dateOfBirth, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get gender => $composableBuilder(
+      column: $table.gender, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get maritalStatus => $composableBuilder(
+      column: $table.maritalStatus,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get nationality => $composableBuilder(
+      column: $table.nationality, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get citizenshipStatus => $composableBuilder(
+      column: $table.citizenshipStatus,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get email => $composableBuilder(
+      column: $table.email, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get cellNumber => $composableBuilder(
+      column: $table.cellNumber, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get medicalAidStatus => $composableBuilder(
+      column: $table.medicalAidStatus,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get medicalAidName => $composableBuilder(
+      column: $table.medicalAidName,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get medicalAidNumber => $composableBuilder(
+      column: $table.medicalAidNumber,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$MembersTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MembersTable> {
+  $$MembersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get surname =>
+      $composableBuilder(column: $table.surname, builder: (column) => column);
+
+  GeneratedColumn<String> get idNumber =>
+      $composableBuilder(column: $table.idNumber, builder: (column) => column);
+
+  GeneratedColumn<String> get passportNumber => $composableBuilder(
+      column: $table.passportNumber, builder: (column) => column);
+
+  GeneratedColumn<String> get idDocumentType => $composableBuilder(
+      column: $table.idDocumentType, builder: (column) => column);
+
+  GeneratedColumn<String> get dateOfBirth => $composableBuilder(
+      column: $table.dateOfBirth, builder: (column) => column);
+
+  GeneratedColumn<String> get gender =>
+      $composableBuilder(column: $table.gender, builder: (column) => column);
+
+  GeneratedColumn<String> get maritalStatus => $composableBuilder(
+      column: $table.maritalStatus, builder: (column) => column);
+
+  GeneratedColumn<String> get nationality => $composableBuilder(
+      column: $table.nationality, builder: (column) => column);
+
+  GeneratedColumn<String> get citizenshipStatus => $composableBuilder(
+      column: $table.citizenshipStatus, builder: (column) => column);
+
+  GeneratedColumn<String> get email =>
+      $composableBuilder(column: $table.email, builder: (column) => column);
+
+  GeneratedColumn<String> get cellNumber => $composableBuilder(
+      column: $table.cellNumber, builder: (column) => column);
+
+  GeneratedColumn<String> get medicalAidStatus => $composableBuilder(
+      column: $table.medicalAidStatus, builder: (column) => column);
+
+  GeneratedColumn<String> get medicalAidName => $composableBuilder(
+      column: $table.medicalAidName, builder: (column) => column);
+
+  GeneratedColumn<String> get medicalAidNumber => $composableBuilder(
+      column: $table.medicalAidNumber, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$MembersTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $MembersTable,
+    MemberEntity,
+    $$MembersTableFilterComposer,
+    $$MembersTableOrderingComposer,
+    $$MembersTableAnnotationComposer,
+    $$MembersTableCreateCompanionBuilder,
+    $$MembersTableUpdateCompanionBuilder,
+    (MemberEntity, BaseReferences<_$AppDatabase, $MembersTable, MemberEntity>),
+    MemberEntity,
+    PrefetchHooks Function()> {
+  $$MembersTableTableManager(_$AppDatabase db, $MembersTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MembersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MembersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MembersTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<String> surname = const Value.absent(),
+            Value<String?> idNumber = const Value.absent(),
+            Value<String?> passportNumber = const Value.absent(),
+            Value<String> idDocumentType = const Value.absent(),
+            Value<String?> dateOfBirth = const Value.absent(),
+            Value<String?> gender = const Value.absent(),
+            Value<String?> maritalStatus = const Value.absent(),
+            Value<String?> nationality = const Value.absent(),
+            Value<String?> citizenshipStatus = const Value.absent(),
+            Value<String?> email = const Value.absent(),
+            Value<String?> cellNumber = const Value.absent(),
+            Value<String?> medicalAidStatus = const Value.absent(),
+            Value<String?> medicalAidName = const Value.absent(),
+            Value<String?> medicalAidNumber = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              MembersCompanion(
+            id: id,
+            name: name,
+            surname: surname,
+            idNumber: idNumber,
+            passportNumber: passportNumber,
+            idDocumentType: idDocumentType,
+            dateOfBirth: dateOfBirth,
+            gender: gender,
+            maritalStatus: maritalStatus,
+            nationality: nationality,
+            citizenshipStatus: citizenshipStatus,
+            email: email,
+            cellNumber: cellNumber,
+            medicalAidStatus: medicalAidStatus,
+            medicalAidName: medicalAidName,
+            medicalAidNumber: medicalAidNumber,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String name,
+            required String surname,
+            Value<String?> idNumber = const Value.absent(),
+            Value<String?> passportNumber = const Value.absent(),
+            required String idDocumentType,
+            Value<String?> dateOfBirth = const Value.absent(),
+            Value<String?> gender = const Value.absent(),
+            Value<String?> maritalStatus = const Value.absent(),
+            Value<String?> nationality = const Value.absent(),
+            Value<String?> citizenshipStatus = const Value.absent(),
+            Value<String?> email = const Value.absent(),
+            Value<String?> cellNumber = const Value.absent(),
+            Value<String?> medicalAidStatus = const Value.absent(),
+            Value<String?> medicalAidName = const Value.absent(),
+            Value<String?> medicalAidNumber = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              MembersCompanion.insert(
+            id: id,
+            name: name,
+            surname: surname,
+            idNumber: idNumber,
+            passportNumber: passportNumber,
+            idDocumentType: idDocumentType,
+            dateOfBirth: dateOfBirth,
+            gender: gender,
+            maritalStatus: maritalStatus,
+            nationality: nationality,
+            citizenshipStatus: citizenshipStatus,
+            email: email,
+            cellNumber: cellNumber,
+            medicalAidStatus: medicalAidStatus,
+            medicalAidName: medicalAidName,
+            medicalAidNumber: medicalAidNumber,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$MembersTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $MembersTable,
+    MemberEntity,
+    $$MembersTableFilterComposer,
+    $$MembersTableOrderingComposer,
+    $$MembersTableAnnotationComposer,
+    $$MembersTableCreateCompanionBuilder,
+    $$MembersTableUpdateCompanionBuilder,
+    (MemberEntity, BaseReferences<_$AppDatabase, $MembersTable, MemberEntity>),
+    MemberEntity,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2770,4 +4080,6 @@ class $AppDatabaseManager {
       $$UsersTableTableManager(_db, _db.users);
   $$EventsTableTableManager get events =>
       $$EventsTableTableManager(_db, _db.events);
+  $$MembersTableTableManager get members =>
+      $$MembersTableTableManager(_db, _db.members);
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../../../domain/models/wellness_event.dart';
 
 class EventDetailsViewModel extends ChangeNotifier {
@@ -12,5 +13,10 @@ class EventDetailsViewModel extends ChangeNotifier {
   Future<void> deleteEvent() async {
     // Add your delete logic here
     notifyListeners();
+  }
+
+  // ------------------ Formatting Methods ------------------
+  String formatEventDate(DateTime date) {
+    return DateFormat.yMMMMd().format(date);
   }
 }

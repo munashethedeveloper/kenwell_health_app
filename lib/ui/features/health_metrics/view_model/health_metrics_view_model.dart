@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 import 'dart:math';
 
 class HealthMetricsViewModel extends ChangeNotifier {
@@ -60,8 +61,9 @@ class HealthMetricsViewModel extends ChangeNotifier {
     required VoidCallback onNext,
   }) async {
     if (!isFormValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please complete all required fields.')),
+      AppSnackbar.showWarning(
+        context,
+        'Please complete all required fields',
       );
       return;
     }
@@ -74,15 +76,17 @@ class HealthMetricsViewModel extends ChangeNotifier {
 
       if (!context.mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Screening Results Saved!')),
+      AppSnackbar.showSuccess(
+        context,
+        'Health metrics saved successfully',
       );
 
       onNext();
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving results: $e')),
+        AppSnackbar.showError(
+          context,
+          'Error saving health metrics: $e',
         );
       }
     } finally {

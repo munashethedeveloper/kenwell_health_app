@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../data/repositories_dcl/event_repository.dart';
+import '../../../../utils/event_color_helper.dart';
 
 class CalendarViewModel extends ChangeNotifier {
   CalendarViewModel({EventRepository? repository})
@@ -33,7 +34,7 @@ class CalendarViewModel extends ChangeNotifier {
 
     try {
       final fetchedEvents = await _repository.fetchAllEvents();
-      _events = fetchedEvents ?? [];
+      _events = fetchedEvents;
       // Don't set error if list is empty - that's a valid state
     } catch (e) {
       // Only set error for actual failures (network, database errors, etc.)
@@ -61,13 +62,13 @@ class CalendarViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  DateTime _normalizeDate(DateTime date) =>
+  DateTime normalizeDate(DateTime date) =>
       DateTime(date.year, date.month, date.day);
 
   List<WellnessEvent> getEventsForDay(DateTime day) {
-    final normalized = _normalizeDate(day);
+    final normalized = normalizeDate(day);
     return _events
-        .where((event) => _normalizeDate(event.date) == normalized)
+        .where((event) => normalizeDate(event.date) == normalized)
         .toList();
   }
 
@@ -160,17 +161,12 @@ class CalendarViewModel extends ChangeNotifier {
   }
 
   // Helper methods for UI
-  Color getCategoryColor(String category) {
-    switch (category.toLowerCase()) {
-      case 'screening':
-        return Colors.orange;
-      case 'wellness':
-        return Colors.green;
-      case 'workshop':
-        return Colors.purple;
-      default:
-        return Colors.grey;
-    }
+  Color getCategoryColor(String servicesRequested) {
+    return EventColorHelper.getCategoryColor(servicesRequested);
+  }
+
+  IconData getServiceIcon(String service) {
+    return EventColorHelper.getServiceIcon(service);
   }
 
   int compareEvents(WellnessEvent a, WellnessEvent b) {
@@ -241,5 +237,33 @@ class CalendarViewModel extends ChangeNotifier {
   void clearError() {
     _error = null;
     notifyListeners();
+  }
+
+  // ------------------ Date Formatting Methods ------------------
+  // These methods encapsulate formatting logic that should be in the ViewModel
+  // rather than scattered throughout the UI widgets
+
+  String formatDateShort(DateTime date) {
+    return DateFormat.yMMMd().format(date);
+  }
+
+  String formatDateLong(DateTime date) {
+    return DateFormat.yMMMMd().format(date);
+  }
+
+  String formatMonthYear(DateTime date) {
+    return DateFormat.yMMMM().format(date);
+  }
+
+  String formatDateMedium(DateTime date) {
+    return DateFormat('MMMM d, yyyy').format(date);
+  }
+
+  String getNoEventsMessage(DateTime selectedDay) {
+    return 'No events on ${formatDateShort(selectedDay)}';
+  }
+
+  String getMonthYearTitle() {
+    return formatMonthYear(_focusedDay);
   }
 }

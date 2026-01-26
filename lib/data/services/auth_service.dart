@@ -149,6 +149,35 @@ class AuthService {
     return entities.map(_mapToUserModel).toList();
   }
 
+  Future<bool> deleteUser(String userId) async {
+    try {
+      final rowsDeleted = await _database.deleteUserById(userId);
+      return rowsDeleted > 0;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> resetPassword(String userId, String newPassword) async {
+    try {
+      final user = await _database.getUserById(userId);
+      if (user == null) return false;
+
+      await _database.updateUser(
+        id: userId,
+        email: user.email,
+        password: newPassword,
+        role: user.role,
+        phoneNumber: user.phoneNumber,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      );
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   UserModel _mapToUserModel(UserEntity entity) {
     return UserModel(
       id: entity.id,

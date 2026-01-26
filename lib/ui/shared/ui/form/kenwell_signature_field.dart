@@ -28,7 +28,7 @@ class KenwellSignatureField extends StatelessWidget {
             style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 14,
-              color: Color(0xFF201C58),
+              color: Colors.black,
             ),
           ),
         if (label != null) const SizedBox(height: 8),

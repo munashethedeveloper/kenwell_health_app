@@ -4,6 +4,12 @@ import 'package:signature/signature.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
 import 'package:kenwell_health_app/data/services/auth_service.dart';
+import 'package:kenwell_health_app/data/repositories_dcl/firestore_hiv_result_repository.dart';
+import 'package:kenwell_health_app/domain/models/hiv_result.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
+import 'package:uuid/uuid.dart';
+import 'dart:convert';
+import 'package:kenwell_health_app/domain/constants/enums.dart';
 
 class HIVTestResultViewModel extends ChangeNotifier {
   HIVTestResultViewModel() {
@@ -11,6 +17,16 @@ class HIVTestResultViewModel extends ChangeNotifier {
   }
 
   final AuthService _authService = AuthService();
+  final FirestoreHivResultRepository _repository =
+      FirestoreHivResultRepository();
+
+  String? _memberId;
+  String? _eventId;
+
+  void setMemberAndEventId(String memberId, String eventId) {
+    _memberId = memberId;
+    _eventId = eventId;
+  }
 
   // Note: formKey is defined here
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -26,19 +42,19 @@ class HIVTestResultViewModel extends ChangeNotifier {
 
   // --- Initial Assessment ---
   String? windowPeriod; // 'N/A', 'Yes', 'No'
-  final List<String> windowPeriodOptions = ['N/A', 'Yes', 'No'];
+  final List<String> windowPeriodOptions = YesNoNA.values.labels;
 
   String? expectedResult; // 'N/A', 'Yes', 'No'
-  final List<String> expectedResultOptions = ['N/A', 'Yes', 'No'];
+  final List<String> expectedResultOptions = YesNoNA.values.labels;
 
   String? difficultyDealingResult; // 'N/A', 'Yes', 'No'
-  final List<String> difficultyOptions = ['N/A', 'Yes', 'No'];
+  final List<String> difficultyOptions = YesNoNA.values.labels;
 
   String? urgentPsychosocial; // 'N/A', 'Yes', 'No'
-  final List<String> urgentOptions = ['N/A', 'Yes', 'No'];
+  final List<String> urgentOptions = YesNoNA.values.labels;
 
   String? committedToChange; // 'N/A', 'Yes', 'No'
-  final List<String> committedOptions = ['N/A', 'Yes', 'No'];
+  final List<String> committedOptions = YesNoNA.values.labels;
 
   void setWindowPeriod(String? value) => _setValue(() => windowPeriod = value);
   void setExpectedResult(String? value) =>
@@ -52,12 +68,7 @@ class HIVTestResultViewModel extends ChangeNotifier {
 
   // --- Follow-up ---
   String? followUpLocation; // 'State clinic', 'Private doctor', 'Other'
-  final List<String> followUpLocationOptions = [
-    'Referred to State clinic',
-    'Referred to Private doctor',
-    'Other',
-    'No follow-up needed',
-  ];
+  final List<String> followUpLocationOptions = FollowUpLocation.values.labels;
   final TextEditingController followUpOtherController = TextEditingController();
   final TextEditingController followUpDateController = TextEditingController();
 
@@ -233,9 +244,21 @@ class HIVTestResultViewModel extends ChangeNotifier {
   }
 
   // --- Save & continue ---
-  Future<void> submitTestResult(VoidCallback? onNext) async {
+  Future<void> submitTestResult(BuildContext context,
+      {VoidCallback? onNext}) async {
     if (!isFormValid) {
-      debugPrint("Form validation failed");
+      AppSnackbar.showWarning(
+        context,
+        'Please complete all required fields',
+      );
+      return;
+    }
+
+    if (_memberId == null || _eventId == null) {
+      AppSnackbar.showError(
+        context,
+        'Missing member or event information',
+      );
       return;
     }
 
@@ -243,18 +266,63 @@ class HIVTestResultViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final data = await toMap();
-      debugPrint('✅ HIV Test Result Saved:');
-      debugPrint(data.toString());
+      // Convert signature to base64
+      final signatureBytes = await signatureController.toPngBytes();
+      final signatureBase64 =
+          signatureBytes != null ? base64Encode(signatureBytes) : null;
 
-      await Future.delayed(const Duration(milliseconds: 500));
+      final result = HivResult(
+        id: const Uuid().v4(),
+        memberId: _memberId!,
+        eventId: _eventId!,
+        screeningTestName: screeningTestNameController.text,
+        screeningBatchNo: screeningBatchNoController.text,
+        screeningExpiryDate: screeningExpiryDateController.text,
+        screeningResult: screeningResult,
+        windowPeriod: windowPeriod,
+        expectedResult: expectedResult,
+        difficultyDealingResult: difficultyDealingResult,
+        urgentPsychosocial: urgentPsychosocial,
+        committedToChange: committedToChange,
+        followUpLocation: followUpLocation,
+        followUpOther: followUpOtherController.text.isEmpty
+            ? null
+            : followUpOtherController.text,
+        followUpDate: followUpDateController.text.isEmpty
+            ? null
+            : followUpDateController.text,
+        nursingReferral: nursingReferralSelection?.name,
+        notReferredReason: notReferredReasonController.text.isEmpty
+            ? null
+            : notReferredReasonController.text,
+        nurseFirstName: nurseFirstNameController.text,
+        nurseLastName: nurseLastNameController.text,
+        rank: rankController.text,
+        sancNumber: sancNumberController.text,
+        nurseDate: nurseDateController.text,
+        signatureData: signatureBase64,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
 
-      _isSubmitting = false;
-      notifyListeners();
+      await _repository.addHivResult(result);
+
+      if (!context.mounted) return;
+
+      AppSnackbar.showSuccess(
+        context,
+        'HIV test result saved successfully',
+      );
 
       onNext?.call();
     } catch (e) {
-      debugPrint("Error submitting HIV Test Result: $e");
+      if (context.mounted) {
+        AppSnackbar.showError(
+          context,
+          'Error saving HIV test result: $e',
+        );
+      }
+    } finally {
       _isSubmitting = false;
       notifyListeners();
     }

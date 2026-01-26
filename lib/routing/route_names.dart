@@ -1,4 +1,5 @@
 class RouteNames {
+  static const String memberSearch = '/member-search';
   static const String login = '/login';
   static const String register = '/register';
   //static const String signup = '/sign-up'; // <-- UPDATED
@@ -29,4 +30,7 @@ class RouteNames {
 
   // NEW: standalone personal details route
   static const String personalDetails = '/personal-details';
+
+  // Admin tools route
+  static const String adminTools = '/admin-tools';
 }

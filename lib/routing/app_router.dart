@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/features/help/widgets/help_screen.dart';
-import 'package:kenwell_health_app/ui/features/user_management/widgets/user_management_screen.dart';
 import 'package:kenwell_health_app/ui/features/user_management/widgets/user_management_screen_version_two.dart';
 import 'package:provider/provider.dart';
 
@@ -43,13 +42,24 @@ import '../ui/features/survey/widgets/survey_screen.dart';
 import '../ui/features/profile/widgets/profile_screen.dart';
 import '../ui/features/settings/widgets/settings_screen.dart';
 
+// Admin
+import '../ui/features/admin/admin_tools_screen.dart';
+
 import 'route_names.dart';
+import '../ui/features/wellness/widgets/member_search_screen.dart';
 
 class AppRouter {
   //final NurseInterventionFormMixin nurseViewModel;
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case RouteNames.memberSearch:
+        return MaterialPageRoute(
+          builder: (_) => MemberSearchScreen(
+            onGoToMemberDetails: (searchQuery) {},
+            onPrevious: () {}, // No-op to prevent pop on root
+          ),
+        );
       case RouteNames.login:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
 
@@ -196,11 +206,15 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const HelpScreen());
 
       case RouteNames.userManagement:
-        return MaterialPageRoute(builder: (_) => const UserManagementScreen());
+        return MaterialPageRoute(
+            builder: (_) => const UserManagementScreenVersionTwo());
 
       case RouteNames.userManagementVersionTwo:
         return MaterialPageRoute(
             builder: (_) => const UserManagementScreenVersionTwo());
+
+      case RouteNames.adminTools:
+        return MaterialPageRoute(builder: (_) => const AdminToolsScreen());
 
       default:
         return MaterialPageRoute(

@@ -55,7 +55,8 @@ class KenwellReferralCard<T> extends StatelessWidget {
                     dense: true,
                     contentPadding: EdgeInsets.zero,
                     groupValue: selectedValue,
-                    onChanged: onChanged,
+                    onChanged: (val) => onChanged(val),
+                    toggleable: false,
                   ),
                   if (option.requiresReason &&
                       selectedValue == option.value &&

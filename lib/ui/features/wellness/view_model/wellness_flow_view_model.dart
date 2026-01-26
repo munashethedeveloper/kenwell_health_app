@@ -4,19 +4,96 @@ import 'package:flutter/material.dart';
 import '../../consent_form/view_model/consent_screen_view_model.dart';
 import '../../hiv_test_results/view_model/hiv_test_result_view_model.dart';
 import '../../nurse_interventions/view_model/nurse_intervention_view_model.dart';
-import '../../member/view_model/member_details_view_model.dart';
-import '../../risk_assessment/view_model/personal_risk_assessment_view_model.dart';
+import '../../member/view_model/member_registration_view_model.dart';
+import '../../health_risk_assessment/view_model/health_risk_assessment_view_model.dart';
 import '../../health_metrics/view_model/health_metrics_view_model.dart';
 import '../../hiv_test/view_model/hiv_test_view_model.dart';
 import '../../survey/view_model/survey_view_model.dart';
 import '../../tb_test/view_model/tb_testing_view_model.dart';
 import '../../../../domain/models/wellness_event.dart';
+import '../../../../domain/models/member.dart';
+import '../../../../domain/constants/enums.dart';
+import '../../../../data/repositories_dcl/firestore_consent_repository.dart';
+import '../../../../data/repositories_dcl/firestore_hra_repository.dart';
+import '../../../../data/repositories_dcl/firestore_hiv_screening_repository.dart';
+import '../../../../data/repositories_dcl/firestore_tb_screening_repository.dart';
 
 class WellnessFlowViewModel extends ChangeNotifier {
+  /// Loads all completion flags (consent, HRA, HIV, TB, survey) for the given member and event from Firestore
+  Future<void> loadAllCompletionFlags(String? memberId, String? eventId) async {
+    if (memberId == null || eventId == null) return;
+
+    // Reset all flags
+    consentCompleted = false;
+    hraCompleted = false;
+    hivCompleted = false;
+    tbCompleted = false;
+    screeningsCompleted = false;
+    surveyCompleted = false;
+
+    // Consent
+    try {
+      final consentRepo = FirestoreConsentRepository();
+      final consents = await consentRepo.getConsentsByMember(memberId);
+      final hasConsent = consents.any((consent) => consent.eventId == eventId);
+      if (hasConsent) {
+        consentCompleted = true;
+      }
+    } catch (e) {
+      debugPrint('Error loading consent completion: $e');
+    }
+
+    // HRA
+    try {
+      final hraRepo = FirestoreHraRepository();
+      final hraList = await hraRepo.getHraScreeningsByMember(memberId);
+      final hasHra = hraList.any((hra) => hra.eventId == eventId);
+      if (hasHra) {
+        hraCompleted = true;
+      }
+    } catch (e) {
+      debugPrint('Error loading HRA completion: $e');
+    }
+
+    // HIV
+    try {
+      final hivRepo = FirestoreHivScreeningRepository();
+      final hivList = await hivRepo.getHivScreeningsByMember(memberId);
+      final hasHiv = hivList.any((hiv) => hiv.eventId == eventId);
+      if (hasHiv) {
+        hivCompleted = true;
+      }
+    } catch (e) {
+      debugPrint('Error loading HIV completion: $e');
+    }
+
+    // TB
+    try {
+      final tbRepo = FirestoreTbScreeningRepository();
+      final tbList = await tbRepo.getTbScreeningsByMember(memberId);
+      final hasTb = tbList.any((tb) => tb.eventId == eventId);
+      if (hasTb) {
+        tbCompleted = true;
+      }
+    } catch (e) {
+      debugPrint('Error loading TB completion: $e');
+    }
+
+    // If all enabled screenings are completed, set screeningsCompleted
+    if (hraCompleted && hivCompleted && tbCompleted) {
+      screeningsCompleted = true;
+    }
+
+    // TODO: Survey loading logic (if survey is persisted in Firestore, add here)
+
+    notifyListeners();
+  }
+
   // Step name constants
+  static const String stepMemberRegistration = 'member_registration';
   static const String stepCurrentEventDetails = 'current_event_details';
   static const String stepConsent = 'consent';
-  static const String stepMemberRegistration = 'member_registration';
+  static const String stepHealthScreeningsMenu = 'health_screenings_menu';
   static const String stepPersonalDetails = 'personal_details';
   static const String stepRiskAssessment = 'risk_assessment';
   static const String stepHivTest = 'hiv_test';
@@ -31,17 +108,17 @@ class WellnessFlowViewModel extends ChangeNotifier {
   static const String sectionSurvey = 'survey';
 
   // Screening steps (used for detecting screening flows)
-  static const List<String> screeningSteps = [
-    stepConsent,
-    stepRiskAssessment,
-    stepHivTest,
-    stepHivResults,
-    stepTbTest,
+  static final List<String> screeningSteps = [
+    WellnessStep.consent.value,
+    WellnessStep.riskAssessment.value,
+    WellnessStep.hivTest.value,
+    WellnessStep.hivResults.value,
+    WellnessStep.tbTest.value,
   ];
 
   WellnessFlowViewModel({this.activeEvent}) {
-    // Initialize with current event details as the first step
-    _flowSteps = [stepCurrentEventDetails];
+    // Initialize with member registration as the first step
+    _flowSteps = [stepMemberRegistration];
   }
 
   // ViewModels for each step
@@ -56,18 +133,31 @@ class WellnessFlowViewModel extends ChangeNotifier {
   final surveyVM = SurveyViewModel();
 
   WellnessEvent? activeEvent;
+  Member? currentMember;
+
+  // Track completion status for different sections
+  bool consentCompleted = false;
+  bool memberRegistrationCompleted = false;
+  bool screeningsCompleted = false;
+  bool screeningsInProgress = false;
+  bool surveyCompleted = false;
+
+  // Track individual screening completions
+  bool hraCompleted = false;
+  bool hivCompleted = false;
+  bool tbCompleted = false;
 
   int _currentStep = 0;
   int get currentStep => _currentStep;
 
   // Dynamic flow based on selected checkboxes
-  List<String> _flowSteps = [stepCurrentEventDetails];
+  List<String> _flowSteps = [stepMemberRegistration];
   List<String> get flowSteps => _flowSteps;
 
   // Initialize flow based on consent selections
   void initializeFlow(List<String> selectedScreenings) {
-    // Preserve current_event_details and consent as the first steps
-    _flowSteps = [stepCurrentEventDetails, stepConsent];
+    // Preserve member registration and consent as the first steps
+    _flowSteps = [stepMemberRegistration, stepConsent];
 
     // Add the personal details screen as the first screen if any screening is selected
     if (selectedScreenings.isNotEmpty) {
@@ -136,7 +226,14 @@ class WellnessFlowViewModel extends ChangeNotifier {
 
   void cancelFlow() {
     _currentStep = 0;
-    _flowSteps = [stepCurrentEventDetails]; // Reset flow to initial state
+    _flowSteps = [stepMemberRegistration]; // Reset flow to initial state
+    notifyListeners();
+  }
+
+  void resetToMemberSearch() {
+    _currentStep = 0;
+    _flowSteps = [stepMemberRegistration]; // Reset to member registration step
+    currentMember = null; // Clear current member
     notifyListeners();
   }
 
@@ -191,10 +288,73 @@ class WellnessFlowViewModel extends ChangeNotifier {
     }
   }
 
-  /// Reset the flow to current event details screen (for reuse)
+  /// Reset the flow to member registration screen (for reuse)
   void resetFlow() {
     _currentStep = 0;
-    _flowSteps = [stepCurrentEventDetails]; // Reset flow to initial state
+    _flowSteps = [stepMemberRegistration]; // Reset flow to initial state
+    currentMember = null;
+    consentCompleted = false;
+    memberRegistrationCompleted = false;
+    screeningsCompleted = false;
+    screeningsInProgress = false;
+    surveyCompleted = false;
+    notifyListeners();
+  }
+
+  /// Set the current member
+  void setCurrentMember(Member member) {
+    currentMember = member;
+    memberRegistrationCompleted = true;
+    notifyListeners();
+  }
+
+  /// Mark consent as completed
+  void markConsentCompleted() {
+    consentCompleted = true;
+    notifyListeners();
+  }
+
+  /// Mark screenings as in progress
+  void markScreeningsInProgress() {
+    screeningsInProgress = true;
+    notifyListeners();
+  }
+
+  /// Mark screenings as completed
+  void markScreeningsCompleted() {
+    screeningsCompleted = true;
+    screeningsInProgress = false;
+    notifyListeners();
+  }
+
+  /// Mark survey as completed
+  void markSurveyCompleted() {
+    surveyCompleted = true;
+    notifyListeners();
+  }
+
+  /// Mark HRA screening as completed
+  void markHraCompleted() {
+    hraCompleted = true;
+    notifyListeners();
+  }
+
+  /// Mark HIV screening as completed
+  void markHivCompleted() {
+    hivCompleted = true;
+    notifyListeners();
+  }
+
+  /// Mark TB screening as completed
+  void markTbCompleted() {
+    tbCompleted = true;
+    notifyListeners();
+  }
+
+  /// Navigate to current event details screen after member registration
+  void navigateToEventDetails() {
+    _flowSteps = [stepMemberRegistration, stepCurrentEventDetails];
+    _currentStep = 1;
     notifyListeners();
   }
 
@@ -202,21 +362,43 @@ class WellnessFlowViewModel extends ChangeNotifier {
   void navigateToSection(String section) {
     switch (section) {
       case sectionConsent:
-        _flowSteps = [stepCurrentEventDetails, stepConsent];
-        _currentStep = 1;
+        _flowSteps = [
+          stepMemberRegistration,
+          stepCurrentEventDetails,
+          stepConsent
+        ];
+        _currentStep = 2;
         break;
       case sectionMemberRegistration:
-        _flowSteps = [stepCurrentEventDetails, stepMemberRegistration];
-        _currentStep = 1;
+        _flowSteps = [stepMemberRegistration];
+        _currentStep = 0;
         break;
       case sectionHealthScreenings:
-        // For health screenings, we show consent first to select which screenings
-        _flowSteps = [stepCurrentEventDetails, stepConsent];
-        _currentStep = 1;
+        // Navigate to health screenings menu if consent is completed
+        if (consentCompleted && consentVM.selectedScreenings.isNotEmpty) {
+          _flowSteps = [
+            stepMemberRegistration,
+            stepCurrentEventDetails,
+            stepHealthScreeningsMenu
+          ];
+          _currentStep = 2;
+        } else {
+          // If no consent yet, go to consent screen first
+          _flowSteps = [
+            stepMemberRegistration,
+            stepCurrentEventDetails,
+            stepConsent
+          ];
+          _currentStep = 2;
+        }
         break;
       case sectionSurvey:
-        _flowSteps = [stepCurrentEventDetails, stepSurvey];
-        _currentStep = 1;
+        _flowSteps = [
+          stepMemberRegistration,
+          stepCurrentEventDetails,
+          stepSurvey
+        ];
+        _currentStep = 2;
         break;
     }
     notifyListeners();
@@ -224,25 +406,72 @@ class WellnessFlowViewModel extends ChangeNotifier {
 
   /// Navigate from member registration to personal details
   /// This allows users to create a new member or proceed after selecting a member from search
-  void navigateToPersonalDetails() {
+  void navigateToPersonalDetails(String searchQuery) {
+    // Pre-populate ID/Passport field if search query exists
+    if (searchQuery.isNotEmpty) {
+      if (searchQuery.length == 13 && int.tryParse(searchQuery) != null) {
+        // SA ID Number
+        memberDetailsVM.setIdDocumentChoice('ID');
+        memberDetailsVM.idNumberController.text = searchQuery;
+      } else {
+        // Passport
+        memberDetailsVM.setIdDocumentChoice('Passport');
+        memberDetailsVM.passportNumberController.text = searchQuery;
+      }
+    }
+
+    _flowSteps = [stepMemberRegistration, stepPersonalDetails];
+    _currentStep = 1;
+    notifyListeners();
+  }
+
+  /// Navigate to HRA screening from health screenings menu
+  void navigateToHraScreening() {
     _flowSteps = [
-      stepCurrentEventDetails,
       stepMemberRegistration,
-      stepPersonalDetails
+      stepCurrentEventDetails,
+      stepHealthScreeningsMenu,
+      stepRiskAssessment,
     ];
-    _currentStep = 2;
+    _currentStep = 3; // Go directly to risk assessment
+    notifyListeners();
+  }
+
+  /// Navigate to HIV screening from health screenings menu
+  void navigateToHivScreening() {
+    _flowSteps = [
+      stepMemberRegistration,
+      stepCurrentEventDetails,
+      stepHealthScreeningsMenu,
+      stepHivTest,
+      stepHivResults,
+    ];
+    _currentStep = 3; // Go directly to HIV test
+    notifyListeners();
+  }
+
+  /// Navigate to TB screening from health screenings menu
+  void navigateToTbScreening() {
+    _flowSteps = [
+      stepMemberRegistration,
+      stepCurrentEventDetails,
+      stepHealthScreeningsMenu,
+      stepTbTest,
+    ];
+    _currentStep = 3; // Go directly to TB test
     notifyListeners();
   }
 
   /// Check if the current survey is standalone (accessed directly) or part of a screening flow
   /// A survey is standalone if:
-  /// 1. The flow only has current_event_details and survey (direct access)
+  /// 1. The flow only has member_registration, current_event_details and survey (direct access)
   /// 2. The flow doesn't contain screening steps (consent, risk_assessment, hiv_test, tb_test)
   bool get isStandaloneSurvey {
-    // Check for direct access: only current_event_details and survey
-    if (_flowSteps.length == 2 &&
-        _flowSteps[0] == stepCurrentEventDetails &&
-        _flowSteps[1] == stepSurvey) {
+    // Check for direct access: only member_registration, current_event_details and survey
+    if (_flowSteps.length == 3 &&
+        _flowSteps[0] == stepMemberRegistration &&
+        _flowSteps[1] == stepCurrentEventDetails &&
+        _flowSteps[2] == stepSurvey) {
       return true;
     }
 
@@ -252,5 +481,25 @@ class WellnessFlowViewModel extends ChangeNotifier {
 
     // If no screening steps, consider it standalone even if member registration was used
     return !hasScreeningSteps;
+  }
+
+  /// Check if consent exists for this member and event
+  Future<void> checkConsentCompletion(String? memberId, String? eventId) async {
+    if (memberId == null || eventId == null) return;
+
+    try {
+      final consentRepo = FirestoreConsentRepository();
+      final consents = await consentRepo.getConsentsByMember(memberId);
+
+      // Check if any consent exists for this event
+      final hasConsent = consents.any((consent) => consent.eventId == eventId);
+
+      if (hasConsent) {
+        consentCompleted = true;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Error checking consent completion: $e');
+    }
   }
 }
