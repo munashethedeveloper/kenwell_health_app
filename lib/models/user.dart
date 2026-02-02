@@ -27,19 +27,3 @@ class User {
         'role': role,
       };
 }
-
-class UserRole {
-  const UserRole._();
-
-  static const String admin = 'admin';
-  static const String practitioner = 'practitioner';
-  static const String coordinator = 'coordinator';
-  static const String nurse = 'nurse';
-
-  static const List<String> all = [
-    admin,
-    practitioner,
-    coordinator,
-    nurse,
-  ];
-}
