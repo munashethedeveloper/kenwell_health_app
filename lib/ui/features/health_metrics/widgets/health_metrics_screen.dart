@@ -11,6 +11,7 @@ import '../../../shared/ui/form/kenwell_section_header.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/health_metrics_view_model.dart';
 
+// HealthMetricsScreen displays the health metrics form
 class HealthMetricsScreen extends StatelessWidget {
   final HealthMetricsViewModel viewModel;
   final dynamic nurseViewModel;
@@ -18,6 +19,7 @@ class HealthMetricsScreen extends StatelessWidget {
   final VoidCallback onNext;
   final VoidCallback onPrevious;
 
+  // Constructor
   const HealthMetricsScreen({
     super.key,
     required this.viewModel,
@@ -26,15 +28,18 @@ class HealthMetricsScreen extends StatelessWidget {
     required this.nurseViewModel,
   });
 
+  // Build method
   @override
   Widget build(BuildContext context) {
     //final viewModel = context.watch<NurseInterventionViewModel>();
 
+    // Provide the HealthMetricsViewModel to the widget tree
     return ChangeNotifierProvider.value(
       value: viewModel,
       child: Consumer<HealthMetricsViewModel>(
         builder: (context, vm, _) {
           return Scaffold(
+            // App bar
             appBar: const KenwellAppBar(
               title: 'Health Metrics Form',
               automaticallyImplyLeading: false,
@@ -42,19 +47,24 @@ class HealthMetricsScreen extends StatelessWidget {
             ),
             body: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
+              // Form for health metrics
               child: Form(
                 key: vm.formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Section header
                     const KenwellSectionHeader(
                       title: 'Section D: Health Metrics',
                       uppercase: true,
                     ),
+                    const SizedBox(height: 16),
+                    // Measurements form card
                     KenwellFormCard(
                       title: 'Measurements',
                       child: Column(
                         children: [
+                          //  Text fields for various health metrics
                           KenwellTextField(
                             label: 'Waist Circumference (cm)',
                             hintText: 'e.g., 80',
@@ -66,6 +76,7 @@ class HealthMetricsScreen extends StatelessWidget {
                                 val, 'Waist Circumference (cm)'),
                           ),
                           const SizedBox(height: 12),
+                          // Height input field
                           KenwellTextField(
                             label: 'Height (cm)',
                             hintText: 'Enter your height in centimeters',
@@ -77,6 +88,7 @@ class HealthMetricsScreen extends StatelessWidget {
                                 _validateRequired(val, 'Height (cm)'),
                           ),
                           const SizedBox(height: 12),
+                          // Weight input field
                           KenwellTextField(
                             label: 'Weight (kg)',
                             hintText: 'Enter your weight',
@@ -88,6 +100,7 @@ class HealthMetricsScreen extends StatelessWidget {
                                 _validateRequired(val, 'Weight (kg)'),
                           ),
                           const SizedBox(height: 12),
+                          // BMI display field
                           KenwellTextField(
                             label: 'BMI',
                             hintText: 'Automatically calculated',
@@ -95,6 +108,7 @@ class HealthMetricsScreen extends StatelessWidget {
                             readOnly: true,
                           ),
                           const SizedBox(height: 12),
+                          // Blood pressure, cholesterol, and blood sugar fields
                           const Text(
                             'Blood Pressure (mmHg)',
                             style: TextStyle(
@@ -133,6 +147,7 @@ class HealthMetricsScreen extends StatelessWidget {
                             ],
                           ),
                           const SizedBox(height: 12),
+                          // Cholesterol input field
                           KenwellTextField(
                             label: 'Cholesterol (mmol/L)',
                             hintText: 'e.g., 5.2',
@@ -144,6 +159,7 @@ class HealthMetricsScreen extends StatelessWidget {
                                 _validateRequired(val, 'Cholesterol (mmol/L)'),
                           ),
                           const SizedBox(height: 12),
+                          // Blood sugar input field
                           KenwellTextField(
                             label: 'Blood Sugar (mmol/L)',
                             hintText: 'e.g., 6.1',
@@ -159,16 +175,10 @@ class HealthMetricsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
                     _buildReferrals(),
-                    //NurseInterventionForm(
-                    //viewModel: viewModel,
-                    //title: 'HRA Nurse Intervention Form',
-                    //sectionTitle: 'Section E: HRA - Nurse Intervention',
-                    // onNext: onNext,
-                    // onPrevious: onPrevious,
-                    // ),
                     const SizedBox(
                       height: 24,
                     ),
+                    // Navigation buttons
                     KenwellFormNavigation(
                       onPrevious: vm.isSubmitting ? null : onPrevious,
                       onNext: () => vm.submitResults(context, onNext: onNext),
@@ -185,6 +195,7 @@ class HealthMetricsScreen extends StatelessWidget {
     );
   }
 
+  // Build nursing referrals widget
   Widget _buildReferrals() {
     return KenwellReferralCard<NursingReferralOption>(
       title: 'Nursing Referrals',
@@ -193,6 +204,7 @@ class HealthMetricsScreen extends StatelessWidget {
       reasonValidator: (val) =>
           (val == null || val.isEmpty) ? 'Please enter a reason' : null,
       options: [
+        // Referral options
         KenwellReferralOption(
           value: NursingReferralOption.patientNotReferred,
           label: 'Patient not referred',
@@ -212,6 +224,7 @@ class HealthMetricsScreen extends StatelessWidget {
     );
   }
 
+  // Validate required fields
   String? _validateRequired(String? value, String label) {
     if (value == null || value.isEmpty) {
       return 'Please enter $label';

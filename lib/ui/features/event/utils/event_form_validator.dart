@@ -85,6 +85,7 @@ class EventFormValidator {
     return invalidFields;
   }
 
+  // Checks if a string is null or empty
   static bool _isEmpty(String? value) {
     return value == null || value.isEmpty;
   }

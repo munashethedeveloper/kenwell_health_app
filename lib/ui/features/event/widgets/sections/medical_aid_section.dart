@@ -3,20 +3,24 @@ import '../../view_model/event_view_model.dart';
 import '../../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../../shared/ui/form/custom_dropdown_field.dart';
 
+/// Medical aid information form section
 class MedicalAidSection extends StatefulWidget {
   final EventViewModel viewModel;
   final String? Function(String?, String?) requiredSelection;
 
+  // Constructor
   const MedicalAidSection({
     super.key,
     required this.viewModel,
     required this.requiredSelection,
   });
 
+  // Create state
   @override
   State<MedicalAidSection> createState() => _MedicalAidSectionState();
 }
 
+// State class for MedicalAidSection
 class _MedicalAidSectionState extends State<MedicalAidSection> {
   @override
   Widget build(BuildContext context) {
@@ -38,5 +42,6 @@ class _MedicalAidSectionState extends State<MedicalAidSection> {
     );
   }
 
+  // Helper method to convert empty string to null
   String? _nullableValue(String value) => value.isEmpty ? null : value;
 }

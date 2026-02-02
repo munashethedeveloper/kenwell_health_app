@@ -12,6 +12,7 @@ class ContactPersonSection extends StatelessWidget {
   final bool isOnsite;
   final String? Function(String?, String?) requiredField;
 
+  // Constructor
   const ContactPersonSection({
     super.key,
     required this.viewModel,
@@ -20,6 +21,7 @@ class ContactPersonSection extends StatelessWidget {
     required this.requiredField,
   });
 
+  // Build method
   @override
   Widget build(BuildContext context) {
     final firstNameController = isOnsite
@@ -35,11 +37,13 @@ class ContactPersonSection extends StatelessWidget {
         ? viewModel.onsiteEmailController
         : viewModel.aeEmailController;
 
+    // Build the form card
     return KenwellFormCard(
       title: title,
       margin: const EdgeInsets.only(bottom: 16),
       child: Column(
         children: [
+          // Contact Person First Name field
           KenwellTextField(
             label: 'Contact Person First Name',
             controller: firstNameController,
@@ -50,6 +54,7 @@ class ContactPersonSection extends StatelessWidget {
                 requiredField('Contact Person First Name', value),
           ),
           const SizedBox(height: 24),
+          // Contact Person Last Name field
           KenwellTextField(
             label: 'Contact Person Last Name',
             controller: lastNameController,
@@ -60,6 +65,7 @@ class ContactPersonSection extends StatelessWidget {
                 requiredField('Contact Person Last Name', value),
           ),
           const SizedBox(height: 24),
+          // Contact Number field
           KenwellTextField(
             label: 'Contact Number',
             controller: numberController,
@@ -69,6 +75,7 @@ class ContactPersonSection extends StatelessWidget {
             validator: Validators.validateSouthAfricanPhoneNumber,
           ),
           const SizedBox(height: 24),
+          // Contact Email field
           KenwellTextField(
             label: 'Email',
             controller: emailController,

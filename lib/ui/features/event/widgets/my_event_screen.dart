@@ -1,40 +1,138 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/routing/route_names.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
-
+import '../../../../data/repositories_dcl/user_event_repository.dart';
+import '../../../../data/services/auth_service.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../shared/ui/buttons/custom_primary_button.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../view_model/event_view_model.dart';
 import '../../wellness/widgets/wellness_flow_page.dart';
 
+// MyEventScreen displays the events assigned to the current user
 class MyEventScreen extends StatefulWidget {
+  // Constructor
   const MyEventScreen({super.key});
 
+  // Static method to access state from context
+  static MyEventScreenState? of(BuildContext context) {
+    final state = context.findAncestorStateOfType<MyEventScreenState>();
+    return state;
+  }
+
+  // Create state
   @override
-  State<MyEventScreen> createState() => _MyEventScreenState();
+  State<MyEventScreen> createState() => MyEventScreenState();
 }
 
-class _MyEventScreenState extends State<MyEventScreen> {
+// State class for MyEventScreen
+class MyEventScreenState extends State<MyEventScreen> {
   String? _startingEventId;
   int _selectedWeek = 0; // 0 = this week, 1 = next week
+  List<WellnessEvent> _userEvents = [];
 
+  // Initialize state
   @override
   void initState() {
     super.initState();
-    // Reload events when screen is displayed to ensure latest data
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<EventViewModel>().reloadEvents();
+    _fetchUserEvents();
+  }
+
+  // Call this method after returning from allocation to refresh events
+  void refreshUserEvents() {
+    _fetchUserEvents();
+  }
+
+  // Fetch user events from Firestore
+  Future<void> _fetchUserEvents() async {
+    setState(() {});
+    // Get current user
+    final authService = AuthService();
+    final user = await authService.getCurrentUser();
+    debugPrint('MyEventScreen: Current user: \\${user?.id}');
+    // If no user, clear events and return
+    if (user == null) {
+      setState(() {
+        _userEvents = [];
+      });
+      debugPrint('MyEventScreen: No user logged in.');
+      return;
+    }
+    // Fetch user events from repository
+    final repo = UserEventRepository();
+    final userEventMaps = await repo.fetchUserEvents(user.id);
+    debugPrint('MyEventScreen: Raw userEventMaps from Firestore:');
+    for (final map in userEventMaps) {
+      debugPrint('  - \\${map.toString()}');
+    }
+    // Convert Firestore maps to WellnessEvent objects
+    final events = userEventMaps
+        .map((e) {
+          try {
+            return WellnessEvent(
+              id: e['eventId'] ?? '',
+              title: e['eventTitle'] ?? '',
+              date: (e['eventDate'] as Timestamp).toDate(),
+              venue: e['eventVenue'] ?? '',
+              address: e['eventLocation'] ?? '',
+              townCity: '',
+              province: '',
+              onsiteContactFirstName: '',
+              onsiteContactLastName: '',
+              onsiteContactNumber: '',
+              onsiteContactEmail: '',
+              aeContactFirstName: '',
+              aeContactLastName: '',
+              aeContactNumber: '',
+              aeContactEmail: '',
+              servicesRequested: '',
+              additionalServicesRequested: '',
+              expectedParticipation: 0,
+              nurses: 0,
+              coordinators: 0,
+              setUpTime: '',
+              startTime: e['eventStartTime'] ?? '',
+              endTime: e['eventEndTime'] ?? '',
+              strikeDownTime: '',
+              mobileBooths: '',
+              description: '',
+              medicalAid: '',
+              status: 'scheduled',
+              actualStartTime: null,
+              actualEndTime: null,
+            );
+          } catch (err) {
+            debugPrint(
+                'MyEventScreen: Failed to map event: \\${e.toString()} | Error: \\${err.toString()}');
+            return null;
+          }
+        })
+        .whereType<WellnessEvent>()
+        .toList();
+    debugPrint('MyEventScreen: Mapped WellnessEvent list:');
+    for (final event in events) {
+      debugPrint(
+          '  - id: \\${event.id}, title: \\${event.title}, date: \\${event.date}');
+    }
+    setState(() {
+      _userEvents = events;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final eventVM = context.watch<EventViewModel>();
-    final allEvents = eventVM.events; // Get ALL events
-    final allUpcoming = eventVM.getUpcomingEvents();
+    // Use _userEvents instead of allEvents
+    final allEvents = _userEvents;
+    final now = DateTime.now();
+    final weekStart = _startOfWeek(now); // Sunday 00:00:00 of this week
+    final nextWeekStart = weekStart.add(const Duration(days: 7));
+    final selectedStart = _selectedWeek == 0 ? weekStart : nextWeekStart;
+    final selectedEnd = _endOfWeek(selectedStart);
+    final allUpcoming = allEvents.where((e) => !e.date.isBefore(now)).toList();
+    // Removed duplicate and unused 'weeklyEvents' definition
 
     debugPrint(
         'ConductEventScreen: Total events in database = ${allEvents.length}');
@@ -52,6 +150,16 @@ class _MyEventScreenState extends State<MyEventScreen> {
     }
 
     // Debug: Print details about filtered out events
+    if (_userEvents.isEmpty && allEvents.isNotEmpty) {
+      debugPrint(
+          'MyEventScreen: All user_events failed to map to WellnessEvent.');
+    } else if (_userEvents.isNotEmpty) {
+      debugPrint('MyEventScreen: Mapped WellnessEvent list:');
+      for (final event in _userEvents) {
+        debugPrint(
+            '  - id: \\${event.id}, title: \\${event.title}, date: \\${event.date}');
+      }
+    }
     final filteredOut =
         allEvents.where((e) => !allUpcoming.contains(e)).toList();
     if (filteredOut.isNotEmpty) {
@@ -64,13 +172,6 @@ class _MyEventScreenState extends State<MyEventScreen> {
     }
 
     // Compute week ranges
-    final now = DateTime.now();
-    final weekStart = _startOfWeek(now); // Sunday 00:00:00 of this week
-    final nextWeekStart = weekStart.add(const Duration(days: 7));
-
-    final selectedStart = _selectedWeek == 0 ? weekStart : nextWeekStart;
-    final selectedEnd = _endOfWeek(selectedStart);
-
     debugPrint(
         'ConductEventScreen: Selected week range: $selectedStart to $selectedEnd');
 
@@ -90,6 +191,8 @@ class _MyEventScreenState extends State<MyEventScreen> {
       }
     }
 
+    // Build the Scaffold
+    final eventVM = context.read<EventViewModel>();
     return Scaffold(
       appBar: KenwellAppBar(
         title: 'My Events',
@@ -105,15 +208,15 @@ class _MyEventScreenState extends State<MyEventScreen> {
             icon: const Icon(Icons.refresh, color: Color(0xFF201C58)),
             onPressed: () async {
               // Refresh events from Firestore
+              final eventVM = context.read<EventViewModel>();
               await eventVM.reloadEvents();
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Events refreshed'),
-                    duration: Duration(seconds: 1),
-                  ),
-                );
-              }
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Events refreshed'),
+                  duration: Duration(seconds: 1),
+                ),
+              );
             },
           ),
           TextButton.icon(
@@ -396,6 +499,7 @@ class _MyEventScreenState extends State<MyEventScreen> {
     );
   }
 
+  // Calculate the start of the week (Sunday) for a given date
   DateTime _startOfWeek(DateTime date) {
     final int daysToSubtract = date.weekday % 7;
     final dt = DateTime(date.year, date.month, date.day)
@@ -403,11 +507,13 @@ class _MyEventScreenState extends State<MyEventScreen> {
     return DateTime(dt.year, dt.month, dt.day);
   }
 
+  // Calculate the end of the week (Saturday) for a given week start date
   DateTime _endOfWeek(DateTime weekStart) {
     final end = weekStart.add(const Duration(days: 6));
     return DateTime(end.year, end.month, end.day, 23, 59, 59, 999);
   }
 
+  // Determine if the event can be started based on current time and event start time
   bool _canStartEvent(WellnessEvent event) {
     // Allow resuming events that are already in progress
     if (event.status == WellnessEventStatus.inProgress) {
@@ -428,6 +534,7 @@ class _MyEventScreenState extends State<MyEventScreen> {
     return !now.isBefore(fiveMinutesBeforeStart);
   }
 
+  // Start the event and navigate to WellnessFlowPage
   Future<void> _startEvent(BuildContext context, WellnessEvent event) async {
     setState(() => _startingEventId = event.id);
     try {
@@ -459,6 +566,7 @@ class _MyEventScreenState extends State<MyEventScreen> {
     }
   }
 
+  // Finish the event
   Future<void> _finishEvent(BuildContext context, WellnessEvent event) async {
     final eventVM = context.read<EventViewModel>();
     final messenger = ScaffoldMessenger.of(context);
@@ -473,6 +581,7 @@ class _MyEventScreenState extends State<MyEventScreen> {
     setState(() {});
   }
 
+  // Build info chip widget
   Widget _infoChip(IconData icon, String label) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

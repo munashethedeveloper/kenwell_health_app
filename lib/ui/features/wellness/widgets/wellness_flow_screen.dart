@@ -81,26 +81,21 @@ class WellnessFlowScreen extends StatelessWidget {
         );
 
       case WellnessFlowViewModel.stepConsent:
-        return ChangeNotifierProvider.value(
-          value: flowVM.consentVM,
-          child: event != null
-              ? ConsentScreen(
-                  event: event!,
-                  onNext: () {
-                    // Mark consent as completed and update UI immediately
-                    flowVM.markConsentCompleted();
-                    if (flowVM.consentVM.selectedScreenings.isNotEmpty) {
-                      flowVM.markScreeningsInProgress();
-                    }
-                    flowVM.initializeFlow(flowVM.consentVM.selectedScreenings);
-                    // Ensure UI updates before navigating
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      flowVM.navigateToEventDetails();
-                    });
-                  },
-                )
-              : const SizedBox(),
-        );
+        return event != null
+            ? ConsentScreen(
+                event: event!,
+                onNext: () {
+                  flowVM.markConsentCompleted();
+                  if (flowVM.consentVM.selectedScreenings.isNotEmpty) {
+                    flowVM.markScreeningsInProgress();
+                  }
+                  flowVM.initializeFlow(flowVM.consentVM.selectedScreenings);
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    flowVM.navigateToEventDetails();
+                  });
+                },
+              )
+            : const SizedBox();
 
       case WellnessFlowViewModel.stepHealthScreeningsMenu:
         // Show health screenings menu with enabled/disabled cards based on consent

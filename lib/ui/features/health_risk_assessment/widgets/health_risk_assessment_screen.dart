@@ -14,6 +14,7 @@ import '../../../shared/ui/form/kenwell_section_header.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/health_risk_assessment_view_model.dart';
 
+// PersonalRiskAssessmentScreen displays the personal risk assessment form
 class PersonalRiskAssessmentScreen extends StatelessWidget {
   final PersonalRiskAssessmentViewModel viewModel;
   final dynamic nurseViewModel;
@@ -23,6 +24,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
   final int age;
   final PreferredSizeWidget? appBar;
 
+  //  Constructor
   const PersonalRiskAssessmentScreen({
     super.key,
     required this.viewModel,
@@ -34,6 +36,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
     this.appBar,
   });
 
+  // Build method
   @override
   Widget build(BuildContext context) {
     // Initialize the view model with gender and age data
@@ -44,11 +47,13 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
       );
     });
 
+    // Provide the view model to the widget tree
     return ChangeNotifierProvider.value(
       value: viewModel,
       child: Consumer<PersonalRiskAssessmentViewModel>(
         builder: (context, vm, _) {
           return Scaffold(
+            // App bar
             appBar: appBar ??
                 const KenwellAppBar(
                   title: 'Health Risk Assessment Form',
@@ -57,11 +62,13 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                 ),
             body: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
+              // Form
               child: Form(
                 key: vm.formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // ===== Section C: Health Screening =====
                     const KenwellSectionHeader(
                       title: 'Section C: Health Screening',
                       uppercase: true,
@@ -444,6 +451,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
     );
   }
 
+  // Build radio group widget
   Widget _buildStringRadioGroup({
     required String? selected,
     required List<String> options,
@@ -466,6 +474,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
     );
   }
 
+  // Build referrals widget
   Widget _buildReferrals() {
     return KenwellReferralCard<NursingReferralOption>(
       title: 'Nursing Referrals',
@@ -493,6 +502,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
     );
   }
 
+  // Validate required field
   String? _validateRequired(String? value, String label) {
     if (value == null || value.isEmpty) {
       return 'Please enter $label';

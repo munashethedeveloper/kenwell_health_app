@@ -22,6 +22,34 @@ class CreateUserSection extends StatefulWidget {
 }
 
 class _CreateUserSectionState extends State<CreateUserSection> {
+  bool _verificationSent = false;
+  bool _isVerified = false;
+
+  Future<void> _checkEmailVerified() async {
+    final viewModel = context.read<UserManagementViewModel>();
+    final verified = await viewModel.isEmailVerified();
+    setState(() {
+      _isVerified = verified;
+    });
+    if (verified) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Email verified!')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Email not yet verified.')),
+      );
+    }
+  }
+
+  Future<void> _resendVerification() async {
+    final viewModel = context.read<UserManagementViewModel>();
+    await viewModel.sendEmailVerification();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Verification email resent.')),
+    );
+  }
+
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -59,12 +87,15 @@ class _CreateUserSectionState extends State<CreateUserSection> {
     if (!mounted) return;
 
     if (success) {
+      setState(() {
+        _verificationSent = true;
+        _isVerified = false;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text(
-                viewModel.successMessage ?? 'User registered successfully!')),
+            content: Text(viewModel.successMessage ??
+                'User registered successfully! Verification email sent.')),
       );
-
       // Clear the form
       _emailController.clear();
       _passwordController.clear();
@@ -73,7 +104,6 @@ class _CreateUserSectionState extends State<CreateUserSection> {
       _firstNameController.clear();
       _lastNameController.clear();
       setState(() => _selectedRole = null);
-
       widget.onUserCreated?.call();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -216,6 +246,27 @@ class _CreateUserSectionState extends State<CreateUserSection> {
                     onPressed: _register,
                     isBusy: viewModel.isLoading,
                   ),
+                  if (_verificationSent) ...[
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(_isVerified
+                              ? 'Email verified!'
+                              : 'Please verify your email (check inbox)'),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.refresh),
+                          tooltip: 'Check verification',
+                          onPressed: _checkEmailVerified,
+                        ),
+                        TextButton(
+                          onPressed: _resendVerification,
+                          child: const Text('Resend Email'),
+                        ),
+                      ],
+                    ),
+                  ],
                   const SizedBox(height: 16),
                 ],
               ),

@@ -101,6 +101,27 @@ class UserCardWidget extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Icon(
+                          user.emailVerified
+                              ? Icons.verified
+                              : Icons.error_outline,
+                          color: user.emailVerified ? Colors.green : Colors.red,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          user.emailVerified ? 'Verified' : 'Not Verified',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color:
+                                user.emailVerified ? Colors.green : Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),

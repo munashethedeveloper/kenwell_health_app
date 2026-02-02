@@ -131,14 +131,13 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
               icon: const Icon(Icons.refresh, color: Color(0xFF201C58)),
               onPressed: () async {
                 await _loadAndPopulateProfile();
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Profile refreshed'),
-                      duration: Duration(seconds: 1),
-                    ),
-                  );
-                }
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Profile refreshed'),
+                    duration: Duration(seconds: 1),
+                  ),
+                );
               },
             ),
             TextButton.icon(

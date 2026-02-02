@@ -6,18 +6,22 @@ import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../view_model/calendar_view_model.dart';
 
+// Widget representing a single event card in the calendar
 class EventCard extends StatelessWidget {
   final WellnessEvent event;
   final CalendarViewModel viewModel;
 
+  // Constructor
   const EventCard({
     super.key,
     required this.event,
     required this.viewModel,
   });
 
+  // Build method to render the event card
   @override
   Widget build(BuildContext context) {
+    // Use Dismissible to enable swipe-to-delete functionality
     return Dismissible(
       key: Key(event.id),
       direction: DismissDirection.endToStart,
@@ -27,11 +31,14 @@ class EventCard extends StatelessWidget {
           builder: (dialogContext) => AlertDialog(
             title: const Text('Delete Event'),
             content: const Text('Are you sure you want to delete this event?'),
+            // Actions for confirming or canceling the deletion
             actions: [
+              // Cancel button
               TextButton(
                 onPressed: () => Navigator.of(dialogContext).pop(false),
                 child: const Text('Cancel'),
               ),
+              // Delete button
               TextButton(
                 onPressed: () => Navigator.of(dialogContext).pop(true),
                 child:
@@ -41,6 +48,7 @@ class EventCard extends StatelessWidget {
           ),
         );
       },
+      // Background shown when swiping to delete
       background: Container(
         margin: const EdgeInsets.symmetric(vertical: 4),
         decoration: BoxDecoration(
@@ -56,6 +64,7 @@ class EventCard extends StatelessWidget {
             Provider.of<EventViewModel>(context, listen: false);
         await eventViewModel.deleteEvent(event.id);
 
+        // Show snackbar with UNDO option
         if (context.mounted) {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
@@ -73,6 +82,7 @@ class EventCard extends StatelessWidget {
             );
         }
       },
+      // Event card content
       child: InkWell(
         onTap: () {
           Navigator.of(context).pushNamed(
@@ -80,6 +90,7 @@ class EventCard extends StatelessWidget {
             arguments: {'event': event},
           );
         },
+        // Card container
         child: Container(
           margin: const EdgeInsets.symmetric(vertical: 4),
           decoration: BoxDecoration(
@@ -102,6 +113,7 @@ class EventCard extends StatelessWidget {
                         .withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
+                  // Icon representing the event category
                   child: Icon(
                     viewModel.getServiceIcon(event.servicesRequested),
                     size: 28,
@@ -114,6 +126,7 @@ class EventCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Event title
                       Text(
                         event.title,
                         style: const TextStyle(
@@ -123,11 +136,14 @@ class EventCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 4),
+                      // Event time
                       Row(
                         children: [
+                          // Time icon
                           const Icon(Icons.access_time,
                               size: 14, color: Colors.grey),
                           const SizedBox(width: 4),
+                          // Time text
                           Text(
                             '${event.startTime}${event.endTime.isNotEmpty ? ' - ${event.endTime}' : ''}',
                             style: TextStyle(
@@ -137,6 +153,7 @@ class EventCard extends StatelessWidget {
                           ),
                         ],
                       ),
+                      // Optional venue/address and expected participation
                       if (event.venue.isNotEmpty ||
                           event.address.isNotEmpty) ...[
                         const SizedBox(height: 2),

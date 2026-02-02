@@ -37,10 +37,10 @@ class WellnessNavigator {
 
   /// Start the wellness flow from member registration
   Future<void> startFlow() async {
+    final wellnessVM = WellnessFlowViewModel(activeEvent: event);
     final member = await _navigateToMemberRegistration();
     if (member != null && context.mounted) {
-      // Member found or registered, continue to event details
-      await navigateToEventDetails(member);
+      await navigateToEventDetails(member, wellnessVM);
     }
   }
 
@@ -152,12 +152,10 @@ class WellnessNavigator {
   }
 
   /// Navigate to event details hub (shows sections to complete)
-  Future<void> navigateToEventDetails(Member member) async {
-    final wellnessVM = WellnessFlowViewModel(activeEvent: event);
+  Future<void> navigateToEventDetails(
+      Member member, WellnessFlowViewModel wellnessVM) async {
     wellnessVM.currentMember = member;
     wellnessVM.memberRegistrationCompleted = true;
-
-    // Check if consent already exists for this member and event
     await wellnessVM.checkConsentCompletion(member.id, event.id);
 
     await Navigator.push(
@@ -221,25 +219,42 @@ class WellnessNavigator {
               onSectionTap: (section) async {
                 switch (section) {
                   case 'consent':
-                    final result = await _navigateToConsent(member);
-                    if (result != null) {
-                      wellnessVM.consentCompleted = true;
-                      wellnessVM.surveyCompleted = true;
+                    {
+                      final selectedScreenings =
+                          await _navigateToConsent(member, wellnessVM);
+                      wellnessVM.markConsentCompleted();
+                      // Store selected screenings in wellnessVM for later use
+                      wellnessVM.hraEnabled =
+                          selectedScreenings?.contains('hra') ?? false;
+                      wellnessVM.hivEnabled =
+                          selectedScreenings?.contains('hiv') ?? false;
+                      wellnessVM.tbEnabled =
+                          selectedScreenings?.contains('tb') ?? false;
+                      break;
                     }
-                    break;
                   case 'health_screenings':
-                    final result =
-                        await _navigateToHealthScreenings(member, wellnessVM);
-                    if (result == true) {
-                      wellnessVM.screeningsCompleted = true;
+                    {
+                      // Use stored flags from wellnessVM
+                      final result = await navigateToHealthScreenings(
+                        member,
+                        wellnessVM,
+                        hraEnabled: wellnessVM.hraEnabled,
+                        hivEnabled: wellnessVM.hivEnabled,
+                        tbEnabled: wellnessVM.tbEnabled,
+                      );
+                      if (result == true) {
+                        wellnessVM.screeningsCompleted = true;
+                      }
+                      break;
                     }
-                    break;
                   case 'survey':
-                    final result = await _navigateToSurvey(member);
-                    if (result == true) {
-                      wellnessVM.surveyCompleted = true;
+                    {
+                      final result = await _navigateToSurvey(member);
+                      if (result == true) {
+                        wellnessVM.surveyCompleted = true;
+                      }
+                      break;
                     }
-                    break;
                 }
               },
               onBackToSearch: () {
@@ -253,7 +268,8 @@ class WellnessNavigator {
   }
 
   /// Navigate to consent form
-  Future<List<String>?> _navigateToConsent(Member member) async {
+  Future<List<String>?> _navigateToConsent(
+      Member member, WellnessFlowViewModel wellnessVM) async {
     final consentVM = ConsentScreenViewModel();
 
     return await Navigator.push<List<String>>(
@@ -285,15 +301,18 @@ class WellnessNavigator {
   }
 
   /// Navigate to health screenings menu
-  Future<bool?> _navigateToHealthScreenings(
-      Member member, WellnessFlowViewModel wellnessVM) async {
+  Future<bool?> navigateToHealthScreenings(
+      Member member, WellnessFlowViewModel wellnessVM,
+      {required bool hraEnabled,
+      required bool hivEnabled,
+      required bool tbEnabled}) async {
     return await Navigator.push<bool>(
       context,
       MaterialPageRoute(
         builder: (context) => HealthScreeningsScreen(
-          hraEnabled: true, // TO DO: Get from consent
-          hivEnabled: true,
-          tbEnabled: true,
+          hraEnabled: hraEnabled,
+          hivEnabled: hivEnabled,
+          tbEnabled: tbEnabled,
           hraCompleted: wellnessVM.hraCompleted,
           hivCompleted: wellnessVM.hivCompleted,
           tbCompleted: wellnessVM.tbCompleted,
@@ -303,7 +322,13 @@ class WellnessNavigator {
             if (result == true) {
               wellnessVM.hraCompleted = true;
               // Reopen health screenings to update UI
-              await _navigateToHealthScreenings(member, wellnessVM);
+              await navigateToHealthScreenings(
+                member,
+                wellnessVM,
+                hraEnabled: hraEnabled,
+                hivEnabled: hivEnabled,
+                tbEnabled: tbEnabled,
+              );
             }
           },
           onHivTap: () async {
@@ -311,7 +336,13 @@ class WellnessNavigator {
             if (!context.mounted) return;
             if (result == true) {
               wellnessVM.hivCompleted = true;
-              await _navigateToHealthScreenings(member, wellnessVM);
+              await navigateToHealthScreenings(
+                member,
+                wellnessVM,
+                hraEnabled: hraEnabled,
+                hivEnabled: hivEnabled,
+                tbEnabled: tbEnabled,
+              );
             }
           },
           onTbTap: () async {
@@ -319,7 +350,13 @@ class WellnessNavigator {
             if (!context.mounted) return;
             if (result == true) {
               wellnessVM.tbCompleted = true;
-              await _navigateToHealthScreenings(member, wellnessVM);
+              await navigateToHealthScreenings(
+                member,
+                wellnessVM,
+                hraEnabled: hraEnabled,
+                hivEnabled: hivEnabled,
+                tbEnabled: tbEnabled,
+              );
             }
           },
           onSubmitAll: () {

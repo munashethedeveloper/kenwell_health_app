@@ -11,10 +11,12 @@ class AuthWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     final authVM = Provider.of<AuthViewModel>(context);
 
+    //Check if the user is logged in
     if (authVM.isLoggedIn) {
       // ✅ After login, show main navigation screen
       return const MainNavigationScreen();
     } else {
+      //Else show login screen again if user is not logged in
       return const LoginScreen();
     }
   }

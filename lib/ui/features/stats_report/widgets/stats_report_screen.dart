@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/routing/route_names.dart';
 import 'package:provider/provider.dart';
 
+import '../../../shared/ui/form/kenwell_section_header.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
@@ -213,6 +214,10 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
           children: [
             const SizedBox(height: 16),
             const AppLogo(size: 200),
+            const KenwellSectionHeader(
+              title: 'Overall Wellness Statistics',
+              subtitle: 'Summary of wellness events and participation metrics.',
+            ),
             const SizedBox(height: 24),
             // Search Field
             TextField(

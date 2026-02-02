@@ -15,6 +15,7 @@ class HealthcareProfessionalOption extends StatelessWidget {
   final int minCount;
   final int maxCount;
 
+  // Constructor
   const HealthcareProfessionalOption({
     super.key,
     required this.label,
@@ -28,10 +29,12 @@ class HealthcareProfessionalOption extends StatelessWidget {
     this.maxCount = 20,
   });
 
+  // Build method
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
+        // Dropdown for Yes/No selection
         KenwellDropdownField<String>(
           label: label,
           value: selectedOption,

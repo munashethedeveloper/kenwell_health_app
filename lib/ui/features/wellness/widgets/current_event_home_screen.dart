@@ -6,7 +6,8 @@ import 'package:kenwell_health_app/ui/features/wellness/view_model/wellness_flow
 import 'package:provider/provider.dart';
 
 import '../../../../routing/route_names.dart';
-import 'member_search_screen.dart';
+import '../../../shared/ui/form/kenwell_section_header.dart';
+// Removed unused import
 
 class CurrentEventHomeScreen extends StatelessWidget {
   final WellnessEvent event;
@@ -26,7 +27,9 @@ class CurrentEventHomeScreen extends StatelessWidget {
     final viewModel = context.watch<WellnessFlowViewModel>();
 
     return PopScope(
-      onPopInvoked: (didPop) {
+      onPopInvokedWithResult: (didPop, result) {
+        debugPrint('Back pressed. didPop=$didPop');
+        debugPrint('canPop=${Navigator.of(context).canPop()}');
         if (!didPop) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (Navigator.of(context).canPop()) {
@@ -120,16 +123,15 @@ class CurrentEventHomeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              Text(
-                'Process Steps',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+              const KenwellSectionHeader(
+                title: 'Event Process',
+                subtitle:
+                    'Complete the steps below to finish the wellness event process.',
               ),
               const SizedBox(height: 12),
               _ProcessStepCard(
                 icon: Icons.person_add,
-                title: 'Member Registration',
+                title: 'Section A: Member Registration',
                 status: viewModel.memberRegistrationCompleted
                     ? 'Completed'
                     : 'Not Completed',
@@ -139,7 +141,7 @@ class CurrentEventHomeScreen extends StatelessWidget {
               ),
               _ProcessStepCard(
                 icon: Icons.assignment,
-                title: 'Consent',
+                title: 'Section B: Informed Consent',
                 status:
                     viewModel.consentCompleted ? 'Completed' : 'Not Completed',
                 isCompleted: viewModel.consentCompleted,
@@ -147,7 +149,7 @@ class CurrentEventHomeScreen extends StatelessWidget {
               ),
               _ProcessStepCard(
                 icon: Icons.health_and_safety,
-                title: 'Health Screenings',
+                title: 'Section C: Health Screenings',
                 status: viewModel.screeningsCompleted
                     ? 'Completed'
                     : viewModel.screeningsInProgress
@@ -160,7 +162,7 @@ class CurrentEventHomeScreen extends StatelessWidget {
               ),
               _ProcessStepCard(
                 icon: Icons.poll,
-                title: 'Survey',
+                title: 'Section D: Survey',
                 status:
                     viewModel.surveyCompleted ? 'Completed' : 'Not Completed',
                 isCompleted: viewModel.surveyCompleted,

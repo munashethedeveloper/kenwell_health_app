@@ -5,6 +5,7 @@ import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_m
 import 'package:provider/provider.dart';
 
 import 'firebase_options.dart';
+import 'providers/app_provider.dart';
 import 'providers/theme_provider.dart';
 import 'routing/app_router.dart';
 import 'ui/features/auth/view_models/auth_view_model.dart';
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider<AppProvider>(create: (_) => AppProvider()),
         ChangeNotifierProvider<ProfileViewModel>(
             create: (_) => ProfileViewModel()),
         ChangeNotifierProvider<ConsentScreenViewModel>(

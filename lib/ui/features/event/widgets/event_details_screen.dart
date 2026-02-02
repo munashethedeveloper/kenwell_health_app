@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
+import 'package:provider/provider.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/buttons/custom_primary_button.dart';
@@ -8,27 +8,34 @@ import '../../../shared/ui/buttons/custom_secondary_button.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_section_header.dart';
 import '../../../shared/ui/logo/app_logo.dart';
+import '../../user_management/viewmodel/user_management_view_model.dart';
 import '../view_model/event_view_model.dart';
 import 'allocate_event_screen.dart';
+import 'my_event_screen.dart';
 
+// EventDetailsScreen displays detailed information about a wellness event
 class EventDetailsScreen extends StatelessWidget {
+  // Event to display
   final WellnessEvent event;
   final EventViewModel? viewModel;
 
+  // Constructor
   const EventDetailsScreen({
     super.key,
     required this.event,
     this.viewModel,
   });
 
+  // Build method
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     String fullName(String first, String last) => '$first $last';
 
     return Scaffold(
+      // App bar with title and actions
       appBar: KenwellAppBar(
-        title: 'Event Details',
+        title: 'Event Details: ${event.title}',
         titleColor: Colors.white,
         titleStyle: const TextStyle(
           color: Colors.white,
@@ -37,6 +44,7 @@ class EventDetailsScreen extends StatelessWidget {
         automaticallyImplyLeading: true,
         backgroundColor: const Color(0xFF201C58),
         centerTitle: true,
+        // Action buttons for edit and delete
         actions: [
           if (viewModel != null)
             IconButton(
@@ -52,16 +60,20 @@ class EventDetailsScreen extends StatelessWidget {
             ),
         ],
       ),
+      // Body of the screen
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           const SizedBox(height: 16),
-          const AppLogo(size: 200),
+          const AppLogo(size: 150),
           const SizedBox(height: 24),
+          // Section header
           const KenwellSectionHeader(
             title: 'Event Summary Details',
+            subtitle: 'Detailed information about the event',
             uppercase: true,
           ),
+          // Event detail sections
           _buildSectionCard('Client Organization', [
             _buildDetailRow('Event Title', event.title, theme),
           ]),
@@ -125,25 +137,39 @@ class EventDetailsScreen extends StatelessWidget {
             ],
           ]),
           const SizedBox(height: 24),
+          // Allocate Event button
           CustomPrimaryButton(
             label: 'Allocate Event',
             onPressed: () async {
-              await Navigator.push(
+              final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => AllocateEventScreen(
-                    onAllocate: (assignedUserIds) {
-                      // TODO: Handle assignment logic
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                              'Assigned to: ' + assignedUserIds.join(', ')),
-                        ),
-                      );
-                    },
+                  builder: (_) => ChangeNotifierProvider(
+                    create: (_) => UserManagementViewModel(),
+                    child: AllocateEventScreen(
+                      event: event,
+                      onAllocate: (assignedUserIds) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                  'Assigned to: ${assignedUserIds.join(', ')}'),
+                            ),
+                          );
+                        }
+                      },
+                    ),
                   ),
                 ),
               );
+              // After returning from allocation, trigger refresh in MyEventScreen if allocation occurred
+              if (context.mounted &&
+                  result != null &&
+                  result is bool &&
+                  result) {
+                final myEventScreenState = MyEventScreen.of(context);
+                myEventScreenState?.refreshUserEvents();
+              }
             },
           ),
         ],
@@ -151,6 +177,7 @@ class EventDetailsScreen extends StatelessWidget {
     );
   }
 
+  // Show delete confirmation dialog
   void _showDeleteConfirmation(BuildContext context) {
     showDialog(
       context: context,
@@ -185,6 +212,7 @@ class EventDetailsScreen extends StatelessWidget {
     );
   }
 
+  // Navigate to edit event screen
   void _navigateToEditEvent(BuildContext context) {
     Navigator.pushNamed(
       context,
@@ -196,6 +224,7 @@ class EventDetailsScreen extends StatelessWidget {
     );
   }
 
+  // Delete event method
   Future<void> _deleteEvent(BuildContext context) async {
     if (viewModel == null) return;
     await viewModel!.deleteEvent(event.id); // implement deleteEvent in VM
@@ -206,6 +235,7 @@ class EventDetailsScreen extends StatelessWidget {
     );
   }
 
+  // Build a detail row widget
   Widget _buildDetailRow(String label, String value, ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -233,6 +263,7 @@ class EventDetailsScreen extends StatelessWidget {
     );
   }
 
+  // Build a section card widget
   Widget _buildSectionCard(String title, List<Widget> children) {
     return KenwellFormCard(
       title: title,

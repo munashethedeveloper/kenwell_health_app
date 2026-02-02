@@ -11,23 +11,28 @@ import '../../../shared/ui/form/kenwell_yes_no_list.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/hiv_test_view_model.dart';
 
+// HIVTestScreen displays the HIV test screening form
 class HIVTestScreen extends StatelessWidget {
+  // Constructor
   final VoidCallback? onNext;
   final VoidCallback? onPrevious;
   final PreferredSizeWidget? appBar;
 
   const HIVTestScreen({super.key, this.onNext, this.onPrevious, this.appBar});
 
+  // Build method
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<HIVTestViewModel>();
 
+    // Build the form page
     return KenwellFormPage(
       title: 'HIV Test Screening Form',
-      sectionTitle: 'Section F: HIV Screening',
+      sectionTitle: 'Section C: HIV Screening',
       formKey: viewModel.formKey,
       appBar: appBar,
       children: [
+        // HIV Testing History Card
         KenwellFormCard(
           title: 'HIV Testing History',
           child: Column(
@@ -81,6 +86,7 @@ class HIVTestScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
+        // Risk Behaviors Card
         KenwellFormCard(
           title: 'Risk Behaviors (last 12 months)',
           child: Column(
@@ -118,6 +124,7 @@ class HIVTestScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
+        // Partner HIV Status Card
         KenwellFormCard(
           title: 'Partner HIV Status & Risk Reasons',
           child: Column(
@@ -136,6 +143,7 @@ class HIVTestScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
+        // Navigation Buttons
         KenwellFormNavigation(
           onPrevious: onPrevious,
           onNext: () => viewModel.submitHIVTest(context, onNext: onNext),

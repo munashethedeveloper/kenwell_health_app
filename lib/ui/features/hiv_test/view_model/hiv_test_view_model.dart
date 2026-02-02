@@ -4,14 +4,18 @@ import 'package:kenwell_health_app/data/repositories_dcl/firestore_hiv_screening
 import 'package:kenwell_health_app/domain/models/hiv_screening.dart';
 import 'package:uuid/uuid.dart';
 
+// ViewModel for managing HIV Test form state and submission
 class HIVTestViewModel extends ChangeNotifier {
+  // Form key for validation
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final FirestoreHivScreeningRepository _repository =
       FirestoreHivScreeningRepository();
 
+  // Member and Event IDs
   String? _memberId;
   String? _eventId;
 
+  // Set memberId and eventId
   void setMemberAndEventId(String memberId, String eventId) {
     _memberId = memberId;
     _eventId = eventId;
@@ -31,8 +35,6 @@ class HIVTestViewModel extends ChangeNotifier {
   TextEditingController noCondomReasonController = TextEditingController();
 
   String? knowPartnerStatus; // Yes/No
-  // List<String> riskReasons = [];
-  // TextEditingController otherRiskReasonController = TextEditingController();
 
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
@@ -87,19 +89,12 @@ class HIVTestViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  //void toggleRiskReason(String reason) {
-  //if (riskReasons.contains(reason)) {
-  //riskReasons.remove(reason);
-  //} else {
-  //riskReasons.add(reason);
-  // }
-  //notifyListeners();
-  // }
-
+  // Check if form is valid
   bool get isFormValid {
     return formKey.currentState?.validate() == true;
   }
 
+  // Convert form data to map
   Map<String, dynamic> toMap() {
     return {
       'firstHIVTest': firstHIVTest,
@@ -113,11 +108,10 @@ class HIVTestViewModel extends ChangeNotifier {
       'noCondomUse': noCondomUse,
       'noCondomReason': noCondomReasonController.text,
       'knowPartnerStatus': knowPartnerStatus,
-      //'riskReasons': List<String>.from(riskReasons),
-      //'otherRiskReason': otherRiskReasonController.text,
     };
   }
 
+  // Submit HIV Test form
   Future<void> submitHIVTest(
     BuildContext context, {
     VoidCallback? onNext,
@@ -185,12 +179,12 @@ class HIVTestViewModel extends ChangeNotifier {
     }
   }
 
+  // Dispose controllers
   @override
   void dispose() {
     lastTestMonthController.dispose();
     lastTestYearController.dispose();
     noCondomReasonController.dispose();
-    //otherRiskReasonController.dispose();
     super.dispose();
   }
 }

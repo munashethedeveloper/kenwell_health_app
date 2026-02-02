@@ -3,12 +3,15 @@ import '../../../../domain/models/wellness_event.dart';
 import '../view_model/calendar_view_model.dart';
 import 'event_list_dialog.dart';
 
+/// Dialog to show events for a selected day with options to view or create events
 class DayEventsDialog extends StatelessWidget {
+  // The selected day to show events for
   final DateTime selectedDay;
   final List<WellnessEvent> events;
   final CalendarViewModel viewModel;
   final Function(DateTime, {WellnessEvent? existingEvent}) onOpenEventForm;
 
+  // Constructor
   const DayEventsDialog({
     super.key,
     required this.selectedDay,
@@ -17,22 +20,28 @@ class DayEventsDialog extends StatelessWidget {
     required this.onOpenEventForm,
   });
 
+  // Build method to create the dialog UI
   @override
   Widget build(BuildContext context) {
+    // Sort events by start time
     final dayEvents = [...events]..sort(viewModel.compareEvents);
 
+    // Return the AlertDialog widget
     return AlertDialog(
       title: Text(viewModel.formatDateMedium(selectedDay)),
       content: Column(
         mainAxisSize: MainAxisSize.min,
+        // Show message based on whether there are events or not
         children: [
           if (dayEvents.isEmpty) const Text('No events scheduled for this day'),
           if (dayEvents.isNotEmpty)
             Text('${dayEvents.length} event(s) scheduled'),
         ],
       ),
+      // Actions for viewing or creating events
       actions: [
         if (dayEvents.isNotEmpty)
+          // Button to view the list of events
           TextButton(
             onPressed: () {
               Navigator.pop(context);
@@ -49,6 +58,7 @@ class DayEventsDialog extends StatelessWidget {
             },
             child: const Text('View Events'),
           ),
+        // Button to create a new event
         FilledButton(
           onPressed: () {
             Navigator.pop(context);

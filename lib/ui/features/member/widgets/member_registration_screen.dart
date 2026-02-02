@@ -32,7 +32,7 @@ class MemberDetailsScreen extends StatelessWidget {
         builder: (context, vm, _) {
           return KenwellFormPage(
             title: 'Member Registration Form',
-            sectionTitle: 'Section B: Personal Details',
+            sectionTitle: 'Section A: Member Registration',
             formKey: vm.formKey,
             appBar: appBar,
             children: [

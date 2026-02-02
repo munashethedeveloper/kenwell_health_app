@@ -15,11 +15,13 @@ import '../view_model/consent_screen_view_model.dart';
 import '../../profile/view_model/profile_view_model.dart';
 import '../../wellness/view_model/wellness_flow_view_model.dart';
 
+// ConsentScreen displays the consent form for a wellness event
 class ConsentScreen extends StatelessWidget {
   final VoidCallback onNext;
   final WellnessEvent event;
   final PreferredSizeWidget? appBar;
 
+  // Constructor
   const ConsentScreen({
     super.key,
     required this.onNext,
@@ -27,6 +29,7 @@ class ConsentScreen extends StatelessWidget {
     this.appBar,
   });
 
+  // Build method
   @override
   Widget build(BuildContext context) {
     final vm = Provider.of<ConsentScreenViewModel>(context);
@@ -54,18 +57,22 @@ class ConsentScreen extends StatelessWidget {
     // Initialise the VM with event data
     //vm.initialise(event);
 
+    // Build form steps
     final steps = _buildFormSteps(vm);
 
+    // Return the form page
     return KenwellFormPage(
       title: 'Consent Form',
       sectionTitle: 'Section B: Informed Consent',
       formKey: vm.formKey,
       appBar: appBar,
       children: [
+        // Build each form step
         for (final step in steps) ...[
           step.builder(context),
           SizedBox(height: step.spacingAfter),
         ],
+        // Signature actions
         KenwellSignatureActions(
           controller: vm.signatureController,
           onClear: vm.clearSignature,
@@ -76,38 +83,50 @@ class ConsentScreen extends StatelessWidget {
     );
   }
 
+  // Build action buttons
   Widget _buildActionButtons(BuildContext context, ConsentScreenViewModel vm) {
     return KenwellFormNavigation(
       nextLabel: 'Submit',
       onNext: () async {
         if (!vm.hasAtLeastOneScreening) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Please select at least one screening option.',
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'Please select at least one screening option.',
+                ),
               ),
-            ),
-          );
+            );
+          }
           return;
         }
 
+        // Validate and submit the form
         if (vm.formKey.currentState!.validate() && vm.isFormValid) {
           await vm.submitConsent();
-          // Immediate update: mark consent as completed in the parent ViewModel
+          // FIX: Always use markConsentCompleted() to update and notify listeners
           try {
-            final wellnessFlowVm =
-                Provider.of<WellnessFlowViewModel>(context, listen: false);
-            wellnessFlowVm.markConsentCompleted();
-          } catch (e) {}
-          onNext();
+            if (context.mounted) {
+              final wellnessFlowVm =
+                  Provider.of<WellnessFlowViewModel>(context, listen: false);
+              wellnessFlowVm.markConsentCompleted();
+            }
+          } catch (e) {
+            // Optionally log error
+          }
+          if (context.mounted) {
+            onNext();
+          }
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Please complete all fields and sign before proceeding.',
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'Please complete all fields and sign before proceeding.',
+                ),
               ),
-            ),
-          );
+            );
+          }
         }
       },
       isNextBusy: vm.isSubmitting,
@@ -115,6 +134,7 @@ class ConsentScreen extends StatelessWidget {
     );
   }
 
+  // Build form steps
   List<KenwellFormStep> _buildFormSteps(ConsentScreenViewModel vm) {
     return [
       KenwellFormStep(
@@ -123,6 +143,7 @@ class ConsentScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Event details fields
               KenwellTextField(
                 label: 'Venue',
                 controller: vm.venueController,
@@ -132,6 +153,7 @@ class ConsentScreen extends StatelessWidget {
                     (val == null || val.isEmpty) ? 'Please enter Venue' : null,
               ),
               const SizedBox(height: 16),
+              // Date field
               KenwellDateField(
                 label: 'Date',
                 controller: vm.dateController,
@@ -139,6 +161,7 @@ class ConsentScreen extends StatelessWidget {
                 readOnly: true, // <-- make read-only
               ),
               const SizedBox(height: 16),
+              // Healthcare practitioner field
               KenwellTextField(
                 label: 'Name of Healthcare Practitioner',
                 enabled: false,
@@ -152,6 +175,7 @@ class ConsentScreen extends StatelessWidget {
           ),
         ),
       ),
+      // Information and screening options
       KenwellFormStep(
         builder: (_) => const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -165,10 +189,12 @@ class ConsentScreen extends StatelessWidget {
               ),
             ),
             SizedBox(height: 12),
+            // Bullet list of information
             KenwellBulletList(items: _informationBullets),
           ],
         ),
       ),
+      // Screening options
       KenwellFormStep(
         builder: (_) => KenwellCheckboxListCard(
           title: 'Please select applicable screenings',
@@ -178,6 +204,7 @@ class ConsentScreen extends StatelessWidget {
     ];
   }
 
+  // Information bullets
   static const List<String> _informationBullets = [
     'HIV, glucose, cholesterol, blood pressure, BMI, TB, stress / psychological screenings, and a lifestyle assessment, amongst others, will take place'
         'The process of these screening tests was explained to me',
@@ -194,6 +221,7 @@ class ConsentScreen extends StatelessWidget {
     'I understand and agree that I may receive a follow up regarding my medical condition.',
   ];
 
+  // Screening options
   List<KenwellCheckboxOption> _screeningOptions(ConsentScreenViewModel vm) {
     final screenings = [
       {'label': 'HIV', 'value': vm.hiv, 'field': 'hiv'},

@@ -26,7 +26,7 @@ class SurveyScreen extends StatelessWidget {
 
     return KenwellFormPage(
       title: 'Survey Form',
-      sectionTitle: 'Section K: Survey',
+      sectionTitle: 'Section D: Survey',
       appBar: appBar,
       children: [
         const Center(

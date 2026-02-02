@@ -9,7 +9,9 @@ import 'package:kenwell_health_app/utils/logger.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 
+// ViewModel for Consent Screen
 class ConsentScreenViewModel extends ChangeNotifier {
+  // Firestore repository
   final FirestoreConsentRepository _consentRepository =
       FirestoreConsentRepository();
 
@@ -32,9 +34,11 @@ class ConsentScreenViewModel extends ChangeNotifier {
   bool tb = false;
   //bool hiv = false;
 
+  // Submission state
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
 
+  // Stored event and IDs
   WellnessEvent? event;
   String? _memberId;
   String? _eventId;
@@ -43,6 +47,7 @@ class ConsentScreenViewModel extends ChangeNotifier {
   String? userFirstName;
   String? userLastName;
 
+  // Validate form
   bool get isFormValid =>
       //(hra || vct || tb || hiv) && // At least one checkbox must be selected
       (hra || hiv || tb) && // At least one checkbox must be selected
@@ -78,12 +83,14 @@ class ConsentScreenViewModel extends ChangeNotifier {
   }) {
     if (event != null) return; // prevent double init
 
+    // Store event and IDs
     event = e;
     userFirstName = firstName;
     userLastName = lastName;
     _memberId = memberId;
     _eventId = eventId ?? e.id;
 
+    // Pre-fill venue and date
     WidgetsBinding.instance.addPostFrameCallback((_) {
       venueController.text = e.venue;
       dateController.text = DateFormat('yyyy-MM-dd').format(e.date);
@@ -92,10 +99,12 @@ class ConsentScreenViewModel extends ChangeNotifier {
       practitionerController.text =
           '${userFirstName ?? ''} ${userLastName ?? ''}'.trim();
 
+      // Notify listeners
       notifyListeners();
     });
   }
 
+  // Toggle checkbox values
   void toggleCheckbox(String field, bool? value) {
     switch (field) {
       case 'hra':
@@ -117,12 +126,15 @@ class ConsentScreenViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Clear signature
   void clearSignature() {
     signatureController.clear();
     notifyListeners();
   }
 
+  // Submit consent form
   Future<void> submitConsent() async {
+    debugPrint('Saving consent for memberId=$_memberId, eventId=$_eventId');
     _isSubmitting = true;
     notifyListeners();
 
@@ -188,6 +200,7 @@ class ConsentScreenViewModel extends ChangeNotifier {
         'createdAt': consent.createdAt.toIso8601String(),
       };
 
+      // Save to Firestore
       await FirebaseFirestore.instance
           .collection('survey_results')
           .doc(consent.id)
@@ -198,6 +211,7 @@ class ConsentScreenViewModel extends ChangeNotifier {
     }
   }
 
+  // Convert current form state to Map (for debugging or other uses)
   Map<String, dynamic> toMap() => {
         'venue': venueController.text,
         'date': dateController.text,
@@ -210,6 +224,7 @@ class ConsentScreenViewModel extends ChangeNotifier {
         'hasSignature': signatureController.isNotEmpty,
       };
 
+  // Dispose controllers
   @override
   void dispose() {
     signatureController.dispose();

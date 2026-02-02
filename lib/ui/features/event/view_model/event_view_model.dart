@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../data/repositories_dcl/event_repository.dart';
 import '../../../../domain/enums/service_type.dart';
 import '../../../../domain/enums/additional_service_type.dart';
 
+/// ViewModel for managing wellness events
 class EventViewModel extends ChangeNotifier {
+  /// Constructor
   EventViewModel({EventRepository? repository})
       : _repository = repository ?? EventRepository() {
     _initializationFuture = _loadPersistedEvents();
   }
 
+  // Repository
   final EventRepository _repository;
+  // Initialization Future
   late final Future<void> _initializationFuture;
 
   // Controllers
@@ -84,6 +87,7 @@ class EventViewModel extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
+  // State Management Helpers
   void _setLoading(bool loading) {
     _isLoading = loading;
     notifyListeners();
@@ -126,24 +130,29 @@ class EventViewModel extends ChangeNotifier {
   final Set<ServiceType> _selectedServices = {};
   final Set<AdditionalServiceType> _selectedAdditionalServices = {};
 
+  // Getters for available options
   List<String> get availableServiceOptions =>
       ServiceTypeExtension.allDisplayNames;
   List<String> get availableAdditionalServiceOptions =>
       AdditionalServiceTypeExtension.allDisplayNames;
 
+  // Getters for selected services
   Set<String> get selectedServices =>
       _selectedServices.map((e) => e.displayName).toSet();
   Set<String> get selectedAdditionalServices =>
       _selectedAdditionalServices.map((e) => e.displayName).toSet();
 
+  // Check if service is selected
   bool isServiceSelected(String service) {
     return _selectedServices.any((s) => s.displayName == service);
   }
 
+  // Check if additional service is selected
   bool isAdditionalServiceSelected(String service) {
     return _selectedAdditionalServices.any((s) => s.displayName == service);
   }
 
+  // Toggle service selection
   void toggleServiceSelection(String service, bool shouldSelect) {
     final serviceType = ServiceTypeExtension.fromString(service);
     if (serviceType == null) return;
@@ -156,6 +165,7 @@ class EventViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Toggle additional service selection
   void toggleAdditionalServiceSelection(String service, bool shouldSelect) {
     final serviceType = AdditionalServiceTypeExtension.fromString(service);
     if (serviceType == null) return;
@@ -168,6 +178,7 @@ class EventViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Getters for storage strings
   String get servicesRequested =>
       ServiceTypeConverter.toStorageString(_selectedServices);
   String get additionalServicesRequested =>
@@ -218,11 +229,13 @@ class EventViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Update province
   void updateProvince(String value) {
     province = value;
     notifyListeners();
   }
 
+  // Pick time using TimePicker
   Future<void> pickTime(
       BuildContext context, TextEditingController controller) async {
     final picked = await showTimePicker(
@@ -271,6 +284,7 @@ class EventViewModel extends ChangeNotifier {
     );
   }
 
+  // Increment screened count
   Future<void> incrementScreened(String eventId) async {
     try {
       final idx = _events.indexWhere((e) => e.id == eventId);
@@ -295,6 +309,7 @@ class EventViewModel extends ChangeNotifier {
     }
   }
 
+  /// Adds a new event to the list and persists it
   Future<void> addEvent(WellnessEvent event) async {
     _setLoading(true);
     _setError(null);
@@ -376,6 +391,7 @@ class EventViewModel extends ChangeNotifier {
     await _repository.upsertEvent(event);
   }
 
+  /// Retrieves events for a specific date
   List<WellnessEvent> getEventsForDate(DateTime date) {
     return _events
         .where((e) =>
@@ -385,6 +401,7 @@ class EventViewModel extends ChangeNotifier {
         .toList();
   }
 
+  /// Retrieves upcoming events from a specific date
   List<WellnessEvent> getUpcomingEvents({DateTime? from}) {
     // Show all events that are not completed
     // The conduct_event_screen will filter by week range
@@ -396,6 +413,7 @@ class EventViewModel extends ChangeNotifier {
     return eventsCopy;
   }
 
+  /// Marks an event as in-progress
   Future<WellnessEvent?> markEventInProgress(String eventId) async {
     final index = _events.indexWhere((e) => e.id == eventId);
     if (index == -1) return null;
@@ -408,6 +426,7 @@ class EventViewModel extends ChangeNotifier {
     return updated;
   }
 
+  /// Marks an event as completed
   Future<WellnessEvent?> markEventCompleted(String eventId) async {
     final index = _events.indexWhere((e) => e.id == eventId);
     if (index == -1) return null;
@@ -420,6 +439,7 @@ class EventViewModel extends ChangeNotifier {
     return updated;
   }
 
+  // Clear all controllers
   void clearControllers() {
     titleController.clear();
     venueController.clear();
@@ -444,6 +464,7 @@ class EventViewModel extends ChangeNotifier {
     _resetAdditionalServiceSelections();
   }
 
+  // Dispose controllers
   @override
   void dispose() {
     titleController.dispose();
@@ -468,25 +489,30 @@ class EventViewModel extends ChangeNotifier {
     super.dispose();
   }
 
+  // Helper to set services from storage string
   void _setServicesFromString(String raw) {
     _selectedServices.clear();
     _selectedServices.addAll(ServiceTypeConverter.fromStorageString(raw));
   }
 
+  // Helper to set additional services from storage string
   void _setAdditionalServicesFromString(String raw) {
     _selectedAdditionalServices.clear();
     _selectedAdditionalServices
         .addAll(AdditionalServiceTypeConverter.fromStorageString(raw));
   }
 
+  // Reset selections
   void _resetServiceSelections() {
     _selectedServices.clear();
   }
 
+  // Reset additional selections
   void _resetAdditionalServiceSelections() {
     _selectedAdditionalServices.clear();
   }
 
+  /// Load persisted events from repository
   Future<void> _loadPersistedEvents() async {
     _setLoading(true);
     _setError(null);
@@ -519,6 +545,7 @@ class EventViewModel extends ChangeNotifier {
     }
   }
 
+  // Comparator for sorting events by start time
   int _compareEventsByStartTime(WellnessEvent a, WellnessEvent b) {
     final aStart = a.startDateTime ?? a.date;
     final bStart = b.startDateTime ?? b.date;

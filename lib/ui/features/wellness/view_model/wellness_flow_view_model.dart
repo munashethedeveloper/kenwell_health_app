@@ -19,6 +19,11 @@ import '../../../../data/repositories_dcl/firestore_hiv_screening_repository.dar
 import '../../../../data/repositories_dcl/firestore_tb_screening_repository.dart';
 
 class WellnessFlowViewModel extends ChangeNotifier {
+  // Consent flags for screenings
+  bool hraEnabled = false;
+  bool hivEnabled = false;
+  bool tbEnabled = false;
+
   /// Loads all completion flags (consent, HRA, HIV, TB, survey) for the given member and event from Firestore
   Future<void> loadAllCompletionFlags(String? memberId, String? eventId) async {
     if (memberId == null || eventId == null) return;
@@ -35,6 +40,8 @@ class WellnessFlowViewModel extends ChangeNotifier {
     try {
       final consentRepo = FirestoreConsentRepository();
       final consents = await consentRepo.getConsentsByMember(memberId);
+      debugPrint(
+          'Loaded consents for $memberId: ${consents.map((c) => c.eventId).toList()}');
       final hasConsent = consents.any((consent) => consent.eventId == eventId);
       if (hasConsent) {
         consentCompleted = true;
@@ -47,6 +54,8 @@ class WellnessFlowViewModel extends ChangeNotifier {
     try {
       final hraRepo = FirestoreHraRepository();
       final hraList = await hraRepo.getHraScreeningsByMember(memberId);
+      debugPrint(
+          'Loaded HRA for $memberId: ${hraList.map((h) => h.eventId).toList()}');
       final hasHra = hraList.any((hra) => hra.eventId == eventId);
       if (hasHra) {
         hraCompleted = true;
@@ -59,6 +68,8 @@ class WellnessFlowViewModel extends ChangeNotifier {
     try {
       final hivRepo = FirestoreHivScreeningRepository();
       final hivList = await hivRepo.getHivScreeningsByMember(memberId);
+      debugPrint(
+          'Loaded HIV for $memberId: ${hivList.map((h) => h.eventId).toList()}');
       final hasHiv = hivList.any((hiv) => hiv.eventId == eventId);
       if (hasHiv) {
         hivCompleted = true;
@@ -71,6 +82,8 @@ class WellnessFlowViewModel extends ChangeNotifier {
     try {
       final tbRepo = FirestoreTbScreeningRepository();
       final tbList = await tbRepo.getTbScreeningsByMember(memberId);
+      debugPrint(
+          'Loaded TB for $memberId: ${tbList.map((t) => t.eventId).toList()}');
       final hasTb = tbList.any((tb) => tb.eventId == eventId);
       if (hasTb) {
         tbCompleted = true;

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 
+import '../../../shared/ui/form/kenwell_section_header.dart';
+
 class HealthScreeningsScreen extends StatelessWidget {
   final bool hraEnabled;
   final bool hivEnabled;
@@ -43,6 +45,11 @@ class HealthScreeningsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            const KenwellSectionHeader(
+              title: 'Section C: Health Screenings',
+              subtitle: 'Complete the health screenings you have consented to.',
+            ),
+            const SizedBox(height: 12),
             Text(
               'Select a screening to continue',
               style: theme.textTheme.titleMedium?.copyWith(
@@ -51,41 +58,41 @@ class HealthScreeningsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // HRA Card
-            _ScreeningCard(
-              icon: Icons.psychology,
-              title: 'Health Risk Assessment',
-              subtitle: 'Evaluate your health risks',
-              isEnabled: hraEnabled,
-              isCompleted: hraCompleted,
-              onTap: hraEnabled ? onHraTap : null,
-            ),
+            if (hraEnabled) ...[
+              _ScreeningCard(
+                icon: Icons.psychology,
+                title: 'Health Risk Assessment',
+                subtitle: 'Evaluate your health risks',
+                isEnabled: hraEnabled,
+                isCompleted: hraCompleted,
+                onTap: onHraTap,
+              ),
+              const SizedBox(height: 12),
+            ],
 
-            const SizedBox(height: 12),
+            if (hivEnabled) ...[
+              _ScreeningCard(
+                icon: Icons.vaccines,
+                title: 'HIV Screening',
+                subtitle: 'HIV testing and counseling',
+                isEnabled: hivEnabled,
+                isCompleted: hivCompleted,
+                onTap: onHivTap,
+              ),
+              const SizedBox(height: 12),
+            ],
 
-            // HIV Card
-            _ScreeningCard(
-              icon: Icons.vaccines,
-              title: 'HIV Screening',
-              subtitle: 'HIV testing and counseling',
-              isEnabled: hivEnabled,
-              isCompleted: hivCompleted,
-              onTap: hivEnabled ? onHivTap : null,
-            ),
-
-            const SizedBox(height: 12),
-
-            // TB Card
-            _ScreeningCard(
-              icon: Icons.healing,
-              title: 'TB Screening',
-              subtitle: 'Tuberculosis testing',
-              isEnabled: tbEnabled,
-              isCompleted: tbCompleted,
-              onTap: tbEnabled ? onTbTap : null,
-            ),
-
-            const SizedBox(height: 24),
+            if (tbEnabled) ...[
+              _ScreeningCard(
+                icon: Icons.healing,
+                title: 'TB Screening',
+                subtitle: 'Tuberculosis testing',
+                isEnabled: tbEnabled,
+                isCompleted: tbCompleted,
+                onTap: onTbTap,
+              ),
+              const SizedBox(height: 24),
+            ],
 
             // Submit All Button
             if (onSubmitAll != null &&

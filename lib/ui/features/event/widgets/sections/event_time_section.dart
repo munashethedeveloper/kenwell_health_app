@@ -10,20 +10,24 @@ class EventTimeSection extends StatelessWidget {
   final EventViewModel viewModel;
   final String? Function(String?, String?) requiredField;
 
+  // Constructor
   const EventTimeSection({
     super.key,
     required this.viewModel,
     required this.requiredField,
   });
 
+  // Build method
   @override
   Widget build(BuildContext context) {
+    // Return a form card with time detail fields
     return KenwellFormCard(
       title: 'Time Details',
       margin: const EdgeInsets.only(bottom: 16),
       child: Column(
         children: [
           KenwellTextField(
+            // Setup Time
             label: 'Setup Time',
             controller: viewModel.setUpTimeController,
             padding: EdgeInsets.zero,
@@ -37,6 +41,7 @@ class EventTimeSection extends StatelessWidget {
                 viewModel.pickTime(context, viewModel.setUpTimeController),
           ),
           KenwellFormStyles.fieldSpacing,
+          // Start Time
           KenwellTextField(
             label: 'Start Time',
             controller: viewModel.startTimeController,
@@ -51,6 +56,7 @@ class EventTimeSection extends StatelessWidget {
                 viewModel.pickTime(context, viewModel.startTimeController),
           ),
           KenwellFormStyles.fieldSpacing,
+          // End Time
           KenwellTextField(
             label: 'End Time',
             controller: viewModel.endTimeController,
@@ -65,6 +71,7 @@ class EventTimeSection extends StatelessWidget {
                 viewModel.pickTime(context, viewModel.endTimeController),
           ),
           KenwellFormStyles.fieldSpacing,
+          // Strike Down Time
           KenwellTextField(
             label: 'Strike Down Time',
             controller: viewModel.strikeDownTimeController,

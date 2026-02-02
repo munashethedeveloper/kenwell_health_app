@@ -13,23 +13,32 @@ import '../view_model/calendar_view_model.dart';
 import 'day_events_dialog.dart';
 import 'event_card.dart';
 
+/// The main calendar screen displaying events in calendar and list views.
 class CalendarScreen extends StatelessWidget {
+  // Constructor
   const CalendarScreen({super.key});
 
+  // Build method to create the widget tree
   @override
   Widget build(BuildContext context) {
+    // Return the body of the calendar screen
     return const _CalendarScreenBody();
   }
 }
 
+// The stateful body of the calendar screen
 class _CalendarScreenBody extends StatefulWidget {
+  // Constructor
   const _CalendarScreenBody();
 
+  // Create state for the widget
   @override
   State<_CalendarScreenBody> createState() => _CalendarScreenBodyState();
 }
 
+// State class for the calendar screen body
 class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
+  // Initialize state
   @override
   void initState() {
     super.initState();
@@ -39,14 +48,18 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
     });
   }
 
+  // Build method to create the widget tree
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    // Use Consumer to listen to CalendarViewModel changes
     return Consumer<CalendarViewModel>(
       builder: (context, viewModel, _) {
+        // Main scaffold with tab controller
         return DefaultTabController(
           length: 2,
           child: Scaffold(
+            // App bar with title and actions
             appBar: KenwellAppBar(
               title: 'Wellness Planner',
               automaticallyImplyLeading: false,
@@ -56,6 +69,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                 fontWeight: FontWeight.bold,
               ),
               actions: [
+                // Refresh events button
                 IconButton(
                   onPressed: () {
                     if (mounted) {
@@ -71,6 +85,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                   icon: const Icon(Icons.refresh, color: Color(0xFF201C58)),
                   tooltip: 'Refresh events',
                 ),
+                // Help button
                 TextButton.icon(
                   onPressed: () {
                     if (mounted) {
@@ -85,6 +100,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                   ),
                 ),
               ],
+              // Tab bar for switching views
               bottom: TabBar(
                 indicatorSize: TabBarIndicatorSize.label,
                 indicator: UnderlineTabIndicator(
@@ -105,6 +121,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                   fontWeight: FontWeight.normal,
                   fontSize: 14,
                 ),
+                // Tabs for calendar and list views
                 tabs: const [
                   Tab(
                       icon: Icon(Icons.calendar_today),
@@ -113,6 +130,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                 ],
               ),
             ),
+            // Body with loading indicator, error banner, and tab views
             body: viewModel.isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : Column(
@@ -125,6 +143,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                           color: Colors.orange.shade100,
                           child: Row(
                             children: [
+                              // Warning icon and error message
                               Icon(Icons.warning,
                                   color: Colors.orange.shade900),
                               const SizedBox(width: 8),
@@ -135,10 +154,12 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                                       TextStyle(color: Colors.orange.shade900),
                                 ),
                               ),
+                              // Retry button
                               TextButton(
                                 onPressed: () => viewModel.loadEvents(),
                                 child: const Text('Retry'),
                               ),
+                              // Dismiss button
                               IconButton(
                                 icon: const Icon(Icons.close),
                                 onPressed: () => viewModel.clearError(),
@@ -151,6 +172,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                       // Always show the calendar and events list
                       Expanded(
                         child: TabBarView(
+                          // Two tabs: Calendar view and Events list view
                           children: [
                             _buildCalendarTab(viewModel),
                             _buildEventsListTab(viewModel),
@@ -159,6 +181,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                       ),
                     ],
                   ),
+            // Floating action button to add new events
             floatingActionButton: FloatingActionButton.extended(
               backgroundColor: const Color(0xFF90C048),
               icon: const Icon(Icons.add, color: Colors.white),
@@ -176,6 +199,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
     );
   }
 
+  // Build the calendar tab view
   Widget _buildCalendarTab(CalendarViewModel viewModel) {
     return SingleChildScrollView(
       child: Column(
@@ -183,8 +207,10 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
           const SizedBox(height: 16),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
+            // Calendar widget inside a form card
             child: KenwellFormCard(
               child: TableCalendar(
+                // Calendar configuration
                 firstDay: DateTime.utc(2020, 1, 1),
                 lastDay: DateTime.utc(3000, 12, 31),
                 focusedDay: viewModel.focusedDay,
@@ -193,6 +219,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                 eventLoader: (day) => viewModel.getEventsForDay(day),
                 calendarFormat: CalendarFormat.month,
                 startingDayOfWeek: StartingDayOfWeek.monday,
+                // Calendar styles
                 headerStyle: const HeaderStyle(
                   formatButtonVisible: false,
                   titleCentered: true,
@@ -202,6 +229,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                     color: Color(0xFF201C58),
                   ),
                 ),
+                // Days of week styles
                 daysOfWeekStyle: const DaysOfWeekStyle(
                   weekdayStyle: TextStyle(fontWeight: FontWeight.bold),
                   weekendStyle: TextStyle(
@@ -209,8 +237,11 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                     color: Colors.red,
                   ),
                 ),
+                // Calendar day styles
                 calendarStyle: CalendarStyle(
+                  // Styles for weekdays and weekends
                   weekendTextStyle: const TextStyle(color: Colors.red),
+                  // Styles for today, selected day, and event markers
                   todayDecoration: BoxDecoration(
                     color: Colors.deepPurple.withValues(alpha: 0.3),
                     shape: BoxShape.circle,
@@ -224,9 +255,11 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                     shape: BoxShape.circle,
                   ),
                 ),
+                // Handle day selection and page changes
                 onDaySelected: (selectedDay, focusedDay) async {
                   viewModel.setSelectedDay(selectedDay);
                   viewModel.setFocusedDay(focusedDay);
+                  // Show dialog with events for the selected day
                   final eventsForDay = viewModel.getEventsForDay(selectedDay);
                   showDialog(
                     context: context,
@@ -234,12 +267,14 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                       selectedDay: selectedDay,
                       events: eventsForDay,
                       viewModel: viewModel,
+                      // Callback to open the event form
                       onOpenEventForm: (date, {WellnessEvent? existingEvent}) =>
                           _openEventForm(context, viewModel, date,
                               existingEvent: existingEvent),
                     ),
                   );
                 },
+                // Handle month navigation
                 onPageChanged: (focusedDay) {
                   viewModel.setFocusedDay(focusedDay);
                 },
@@ -252,7 +287,9 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
     );
   }
 
+  // Build the events list tab view
   Widget _buildEventsListTab(CalendarViewModel viewModel) {
+    // Get events for the focused month
     final eventsThisMonth = viewModel.getEventsForMonth(viewModel.focusedDay);
 
     return Column(
@@ -263,10 +300,12 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // Previous month button
               IconButton(
                 icon: const Icon(Icons.chevron_left),
                 onPressed: () => viewModel.goToPreviousMonth(),
               ),
+              // Month and year title
               Text(
                 viewModel.getMonthYearTitle(),
                 style: const TextStyle(
@@ -275,6 +314,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                   color: Color(0xFF201C58),
                 ),
               ),
+              // Next month button
               IconButton(
                 icon: const Icon(Icons.chevron_right),
                 onPressed: () => viewModel.goToNextMonth(),
@@ -291,12 +331,14 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        // No events illustration and message
                         Icon(
                           Icons.event_busy,
                           size: 100,
                           color: Colors.grey.shade400,
                         ),
                         const SizedBox(height: 16),
+                        // Informative message
                         Text(
                           'No events this month',
                           style: TextStyle(
@@ -306,6 +348,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                           ),
                         ),
                         const SizedBox(height: 8),
+                        // Suggestion to create events
                         Text(
                           'Create an event to get started',
                           style: TextStyle(
@@ -314,6 +357,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                           ),
                         ),
                         const SizedBox(height: 24),
+                        // Button to create a new event
                         CustomPrimaryButton(
                           label: 'Create Event',
                           onPressed: () => _openEventForm(
@@ -324,6 +368,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                     ),
                   ),
                 )
+              // List of events for the month
               : Builder(
                   builder: (_) {
                     // Sort events
@@ -350,10 +395,12 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // Day header
                             KenwellSectionHeader(
                               title: viewModel.formatDateLong(day),
                             ),
                             const SizedBox(height: 8),
+                            // Event cards for the day
                             ...dayEvents
                                 .map((event) => EventCard(
                                     event: event, viewModel: viewModel))
@@ -370,6 +417,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
     );
   }
 
+  // Open the event form for adding or editing events
   Future<void> _openEventForm(
       BuildContext context, CalendarViewModel viewModel, DateTime date,
       {WellnessEvent? existingEvent}) async {
@@ -377,10 +425,13 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
     final eventViewModel = context.read<EventViewModel>();
     await eventViewModel.initialized;
 
+    // Navigate to the EventScreen
     if (!context.mounted) return;
 
+    // Push EventScreen and wait for it to close
     await Navigator.push(
       context,
+      // Navigate to EventScreen
       MaterialPageRoute(
         builder: (_) => EventScreen(
           date: date,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
-
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/colours/kenwell_colours.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
@@ -16,11 +15,13 @@ import '../../../shared/ui/navigation/form_navigation.dart';
 import '../../../shared/models/nursing_referral_option.dart';
 import '../view_model/hiv_test_result_view_model.dart';
 
+// HIVTestResultScreen displays the HIV test results form
 class HIVTestResultScreen extends StatelessWidget {
   final VoidCallback onNext;
   final VoidCallback onPrevious;
   final PreferredSizeWidget? appBar;
 
+  // Constructor
   const HIVTestResultScreen({
     super.key,
     required this.onNext,
@@ -28,11 +29,14 @@ class HIVTestResultScreen extends StatelessWidget {
     this.appBar,
   });
 
+  // Build method
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<HIVTestResultViewModel>();
 
+    // Build the scaffold
     return Scaffold(
+      // App bar
       appBar: appBar ??
           const KenwellAppBar(
             title: 'HIV Test Results Form',
@@ -41,15 +45,20 @@ class HIVTestResultScreen extends StatelessWidget {
           ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
+        // Form
         child: Form(
           key: viewModel.formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              //  Section Header
               const KenwellSectionHeader(
-                title: 'Section G: HIV Test Results',
+                title: 'Section C: HIV Test Results',
                 uppercase: true,
               ),
+              // Spacing
+              const SizedBox(height: 16),
+              // Screening Test Card
               KenwellFormCard(
                 title: 'Screening Test',
                 child: Column(
@@ -87,16 +96,16 @@ class HIVTestResultScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
+              // Confirmatory Test Card
               _buildInitialAssessment(viewModel),
               const SizedBox(height: 24),
+              // Confirmatory Test Card
               _buildReferrals(viewModel),
               const SizedBox(height: 24),
-              // if (viewModel.windowPeriod == 'Yes') ...[
-              //  _buildFollowUpSection(viewModel),
-              //   const SizedBox(height: 24),
-              //  ],
+              // Nurse Details Card
               _buildNurseDetails(viewModel),
               const SizedBox(height: 24),
+              // Signature Actions
               KenwellSignatureActions(
                 title: 'Signature',
                 controller: viewModel.signatureController,
@@ -127,6 +136,7 @@ class HIVTestResultScreen extends StatelessWidget {
     );
   }
 
+  // Build a text field
   Widget _buildTextField({
     required String label,
     required TextEditingController controller,
@@ -151,6 +161,7 @@ class HIVTestResultScreen extends StatelessWidget {
     );
   }
 
+  // Build a dropdown field
   Widget _buildDropdown(String label, List<String> items, String value,
       void Function(String) onChanged) {
     return KenwellDropdownField<String>(
@@ -169,6 +180,7 @@ class HIVTestResultScreen extends StatelessWidget {
     );
   }
 
+  // Build Initial Assessment section
   Widget _buildInitialAssessment(HIVTestResultViewModel viewModel) {
     return KenwellFormCard(
       title: 'Initial Assessment',
@@ -218,6 +230,7 @@ class HIVTestResultScreen extends StatelessWidget {
     );
   }
 
+  // Build Referrals section
   Widget _buildReferrals(HIVTestResultViewModel viewModel) {
     return KenwellReferralCard<NursingReferralOption>(
       title: 'Nursing Referrals',
@@ -245,49 +258,7 @@ class HIVTestResultScreen extends StatelessWidget {
     );
   }
 
-  // Widget _buildFollowUpSection(HIVTestResultViewModel viewModel) {
-  // return KenwellFormCard(
-  //   title: 'Follow-up',
-  //   child: Column(
-  //    children: [
-  //      KenwellDropdownField<String>(
-  //       label: 'Follow-up location',
-  //        value: viewModel.followUpLocation,
-  //        items: viewModel.followUpLocationOptions,
-  //        onChanged: viewModel.setFollowUpLocation,
-  //        decoration: KenwellFormStyles.decoration(
-  //          label: 'Follow-up location',
-  //          hint: 'Select follow-up location',
-  //        ),
-  //        validator: (val) => (val == null || val.isEmpty)
-  //            ? 'Please select Follow-up location'
-  //            : null,
-  //      ),
-  //      if (viewModel.followUpLocation == 'Other')
-  //        KenwellTextField(
-  //          label: 'Other location detail',
-  //          hintText: 'Specify other location',
-  //          controller: viewModel.followUpOtherController,
-  //          decoration: KenwellFormStyles.decoration(
-  //           label: 'Other location detail',
-  //           hint: 'Specify other location',
-  //          ),
-  //         validator: (val) => (val == null || val.isEmpty)
-  //             ? 'Please enter Other location detail'
-  //              : null,
-  //       ),
-  //   KenwellDateField(
-  //    label: 'Follow-up test date',
-  //    controller: viewModel.followUpDateController,
-  //     validator: (val) => (val == null || val.isEmpty)
-  //         ? 'Please select Follow-up test date'
-  //         : null,
-  //      ),
-  //    ],
-  //   ),
-  // );
-//  }
-
+  // Build Nurse Details section
   Widget _buildNurseDetails(HIVTestResultViewModel viewModel) {
     return KenwellFormCard(
       title: 'Nurse Details',

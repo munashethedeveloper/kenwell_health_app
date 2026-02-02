@@ -15,6 +15,7 @@ class YesNoCountWidget extends StatelessWidget {
   final int minCount;
   final int maxCount;
 
+  // Constructor
   const YesNoCountWidget({
     super.key,
     required this.label,
@@ -28,10 +29,12 @@ class YesNoCountWidget extends StatelessWidget {
     this.maxCount = 20,
   });
 
+  // Build method
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
+        // Yes/No Dropdown
         KenwellDropdownField<String>(
           label: label,
           value: selectedOption,

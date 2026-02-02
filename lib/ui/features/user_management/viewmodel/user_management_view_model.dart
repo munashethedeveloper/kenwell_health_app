@@ -6,6 +6,15 @@ import '../../../../domain/models/user_model.dart';
 enum UserManagementNavigationTarget { loginScreen }
 
 class UserManagementViewModel extends ChangeNotifier {
+  // Email verification helpers
+  Future<void> sendEmailVerification() async {
+    await _authService.sendEmailVerification();
+  }
+
+  Future<bool> isEmailVerified() async {
+    return await _authService.isEmailVerified();
+  }
+
   final FirebaseAuthService _authService;
 
   bool _isLoading = false;
@@ -156,7 +165,7 @@ class UserManagementViewModel extends ChangeNotifier {
       );
 
       if (user != null) {
-        _setSuccess('User registered successfully!');
+        _setSuccess('User registered successfully! Verification email sent.');
         // Reload users list to include new user
         await loadUsers();
         return true;

@@ -1,9 +1,11 @@
+import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:intl/intl.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/containers/gradient_container.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
+import '../../../shared/ui/form/kenwell_section_header.dart';
 
 class EventStatsDetailScreen extends StatelessWidget {
   final WellnessEvent event;
@@ -23,14 +25,26 @@ class EventStatsDetailScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: KenwellAppBar(
-        title: 'Event Statistics',
-        backgroundColor: theme.primaryColor,
+        title: 'Event Statistics: ${event.title}',
+        titleColor: Colors.white,
+        titleStyle: const TextStyle(
+          color: Colors.white,
+          //fontWeight: FontWeight.bold,
+        ),
+        backgroundColor: const Color(0xFF201C58),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            const KenwellSectionHeader(
+              title: 'Event Details',
+              subtitle: 'Detailed information about the wellness event',
+              uppercase: true,
+            ),
+            const SizedBox(height: 24),
+
             // Event Title Card
             GradientContainer.purpleGreen(
               padding: const EdgeInsets.all(16),
@@ -303,6 +317,97 @@ class EventStatsDetailScreen extends StatelessWidget {
     );
   }
 
+  /* Future<File?> _exportEventAsExcel(BuildContext context) async {
+    final excel = Excel.Excel.createExcel(); // create a new excel document
+    final sheet = excel['Event Details'];
+
+    // Helper to convert any value to String
+    String cv(dynamic value) => value?.toString() ?? '';
+
+    // Append header row
+    sheet.appendRow([cv('Field'), cv('Value')]);
+
+    final event = this.event; // assuming this is in your class
+
+    // Prepare data list
+    final List<List<dynamic>> details = [
+      ['Title', event.title],
+      ['Date', DateFormat('yyyy-MM-dd').format(event.date)],
+      ['Venue', event.venue],
+      ['Address', event.address],
+      ['Town/City', event.townCity],
+      ['Province', event.province],
+      [
+        'Onsite Contact Name',
+        '${event.onsiteContactFirstName} ${event.onsiteContactLastName}'
+      ],
+      ['Onsite Contact Number', event.onsiteContactNumber],
+      ['Onsite Contact Email', event.onsiteContactEmail],
+      [
+        'AE Contact Name',
+        '${event.aeContactFirstName} ${event.aeContactLastName}'
+      ],
+      ['AE Contact Number', event.aeContactNumber],
+      ['AE Contact Email', event.aeContactEmail],
+      [
+        'Services Requested',
+        event.servicesRequested is List
+            ? (event.servicesRequested as List).join(', ')
+            : event.servicesRequested.toString()
+      ],
+      [
+        'Additional Services',
+        event.additionalServicesRequested is List
+            ? (event.additionalServicesRequested as List).join(', ')
+            : event.additionalServicesRequested.toString()
+      ],
+      ['Expected Participation', event.expectedParticipation.toString()],
+      ['Nurses', event.nurses.toString()],
+      ['Coordinators', event.coordinators.toString()],
+      ['Set Up Time', event.setUpTime.toString()],
+      ['Start Time', event.startTime.toString()],
+      ['End Time', event.endTime.toString()],
+      ['Strike Down Time', event.strikeDownTime.toString()],
+      ['Medical Aid', event.medicalAid == true ? 'Yes' : 'No'],
+      ['Mobile Booths', event.mobileBooths == true ? 'Yes' : 'No'],
+      ['Description', event.description ?? ''],
+      ['Status', event.status],
+      [
+        'Actual Start Time',
+        event.actualStartTime != null
+            ? DateFormat('yyyy-MM-dd HH:mm').format(event.actualStartTime!)
+            : ''
+      ],
+      [
+        'Actual End Time',
+        event.actualEndTime != null
+            ? DateFormat('yyyy-MM-dd HH:mm').format(event.actualEndTime!)
+            : ''
+      ],
+      ['Screened Count', event.screenedCount.toString()],
+    ];
+
+    // Append data rows
+    for (final row in details) {
+      sheet.appendRow([
+        cv(row[0]),
+        cv(row[1]),
+      ]);
+    }
+
+    // Encode to bytes
+    final fileBytes = excel.encode();
+    if (fileBytes == null) return null;
+
+    // Save to file
+    final directory = await getApplicationDocumentsDirectory();
+    final path = '${directory.path}/event_${event.id}.xlsx';
+    final file = File(path);
+    await file.writeAsBytes(fileBytes, flush: true);
+
+    return file;
+  } */
+
   void _showExportSheet(BuildContext context) {
     final theme = Theme.of(context);
     showModalBottomSheet(
@@ -330,6 +435,42 @@ class EventStatsDetailScreen extends StatelessWidget {
                   );
                 },
               ),
+              /*     ListTile(
+                leading: const Icon(Icons.grid_on, color: Colors.green),
+                title: Text('Export as Excel Spreadsheet',
+                    style: theme.textTheme.bodyMedium),
+                subtitle:
+                    const Text('Export event data as an Excel (.xlsx) file'),
+                onTap: () async {
+                  Navigator.of(ctx).pop();
+                  try {
+                    final file = await _exportEventAsExcel(context);
+                    if (file != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Excel file saved: ${file.path}'),
+                          action: SnackBarAction(
+                            label: 'Open',
+                            onPressed: () {
+                              // Optionally implement file opening
+                            },
+                          ),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Failed to export Excel file.'),
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error exporting Excel: $e')),
+                    );
+                  }
+                },
+              ), */
               ListTile(
                 leading: const Icon(Icons.picture_as_pdf, color: Colors.red),
                 title: Text('Export as PDF', style: theme.textTheme.bodyMedium),

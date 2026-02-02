@@ -4,6 +4,43 @@ import '../../domain/models/user_model.dart';
 import 'package:flutter/foundation.dart';
 
 class FirebaseAuthService {
+  /// Real-time stream of all users (admin function)
+  Stream<List<UserModel>> getAllUsersStream() {
+    return _firestore.collection('users').snapshots().map((querySnapshot) =>
+        querySnapshot.docs
+            .map((doc) => UserModel.fromMap(doc.data()))
+            .toList());
+  }
+
+  /// Update the emailVerified field in Firestore for the current user
+  Future<void> syncCurrentUserEmailVerified() async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      await user.reload();
+      await _firestore.collection('users').doc(user.uid).update({
+        'emailVerified': user.emailVerified,
+      });
+    }
+  }
+
+  /// Send email verification to current user
+  Future<void> sendEmailVerification() async {
+    final user = _auth.currentUser;
+    if (user != null && !user.emailVerified) {
+      await user.sendEmailVerification();
+    }
+  }
+
+  /// Check if current user's email is verified
+  Future<bool> isEmailVerified() async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      await user.reload();
+      return user.emailVerified;
+    }
+    return false;
+  }
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -22,16 +59,17 @@ class FirebaseAuthService {
 
       // Fetch additional user data from Firestore
       final doc = await _firestore.collection('users').doc(user.uid).get();
+      bool emailVerified = user.emailVerified;
       if (!doc.exists) {
         debugPrint('FirebaseAuth: User document not found for ${user.uid}');
         return UserModel(
           id: user.uid,
           email: user.email ?? '',
           role: '',
-          // username: '',
           firstName: '',
           lastName: '',
           phoneNumber: '',
+          emailVerified: emailVerified,
         );
       }
 
@@ -53,6 +91,7 @@ class FirebaseAuthService {
     //required String username,
     required String firstName,
     required String lastName,
+    emailVerified = false,
     required String phoneNumber,
   }) async {
     try {
@@ -71,6 +110,9 @@ class FirebaseAuthService {
 
       debugPrint('FirebaseAuth: User created with UID: ${user.uid}');
 
+      // Send email verification
+      await user.sendEmailVerification();
+
       // Create UserModel
       final userModel = UserModel(
         id: user.uid,
@@ -80,6 +122,7 @@ class FirebaseAuthService {
         firstName: firstName,
         lastName: lastName,
         phoneNumber: phoneNumber,
+        emailVerified: emailVerified,
       );
 
       debugPrint(
@@ -132,6 +175,7 @@ class FirebaseAuthService {
         firstName: '',
         lastName: '',
         phoneNumber: '',
+        emailVerified: user.emailVerified,
       );
     }
     debugPrint('FirebaseAuth: Current user data: ${doc.data()}');
@@ -177,6 +221,7 @@ class FirebaseAuthService {
         firstName: firstName,
         lastName: lastName,
         phoneNumber: phoneNumber,
+        emailVerified: user.emailVerified,
       );
 
       // Update Firestore document

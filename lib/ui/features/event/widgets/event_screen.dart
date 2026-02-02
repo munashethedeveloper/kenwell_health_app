@@ -17,12 +17,15 @@ import 'sections/services_selection_section.dart';
 import 'sections/medical_aid_section.dart';
 import 'sections/participation_section.dart';
 
+// EventScreen allows adding or editing a wellness event
 class EventScreen extends StatefulWidget {
+  // ViewModel for managing event data
   final EventViewModel viewModel;
   final DateTime date;
   final WellnessEvent? existingEvent;
   final Future<void> Function(WellnessEvent) onSave;
 
+  // Constructor
   const EventScreen({
     super.key,
     required this.viewModel,
@@ -31,20 +34,24 @@ class EventScreen extends StatefulWidget {
     required this.onSave,
   });
 
+  // Create state
   @override
   State<EventScreen> createState() => _EventScreenState();
 }
 
+// State class for EventScreen
 class _EventScreenState extends State<EventScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _didLoadExistingEvent = false;
   String _wantsAdditionalServices = 'No'; // 'Yes' or 'No'
 
+  // Initialize state
   @override
   void initState() {
     super.initState();
     final WellnessEvent? eventToEdit = widget.existingEvent;
 
+    // Load existing event data into the ViewModel if editing
     if (eventToEdit != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
@@ -81,6 +88,7 @@ class _EventScreenState extends State<EventScreen> {
       return;
     }
 
+    // Show confirmation dialog
     final confirmed = await ConfirmationDialog.show(
       context,
       title: 'Discard Changes?',
@@ -97,6 +105,7 @@ class _EventScreenState extends State<EventScreen> {
     }
   }
 
+  // Validate form and save event
   Future<void> _validateAndSave() async {
     final invalidFields =
         EventFormValidator.validateEventForm(widget.viewModel);
@@ -120,6 +129,7 @@ class _EventScreenState extends State<EventScreen> {
     WellnessEvent eventToSave;
     final isEditMode = widget.existingEvent != null;
 
+    // Build event object to save
     if (isEditMode) {
       eventToSave = widget.viewModel
           .buildEvent(eventDate)
@@ -128,6 +138,7 @@ class _EventScreenState extends State<EventScreen> {
       eventToSave = widget.viewModel.buildEvent(eventDate);
     }
 
+    // Save event using the provided onSave callback
     try {
       debugPrint('EventScreen: Saving event "${eventToSave.title}"');
       await widget.onSave(eventToSave);
@@ -136,6 +147,7 @@ class _EventScreenState extends State<EventScreen> {
       debugPrint('EventScreen: ERROR saving event: $e');
       debugPrintStack(stackTrace: stackTrace);
 
+      // Show error SnackBar at the top
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -149,6 +161,7 @@ class _EventScreenState extends State<EventScreen> {
       return;
     }
 
+    // Clear controllers and show success message
     if (!mounted) return;
     widget.viewModel.clearControllers();
 
@@ -164,20 +177,24 @@ class _EventScreenState extends State<EventScreen> {
       ),
     );
 
+    // Close the screen
     Navigator.pop(context);
   }
 
+  // Build method
   @override
   Widget build(BuildContext context) {
     final WellnessEvent? eventToEdit = widget.existingEvent;
     final bool isEditMode = eventToEdit != null;
 
+    // Build the Scaffold
     return Scaffold(
       appBar: KenwellAppBar(
         title: isEditMode ? 'Edit Event' : 'Add Event',
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
+        // Form for event details
         child: Form(
           key: _formKey,
           child: Column(
@@ -186,39 +203,47 @@ class _EventScreenState extends State<EventScreen> {
               const SizedBox(height: 16),
               const AppLogo(size: 200),
               const SizedBox(height: 16),
+              // Section header
               KenwellSectionHeader(
                 title: isEditMode ? 'Edit Event' : 'Add New Event',
                 subtitle:
                     'Complete the event details or update the event information',
               ),
+              // Event Basic Info Section
               EventBasicInfoSection(
                 viewModel: widget.viewModel,
                 date: widget.date,
                 requiredField: _requiredField,
               ),
+              // Contact Person Sections
               ContactPersonSection(
                 viewModel: widget.viewModel,
                 title: 'Onsite Contact Person',
                 isOnsite: true,
                 requiredField: _requiredField,
               ),
+              // AE Contact Person Section
               ContactPersonSection(
                 viewModel: widget.viewModel,
                 title: 'AE Contact Person',
                 isOnsite: false,
                 requiredField: _requiredField,
               ),
+              // Medical Aid Section
               MedicalAidSection(
                 viewModel: widget.viewModel,
                 requiredSelection: _requiredSelection,
               ),
+              // Participation Section
               ParticipationSection(
                 viewModel: widget.viewModel,
               ),
+              // Event Options Section
               EventOptionsSection(
                 viewModel: widget.viewModel,
                 requiredSelection: _requiredSelection,
               ),
+              // Services Selection Section
               ServicesSelectionSection(
                 viewModel: widget.viewModel,
                 isAdditionalServices: false,
@@ -238,8 +263,9 @@ class _EventScreenState extends State<EventScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
+                    // Dropdown for additional services selection
                     DropdownButtonFormField<String>(
-                      value: _wantsAdditionalServices,
+                      initialValue: _wantsAdditionalServices,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -297,15 +323,18 @@ class _EventScreenState extends State<EventScreen> {
                   ],
                 ),
               ),
+              // Healthcare Professionals Section
               HealthcareProfessionalsSection(
                 viewModel: widget.viewModel,
                 requiredSelection: _requiredSelection,
               ),
+              // Event Time Section
               EventTimeSection(
                 viewModel: widget.viewModel,
                 requiredField: _requiredField,
               ),
               const SizedBox(height: 20),
+              // Form action buttons
               FormActionButtons(
                 onCancel: _handleCancel,
                 onSave: _validateAndSave,
@@ -320,11 +349,13 @@ class _EventScreenState extends State<EventScreen> {
   }
 }
 
+// Validation helper for required fields
 String? _requiredField(String? label, String? value) =>
     (value == null || value.isEmpty)
         ? 'Please Enter ${label ?? "Field"}'
         : null;
 
+// Validation helper for required selections
 String? _requiredSelection(String? label, String? value) =>
     (value == null || value.isEmpty)
         ? 'Please Select ${label ?? "Field"}'

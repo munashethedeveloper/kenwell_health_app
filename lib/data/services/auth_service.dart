@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:kenwell_health_app/data/local/app_database.dart';
 import 'package:kenwell_health_app/domain/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
+import 'firebase_auth_service.dart';
 
 class AuthService {
   AuthService({
@@ -11,7 +13,6 @@ class AuthService {
         _prefsFuture = preferences ?? SharedPreferences.getInstance();
 
   static const _currentUserPrefsKey = 'current_user_id';
-  static const _uuid = Uuid();
 
   final AppDatabase _database;
   final Future<SharedPreferences> _prefsFuture;
@@ -21,7 +22,6 @@ class AuthService {
     required String password,
     required String role,
     required String phoneNumber,
-    //required String username,
     required String firstName,
     required String lastName,
   }) async {
@@ -29,26 +29,31 @@ class AuthService {
     final sanitizedPassword = password.trim();
     final sanitizedRole = role.trim();
     final sanitizedPhone = phoneNumber.trim();
-    //final sanitizedUsername = username.trim();
     final sanitizedFirstName = firstName.trim();
     final sanitizedLastName = lastName.trim();
 
-    final existingUser = await _database.getUserByEmail(sanitizedEmail);
-    if (existingUser != null) {
-      return null;
-    }
+    // Register with FirebaseAuth
+    final firebaseAuthService = FirebaseAuthService();
+    final firebaseUser = await firebaseAuthService.register(
+      email: sanitizedEmail,
+      password: sanitizedPassword,
+      role: sanitizedRole,
+      firstName: sanitizedFirstName,
+      lastName: sanitizedLastName,
+      phoneNumber: sanitizedPhone,
+    );
+    if (firebaseUser == null) return null;
 
+    // Store user in local DB with Firebase UID
     final newUser = await _database.createUser(
-      id: _uuid.v4(),
+      id: firebaseUser.id, // Firebase UID
       email: sanitizedEmail,
       password: sanitizedPassword,
       role: sanitizedRole,
       phoneNumber: sanitizedPhone,
-      //username: sanitizedUsername,
       firstName: sanitizedFirstName,
       lastName: sanitizedLastName,
     );
-
     return _mapToUserModel(newUser);
   }
 
@@ -56,9 +61,23 @@ class AuthService {
     final sanitizedEmail = email.trim().toLowerCase();
     final sanitizedPassword = password.trim();
 
-    final user =
-        await _database.getUserByCredentials(sanitizedEmail, sanitizedPassword);
-    if (user == null) return null;
+    // Login with FirebaseAuth
+    final firebaseAuthService = FirebaseAuthService();
+    final firebaseUser =
+        await firebaseAuthService.login(sanitizedEmail, sanitizedPassword);
+    if (firebaseUser == null) return null;
+
+    // Fetch user from local DB by Firebase UID, or create if not found
+    var user = await _database.getUserById(firebaseUser.id);
+    user ??= await _database.createUser(
+      id: firebaseUser.id,
+      email: firebaseUser.email,
+      password: sanitizedPassword,
+      role: firebaseUser.role,
+      phoneNumber: firebaseUser.phoneNumber,
+      firstName: firebaseUser.firstName,
+      lastName: firebaseUser.lastName,
+    );
 
     final prefs = await _prefsFuture;
     await prefs.setString(_currentUserPrefsKey, user.id);
@@ -67,8 +86,32 @@ class AuthService {
   }
 
   Future<UserModel?> getCurrentUser() async {
-    final entity = await _getCurrentUserEntity();
-    return entity != null ? _mapToUserModel(entity) : null;
+    // Always get the current FirebaseAuth user
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+    if (firebaseUser == null) {
+      return null;
+    }
+    // Try to fetch user data from Firestore
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(firebaseUser.uid)
+        .get();
+    if (!doc.exists) {
+      // If not found, return minimal user info with UID
+      return UserModel(
+        id: firebaseUser.uid,
+        email: firebaseUser.email ?? '',
+        role: '',
+        phoneNumber: '',
+        firstName: '',
+        lastName: '',
+        emailVerified: firebaseUser.emailVerified,
+      );
+    }
+    final data = doc.data()!;
+    // Ensure the id is always the FirebaseAuth UID
+    data['id'] = firebaseUser.uid;
+    return UserModel.fromMap(data);
   }
 
   Future<String?> getStoredPassword() async {
@@ -139,9 +182,10 @@ class AuthService {
   }
 
   Future<bool> forgotPassword(String email) async {
-    final sanitizedEmail = email.trim().toLowerCase();
-    final user = await _database.getUserByEmail(sanitizedEmail);
-    return user != null;
+    // Use FirebaseAuthService to send password reset email
+    // Import if not already: import 'firebase_auth_service.dart';
+    final firebaseAuthService = FirebaseAuthService();
+    return await firebaseAuthService.sendPasswordResetEmail(email);
   }
 
   Future<List<UserModel>> getAllUsers() async {
@@ -184,9 +228,9 @@ class AuthService {
       email: entity.email,
       role: entity.role,
       phoneNumber: entity.phoneNumber,
-      // username: entity.username,
       firstName: entity.firstName,
       lastName: entity.lastName,
+      emailVerified: false,
     );
   }
 

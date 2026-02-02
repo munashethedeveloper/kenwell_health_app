@@ -5,10 +5,12 @@ import 'package:kenwell_health_app/data/repositories_dcl/firestore_hra_repositor
 import 'package:kenwell_health_app/utils/logger.dart';
 import 'package:kenwell_health_app/domain/constants/enums.dart';
 
+// ViewModel for Personal Risk Assessment
 class PersonalRiskAssessmentViewModel extends ChangeNotifier {
   final FirestoreHraRepository _hraRepository = FirestoreHraRepository();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>(); // Add this
 
+  // Private fields to store memberId and eventId
   String? _memberId;
   String? _eventId;
 
@@ -81,6 +83,7 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Section 2: Exercise frequency (radio)
   void setExerciseFrequency(String value) {
     if (exerciseFrequency == value) return;
     exerciseFrequency = value;
@@ -117,22 +120,24 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
     }
   }
 
-  //NEW
-  // New fields to store personal details
+  // Fields to store personal details
   String? gender; // 'Male' or 'Female'
   int? age;
 
+  // Set personal details
   void setPersonalDetails({required String gender, required int age}) {
     this.gender = gender;
     this.age = age;
     notifyListeners();
   }
 
+  // Set memberId and eventId
   void setMemberAndEventId(String? memberId, String? eventId) {
     _memberId = memberId;
     _eventId = eventId;
   }
 
+  // Gender checks
   bool get isFemale => gender == 'Female';
   bool get isMale => gender == 'Male';
 
@@ -141,6 +146,7 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
   bool get showMammogramQuestion => isFemale && (age ?? 0) >= 40;
   bool get showProstateCheckQuestion => isMale && (age ?? 0) >= 40;
 
+  // --- Dropdown setters ---
   void setDrinkingStatus(String? value) {
     if (drinkingStatus != value) {
       drinkingStatus = value;
@@ -177,6 +183,7 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
   bool? prostateCheck;
   bool? prostateTested;
 
+  // --- Dropdown setters ---
   void setProstateCheck(bool? value) {
     if (prostateCheck == value) return;
     prostateCheck = value;
@@ -189,6 +196,7 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Submission state
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
 
@@ -197,6 +205,7 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
   bool get showDrinkingFields => drinkingStatus == 'Yes';
   bool get showExerciseFields => exerciseStatus == 'Yes';
 
+  // Form validation
   bool get isFormValid {
     // Check form field validation
     if (formKey.currentState?.validate() != true) return false;
@@ -229,11 +238,13 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
     return true;
   }
 
+  // Toggle chronic condition
   void toggleCondition(String condition, bool? value) {
     chronicConditions[condition] = value ?? false;
     notifyListeners();
   }
 
+  // Convert to map for submission
   Map<String, dynamic> toMap() {
     return {
       'chronicConditions': chronicConditions,
@@ -259,10 +270,12 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
     };
   }
 
+  // Submit results
   Future<void> submitResults(
     BuildContext context, {
     required VoidCallback onNext,
   }) async {
+    debugPrint('Saving HRA for memberId=$_memberId, eventId=$_eventId');
     if (!isFormValid || !formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please complete all required fields.')),
@@ -317,27 +330,16 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
       // Save to Firestore
       await _hraRepository.addHraScreening(hraScreening);
       AppLogger.info('HRA screening saved successfully');
-
-      if (!context.mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Screening Results Saved!')),
-      );
-
       onNext();
     } catch (e) {
       AppLogger.error('Failed to save HRA screening', e);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving results: $e')),
-        );
-      }
     } finally {
       _isSubmitting = false;
       notifyListeners();
     }
   }
 
+  // Dispose controllers
   @override
   void dispose() {
     otherConditionController.dispose();

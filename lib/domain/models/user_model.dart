@@ -6,6 +6,7 @@ class UserModel {
   //final String username;
   final String firstName;
   final String lastName;
+  final bool emailVerified;
 
   UserModel({
     required this.id,
@@ -15,6 +16,7 @@ class UserModel {
     //required this.username,
     required this.firstName,
     required this.lastName,
+    required this.emailVerified,
   });
 
   factory UserModel.fromMap(Map<String, dynamic> data) {
@@ -26,6 +28,11 @@ class UserModel {
       //username: data['username'] ?? '',
       firstName: data['firstName'] ?? '',
       lastName: data['lastName'] ?? '',
+      emailVerified: (data['emailVerified'] is bool)
+          ? data['emailVerified']
+          : (data['emailVerified'] == null
+              ? false
+              : data['emailVerified'].toString() == 'true'),
     );
   }
 
@@ -37,5 +44,6 @@ class UserModel {
         //  'username': username,
         'firstName': firstName,
         'lastName': lastName,
+        'emailVerified': emailVerified,
       };
 }

@@ -12,6 +12,7 @@ class EventBasicInfoSection extends StatelessWidget {
   final DateTime date;
   final String? Function(String?, String?) requiredField;
 
+  // Constructor
   const EventBasicInfoSection({
     super.key,
     required this.viewModel,
@@ -19,10 +20,12 @@ class EventBasicInfoSection extends StatelessWidget {
     required this.requiredField,
   });
 
+  // Build method
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
+        // Event Date (read-only)
         KenwellDateField(
           label: 'Event Date',
           controller: viewModel.dateController,
@@ -31,11 +34,13 @@ class EventBasicInfoSection extends StatelessWidget {
           enabled: false,
         ),
         const SizedBox(height: 24),
+        // Client Organization
         KenwellFormCard(
           title: 'Client Organization',
           margin: const EdgeInsets.only(bottom: 16),
           child: Column(
             children: [
+              // Organization Name
               KenwellTextField(
                 label: 'Event Title',
                 controller: viewModel.titleController,
@@ -45,11 +50,13 @@ class EventBasicInfoSection extends StatelessWidget {
             ],
           ),
         ),
+        // Event Location
         KenwellFormCard(
           title: 'Event Location',
           margin: const EdgeInsets.only(bottom: 16),
           child: Column(
             children: [
+              // Venue
               KenwellTextField(
                 label: 'Venue',
                 controller: viewModel.venueController,
@@ -57,6 +64,7 @@ class EventBasicInfoSection extends StatelessWidget {
                 validator: (value) => requiredField('Venue', value),
               ),
               const SizedBox(height: 24),
+              // Address
               KenwellTextField(
                 label: 'Address',
                 controller: viewModel.addressController,
@@ -65,12 +73,14 @@ class EventBasicInfoSection extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               KenwellTextField(
+                // Town/City
                 label: 'Town/City',
                 controller: viewModel.townCityController,
                 padding: EdgeInsets.zero,
                 validator: (value) => requiredField('Town/City', value),
               ),
               const SizedBox(height: 24),
+              //  Province
               KenwellDropdownField<String>(
                 label: 'Province',
                 value: viewModel.province,

@@ -3,12 +3,14 @@ import '../../view_model/event_view_model.dart';
 import '../../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../../shared/ui/form/kenwell_checkbox_group.dart';
 
+// Section for selecting services
 class ServicesSelectionSection extends StatefulWidget {
   final EventViewModel viewModel;
   final bool
       isAdditionalServices; // true for additional, false for main services
   final bool isRequired; // Whether this section is required
 
+  // Constructor
   const ServicesSelectionSection({
     super.key,
     required this.viewModel,
@@ -16,14 +18,17 @@ class ServicesSelectionSection extends StatefulWidget {
     this.isRequired = true,
   });
 
+  // Create state
   @override
   State<ServicesSelectionSection> createState() =>
       _ServicesSelectionSectionState();
 }
 
+// State class
 class _ServicesSelectionSectionState extends State<ServicesSelectionSection> {
   @override
   Widget build(BuildContext context) {
+    // Determine title and options based on whether it's additional services
     final title = widget.isAdditionalServices
         ? 'Additional Services Requested'
         : 'Requested Services';
@@ -36,6 +41,7 @@ class _ServicesSelectionSectionState extends State<ServicesSelectionSection> {
         ? widget.viewModel.selectedAdditionalServices
         : widget.viewModel.selectedServices;
 
+    // Build the form card
     return KenwellFormCard(
       title: title,
       margin: const EdgeInsets.only(bottom: 16),
@@ -52,6 +58,7 @@ class _ServicesSelectionSectionState extends State<ServicesSelectionSection> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Checkbox group for selecting services
               KenwellCheckboxGroup(
                 options: options
                     .map(

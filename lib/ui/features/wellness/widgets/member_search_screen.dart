@@ -10,7 +10,8 @@ import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_form_card.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 
 import '../../../../routing/route_names.dart';
-import '../../event/widgets/my_event_screen.dart';
+import '../../../shared/ui/form/kenwell_section_header.dart';
+// ...existing code...
 
 class MemberSearchScreen extends StatefulWidget {
   final Function(String searchQuery) onGoToMemberDetails;
@@ -134,12 +135,6 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
     widget.onGoToMemberDetails(_idController.text.trim());
   }
 
-  void _handlePrevious() {
-    if (widget.onPrevious != null) {
-      widget.onPrevious!();
-    }
-  }
-
   void _proceedWithFoundMember() {
     if (_foundMember != null && widget.onMemberFound != null) {
       widget.onMemberFound!(_foundMember!);
@@ -151,7 +146,7 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
     final theme = Theme.of(context);
 
     return PopScope(
-      onPopInvoked: (didPop) {
+      onPopInvokedWithResult: (didPop, result) {
         debugPrint('Back pressed. didPop=\u{24}didPop');
         debugPrint('canPop=\u{24}{Navigator.of(context).canPop()}');
         if (!didPop) {
@@ -163,10 +158,6 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: true,
-          title: const Text('Member Search'),
-        ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -175,6 +166,11 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
               const SizedBox(height: 16),
               const AppLogo(size: 200),
               const SizedBox(height: 24),
+              const KenwellSectionHeader(
+                title: 'Search Member',
+                subtitle:
+                    'Find an existing member by their ID or Passport number',
+              ),
 
               // Search section with background
               Container(

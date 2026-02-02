@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/features/help/widgets/help_screen.dart';
 import 'package:kenwell_health_app/ui/features/user_management/widgets/user_management_screen_version_two.dart';
 import 'package:provider/provider.dart';
-
 import '../domain/models/wellness_event.dart';
 
 // Navigation & Auth
 import '../ui/shared/ui/navigation/main_navigation_screen.dart';
 import '../ui/features/auth/widgets/forgot_password_screen.dart';
 import '../ui/features/auth/widgets/login_screen.dart';
-import '../ui/features/auth/widgets/register_screen.dart';
 
 // Calendar & Events
 import '../ui/features/calendar/widgets/calendar_screen.dart';
@@ -62,12 +60,6 @@ class AppRouter {
         );
       case RouteNames.login:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
-
-      //case RouteNames.signup:
-      //return MaterialPageRoute(builder: (_) => const SignUpScreen());
-
-      case RouteNames.register:
-        return MaterialPageRoute(builder: (_) => const RegisterScreen());
 
       case RouteNames.forgotPassword:
         return MaterialPageRoute(builder: (_) => const ForgotPasswordScreen());

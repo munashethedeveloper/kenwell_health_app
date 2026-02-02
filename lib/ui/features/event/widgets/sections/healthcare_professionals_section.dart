@@ -4,25 +4,30 @@ import '../../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../../shared/ui/form/kenwell_form_styles.dart';
 import 'healthcare_professional_option_widget.dart';
 
+// Healthcare professionals needed section
 class HealthcareProfessionalsSection extends StatefulWidget {
   final EventViewModel viewModel;
   final String? Function(String?, String?) requiredSelection;
 
+  // Constructor
   const HealthcareProfessionalsSection({
     super.key,
     required this.viewModel,
     required this.requiredSelection,
   });
 
+  // Create state
   @override
   State<HealthcareProfessionalsSection> createState() =>
       _HealthcareProfessionalsSectionState();
 }
 
+// State class for HealthcareProfessionalsSection
 class _HealthcareProfessionalsSectionState
     extends State<HealthcareProfessionalsSection> {
   @override
   Widget build(BuildContext context) {
+    // Build the healthcare professionals section card
     return KenwellFormCard(
       title: 'Healthcare Professionals Needed',
       margin: const EdgeInsets.only(bottom: 16),
@@ -158,5 +163,6 @@ class _HealthcareProfessionalsSectionState
     );
   }
 
+  // Helper to convert empty string to null
   String? _nullableValue(String value) => value.isEmpty ? null : value;
 }

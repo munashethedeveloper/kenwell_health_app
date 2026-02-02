@@ -102,6 +102,7 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
                       onTap: () =>
                           Navigator.pushNamed(context, RouteNames.help),
                     ),
+                    //only visible to admin users
                     if (vm.role.toLowerCase() == 'admin')
                       _ProfileMenuItem(
                         icon: Icons.admin_panel_settings,

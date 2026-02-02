@@ -3,20 +3,24 @@ import '../../view_model/event_view_model.dart';
 import '../../../../shared/ui/form/kenwell_form_card.dart';
 import 'yes_no_count_widget.dart';
 
+/// Event options form section
 class EventOptionsSection extends StatefulWidget {
   final EventViewModel viewModel;
   final String? Function(String?, String?) requiredSelection;
 
+  // Constructor
   const EventOptionsSection({
     super.key,
     required this.viewModel,
     required this.requiredSelection,
   });
 
+  // Create state
   @override
   State<EventOptionsSection> createState() => _EventOptionsSectionState();
 }
 
+// State class for EventOptionsSection
 class _EventOptionsSectionState extends State<EventOptionsSection> {
   @override
   Widget build(BuildContext context) {
@@ -71,5 +75,6 @@ class _EventOptionsSectionState extends State<EventOptionsSection> {
     );
   }
 
+  // Helper to convert empty string to null
   String? _nullableValue(String value) => value.isEmpty ? null : value;
 }
