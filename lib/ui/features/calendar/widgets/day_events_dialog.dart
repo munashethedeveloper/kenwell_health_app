@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../../domain/models/wellness_event.dart';
+import '../../profile/view_model/profile_view_model.dart';
 import '../view_model/calendar_view_model.dart';
 import 'event_list_dialog.dart';
+import 'package:provider/provider.dart';
 
 /// Dialog to show events for a selected day with options to view or create events
 class DayEventsDialog extends StatelessWidget {
@@ -31,6 +33,7 @@ class DayEventsDialog extends StatelessWidget {
   // Build method to create the dialog UI
   @override
   Widget build(BuildContext context) {
+    final userRole = context.watch<ProfileViewModel>().role;
     // Sort events by start time
     final dayEvents = [...events]..sort(viewModel.compareEvents);
 
@@ -67,7 +70,7 @@ class DayEventsDialog extends StatelessWidget {
             child: const Text('View Events'),
           ),
         // Only show Create Event button for privileged roles
-        if (_canAddEvent(viewModel.role))
+        if (_canAddEvent(userRole))
           FilledButton(
             onPressed: () {
               Navigator.pop(context);

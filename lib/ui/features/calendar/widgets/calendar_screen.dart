@@ -5,6 +5,7 @@ import '../../../../domain/models/wellness_event.dart';
 import '../../../../routing/route_names.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../event/widgets/event_screen.dart';
+import '../../profile/view_model/profile_view_model.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/buttons/custom_primary_button.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
@@ -60,6 +61,8 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final profileViewModel = context.watch<ProfileViewModel>();
+    final userRole = profileViewModel.role;
     // Use Consumer to listen to CalendarViewModel changes
     return Consumer<CalendarViewModel>(
       builder: (context, viewModel, _) {
@@ -191,7 +194,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                   ),
 
             // Floating action button to add new events
-            floatingActionButton: _canAddEvent(viewModel.role)
+            floatingActionButton: _canAddEvent(userRole)
                 ? FloatingActionButton.extended(
                     backgroundColor: const Color(0xFF90C048),
                     icon: const Icon(Icons.add, color: Colors.white),
@@ -360,7 +363,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                         ),
                         const SizedBox(height: 8),
                         // Suggestion to create events
-                        if (_canAddEvent(viewModel.role))
+                        if (_canAddEvent(userRole))
                           Text(
                             'Create an event to get started',
                             style: TextStyle(
@@ -370,7 +373,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                           ),
                         const SizedBox(height: 24),
                         // Button to create a new event
-                        if (_canAddEvent(viewModel.role))
+                        if (_canAddEvent(userRole))
                           CustomPrimaryButton(
                             label: 'Create Event',
                             onPressed: () => _openEventForm(
