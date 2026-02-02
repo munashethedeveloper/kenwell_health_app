@@ -170,11 +170,29 @@ class UserManagementViewModel extends ChangeNotifier {
         await loadUsers();
         return true;
       } else {
-        _setError('Registration failed. Email may already exist.');
+        _setError(
+          'Registration failed. This email address may already be in use.\n\n'
+          'If you recently deleted a user with this email, the Firebase '
+          'Authentication account may still exist. Please delete it from:\n'
+          'Firebase Console > Authentication > Users'
+        );
         return false;
       }
     } catch (e) {
-      _setError('Registration failed. Please try again.');
+      final errorMessage = e.toString().toLowerCase();
+      if (errorMessage.contains('email-already-in-use') || 
+          errorMessage.contains('already exists')) {
+        _setError(
+          'This email address is already registered.\n\n'
+          'If you recently deleted this user, the Firebase Authentication '
+          'account may still exist. To reuse this email:\n'
+          '1. Go to Firebase Console > Authentication > Users\n'
+          '2. Find and delete the user with this email\n'
+          '3. Try registration again'
+        );
+      } else {
+        _setError('Registration failed. Please try again.\n\nError: $e');
+      }
       debugPrint('Registration error: $e');
       return false;
     }
@@ -188,7 +206,15 @@ class UserManagementViewModel extends ChangeNotifier {
       final success = await _authService.deleteUser(userId);
 
       if (success) {
-        _setSuccess('User $userName deleted successfully');
+        _setSuccess(
+          'User $userName deleted successfully!\n\n'
+          'The system attempted to delete both database records and '
+          'the authentication account.\n\n'
+          'If Cloud Functions are deployed, the email can be immediately reused. '
+          'Check the console logs to confirm complete deletion.\n\n'
+          'If using Firestore-only deletion (no Cloud Functions), you may need to '
+          'manually delete the Auth account from Firebase Console to reuse the email.'
+        );
         // Reload users list
         await loadUsers();
         return true;

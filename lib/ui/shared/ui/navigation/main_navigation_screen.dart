@@ -19,7 +19,7 @@ class MainNavigationScreen extends StatefulWidget {
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _lastTabCount = 0;
-  int _currentIndex = 2;
+  int _currentIndex = 0;
 
   @override
   void initState() {
@@ -31,12 +31,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     final theme = Theme.of(context);
     final isDesktop = ResponsiveBreakpoints.isDesktop(context);
     final profileVM = context.watch<ProfileViewModel>();
-    final String role = profileVM.role.toUpperCase();
+    final String role = (profileVM.role.isEmpty ? 'NURSE' : profileVM.role).toUpperCase();
 
     bool isPrivilegedRole(String role) {
       return role == 'ADMIN' ||
           role == 'TOP MANAGEMENT' ||
-          role == 'PROJECT MANAGER';
+          role == 'PROJECT MANAGER' ||
+          role == 'COORDINATOR';
     }
 
     // Define tabs and destinations based on role
@@ -190,13 +191,29 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     // Adjust _currentIndex if needed (fixes out-of-range errors on role change)
     if (_lastTabCount != tabs.length) {
       if (_currentIndex >= tabs.length) {
-        setState(() {
-          _currentIndex = tabs.length - 1;
+        // Schedule setState for next frame to avoid calling setState during build
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            setState(() {
+              _currentIndex = 0;
+            });
+          }
         });
       }
       _lastTabCount = tabs.length;
     }
-    int currentIndex = _currentIndex;
+    
+    // Validate that all lists have the same length (they should always match)
+    assert(tabs.length == railDestinations.length,
+        'Tabs and rail destinations must have the same length: tabs=${tabs.length}, rail=${railDestinations.length}');
+    assert(tabs.length == navDestinations.length,
+        'Tabs and nav destinations must have the same length: tabs=${tabs.length}, nav=${navDestinations.length}');
+    assert(tabs.isNotEmpty, 'Tabs list cannot be empty for role: $role');
+    
+    // Ensure currentIndex is always within valid bounds before passing to any navigation widget
+    // This is needed in addition to the setState above because setState happens on next frame,
+    // but we need immediate protection for the current frame's render
+    int currentIndex = _currentIndex.clamp(0, tabs.length - 1);
 
     // For desktop/tablet, use NavigationRail + content side-by-side
     if (isDesktop) {

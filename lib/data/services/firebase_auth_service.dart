@@ -1,9 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import '../../domain/models/user_model.dart';
 import 'package:flutter/foundation.dart';
 
 class FirebaseAuthService {
+  late final FirebaseAuth _auth;
+  late final FirebaseFirestore _firestore;
+  late final FirebaseFunctions _functions;
+
+  FirebaseAuthService() {
+    _auth = FirebaseAuth.instance;
+    _firestore = FirebaseFirestore.instance;
+    _functions = FirebaseFunctions.instance;
+  }
+
   /// Real-time stream of all users (admin function)
   Stream<List<UserModel>> getAllUsersStream() {
     return _firestore.collection('users').snapshots().map((querySnapshot) =>
@@ -40,9 +51,6 @@ class FirebaseAuthService {
     }
     return false;
   }
-
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   /// Login with email & password
   Future<UserModel?> login(String email, String password) async {
@@ -321,11 +329,58 @@ class FirebaseAuthService {
   }
 
   /// Delete user (admin function)
-  /// Deletes the user and all related data using cascade deletion
-  /// This includes: user document, user_events, and wellness_sessions
+  /// Deletes the user completely including Firebase Auth account
+  /// 
+  /// This method uses a Cloud Function to delete both Firestore data and Auth account.
+  /// If Cloud Function fails, it falls back to Firestore-only deletion.
+  /// 
+  /// Cloud Function advantages:
+  /// - Deletes both Firestore data AND Firebase Auth account
+  /// - Email can be immediately reused for new registrations
+  /// - Single operation, fully automated
+  /// 
+  /// Requirements:
+  /// - Cloud Function must be deployed (see CLOUD_FUNCTIONS_SETUP.md)
+  /// - Calling user must be authenticated
+  /// - Calling user must have ADMIN or TOP MANAGEMENT role
+  /// 
+  /// If Cloud Function is not available or fails:
+  /// - Falls back to Firestore-only deletion
+  /// - Auth account remains (email cannot be reused)
+  /// - Admin must manually delete from Firebase Console
   Future<bool> deleteUser(String userId) async {
     try {
       debugPrint('FirebaseAuth: Starting deletion for user $userId');
+
+      // Try to use Cloud Function for complete deletion
+      try {
+        debugPrint('FirebaseAuth: Attempting Cloud Function deletion...');
+        
+        final callable = _functions.httpsCallable('deleteUserCompletely');
+        final result = await callable.call<Map<String, dynamic>>({
+          'userId': userId,
+        });
+
+        if (result.data['success'] == true) {
+          debugPrint(
+            'FirebaseAuth: Cloud Function successfully deleted user $userId '
+            '(${result.data['deletedDocuments']} documents + Auth account)'
+          );
+          debugPrint('SUCCESS: Email can now be reused for new registrations!');
+          return true;
+        }
+      } on FirebaseFunctionsException catch (e) {
+        debugPrint('FirebaseAuth: Cloud Function error: ${e.code} - ${e.message}');
+        debugPrint('FirebaseAuth: Falling back to Firestore-only deletion...');
+        // Fall through to Firestore-only deletion
+      } catch (e) {
+        debugPrint('FirebaseAuth: Cloud Function call failed: $e');
+        debugPrint('FirebaseAuth: Falling back to Firestore-only deletion...');
+        // Fall through to Firestore-only deletion
+      }
+
+      // Fallback: Firestore-only deletion (original implementation)
+      debugPrint('FirebaseAuth: Using Firestore-only deletion (Auth account will remain)');
 
       // Firestore batch limit is 500 operations per batch
       const int batchLimit = 500;
@@ -391,13 +446,12 @@ class FirebaseAuthService {
       await Future.wait(batches.map((batch) => batch.commit()));
 
       debugPrint(
-          'FirebaseAuth: Successfully deleted user $userId and all related data');
-
-      // Note: Deleting Firebase Auth user requires admin SDK or the user to be logged in
-      // For admin delete, you would typically use Firebase Admin SDK on backend
-      // Or use Firebase Extensions like "Delete User Data"
-      // For now, we've deleted the Firestore documents and related data
-      // The auth account can be deleted via Firebase Console or Admin SDK
+          'FirebaseAuth: Successfully deleted user $userId Firestore data');
+      
+      debugPrint(
+          'WARNING: Firebase Auth account for user $userId was NOT deleted. '
+          'The email address cannot be reused until the Auth account is manually '
+          'deleted from Firebase Console OR Cloud Function is deployed.');
 
       return true;
     } catch (e, stackTrace) {
