@@ -323,6 +323,24 @@ class FirebaseAuthService {
   /// Delete user (admin function)
   /// Deletes the user and all related data using cascade deletion
   /// This includes: user document, user_events, and wellness_sessions
+  /// 
+  /// IMPORTANT LIMITATION:
+  /// This method deletes Firestore data but CANNOT delete the Firebase Auth account
+  /// from the client SDK. The Firebase Auth account must be deleted separately:
+  /// 
+  /// Option 1 (Recommended): Use Firebase Console
+  /// - Go to Firebase Console > Authentication > Users
+  /// - Find the user by email/UID and delete manually
+  /// 
+  /// Option 2: Implement Cloud Functions
+  /// - Create a callable function using Firebase Admin SDK
+  /// - Call it from the client to delete both Firestore and Auth
+  /// 
+  /// Option 3: Use Firebase Extensions
+  /// - Install "Delete User Data" extension from Firebase
+  /// - Configure it to delete Auth accounts along with Firestore data
+  /// 
+  /// If the Auth account is not deleted, the email cannot be reused for registration.
   Future<bool> deleteUser(String userId) async {
     try {
       debugPrint('FirebaseAuth: Starting deletion for user $userId');
@@ -391,13 +409,12 @@ class FirebaseAuthService {
       await Future.wait(batches.map((batch) => batch.commit()));
 
       debugPrint(
-          'FirebaseAuth: Successfully deleted user $userId and all related data');
-
-      // Note: Deleting Firebase Auth user requires admin SDK or the user to be logged in
-      // For admin delete, you would typically use Firebase Admin SDK on backend
-      // Or use Firebase Extensions like "Delete User Data"
-      // For now, we've deleted the Firestore documents and related data
-      // The auth account can be deleted via Firebase Console or Admin SDK
+          'FirebaseAuth: Successfully deleted user $userId Firestore data');
+      
+      debugPrint(
+          'WARNING: Firebase Auth account for user $userId was NOT deleted. '
+          'The email address cannot be reused until the Auth account is manually '
+          'deleted from Firebase Console.');
 
       return true;
     } catch (e, stackTrace) {
