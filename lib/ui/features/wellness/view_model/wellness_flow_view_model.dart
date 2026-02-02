@@ -121,6 +121,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
   static const String sectionSurvey = 'survey';
 
   // Screening steps (used for detecting screening flows)
+  // Derived from ScreeningType enum to ensure consistency with screening type definitions
   static List<String> get screeningSteps => ScreeningType.values.labels;
 
   WellnessFlowViewModel({this.activeEvent}) {

@@ -15,6 +15,8 @@ enum UserRole {
     final normalized = role.trim().toUpperCase();
     return UserRole.values.firstWhere(
       (e) => e.value == normalized,
+      // Default to client role as fallback for unknown/invalid roles
+      // This provides safe default permissions for unrecognized role values
       orElse: () => UserRole.client,
     );
   }
