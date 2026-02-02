@@ -31,7 +31,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     final theme = Theme.of(context);
     final isDesktop = ResponsiveBreakpoints.isDesktop(context);
     final profileVM = context.watch<ProfileViewModel>();
-    final String role = profileVM.role.toUpperCase();
+    final String role = (profileVM.role.isEmpty ? 'NURSE' : profileVM.role).toUpperCase();
 
     bool isPrivilegedRole(String role) {
       return role == 'ADMIN' ||
@@ -205,10 +205,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     
     // Validate that all lists have the same length (they should always match)
     assert(tabs.length == railDestinations.length,
-        'Tabs and rail destinations must have the same length');
+        'Tabs and rail destinations must have the same length: tabs=${tabs.length}, rail=${railDestinations.length}');
     assert(tabs.length == navDestinations.length,
-        'Tabs and nav destinations must have the same length');
-    assert(tabs.isNotEmpty, 'Tabs list cannot be empty');
+        'Tabs and nav destinations must have the same length: tabs=${tabs.length}, nav=${navDestinations.length}');
+    assert(tabs.isNotEmpty, 'Tabs list cannot be empty for role: $role');
     
     // Ensure currentIndex is always within valid bounds before passing to any navigation widget
     // This is needed in addition to the setState above because setState happens on next frame,
