@@ -36,7 +36,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     bool isPrivilegedRole(String role) {
       return role == 'ADMIN' ||
           role == 'TOP MANAGEMENT' ||
-          role == 'PROJECT MANAGER';
+          role == 'PROJECT MANAGER' ||
+          role == 'COORDINATOR';
     }
 
     // Define tabs and destinations based on role
