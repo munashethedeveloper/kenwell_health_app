@@ -20,6 +20,14 @@ class DayEventsDialog extends StatelessWidget {
     required this.onOpenEventForm,
   });
 
+  // Helper to check if user can add events (copied from calendar_screen.dart)
+  bool _canAddEvent(String role) {
+    final normalized = role.trim().toUpperCase();
+    return normalized == 'ADMIN' ||
+        normalized == 'TOP MANAGEMENT' ||
+        normalized == 'PROJECT MANAGER';
+  }
+
   // Build method to create the dialog UI
   @override
   Widget build(BuildContext context) {
@@ -58,14 +66,15 @@ class DayEventsDialog extends StatelessWidget {
             },
             child: const Text('View Events'),
           ),
-        // Button to create a new event
-        FilledButton(
-          onPressed: () {
-            Navigator.pop(context);
-            onOpenEventForm(selectedDay);
-          },
-          child: const Text('Create Event'),
-        ),
+        // Only show Create Event button for privileged roles
+        if (_canAddEvent(viewModel.role))
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(context);
+              onOpenEventForm(selectedDay);
+            },
+            child: const Text('Create Event'),
+          ),
       ],
     );
   }

@@ -38,6 +38,14 @@ class _CalendarScreenBody extends StatefulWidget {
 
 // State class for the calendar screen body
 class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
+  // Helper to check if user can add events
+  bool _canAddEvent(String role) {
+    final normalized = role.trim().toUpperCase();
+    return normalized == 'ADMIN' ||
+        normalized == 'TOP MANAGEMENT' ||
+        normalized == 'PROJECT MANAGER';
+  }
+
   // Initialize state
   @override
   void initState() {
@@ -181,18 +189,21 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                       ),
                     ],
                   ),
+
             // Floating action button to add new events
-            floatingActionButton: FloatingActionButton.extended(
-              backgroundColor: const Color(0xFF90C048),
-              icon: const Icon(Icons.add, color: Colors.white),
-              label: const Text('Add Event',
-                  style: TextStyle(color: Colors.white)),
-              onPressed: () {
-                final targetDate =
-                    viewModel.selectedDay ?? viewModel.focusedDay;
-                _openEventForm(context, viewModel, targetDate);
-              },
-            ),
+            floatingActionButton: _canAddEvent(viewModel.role)
+                ? FloatingActionButton.extended(
+                    backgroundColor: const Color(0xFF90C048),
+                    icon: const Icon(Icons.add, color: Colors.white),
+                    label: const Text('Add Event',
+                        style: TextStyle(color: Colors.white)),
+                    onPressed: () {
+                      final targetDate =
+                          viewModel.selectedDay ?? viewModel.focusedDay;
+                      _openEventForm(context, viewModel, targetDate);
+                    },
+                  )
+                : null,
           ),
         );
       },
@@ -349,21 +360,23 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                         ),
                         const SizedBox(height: 8),
                         // Suggestion to create events
-                        Text(
-                          'Create an event to get started',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade600,
+                        if (_canAddEvent(viewModel.role))
+                          Text(
+                            'Create an event to get started',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey.shade600,
+                            ),
                           ),
-                        ),
                         const SizedBox(height: 24),
                         // Button to create a new event
-                        CustomPrimaryButton(
-                          label: 'Create Event',
-                          onPressed: () => _openEventForm(
-                              context, viewModel, viewModel.focusedDay),
-                          leading: const Icon(Icons.add),
-                        ),
+                        if (_canAddEvent(viewModel.role))
+                          CustomPrimaryButton(
+                            label: 'Create Event',
+                            onPressed: () => _openEventForm(
+                                context, viewModel, viewModel.focusedDay),
+                            leading: const Icon(Icons.add),
+                          ),
                       ],
                     ),
                   ),

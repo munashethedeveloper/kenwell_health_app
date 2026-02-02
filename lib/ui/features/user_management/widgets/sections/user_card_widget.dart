@@ -28,10 +28,11 @@ class UserCardWidget extends StatelessWidget {
 
     final roleIcons = {
       'ADMIN': Icons.admin_panel_settings,
-      'MANAGEMENT': Icons.business_center,
+      'TOPMANAGEMENT': Icons.business_center,
+      'PROJECTMANAGER': Icons.manage_accounts,
       'COORDINATOR': Icons.event,
       'NURSE': Icons.medical_services,
-      'DATA CAPTURER': Icons.data_usage,
+      //'DATA CAPTURER': Icons.data_usage,
       'CLIENT': Icons.person,
     };
 

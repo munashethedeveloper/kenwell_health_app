@@ -321,17 +321,82 @@ class FirebaseAuthService {
   }
 
   /// Delete user (admin function)
-  /// Deletes both the auth account and Firestore document
+  /// Deletes the user and all related data using cascade deletion
+  /// This includes: user document, user_events, and wellness_sessions
   Future<bool> deleteUser(String userId) async {
     try {
-      // Delete Firestore document first
-      await _firestore.collection('users').doc(userId).delete();
-      debugPrint('FirebaseAuth: Deleted Firestore document for user $userId');
+      debugPrint('FirebaseAuth: Starting deletion for user $userId');
+
+      // Firestore batch limit is 500 operations per batch
+      const int batchLimit = 500;
+      final List<WriteBatch> batches = [];
+      WriteBatch currentBatch = _firestore.batch();
+      int operationCount = 0;
+
+      // Helper function to manage batch operations
+      void addDeleteOperation(DocumentReference docRef) {
+        if (operationCount >= batchLimit) {
+          batches.add(currentBatch);
+          currentBatch = _firestore.batch();
+          operationCount = 0;
+        }
+        currentBatch.delete(docRef);
+        operationCount++;
+      }
+
+      // 1. Delete the user's main document
+      addDeleteOperation(_firestore.collection('users').doc(userId));
+      debugPrint('FirebaseAuth: Queued user document deletion');
+
+      // 2. Query all related data concurrently
+      final results = await Future.wait([
+        _firestore
+            .collection('user_events')
+            .where('userId', isEqualTo: userId)
+            .get(),
+        _firestore
+            .collection('wellness_sessions')
+            .where('nurseUserId', isEqualTo: userId)
+            .get(),
+      ]);
+
+      final userEventsQuery = results[0];
+      final wellnessSessionsQuery = results[1];
+
+      // 3. Add user_events to batch
+      for (var doc in userEventsQuery.docs) {
+        addDeleteOperation(doc.reference);
+      }
+      debugPrint(
+          'FirebaseAuth: Queued ${userEventsQuery.docs.length} user_events for deletion');
+
+      // 4. Add wellness_sessions to batch
+      for (var doc in wellnessSessionsQuery.docs) {
+        addDeleteOperation(doc.reference);
+      }
+      debugPrint(
+          'FirebaseAuth: Queued ${wellnessSessionsQuery.docs.length} wellness_sessions for deletion');
+
+      // Add the final batch if it has operations
+      if (operationCount > 0) {
+        batches.add(currentBatch);
+      }
+
+      // Commit all batches concurrently
+      final totalDeletions =
+          1 + userEventsQuery.docs.length + wellnessSessionsQuery.docs.length;
+      debugPrint(
+          'FirebaseAuth: Committing ${batches.length} batch(es) with total $totalDeletions deletions');
+
+      await Future.wait(batches.map((batch) => batch.commit()));
+
+      debugPrint(
+          'FirebaseAuth: Successfully deleted user $userId and all related data');
 
       // Note: Deleting Firebase Auth user requires admin SDK or the user to be logged in
       // For admin delete, you would typically use Firebase Admin SDK on backend
       // Or use Firebase Extensions like "Delete User Data"
-      // For now, we'll just delete the Firestore document
+      // For now, we've deleted the Firestore documents and related data
       // The auth account can be deleted via Firebase Console or Admin SDK
 
       return true;

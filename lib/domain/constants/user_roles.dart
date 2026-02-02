@@ -3,9 +3,9 @@ class UserRoles {
 
   static const List<String> values = [
     'ADMIN',
-    'MANAGEMENT',
+    'TOP MANAGEMENT',
+    'PROJECT MANAGER',
     'COORDINATOR',
-    'DATA CAPTURER',
     'NURSE',
     'CLIENT',
   ];
