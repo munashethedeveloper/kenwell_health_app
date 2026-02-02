@@ -121,13 +121,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
   static const String sectionSurvey = 'survey';
 
   // Screening steps (used for detecting screening flows)
-  static final List<String> screeningSteps = [
-    WellnessStep.consent.value,
-    WellnessStep.riskAssessment.value,
-    WellnessStep.hivTest.value,
-    WellnessStep.hivResults.value,
-    WellnessStep.tbTest.value,
-  ];
+  static List<String> get screeningSteps => ScreeningType.values.labels;
 
   WellnessFlowViewModel({this.activeEvent}) {
     // Initialize with member registration as the first step
