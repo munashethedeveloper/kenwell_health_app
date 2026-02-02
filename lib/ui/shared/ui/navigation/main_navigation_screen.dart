@@ -213,7 +213,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     // Ensure currentIndex is always within valid bounds before passing to any navigation widget
     // This is needed in addition to the setState above because setState happens on next frame,
     // but we need immediate protection for the current frame's render
-    int currentIndex = tabs.isEmpty ? 0 : (_currentIndex.clamp(0, tabs.length - 1));
+    int currentIndex = _currentIndex.clamp(0, tabs.length - 1);
 
     // For desktop/tablet, use NavigationRail + content side-by-side
     if (isDesktop) {
