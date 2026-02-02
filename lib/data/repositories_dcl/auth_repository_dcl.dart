@@ -9,9 +9,16 @@ class AuthRepository {
 
   /// Login user - tries Firebase first, falls back to local database
   Future<UserModel?> login(String email, String password) async {
+    // Sanitize inputs to match registration normalization
+    final sanitizedEmail = email.trim().toLowerCase();
+    final sanitizedPassword = password.trim();
+    
     // Try Firebase first
     try {
-      final firebaseUser = await _firebaseAuthService.login(email, password);
+      final firebaseUser = await _firebaseAuthService.login(
+        sanitizedEmail,
+        sanitizedPassword,
+      );
       if (firebaseUser != null) {
         return firebaseUser;
       }
@@ -21,7 +28,10 @@ class AuthRepository {
 
     // Fallback to local database
     try {
-      final localUser = await _localAuthService.login(email, password);
+      final localUser = await _localAuthService.login(
+        sanitizedEmail,
+        sanitizedPassword,
+      );
       return localUser;
     } catch (e) {
       AppLogger.error('Local login failed', e);
@@ -39,14 +49,22 @@ class AuthRepository {
     required String firstName,
     required String lastName,
   }) {
+    // Sanitize inputs to ensure consistency
+    final sanitizedEmail = email.trim().toLowerCase();
+    final sanitizedPassword = password.trim();
+    final sanitizedRole = role.trim();
+    final sanitizedPhoneNumber = phoneNumber.trim();
+    final sanitizedFirstName = firstName.trim();
+    final sanitizedLastName = lastName.trim();
+    
     return _firebaseAuthService.register(
-      email: email,
-      password: password,
-      role: role,
-      phoneNumber: phoneNumber,
+      email: sanitizedEmail,
+      password: sanitizedPassword,
+      role: sanitizedRole,
+      phoneNumber: sanitizedPhoneNumber,
       // username: username,
-      firstName: firstName,
-      lastName: lastName,
+      firstName: sanitizedFirstName,
+      lastName: sanitizedLastName,
     );
   }
 
@@ -83,13 +101,19 @@ class AuthRepository {
     final currentUser = await getCurrentUser();
     if (currentUser == null) return null;
 
+    // Sanitize inputs to ensure consistency
+    final sanitizedEmail = email.trim().toLowerCase();
+    final sanitizedPhoneNumber = phoneNumber.trim();
+    final sanitizedFirstName = firstName.trim();
+    final sanitizedLastName = lastName.trim();
+
     return _firebaseAuthService.updateUserProfile(
       id: userId,
-      email: email,
+      email: sanitizedEmail,
       role: currentUser.role,
-      phoneNumber: phoneNumber,
-      firstName: firstName,
-      lastName: lastName,
+      phoneNumber: sanitizedPhoneNumber,
+      firstName: sanitizedFirstName,
+      lastName: sanitizedLastName,
     );
   }
 }
