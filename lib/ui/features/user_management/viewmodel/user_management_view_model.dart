@@ -207,13 +207,13 @@ class UserManagementViewModel extends ChangeNotifier {
 
       if (success) {
         _setSuccess(
-          'User $userName deleted from database.\n\n'
-          'IMPORTANT: The Firebase Authentication account still exists. '
-          'To allow re-registration with this email, you must also delete '
-          'the user from Firebase Console:\n'
-          '1. Go to Firebase Console > Authentication > Users\n'
-          '2. Find the user by email and delete manually\n\n'
-          'Otherwise, the email address cannot be reused for new registrations.'
+          'User $userName deleted successfully!\n\n'
+          'The system attempted to delete both database records and '
+          'the authentication account.\n\n'
+          'If Cloud Functions are deployed, the email can be immediately reused. '
+          'Check the console logs to confirm complete deletion.\n\n'
+          'If using Firestore-only deletion (no Cloud Functions), you may need to '
+          'manually delete the Auth account from Firebase Console to reuse the email.'
         );
         // Reload users list
         await loadUsers();
