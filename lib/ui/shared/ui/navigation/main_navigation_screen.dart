@@ -203,10 +203,17 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       _lastTabCount = tabs.length;
     }
     
-    // Ensure currentIndex is always within valid bounds before passing to IndexedStack
+    // Validate that all lists have the same length (they should always match)
+    assert(tabs.length == railDestinations.length,
+        'Tabs and rail destinations must have the same length');
+    assert(tabs.length == navDestinations.length,
+        'Tabs and nav destinations must have the same length');
+    assert(tabs.isNotEmpty, 'Tabs list cannot be empty');
+    
+    // Ensure currentIndex is always within valid bounds before passing to any navigation widget
     // This is needed in addition to the setState above because setState happens on next frame,
     // but we need immediate protection for the current frame's render
-    int currentIndex = _currentIndex < tabs.length ? _currentIndex : 0;
+    int currentIndex = tabs.isEmpty ? 0 : (_currentIndex.clamp(0, tabs.length - 1));
 
     // For desktop/tablet, use NavigationRail + content side-by-side
     if (isDesktop) {
