@@ -19,7 +19,7 @@ class MainNavigationScreen extends StatefulWidget {
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _lastTabCount = 0;
-  int _currentIndex = 2;
+  int _currentIndex = 0;
 
   @override
   void initState() {
@@ -191,13 +191,20 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     // Adjust _currentIndex if needed (fixes out-of-range errors on role change)
     if (_lastTabCount != tabs.length) {
       if (_currentIndex >= tabs.length) {
-        setState(() {
-          _currentIndex = tabs.length - 1;
+        // Schedule setState for next frame to avoid calling setState during build
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            setState(() {
+              _currentIndex = 0;
+            });
+          }
         });
       }
       _lastTabCount = tabs.length;
     }
-    int currentIndex = _currentIndex;
+    
+    // Ensure currentIndex is always within valid bounds
+    int currentIndex = _currentIndex < tabs.length ? _currentIndex : 0;
 
     // For desktop/tablet, use NavigationRail + content side-by-side
     if (isDesktop) {
