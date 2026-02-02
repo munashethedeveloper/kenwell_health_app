@@ -348,23 +348,28 @@ class FirebaseAuthService {
       addDeleteOperation(_firestore.collection('users').doc(userId));
       debugPrint('FirebaseAuth: Queued user document deletion');
 
-      // 2. Delete all user_events where userId matches
-      final userEventsQuery = await _firestore
-          .collection('user_events')
-          .where('userId', isEqualTo: userId)
-          .get();
+      // 2. Query all related data concurrently
+      final results = await Future.wait([
+        _firestore
+            .collection('user_events')
+            .where('userId', isEqualTo: userId)
+            .get(),
+        _firestore
+            .collection('wellness_sessions')
+            .where('nurseUserId', isEqualTo: userId)
+            .get(),
+      ]);
       
+      final userEventsQuery = results[0];
+      final wellnessSessionsQuery = results[1];
+
+      // 3. Add user_events to batch
       for (var doc in userEventsQuery.docs) {
         addDeleteOperation(doc.reference);
       }
       debugPrint('FirebaseAuth: Queued ${userEventsQuery.docs.length} user_events for deletion');
 
-      // 3. Delete all wellness_sessions where nurseUserId matches
-      final wellnessSessionsQuery = await _firestore
-          .collection('wellness_sessions')
-          .where('nurseUserId', isEqualTo: userId)
-          .get();
-      
+      // 4. Add wellness_sessions to batch
       for (var doc in wellnessSessionsQuery.docs) {
         addDeleteOperation(doc.reference);
       }
@@ -375,11 +380,11 @@ class FirebaseAuthService {
         batches.add(currentBatch);
       }
 
-      // Commit all batches
-      debugPrint('FirebaseAuth: Committing ${batches.length} batch(es) with total ${userEventsQuery.docs.length + wellnessSessionsQuery.docs.length + 1} deletions');
-      for (var batch in batches) {
-        await batch.commit();
-      }
+      // Commit all batches concurrently
+      final totalDeletions = 1 + userEventsQuery.docs.length + wellnessSessionsQuery.docs.length;
+      debugPrint('FirebaseAuth: Committing ${batches.length} batch(es) with total $totalDeletions deletions');
+      
+      await Future.wait(batches.map((batch) => batch.commit()));
       
       debugPrint('FirebaseAuth: Successfully deleted user $userId and all related data');
 
