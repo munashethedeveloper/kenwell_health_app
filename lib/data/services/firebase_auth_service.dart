@@ -5,9 +5,16 @@ import '../../domain/models/user_model.dart';
 import 'package:flutter/foundation.dart';
 
 class FirebaseAuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseFunctions _functions = FirebaseFunctions.instance;
+  late final FirebaseAuth _auth;
+  late final FirebaseFirestore _firestore;
+  late final FirebaseFunctions _functions;
+
+  FirebaseAuthService() {
+    _auth = FirebaseAuth.instance;
+    _firestore = FirebaseFirestore.instance;
+    _functions = FirebaseFunctions.instance;
+  }
+
   /// Real-time stream of all users (admin function)
   Stream<List<UserModel>> getAllUsersStream() {
     return _firestore.collection('users').snapshots().map((querySnapshot) =>
