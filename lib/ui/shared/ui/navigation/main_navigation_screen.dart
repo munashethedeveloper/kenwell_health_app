@@ -203,7 +203,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       _lastTabCount = tabs.length;
     }
     
-    // Ensure currentIndex is always within valid bounds
+    // Ensure currentIndex is always within valid bounds before passing to IndexedStack
+    // This is needed in addition to the setState above because setState happens on next frame,
+    // but we need immediate protection for the current frame's render
     int currentIndex = _currentIndex < tabs.length ? _currentIndex : 0;
 
     // For desktop/tablet, use NavigationRail + content side-by-side
