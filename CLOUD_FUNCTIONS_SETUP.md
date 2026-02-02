@@ -78,6 +78,8 @@ firebase login
 cd C:\src\flutter_projects\ProductionReadyKenwellApp\kenwell_health_app
 ```
 
+**IMPORTANT:** The repository includes a template `.firebaserc` file. When you run the command below, it will update this file with your actual project ID.
+
 **Link to Firebase project:**
 ```bash
 firebase use --add
@@ -88,6 +90,7 @@ firebase use --add
 2. Use arrow keys to select your Kenwell Health project
 3. Enter an alias (suggestion: `production`)
 4. Press Enter
+5. The `.firebaserc` file will be updated with your project ID
 
 **Expected Output:**
 ```
@@ -101,7 +104,31 @@ firebase use --add
 Now using alias production (kenwell-health-app)
 ```
 
+**What gets updated:**
+The `.firebaserc` file changes from:
+```json
+{
+  "projects": {
+    "default": "YOUR-PROJECT-ID-HERE"
+  }
+}
+```
+
+To:
+```json
+{
+  "projects": {
+    "default": "kenwell-health-app",
+    "production": "kenwell-health-app"
+  }
+}
+```
+
 **Troubleshooting:**
+- **Error: "must be run from a Firebase project directory"?** 
+  - Make sure you're in the `kenwell_health_app` directory (where `firebase.json` is)
+  - Check that `.firebaserc` file exists: `dir .firebaserc` (Windows) or `ls -la .firebaserc` (Mac/Linux)
+  - If missing, the file should have been included in the repository
 - **No projects listed?** Check you're logged into the correct Google account
 - **Wrong project selected?** Run `firebase use --add` again to change
 - **Check current project:** `firebase use`
@@ -337,6 +364,75 @@ Delete Button → Try Cloud Function → Success? → Both deleted ✅
 
 **Next step:**
 → Go to [Step 2: Link to Your Firebase Project](#step-2-link-to-your-firebase-project)
+
+---
+
+### Error: "firebase use must be run from a Firebase project directory"
+
+**This error means Firebase CLI can't find the project configuration files.**
+
+**Cause:** 
+- Missing `.firebaserc` file
+- Or you're in the wrong directory
+
+**Solution:**
+
+**1. Check you're in the correct directory:**
+```bash
+# Windows PowerShell
+cd C:\src\flutter_projects\ProductionReadyKenwellApp\kenwell_health_app
+
+# Verify you're in the right place
+dir firebase.json
+```
+
+**2. Check if `.firebaserc` exists:**
+```bash
+# Windows PowerShell
+dir .firebaserc
+
+# Mac/Linux
+ls -la .firebaserc
+```
+
+**3. If `.firebaserc` is missing:**
+
+The file should be in the repository. If it's not there, create it manually:
+
+**Windows PowerShell:**
+```powershell
+@"
+{
+  "projects": {
+    "default": "YOUR-PROJECT-ID-HERE"
+  }
+}
+"@ | Out-File -FilePath .firebaserc -Encoding utf8
+```
+
+**Mac/Linux:**
+```bash
+cat > .firebaserc << 'EOF'
+{
+  "projects": {
+    "default": "YOUR-PROJECT-ID-HERE"
+  }
+}
+EOF
+```
+
+**4. Now run the command again:**
+```bash
+firebase use --add
+```
+
+This should now show your Firebase projects and let you select one.
+
+**5. Verify it worked:**
+```bash
+firebase use
+# Should show: Active Project: your-project-name (project-id)
+```
 
 ---
 
