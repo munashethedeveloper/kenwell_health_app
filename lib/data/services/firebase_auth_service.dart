@@ -5,9 +5,13 @@ import 'package:flutter/foundation.dart';
 
 class FirebaseAuthService {
   /// Real-time stream of all users (admin function)
+  /// Excludes users marked as deleted
   Stream<List<UserModel>> getAllUsersStream() {
-    return _firestore.collection('users').snapshots().map((querySnapshot) =>
-        querySnapshot.docs
+    return _firestore
+        .collection('users')
+        .where('deleted', isNotEqualTo: true)
+        .snapshots()
+        .map((querySnapshot) => querySnapshot.docs
             .map((doc) => UserModel.fromMap(doc.data()))
             .toList());
   }
@@ -60,21 +64,25 @@ class FirebaseAuthService {
       // Fetch additional user data from Firestore
       final doc = await _firestore.collection('users').doc(user.uid).get();
       bool emailVerified = user.emailVerified;
+      
       if (!doc.exists) {
         debugPrint('FirebaseAuth: User document not found for ${user.uid}');
-        return UserModel(
-          id: user.uid,
-          email: user.email ?? '',
-          role: '',
-          firstName: '',
-          lastName: '',
-          phoneNumber: '',
-          emailVerified: emailVerified,
-        );
+        // Sign out the user since their account is orphaned
+        await _auth.signOut();
+        return null;
       }
 
-      debugPrint('FirebaseAuth: User data from Firestore: ${doc.data()}');
-      return UserModel.fromMap(doc.data()!);
+      final userData = doc.data()!;
+      
+      // Check if user is marked as deleted
+      if (userData['deleted'] == true) {
+        debugPrint('FirebaseAuth: User ${user.uid} is marked as deleted');
+        await _auth.signOut();
+        return null;
+      }
+
+      debugPrint('FirebaseAuth: User data from Firestore: $userData');
+      return UserModel.fromMap(userData);
     } catch (e, stackTrace) {
       // Handle errors (FirebaseAuthException, network issues, etc.)
       debugPrint('Login error: $e');
@@ -97,21 +105,71 @@ class FirebaseAuthService {
     try {
       debugPrint('FirebaseAuth: Starting registration for $email');
 
-      final userCredential = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      UserCredential? userCredential;
+      User? user;
+      bool isReactivation = false;
 
-      final user = userCredential.user;
+      // Try to create a new user
+      try {
+        userCredential = await _auth.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+        user = userCredential.user;
+      } on FirebaseAuthException catch (authError) {
+        // Check if error is due to email already in use
+        if (authError.code == 'email-already-in-use') {
+          debugPrint('FirebaseAuth: Email already in use, checking if it\'s a deleted user');
+          
+          // Note: This approach has a potential security consideration regarding account enumeration.
+          // An attacker could determine if an email is registered by observing different error patterns.
+          // However, this is a necessary trade-off given Firebase client SDK limitations.
+          // Consider implementing rate limiting and monitoring for registration attempts.
+          
+          // Try to sign in with the credentials to get the user
+          try {
+            userCredential = await _auth.signInWithEmailAndPassword(
+              email: email,
+              password: password,
+            );
+            user = userCredential.user;
+            
+            if (user != null) {
+              // Check if this is a deleted user
+              final doc = await _firestore.collection('users').doc(user.uid).get();
+              
+              if (doc.exists && doc.data()?['deleted'] == true) {
+                debugPrint('FirebaseAuth: Found deleted user, will reactivate');
+                isReactivation = true;
+              } else {
+                // User exists and is not deleted - can't register
+                debugPrint('FirebaseAuth: User already exists and is active');
+                await _auth.signOut();
+                return null;
+              }
+            }
+          } catch (signInError) {
+            // Wrong password or other error - can't proceed
+            debugPrint('FirebaseAuth: Cannot verify deleted user status: $signInError');
+            return null;
+          }
+        } else {
+          // Other authentication error
+          rethrow;
+        }
+      }
+
       if (user == null) {
         debugPrint('FirebaseAuth: User creation failed - user is null');
         return null;
       }
 
-      debugPrint('FirebaseAuth: User created with UID: ${user.uid}');
+      debugPrint('FirebaseAuth: User ${isReactivation ? 'reactivated' : 'created'} with UID: ${user.uid}');
 
-      // Send email verification
-      await user.sendEmailVerification();
+      // Send email verification for new users
+      if (!isReactivation) {
+        await user.sendEmailVerification();
+      }
 
       // Create UserModel
       final userModel = UserModel(
@@ -128,12 +186,24 @@ class FirebaseAuthService {
       debugPrint(
           'FirebaseAuth: Saving user data to Firestore: ${userModel.toMap()}');
 
-      // Save extra fields to Firestore
+      // Save extra fields to Firestore (this will overwrite deleted user data if reactivating)
       try {
+        final dataToSave = {
+          ...userModel.toMap(),
+          'deleted': false, // Explicitly mark as not deleted
+        };
+        
+        // Add reactivation timestamp only if this is a reactivation
+        if (isReactivation) {
+          dataToSave['reactivatedAt'] = FieldValue.serverTimestamp();
+          // Note: We keep the deletedAt field to maintain complete audit history
+          // The 'deleted: false' flag indicates the current active status
+        }
+        
         await _firestore
             .collection('users')
             .doc(user.uid)
-            .set(userModel.toMap());
+            .set(dataToSave);
         debugPrint('FirebaseAuth: User data saved successfully to Firestore');
       } catch (firestoreError) {
         debugPrint('FirebaseAuth: ERROR saving to Firestore: $firestoreError');
@@ -307,9 +377,13 @@ class FirebaseAuthService {
   }
 
   /// Get all users (admin function)
+  /// Excludes users marked as deleted
   Future<List<UserModel>> getAllUsers() async {
     try {
-      final querySnapshot = await _firestore.collection('users').get();
+      final querySnapshot = await _firestore
+          .collection('users')
+          .where('deleted', isNotEqualTo: true)
+          .get();
       return querySnapshot.docs
           .map((doc) => UserModel.fromMap(doc.data()))
           .toList();
@@ -321,18 +395,96 @@ class FirebaseAuthService {
   }
 
   /// Delete user (admin function)
-  /// Deletes both the auth account and Firestore document
+  /// Marks the user as deleted and removes all related data
+  /// Uses soft delete for user document to prevent re-registration issues
+  /// This includes: marking user as deleted, deleting user_events, and wellness_sessions
   Future<bool> deleteUser(String userId) async {
     try {
-      // Delete Firestore document first
-      await _firestore.collection('users').doc(userId).delete();
-      debugPrint('FirebaseAuth: Deleted Firestore document for user $userId');
+      debugPrint('FirebaseAuth: Starting deletion for user $userId');
 
-      // Note: Deleting Firebase Auth user requires admin SDK or the user to be logged in
-      // For admin delete, you would typically use Firebase Admin SDK on backend
-      // Or use Firebase Extensions like "Delete User Data"
-      // For now, we'll just delete the Firestore document
-      // The auth account can be deleted via Firebase Console or Admin SDK
+      // Firestore batch limit is 500 operations per batch
+      const int batchLimit = 500;
+      final List<WriteBatch> batches = [];
+      WriteBatch currentBatch = _firestore.batch();
+      int operationCount = 0;
+
+      // Helper function to manage batch operations
+      void addDeleteOperation(DocumentReference docRef) {
+        if (operationCount >= batchLimit) {
+          batches.add(currentBatch);
+          currentBatch = _firestore.batch();
+          operationCount = 0;
+        }
+        currentBatch.delete(docRef);
+        operationCount++;
+      }
+
+      // Helper function to manage update operations
+      void addUpdateOperation(DocumentReference docRef, Map<String, dynamic> data) {
+        if (operationCount >= batchLimit) {
+          batches.add(currentBatch);
+          currentBatch = _firestore.batch();
+          operationCount = 0;
+        }
+        currentBatch.update(docRef, data);
+        operationCount++;
+      }
+
+      // 1. Mark the user as deleted (soft delete) instead of removing the document
+      // This prevents issues with orphaned Firebase Auth accounts
+      addUpdateOperation(
+        _firestore.collection('users').doc(userId),
+        {
+          'deleted': true,
+          'deletedAt': FieldValue.serverTimestamp(),
+        },
+      );
+      debugPrint('FirebaseAuth: Queued user document for soft delete');
+
+      // 2. Query all related data concurrently
+      final results = await Future.wait([
+        _firestore
+            .collection('user_events')
+            .where('userId', isEqualTo: userId)
+            .get(),
+        _firestore
+            .collection('wellness_sessions')
+            .where('nurseUserId', isEqualTo: userId)
+            .get(),
+      ]);
+      
+      final userEventsQuery = results[0];
+      final wellnessSessionsQuery = results[1];
+
+      // 3. Delete user_events (hard delete - these are activity records)
+      for (var doc in userEventsQuery.docs) {
+        addDeleteOperation(doc.reference);
+      }
+      debugPrint('FirebaseAuth: Queued ${userEventsQuery.docs.length} user_events for deletion');
+
+      // 4. Delete wellness_sessions (hard delete - these are session records)
+      for (var doc in wellnessSessionsQuery.docs) {
+        addDeleteOperation(doc.reference);
+      }
+      debugPrint('FirebaseAuth: Queued ${wellnessSessionsQuery.docs.length} wellness_sessions for deletion');
+
+      // Add the final batch if it has operations
+      if (operationCount > 0) {
+        batches.add(currentBatch);
+      }
+
+      // Commit all batches concurrently
+      final totalOperations = 1 + userEventsQuery.docs.length + wellnessSessionsQuery.docs.length;
+      debugPrint('FirebaseAuth: Committing ${batches.length} batch(es) with total $totalOperations operations');
+      
+      await Future.wait(batches.map((batch) => batch.commit()));
+      
+      debugPrint('FirebaseAuth: Successfully deleted user $userId and all related data');
+
+      // Note: We use soft delete for the user document to handle Firebase Auth limitations
+      // The user document is marked as deleted but not removed
+      // This allows detection and handling of deleted users during login and re-registration
+      // Related activity data (user_events, wellness_sessions) is hard deleted
 
       return true;
     } catch (e, stackTrace) {
