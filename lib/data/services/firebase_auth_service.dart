@@ -121,6 +121,11 @@ class FirebaseAuthService {
         if (authError.code == 'email-already-in-use') {
           debugPrint('FirebaseAuth: Email already in use, checking if it\'s a deleted user');
           
+          // Note: This approach has a potential security consideration regarding account enumeration.
+          // An attacker could determine if an email is registered by observing different error patterns.
+          // However, this is a necessary trade-off given Firebase client SDK limitations.
+          // Consider implementing rate limiting and monitoring for registration attempts.
+          
           // Try to sign in with the credentials to get the user
           try {
             userCredential = await _auth.signInWithEmailAndPassword(
@@ -186,7 +191,13 @@ class FirebaseAuthService {
         final dataToSave = {
           ...userModel.toMap(),
           'deleted': false, // Explicitly mark as not deleted
+          'reactivatedAt': isReactivation ? FieldValue.serverTimestamp() : null,
         };
+        
+        // Remove deletedAt timestamp if reactivating to keep audit trail clean
+        if (isReactivation) {
+          dataToSave.remove('deletedAt');
+        }
         
         await _firestore
             .collection('users')
