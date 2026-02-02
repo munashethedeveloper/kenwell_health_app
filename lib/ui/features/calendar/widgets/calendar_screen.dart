@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../../../domain/models/wellness_event.dart';
+import '../../../../domain/constants/role_permissions.dart';
 import '../../../../routing/route_names.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../event/widgets/event_screen.dart';
@@ -39,14 +40,6 @@ class _CalendarScreenBody extends StatefulWidget {
 
 // State class for the calendar screen body
 class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
-  // Helper to check if user can add events
-  bool _canAddEvent(String role) {
-    final normalized = role.trim().toUpperCase();
-    return normalized == 'ADMIN' ||
-        normalized == 'TOP MANAGEMENT' ||
-        normalized == 'PROJECT MANAGER';
-  }
-
   // Initialize state
   @override
   void initState() {
@@ -194,7 +187,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                   ),
 
             // Floating action button to add new events
-            floatingActionButton: _canAddEvent(userRole)
+            floatingActionButton: RolePermissions.canAddEvent(userRole)
                 ? FloatingActionButton.extended(
                     backgroundColor: const Color(0xFF90C048),
                     icon: const Icon(Icons.add, color: Colors.white),
@@ -363,7 +356,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                         ),
                         const SizedBox(height: 8),
                         // Suggestion to create events
-                        if (_canAddEvent(userRole))
+                        if (RolePermissions.canAddEvent(userRole))
                           Text(
                             'Create an event to get started',
                             style: TextStyle(
@@ -373,7 +366,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                           ),
                         const SizedBox(height: 24),
                         // Button to create a new event
-                        if (_canAddEvent(userRole))
+                        if (RolePermissions.canAddEvent(userRole))
                           CustomPrimaryButton(
                             label: 'Create Event',
                             onPressed: () => _openEventForm(
