@@ -140,4 +140,14 @@ class RolePermissions {
   static bool isCoordinator(String? userRole) {
     return UserRoles.normalize(userRole) == 'COORDINATOR';
   }
+
+  /// Check if user can add/create events
+  /// Allowed roles: ADMIN, TOP MANAGEMENT, PROJECT MANAGER
+  static bool canAddEvent(String? userRole) {
+    if (userRole == null || userRole.isEmpty) return false;
+    final normalized = UserRoles.normalize(userRole);
+    return normalized == 'ADMIN' ||
+        normalized == 'TOP MANAGEMENT' ||
+        normalized == 'PROJECT MANAGER';
+  }
 }

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../../domain/models/wellness_event.dart';
+import '../../../../domain/constants/role_permissions.dart';
+import '../../profile/view_model/profile_view_model.dart';
 import '../view_model/calendar_view_model.dart';
+import 'package:provider/provider.dart';
 
 /// Dialog to display list of events for a selected day
 class EventListDialog extends StatelessWidget {
@@ -22,6 +25,7 @@ class EventListDialog extends StatelessWidget {
   // Build method
   @override
   Widget build(BuildContext context) {
+    final userRole = context.watch<ProfileViewModel>().role;
     // Build the dialog
     return AlertDialog(
       title: Text('Events on ${viewModel.formatDateLong(selectedDay)}'),
@@ -63,14 +67,15 @@ class EventListDialog extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
           child: const Text('Close'),
         ),
-        // Add Event button
-        FilledButton(
-          onPressed: () {
-            Navigator.pop(context);
-            onOpenEventForm(selectedDay);
-          },
-          child: const Text('Add Event'),
-        ),
+        // Add Event button - only show for privileged roles
+        if (RolePermissions.canAddEvent(userRole))
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(context);
+              onOpenEventForm(selectedDay);
+            },
+            child: const Text('Add Event'),
+          ),
       ],
     );
   }

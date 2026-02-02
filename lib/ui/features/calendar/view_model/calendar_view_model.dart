@@ -25,7 +25,6 @@ class CalendarViewModel extends ChangeNotifier {
   List<WellnessEvent> _events = [];
   bool _isLoading = false;
   String? _error;
-  String _role = '';
 
   // Public getters
   DateTime get focusedDay => _focusedDay;
@@ -33,7 +32,6 @@ class CalendarViewModel extends ChangeNotifier {
   List<WellnessEvent> get events => _events;
   bool get isLoading => _isLoading;
   String? get error => _error;
-  String get role => _role;
 
   /// Load events from the repository
   Future<void> loadEvents() async {
