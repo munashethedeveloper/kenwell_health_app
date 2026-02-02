@@ -191,12 +191,13 @@ class FirebaseAuthService {
         final dataToSave = {
           ...userModel.toMap(),
           'deleted': false, // Explicitly mark as not deleted
-          'reactivatedAt': isReactivation ? FieldValue.serverTimestamp() : null,
         };
         
-        // Remove deletedAt timestamp if reactivating to keep audit trail clean
+        // Add reactivation timestamp only if this is a reactivation
         if (isReactivation) {
-          dataToSave.remove('deletedAt');
+          dataToSave['reactivatedAt'] = FieldValue.serverTimestamp();
+          // Note: We keep the deletedAt field to maintain complete audit history
+          // The 'deleted: false' flag indicates the current active status
         }
         
         await _firestore
