@@ -3,6 +3,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class UserEventRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  /// Fetches user events for the upcoming week and following week.
+  /// 
+  /// Note: This query requires a composite index on the 'user_events' collection
+  /// with fields 'userId' (ascending) and 'eventDate' (ascending).
+  /// Firestore will automatically suggest creating this index when the query is first run.
   Future<List<Map<String, dynamic>>> fetchUserEvents(String userId) async {
     // Calculate date range for upcoming week and following week
     final now = DateTime.now();
@@ -21,9 +26,8 @@ class UserEventRepository {
   // Calculate the start of the week (Sunday) for a given date
   DateTime _startOfWeek(DateTime date) {
     final int daysToSubtract = date.weekday % 7;
-    final dt = DateTime(date.year, date.month, date.day)
-        .subtract(Duration(days: daysToSubtract));
-    return DateTime(dt.year, dt.month, dt.day);
+    final dateOnly = DateTime(date.year, date.month, date.day);
+    return dateOnly.subtract(Duration(days: daysToSubtract));
   }
 
   // Calculate the end of the week (Saturday) for a given week start date
