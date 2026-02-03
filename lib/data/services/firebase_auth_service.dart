@@ -98,6 +98,7 @@ class FirebaseAuthService {
     required String phoneNumber,
   }) async {
     FirebaseApp? secondaryApp;
+    FirebaseAuth? secondaryAuth;
     try {
       debugPrint('FirebaseAuth: Starting registration for $email');
 
@@ -105,12 +106,10 @@ class FirebaseAuthService {
       // This is necessary because createUserWithEmailAndPassword automatically
       // signs in the newly created user, which would log out the admin
       // Check if the app already exists
-      final existingApps = Firebase.apps
-          .where((app) => app.name == 'userRegistration')
-          .toList();
-
-      if (existingApps.isNotEmpty) {
-        secondaryApp = existingApps.first;
+      if (Firebase.apps.any((app) => app.name == 'userRegistration')) {
+        secondaryApp = Firebase.apps.firstWhere(
+          (app) => app.name == 'userRegistration',
+        );
         debugPrint('FirebaseAuth: Using existing secondary app');
       } else {
         // App doesn't exist, create it
@@ -123,7 +122,7 @@ class FirebaseAuthService {
       }
 
       // Use the secondary app's auth instance
-      final secondaryAuth = FirebaseAuth.instanceFor(app: secondaryApp);
+      secondaryAuth = FirebaseAuth.instanceFor(app: secondaryApp);
 
       final userCredential = await secondaryAuth.createUserWithEmailAndPassword(
         email: email,
@@ -171,9 +170,8 @@ class FirebaseAuthService {
     } finally {
       // Always clean up the secondary app session
       // This ensures the admin's session remains active regardless of success or failure
-      if (secondaryApp != null) {
+      if (secondaryAuth != null) {
         try {
-          final secondaryAuth = FirebaseAuth.instanceFor(app: secondaryApp);
           await secondaryAuth.signOut();
           debugPrint(
               'FirebaseAuth: Signed out from secondary app, main session preserved');
