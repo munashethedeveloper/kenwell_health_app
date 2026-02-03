@@ -71,10 +71,24 @@ class _UserManagementScreenVersionTwoState
                       
                       if (value == 'sync_verification') {
                         // Show loading indicator
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        final messenger = ScaffoldMessenger.of(context);
+                        messenger.showSnackBar(
                           const SnackBar(
-                            content: Text('Syncing your verification status...'),
-                            duration: Duration(seconds: 2),
+                            content: Row(
+                              children: [
+                                SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  ),
+                                ),
+                                SizedBox(width: 16),
+                                Text('Syncing your verification status...'),
+                              ],
+                            ),
+                            duration: Duration(minutes: 1), // Long duration, will be dismissed manually
                           ),
                         );
                         
@@ -85,20 +99,25 @@ class _UserManagementScreenVersionTwoState
                         
                         if (!mounted) return;
                         
-                        // Show success message
+                        // Hide loading snackbar
+                        messenger.hideCurrentSnackBar();
+                        
+                        // Show result message
                         final viewModel = context.read<UserManagementViewModel>();
                         if (viewModel.successMessage != null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
+                          messenger.showSnackBar(
                             SnackBar(
                               content: Text(viewModel.successMessage!),
                               backgroundColor: Colors.green,
+                              duration: const Duration(seconds: 3),
                             ),
                           );
                         } else if (viewModel.errorMessage != null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
+                          messenger.showSnackBar(
                             SnackBar(
                               content: Text(viewModel.errorMessage!),
                               backgroundColor: Colors.red,
+                              duration: const Duration(seconds: 3),
                             ),
                           );
                         }

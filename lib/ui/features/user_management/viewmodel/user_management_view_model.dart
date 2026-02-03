@@ -19,6 +19,7 @@ class UserManagementViewModel extends ChangeNotifier {
   final FirebaseAuthService _authService;
   StreamSubscription<List<UserModel>>? _usersStreamSubscription;
   Timer? _verificationSyncTimer;
+  bool _isSyncingVerification = false; // Flag to prevent concurrent syncs
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -106,11 +107,20 @@ class UserManagementViewModel extends ChangeNotifier {
     _verificationSyncTimer = Timer.periodic(
       const Duration(seconds: 30),
       (_) async {
+        // Skip if a sync is already in progress
+        if (_isSyncingVerification) {
+          debugPrint('UserManagementViewModel: Skipping sync - already in progress');
+          return;
+        }
+        
+        _isSyncingVerification = true;
         try {
           await _authService.syncCurrentUserEmailVerified();
           debugPrint('UserManagementViewModel: Synced current user verification status');
         } catch (e) {
           debugPrint('UserManagementViewModel: Error syncing verification: $e');
+        } finally {
+          _isSyncingVerification = false;
         }
       },
     );

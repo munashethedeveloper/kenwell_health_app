@@ -107,6 +107,7 @@ class FirebaseAuthService {
       } on FirebaseException catch (firestoreError) {
         // Log Firestore sync failure but don't fail the login
         debugPrint('FirebaseAuth: Warning - Login succeeded but verification status sync failed: ${firestoreError.message}');
+        debugPrint('FirebaseAuth: Verification status will be synced on next login or manual sync');
         // Continue with login even if verification sync fails
       }
 
