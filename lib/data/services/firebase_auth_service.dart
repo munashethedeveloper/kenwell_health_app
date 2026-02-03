@@ -163,9 +163,9 @@ class FirebaseAuthService {
             .doc(user.uid)
             .set(userModel.toMap());
         debugPrint('FirebaseAuth: User data saved successfully to Firestore');
-      } catch (firestoreError) {
+      } catch (firestoreError, firestoreStackTrace) {
         debugPrint('FirebaseAuth: ERROR saving to Firestore: $firestoreError');
-        debugPrintStack(stackTrace: StackTrace.current);
+        debugPrintStack(stackTrace: firestoreStackTrace);
         // Note: User account was created in Firebase Auth even if Firestore fails
         // This could lead to inconsistent state, but we still return the user model
         // so the caller knows the user was created
