@@ -107,19 +107,23 @@ class UserManagementViewModel extends ChangeNotifier {
     _verificationSyncTimer = Timer.periodic(
       const Duration(seconds: 30),
       (_) async {
-        // Skip if a sync is already in progress
+        // Atomically check and set flag to prevent race condition
         if (_isSyncingVerification) {
           debugPrint('UserManagementViewModel: Skipping sync - already in progress');
           return;
         }
         
+        // Set flag before async operation
         _isSyncingVerification = true;
+        
         try {
-          await _authService.syncCurrentUserEmailVerified();
+          // Use the wrapper method for consistency
+          await _authService.syncCurrentUserEmailVerification();
           debugPrint('UserManagementViewModel: Synced current user verification status');
         } catch (e) {
           debugPrint('UserManagementViewModel: Error syncing verification: $e');
         } finally {
+          // Always reset flag in finally block
           _isSyncingVerification = false;
         }
       },

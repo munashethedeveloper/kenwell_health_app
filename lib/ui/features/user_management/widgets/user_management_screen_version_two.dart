@@ -88,7 +88,7 @@ class _UserManagementScreenVersionTwoState
                                 Text('Syncing your verification status...'),
                               ],
                             ),
-                            duration: Duration(minutes: 1), // Long duration, will be dismissed manually
+                            duration: Duration(seconds: 10), // Fallback timeout if dismissal fails
                           ),
                         );
                         
