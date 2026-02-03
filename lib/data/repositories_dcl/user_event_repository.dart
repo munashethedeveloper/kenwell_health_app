@@ -30,8 +30,10 @@ class UserEventRepository {
       final startOfThisWeek = _startOfWeek(now);
       final endOfFollowingWeek = _endOfWeek(startOfThisWeek.add(const Duration(days: 7)));
       
-      debugPrint('UserEventRepository: Fetching events for user: $userId');
-      debugPrint('UserEventRepository: Date range: $startOfThisWeek to $endOfFollowingWeek');
+      if (kDebugMode) {
+        debugPrint('UserEventRepository: Fetching events');
+        debugPrint('UserEventRepository: Date range: $startOfThisWeek to $endOfFollowingWeek');
+      }
       
       final snapshot = await _firestore
           .collection('user_events')
@@ -40,11 +42,13 @@ class UserEventRepository {
           .where('eventDate', isLessThanOrEqualTo: Timestamp.fromDate(endOfFollowingWeek))
           .get();
       
-      debugPrint('UserEventRepository: Successfully fetched ${snapshot.docs.length} events');
+      if (kDebugMode) {
+        debugPrint('UserEventRepository: Successfully fetched ${snapshot.docs.length} events');
+      }
       return snapshot.docs.map((doc) => doc.data()).toList();
     } on FirebaseException catch (e) {
       if (e.code == 'failed-precondition') {
-        debugPrint('UserEventRepository: Index required! Creating index...');
+        debugPrint('UserEventRepository: Missing index detected!');
         debugPrint('UserEventRepository: Error message: ${e.message}');
         debugPrint('UserEventRepository: Please follow these steps:');
         debugPrint('1. Click the link in the error message to create the index');
