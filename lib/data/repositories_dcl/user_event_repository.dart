@@ -30,11 +30,37 @@ class UserEventRepository {
       final startOfThisWeek = _startOfWeek(now);
       final endOfFollowingWeek = _endOfWeek(startOfThisWeek.add(const Duration(days: 7)));
       
-      if (kDebugMode) {
-        debugPrint('UserEventRepository: Fetching events');
-        debugPrint('UserEventRepository: Date range: $startOfThisWeek to $endOfFollowingWeek');
+      debugPrint('=== UserEventRepository: fetchUserEvents ===');
+      debugPrint('UserEventRepository: Current time: $now');
+      debugPrint('UserEventRepository: UserId: $userId');
+      debugPrint('UserEventRepository: Date range: $startOfThisWeek to $endOfFollowingWeek');
+      debugPrint('UserEventRepository: Week calculation:');
+      debugPrint('  - Start of this week (Sunday): $startOfThisWeek');
+      debugPrint('  - End of next week (Saturday): $endOfFollowingWeek');
+      debugPrint('  - Total days in range: ${endOfFollowingWeek.difference(startOfThisWeek).inDays}');
+      
+      // First, check if ANY events exist for this user (for debugging)
+      debugPrint('UserEventRepository: Checking for any events for this user...');
+      final allUserEvents = await _firestore
+          .collection('user_events')
+          .where('userId', isEqualTo: userId)
+          .get();
+      
+      debugPrint('UserEventRepository: Total events for user (no date filter): ${allUserEvents.docs.length}');
+      if (allUserEvents.docs.isNotEmpty) {
+        debugPrint('UserEventRepository: Sample events (showing all):');
+        for (var doc in allUserEvents.docs) {
+          final data = doc.data();
+          final eventDate = data['eventDate'];
+          DateTime? parsedDate;
+          if (eventDate is Timestamp) {
+            parsedDate = eventDate.toDate();
+          }
+          debugPrint('  - ${data['eventTitle']} | Date: $parsedDate (raw: $eventDate) | UserId: ${data['userId']}');
+        }
       }
       
+      // Now query with date range
       final snapshot = await _firestore
           .collection('user_events')
           .where('userId', isEqualTo: userId)
@@ -42,19 +68,40 @@ class UserEventRepository {
           .where('eventDate', isLessThanOrEqualTo: Timestamp.fromDate(endOfFollowingWeek))
           .get();
       
-      if (kDebugMode) {
-        debugPrint('UserEventRepository: Successfully fetched ${snapshot.docs.length} events');
+      debugPrint('UserEventRepository: Query executed successfully');
+      debugPrint('UserEventRepository: Number of documents returned (with date filter): ${snapshot.docs.length}');
+      
+      if (snapshot.docs.isEmpty) {
+        debugPrint('UserEventRepository: ⚠️ No events found for userId: $userId in the date range');
+        debugPrint('UserEventRepository: Please check:');
+        debugPrint('  1. Do events exist in Firestore user_events collection? ${allUserEvents.docs.isNotEmpty ? "YES (${allUserEvents.docs.length} total)" : "NO"}');
+        debugPrint('  2. Is the userId correct? (userId: $userId)');
+        debugPrint('  3. Are the event dates within the range? (${startOfThisWeek} to ${endOfFollowingWeek})');
+        debugPrint('  4. Is the Firestore composite index created?');
+      } else {
+        debugPrint('UserEventRepository: ✅ Found ${snapshot.docs.length} events in date range');
+        for (var doc in snapshot.docs) {
+          final data = doc.data();
+          debugPrint('  - Event: ${data['eventTitle']} | Date: ${data['eventDate']} | UserId: ${data['userId']}');
+        }
       }
+      
       return snapshot.docs.map((doc) => doc.data()).toList();
     } on FirebaseException catch (e) {
+      debugPrint('UserEventRepository: ❌ FirebaseException occurred');
+      debugPrint('UserEventRepository: Error code: ${e.code}');
+      debugPrint('UserEventRepository: Error message: ${e.message}');
+      
       if (e.code == 'failed-precondition') {
         debugPrint('UserEventRepository: Missing index detected!');
-        debugPrint('UserEventRepository: Error message: ${e.message}');
         debugPrint('UserEventRepository: Please follow these steps:');
         debugPrint('1. Click the link in the error message to create the index');
         debugPrint('2. Wait 1-2 minutes for the index to build');
         debugPrint('3. Try again - the query will work automatically once index is ready');
       }
+      rethrow;
+    } catch (e) {
+      debugPrint('UserEventRepository: ❌ Unexpected error: ${e.toString()}');
       rethrow;
     }
   }
