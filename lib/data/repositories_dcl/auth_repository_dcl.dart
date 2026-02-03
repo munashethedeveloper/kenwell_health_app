@@ -9,22 +9,33 @@ class AuthRepository {
 
   /// Login user - tries Firebase first, falls back to local database
   Future<UserModel?> login(String email, String password) async {
+    AppLogger.info('AuthRepository: Login attempt for email: $email');
+    
     // Try Firebase first
     try {
+      AppLogger.info('AuthRepository: Trying Firebase authentication');
       final firebaseUser = await _firebaseAuthService.login(email, password);
       if (firebaseUser != null) {
+        AppLogger.info('AuthRepository: Firebase login successful');
         return firebaseUser;
       }
+      AppLogger.warning('AuthRepository: Firebase login returned null');
     } catch (e) {
-      AppLogger.error('Firebase login failed', e);
+      AppLogger.error('AuthRepository: Firebase login failed', e);
     }
 
     // Fallback to local database
     try {
+      AppLogger.info('AuthRepository: Trying local database authentication');
       final localUser = await _localAuthService.login(email, password);
+      if (localUser != null) {
+        AppLogger.info('AuthRepository: Local database login successful');
+      } else {
+        AppLogger.warning('AuthRepository: Local database login returned null');
+      }
       return localUser;
     } catch (e) {
-      AppLogger.error('Local login failed', e);
+      AppLogger.error('AuthRepository: Local login failed', e);
       return null;
     }
   }

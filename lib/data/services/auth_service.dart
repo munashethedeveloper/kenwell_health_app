@@ -61,26 +61,42 @@ class AuthService {
     final sanitizedEmail = email.trim().toLowerCase();
     final sanitizedPassword = password.trim();
 
+    debugPrint('AuthService: Login attempt for email: $sanitizedEmail');
+
     // Login with FirebaseAuth
     final firebaseAuthService = FirebaseAuthService();
     final firebaseUser =
         await firebaseAuthService.login(sanitizedEmail, sanitizedPassword);
-    if (firebaseUser == null) return null;
+    
+    if (firebaseUser == null) {
+      debugPrint('AuthService: Firebase login failed, returning null');
+      return null;
+    }
+
+    debugPrint('AuthService: Firebase login successful, UID: ${firebaseUser.id}');
 
     // Fetch user from local DB by Firebase UID, or create if not found
     var user = await _database.getUserById(firebaseUser.id);
-    user ??= await _database.createUser(
-      id: firebaseUser.id,
-      email: firebaseUser.email,
-      password: sanitizedPassword,
-      role: firebaseUser.role,
-      phoneNumber: firebaseUser.phoneNumber,
-      firstName: firebaseUser.firstName,
-      lastName: firebaseUser.lastName,
-    );
+    
+    if (user == null) {
+      debugPrint('AuthService: User not found in local DB, creating new entry');
+      user = await _database.createUser(
+        id: firebaseUser.id,
+        email: firebaseUser.email,
+        password: sanitizedPassword,
+        role: firebaseUser.role,
+        phoneNumber: firebaseUser.phoneNumber,
+        firstName: firebaseUser.firstName,
+        lastName: firebaseUser.lastName,
+      );
+      debugPrint('AuthService: User created in local DB');
+    } else {
+      debugPrint('AuthService: User found in local DB');
+    }
 
     final prefs = await _prefsFuture;
     await prefs.setString(_currentUserPrefsKey, user.id);
+    debugPrint('AuthService: User ID saved to SharedPreferences');
 
     return _mapToUserModel(user);
   }

@@ -47,6 +47,8 @@ class FirebaseAuthService {
   /// Login with email & password
   Future<UserModel?> login(String email, String password) async {
     try {
+      debugPrint('FirebaseAuth: Attempting login for email: $email');
+      
       final userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
@@ -54,14 +56,19 @@ class FirebaseAuthService {
 
       final user = userCredential.user;
       if (user == null) {
+        debugPrint('FirebaseAuth: Login failed - userCredential.user is null');
         return null;
       }
+
+      debugPrint('FirebaseAuth: Login successful for UID: ${user.uid}');
 
       // Fetch additional user data from Firestore
       final doc = await _firestore.collection('users').doc(user.uid).get();
       bool emailVerified = user.emailVerified;
+      
       if (!doc.exists) {
-        debugPrint('FirebaseAuth: User document not found for ${user.uid}');
+        debugPrint('FirebaseAuth: User document not found in Firestore for ${user.uid}');
+        debugPrint('FirebaseAuth: Creating minimal user model with available data');
         return UserModel(
           id: user.uid,
           email: user.email ?? '',
@@ -75,9 +82,35 @@ class FirebaseAuthService {
 
       debugPrint('FirebaseAuth: User data from Firestore: ${doc.data()}');
       return UserModel.fromMap(doc.data()!);
+    } on FirebaseAuthException catch (e) {
+      // Handle specific Firebase Auth errors with detailed logging
+      debugPrint('FirebaseAuth: Login failed with code: ${e.code}');
+      debugPrint('FirebaseAuth: Error message: ${e.message}');
+      
+      switch (e.code) {
+        case 'user-not-found':
+          debugPrint('FirebaseAuth: No user found with email: $email');
+          break;
+        case 'wrong-password':
+          debugPrint('FirebaseAuth: Invalid password provided for email: $email');
+          break;
+        case 'invalid-email':
+          debugPrint('FirebaseAuth: Invalid email format: $email');
+          break;
+        case 'user-disabled':
+          debugPrint('FirebaseAuth: User account has been disabled: $email');
+          break;
+        case 'too-many-requests':
+          debugPrint('FirebaseAuth: Too many failed login attempts. Account temporarily locked.');
+          break;
+        default:
+          debugPrint('FirebaseAuth: Unknown error code: ${e.code}');
+      }
+      
+      return null;
     } catch (e, stackTrace) {
-      // Handle errors (FirebaseAuthException, network issues, etc.)
-      debugPrint('Login error: $e');
+      // Handle other errors (network issues, etc.)
+      debugPrint('FirebaseAuth: Login error (non-auth): $e');
       debugPrintStack(stackTrace: stackTrace);
       return null;
     }
