@@ -112,7 +112,8 @@ class FirebaseAuthService {
       }
 
       // Return user model with updated verification status
-      final userData = doc.data()!;
+      // Create a mutable copy of userData since Firestore returns an immutable Map
+      final userData = Map<String, dynamic>.from(doc.data()!);
       userData['emailVerified'] = emailVerified;
       
       debugPrint('FirebaseAuth: User data from Firestore: $userData');
