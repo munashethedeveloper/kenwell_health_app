@@ -73,7 +73,7 @@ class _UserManagementScreenVersionTwoState
                         // Show loading indicator
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Syncing verification status...'),
+                            content: Text('Syncing your verification status...'),
                             duration: Duration(seconds: 2),
                           ),
                         );
@@ -81,7 +81,7 @@ class _UserManagementScreenVersionTwoState
                         // Sync verification status
                         await context
                             .read<UserManagementViewModel>()
-                            .syncAllUsersVerificationStatus();
+                            .syncCurrentUserVerificationStatus();
                         
                         if (!mounted) return;
                         
@@ -111,7 +111,19 @@ class _UserManagementScreenVersionTwoState
                           children: [
                             Icon(Icons.sync, size: 20),
                             SizedBox(width: 8),
-                            Text('Sync Verification Status'),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Sync My Verification'),
+                                Text(
+                                  'Check if email is verified',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),

@@ -189,12 +189,12 @@ class UserManagementViewModel extends ChangeNotifier {
     }
   }
 
-  /// Sync email verification status for all users
-  /// This checks Firebase Auth and updates Firestore for each user
-  Future<void> syncAllUsersVerificationStatus() async {
+  /// Sync email verification status for the current logged-in user
+  /// This triggers Firebase Auth to check if the user has verified their email
+  Future<void> syncCurrentUserVerificationStatus() async {
     try {
-      await _authService.syncAllUsersEmailVerification();
-      _setSuccess('Verification status synced for all users');
+      await _authService.syncCurrentUserEmailVerification();
+      _setSuccess('Your verification status has been synced');
     } catch (e) {
       _setError('Failed to sync verification status');
       debugPrint('Sync verification error: $e');

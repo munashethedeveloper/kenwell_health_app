@@ -27,10 +27,8 @@ class FirebaseAuthService {
 
   /// Sync email verification status for the current logged-in user
   /// Note: Firebase Auth client SDK can only check the current user's verification.
-  /// Other users' verification status is updated when they log in.
-  /// This method is named for consistency with the UI action "Sync All Users"
-  /// which actually syncs the current admin user's status.
-  Future<void> syncAllUsersEmailVerification() async {
+  /// Other users' verification status is automatically updated when they log in.
+  Future<void> syncCurrentUserEmailVerification() async {
     try {
       debugPrint('FirebaseAuth: Syncing current user verification status');
       
@@ -101,10 +99,16 @@ class FirebaseAuthService {
       }
 
       // Update Firestore with latest email verification status
-      await _firestore.collection('users').doc(user.uid).update({
-        'emailVerified': emailVerified,
-      });
-      debugPrint('FirebaseAuth: Updated emailVerified to $emailVerified for ${user.uid}');
+      try {
+        await _firestore.collection('users').doc(user.uid).update({
+          'emailVerified': emailVerified,
+        });
+        debugPrint('FirebaseAuth: Updated emailVerified to $emailVerified for ${user.uid}');
+      } on FirebaseException catch (firestoreError) {
+        // Log Firestore sync failure but don't fail the login
+        debugPrint('FirebaseAuth: Warning - Login succeeded but verification status sync failed: ${firestoreError.message}');
+        // Continue with login even if verification sync fails
+      }
 
       // Return user model with updated verification status
       final userData = doc.data()!;
@@ -118,8 +122,8 @@ class FirebaseAuthService {
       debugPrintStack(stackTrace: stackTrace);
       return null;
     } on FirebaseException catch (e, stackTrace) {
-      // Handle Firestore specific errors (e.g., during verification status update)
-      debugPrint('Firestore error during login (verification sync may have failed): ${e.code} - ${e.message}');
+      // Handle Firestore specific errors (e.g., during user data fetch)
+      debugPrint('Firestore error during login (user data fetch failed): ${e.code} - ${e.message}');
       debugPrintStack(stackTrace: stackTrace);
       return null;
     } catch (e, stackTrace) {
