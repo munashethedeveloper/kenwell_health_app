@@ -161,13 +161,19 @@ class MyEventScreenState extends State<MyEventScreen> {
   
   // Get user-friendly error message
   String _getErrorMessage(dynamic error) {
+    // Check for FirebaseException first
+    if (error is FirebaseException) {
+      if (error.code == 'failed-precondition') {
+        return 'Database index is being created. Please wait a moment and try again.';
+      } else if (error.code == 'permission-denied') {
+        return 'You don\'t have permission to view events. Please contact support.';
+      }
+    }
+    
+    // Fall back to string matching for other error types
     final errorStr = error.toString().toLowerCase();
     
-    if (errorStr.contains('failed-precondition') || errorStr.contains('index')) {
-      return 'Database index is being created. Please wait a moment and try again.';
-    } else if (errorStr.contains('permission') || errorStr.contains('denied')) {
-      return 'You don\'t have permission to view events. Please contact support.';
-    } else if (errorStr.contains('network') || errorStr.contains('connection')) {
+    if (errorStr.contains('network') || errorStr.contains('connection')) {
       return 'Network error. Please check your internet connection and try again.';
     } else {
       return 'Failed to load events. Please try again.';
