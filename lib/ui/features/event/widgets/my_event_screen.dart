@@ -50,6 +50,9 @@ class MyEventScreenState extends State<MyEventScreen> {
 
   // Fetch user events from Firestore
   Future<void> _fetchUserEvents() async {
+    // Don't show loading state if widget is not mounted
+    if (!mounted) return;
+    
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -59,14 +62,17 @@ class MyEventScreenState extends State<MyEventScreen> {
       // Get current user
       final authService = AuthService();
       final user = await authService.getCurrentUser();
+      
+      if (!mounted) return;
+      
       debugPrint('MyEventScreen: Current user: ${user?.id}');
       
-      // If no user, clear events and return
+      // If no user, clear events and return (but don't show error snackbar during login)
       if (user == null) {
         setState(() {
           _userEvents = [];
           _isLoading = false;
-          _errorMessage = 'No user logged in. Please log in to view your events.';
+          // Don't set error message - this is expected during logout or initial load
         });
         debugPrint('MyEventScreen: No user logged in.');
         return;
@@ -75,6 +81,9 @@ class MyEventScreenState extends State<MyEventScreen> {
       // Fetch user events from repository
       final repo = UserEventRepository();
       final userEventMaps = await repo.fetchUserEvents(user.id);
+      
+      if (!mounted) return;
+      
       debugPrint('MyEventScreen: Raw userEventMaps from Firestore:');
       for (final map in userEventMaps) {
         debugPrint('  - ${map.toString()}');
@@ -131,30 +140,41 @@ class MyEventScreenState extends State<MyEventScreen> {
             '  - id: ${event.id}, title: ${event.title}, date: ${event.date}');
       }
       
+      if (!mounted) return;
+      
       setState(() {
         _userEvents = events;
         _isLoading = false;
       });
     } catch (e) {
       debugPrint('MyEventScreen: Error fetching events: ${e.toString()}');
+      
+      if (!mounted) return;
+      
       setState(() {
         _userEvents = [];
         _isLoading = false;
         _errorMessage = _getErrorMessage(e);
       });
       
-      // Show error snackbar
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(_errorMessage ?? 'Failed to load events'),
-            duration: const Duration(seconds: 5),
-            action: SnackBarAction(
-              label: 'Retry',
-              onPressed: _fetchUserEvents,
+      // Only show error snackbar if the widget is visible and mounted
+      // and it's not a "not logged in" scenario (which is handled silently)
+      if (mounted && _errorMessage != null) {
+        // Don't show snackbar during initial load or if screen isn't visible
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(_errorMessage!),
+              duration: const Duration(seconds: 5),
+              action: SnackBarAction(
+                label: 'Retry',
+                onPressed: _fetchUserEvents,
+              ),
             ),
-          ),
-        );
+          );
+        });
       }
     }
   }
