@@ -97,17 +97,18 @@ class FirebaseAuthService {
     emailVerified = false,
     required String phoneNumber,
   }) async {
-    FirebaseApp? secondaryApp;
     try {
       debugPrint('FirebaseAuth: Starting registration for $email');
 
       // Create a secondary Firebase app to avoid logging out the current user
       // This is necessary because createUserWithEmailAndPassword automatically
       // signs in the newly created user, which would log out the admin
+      final FirebaseApp secondaryApp;
       try {
         secondaryApp = Firebase.app('userRegistration');
         debugPrint('FirebaseAuth: Using existing secondary app');
-      } catch (e) {
+      } on FirebaseException catch (_) {
+        // App doesn't exist, create it
         debugPrint(
             'FirebaseAuth: Creating new secondary app for user registration');
         secondaryApp = await Firebase.initializeApp(
