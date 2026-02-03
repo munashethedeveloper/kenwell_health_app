@@ -61,6 +61,93 @@ class _UserManagementScreenVersionTwoState
                   ],
                 ),
                 actions: [
+                  // Sync verification status button
+                  PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert,
+                        color: Color(0xFF201C58)),
+                    tooltip: 'More options',
+                    onSelected: (value) async {
+                      if (!mounted) return;
+                      
+                      if (value == 'sync_verification') {
+                        // Show loading indicator
+                        final messenger = ScaffoldMessenger.of(context);
+                        messenger.showSnackBar(
+                          const SnackBar(
+                            content: Row(
+                              children: [
+                                SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  ),
+                                ),
+                                SizedBox(width: 16),
+                                Text('Syncing your verification status...'),
+                              ],
+                            ),
+                            duration: Duration(seconds: 10), // Fallback timeout if dismissal fails
+                          ),
+                        );
+                        
+                        // Sync verification status
+                        await context
+                            .read<UserManagementViewModel>()
+                            .syncCurrentUserVerificationStatus();
+                        
+                        if (!mounted) return;
+                        
+                        // Hide loading snackbar
+                        messenger.hideCurrentSnackBar();
+                        
+                        // Show result message
+                        final viewModel = context.read<UserManagementViewModel>();
+                        if (viewModel.successMessage != null) {
+                          messenger.showSnackBar(
+                            SnackBar(
+                              content: Text(viewModel.successMessage!),
+                              backgroundColor: Colors.green,
+                              duration: const Duration(seconds: 3),
+                            ),
+                          );
+                        } else if (viewModel.errorMessage != null) {
+                          messenger.showSnackBar(
+                            SnackBar(
+                              content: Text(viewModel.errorMessage!),
+                              backgroundColor: Colors.red,
+                              duration: const Duration(seconds: 3),
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(
+                        value: 'sync_verification',
+                        child: Row(
+                          children: [
+                            Icon(Icons.sync, size: 20),
+                            SizedBox(width: 8),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Sync My Verification'),
+                                Text(
+                                  'Check if email is verified',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                   IconButton(
                     onPressed: () {
                       if (mounted) {

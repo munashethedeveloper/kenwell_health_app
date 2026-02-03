@@ -298,6 +298,8 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
 
         final filteredUsers = viewModel.filteredUsers;
         final totalUsers = viewModel.users.length;
+        final verifiedCount = viewModel.verifiedUsersCount;
+        final unverifiedCount = viewModel.unverifiedUsersCount;
         final filterActive = viewModel.selectedFilter != 'All' ||
             viewModel.searchQuery.isNotEmpty;
 
@@ -339,14 +341,36 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                             ),
                           ),
                           const SizedBox(height: 4),
-                          Text(
-                            filterActive
-                                ? 'Filtered results'
-                                : 'Manage your user accounts',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.9),
-                              fontSize: 14,
-                            ),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.verified,
+                                color: Colors.white.withValues(alpha: 0.9),
+                                size: 16,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '$verifiedCount verified',
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.9),
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Icon(
+                                Icons.error_outline,
+                                color: Colors.white.withValues(alpha: 0.9),
+                                size: 16,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '$unverifiedCount not verified',
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.9),
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
