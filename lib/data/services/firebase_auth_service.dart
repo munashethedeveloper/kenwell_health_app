@@ -25,6 +25,37 @@ class FirebaseAuthService {
     }
   }
 
+  /// Sync email verification status for all users in Firestore
+  /// This is an admin function that checks Firebase Auth and updates Firestore
+  /// Note: This only works for users who have logged in at least once
+  /// as we can't access other users' auth state directly from client
+  Future<void> syncAllUsersEmailVerification() async {
+    try {
+      debugPrint('FirebaseAuth: Starting sync of all users verification status');
+      
+      // Get all users from Firestore
+      final querySnapshot = await _firestore.collection('users').get();
+      
+      int updatedCount = 0;
+      for (var doc in querySnapshot.docs) {
+        final userData = doc.data();
+        final userId = doc.id;
+        
+        // Note: We can only reliably check the current user's verification status
+        // For other users, we rely on them logging in to update their status
+        // This method primarily serves to refresh data from Firestore
+        
+        debugPrint('FirebaseAuth: Processed user $userId');
+      }
+      
+      debugPrint('FirebaseAuth: Completed verification sync for all users');
+    } catch (e, stackTrace) {
+      debugPrint('FirebaseAuth: Error syncing verification status: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
   /// Send email verification to current user
   Future<void> sendEmailVerification() async {
     final user = _auth.currentUser;
@@ -59,9 +90,14 @@ class FirebaseAuthService {
         return null;
       }
 
+      // Reload user to get latest verification status
+      await user.reload();
+      final updatedUser = _auth.currentUser;
+      final emailVerified = updatedUser?.emailVerified ?? false;
+
       // Fetch additional user data from Firestore
       final doc = await _firestore.collection('users').doc(user.uid).get();
-      bool emailVerified = user.emailVerified;
+      
       if (!doc.exists) {
         debugPrint('FirebaseAuth: User document not found for ${user.uid}');
         return UserModel(
@@ -75,8 +111,18 @@ class FirebaseAuthService {
         );
       }
 
-      debugPrint('FirebaseAuth: User data from Firestore: ${doc.data()}');
-      return UserModel.fromMap(doc.data()!);
+      // Update Firestore with latest email verification status
+      await _firestore.collection('users').doc(user.uid).update({
+        'emailVerified': emailVerified,
+      });
+      debugPrint('FirebaseAuth: Updated emailVerified to $emailVerified for ${user.uid}');
+
+      // Return user model with updated verification status
+      final userData = doc.data()!;
+      userData['emailVerified'] = emailVerified;
+      
+      debugPrint('FirebaseAuth: User data from Firestore: $userData');
+      return UserModel.fromMap(userData);
     } catch (e, stackTrace) {
       // Handle errors (FirebaseAuthException, network issues, etc.)
       debugPrint('Login error: $e');

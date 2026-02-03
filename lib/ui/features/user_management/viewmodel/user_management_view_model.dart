@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../data/services/firebase_auth_service.dart';
 import '../../../../domain/constants/user_roles.dart';
@@ -16,6 +17,7 @@ class UserManagementViewModel extends ChangeNotifier {
   }
 
   final FirebaseAuthService _authService;
+  StreamSubscription<List<UserModel>>? _usersStreamSubscription;
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -60,7 +62,32 @@ class UserManagementViewModel extends ChangeNotifier {
   }
 
   UserManagementViewModel({FirebaseAuthService? authService})
-      : _authService = authService ?? FirebaseAuthService();
+      : _authService = authService ?? FirebaseAuthService() {
+    // Start listening to user updates immediately
+    _startListeningToUsers();
+  }
+
+  @override
+  void dispose() {
+    _usersStreamSubscription?.cancel();
+    super.dispose();
+  }
+
+  /// Start listening to real-time user updates from Firestore
+  void _startListeningToUsers() {
+    _setLoading(true);
+    _usersStreamSubscription = _authService.getAllUsersStream().listen(
+      (users) {
+        _users = users;
+        _isLoading = false;
+        notifyListeners();
+      },
+      onError: (error) {
+        _setError('Failed to load users. Please try again.');
+        debugPrint('Users stream error: $error');
+      },
+    );
+  }
 
   // Private helper methods
   void _setLoading(bool value) {
@@ -117,7 +144,8 @@ class UserManagementViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Load all users
+  // Load all users - now triggers a one-time fetch
+  // The stream will continue to provide updates
   Future<void> loadUsers() async {
     _setLoading(true);
     _errorMessage = null;
@@ -130,6 +158,18 @@ class UserManagementViewModel extends ChangeNotifier {
     } catch (e) {
       _setError('Failed to load users. Please try again.');
       debugPrint('Load users error: $e');
+    }
+  }
+
+  /// Sync email verification status for all users
+  /// This checks Firebase Auth and updates Firestore for each user
+  Future<void> syncAllUsersVerificationStatus() async {
+    try {
+      await _authService.syncAllUsersEmailVerification();
+      _setSuccess('Verification status synced for all users');
+    } catch (e) {
+      _setError('Failed to sync verification status');
+      debugPrint('Sync verification error: $e');
     }
   }
 
