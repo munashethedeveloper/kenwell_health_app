@@ -33,6 +33,8 @@ class MyEventScreenState extends State<MyEventScreen> {
   String? _startingEventId;
   int _selectedWeek = 0; // 0 = this week, 1 = next week
   List<WellnessEvent> _userEvents = [];
+  bool _isLoading = false;
+  String? _errorMessage;
 
   // Initialize state
   @override
@@ -48,78 +50,154 @@ class MyEventScreenState extends State<MyEventScreen> {
 
   // Fetch user events from Firestore
   Future<void> _fetchUserEvents() async {
-    setState(() {});
-    // Get current user
-    final authService = AuthService();
-    final user = await authService.getCurrentUser();
-    debugPrint('MyEventScreen: Current user: \\${user?.id}');
-    // If no user, clear events and return
-    if (user == null) {
+    // Don't show loading state if widget is not mounted
+    if (!mounted) return;
+    
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+    
+    try {
+      // Get current user
+      final authService = AuthService();
+      final user = await authService.getCurrentUser();
+      
+      if (!mounted) return;
+      
+      debugPrint('MyEventScreen: Current user: ${user?.id}');
+      
+      // If no user, clear events and return (but don't show error snackbar during login)
+      if (user == null) {
+        setState(() {
+          _userEvents = [];
+          _isLoading = false;
+          // Don't set error message - this is expected during logout or initial load
+        });
+        debugPrint('MyEventScreen: No user logged in.');
+        return;
+      }
+      
+      // Fetch user events from repository
+      final repo = UserEventRepository();
+      final userEventMaps = await repo.fetchUserEvents(user.id);
+      
+      if (!mounted) return;
+      
+      debugPrint('MyEventScreen: Raw userEventMaps from Firestore:');
+      for (final map in userEventMaps) {
+        debugPrint('  - ${map.toString()}');
+      }
+      
+      // Convert Firestore maps to WellnessEvent objects
+      final events = userEventMaps
+          .map((e) {
+            try {
+              return WellnessEvent(
+                id: e['eventId'] ?? '',
+                title: e['eventTitle'] ?? '',
+                date: (e['eventDate'] as Timestamp).toDate(),
+                venue: e['eventVenue'] ?? '',
+                address: e['eventLocation'] ?? '',
+                townCity: '',
+                province: '',
+                onsiteContactFirstName: '',
+                onsiteContactLastName: '',
+                onsiteContactNumber: '',
+                onsiteContactEmail: '',
+                aeContactFirstName: '',
+                aeContactLastName: '',
+                aeContactNumber: '',
+                aeContactEmail: '',
+                servicesRequested: '',
+                additionalServicesRequested: '',
+                expectedParticipation: 0,
+                nurses: 0,
+                coordinators: 0,
+                setUpTime: '',
+                startTime: e['eventStartTime'] ?? '',
+                endTime: e['eventEndTime'] ?? '',
+                strikeDownTime: '',
+                mobileBooths: '',
+                description: '',
+                medicalAid: '',
+                status: 'scheduled',
+                actualStartTime: null,
+                actualEndTime: null,
+              );
+            } catch (err) {
+              debugPrint(
+                  'MyEventScreen: Failed to map event: ${e.toString()} | Error: ${err.toString()}');
+              return null;
+            }
+          })
+          .whereType<WellnessEvent>()
+          .toList();
+      
+      debugPrint('MyEventScreen: Mapped WellnessEvent list:');
+      for (final event in events) {
+        debugPrint(
+            '  - id: ${event.id}, title: ${event.title}, date: ${event.date}');
+      }
+      
+      if (!mounted) return;
+      
+      setState(() {
+        _userEvents = events;
+        _isLoading = false;
+      });
+    } catch (e) {
+      debugPrint('MyEventScreen: Error fetching events: ${e.toString()}');
+      
+      if (!mounted) return;
+      
       setState(() {
         _userEvents = [];
+        _isLoading = false;
+        _errorMessage = _getErrorMessage(e);
       });
-      debugPrint('MyEventScreen: No user logged in.');
-      return;
+      
+      // Only show error snackbar if the widget is visible and mounted
+      // and it's not a "not logged in" scenario (which is handled silently)
+      if (mounted && _errorMessage != null) {
+        // Don't show snackbar during initial load or if screen isn't visible
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(_errorMessage!),
+              duration: const Duration(seconds: 5),
+              action: SnackBarAction(
+                label: 'Retry',
+                onPressed: _fetchUserEvents,
+              ),
+            ),
+          );
+        });
+      }
     }
-    // Fetch user events from repository
-    final repo = UserEventRepository();
-    final userEventMaps = await repo.fetchUserEvents(user.id);
-    debugPrint('MyEventScreen: Raw userEventMaps from Firestore:');
-    for (final map in userEventMaps) {
-      debugPrint('  - \\${map.toString()}');
+  }
+  
+  // Get user-friendly error message
+  String _getErrorMessage(dynamic error) {
+    // Check for FirebaseException first
+    if (error is FirebaseException) {
+      if (error.code == 'failed-precondition') {
+        return 'Database index is being created. Please wait a moment and try again.';
+      } else if (error.code == 'permission-denied') {
+        return 'You don\'t have permission to view events. Please contact support.';
+      }
     }
-    // Convert Firestore maps to WellnessEvent objects
-    final events = userEventMaps
-        .map((e) {
-          try {
-            return WellnessEvent(
-              id: e['eventId'] ?? '',
-              title: e['eventTitle'] ?? '',
-              date: (e['eventDate'] as Timestamp).toDate(),
-              venue: e['eventVenue'] ?? '',
-              address: e['eventLocation'] ?? '',
-              townCity: '',
-              province: '',
-              onsiteContactFirstName: '',
-              onsiteContactLastName: '',
-              onsiteContactNumber: '',
-              onsiteContactEmail: '',
-              aeContactFirstName: '',
-              aeContactLastName: '',
-              aeContactNumber: '',
-              aeContactEmail: '',
-              servicesRequested: '',
-              additionalServicesRequested: '',
-              expectedParticipation: 0,
-              nurses: 0,
-              coordinators: 0,
-              setUpTime: '',
-              startTime: e['eventStartTime'] ?? '',
-              endTime: e['eventEndTime'] ?? '',
-              strikeDownTime: '',
-              mobileBooths: '',
-              description: '',
-              medicalAid: '',
-              status: 'scheduled',
-              actualStartTime: null,
-              actualEndTime: null,
-            );
-          } catch (err) {
-            debugPrint(
-                'MyEventScreen: Failed to map event: \\${e.toString()} | Error: \\${err.toString()}');
-            return null;
-          }
-        })
-        .whereType<WellnessEvent>()
-        .toList();
-    debugPrint('MyEventScreen: Mapped WellnessEvent list:');
-    for (final event in events) {
-      debugPrint(
-          '  - id: \\${event.id}, title: \\${event.title}, date: \\${event.date}');
+    
+    // Fall back to string matching for other error types
+    final errorStr = error.toString().toLowerCase();
+    
+    if (errorStr.contains('network') || errorStr.contains('connection')) {
+      return 'Network error. Please check your internet connection and try again.';
+    } else {
+      return 'Failed to load events. Please try again.';
     }
-    setState(() {
-      _userEvents = events;
-    });
   }
 
   @override
@@ -131,7 +209,10 @@ class MyEventScreenState extends State<MyEventScreen> {
     final nextWeekStart = weekStart.add(const Duration(days: 7));
     final selectedStart = _selectedWeek == 0 ? weekStart : nextWeekStart;
     final selectedEnd = _endOfWeek(selectedStart);
-    final allUpcoming = allEvents.where((e) => !e.date.isBefore(now)).toList();
+    
+    // Compare dates only (not timestamps) to include events on today even if stored at midnight
+    final today = DateTime(now.year, now.month, now.day);
+    final allUpcoming = allEvents.where((e) => !e.date.isBefore(today)).toList();
     // Removed duplicate and unused 'weeklyEvents' definition
 
     debugPrint(
@@ -139,6 +220,7 @@ class MyEventScreenState extends State<MyEventScreen> {
     debugPrint(
         'ConductEventScreen: Total upcoming events = ${allUpcoming.length}');
     debugPrint('ConductEventScreen: Current date/time = ${DateTime.now()}');
+    debugPrint('ConductEventScreen: Today (for comparison) = $today');
 
     // Debug: Print ALL events with details
     if (allEvents.isNotEmpty) {
@@ -206,17 +288,9 @@ class MyEventScreenState extends State<MyEventScreen> {
           IconButton(
             tooltip: 'Refresh',
             icon: const Icon(Icons.refresh, color: Color(0xFF201C58)),
-            onPressed: () async {
-              // Refresh events from Firestore
-              final eventVM = context.read<EventViewModel>();
-              await eventVM.reloadEvents();
-              if (!context.mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Events refreshed'),
-                  duration: Duration(seconds: 1),
-                ),
-              );
+            onPressed: _isLoading ? null : () async {
+              // Refresh user events from Firestore
+              await _fetchUserEvents();
             },
           ),
           TextButton.icon(
@@ -307,8 +381,56 @@ class MyEventScreenState extends State<MyEventScreen> {
             ),
             const SizedBox(height: 12),
 
+            // Show loading indicator
+            if (_isLoading)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircularProgressIndicator(),
+                      SizedBox(height: 16),
+                      Text(
+                        'Loading events...',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            // Show error message
+            else if (_errorMessage != null)
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.error_outline,
+                          size: 64, color: Colors.red),
+                      const SizedBox(height: 16),
+                      Text(
+                        _errorMessage!,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton.icon(
+                        onPressed: _fetchUserEvents,
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Retry'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF201C58),
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
             // If no events for selected week, show friendly empty state
-            if (weeklyEvents.isEmpty)
+            else if (weeklyEvents.isEmpty)
               Center(
                 child: Padding(
                   padding: const EdgeInsets.all(24),
