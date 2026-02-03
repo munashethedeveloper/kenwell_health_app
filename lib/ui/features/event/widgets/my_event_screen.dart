@@ -48,6 +48,7 @@ class MyEventScreenState extends State<MyEventScreen> {
 
   // Fetch user events from Firestore
   Future<void> _fetchUserEvents() async {
+    if (!mounted) return;
     setState(() {});
     // Get current user
     final authService = AuthService();
@@ -55,6 +56,7 @@ class MyEventScreenState extends State<MyEventScreen> {
     debugPrint('MyEventScreen: Current user: \\${user?.id}');
     // If no user, clear events and return
     if (user == null) {
+      if (!mounted) return;
       setState(() {
         _userEvents = [];
       });
@@ -117,6 +119,7 @@ class MyEventScreenState extends State<MyEventScreen> {
       debugPrint(
           '  - id: \\${event.id}, title: \\${event.title}, date: \\${event.date}');
     }
+    if (!mounted) return;
     setState(() {
       _userEvents = events;
     });
@@ -536,6 +539,7 @@ class MyEventScreenState extends State<MyEventScreen> {
 
   // Start the event and navigate to WellnessFlowPage
   Future<void> _startEvent(BuildContext context, WellnessEvent event) async {
+    if (!mounted) return;
     setState(() => _startingEventId = event.id);
     try {
       final eventVM = context.read<EventViewModel>();
@@ -578,6 +582,7 @@ class MyEventScreenState extends State<MyEventScreen> {
       const SnackBar(content: Text('Event finished successfully')),
     );
 
+    if (!mounted) return;
     setState(() {});
   }
 
