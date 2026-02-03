@@ -92,6 +92,8 @@ class UserManagementViewModel extends ChangeNotifier {
       },
       onError: (error) {
         _setError('Failed to load users. Please try again.');
+        _isLoading = false; // Ensure loading state is reset on error
+        notifyListeners();
         debugPrint('Users stream error: $error');
       },
     );
@@ -169,8 +171,9 @@ class UserManagementViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Load all users - now triggers a one-time fetch
-  // The stream will continue to provide updates
+  // Load all users - performs a one-time fetch
+  // This is kept for manual refresh functionality
+  // The stream subscription (_startListeningToUsers) provides continuous updates
   Future<void> loadUsers() async {
     _setLoading(true);
     _errorMessage = null;

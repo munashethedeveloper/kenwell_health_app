@@ -25,11 +25,11 @@ class FirebaseAuthService {
     }
   }
 
-  /// Sync email verification status for all users in Firestore
-  /// Note: This is limited by Firebase Auth client SDK restrictions.
-  /// We can only sync the currently logged-in user's verification status.
+  /// Sync email verification status for the current logged-in user
+  /// Note: Firebase Auth client SDK can only check the current user's verification.
   /// Other users' verification status is updated when they log in.
-  /// This method is primarily for triggering a Firestore refresh.
+  /// This method is named for consistency with the UI action "Sync All Users"
+  /// which actually syncs the current admin user's status.
   Future<void> syncAllUsersEmailVerification() async {
     try {
       debugPrint('FirebaseAuth: Syncing current user verification status');
@@ -112,8 +112,18 @@ class FirebaseAuthService {
       
       debugPrint('FirebaseAuth: User data from Firestore: $userData');
       return UserModel.fromMap(userData);
+    } on FirebaseAuthException catch (e, stackTrace) {
+      // Handle Firebase Auth specific errors
+      debugPrint('Firebase Auth error during login: ${e.code} - ${e.message}');
+      debugPrintStack(stackTrace: stackTrace);
+      return null;
+    } on FirebaseException catch (e, stackTrace) {
+      // Handle Firestore specific errors (e.g., during verification status update)
+      debugPrint('Firestore error during login (verification sync may have failed): ${e.code} - ${e.message}');
+      debugPrintStack(stackTrace: stackTrace);
+      return null;
     } catch (e, stackTrace) {
-      // Handle errors (FirebaseAuthException, network issues, etc.)
+      // Handle any other errors
       debugPrint('Login error: $e');
       debugPrintStack(stackTrace: stackTrace);
       return null;
