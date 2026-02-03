@@ -298,8 +298,8 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
 
         final filteredUsers = viewModel.filteredUsers;
         final totalUsers = viewModel.users.length;
-        final verifiedCount = viewModel.users.where((u) => u.emailVerified).length;
-        final unverifiedCount = totalUsers - verifiedCount;
+        final verifiedCount = viewModel.verifiedUsersCount;
+        final unverifiedCount = viewModel.unverifiedUsersCount;
         final filterActive = viewModel.selectedFilter != 'All' ||
             viewModel.searchQuery.isNotEmpty;
 

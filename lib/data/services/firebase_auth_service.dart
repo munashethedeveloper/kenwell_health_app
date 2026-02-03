@@ -26,29 +26,18 @@ class FirebaseAuthService {
   }
 
   /// Sync email verification status for all users in Firestore
-  /// This is an admin function that checks Firebase Auth and updates Firestore
-  /// Note: This only works for users who have logged in at least once
-  /// as we can't access other users' auth state directly from client
+  /// Note: This is limited by Firebase Auth client SDK restrictions.
+  /// We can only sync the currently logged-in user's verification status.
+  /// Other users' verification status is updated when they log in.
+  /// This method is primarily for triggering a Firestore refresh.
   Future<void> syncAllUsersEmailVerification() async {
     try {
-      debugPrint('FirebaseAuth: Starting sync of all users verification status');
+      debugPrint('FirebaseAuth: Syncing current user verification status');
       
-      // Get all users from Firestore
-      final querySnapshot = await _firestore.collection('users').get();
+      // Sync the current user's verification status
+      await syncCurrentUserEmailVerified();
       
-      int updatedCount = 0;
-      for (var doc in querySnapshot.docs) {
-        final userData = doc.data();
-        final userId = doc.id;
-        
-        // Note: We can only reliably check the current user's verification status
-        // For other users, we rely on them logging in to update their status
-        // This method primarily serves to refresh data from Firestore
-        
-        debugPrint('FirebaseAuth: Processed user $userId');
-      }
-      
-      debugPrint('FirebaseAuth: Completed verification sync for all users');
+      debugPrint('FirebaseAuth: Verification sync completed');
     } catch (e, stackTrace) {
       debugPrint('FirebaseAuth: Error syncing verification status: $e');
       debugPrintStack(stackTrace: stackTrace);

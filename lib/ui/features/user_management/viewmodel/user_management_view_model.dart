@@ -37,6 +37,10 @@ class UserManagementViewModel extends ChangeNotifier {
   String get searchQuery => _searchQuery;
   String get selectedFilter => _selectedFilter;
 
+  // Verification statistics
+  int get verifiedUsersCount => _users.where((u) => u.emailVerified).length;
+  int get unverifiedUsersCount => _users.where((u) => !u.emailVerified).length;
+
   List<UserModel> get filteredUsers {
     var filtered = _users;
 
