@@ -209,7 +209,10 @@ class MyEventScreenState extends State<MyEventScreen> {
     final nextWeekStart = weekStart.add(const Duration(days: 7));
     final selectedStart = _selectedWeek == 0 ? weekStart : nextWeekStart;
     final selectedEnd = _endOfWeek(selectedStart);
-    final allUpcoming = allEvents.where((e) => !e.date.isBefore(now)).toList();
+    
+    // Compare dates only (not timestamps) to include events on today even if stored at midnight
+    final today = DateTime(now.year, now.month, now.day);
+    final allUpcoming = allEvents.where((e) => !e.date.isBefore(today)).toList();
     // Removed duplicate and unused 'weeklyEvents' definition
 
     debugPrint(
@@ -217,6 +220,7 @@ class MyEventScreenState extends State<MyEventScreen> {
     debugPrint(
         'ConductEventScreen: Total upcoming events = ${allUpcoming.length}');
     debugPrint('ConductEventScreen: Current date/time = ${DateTime.now()}');
+    debugPrint('ConductEventScreen: Today (for comparison) = $today');
 
     // Debug: Print ALL events with details
     if (allEvents.isNotEmpty) {
