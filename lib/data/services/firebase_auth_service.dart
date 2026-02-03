@@ -97,17 +97,22 @@ class FirebaseAuthService {
     emailVerified = false,
     required String phoneNumber,
   }) async {
+    FirebaseApp? secondaryApp;
     try {
       debugPrint('FirebaseAuth: Starting registration for $email');
 
       // Create a secondary Firebase app to avoid logging out the current user
       // This is necessary because createUserWithEmailAndPassword automatically
       // signs in the newly created user, which would log out the admin
-      final FirebaseApp secondaryApp;
-      try {
-        secondaryApp = Firebase.app('userRegistration');
+      // Check if the app already exists
+      final existingApps = Firebase.apps
+          .where((app) => app.name == 'userRegistration')
+          .toList();
+
+      if (existingApps.isNotEmpty) {
+        secondaryApp = existingApps.first;
         debugPrint('FirebaseAuth: Using existing secondary app');
-      } on FirebaseException catch (_) {
+      } else {
         // App doesn't exist, create it
         debugPrint(
             'FirebaseAuth: Creating new secondary app for user registration');
@@ -152,30 +157,31 @@ class FirebaseAuthService {
           'FirebaseAuth: Saving user data to Firestore: ${userModel.toMap()}');
 
       // Save extra fields to Firestore (using the main app's firestore)
-      try {
-        await _firestore
-            .collection('users')
-            .doc(user.uid)
-            .set(userModel.toMap());
-        debugPrint('FirebaseAuth: User data saved successfully to Firestore');
-      } catch (firestoreError) {
-        debugPrint('FirebaseAuth: ERROR saving to Firestore: $firestoreError');
-        // Even if Firestore save fails, return the user model
-        // The user account was created in Firebase Auth
-        rethrow;
-      }
-
-      // Sign out from the secondary app to clean up
-      // The main app's auth state remains unchanged
-      await secondaryAuth.signOut();
-      debugPrint(
-          'FirebaseAuth: Signed out from secondary app, main session preserved');
+      await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .set(userModel.toMap());
+      debugPrint('FirebaseAuth: User data saved successfully to Firestore');
 
       return userModel;
     } catch (e, stackTrace) {
       debugPrint('Registration error: $e');
       debugPrintStack(stackTrace: stackTrace);
       return null;
+    } finally {
+      // Always clean up the secondary app session
+      // This ensures the admin's session remains active regardless of success or failure
+      if (secondaryApp != null) {
+        try {
+          final secondaryAuth = FirebaseAuth.instanceFor(app: secondaryApp);
+          await secondaryAuth.signOut();
+          debugPrint(
+              'FirebaseAuth: Signed out from secondary app, main session preserved');
+        } catch (signOutError) {
+          debugPrint(
+              'FirebaseAuth: Error signing out from secondary app: $signOutError');
+        }
+      }
     }
   }
 
