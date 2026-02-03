@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import '../../domain/models/user_model.dart';
 import 'package:flutter/foundation.dart';
+import '../../firebase_options.dart';
 
 class FirebaseAuthService {
   /// Real-time stream of all users (admin function)
@@ -84,6 +86,7 @@ class FirebaseAuthService {
   }
 
   /// Register a new user with extra fields
+  /// Uses a secondary Firebase app to avoid logging out the current admin user
   Future<UserModel?> register({
     required String email,
     required String password,
@@ -94,10 +97,29 @@ class FirebaseAuthService {
     emailVerified = false,
     required String phoneNumber,
   }) async {
+    FirebaseApp? secondaryApp;
     try {
       debugPrint('FirebaseAuth: Starting registration for $email');
 
-      final userCredential = await _auth.createUserWithEmailAndPassword(
+      // Create a secondary Firebase app to avoid logging out the current user
+      // This is necessary because createUserWithEmailAndPassword automatically
+      // signs in the newly created user, which would log out the admin
+      try {
+        secondaryApp = Firebase.app('userRegistration');
+        debugPrint('FirebaseAuth: Using existing secondary app');
+      } catch (e) {
+        debugPrint(
+            'FirebaseAuth: Creating new secondary app for user registration');
+        secondaryApp = await Firebase.initializeApp(
+          name: 'userRegistration',
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+      }
+
+      // Use the secondary app's auth instance
+      final secondaryAuth = FirebaseAuth.instanceFor(app: secondaryApp);
+
+      final userCredential = await secondaryAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -128,7 +150,7 @@ class FirebaseAuthService {
       debugPrint(
           'FirebaseAuth: Saving user data to Firestore: ${userModel.toMap()}');
 
-      // Save extra fields to Firestore
+      // Save extra fields to Firestore (using the main app's firestore)
       try {
         await _firestore
             .collection('users')
@@ -141,6 +163,12 @@ class FirebaseAuthService {
         // The user account was created in Firebase Auth
         rethrow;
       }
+
+      // Sign out from the secondary app to clean up
+      // The main app's auth state remains unchanged
+      await secondaryAuth.signOut();
+      debugPrint(
+          'FirebaseAuth: Signed out from secondary app, main session preserved');
 
       return userModel;
     } catch (e, stackTrace) {
