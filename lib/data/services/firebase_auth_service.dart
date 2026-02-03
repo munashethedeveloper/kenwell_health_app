@@ -106,10 +106,11 @@ class FirebaseAuthService {
       // This is necessary because createUserWithEmailAndPassword automatically
       // signs in the newly created user, which would log out the admin
       // Check if the app already exists
-      if (Firebase.apps.any((app) => app.name == 'userRegistration')) {
-        secondaryApp = Firebase.apps.firstWhere(
-          (app) => app.name == 'userRegistration',
-        );
+      secondaryApp = Firebase.apps
+          .where((app) => app.name == 'userRegistration')
+          .firstOrNull;
+
+      if (secondaryApp != null) {
         debugPrint('FirebaseAuth: Using existing secondary app');
       } else {
         // App doesn't exist, create it
@@ -156,11 +157,19 @@ class FirebaseAuthService {
           'FirebaseAuth: Saving user data to Firestore: ${userModel.toMap()}');
 
       // Save extra fields to Firestore (using the main app's firestore)
-      await _firestore
-          .collection('users')
-          .doc(user.uid)
-          .set(userModel.toMap());
-      debugPrint('FirebaseAuth: User data saved successfully to Firestore');
+      try {
+        await _firestore
+            .collection('users')
+            .doc(user.uid)
+            .set(userModel.toMap());
+        debugPrint('FirebaseAuth: User data saved successfully to Firestore');
+      } catch (firestoreError) {
+        debugPrint('FirebaseAuth: ERROR saving to Firestore: $firestoreError');
+        debugPrintStack(stackTrace: StackTrace.current);
+        // Note: User account was created in Firebase Auth even if Firestore fails
+        // This could lead to inconsistent state, but we still return the user model
+        // so the caller knows the user was created
+      }
 
       return userModel;
     } catch (e, stackTrace) {
