@@ -48,8 +48,6 @@ class MyEventScreenState extends State<MyEventScreen> {
 
   // Fetch user events from Firestore
   Future<void> _fetchUserEvents() async {
-    if (!mounted) return;
-    setState(() {});
     // Get current user
     final authService = AuthService();
     final user = await authService.getCurrentUser();
@@ -539,7 +537,6 @@ class MyEventScreenState extends State<MyEventScreen> {
 
   // Start the event and navigate to WellnessFlowPage
   Future<void> _startEvent(BuildContext context, WellnessEvent event) async {
-    if (!mounted) return;
     setState(() => _startingEventId = event.id);
     try {
       final eventVM = context.read<EventViewModel>();
@@ -563,6 +560,10 @@ class MyEventScreenState extends State<MyEventScreen> {
           ),
         ),
       );
+      
+      // Refresh events after returning from wellness flow
+      if (!mounted) return;
+      _fetchUserEvents();
     } finally {
       if (mounted) {
         setState(() => _startingEventId = null);
@@ -582,8 +583,9 @@ class MyEventScreenState extends State<MyEventScreen> {
       const SnackBar(content: Text('Event finished successfully')),
     );
 
+    // Refresh events after finishing
     if (!mounted) return;
-    setState(() {});
+    _fetchUserEvents();
   }
 
   // Build info chip widget
