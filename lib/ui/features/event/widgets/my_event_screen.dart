@@ -563,7 +563,7 @@ class MyEventScreenState extends State<MyEventScreen> {
       
       // Refresh events after returning from wellness flow
       if (!mounted) return;
-      _fetchUserEvents();
+      await _fetchUserEvents();
     } finally {
       if (mounted) {
         setState(() => _startingEventId = null);
@@ -585,7 +585,7 @@ class MyEventScreenState extends State<MyEventScreen> {
 
     // Refresh events after finishing
     if (!mounted) return;
-    _fetchUserEvents();
+    await _fetchUserEvents();
   }
 
   // Build info chip widget
