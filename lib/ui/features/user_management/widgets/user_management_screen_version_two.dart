@@ -61,6 +61,62 @@ class _UserManagementScreenVersionTwoState
                   ],
                 ),
                 actions: [
+                  // Sync verification status button
+                  PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert,
+                        color: Color(0xFF201C58)),
+                    tooltip: 'More options',
+                    onSelected: (value) async {
+                      if (!mounted) return;
+                      
+                      if (value == 'sync_verification') {
+                        // Show loading indicator
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Syncing verification status...'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                        
+                        // Sync verification status
+                        await context
+                            .read<UserManagementViewModel>()
+                            .syncAllUsersVerificationStatus();
+                        
+                        if (!mounted) return;
+                        
+                        // Show success message
+                        final viewModel = context.read<UserManagementViewModel>();
+                        if (viewModel.successMessage != null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(viewModel.successMessage!),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        } else if (viewModel.errorMessage != null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(viewModel.errorMessage!),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(
+                        value: 'sync_verification',
+                        child: Row(
+                          children: [
+                            Icon(Icons.sync, size: 20),
+                            SizedBox(width: 8),
+                            Text('Sync Verification Status'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                   IconButton(
                     onPressed: () {
                       if (mounted) {

@@ -18,6 +18,7 @@ class UserManagementViewModel extends ChangeNotifier {
 
   final FirebaseAuthService _authService;
   StreamSubscription<List<UserModel>>? _usersStreamSubscription;
+  Timer? _verificationSyncTimer;
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -65,11 +66,14 @@ class UserManagementViewModel extends ChangeNotifier {
       : _authService = authService ?? FirebaseAuthService() {
     // Start listening to user updates immediately
     _startListeningToUsers();
+    // Start periodic verification sync for current user
+    _startPeriodicVerificationSync();
   }
 
   @override
   void dispose() {
     _usersStreamSubscription?.cancel();
+    _verificationSyncTimer?.cancel();
     super.dispose();
   }
 
@@ -85,6 +89,23 @@ class UserManagementViewModel extends ChangeNotifier {
       onError: (error) {
         _setError('Failed to load users. Please try again.');
         debugPrint('Users stream error: $error');
+      },
+    );
+  }
+
+  /// Start periodic sync of current user's email verification status
+  /// This ensures that when a user verifies their email, it's reflected in the UI
+  void _startPeriodicVerificationSync() {
+    // Check every 30 seconds
+    _verificationSyncTimer = Timer.periodic(
+      const Duration(seconds: 30),
+      (_) async {
+        try {
+          await _authService.syncCurrentUserEmailVerified();
+          debugPrint('UserManagementViewModel: Synced current user verification status');
+        } catch (e) {
+          debugPrint('UserManagementViewModel: Error syncing verification: $e');
+        }
       },
     );
   }
