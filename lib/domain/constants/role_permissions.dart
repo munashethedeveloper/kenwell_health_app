@@ -18,11 +18,15 @@ class RolePermissions {
     '/help': [...UserRoles.values],
 
     // Admin-only routes
-    '/user-management': ['ADMIN', 'TOP MANAGEMENT'],
-    '/user-management-version-two': ['ADMIN', 'TOP MANAGEMENT'],
-    '/add-edit-event': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT COORDINATOR'],
-    '/allocate-event': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT COORDINATOR'],
-    '/stats': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT COORDINATOR', 'CLIENT'],
+    '/user-management': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
+    '/user-management-version-two': [
+      'ADMIN',
+      'TOP MANAGEMENT',
+      'PROJECT MANAGER'
+    ],
+    '/add-edit-event': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
+    '/allocate-event': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
+    '/stats': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER', 'CLIENT'],
     '/detailed-stats': [
       'ADMIN',
       'TOP MANAGEMENT',
@@ -124,6 +128,78 @@ class RolePermissions {
     'export_data': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     'update_own_profile': [...UserRoles.values],
     'view_help': [...UserRoles.values],
+    'access_detailed_stats': [
+      'ADMIN',
+      'TOP MANAGEMENT',
+      'PROJECT COORDINATOR',
+      'CLIENT'
+    ],
+    'allocate_event': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
+    'view_member_search': [
+      'PROJECT COORDINATOR',
+      'PROJECT MANAGER',
+      'HEALTH PRACTITIONER',
+      'ADMIN',
+      'TOP MANAGEMENT'
+    ],
+    'register_member': [
+      'PROJECT COORDINATOR',
+      'PROJECT MANAGER',
+      'HEALTH PRACTITIONER',
+      'ADMIN',
+      'TOP MANAGEMENT'
+    ],
+    'conduct_consent': [
+      'PROJECT COORDINATOR',
+      'PROJECT MANAGER',
+      'HEALTH PRACTITIONER',
+      'ADMIN',
+      'TOP MANAGEMENT'
+    ],
+    'conduct_health_screening': [
+      'PROJECT COORDINATOR',
+      'PROJECT MANAGER',
+      'HEALTH PRACTITIONER',
+      'ADMIN',
+      'TOP MANAGEMENT'
+    ],
+    'conduct_health_risk_assessment': [
+      'PROJECT COORDINATOR',
+      'PROJECT MANAGER',
+      'HEALTH PRACTITIONER',
+      'ADMIN',
+      'TOP MANAGEMENT'
+    ],
+    'conduct_hiv_test': [
+      'PROJECT COORDINATOR',
+      'PROJECT MANAGER',
+      'HEALTH PRACTITIONER',
+      'ADMIN',
+      'TOP MANAGEMENT'
+    ],
+    'record_hiv_result': [
+      'PROJECT COORDINATOR',
+      'PROJECT MANAGER',
+      'HEALTH PRACTITIONER',
+      'ADMIN',
+      'TOP MANAGEMENT'
+    ],
+    'conduct_tb_testing': [
+      'PROJECT COORDINATOR',
+      'PROJECT MANAGER',
+      'HEALTH PRACTITIONER',
+      'ADMIN',
+      'TOP MANAGEMENT'
+    ],
+    'conduct_survey': [
+      'PROJECT COORDINATOR',
+      'PROJECT MANAGER',
+      'HEALTH PRACTITIONER',
+      'ADMIN',
+      'TOP MANAGEMENT'
+    ],
+    'view_calendar': [...UserRoles.values],
+    'view_event_details': [...UserRoles.values],
   };
 
   /// Check if a role has access to a specific route

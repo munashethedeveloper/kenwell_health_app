@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/logo/app_logo.dart';
-import '../../../shared/ui/navigation/main_navigation_screen.dart';
-import '../../auth/widgets/auth_wrapper.dart';
 import '../../auth/view_models/auth_view_model.dart';
 import '../view_model/splash_view_model.dart';
 
@@ -70,18 +69,10 @@ class _SplashScreenBodyState extends State<_SplashScreenBody>
 
             switch (target) {
               case SplashNavigationTarget.mainNavigation:
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const MainNavigationScreen(),
-                  ),
-                );
+                context.go('/');
                 break;
               case SplashNavigationTarget.authWrapper:
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const AuthWrapper()),
-                );
+                context.go('/login');
                 break;
             }
           });

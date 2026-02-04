@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../../../domain/constants/role_permissions.dart';
 import '../../../../../domain/constants/user_roles.dart';
 import '../../../../../utils/input_formatters.dart';
 import '../../../../../utils/validators.dart';
@@ -126,6 +127,9 @@ class _CreateUserSectionState extends State<CreateUserSection> {
 
   @override
   Widget build(BuildContext context) {
+    // final userVM = context.watch<UserManagementViewModel>();
+    //  final canCreateUser =
+    //     RolePermissions.canAccessFeature(userVM., 'create_user');
     return Consumer<UserManagementViewModel>(
       builder: (context, viewModel, child) {
         return SafeArea(

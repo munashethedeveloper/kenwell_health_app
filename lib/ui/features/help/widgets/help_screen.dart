@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
@@ -94,7 +95,7 @@ class HelpScreen extends StatelessWidget {
                     // Cancel button
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () => context.pop(),
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(
                               color: KenwellColors.primaryGreen, width: 2),

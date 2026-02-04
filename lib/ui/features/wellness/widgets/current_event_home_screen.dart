@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/ui/shared/ui/containers/gradient_container.dart';
 import 'package:kenwell_health_app/ui/features/wellness/view_model/wellness_flow_view_model.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../routing/route_names.dart';
 import '../../../shared/ui/form/kenwell_section_header.dart';
 // Removed unused import
 
@@ -32,11 +32,10 @@ class CurrentEventHomeScreen extends StatelessWidget {
         debugPrint('canPop=${Navigator.of(context).canPop()}');
         if (!didPop) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (Navigator.of(context).canPop()) {
-              Navigator.of(context).pop();
+            if (context.canPop()) {
+              context.pop();
             } else {
-              Navigator.of(context)
-                  .pushReplacementNamed(RouteNames.memberSearch);
+              context.go('/member-search');
             }
           });
         }
@@ -172,11 +171,10 @@ class CurrentEventHomeScreen extends StatelessWidget {
               CustomPrimaryButton(
                 label: 'Back to Search',
                 onPressed: () {
-                  if (Navigator.of(context).canPop()) {
-                    Navigator.of(context).pop();
+                  if (context.canPop()) {
+                    context.pop();
                   } else {
-                    Navigator.of(context)
-                        .pushReplacementNamed(RouteNames.memberSearch);
+                    context.go('/member-search');
                   }
                 },
               ),

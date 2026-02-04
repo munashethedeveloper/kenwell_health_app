@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
@@ -143,7 +144,7 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
             TextButton.icon(
               onPressed: () {
                 if (mounted) {
-                  Navigator.pushNamed(context, '/help');
+                  context.pushNamed('help');
                 }
               },
               icon: const Icon(Icons.help_outline, color: Color(0xFF201C58)),

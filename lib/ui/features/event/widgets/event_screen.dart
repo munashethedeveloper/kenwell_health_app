@@ -1,3 +1,4 @@
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import '../../../../domain/models/wellness_event.dart';
@@ -84,7 +85,7 @@ class _EventScreenState extends State<EventScreen> {
   /// Handle cancel with unsaved changes confirmation
   Future<void> _handleCancel() async {
     if (!_hasUnsavedChanges()) {
-      Navigator.pop(context);
+      context.pop();
       return;
     }
 
@@ -101,7 +102,7 @@ class _EventScreenState extends State<EventScreen> {
     );
 
     if (confirmed && mounted) {
-      Navigator.pop(context);
+      context.pop();
     }
   }
 
@@ -178,7 +179,7 @@ class _EventScreenState extends State<EventScreen> {
     );
 
     // Close the screen
-    Navigator.pop(context);
+    context.pop();
   }
 
   // Build method
