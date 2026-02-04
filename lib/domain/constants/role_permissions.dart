@@ -6,54 +6,122 @@ class RolePermissions {
 
   // Route access permissions - maps routes to allowed roles
   static const Map<String, List<String>> routeAccess = {
-    // Authentication routes - accessible to all
+    //Routes Accessible to All Roles
     '/login': [...UserRoles.values],
     '/register': [...UserRoles.values],
     '/forgot-password': [...UserRoles.values],
-
-    // Admin-only routes
-    '/user-management': ['ADMIN', 'MANAGEMENT'],
-    '/user-management-version-two': ['ADMIN', 'MANAGEMENT'],
-
-    // Stats and reports - Admin, Management, Coordinator, Data Capturer
-    '/stats-report': ['ADMIN', 'MANAGEMENT', 'COORDINATOR', 'DATA CAPTURER'],
-
-    // Calendar - All roles
-    '/': [...UserRoles.values], // Main navigation
+    '/': [...UserRoles.values],
     '/calendar': [...UserRoles.values],
-    '/event': ['ADMIN', 'MANAGEMENT', 'COORDINATOR'], // Create/Edit events
-    '/event-details': [...UserRoles.values], // View events
-
-    // Profile and settings - All roles
+    '/event-details': [...UserRoles.values],
     '/profile': [...UserRoles.values],
-    '/settings': [...UserRoles.values],
+    '/my-profile-menu': [...UserRoles.values],
     '/help': [...UserRoles.values],
 
-    // Nurse-specific routes
-    '/nurse': ['NURSE', 'ADMIN', 'MANAGEMENT'],
-    '/hiv-test': ['NURSE', 'ADMIN', 'MANAGEMENT'],
-    '/hiv-result': ['NURSE', 'ADMIN', 'MANAGEMENT'],
-    '/tb-testing': ['NURSE', 'ADMIN', 'MANAGEMENT'],
-    '/survey': ['NURSE', 'ADMIN', 'MANAGEMENT'],
+    // Admin-only routes
+    '/user-management': ['ADMIN', 'TOP MANAGEMENT'],
+    '/user-management-version-two': ['ADMIN', 'TOP MANAGEMENT'],
+    '/add-edit-event': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT COORDINATOR'],
+    '/allocate-event': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT COORDINATOR'],
+    '/stats': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT COORDINATOR', 'CLIENT'],
+    '/detailed-stats': [
+      'ADMIN',
+      'TOP MANAGEMENT',
+      'PROJECT COORDINATOR',
+      'CLIENT'
+    ],
 
-    // Consent forms - Coordinator, Nurse, Admin, Management
-    '/consent': ['COORDINATOR', 'NURSE', 'ADMIN', 'MANAGEMENT'],
-    '/personal-details': ['COORDINATOR', 'NURSE', 'ADMIN', 'MANAGEMENT'],
+    //Staff Route Permissions
+    '/member-search': [
+      'PROJECT COORDINATOR',
+      'PROJECT MANAGER',
+      'HEALTH PRACTITIONER',
+      'ADMIN',
+      'TOP MANAGEMENT'
+    ],
+    '/event-home': [
+      'PROJECT COORDINATOR',
+      'PROJECT MANAGER',
+      'HEALTH PRACTITIONER',
+      'ADMIN',
+      'TOP MANAGEMENT'
+    ],
+    '/member-registration': [
+      'PROJECT COORDINATOR',
+      'PROJECT MANAGER',
+      'HEALTH PRACTITIONER',
+      'ADMIN',
+      'TOP MANAGEMENT'
+    ],
+    '/consent': [
+      'PROJECT COORDINATOR',
+      'PROJECT MANAGER',
+      'HEALTH PRACTITIONER',
+      'ADMIN',
+      'TOP MANAGEMENT'
+    ],
+    '/health-screening': [
+      'PROJECT COORDINATOR',
+      'PROJECT MANAGER',
+      'HEALTH PRACTITIONER',
+      'ADMIN',
+      'TOP MANAGEMENT'
+    ],
+    '/health-risk-assessment': [
+      'PROJECT COORDINATOR',
+      'PROJECT MANAGER',
+      'HEALTH PRACTITIONER',
+      'ADMIN',
+      'TOP MANAGEMENT'
+    ],
+    '/hiv-test': [
+      'PROJECT COORDINATOR',
+      'PROJECT MANAGER',
+      'HEALTH PRACTITIONER',
+      'ADMIN',
+      'TOP MANAGEMENT'
+    ],
+    '/hiv-result': [
+      'PROJECT COORDINATOR',
+      'PROJECT MANAGER',
+      'HEALTH PRACTITIONER',
+      'ADMIN',
+      'TOP MANAGEMENT'
+    ],
+    '/tb-testing': [
+      'PROJECT COORDINATOR',
+      'PROJECT MANAGER',
+      'HEALTH PRACTITIONER',
+      'ADMIN',
+      'TOP MANAGEMENT'
+    ],
+    '/survey': [
+      'PROJECT COORDINATOR',
+      'PROJECT MANAGER',
+      'HEALTH PRACTITIONER',
+      'ADMIN',
+      'TOP MANAGEMENT'
+    ],
   };
 
   // Feature access permissions
   static const Map<String, List<String>> featureAccess = {
-    'create_event': ['ADMIN', 'MANAGEMENT', 'COORDINATOR'],
-    'edit_event': ['ADMIN', 'MANAGEMENT', 'COORDINATOR'],
-    'delete_event': ['ADMIN', 'MANAGEMENT'],
+    'create_event': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
+    'edit_event': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
+    'delete_event': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     'view_events': [...UserRoles.values],
-    'create_user': ['ADMIN', 'MANAGEMENT'],
-    'edit_user': ['ADMIN', 'MANAGEMENT'],
+    'create_user': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
+    'edit_user': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     'delete_user': ['ADMIN'],
-    'view_users': ['ADMIN', 'MANAGEMENT', 'COORDINATOR'],
-    'conduct_wellness_flow': ['NURSE', 'ADMIN', 'MANAGEMENT'],
-    'view_statistics': ['ADMIN', 'MANAGEMENT', 'COORDINATOR', 'DATA CAPTURER'],
-    'export_data': ['ADMIN', 'MANAGEMENT', 'DATA CAPTURER'],
+    'view_users': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
+    'conduct_wellness_flow': [
+      'HEALTH PRACTITIONER',
+      'PROJECT MANAGER',
+      'PROJECT COORDINATOR',
+      'ADMIN',
+      'TOP MANAGEMENT'
+    ],
+    'view_statistics': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER', 'CLIENT'],
+    'export_data': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     'update_own_profile': [...UserRoles.values],
     'view_help': [...UserRoles.values],
   };
@@ -128,7 +196,7 @@ class RolePermissions {
   /// Check if user is management
   static bool isManagement(String? userRole) {
     final role = UserRoles.normalize(userRole);
-    return role == 'ADMIN' || role == 'MANAGEMENT';
+    return role == 'ADMIN' || role == 'TOP MANAGEMENT';
   }
 
   /// Check if user is nurse
@@ -138,6 +206,6 @@ class RolePermissions {
 
   /// Check if user is coordinator
   static bool isCoordinator(String? userRole) {
-    return UserRoles.normalize(userRole) == 'COORDINATOR';
+    return UserRoles.normalize(userRole) == 'PROJECT COORDINATOR';
   }
 }

@@ -5,8 +5,8 @@ class UserRoles {
     'ADMIN',
     'TOP MANAGEMENT',
     'PROJECT MANAGER',
-    'COORDINATOR',
-    'NURSE',
+    'PROJECT COORDINATOR',
+    'HEALTH PRACTITIONER',
     'CLIENT',
   ];
 

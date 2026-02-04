@@ -67,7 +67,7 @@ class AppRouter {
       case RouteNames.main:
         return MaterialPageRoute(builder: (_) => const MainNavigationScreen());
 
-      case RouteNames.statsReport:
+      case RouteNames.stats:
         return MaterialPageRoute(
           builder: (_) => ChangeNotifierProvider(
             create: (_) => StatsReportViewModel(),
@@ -129,20 +129,20 @@ class AppRouter {
           ),
         );
 
-      case RouteNames.nurseIntervention:
-        return MaterialPageRoute(
-          builder: (_) => ChangeNotifierProvider<NurseInterventionViewModel>(
-            create: (_) => NurseInterventionViewModel(),
-            child: NurseInterventionScreen(
-              onPrevious: () {
-                Navigator.pop(_);
-              },
-              onNext: () {
-                Navigator.pushNamed(_, RouteNames.hivTest);
-              },
-            ),
-          ),
-        );
+      //  case RouteNames.nurseIntervention:
+      // return MaterialPageRoute(
+      //   builder: (_) => ChangeNotifierProvider<NurseInterventionViewModel>(
+      //   create: (_) => NurseInterventionViewModel(),
+      //  child: NurseInterventionScreen(
+      //    onPrevious: () {
+      //  Navigator.pop(_);
+      //      },
+      //     onNext: () {
+      //       Navigator.pushNamed(_, RouteNames.hivTest);
+      //      },
+      //    ),
+      //   ),
+      // );
 
       case RouteNames.calendar:
         return MaterialPageRoute(
@@ -152,7 +152,7 @@ class AppRouter {
           },
         );
 
-      case RouteNames.event:
+      case RouteNames.addEditEvent:
         final args = settings.arguments as Map<String, dynamic>?;
         final DateTime date = args?['date'] as DateTime? ?? DateTime.now();
         final Future<void> Function(WellnessEvent) onSave =
@@ -191,8 +191,8 @@ class AppRouter {
       case RouteNames.profile:
         return MaterialPageRoute(builder: (_) => const ProfileScreen());
 
-      case RouteNames.settings:
-        return MaterialPageRoute(builder: (_) => const SettingsScreen());
+      // case RouteNames.settings:
+      // return MaterialPageRoute(builder: (_) => const SettingsScreen());
 
       case RouteNames.help:
         return MaterialPageRoute(builder: (_) => const HelpScreen());
