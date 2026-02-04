@@ -9,6 +9,8 @@ import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_section_header.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
+import '../../profile/view_model/profile_view_model.dart';
+import '../view_models/auth_view_model.dart';
 import '../view_models/login_view_model.dart';
 
 // Login Screen Widget
@@ -77,12 +79,24 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
       // Handle navigation
       if (viewModel.navigationTarget != null) {
         // Navigate to main screen on successful login
-        WidgetsBinding.instance.addPostFrameCallback((_) {
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
           if (!mounted) return;
+          
+          // Load user profile data before navigation
+          final profileVM = context.read<ProfileViewModel>();
+          await profileVM.loadProfile();
+          
+          // Update AuthViewModel login status
+          final authVM = context.read<AuthViewModel>();
+          await authVM.checkLoginStatus();
+          
           // Clear navigation target to prevent repeated navigation
           viewModel.clearNavigationTarget();
+          
           // Navigate to main navigation screen
-          context.go('/');
+          if (mounted) {
+            context.go('/');
+          }
         });
       }
 
