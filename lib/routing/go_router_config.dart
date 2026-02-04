@@ -80,13 +80,15 @@ class AppRouterConfig {
         ),
 
         // Member Search Route
+        // Note: This screen is primarily used within the wellness flow navigation
+        // and typically accessed via wellness_navigator.dart, not directly via routes
         GoRoute(
           path: '/member-search',
           name: 'memberSearch',
           builder: (context, state) {
             return MemberSearchScreen(
               onGoToMemberDetails: (searchQuery) {},
-              onPrevious: () {},
+              onPrevious: () {}, // No-op to prevent pop on root
             );
           },
         ),
