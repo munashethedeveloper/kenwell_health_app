@@ -195,6 +195,17 @@ class FirebaseAuthService {
 
       // Send email verification
       await user.sendEmailVerification();
+      
+      // Send password reset email so user can set their own password
+      // This is important because the admin-set password is not communicated to the user
+      try {
+        // Use main app's auth instance for password reset email
+        await _auth.sendPasswordResetEmail(email: email);
+        debugPrint('FirebaseAuth: Password reset email sent to $email');
+      } catch (passwordResetError) {
+        debugPrint('FirebaseAuth: Warning - Failed to send password reset email: $passwordResetError');
+        // Continue even if password reset email fails - user can request it later
+      }
 
       // Create UserModel
       final userModel = UserModel(

@@ -94,7 +94,7 @@ class _CreateUserSectionState extends State<CreateUserSection> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(viewModel.successMessage ??
-                'User registered successfully! Verification email sent.')),
+                'User registered successfully! Password reset email sent.')),
       );
       // Clear the form
       _emailController.clear();

@@ -249,7 +249,7 @@ class UserManagementViewModel extends ChangeNotifier {
       );
 
       if (user != null) {
-        _setSuccess('User registered successfully! Verification email sent.');
+        _setSuccess('User registered successfully! Password reset email sent to ${user.email}. User can set their own password using the link in the email.');
         // Reload users list to include new user
         await loadUsers();
         return true;
