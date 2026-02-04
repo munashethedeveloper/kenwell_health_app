@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../domain/models/wellness_event.dart';
-import '../../../../routing/route_names.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../view_model/calendar_view_model.dart';
@@ -85,9 +85,9 @@ class EventCard extends StatelessWidget {
       // Event card content
       child: InkWell(
         onTap: () {
-          Navigator.of(context).pushNamed(
-            RouteNames.eventDetails,
-            arguments: {'event': event},
+          context.pushNamed(
+            'eventDetails',
+            extra: {'event': event},
           );
         },
         // Card container
