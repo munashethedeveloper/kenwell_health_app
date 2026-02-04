@@ -287,7 +287,7 @@ class UserManagementViewModel extends ChangeNotifier {
     }
   }
 
-  // Reset user password
+  // Reset user password by sending them a password reset email
   Future<bool> resetUserPassword(String email, String userName) async {
     _setLoading(true);
 
@@ -295,10 +295,14 @@ class UserManagementViewModel extends ChangeNotifier {
       final success = await _authService.resetUserPassword(email);
 
       if (success) {
-        _setSuccess('Password reset email sent to $email');
+        _setSuccess(
+          'Password reset email sent to $userName ($email). '
+          'The user will receive an email with a link to set a new password. '
+          'After setting their new password, they can login immediately with it.'
+        );
         return true;
       } else {
-        _setError('Failed to send password reset email');
+        _setError('Failed to send password reset email. User may not exist with this email address.');
         return false;
       }
     } catch (e) {

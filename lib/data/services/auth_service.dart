@@ -61,7 +61,7 @@ class AuthService {
     final sanitizedEmail = email.trim().toLowerCase();
     final sanitizedPassword = password.trim();
 
-    // Login with FirebaseAuth
+    // Login with FirebaseAuth (this is the source of truth for authentication)
     final firebaseAuthService = FirebaseAuthService();
     final firebaseUser =
         await firebaseAuthService.login(sanitizedEmail, sanitizedPassword);
@@ -69,15 +69,31 @@ class AuthService {
 
     // Fetch user from local DB by Firebase UID, or create if not found
     var user = await _database.getUserById(firebaseUser.id);
-    user ??= await _database.createUser(
-      id: firebaseUser.id,
-      email: firebaseUser.email,
-      password: sanitizedPassword,
-      role: firebaseUser.role,
-      phoneNumber: firebaseUser.phoneNumber,
-      firstName: firebaseUser.firstName,
-      lastName: firebaseUser.lastName,
-    );
+    
+    if (user == null) {
+      // User doesn't exist in local DB, create them
+      user = await _database.createUser(
+        id: firebaseUser.id,
+        email: firebaseUser.email,
+        password: sanitizedPassword,  // Store the password that worked
+        role: firebaseUser.role,
+        phoneNumber: firebaseUser.phoneNumber,
+        firstName: firebaseUser.firstName,
+        lastName: firebaseUser.lastName,
+      );
+    } else {
+      // User exists in local DB - sync their password with what they just used
+      // This ensures local DB password stays in sync with Firebase Auth
+      await _database.updateUser(
+        id: user.id,
+        email: user.email,
+        password: sanitizedPassword,  // Update to the password that worked
+        role: user.role,
+        phoneNumber: user.phoneNumber,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      );
+    }
 
     final prefs = await _prefsFuture;
     await prefs.setString(_currentUserPrefsKey, user.id);
@@ -183,7 +199,14 @@ class AuthService {
 
   Future<bool> forgotPassword(String email) async {
     // Use FirebaseAuthService to send password reset email
-    // Import if not already: import 'firebase_auth_service.dart';
+    final firebaseAuthService = FirebaseAuthService();
+    return await firebaseAuthService.sendPasswordResetEmail(email);
+  }
+  
+  /// Admin function: Reset user password by sending them a reset email
+  /// This does NOT set a specific password, it sends a reset link
+  Future<bool> resetUserPassword(String email) async {
+    // Use FirebaseAuthService to send password reset email
     final firebaseAuthService = FirebaseAuthService();
     return await firebaseAuthService.sendPasswordResetEmail(email);
   }

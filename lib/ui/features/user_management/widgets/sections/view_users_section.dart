@@ -235,17 +235,28 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
     if (mounted && success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content:
-              Text(viewModel.successMessage ?? 'Password reset email sent'),
+          content: Text(
+            viewModel.successMessage ?? 'Password reset email sent successfully',
+            maxLines: 5,
+          ),
+          duration: const Duration(seconds: 6),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          action: SnackBarAction(
+            label: 'OK',
+            onPressed: () {},
+          ),
         ),
       );
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content:
-                Text(viewModel.errorMessage ?? 'Failed to send reset email')),
+          content: Text(
+            viewModel.errorMessage ?? 'Failed to send reset email',
+            maxLines: 3,
+          ),
+          duration: const Duration(seconds: 4),
+        ),
       );
     }
   }
