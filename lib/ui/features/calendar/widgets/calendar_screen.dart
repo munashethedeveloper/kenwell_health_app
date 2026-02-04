@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../../../domain/models/wellness_event.dart';
-import '../../../../routing/route_names.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../event/widgets/event_screen.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
@@ -97,7 +97,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                 TextButton.icon(
                   onPressed: () {
                     if (mounted) {
-                      Navigator.pushNamed(context, RouteNames.help);
+                      context.pushNamed('help');
                     }
                   },
                   icon:
