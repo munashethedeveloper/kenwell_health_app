@@ -19,11 +19,11 @@ class LogoutHelper {
         icon: const Icon(Icons.logout, color: Colors.orange),
         actions: [
           TextButton(
-            onPressed: () => context.pop(false),
+            onPressed: () => dialogContext.pop(false),
             child: const Text('Cancel'),
           ),
           FilledButton(
-            onPressed: () => context.pop(true),
+            onPressed: () => dialogContext.pop(true),
             style: FilledButton.styleFrom(
               backgroundColor: Colors.orange,
             ),
