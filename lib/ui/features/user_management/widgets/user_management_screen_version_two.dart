@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../../../../domain/constants/role_permissions.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../profile/view_model/profile_view_model.dart';
 import '../viewmodel/user_management_view_model.dart';
 import 'sections/create_user_section.dart';
 import 'sections/view_users_section.dart';
@@ -24,8 +26,79 @@ class _UserManagementScreenVersionTwoState
       child: Builder(
         builder: (context) {
           final theme = Theme.of(context);
+          final profileVM = context.watch<ProfileViewModel>();
+          
+          // Check permissions
+          final canCreateUser = RolePermissions.canAccessFeature(
+            profileVM.role, 
+            'create_user'
+          );
+          final canViewUsers = RolePermissions.canAccessFeature(
+            profileVM.role, 
+            'view_users'
+          );
+          
+          // Determine number of tabs based on permissions
+          final List<Tab> tabs = [];
+          final List<Widget> tabViews = [];
+          
+          if (canCreateUser) {
+            tabs.add(const Tab(icon: Icon(Icons.person_add), text: 'Create User'));
+            tabViews.add(const CreateUserSection());
+          }
+          
+          if (canViewUsers) {
+            tabs.add(const Tab(icon: Icon(Icons.group), text: 'View Users'));
+            tabViews.add(const ViewUsersSection());
+          }
+          
+          // If user has no permissions, show a message
+          if (tabs.isEmpty) {
+            return Scaffold(
+              appBar: KenwellAppBar(
+                title: 'User Management',
+                titleColor: const Color(0xFF201C58),
+                titleStyle: const TextStyle(
+                  color: Color(0xFF201C58),
+                  fontWeight: FontWeight.bold,
+                ),
+                automaticallyImplyLeading: false,
+              ),
+              body: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(32.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.lock,
+                        size: 64,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No Access',
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'You do not have permission to access user management features.',
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+          
           return DefaultTabController(
-            length: 2,
+            length: tabs.length,
             child: Scaffold(
               appBar: KenwellAppBar(
                 title: 'User Management',
@@ -55,10 +128,7 @@ class _UserManagementScreenVersionTwoState
                     fontWeight: FontWeight.normal,
                     fontSize: 14,
                   ),
-                  tabs: const [
-                    Tab(icon: Icon(Icons.person_add), text: 'Create User'),
-                    Tab(icon: Icon(Icons.group), text: 'View Users'),
-                  ],
+                  tabs: tabs,
                 ),
                 actions: [
                   // Sync verification status button
@@ -183,16 +253,24 @@ class _UserManagementScreenVersionTwoState
               ),
               body: Consumer<UserManagementViewModel>(
                 builder: (context, viewModel, child) {
+                  // Update tab views with onUserCreated callback
+                  final dynamicTabViews = <Widget>[];
+                  
+                  if (canCreateUser) {
+                    dynamicTabViews.add(CreateUserSection(
+                      onUserCreated: () {
+                        // Reload users when a new user is created
+                        viewModel.loadUsers();
+                      },
+                    ));
+                  }
+                  
+                  if (canViewUsers) {
+                    dynamicTabViews.add(const ViewUsersSection());
+                  }
+                  
                   return TabBarView(
-                    children: [
-                      CreateUserSection(
-                        onUserCreated: () {
-                          // Reload users when a new user is created
-                          viewModel.loadUsers();
-                        },
-                      ),
-                      const ViewUsersSection(),
-                    ],
+                    children: dynamicTabViews,
                   );
                 },
               ),

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../../domain/models/user_model.dart';
+import '../../../../../domain/constants/role_permissions.dart';
 import '../../../../shared/ui/containers/gradient_container.dart';
+import '../../../profile/view_model/profile_view_model.dart';
 import '../../viewmodel/user_management_view_model.dart';
 import 'user_card_widget.dart';
 import 'user_filter_chips.dart';
@@ -37,6 +39,17 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
   void _showUserOptions(UserModel user) {
     final theme = Theme.of(context);
     final viewModel = context.read<UserManagementViewModel>();
+    final profileVM = context.read<ProfileViewModel>();
+    
+    // Check permissions
+    final canResetPassword = RolePermissions.canAccessFeature(
+      profileVM.role, 
+      'reset_user_credentials'
+    );
+    final canDelete = RolePermissions.canAccessFeature(
+      profileVM.role, 
+      'delete_user'
+    );
 
     showModalBottomSheet(
       context: context,
@@ -71,27 +84,39 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
               ),
             ),
             const SizedBox(height: 24),
-            ListTile(
-              leading: Icon(Icons.lock_reset, color: theme.colorScheme.primary),
-              title: Text('Reset Password', style: theme.textTheme.bodyMedium),
-              onTap: () {
-                context.pop();
-                _resetPassword(user, viewModel);
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.delete, color: theme.colorScheme.error),
-              title: Text(
-                'Delete User',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.error,
+            if (canResetPassword)
+              ListTile(
+                leading: Icon(Icons.lock_reset, color: theme.colorScheme.primary),
+                title: Text('Reset Password', style: theme.textTheme.bodyMedium),
+                onTap: () {
+                  context.pop();
+                  _resetPassword(user, viewModel);
+                },
+              ),
+            if (canDelete)
+              ListTile(
+                leading: Icon(Icons.delete, color: theme.colorScheme.error),
+                title: Text(
+                  'Delete User',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.error,
+                  ),
+                ),
+                onTap: () {
+                  context.pop();
+                  _deleteUser(user, viewModel);
+                },
+              ),
+            if (!canResetPassword && !canDelete)
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'No actions available',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ),
-              onTap: () {
-                context.pop();
-                _deleteUser(user, viewModel);
-              },
-            ),
             const SizedBox(height: 16),
           ],
         ),

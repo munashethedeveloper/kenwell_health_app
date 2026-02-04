@@ -105,14 +105,21 @@ class RolePermissions {
 
   // Feature access permissions
   static const Map<String, List<String>> featureAccess = {
+    // Event Management Permissions
     'create_event': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     'edit_event': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     'delete_event': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     'view_events': [...UserRoles.values],
+    'allocate_events': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT COORDINATOR'],
+    
+    // User Management Permissions
     'create_user': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     'edit_user': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     'delete_user': ['ADMIN'],
     'view_users': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
+    'reset_user_credentials': ['ADMIN', 'TOP MANAGEMENT'],
+    
+    // Event Workflow Permissions
     'conduct_wellness_flow': [
       'HEALTH PRACTITIONER',
       'PROJECT MANAGER',
@@ -120,6 +127,8 @@ class RolePermissions {
       'ADMIN',
       'TOP MANAGEMENT'
     ],
+    
+    // Statistics and General Permissions
     'view_statistics': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER', 'CLIENT'],
     'export_data': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     'update_own_profile': [...UserRoles.values],
