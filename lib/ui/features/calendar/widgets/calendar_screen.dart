@@ -3,8 +3,10 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../../../domain/models/wellness_event.dart';
+import '../../../../domain/constants/role_permissions.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../event/widgets/event_screen.dart';
+import '../../profile/view_model/profile_view_model.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/buttons/custom_primary_button.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
@@ -38,12 +40,10 @@ class _CalendarScreenBody extends StatefulWidget {
 
 // State class for the calendar screen body
 class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
-  // Helper to check if user can add events
-  bool _canAddEvent(String role) {
-    final normalized = role.trim().toUpperCase();
-    return normalized == 'ADMIN' ||
-        normalized == 'TOP MANAGEMENT' ||
-        normalized == 'PROJECT MANAGER';
+  // Helper to check if user can add events using RolePermissions
+  bool _canAddEvent(BuildContext context) {
+    final profileVM = context.read<ProfileViewModel>();
+    return RolePermissions.canAccessFeature(profileVM.role, 'create_event');
   }
 
   // Initialize state
@@ -191,7 +191,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                   ),
 
             // Floating action button to add new events
-            floatingActionButton: _canAddEvent(viewModel.role)
+            floatingActionButton: _canAddEvent(context)
                 ? FloatingActionButton.extended(
                     backgroundColor: const Color(0xFF90C048),
                     icon: const Icon(Icons.add, color: Colors.white),
@@ -360,7 +360,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                         ),
                         const SizedBox(height: 8),
                         // Suggestion to create events
-                        if (_canAddEvent(viewModel.role))
+                        if (_canAddEvent(context))
                           Text(
                             'Create an event to get started',
                             style: TextStyle(
@@ -370,7 +370,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                           ),
                         const SizedBox(height: 24),
                         // Button to create a new event
-                        if (_canAddEvent(viewModel.role))
+                        if (_canAddEvent(context))
                           CustomPrimaryButton(
                             label: 'Create Event',
                             onPressed: () => _openEventForm(

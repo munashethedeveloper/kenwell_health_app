@@ -1,6 +1,9 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../../domain/models/wellness_event.dart';
+import '../../../../domain/constants/role_permissions.dart';
+import '../../profile/view_model/profile_view_model.dart';
 import '../view_model/calendar_view_model.dart';
 import 'event_list_dialog.dart';
 
@@ -21,12 +24,10 @@ class DayEventsDialog extends StatelessWidget {
     required this.onOpenEventForm,
   });
 
-  // Helper to check if user can add events (copied from calendar_screen.dart)
-  bool _canAddEvent(String role) {
-    final normalized = role.trim().toUpperCase();
-    return normalized == 'ADMIN' ||
-        normalized == 'TOP MANAGEMENT' ||
-        normalized == 'PROJECT MANAGER';
+  // Helper to check if user can add events using RolePermissions
+  bool _canAddEvent(BuildContext context) {
+    final profileVM = context.read<ProfileViewModel>();
+    return RolePermissions.canAccessFeature(profileVM.role, 'create_event');
   }
 
   // Build method to create the dialog UI
@@ -68,7 +69,7 @@ class DayEventsDialog extends StatelessWidget {
             child: const Text('View Events'),
           ),
         // Only show Create Event button for privileged roles
-        if (_canAddEvent(viewModel.role))
+        if (_canAddEvent(context))
           FilledButton(
             onPressed: () {
               context.pop();

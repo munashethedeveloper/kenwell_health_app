@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../domain/models/wellness_event.dart';
+import '../../../../domain/constants/role_permissions.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../event/view_model/event_view_model.dart';
+import '../../profile/view_model/profile_view_model.dart';
 import '../view_model/calendar_view_model.dart';
 
 // Widget representing a single event card in the calendar
@@ -21,7 +23,36 @@ class EventCard extends StatelessWidget {
   // Build method to render the event card
   @override
   Widget build(BuildContext context) {
-    // Use Dismissible to enable swipe-to-delete functionality
+    final profileVM = context.watch<ProfileViewModel>();
+    final canDelete = RolePermissions.canAccessFeature(profileVM.role, 'delete_event');
+    
+    // Use Dismissible to enable swipe-to-delete functionality (only if user has permission)
+    final cardContent = InkWell(
+      onTap: () {
+        context.pushNamed(
+          'eventDetails',
+          extra: {'event': event},
+        );
+      },
+      // Card container
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: const Color(0xFF201C58),
+            width: 2,
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: _buildCardContent(context),
+      ),
+    );
+    
+    // Only wrap with Dismissible if user can delete
+    if (!canDelete) {
+      return cardContent;
+    }
+    
     return Dismissible(
       key: Key(event.id),
       direction: DismissDirection.endToStart,
@@ -83,26 +114,15 @@ class EventCard extends StatelessWidget {
         }
       },
       // Event card content
-      child: InkWell(
-        onTap: () {
-          context.pushNamed(
-            'eventDetails',
-            extra: {'event': event},
-          );
-        },
-        // Card container
-        child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 4),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: const Color(0xFF201C58),
-              width: 2,
-            ),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: KenwellFormCard(
-            child: Row(
-              children: [
+      child: cardContent,
+    );
+  }
+
+  // Build the card content (extracted for reuse)
+  Widget _buildCardContent(BuildContext context) {
+    return KenwellFormCard(
+      child: Row(
+        children: [
                 // Icon container
                 Container(
                   width: 56,
@@ -201,8 +221,6 @@ class EventCard extends StatelessWidget {
               ],
             ),
           ),
-        ),
-      ),
-    );
+        );
   }
 }
