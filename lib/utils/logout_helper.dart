@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 /// Utility class for handling logout functionality across the app
 class LogoutHelper {
@@ -18,11 +19,11 @@ class LogoutHelper {
         icon: const Icon(Icons.logout, color: Colors.orange),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
+            onPressed: () => context.pop(false),
             child: const Text('Cancel'),
           ),
           FilledButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
+            onPressed: () => context.pop(true),
             style: FilledButton.styleFrom(
               backgroundColor: Colors.orange,
             ),

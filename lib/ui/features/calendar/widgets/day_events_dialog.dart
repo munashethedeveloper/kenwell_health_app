@@ -1,3 +1,4 @@
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../view_model/calendar_view_model.dart';
@@ -52,7 +53,7 @@ class DayEventsDialog extends StatelessWidget {
           // Button to view the list of events
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              context.pop();
               // Show list of events in a new dialog
               showDialog(
                 context: context,
@@ -70,7 +71,7 @@ class DayEventsDialog extends StatelessWidget {
         if (_canAddEvent(viewModel.role))
           FilledButton(
             onPressed: () {
-              Navigator.pop(context);
+              context.pop();
               onOpenEventForm(selectedDay);
             },
             child: const Text('Create Event'),

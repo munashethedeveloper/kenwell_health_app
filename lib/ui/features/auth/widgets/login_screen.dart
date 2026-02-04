@@ -188,8 +188,7 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
                     // Register link
                     TextButton(
                       onPressed: () {
-                        Navigator.pushReplacementNamed(
-                            context, RouteNames.register);
+                        context.go('/register');
                       },
                       // Text for register
                       child: const Text(

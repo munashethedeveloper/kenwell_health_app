@@ -1,3 +1,4 @@
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../view_model/calendar_view_model.dart';
@@ -49,7 +50,7 @@ class EventListDialog extends StatelessWidget {
               subtitle: Text(viewModel.getEventSubtitle(event)),
               trailing: const Icon(Icons.edit_outlined),
               onTap: () {
-                Navigator.pop(context);
+                context.pop();
                 onOpenEventForm(selectedDay, existingEvent: event);
               },
             );
@@ -60,13 +61,13 @@ class EventListDialog extends StatelessWidget {
       actions: [
         // Close button
         TextButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
           child: const Text('Close'),
         ),
         // Add Event button
         FilledButton(
           onPressed: () {
-            Navigator.pop(context);
+            context.pop();
             onOpenEventForm(selectedDay);
           },
           child: const Text('Add Event'),

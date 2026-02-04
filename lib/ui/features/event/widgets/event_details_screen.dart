@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../../../domain/models/wellness_event.dart';
@@ -214,10 +215,9 @@ class EventDetailsScreen extends StatelessWidget {
 
   // Navigate to edit event screen
   void _navigateToEditEvent(BuildContext context) {
-    Navigator.pushNamed(
-      context,
-      '/event',
-      arguments: {
+    context.pushNamed(
+      'addEditEvent',
+      extra: {
         'date': event.date,
         'existingEvent': event,
       },
@@ -229,7 +229,7 @@ class EventDetailsScreen extends StatelessWidget {
     if (viewModel == null) return;
     await viewModel!.deleteEvent(event.id); // implement deleteEvent in VM
     if (!context.mounted) return;
-    Navigator.of(context).pop();
+    context.pop();
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Event deleted')),
     );

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kenwell_health_app/routing/route_names.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../shared/ui/form/kenwell_section_header.dart';
@@ -196,7 +196,7 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
           TextButton.icon(
             onPressed: () {
               if (mounted) {
-                Navigator.pushNamed(context, RouteNames.help);
+                context.pushNamed('help');
               }
             },
             icon: const Icon(Icons.help_outline, color: Color(0xFF201C58)),
