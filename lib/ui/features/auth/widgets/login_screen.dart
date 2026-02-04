@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:provider/provider.dart';
 import '../../../../data/repositories_dcl/auth_repository_dcl.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/logo/app_logo.dart';
-import '../../../../routing/route_names.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_section_header.dart';
-import '../../../shared/ui/navigation/main_navigation_screen.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
 import '../view_models/login_view_model.dart';
 
@@ -83,10 +82,7 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
           // Clear navigation target to prevent repeated navigation
           viewModel.clearNavigationTarget();
           // Navigate to main navigation screen
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
-          );
+          context.go('/');
         });
       }
 
@@ -169,8 +165,7 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () {
-                          Navigator.pushNamed(
-                              context, RouteNames.forgotPassword);
+                          context.pushNamed('forgotPassword');
                         },
                         // Text for forgot password
                         child: const Text(
@@ -193,8 +188,7 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
                     // Register link
                     TextButton(
                       onPressed: () {
-                        Navigator.pushReplacementNamed(
-                            context, RouteNames.register);
+                        context.go('/register');
                       },
                       // Text for register
                       child: const Text(

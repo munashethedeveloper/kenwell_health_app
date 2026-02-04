@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kenwell_health_app/routing/route_names.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/features/auth/view_models/auth_view_model.dart';
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
@@ -28,7 +28,6 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
 
   Future<void> _logout(BuildContext context) async {
     final authVM = context.read<AuthViewModel>();
-    final navigator = Navigator.of(context);
 
     final confirmed = await ConfirmationDialog.show(
       context,
@@ -46,7 +45,7 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
 
     if (!context.mounted) return;
 
-    navigator.pushReplacementNamed(RouteNames.login);
+    context.go('/login');
   }
 
   @override
@@ -93,14 +92,14 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
                       title: 'Edit Profile',
                       subtitle: 'Update your personal information',
                       onTap: () =>
-                          Navigator.pushNamed(context, RouteNames.profile),
+                          context.pushNamed('profile'),
                     ),
                     _ProfileMenuItem(
                       icon: Icons.help_outline,
                       title: 'Help & Support',
                       subtitle: 'Get assistance and FAQs',
                       onTap: () =>
-                          Navigator.pushNamed(context, RouteNames.help),
+                          context.pushNamed('help'),
                     ),
                     //only visible to admin users
                     if (vm.role.toLowerCase() == 'admin')
@@ -109,7 +108,7 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
                         title: 'Admin Tools',
                         subtitle: 'Manage users and settings',
                         onTap: () =>
-                            Navigator.pushNamed(context, RouteNames.adminTools),
+                            context.pushNamed('adminTools'),
                       ),
                     _ProfileMenuItem(
                       icon: Icons.logout,

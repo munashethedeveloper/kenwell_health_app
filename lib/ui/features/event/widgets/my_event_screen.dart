@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:kenwell_health_app/routing/route_names.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
@@ -223,7 +223,7 @@ class MyEventScreenState extends State<MyEventScreen> {
           TextButton.icon(
             onPressed: () {
               if (mounted) {
-                Navigator.pushNamed(context, RouteNames.help);
+                context.pushNamed('help');
               }
             },
             icon: const Icon(Icons.help_outline, color: Color(0xFF201C58)),

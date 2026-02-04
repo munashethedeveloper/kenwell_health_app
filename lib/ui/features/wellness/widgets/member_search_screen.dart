@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_member_repository.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/member_repository.dart';
 import 'package:kenwell_health_app/data/local/app_database.dart';
@@ -9,7 +10,6 @@ import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_form_card.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 
-import '../../../../routing/route_names.dart';
 import '../../../shared/ui/form/kenwell_section_header.dart';
 // ...existing code...
 
@@ -151,10 +151,7 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
         debugPrint('canPop=\u{24}{Navigator.of(context).canPop()}');
         if (!didPop) {
           // If we can't pop, navigate to the member search screen as root
-          Navigator.of(context).pushNamedAndRemoveUntil(
-            RouteNames.memberSearch,
-            (route) => false,
-          );
+          context.go("/member-search");
         }
       },
       child: Scaffold(

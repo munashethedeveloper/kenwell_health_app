@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../../../domain/models/wellness_event.dart';
+import '../../../../domain/constants/role_permissions.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/buttons/custom_primary_button.dart';
 import '../../../shared/ui/buttons/custom_secondary_button.dart';
@@ -9,6 +11,7 @@ import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_section_header.dart';
 import '../../../shared/ui/logo/app_logo.dart';
 import '../../user_management/viewmodel/user_management_view_model.dart';
+import '../../profile/view_model/profile_view_model.dart';
 import '../view_model/event_view_model.dart';
 import 'allocate_event_screen.dart';
 import 'my_event_screen.dart';
@@ -30,6 +33,10 @@ class EventDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final profileVM = context.watch<ProfileViewModel>();
+    final canEdit = RolePermissions.canAccessFeature(profileVM.role, 'edit_event');
+    final canDelete = RolePermissions.canAccessFeature(profileVM.role, 'delete_event');
+    
     String fullName(String first, String last) => '$first $last';
 
     return Scaffold(
@@ -44,15 +51,15 @@ class EventDetailsScreen extends StatelessWidget {
         automaticallyImplyLeading: true,
         backgroundColor: const Color(0xFF201C58),
         centerTitle: true,
-        // Action buttons for edit and delete
+        // Action buttons for edit and delete (with permission checks)
         actions: [
-          if (viewModel != null)
+          if (viewModel != null && canEdit)
             IconButton(
               icon: const Icon(Icons.edit, color: Colors.white),
               tooltip: 'Edit Event',
               onPressed: () => _navigateToEditEvent(context),
             ),
-          if (viewModel != null)
+          if (viewModel != null && canDelete)
             IconButton(
               icon: const Icon(Icons.delete, color: Colors.white),
               tooltip: 'Delete Event',
@@ -214,10 +221,9 @@ class EventDetailsScreen extends StatelessWidget {
 
   // Navigate to edit event screen
   void _navigateToEditEvent(BuildContext context) {
-    Navigator.pushNamed(
-      context,
-      '/event',
-      arguments: {
+    context.pushNamed(
+      'addEditEvent',
+      extra: {
         'date': event.date,
         'existingEvent': event,
       },
@@ -229,7 +235,7 @@ class EventDetailsScreen extends StatelessWidget {
     if (viewModel == null) return;
     await viewModel!.deleteEvent(event.id); // implement deleteEvent in VM
     if (!context.mounted) return;
-    Navigator.of(context).pop();
+    context.pop();
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Event deleted')),
     );

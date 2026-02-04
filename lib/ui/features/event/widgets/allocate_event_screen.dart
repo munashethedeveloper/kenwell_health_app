@@ -1,3 +1,4 @@
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:provider/provider.dart';
@@ -120,8 +121,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                           if (!context.mounted) return;
                           widget.onAllocate(_selectedUserIds.toList());
                           if (!context.mounted) return;
-                          Navigator.pop(context,
-                              true); // Pass true to indicate assignment
+                          context.pop(true); // Pass true to indicate assignment
                         }
                       : null,
                   child: const Text('Assign Selected Users'),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
@@ -50,7 +51,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         );
 
         // Close the screen after success
-        Navigator.pop(context);
+        context.pop();
       } else {
         // Show error if email not found
         ScaffoldMessenger.of(context).showSnackBar(

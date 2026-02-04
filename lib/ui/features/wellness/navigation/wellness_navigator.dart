@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:provider/provider.dart';
 import '../../../../domain/models/member.dart';
 import '../../../../domain/models/wellness_event.dart';
-import '../../../../routing/route_names.dart';
 import '../widgets/member_search_screen.dart';
 import '../widgets/current_event_home_screen.dart';
 import '../widgets/health_screenings_screen.dart';
@@ -64,7 +64,7 @@ class WellnessNavigator {
               TextButton.icon(
                 onPressed: () {
                   if (context.mounted) {
-                    Navigator.pushNamed(context, RouteNames.help);
+                    context.pushNamed('help');
                   }
                 },
                 icon: const Icon(Icons.help_outline, color: Colors.white),
@@ -79,15 +79,15 @@ class WellnessNavigator {
             onGoToMemberDetails: (searchQuery) async {
               final member = await _navigateToMemberDetails(null, searchQuery);
               if (member != null && context.mounted) {
-                Navigator.pop(context, member);
+                context.pop(member);
               }
             },
             onMemberFound: (member) {
               // Member found, go to event details
-              Navigator.pop(context, member);
+              context.pop(member);
             },
             onPrevious: () {
-              Navigator.pop(context);
+              context.pop();
             },
           ),
         ),
@@ -126,7 +126,7 @@ class WellnessNavigator {
                 try {
                   await memberVM.saveLocally();
                   if (context.mounted && memberVM.savedMember != null) {
-                    Navigator.pop(context, memberVM.savedMember);
+                    context.pop(memberVM.savedMember);
                   }
                 } catch (e) {
                   debugPrint('Failed to save member: $e');
@@ -281,7 +281,7 @@ class WellnessNavigator {
             event: event,
             onNext: () {
               final selectedScreenings = consentVM.selectedScreenings;
-              Navigator.pop(context, selectedScreenings);
+              context.pop(selectedScreenings);
             },
             appBar: KenwellAppBar(
               title: event.title,
@@ -360,7 +360,7 @@ class WellnessNavigator {
             }
           },
           onSubmitAll: () {
-            Navigator.pop(context, true);
+            context.pop(true);
           },
           appBar: KenwellAppBar(
             title: event.title,
@@ -408,10 +408,10 @@ class WellnessNavigator {
           ],
           child: PersonalRiskAssessmentScreen(
             onNext: () {
-              Navigator.pop(context, true);
+              context.pop(true);
             },
             onPrevious: () {
-              Navigator.pop(context);
+              context.pop();
             },
             viewModel: riskVM,
             nurseViewModel: nurseVM,
@@ -447,10 +447,10 @@ class WellnessNavigator {
           value: hivTestVM,
           child: HIVTestScreen(
             onNext: () {
-              Navigator.pop(context, true);
+              context.pop(true);
             },
             onPrevious: () {
-              Navigator.pop(context);
+              context.pop();
             },
             appBar: KenwellAppBar(
               title: event.title,
@@ -481,10 +481,10 @@ class WellnessNavigator {
             value: hivResultsVM,
             child: HIVTestResultScreen(
               onNext: () {
-                Navigator.pop(context, true);
+                context.pop(true);
               },
               onPrevious: () {
-                Navigator.pop(context);
+                context.pop();
               },
               appBar: KenwellAppBar(
                 title: event.title,
@@ -519,10 +519,10 @@ class WellnessNavigator {
           value: tbTestVM,
           child: TBTestingScreen(
             onNext: () {
-              Navigator.pop(context, true);
+              context.pop(true);
             },
             onPrevious: () {
-              Navigator.pop(context);
+              context.pop();
             },
             appBar: KenwellAppBar(
               title: event.title,
@@ -552,10 +552,10 @@ class WellnessNavigator {
           value: surveyVM,
           child: SurveyScreen(
             onSubmit: () {
-              Navigator.pop(context, true);
+              context.pop(true);
             },
             onPrevious: () {
-              Navigator.pop(context);
+              context.pop();
             },
             appBar: KenwellAppBar(
               title: event.title,

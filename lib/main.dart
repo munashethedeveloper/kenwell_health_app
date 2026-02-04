@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'providers/app_provider.dart';
 import 'providers/theme_provider.dart';
-import 'routing/app_router.dart';
+import 'routing/go_router_config.dart';
 import 'ui/features/auth/view_models/auth_view_model.dart';
 import 'ui/features/calendar/view_model/calendar_view_model.dart';
 import 'ui/features/event/view_model/event_view_model.dart';
@@ -55,14 +55,15 @@ class MyApp extends StatelessWidget {
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, _) {
-          return MaterialApp(
+          final goRouter = AppRouterConfig.createRouter();
+          
+          return MaterialApp.router(
             debugShowCheckedModeBanner: false,
             title: 'Wellness Planner',
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: themeProvider.themeMode,
-            onGenerateRoute: AppRouter.generateRoute,
-            initialRoute: '/login', // Start at login
+            routerConfig: goRouter,
           );
         },
       ),

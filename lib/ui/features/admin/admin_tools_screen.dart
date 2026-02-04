@@ -1,3 +1,4 @@
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import '../../../utils/seed_events.dart';
 
@@ -50,11 +51,11 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => context.pop(false),
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => context.pop(true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Delete All'),
           ),

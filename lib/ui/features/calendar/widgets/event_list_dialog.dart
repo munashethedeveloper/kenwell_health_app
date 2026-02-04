@@ -1,5 +1,9 @@
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../../domain/models/wellness_event.dart';
+import '../../../../domain/constants/role_permissions.dart';
+import '../../profile/view_model/profile_view_model.dart';
 import '../view_model/calendar_view_model.dart';
 
 /// Dialog to display list of events for a selected day
@@ -22,6 +26,10 @@ class EventListDialog extends StatelessWidget {
   // Build method
   @override
   Widget build(BuildContext context) {
+    final profileVM = context.watch<ProfileViewModel>();
+    final canEdit = RolePermissions.canAccessFeature(profileVM.role, 'edit_event');
+    final canCreate = RolePermissions.canAccessFeature(profileVM.role, 'create_event');
+    
     // Build the dialog
     return AlertDialog(
       title: Text('Events on ${viewModel.formatDateLong(selectedDay)}'),
@@ -47,11 +55,13 @@ class EventListDialog extends StatelessWidget {
               ),
               title: Text(event.title),
               subtitle: Text(viewModel.getEventSubtitle(event)),
-              trailing: const Icon(Icons.edit_outlined),
-              onTap: () {
-                Navigator.pop(context);
-                onOpenEventForm(selectedDay, existingEvent: event);
-              },
+              trailing: canEdit ? const Icon(Icons.edit_outlined) : null,
+              onTap: canEdit
+                  ? () {
+                      context.pop();
+                      onOpenEventForm(selectedDay, existingEvent: event);
+                    }
+                  : null,
             );
           },
         ),
@@ -60,17 +70,18 @@ class EventListDialog extends StatelessWidget {
       actions: [
         // Close button
         TextButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
           child: const Text('Close'),
         ),
-        // Add Event button
-        FilledButton(
-          onPressed: () {
-            Navigator.pop(context);
-            onOpenEventForm(selectedDay);
-          },
-          child: const Text('Add Event'),
-        ),
+        // Add Event button (only if user has permission)
+        if (canCreate)
+          FilledButton(
+            onPressed: () {
+              context.pop();
+              onOpenEventForm(selectedDay);
+            },
+            child: const Text('Add Event'),
+          ),
       ],
     );
   }

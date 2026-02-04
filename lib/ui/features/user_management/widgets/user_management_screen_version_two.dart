@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../../../../routing/route_names.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../viewmodel/user_management_view_model.dart';
 import 'sections/create_user_section.dart';
@@ -169,7 +169,7 @@ class _UserManagementScreenVersionTwoState
                   TextButton.icon(
                     onPressed: () {
                       if (mounted) {
-                        Navigator.pushNamed(context, RouteNames.help);
+                        context.pushNamed('help');
                       }
                     },
                     icon: const Icon(Icons.help_outline,

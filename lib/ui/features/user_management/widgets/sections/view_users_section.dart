@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../../domain/models/user_model.dart';
 import '../../../../shared/ui/containers/gradient_container.dart';
@@ -74,7 +75,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
               leading: Icon(Icons.lock_reset, color: theme.colorScheme.primary),
               title: Text('Reset Password', style: theme.textTheme.bodyMedium),
               onTap: () {
-                Navigator.pop(context);
+                context.pop();
                 _resetPassword(user, viewModel);
               },
             ),
@@ -87,7 +88,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                 ),
               ),
               onTap: () {
-                Navigator.pop(context);
+                context.pop();
                 _deleteUser(user, viewModel);
               },
             ),
@@ -116,7 +117,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => context.pop(false),
             child: Text(
               'Cancel',
               style: theme.textTheme.titleSmall?.copyWith(
@@ -125,7 +126,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
             ),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => context.pop(true),
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.colorScheme.error,
             ),
@@ -179,7 +180,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => context.pop(false),
             child: Text(
               'Cancel',
               style: theme.textTheme.titleSmall?.copyWith(
@@ -188,7 +189,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
             ),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => context.pop(true),
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.colorScheme.primary,
             ),
