@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/ui/features/auth/view_models/auth_view_model.dart';
+import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
+import 'package:kenwell_health_app/domain/constants/role_permissions.dart';
 
 // Navigation & Auth
 import '../ui/shared/ui/navigation/main_navigation_screen.dart';
@@ -42,9 +44,41 @@ import '../ui/features/user_management/widgets/user_management_screen_version_tw
 import '../ui/features/wellness/widgets/member_search_screen.dart';
 
 /// GoRouter configuration for the Kenwell Health App
+/// 
+/// Features:
+/// - Authentication guards with redirect logic
+/// - Role-based access control using RolePermissions
+/// - Deep linking support for web and mobile
+/// - Path parameters for dynamic routes
 class AppRouterConfig {
   static final GlobalKey<NavigatorState> _rootNavigatorKey =
       GlobalKey<NavigatorState>(debugLabel: 'root');
+
+  /// Check if a user is authenticated
+  static bool _isAuthenticated(BuildContext context) {
+    try {
+      final authVM = context.read<AuthViewModel>();
+      return authVM.isLoggedIn;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Get the current user's role
+  static String? _getUserRole(BuildContext context) {
+    try {
+      final profileVM = context.read<ProfileViewModel>();
+      return profileVM.role;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Check if user can access a specific route
+  static bool _canAccessRoute(BuildContext context, String path) {
+    final userRole = _getUserRole(context);
+    return RolePermissions.canAccessRoute(userRole, path);
+  }
 
   static GoRouter createRouter() {
     return GoRouter(
@@ -52,10 +86,34 @@ class AppRouterConfig {
       debugLogDiagnostics: true,
       initialLocation: '/login',
       
-      // Redirect logic for authentication
+      // Global redirect logic for authentication and authorization
       redirect: (BuildContext context, GoRouterState state) {
-        // This can be expanded to check auth state and redirect accordingly
-        // For now, we'll keep the existing behavior
+        final isAuthenticated = _isAuthenticated(context);
+        final currentPath = state.uri.path;
+        
+        // Public routes that don't require authentication
+        final publicRoutes = ['/login', '/forgot-password'];
+        final isPublicRoute = publicRoutes.contains(currentPath);
+        
+        // If not authenticated and trying to access protected route
+        if (!isAuthenticated && !isPublicRoute) {
+          return '/login';
+        }
+        
+        // If authenticated and trying to access login/forgot-password
+        if (isAuthenticated && isPublicRoute) {
+          return '/';
+        }
+        
+        // Role-based access control for authenticated users
+        if (isAuthenticated && !isPublicRoute) {
+          if (!_canAccessRoute(context, currentPath)) {
+            // Redirect to home if user doesn't have permission
+            return '/';
+          }
+        }
+        
+        // Allow navigation
         return null;
       },
       
@@ -100,7 +158,54 @@ class AppRouterConfig {
           builder: (context, state) => const CalendarScreen(),
         ),
 
-        // Event Routes
+        // Event Routes with path parameter support for deep linking
+        GoRoute(
+          path: '/event/:id',
+          name: 'eventById',
+          builder: (context, state) {
+            final eventId = state.pathParameters['id'];
+            
+            // This route supports deep linking by event ID
+            // The EventDetailsScreen will need to fetch the event by ID
+            // For now, we'll use the extra approach as a fallback
+            final extra = state.extra as Map<String, dynamic>?;
+            final WellnessEvent? event = extra?['event'] as WellnessEvent?;
+            final EventViewModel? viewModel = extra?['viewModel'] as EventViewModel?;
+            
+            if (event == null) {
+              // If no event passed, show error or redirect
+              // In a real app, you'd fetch the event by ID here
+              return Scaffold(
+                appBar: AppBar(title: const Text('Event Not Found')),
+                body: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('Event not found or not provided'),
+                      const SizedBox(height: 16),
+                      Text('Event ID: $eventId'),
+                      const SizedBox(height: 24),
+                      ElevatedButton(
+                        onPressed: () => context.go('/'),
+                        child: const Text('Go to Home'),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+
+            return ChangeNotifierProvider(
+              create: (_) => EventDetailsViewModel()..setEvent(event),
+              child: EventDetailsScreen(
+                event: event,
+                viewModel: viewModel,
+              ),
+            );
+          },
+        ),
+        
+        // Legacy route for backward compatibility
         GoRoute(
           path: '/add-edit-event',
           name: 'addEditEvent',
