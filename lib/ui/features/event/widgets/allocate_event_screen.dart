@@ -121,8 +121,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                           if (!context.mounted) return;
                           widget.onAllocate(_selectedUserIds.toList());
                           if (!context.mounted) return;
-                          context.pop(,
-                              true); // Pass true to indicate assignment
+                          context.pop(true); // Pass true to indicate assignment
                         }
                       : null,
                   child: const Text('Assign Selected Users'),
