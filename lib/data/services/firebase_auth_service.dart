@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import '../../domain/models/user_model.dart';
 import 'package:flutter/foundation.dart';
+import '../../firebase_options.dart';
 
 class FirebaseAuthService {
   /// Real-time stream of all users (admin function)
@@ -20,6 +22,24 @@ class FirebaseAuthService {
       await _firestore.collection('users').doc(user.uid).update({
         'emailVerified': user.emailVerified,
       });
+    }
+  }
+
+  /// Sync email verification status for the current logged-in user
+  /// Note: Firebase Auth client SDK can only check the current user's verification.
+  /// Other users' verification status is automatically updated when they log in.
+  Future<void> syncCurrentUserEmailVerification() async {
+    try {
+      debugPrint('FirebaseAuth: Syncing current user verification status');
+
+      // Sync the current user's verification status
+      await syncCurrentUserEmailVerified();
+
+      debugPrint('FirebaseAuth: Verification sync completed');
+    } catch (e, stackTrace) {
+      debugPrint('FirebaseAuth: Error syncing verification status: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      rethrow;
     }
   }
 
@@ -57,9 +77,14 @@ class FirebaseAuthService {
         return null;
       }
 
+      // Reload user to get latest verification status
+      await user.reload();
+      final updatedUser = _auth.currentUser;
+      final emailVerified = updatedUser?.emailVerified ?? false;
+
       // Fetch additional user data from Firestore
       final doc = await _firestore.collection('users').doc(user.uid).get();
-      bool emailVerified = user.emailVerified;
+
       if (!doc.exists) {
         debugPrint('FirebaseAuth: User document not found for ${user.uid}');
         return UserModel(
@@ -73,10 +98,42 @@ class FirebaseAuthService {
         );
       }
 
-      debugPrint('FirebaseAuth: User data from Firestore: ${doc.data()}');
-      return UserModel.fromMap(doc.data()!);
+      // Update Firestore with latest email verification status
+      try {
+        await _firestore.collection('users').doc(user.uid).update({
+          'emailVerified': emailVerified,
+        });
+        debugPrint(
+            'FirebaseAuth: Updated emailVerified to $emailVerified for ${user.uid}');
+      } on FirebaseException catch (firestoreError) {
+        // Log Firestore sync failure but don't fail the login
+        debugPrint(
+            'FirebaseAuth: Warning - Login succeeded but verification status sync failed: ${firestoreError.message}');
+        debugPrint(
+            'FirebaseAuth: Verification status will be synced on next login or manual sync');
+        // Continue with login even if verification sync fails
+      }
+
+      // Return user model with updated verification status
+      // Create a mutable copy of userData since Firestore returns an immutable Map
+      final userData = Map<String, dynamic>.from(doc.data()!);
+      userData['emailVerified'] = emailVerified;
+
+      debugPrint('FirebaseAuth: User data from Firestore: $userData');
+      return UserModel.fromMap(userData);
+    } on FirebaseAuthException catch (e, stackTrace) {
+      // Handle Firebase Auth specific errors
+      debugPrint('Firebase Auth error during login: ${e.code} - ${e.message}');
+      debugPrintStack(stackTrace: stackTrace);
+      return null;
+    } on FirebaseException catch (e, stackTrace) {
+      // Handle Firestore specific errors (e.g., during user data fetch)
+      debugPrint(
+          'Firestore error during login (user data fetch failed): ${e.code} - ${e.message}');
+      debugPrintStack(stackTrace: stackTrace);
+      return null;
     } catch (e, stackTrace) {
-      // Handle errors (FirebaseAuthException, network issues, etc.)
+      // Handle any other errors
       debugPrint('Login error: $e');
       debugPrintStack(stackTrace: stackTrace);
       return null;
@@ -84,6 +141,7 @@ class FirebaseAuthService {
   }
 
   /// Register a new user with extra fields
+  /// Uses a secondary Firebase app to avoid logging out the current admin user
   Future<UserModel?> register({
     required String email,
     required String password,
@@ -94,10 +152,35 @@ class FirebaseAuthService {
     emailVerified = false,
     required String phoneNumber,
   }) async {
+    FirebaseApp? secondaryApp;
+    FirebaseAuth? secondaryAuth;
     try {
       debugPrint('FirebaseAuth: Starting registration for $email');
 
-      final userCredential = await _auth.createUserWithEmailAndPassword(
+      // Create a secondary Firebase app to avoid logging out the current user
+      // This is necessary because createUserWithEmailAndPassword automatically
+      // signs in the newly created user, which would log out the admin
+      // Check if the app already exists
+      secondaryApp = Firebase.apps
+          .where((app) => app.name == 'userRegistration')
+          .firstOrNull;
+
+      if (secondaryApp != null) {
+        debugPrint('FirebaseAuth: Using existing secondary app');
+      } else {
+        // App doesn't exist, create it
+        debugPrint(
+            'FirebaseAuth: Creating new secondary app for user registration');
+        secondaryApp = await Firebase.initializeApp(
+          name: 'userRegistration',
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+      }
+
+      // Use the secondary app's auth instance
+      secondaryAuth = FirebaseAuth.instanceFor(app: secondaryApp);
+
+      final userCredential = await secondaryAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -128,18 +211,19 @@ class FirebaseAuthService {
       debugPrint(
           'FirebaseAuth: Saving user data to Firestore: ${userModel.toMap()}');
 
-      // Save extra fields to Firestore
+      // Save extra fields to Firestore (using the main app's firestore)
       try {
         await _firestore
             .collection('users')
             .doc(user.uid)
             .set(userModel.toMap());
         debugPrint('FirebaseAuth: User data saved successfully to Firestore');
-      } catch (firestoreError) {
+      } catch (firestoreError, firestoreStackTrace) {
         debugPrint('FirebaseAuth: ERROR saving to Firestore: $firestoreError');
-        // Even if Firestore save fails, return the user model
-        // The user account was created in Firebase Auth
-        rethrow;
+        debugPrintStack(stackTrace: firestoreStackTrace);
+        // Note: User account was created in Firebase Auth even if Firestore fails
+        // This could lead to inconsistent state, but we still return the user model
+        // so the caller knows the user was created
       }
 
       return userModel;
@@ -147,6 +231,19 @@ class FirebaseAuthService {
       debugPrint('Registration error: $e');
       debugPrintStack(stackTrace: stackTrace);
       return null;
+    } finally {
+      // Always clean up the secondary app session
+      // This ensures the admin's session remains active regardless of success or failure
+      if (secondaryAuth != null) {
+        try {
+          await secondaryAuth.signOut();
+          debugPrint(
+              'FirebaseAuth: Signed out from secondary app, main session preserved');
+        } catch (signOutError) {
+          debugPrint(
+              'FirebaseAuth: Error signing out from secondary app: $signOutError');
+        }
+      }
     }
   }
 

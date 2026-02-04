@@ -48,13 +48,13 @@ class MyEventScreenState extends State<MyEventScreen> {
 
   // Fetch user events from Firestore
   Future<void> _fetchUserEvents() async {
-    setState(() {});
     // Get current user
     final authService = AuthService();
     final user = await authService.getCurrentUser();
     debugPrint('MyEventScreen: Current user: \\${user?.id}');
     // If no user, clear events and return
     if (user == null) {
+      if (!mounted) return;
       setState(() {
         _userEvents = [];
       });
@@ -117,6 +117,7 @@ class MyEventScreenState extends State<MyEventScreen> {
       debugPrint(
           '  - id: \\${event.id}, title: \\${event.title}, date: \\${event.date}');
     }
+    if (!mounted) return;
     setState(() {
       _userEvents = events;
     });
@@ -559,6 +560,14 @@ class MyEventScreenState extends State<MyEventScreen> {
           ),
         ),
       );
+
+      // Refresh events after returning from wellness flow
+      if (!mounted) return;
+      try {
+        await _fetchUserEvents();
+      } catch (e) {
+        debugPrint('MyEventScreen: Error refreshing events after start: $e');
+      }
     } finally {
       if (mounted) {
         setState(() => _startingEventId = null);
@@ -578,7 +587,13 @@ class MyEventScreenState extends State<MyEventScreen> {
       const SnackBar(content: Text('Event finished successfully')),
     );
 
-    setState(() {});
+    // Refresh events after finishing
+    if (!mounted) return;
+    try {
+      await _fetchUserEvents();
+    } catch (e) {
+      debugPrint('MyEventScreen: Error refreshing events after finish: $e');
+    }
   }
 
   // Build info chip widget

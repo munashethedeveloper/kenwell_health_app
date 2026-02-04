@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../data/services/firebase_auth_service.dart';
 import '../../../../domain/constants/user_roles.dart';
@@ -16,6 +17,9 @@ class UserManagementViewModel extends ChangeNotifier {
   }
 
   final FirebaseAuthService _authService;
+  StreamSubscription<List<UserModel>>? _usersStreamSubscription;
+  Timer? _verificationSyncTimer;
+  bool _isSyncingVerification = false; // Flag to prevent concurrent syncs
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -33,6 +37,10 @@ class UserManagementViewModel extends ChangeNotifier {
   List<UserModel> get users => _users;
   String get searchQuery => _searchQuery;
   String get selectedFilter => _selectedFilter;
+
+  // Verification statistics
+  int get verifiedUsersCount => _users.where((u) => u.emailVerified).length;
+  int get unverifiedUsersCount => _users.where((u) => !u.emailVerified).length;
 
   List<UserModel> get filteredUsers {
     var filtered = _users;
@@ -60,7 +68,69 @@ class UserManagementViewModel extends ChangeNotifier {
   }
 
   UserManagementViewModel({FirebaseAuthService? authService})
-      : _authService = authService ?? FirebaseAuthService();
+      : _authService = authService ?? FirebaseAuthService() {
+    // Start listening to user updates immediately
+    _startListeningToUsers();
+    // Start periodic verification sync for current user
+    _startPeriodicVerificationSync();
+  }
+
+  @override
+  void dispose() {
+    _usersStreamSubscription?.cancel();
+    _verificationSyncTimer?.cancel();
+    super.dispose();
+  }
+
+  /// Start listening to real-time user updates from Firestore
+  void _startListeningToUsers() {
+    _setLoading(true);
+    _usersStreamSubscription = _authService.getAllUsersStream().listen(
+      (users) {
+        _users = users;
+        _isLoading = false;
+        notifyListeners();
+      },
+      onError: (error) {
+        _setError('Failed to load users. Please try again.');
+        _isLoading = false; // Ensure loading state is reset on error
+        notifyListeners();
+        debugPrint('Users stream error: $error');
+      },
+    );
+  }
+
+  /// Start periodic sync of current user's email verification status
+  /// This ensures that when a user verifies their email, it's reflected in the UI
+  void _startPeriodicVerificationSync() {
+    // Check every 30 seconds
+    _verificationSyncTimer = Timer.periodic(
+      const Duration(seconds: 30),
+      (_) async {
+        // Atomically check and set flag to prevent race condition
+        if (_isSyncingVerification) {
+          debugPrint(
+              'UserManagementViewModel: Skipping sync - already in progress');
+          return;
+        }
+
+        // Set flag before async operation
+        _isSyncingVerification = true;
+
+        try {
+          // Use the wrapper method for consistency
+          await _authService.syncCurrentUserEmailVerification();
+          debugPrint(
+              'UserManagementViewModel: Synced current user verification status');
+        } catch (e) {
+          debugPrint('UserManagementViewModel: Error syncing verification: $e');
+        } finally {
+          // Always reset flag in finally block
+          _isSyncingVerification = false;
+        }
+      },
+    );
+  }
 
   // Private helper methods
   void _setLoading(bool value) {
@@ -117,7 +187,9 @@ class UserManagementViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Load all users
+  // Load all users - performs a one-time fetch
+  // This is kept for manual refresh functionality
+  // The stream subscription (_startListeningToUsers) provides continuous updates
   Future<void> loadUsers() async {
     _setLoading(true);
     _errorMessage = null;
@@ -130,6 +202,18 @@ class UserManagementViewModel extends ChangeNotifier {
     } catch (e) {
       _setError('Failed to load users. Please try again.');
       debugPrint('Load users error: $e');
+    }
+  }
+
+  /// Sync email verification status for the current logged-in user
+  /// This triggers Firebase Auth to check if the user has verified their email
+  Future<void> syncCurrentUserVerificationStatus() async {
+    try {
+      await _authService.syncCurrentUserEmailVerification();
+      _setSuccess('Your verification status has been synced');
+    } catch (e) {
+      _setError('Failed to sync verification status');
+      debugPrint('Sync verification error: $e');
     }
   }
 
