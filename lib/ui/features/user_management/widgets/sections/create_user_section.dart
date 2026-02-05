@@ -31,9 +31,13 @@ class _CreateUserSectionState extends State<CreateUserSection> {
     setState(() {
       _isVerified = verified;
     });
+    
+    // If verified, sync the status to Firestore so it's reflected everywhere
     if (verified) {
+      await viewModel.syncCurrentUserVerificationStatus();
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Email verified!')),
+        const SnackBar(content: Text('Email verified! Status synced to database.')),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
