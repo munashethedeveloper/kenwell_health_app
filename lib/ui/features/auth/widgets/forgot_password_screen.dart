@@ -43,9 +43,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       // Show success or error message
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Password reset link sent! Please check your email.',
+          SnackBar(
+            content: const Text(
+              'Password reset email sent! Check your email and click the link to set a new password. After setting your new password, you can login immediately.',
+            ),
+            duration: const Duration(seconds: 6),
+            action: SnackBarAction(
+              label: 'OK',
+              onPressed: () {},
             ),
           ),
         );
@@ -56,7 +61,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         // Show error if email not found
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('No account found with this email.'),
+            content: Text(
+              'No account found with this email. Please check the email address and try again.',
+            ),
+            duration: Duration(seconds: 4),
           ),
         );
       }

@@ -106,17 +106,23 @@ class RolePermissions {
       'TOP MANAGEMENT'
     ],
   };
-
-  // Feature access permissions
+// Feature access permissions
   static const Map<String, List<String>> featureAccess = {
+    // Event Management Permissions
     'create_event': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     'edit_event': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     'delete_event': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     'view_events': [...UserRoles.values],
+    'allocate_events': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT COORDINATOR'],
+
+    // User Management Permissions
     'create_user': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     'edit_user': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     'delete_user': ['ADMIN'],
     'view_users': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
+    'reset_user_credentials': ['ADMIN', 'TOP MANAGEMENT'],
+
+    // Event Workflow Permissions
     'conduct_wellness_flow': [
       'HEALTH PRACTITIONER',
       'PROJECT MANAGER',
@@ -124,82 +130,12 @@ class RolePermissions {
       'ADMIN',
       'TOP MANAGEMENT'
     ],
+
+    // Statistics and General Permissions
     'view_statistics': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER', 'CLIENT'],
     'export_data': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     'update_own_profile': [...UserRoles.values],
     'view_help': [...UserRoles.values],
-    'access_detailed_stats': [
-      'ADMIN',
-      'TOP MANAGEMENT',
-      'PROJECT COORDINATOR',
-      'CLIENT'
-    ],
-    'allocate_event': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
-    'view_member_search': [
-      'PROJECT COORDINATOR',
-      'PROJECT MANAGER',
-      'HEALTH PRACTITIONER',
-      'ADMIN',
-      'TOP MANAGEMENT'
-    ],
-    'register_member': [
-      'PROJECT COORDINATOR',
-      'PROJECT MANAGER',
-      'HEALTH PRACTITIONER',
-      'ADMIN',
-      'TOP MANAGEMENT'
-    ],
-    'conduct_consent': [
-      'PROJECT COORDINATOR',
-      'PROJECT MANAGER',
-      'HEALTH PRACTITIONER',
-      'ADMIN',
-      'TOP MANAGEMENT'
-    ],
-    'conduct_health_screening': [
-      'PROJECT COORDINATOR',
-      'PROJECT MANAGER',
-      'HEALTH PRACTITIONER',
-      'ADMIN',
-      'TOP MANAGEMENT'
-    ],
-    'conduct_health_risk_assessment': [
-      'PROJECT COORDINATOR',
-      'PROJECT MANAGER',
-      'HEALTH PRACTITIONER',
-      'ADMIN',
-      'TOP MANAGEMENT'
-    ],
-    'conduct_hiv_test': [
-      'PROJECT COORDINATOR',
-      'PROJECT MANAGER',
-      'HEALTH PRACTITIONER',
-      'ADMIN',
-      'TOP MANAGEMENT'
-    ],
-    'record_hiv_result': [
-      'PROJECT COORDINATOR',
-      'PROJECT MANAGER',
-      'HEALTH PRACTITIONER',
-      'ADMIN',
-      'TOP MANAGEMENT'
-    ],
-    'conduct_tb_testing': [
-      'PROJECT COORDINATOR',
-      'PROJECT MANAGER',
-      'HEALTH PRACTITIONER',
-      'ADMIN',
-      'TOP MANAGEMENT'
-    ],
-    'conduct_survey': [
-      'PROJECT COORDINATOR',
-      'PROJECT MANAGER',
-      'HEALTH PRACTITIONER',
-      'ADMIN',
-      'TOP MANAGEMENT'
-    ],
-    'view_calendar': [...UserRoles.values],
-    'view_event_details': [...UserRoles.values],
   };
 
   /// Check if a role has access to a specific route
@@ -275,9 +211,19 @@ class RolePermissions {
     return role == 'ADMIN' || role == 'TOP MANAGEMENT';
   }
 
-  /// Check if user is nurse
-  static bool isNurse(String? userRole) {
-    return UserRoles.normalize(userRole) == 'NURSE';
+  /// Check if user is health practitioner
+  static bool isHealthPractitioner(String? userRole) {
+    return UserRoles.normalize(userRole) == 'HEALTH PRACTITIONER';
+  }
+
+  /// Check if user is health practitioner
+  static bool isClient(String? userRole) {
+    return UserRoles.normalize(userRole) == 'CLIENT';
+  }
+
+  /// Check if user is health practitioner
+  static bool isProjectManager(String? userRole) {
+    return UserRoles.normalize(userRole) == 'PROJECT MANAGER';
   }
 
   /// Check if user is coordinator

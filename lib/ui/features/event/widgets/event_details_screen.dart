@@ -146,41 +146,43 @@ class EventDetailsScreen extends StatelessWidget {
             ],
           ]),
           const SizedBox(height: 24),
-          // Allocate Event button
-          CustomPrimaryButton(
-            label: 'Allocate Event',
-            onPressed: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => ChangeNotifierProvider(
-                    create: (_) => UserManagementViewModel(),
-                    child: AllocateEventScreen(
-                      event: event,
-                      onAllocate: (assignedUserIds) {
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                  'Assigned to: ${assignedUserIds.join(', ')}'),
-                            ),
-                          );
-                        }
-                      },
+          // Allocate Event button (with permission check)
+          if (RolePermissions.canAccessFeature(
+              profileVM.role, 'allocate_events'))
+            CustomPrimaryButton(
+              label: 'Allocate Event',
+              onPressed: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ChangeNotifierProvider(
+                      create: (_) => UserManagementViewModel(),
+                      child: AllocateEventScreen(
+                        event: event,
+                        onAllocate: (assignedUserIds) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    'Assigned to: ${assignedUserIds.join(', ')}'),
+                              ),
+                            );
+                          }
+                        },
+                      ),
                     ),
                   ),
-                ),
-              );
-              // After returning from allocation, trigger refresh in MyEventScreen if allocation occurred
-              if (context.mounted &&
-                  result != null &&
-                  result is bool &&
-                  result) {
-                final myEventScreenState = MyEventScreen.of(context);
-                myEventScreenState?.refreshUserEvents();
-              }
-            },
-          ),
+                );
+                // After returning from allocation, trigger refresh in MyEventScreen if allocation occurred
+                if (context.mounted &&
+                    result != null &&
+                    result is bool &&
+                    result) {
+                  final myEventScreenState = MyEventScreen.of(context);
+                  myEventScreenState?.refreshUserEvents();
+                }
+              },
+            ),
         ],
       ),
     );

@@ -100,11 +100,15 @@ class FirebaseAuthService {
 
       // Update Firestore with latest email verification status
       try {
-        await _firestore.collection('users').doc(user.uid).update({
+        final updateData = {
           'emailVerified': emailVerified,
-        });
+          'lastLoginAt': FieldValue.serverTimestamp(),
+        };
+
+        await _firestore.collection('users').doc(user.uid).update(updateData);
         debugPrint(
             'FirebaseAuth: Updated emailVerified to $emailVerified for ${user.uid}');
+        debugPrint('FirebaseAuth: Updated lastLoginAt timestamp');
       } on FirebaseException catch (firestoreError) {
         // Log Firestore sync failure but don't fail the login
         debugPrint(
@@ -195,6 +199,18 @@ class FirebaseAuthService {
 
       // Send email verification
       await user.sendEmailVerification();
+
+      // Send password reset email so user can set their own password
+      // This is important because the admin-set password is not communicated to the user
+      try {
+        // Use main app's auth instance for password reset email
+        await _auth.sendPasswordResetEmail(email: email);
+        debugPrint('FirebaseAuth: Password reset email sent to $email');
+      } catch (passwordResetError) {
+        debugPrint(
+            'FirebaseAuth: Warning - Failed to send password reset email: $passwordResetError');
+        // Continue even if password reset email fails - user can request it later
+      }
 
       // Create UserModel
       final userModel = UserModel(
@@ -386,11 +402,45 @@ class FirebaseAuthService {
   }
 
   /// Send password reset email
+  /// Returns true if email was sent successfully
+  /// After user clicks the link and sets new password:
+  /// 1. Firebase Auth password is updated automatically
+  /// 2. Firestore 'passwordResetAt' field is updated to track the reset
+  /// 3. User can login with new password immediately
+  /// 4. Local DB password syncs on next successful login
   Future<bool> sendPasswordResetEmail(String email) async {
     try {
-      await _auth.sendPasswordResetEmail(email: email.trim());
-      debugPrint('Password reset email sent to: $email');
+      final sanitizedEmail = email.trim().toLowerCase();
+
+      // Check if user exists in Firestore before sending reset email
+      final querySnapshot = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: sanitizedEmail)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        debugPrint('Password reset: No user found with email $sanitizedEmail');
+        return false;
+      }
+
+      // Send password reset email
+      await _auth.sendPasswordResetEmail(email: sanitizedEmail);
+      debugPrint('Password reset email sent to: $sanitizedEmail');
+
+      // Update Firestore to track that a reset was requested
+      final userId = querySnapshot.docs.first.id;
+      await _firestore.collection('users').doc(userId).update({
+        'passwordResetRequestedAt': FieldValue.serverTimestamp(),
+      });
+      debugPrint('Password reset request timestamp updated for user: $userId');
+
       return true;
+    } on FirebaseAuthException catch (e, stackTrace) {
+      debugPrint(
+          'Firebase Auth error during password reset: ${e.code} - ${e.message}');
+      debugPrintStack(stackTrace: stackTrace);
+      return false;
     } catch (e, stackTrace) {
       debugPrint('Password reset error: $e');
       debugPrintStack(stackTrace: stackTrace);
