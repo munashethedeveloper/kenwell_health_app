@@ -208,12 +208,25 @@ class UserManagementViewModel extends ChangeNotifier {
   /// Sync email verification status for the current logged-in user
   /// This triggers Firebase Auth to check if the user has verified their email
   Future<void> syncCurrentUserVerificationStatus() async {
+    // Check if sync is already in progress to prevent race conditions
+    if (_isSyncingVerification) {
+      debugPrint(
+          'UserManagementViewModel: Skipping manual sync - already in progress');
+      return;
+    }
+
+    // Set flag before async operation
+    _isSyncingVerification = true;
+
     try {
       await _authService.syncCurrentUserEmailVerification();
       _setSuccess('Your verification status has been synced');
     } catch (e) {
       _setError('Failed to sync verification status');
       debugPrint('Sync verification error: $e');
+    } finally {
+      // Always reset flag in finally block
+      _isSyncingVerification = false;
     }
   }
 
