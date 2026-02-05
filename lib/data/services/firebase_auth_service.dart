@@ -123,7 +123,7 @@ class FirebaseAuthService {
       // Return user model with updated verification status
       // Create a mutable copy of userData since Firestore returns an immutable Map
       final userData = Map<String, dynamic>.from(doc.data()!);
-      userData['id'] = user.uid;
+      userData['id'] = doc.id;
       userData['emailVerified'] = emailVerified;
 
       debugPrint('FirebaseAuth: User data from Firestore: $userData');
@@ -296,7 +296,7 @@ class FirebaseAuthService {
     }
     debugPrint('FirebaseAuth: Current user data: ${doc.data()}');
     final userData = Map<String, dynamic>.from(doc.data()!);
-    userData['id'] = user.uid;
+    userData['id'] = doc.id;
     return UserModel.fromMap(userData);
   }
 
