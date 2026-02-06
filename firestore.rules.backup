@@ -1,0 +1,244 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to get user document
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    // Helper function to get user role in lowercase for case-insensitive comparison
+    function getUserRole() {
+      return getUserData().role.lower();
+    }
+    
+    // Helper function to check if user has a specific role (case-insensitive)
+    function hasRole(role) {
+      return isAuthenticated() && getUserRole() == role.lower();
+    }
+    
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return hasRole('admin');
+    }
+    
+    // Helper function to check if user is nurse
+    function isNurse() {
+      return hasRole('nurse');
+    }
+    
+    // Helper function to check if user is coordinator
+    function isCoordinator() {
+      return hasRole('coordinator');
+    }
+    
+    // Helper function to check if user has staff role (admin, nurse, or coordinator)
+    function isStaff() {
+      return isAdmin() || isNurse() || isCoordinator();
+    }
+    
+    // Users collection - Role-based access
+    match /users/{userId} {
+      // Anyone authenticated can read their own user document
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      
+      // Only admin can read all users
+      allow list: if isAdmin();
+      
+      // Allow users to create their own document during registration
+      // OR admin can create any user document
+      allow create: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
+      
+      // Users can update their own profile (except role field)
+      // Admin can update any user
+      allow update: if (isAuthenticated() && request.auth.uid == userId && 
+                       !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role'])) 
+                    || isAdmin();
+      
+      // Only admin can delete users
+      allow delete: if isAdmin();
+    }
+
+    //User Events collection - 
+     match /user_events/{document} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Events collection - Staff can manage, authenticated can read
+    match /events/{eventId} {
+      // All authenticated users can read events
+      allow read: if isAuthenticated();
+      
+      // Only staff (admin, nurse, coordinator) can create events
+      allow create: if isStaff();
+      
+      // Only staff can update events
+      allow update: if isStaff();
+      
+      // Only admin can delete events
+      allow delete: if isAdmin();
+    }
+    
+    // Wellness Sessions collection - Staff can create/read/update
+    match /wellness_sessions/{sessionId} {
+      // Staff can read all sessions
+      // Authenticated users can only read their own sessions
+      allow read: if isStaff() || 
+                    (isAuthenticated() && resource.data.userId == request.auth.uid);
+      
+      // Only staff can create wellness sessions
+      allow create: if isStaff();
+      
+      // Only staff can update sessions
+      allow update: if isStaff();
+      
+      // Only admin can delete sessions
+      allow delete: if isAdmin();
+    }
+    
+    // Participants/Members collection - Staff can manage
+    match /participants/{participantId} {
+      // Staff can read all participants
+      allow read: if isStaff();
+      
+      // Staff can create participants
+      allow create: if isStaff();
+      
+      // Staff can update participants
+      allow update: if isStaff();
+      
+      // Only admin can delete participants
+      allow delete: if isAdmin();
+    }
+    
+    // Members collection - Staff can manage
+    match /members/{memberId} {
+      // Staff can read all members
+      allow read: if isStaff();
+      
+      // Staff can create members
+      allow create: if isStaff();
+      
+      // Staff can update members
+      allow update: if isStaff();
+      
+      // Only admin can delete members
+      allow delete: if isAdmin();
+    }
+    
+    // Consents collection - Staff can manage
+    match /consents/{consentId} {
+      // Staff can read all consents
+      allow read: if isStaff();
+      
+      // Staff can create consents
+      allow create: if isStaff();
+      
+      // Staff can update consents
+      allow update: if isStaff();
+      
+      // Only admin can delete consents
+      allow delete: if isAdmin();
+    }
+    
+    // HRA Screenings collection - Staff can manage
+    match /hra_screenings/{screeningId} {
+      // Staff can read all HRA screenings
+      allow read: if isStaff();
+      
+      // Staff can create HRA screenings
+      allow create: if isStaff();
+      
+      // Staff can update HRA screenings
+      allow update: if isStaff();
+      
+      // Only admin can delete HRA screenings
+      allow delete: if isAdmin();
+    }
+    
+    // HIV Screenings collection - Staff can manage
+    match /hiv_screenings/{screeningId} {
+      // Staff can read all HIV screenings
+      allow read: if isStaff();
+      
+      // Staff can create HIV screenings
+      allow create: if isStaff();
+      
+      // Staff can update HIV screenings
+      allow update: if isStaff();
+      
+      // Only admin can delete HIV screenings
+      allow delete: if isAdmin();
+    }
+    
+    // HIV Results collection - Staff can manage
+    match /hiv_results/{resultId} {
+      // Staff can read all HIV results
+      allow read: if isStaff();
+      
+      // Staff can create HIV results
+      allow create: if isStaff();
+      
+      // Staff can update HIV results
+      allow update: if isStaff();
+      
+      // Only admin can delete HIV results
+      allow delete: if isAdmin();
+    }
+    
+    // TB Screenings collection - Staff can manage
+    match /tb_screenings/{screeningId} {
+      // Staff can read all TB screenings
+      allow read: if isStaff();
+      
+      // Staff can create TB screenings
+      allow create: if isStaff();
+      
+      // Staff can update TB screenings
+      allow update: if isStaff();
+      
+      // Only admin can delete TB screenings
+      allow delete: if isAdmin();
+    }
+    
+    // Survey results collection - Staff can read, system can write
+    match /survey_results/{resultId} {
+      // Staff can read survey results
+      allow read: if isStaff();
+      
+      // Staff can create survey results
+      allow create: if isStaff();
+      
+      // Staff can update survey results
+      allow update: if isStaff();
+      
+      // Only admin can delete survey results
+      allow delete: if isAdmin();
+    }
+    
+    // Screening results (HIV, TB, HRA) - Staff only
+    match /screening_results/{resultId} {
+      // Only staff can access screening results (sensitive health data)
+      allow read: if isStaff();
+      
+      // Only staff can create screening results
+      allow create: if isStaff();
+      
+      // Only staff can update screening results
+      allow update: if isStaff();
+      
+      // Only admin can delete screening results
+      allow delete: if isAdmin();
+    }
+    
+    // Default deny all other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
