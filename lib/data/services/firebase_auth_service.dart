@@ -232,10 +232,16 @@ class FirebaseAuthService {
 
       // Save extra fields to Firestore (using the main app's firestore)
       try {
+        final firestoreData = userModel.toMap();
+        // Store the initial password for potential deletion purposes
+        // Note: This is stored in Firestore for admin deletion capability
+        // Users should change their password after first login
+        firestoreData['password'] = password;
+        
         await _firestore
             .collection('users')
             .doc(user.uid)
-            .set(userModel.toMap());
+            .set(firestoreData);
         debugPrint('FirebaseAuth: User data saved successfully to Firestore');
       } catch (firestoreError, firestoreStackTrace) {
         debugPrint('FirebaseAuth: ERROR saving to Firestore: $firestoreError');
@@ -475,12 +481,91 @@ class FirebaseAuthService {
   }
 
   /// Delete user (admin function)
-  /// Deletes the user and all related data using cascade deletion
-  /// This includes: user document, user_events, and wellness_sessions
+  /// Deletes the user from Firebase Auth and all related data using cascade deletion
+  /// This includes: Firebase Auth account, user document, user_events, and wellness_sessions
   Future<bool> deleteUser(String userId) async {
+    FirebaseApp? secondaryApp;
+    FirebaseAuth? secondaryAuth;
+    bool authAccountDeleted = false;
+    
     try {
       debugPrint('FirebaseAuth: Starting deletion for user $userId');
 
+      // Step 1: Fetch user data from Firestore to get email
+      final userDoc = await _firestore.collection('users').doc(userId).get();
+      
+      if (!userDoc.exists) {
+        debugPrint('FirebaseAuth: User document not found for $userId');
+        // Continue with deletion anyway in case of orphaned auth account
+      }
+      
+      final userData = userDoc.data();
+      final userEmail = userData?['email'] as String?;
+      
+      // Step 2: Attempt to delete Firebase Auth account
+      // Using a workaround: sign in as the user with a secondary app, then delete
+      if (userEmail != null) {
+        try {
+          debugPrint('FirebaseAuth: Attempting to delete auth account for $userEmail');
+          
+          // Create a secondary Firebase app to avoid affecting the current admin session
+          secondaryApp = Firebase.apps
+              .where((app) => app.name == 'userDeletion')
+              .firstOrNull;
+
+          if (secondaryApp == null) {
+            debugPrint('FirebaseAuth: Creating new secondary app for user deletion');
+            secondaryApp = await Firebase.initializeApp(
+              name: 'userDeletion',
+              options: DefaultFirebaseOptions.currentPlatform,
+            );
+          } else {
+            debugPrint('FirebaseAuth: Using existing secondary app for deletion');
+          }
+
+          secondaryAuth = FirebaseAuth.instanceFor(app: secondaryApp);
+          
+          // Get the password from the user data (if available)
+          // Note: This only works if the password hasn't been changed via password reset
+          final password = userData?['password'] as String?;
+          
+          if (password != null && password.isNotEmpty) {
+            debugPrint('FirebaseAuth: Attempting to sign in as user for deletion');
+            
+            try {
+              // Sign in as the user
+              final credential = await secondaryAuth.signInWithEmailAndPassword(
+                email: userEmail,
+                password: password,
+              );
+              
+              if (credential.user != null) {
+                debugPrint('FirebaseAuth: Successfully signed in as user, deleting auth account');
+                // Delete the authenticated user
+                await credential.user!.delete();
+                authAccountDeleted = true;
+                debugPrint('FirebaseAuth: ✓ Firebase Auth account deleted successfully');
+              }
+            } on FirebaseAuthException catch (authError) {
+              if (authError.code == 'wrong-password' || authError.code == 'user-not-found') {
+                debugPrint('FirebaseAuth: Could not authenticate user for deletion: ${authError.code}');
+                debugPrint('FirebaseAuth: User may have changed password via password reset');
+                debugPrint('FirebaseAuth: Auth account will remain - manual deletion required');
+              } else {
+                debugPrint('FirebaseAuth: Auth error during user deletion: ${authError.code} - ${authError.message}');
+              }
+            }
+          } else {
+            debugPrint('FirebaseAuth: No password available in user data');
+            debugPrint('FirebaseAuth: Cannot delete auth account without credentials');
+          }
+          
+        } catch (authError) {
+          debugPrint('FirebaseAuth: Error during auth account deletion: $authError');
+        }
+      }
+
+      // Step 3: Delete Firestore data (existing logic)
       // Firestore batch limit is 500 operations per batch
       const int batchLimit = 500;
       final List<WriteBatch> batches = [];
@@ -545,19 +630,43 @@ class FirebaseAuthService {
       await Future.wait(batches.map((batch) => batch.commit()));
 
       debugPrint(
-          'FirebaseAuth: Successfully deleted user $userId and all related data');
-
-      // Note: Deleting Firebase Auth user requires admin SDK or the user to be logged in
-      // For admin delete, you would typically use Firebase Admin SDK on backend
-      // Or use Firebase Extensions like "Delete User Data"
-      // For now, we've deleted the Firestore documents and related data
-      // The auth account can be deleted via Firebase Console or Admin SDK
+          'FirebaseAuth: Successfully deleted user $userId Firestore data and related documents');
+      
+      // Summary of deletion results
+      if (authAccountDeleted) {
+        debugPrint('FirebaseAuth: ✓ COMPLETE DELETION - Both Auth and Firestore data removed');
+      } else {
+        debugPrint('');
+        debugPrint('⚠️  PARTIAL DELETION - Firestore data removed, Auth account remains');
+        debugPrint('   Possible reasons:');
+        debugPrint('   - User changed password via password reset');
+        debugPrint('   - Password not stored in Firestore');
+        debugPrint('   - Auth account may have been previously deleted');
+        debugPrint('');
+        debugPrint('   To complete deletion:');
+        debugPrint('   1. Use Firebase Console to manually delete the auth account');
+        debugPrint('   2. Or setup Firebase Admin SDK with Cloud Functions');
+        debugPrint('   3. Or use Firebase Extensions "Delete User Data"');
+        debugPrint('');
+      }
 
       return true;
     } catch (e, stackTrace) {
       debugPrint('Delete user error: $e');
       debugPrintStack(stackTrace: stackTrace);
       return false;
+    } finally {
+      // Always clean up the secondary app session
+      if (secondaryAuth != null) {
+        try {
+          await secondaryAuth.signOut();
+          debugPrint(
+              'FirebaseAuth: Signed out from secondary app, main session preserved');
+        } catch (signOutError) {
+          debugPrint(
+              'FirebaseAuth: Error signing out from secondary app: $signOutError');
+        }
+      }
     }
   }
 
