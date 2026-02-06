@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../data/services/firebase_auth_service.dart';
+import '../../../../data/local/app_database.dart';
 import '../../../../domain/constants/user_roles.dart';
 import '../../../../domain/models/user_model.dart';
 
@@ -17,6 +18,7 @@ class UserManagementViewModel extends ChangeNotifier {
   }
 
   final FirebaseAuthService _authService;
+  final AppDatabase _database;
   StreamSubscription<List<UserModel>>? _usersStreamSubscription;
   Timer? _verificationSyncTimer;
   bool _isSyncingVerification = false; // Flag to prevent concurrent syncs
@@ -67,8 +69,11 @@ class UserManagementViewModel extends ChangeNotifier {
     return filtered;
   }
 
-  UserManagementViewModel({FirebaseAuthService? authService})
-      : _authService = authService ?? FirebaseAuthService() {
+  UserManagementViewModel({
+    FirebaseAuthService? authService,
+    AppDatabase? database,
+  })  : _authService = authService ?? FirebaseAuthService(),
+        _database = database ?? AppDatabase.instance {
     // Start listening to user updates immediately
     _startListeningToUsers();
     // Start periodic verification sync for current user
@@ -208,12 +213,25 @@ class UserManagementViewModel extends ChangeNotifier {
   /// Sync email verification status for the current logged-in user
   /// This triggers Firebase Auth to check if the user has verified their email
   Future<void> syncCurrentUserVerificationStatus() async {
+    // Check if sync is already in progress to prevent race conditions
+    if (_isSyncingVerification) {
+      debugPrint(
+          'UserManagementViewModel: Skipping manual sync - already in progress');
+      return;
+    }
+
+    // Set flag before async operation
+    _isSyncingVerification = true;
+
     try {
       await _authService.syncCurrentUserEmailVerification();
       _setSuccess('Your verification status has been synced');
     } catch (e) {
       _setError('Failed to sync verification status');
       debugPrint('Sync verification error: $e');
+    } finally {
+      // Always reset flag in finally block
+      _isSyncingVerification = false;
     }
   }
 
@@ -270,9 +288,34 @@ class UserManagementViewModel extends ChangeNotifier {
     _setLoading(true);
 
     try {
-      final success = await _authService.deleteUser(userId);
+      // Try to get user's password from local database
+      String? userPassword;
+      try {
+        final localUser = await _database.getUserById(userId);
+        userPassword = localUser?.password;
+        if (userPassword != null && userPassword.isNotEmpty) {
+          debugPrint('UserManagementViewModel: Retrieved password from local DB for Auth deletion');
+        } else {
+          debugPrint('UserManagementViewModel: No password in local DB, Auth account may not be deleted');
+        }
+      } catch (e) {
+        debugPrint('UserManagementViewModel: Error retrieving password from local DB: $e');
+        userPassword = null;
+      }
+      
+      // Delete from Firebase (Auth + Firestore)
+      final success = await _authService.deleteUser(userId, userPassword: userPassword);
 
       if (success) {
+        // Also delete from local database
+        try {
+          await _database.deleteUserById(userId);
+          debugPrint('UserManagementViewModel: Deleted user from local database');
+        } catch (e) {
+          debugPrint('UserManagementViewModel: Error deleting from local DB: $e');
+          // Continue even if local DB deletion fails
+        }
+        
         _setSuccess('User $userName deleted successfully');
         // Reload users list
         await loadUsers();
