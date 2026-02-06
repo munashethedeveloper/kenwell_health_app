@@ -8,10 +8,14 @@ import '../../firebase_options.dart';
 class FirebaseAuthService {
   /// Real-time stream of all users (admin function)
   Stream<List<UserModel>> getAllUsersStream() {
-    return _firestore.collection('users').snapshots().map((querySnapshot) =>
-        querySnapshot.docs
-            .map((doc) => UserModel.fromMap(doc.data()))
-            .toList());
+    return _firestore
+        .collection('users')
+        .snapshots()
+        .map((querySnapshot) => querySnapshot.docs.map((doc) {
+              final userData = Map<String, dynamic>.from(doc.data());
+              userData['id'] = doc.id;
+              return UserModel.fromMap(userData);
+            }).toList());
   }
 
   /// Update the emailVerified field in Firestore for the current user
@@ -121,6 +125,7 @@ class FirebaseAuthService {
       // Return user model with updated verification status
       // Create a mutable copy of userData since Firestore returns an immutable Map
       final userData = Map<String, dynamic>.from(doc.data()!);
+      userData['id'] = doc.id;
       userData['emailVerified'] = emailVerified;
 
       debugPrint('FirebaseAuth: User data from Firestore: $userData');
@@ -292,7 +297,9 @@ class FirebaseAuthService {
       );
     }
     debugPrint('FirebaseAuth: Current user data: ${doc.data()}');
-    return UserModel.fromMap(doc.data()!);
+    final userData = Map<String, dynamic>.from(doc.data()!);
+    userData['id'] = doc.id;
+    return UserModel.fromMap(userData);
   }
 
   /// Update user profile in Firestore
@@ -457,9 +464,11 @@ class FirebaseAuthService {
   Future<List<UserModel>> getAllUsers() async {
     try {
       final querySnapshot = await _firestore.collection('users').get();
-      return querySnapshot.docs
-          .map((doc) => UserModel.fromMap(doc.data()))
-          .toList();
+      return querySnapshot.docs.map((doc) {
+        final userData = Map<String, dynamic>.from(doc.data());
+        userData['id'] = doc.id;
+        return UserModel.fromMap(userData);
+      }).toList();
     } catch (e, stackTrace) {
       debugPrint('Get all users error: $e');
       debugPrintStack(stackTrace: stackTrace);
