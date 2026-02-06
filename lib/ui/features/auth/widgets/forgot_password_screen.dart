@@ -37,7 +37,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         _emailController.text.trim(),
       );
 
-      // Hide loading indicator
+      // Check if widget is still mounted before using context
       if (!mounted) return;
 
       // Show success or error message
@@ -52,14 +52,19 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             action: SnackBarAction(
               label: 'OK',
               onPressed: () {
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                // Check if context is still valid before using it
+                if (mounted) {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                }
               },
             ),
           ),
         );
 
-        // Close the screen after success
-        context.pop();
+        // Close the screen after success - check mounted again
+        if (mounted) {
+          context.pop();
+        }
       } else {
         // Show error if something went wrong
         ScaffoldMessenger.of(context).showSnackBar(
