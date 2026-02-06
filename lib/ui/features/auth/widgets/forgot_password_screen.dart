@@ -66,15 +66,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           context.pop();
         }
       } else {
-        // Show error if something went wrong
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Unable to send password reset email. Please try again later.',
+        // Show error if something went wrong - check mounted first
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Unable to send password reset email. Please try again later.',
+              ),
+              duration: Duration(seconds: 4),
             ),
-            duration: Duration(seconds: 4),
-          ),
-        );
+          );
+        }
       }
     } catch (e) {
       // Show generic error message
