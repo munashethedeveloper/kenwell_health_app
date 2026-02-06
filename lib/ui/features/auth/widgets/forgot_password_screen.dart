@@ -46,10 +46,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           SnackBar(
             content: const Text(
               'If an account exists with this email, a password reset link has been sent. '
-              'Please check your email (including spam folder) and click the link to reset your password. '
-              'After resetting, you can login immediately with your new password.',
+              'Please check your email and follow the instructions to reset your password.',
             ),
-            duration: const Duration(seconds: 8),
+            duration: const Duration(seconds: 6),
             action: SnackBarAction(
               label: 'OK',
               onPressed: () {
@@ -66,9 +65,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-              'Unable to send password reset email. Please check your internet connection and try again.',
+              'Unable to send password reset email. Please try again later.',
             ),
-            duration: Duration(seconds: 5),
+            duration: Duration(seconds: 4),
           ),
         );
       }
