@@ -45,12 +45,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text(
-              'Password reset email sent! Check your email and click the link to set a new password. After setting your new password, you can login immediately.',
+              'If an account exists with this email, a password reset link has been sent. '
+              'Please check your email (including spam folder) and click the link to reset your password. '
+              'After resetting, you can login immediately with your new password.',
             ),
-            duration: const Duration(seconds: 6),
+            duration: const Duration(seconds: 8),
             action: SnackBarAction(
               label: 'OK',
-              onPressed: () {},
+              onPressed: () {
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              },
             ),
           ),
         );
@@ -58,20 +62,25 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         // Close the screen after success
         context.pop();
       } else {
-        // Show error if email not found
+        // Show error if something went wrong
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-              'No account found with this email. Please check the email address and try again.',
+              'Unable to send password reset email. Please check your internet connection and try again.',
             ),
-            duration: Duration(seconds: 4),
+            duration: Duration(seconds: 5),
           ),
         );
       }
-      // Hide loading indicator
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error: $e')));
+      // Show generic error message
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('An error occurred: ${e.toString()}'),
+          duration: const Duration(seconds: 5),
+        ),
+      );
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
