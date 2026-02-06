@@ -11,7 +11,15 @@ class RolePermissions {
     '/register': [...UserRoles.values],
     '/forgot-password': [...UserRoles.values],
     '/': [...UserRoles.values],
-    '/calendar': [...UserRoles.values],
+    // Calendar is accessible to ALL users regardless of role
+    '/calendar': [
+      'ADMIN',
+      'TOP MANAGEMENT',
+      'PROJECT MANAGER',
+      'PROJECT COORDINATOR',
+      'HEALTH PRACTITIONER',
+      'CLIENT',
+    ],
     '/event-details': [...UserRoles.values],
     '/profile': [...UserRoles.values],
     '/my-profile-menu': [...UserRoles.values],
@@ -112,7 +120,15 @@ class RolePermissions {
     'create_event': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     'edit_event': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     'delete_event': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
-    'view_events': [...UserRoles.values],
+    // View events is accessible to ALL users regardless of role
+    'view_events': [
+      'ADMIN',
+      'TOP MANAGEMENT',
+      'PROJECT MANAGER',
+      'PROJECT COORDINATOR',
+      'HEALTH PRACTITIONER',
+      'CLIENT',
+    ],
     'allocate_events': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT COORDINATOR'],
 
     // User Management Permissions
