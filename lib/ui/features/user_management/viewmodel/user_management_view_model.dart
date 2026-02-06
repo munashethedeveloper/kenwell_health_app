@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../data/services/firebase_auth_service.dart';
+import '../../../../data/services/auth_service.dart';
+import '../../../../data/local/app_database.dart';
 import '../../../../domain/constants/user_roles.dart';
 import '../../../../domain/models/user_model.dart';
 
@@ -17,6 +19,7 @@ class UserManagementViewModel extends ChangeNotifier {
   }
 
   final FirebaseAuthService _authService;
+  final AppDatabase _database;
   StreamSubscription<List<UserModel>>? _usersStreamSubscription;
   Timer? _verificationSyncTimer;
   bool _isSyncingVerification = false; // Flag to prevent concurrent syncs
@@ -67,8 +70,11 @@ class UserManagementViewModel extends ChangeNotifier {
     return filtered;
   }
 
-  UserManagementViewModel({FirebaseAuthService? authService})
-      : _authService = authService ?? FirebaseAuthService() {
+  UserManagementViewModel({
+    FirebaseAuthService? authService,
+    AppDatabase? database,
+  })  : _authService = authService ?? FirebaseAuthService(),
+        _database = database ?? AppDatabase.instance {
     // Start listening to user updates immediately
     _startListeningToUsers();
     // Start periodic verification sync for current user
@@ -283,9 +289,34 @@ class UserManagementViewModel extends ChangeNotifier {
     _setLoading(true);
 
     try {
-      final success = await _authService.deleteUser(userId);
+      // Try to get user's password from local database
+      String? userPassword;
+      try {
+        final localUser = await _database.getUserById(userId);
+        userPassword = localUser?.password;
+        if (userPassword != null && userPassword.isNotEmpty) {
+          debugPrint('UserManagementViewModel: Retrieved password from local DB for Auth deletion');
+        } else {
+          debugPrint('UserManagementViewModel: No password in local DB, Auth account may not be deleted');
+        }
+      } catch (e) {
+        debugPrint('UserManagementViewModel: Error retrieving password from local DB: $e');
+        userPassword = null;
+      }
+      
+      // Delete from Firebase (Auth + Firestore)
+      final success = await _authService.deleteUser(userId, userPassword: userPassword);
 
       if (success) {
+        // Also delete from local database
+        try {
+          await _database.deleteUserById(userId);
+          debugPrint('UserManagementViewModel: Deleted user from local database');
+        } catch (e) {
+          debugPrint('UserManagementViewModel: Error deleting from local DB: $e');
+          // Continue even if local DB deletion fails
+        }
+        
         _setSuccess('User $userName deleted successfully');
         // Reload users list
         await loadUsers();
@@ -294,6 +325,12 @@ class UserManagementViewModel extends ChangeNotifier {
         _setError('Failed to delete user');
         return false;
       }
+    } catch (e) {
+      _setError('Error deleting user. Please try again.');
+      debugPrint('Delete user error: $e');
+      return false;
+    }
+  }
     } catch (e) {
       _setError('Error deleting user. Please try again.');
       debugPrint('Delete user error: $e');
