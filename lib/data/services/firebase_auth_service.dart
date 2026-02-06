@@ -634,21 +634,21 @@ class FirebaseAuthService {
       if (authAccountDeleted) {
         debugPrint('FirebaseAuth: ✓ COMPLETE DELETION - Both Auth and Firestore data removed');
       } else {
-        debugPrint('');
-        debugPrint('WARNING: PARTIAL DELETION - Firestore data removed, Auth account remains');
-        debugPrint('  Reasons for partial deletion:');
-        debugPrint('  - Password not provided or incorrect');
-        debugPrint('  - User may have changed password via password reset');
-        debugPrint('  - Auth account may have been previously deleted');
-        debugPrint('');
-        debugPrint('  To complete full deletion:');
-        debugPrint('  1. Manually delete via Firebase Console > Authentication');
-        debugPrint('  2. Setup Firebase Cloud Functions with Admin SDK');
-        debugPrint('  3. Use Firebase Extensions "Delete User Data"');
-        debugPrint('  4. Or call deleteUser() with the correct password parameter');
-        debugPrint('');
-        debugPrint('  Note: Deleted user can still log in but will have no data.');
-        debugPrint('');
+        debugPrint('''
+WARNING: PARTIAL DELETION - Firestore data removed, Auth account remains
+  Reasons for partial deletion:
+  - Password not provided or incorrect
+  - User may have changed password via password reset
+  - Auth account may have been previously deleted
+
+  To complete full deletion:
+  1. Manually delete via Firebase Console > Authentication
+  2. Setup Firebase Cloud Functions with Admin SDK
+  3. Use Firebase Extensions "Delete User Data"
+  4. Or call deleteUser() with the correct password parameter
+
+  Note: Deleted user can still log in but will have no data.
+''');
       }
 
       return true;

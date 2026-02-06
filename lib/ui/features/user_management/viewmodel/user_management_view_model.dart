@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../data/services/firebase_auth_service.dart';
-import '../../../../data/services/auth_service.dart';
 import '../../../../data/local/app_database.dart';
 import '../../../../domain/constants/user_roles.dart';
 import '../../../../domain/models/user_model.dart';
@@ -325,12 +324,6 @@ class UserManagementViewModel extends ChangeNotifier {
         _setError('Failed to delete user');
         return false;
       }
-    } catch (e) {
-      _setError('Error deleting user. Please try again.');
-      debugPrint('Delete user error: $e');
-      return false;
-    }
-  }
     } catch (e) {
       _setError('Error deleting user. Please try again.');
       debugPrint('Delete user error: $e');
