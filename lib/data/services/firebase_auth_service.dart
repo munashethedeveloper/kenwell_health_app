@@ -6,6 +6,13 @@ import 'package:flutter/foundation.dart';
 import '../../firebase_options.dart';
 
 class FirebaseAuthService {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  
+  // Constants for secondary Firebase app names
+  static const String _registrationAppName = 'userRegistration';
+  static const String _deletionAppName = 'userDeletion';
+
   /// Real-time stream of all users (admin function)
   Stream<List<UserModel>> getAllUsersStream() {
     return _firestore.collection('users').snapshots().map((querySnapshot) =>
@@ -62,9 +69,6 @@ class FirebaseAuthService {
     }
     return false;
   }
-
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   /// Login with email & password
   Future<UserModel?> login(String email, String password) async {
@@ -169,7 +173,7 @@ class FirebaseAuthService {
       // signs in the newly created user, which would log out the admin
       // Check if the app already exists
       secondaryApp = Firebase.apps
-          .where((app) => app.name == 'userRegistration')
+          .where((app) => app.name == _registrationAppName)
           .firstOrNull;
 
       if (secondaryApp != null) {
@@ -179,7 +183,7 @@ class FirebaseAuthService {
         debugPrint(
             'FirebaseAuth: Creating new secondary app for user registration');
         secondaryApp = await Firebase.initializeApp(
-          name: 'userRegistration',
+          name: _registrationAppName,
           options: DefaultFirebaseOptions.currentPlatform,
         );
       }
@@ -514,13 +518,13 @@ class FirebaseAuthService {
           
           // Create a secondary Firebase app to avoid affecting the current admin session
           secondaryApp = Firebase.apps
-              .where((app) => app.name == 'userDeletion')
+              .where((app) => app.name == _deletionAppName)
               .firstOrNull;
 
           if (secondaryApp == null) {
             debugPrint('FirebaseAuth: Creating new secondary app for user deletion');
             secondaryApp = await Firebase.initializeApp(
-              name: 'userDeletion',
+              name: _deletionAppName,
               options: DefaultFirebaseOptions.currentPlatform,
             );
           } else {
@@ -634,21 +638,8 @@ class FirebaseAuthService {
       if (authAccountDeleted) {
         debugPrint('FirebaseAuth: ✓ COMPLETE DELETION - Both Auth and Firestore data removed');
       } else {
-        debugPrint('''
-WARNING: PARTIAL DELETION - Firestore data removed, Auth account remains
-  Reasons for partial deletion:
-  - Password not provided or incorrect
-  - User may have changed password via password reset
-  - Auth account may have been previously deleted
-
-  To complete full deletion:
-  1. Manually delete via Firebase Console > Authentication
-  2. Setup Firebase Cloud Functions with Admin SDK
-  3. Use Firebase Extensions "Delete User Data"
-  4. Or call deleteUser() with the correct password parameter
-
-  Note: Deleted user can still log in but will have no data.
-''');
+        debugPrint('FirebaseAuth: ⚠ PARTIAL DELETION - Firestore data removed, Auth account remains');
+        debugPrint('FirebaseAuth: To complete deletion: Use Firebase Console > Authentication or Cloud Functions with Admin SDK');
       }
 
       return true;
