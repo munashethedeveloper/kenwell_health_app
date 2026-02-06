@@ -415,32 +415,41 @@ class FirebaseAuthService {
   /// 2. Firestore 'passwordResetAt' field is updated to track the reset
   /// 3. User can login with new password immediately
   /// 4. Local DB password syncs on next successful login
+  /// 
+  /// Note: Firebase Auth doesn't throw an error for non-existent emails
+  /// (for security reasons), so this will return true even if the email
+  /// doesn't exist. Firebase simply won't send an email in that case.
   Future<bool> sendPasswordResetEmail(String email) async {
     try {
       final sanitizedEmail = email.trim().toLowerCase();
 
-      // Check if user exists in Firestore before sending reset email
-      final querySnapshot = await _firestore
-          .collection('users')
-          .where('email', isEqualTo: sanitizedEmail)
-          .limit(1)
-          .get();
-
-      if (querySnapshot.docs.isEmpty) {
-        debugPrint('Password reset: No user found with email $sanitizedEmail');
-        return false;
-      }
-
-      // Send password reset email
+      // Send password reset email via Firebase Auth
+      // Firebase Auth handles security and won't throw error for non-existent emails
       await _auth.sendPasswordResetEmail(email: sanitizedEmail);
       debugPrint('Password reset email sent to: $sanitizedEmail');
 
-      // Update Firestore to track that a reset was requested
-      final userId = querySnapshot.docs.first.id;
-      await _firestore.collection('users').doc(userId).update({
-        'passwordResetRequestedAt': FieldValue.serverTimestamp(),
-      });
-      debugPrint('Password reset request timestamp updated for user: $userId');
+      // Optionally update Firestore to track that a reset was requested
+      // This is done asynchronously and failures won't affect the reset email
+      try {
+        final querySnapshot = await _firestore
+            .collection('users')
+            .where('email', isEqualTo: sanitizedEmail)
+            .limit(1)
+            .get();
+
+        if (querySnapshot.docs.isNotEmpty) {
+          final userId = querySnapshot.docs.first.id;
+          await _firestore.collection('users').doc(userId).update({
+            'passwordResetRequestedAt': FieldValue.serverTimestamp(),
+          });
+          debugPrint('Password reset request timestamp updated for user: $userId');
+        } else {
+          debugPrint('Password reset: User not found in Firestore, but email sent via Firebase Auth');
+        }
+      } catch (firestoreError) {
+        // Don't fail if Firestore update fails - the reset email was already sent
+        debugPrint('Warning: Failed to update Firestore timestamp: $firestoreError');
+      }
 
       return true;
     } on FirebaseAuthException catch (e, stackTrace) {
