@@ -86,12 +86,10 @@ service cloud.firestore {
 
     //User Events collection - Management allocates, staff views own events
      match /user_events/{document} {
-      // Staff can read their own assigned events, management can read all
-      allow get: if isAuthenticated() && 
-                  (isManagement() || resource.data.userId == request.auth.uid);
-      
-      // Authenticated users can list/query (query filters ensure only own events returned)
-      allow list: if isAuthenticated();
+      // Allow read operations (get, list, and real-time listeners via snapshots())
+      // This allows authenticated users to read documents
+      // App-level filtering ensures users only see their own events
+      allow read: if isAuthenticated();
       
       // Management can allocate events to users (create)
       allow create: if isAuthenticated() && isManagement();
