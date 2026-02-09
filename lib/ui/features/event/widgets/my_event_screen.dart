@@ -145,67 +145,87 @@ class MyEventScreenState extends State<MyEventScreen> {
     // Use _userEvents instead of allEvents
     final allEvents = _userEvents;
     final now = DateTime.now();
-    final weekStart = _startOfWeek(now); // Sunday 00:00:00 of this week
-    final nextWeekStart = weekStart.add(const Duration(days: 7));
-    final selectedStart = _selectedWeek == 0 ? weekStart : nextWeekStart;
-    final selectedEnd = _endOfWeek(selectedStart);
-    final allUpcoming = allEvents.where((e) => !e.date.isBefore(now)).toList();
-    // Removed duplicate and unused 'weeklyEvents' definition
-
-    debugPrint(
-        'ConductEventScreen: Total events in database = ${allEvents.length}');
-    debugPrint(
-        'ConductEventScreen: Total upcoming events = ${allUpcoming.length}');
-    debugPrint('ConductEventScreen: Current date/time = ${DateTime.now()}');
+    final today = DateTime(now.year, now.month, now.day);
+    
+    debugPrint('MyEventScreen: Total events in database = ${allEvents.length}');
+    debugPrint('MyEventScreen: Current date/time = $now');
+    debugPrint('MyEventScreen: Today\'s date (midnight) = $today');
 
     // Debug: Print ALL events with details
     if (allEvents.isNotEmpty) {
-      debugPrint('ConductEventScreen: All events:');
+      debugPrint('MyEventScreen: All events:');
       for (final event in allEvents) {
-        debugPrint(
-            '  - "${event.title}" | Date: ${event.date} | Status: ${event.status}');
+        debugPrint('  - "${event.title}" | Date: ${event.date} | StartTime: ${event.startTime} | StrikeDownTime: ${event.strikeDownTime} | Status: ${event.status}');
       }
     }
 
-    // Debug: Print details about filtered out events
-    if (_userEvents.isEmpty && allEvents.isNotEmpty) {
-      debugPrint(
-          'MyEventScreen: All user_events failed to map to WellnessEvent.');
-    } else if (_userEvents.isNotEmpty) {
-      debugPrint('MyEventScreen: Mapped WellnessEvent list:');
-      for (final event in _userEvents) {
-        debugPrint(
-            '  - id: \\${event.id}, title: \\${event.title}, date: \\${event.date}');
-      }
+    // Filter events based on selected tab
+    final List<WellnessEvent> filteredEvents;
+    
+    if (_selectedWeek == 0) {
+      // TODAY TAB: Show only today's events
+      // An event is "today's event" if:
+      // 1. The event date is today
+      // 2. Current time is within the event window (between start time and strike down time)
+      //    OR if there's no strike down time, just check if it hasn't ended yet
+      filteredEvents = allEvents.where((event) {
+        // Check if event is today
+        final eventDate = DateTime(event.date.year, event.date.month, event.date.day);
+        if (!eventDate.isAtSameMomentAs(today)) {
+          return false; // Not today
+        }
+        
+        // Event is today, now check the time window
+        final startDateTime = event.startDateTime;
+        final strikeDownDateTime = event.strikeDownDateTime;
+        
+        // If we have both start and strike down times, check if we're within that window
+        if (startDateTime != null && strikeDownDateTime != null) {
+          // Show event if current time is before strike down time
+          return now.isBefore(strikeDownDateTime) || now.isAtSameMomentAs(strikeDownDateTime);
+        } else if (startDateTime != null) {
+          // If we only have start time, show the event if it's today
+          return true;
+        } else {
+          // If no times specified, show all today's events
+          return true;
+        }
+      }).toList();
+      
+      debugPrint('MyEventScreen: TODAY tab - Found ${filteredEvents.length} events for today');
+    } else {
+      // UPCOMING TAB: Show all other events (future events + today's events that have passed)
+      filteredEvents = allEvents.where((event) {
+        final eventDate = DateTime(event.date.year, event.date.month, event.date.day);
+        
+        // Include future events (after today)
+        if (eventDate.isAfter(today)) {
+          return true;
+        }
+        
+        // For today's events, include only those that have passed strike down time
+        if (eventDate.isAtSameMomentAs(today)) {
+          final strikeDownDateTime = event.strikeDownDateTime;
+          if (strikeDownDateTime != null) {
+            // Include if current time is after strike down time
+            return now.isAfter(strikeDownDateTime);
+          }
+          // If no strike down time, exclude from upcoming (they're in TODAY)
+          return false;
+        }
+        
+        // Exclude past events
+        return false;
+      }).toList();
+      
+      debugPrint('MyEventScreen: UPCOMING tab - Found ${filteredEvents.length} upcoming events');
     }
-    final filteredOut =
-        allEvents.where((e) => !allUpcoming.contains(e)).toList();
-    if (filteredOut.isNotEmpty) {
-      debugPrint(
-          'ConductEventScreen: ${filteredOut.length} events were filtered out:');
-      for (final event in filteredOut) {
-        debugPrint(
-            '  - "${event.title}" | Date: ${event.date} | Status: ${event.status} | StrikeDown: ${event.strikeDownDateTime}');
-      }
-    }
-
-    // Compute week ranges
-    debugPrint(
-        'ConductEventScreen: Selected week range: $selectedStart to $selectedEnd');
-
-    // Filter events for the selected week (inclusive)
-    final weeklyEvents = allUpcoming.where((e) {
-      final ev = e.date.toLocal();
-      return !(ev.isBefore(selectedStart) || ev.isAfter(selectedEnd));
-    }).toList();
-
-    debugPrint(
-        'ConductEventScreen: Events in selected week = ${weeklyEvents.length}');
-    if (weeklyEvents.isEmpty && allUpcoming.isNotEmpty) {
-      debugPrint(
-          'ConductEventScreen: No events in selected week. Event dates:');
-      for (final event in allUpcoming) {
-        debugPrint('  - "${event.title}": ${event.date}');
+    
+    // Debug filtered events
+    if (filteredEvents.isNotEmpty) {
+      debugPrint('MyEventScreen: Filtered events for tab $_selectedWeek:');
+      for (final event in filteredEvents) {
+        debugPrint('  - "${event.title}" | Date: ${event.date} | Start: ${event.startDateTime} | StrikeDown: ${event.strikeDownDateTime}');
       }
     }
 
@@ -259,10 +279,10 @@ class MyEventScreenState extends State<MyEventScreen> {
             const AppLogo(size: 200),
             const SizedBox(height: 16),
 
-            // Row with left toggle, centered date-range text, and right toggle
+            // Row with left toggle, centered label, and right toggle
             Row(
               children: [
-                // Left single-button Toggle for "This week"
+                // Left single-button Toggle for "Today"
                 ToggleButtons(
                   isSelected: [_selectedWeek == 0],
                   onPressed: (index) {
@@ -281,23 +301,23 @@ class MyEventScreenState extends State<MyEventScreen> {
                     Padding(
                       padding:
                           EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      child: Text('This week'),
+                      child: Text('Today'),
                     ),
                   ],
                 ),
 
-                // Centered date range
+                // Centered label
                 Expanded(
                   child: Center(
                     child: Text(
-                      eventVM.formatDateRange(selectedStart, selectedEnd),
+                      _selectedWeek == 0 ? 'Today\'s Events' : 'Upcoming Events',
                       style: const TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ),
 
-                // Right single-button Toggle for "Next week"
+                // Right single-button Toggle for "Upcoming"
                 ToggleButtons(
                   isSelected: [_selectedWeek == 1],
                   onPressed: (index) {
@@ -316,7 +336,7 @@ class MyEventScreenState extends State<MyEventScreen> {
                     Padding(
                       padding:
                           EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      child: Text('Next week'),
+                      child: Text('Upcoming'),
                     ),
                   ],
                 ),
@@ -324,8 +344,8 @@ class MyEventScreenState extends State<MyEventScreen> {
             ),
             const SizedBox(height: 12),
 
-            // If no events for selected week, show friendly empty state
-            if (weeklyEvents.isEmpty)
+            // If no events for selected tab, show friendly empty state
+            if (filteredEvents.isEmpty)
               Center(
                 child: Padding(
                   padding: const EdgeInsets.all(24),
@@ -336,17 +356,19 @@ class MyEventScreenState extends State<MyEventScreen> {
                           size: 64, color: Color(0xFF90C048)),
                       const SizedBox(height: 16),
                       Text(
-                        allUpcoming.isEmpty
-                            ? 'No upcoming events.\nCreate an event to get started!'
-                            : 'No events scheduled for the week of ${eventVM.formatDateRange(selectedStart, selectedEnd)}.\nSwitch weeks to see other events.',
+                        _selectedWeek == 0
+                            ? 'No events scheduled for today.\nCheck the "Upcoming" tab for future events.'
+                            : allEvents.isEmpty
+                                ? 'No upcoming events.\nCreate an event to get started!'
+                                : 'No upcoming events.\nAll your events are scheduled for today.',
                         textAlign: TextAlign.center,
                         style: const TextStyle(fontSize: 16),
                       ),
-                      if (allUpcoming.isNotEmpty)
+                      if (allEvents.isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.only(top: 16),
                           child: Text(
-                            '${allUpcoming.length} event(s) total',
+                            '${allEvents.length} event(s) total',
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey[600],
@@ -358,9 +380,9 @@ class MyEventScreenState extends State<MyEventScreen> {
                 ),
               )
             else
-              // List of events for the selected week
+              // List of events for the selected tab
               Column(
-                children: weeklyEvents.map((event) {
+                children: filteredEvents.map((event) {
                   final isStarting = _startingEventId == event.id;
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 6),
@@ -514,20 +536,6 @@ class MyEventScreenState extends State<MyEventScreen> {
         ),
       ),
     );
-  }
-
-  // Calculate the start of the week (Sunday) for a given date
-  DateTime _startOfWeek(DateTime date) {
-    final int daysToSubtract = date.weekday % 7;
-    final dt = DateTime(date.year, date.month, date.day)
-        .subtract(Duration(days: daysToSubtract));
-    return DateTime(dt.year, dt.month, dt.day);
-  }
-
-  // Calculate the end of the week (Saturday) for a given week start date
-  DateTime _endOfWeek(DateTime weekStart) {
-    final end = weekStart.add(const Duration(days: 6));
-    return DateTime(end.year, end.month, end.day, 23, 59, 59, 999);
   }
 
   // Determine if the event can be started based on current time and event start time
