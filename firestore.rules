@@ -84,9 +84,13 @@ service cloud.firestore {
       allow delete: if isAuthenticated() && isManagement();
     }
 
-    //User Events collection - 
+    //User Events collection - Users can read their own assigned events
      match /user_events/{document} {
-      allow read, write: if isAuthenticated() && isManagement();
+      // Users can read their own assigned events
+      allow read: if isAuthenticated() && 
+                  (isManagement() || resource.data.userId == request.auth.uid);
+      // Only management can create/update/delete event assignments
+      allow write: if isAuthenticated() && isManagement();
     }
     
     // Events collection - Staff can manage, authenticated can read
