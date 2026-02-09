@@ -468,6 +468,10 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                               );
                               
                               widget.onAllocate(selectedUsers.map((u) => u.id).toList());
+                              
+                              // Pop back to event details screen with success result
+                              if (!context.mounted) return;
+                              context.pop(true);
                             }
                           : null,
                       style: ElevatedButton.styleFrom(
