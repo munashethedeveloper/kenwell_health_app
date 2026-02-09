@@ -7,6 +7,7 @@ import '../../event/view_model/event_view_model.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/logo/app_logo.dart';
+import '../../../shared/ui/containers/gradient_container.dart';
 import '../../../../data/repositories_dcl/firestore_member_repository.dart';
 import 'event_stats_detail_screen.dart';
 
@@ -425,7 +426,6 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                     icon: Icons.flag,
                     title: 'Total Members Expected',
                     value: totalExpected.toString(),
-                    color: Colors.orange,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -434,7 +434,6 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                     icon: Icons.person_add,
                     title: 'Total Members Registered',
                     value: _isLoadingMembers ? '...' : _totalMembers.toString(),
-                    color: Colors.blue,
                   ),
                 ),
               ],
@@ -449,7 +448,6 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                     icon: Icons.people,
                     title: 'Total Members Screened',
                     value: totalScreened.toString(),
-                    color: theme.primaryColor,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -458,7 +456,6 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                     icon: Icons.person_off,
                     title: 'Total Members No Show',
                     value: (totalExpected - totalScreened).toString(),
-                    color: Colors.red,
                   ),
                 ),
               ],
@@ -473,7 +470,6 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                     icon: Icons.event,
                     title: 'Total Events',
                     value: events.length.toString(),
-                    color: Colors.purple,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -482,7 +478,6 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                     icon: Icons.trending_up,
                     title: 'Participation Rate',
                     value: '$participationRate%',
-                    color: Colors.teal,
                   ),
                 ),
               ],
@@ -906,42 +901,38 @@ class _StatCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final String value;
-  final Color color;
 
   const _StatCard({
     required this.icon,
     required this.title,
     required this.value,
-    required this.color,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, color: color, size: 32),
-            const SizedBox(height: 12),
-            Text(
-              value,
-              style: theme.textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
+    return GradientContainer.purpleGreen(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: Colors.white, size: 32),
+          const SizedBox(height: 12),
+          Text(
+            value,
+            style: theme.textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
-            const SizedBox(height: 4),
-            Text(
-              title,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: Colors.grey[600],
-              ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            title,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: Colors.white,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
