@@ -75,10 +75,22 @@ class MyEventScreenState extends State<MyEventScreen> {
     final events = userEventMaps
         .map((e) {
           try {
+            // Handle eventDate - could be Timestamp or DateTime
+            DateTime eventDate;
+            final rawDate = e['eventDate'];
+            if (rawDate is Timestamp) {
+              eventDate = rawDate.toDate();
+            } else if (rawDate is DateTime) {
+              eventDate = rawDate;
+            } else {
+              debugPrint('MyEventScreen: Invalid date type: ${rawDate.runtimeType}');
+              return null;
+            }
+            
             return WellnessEvent(
               id: e['eventId'] ?? '',
               title: e['eventTitle'] ?? '',
-              date: (e['eventDate'] as Timestamp).toDate(),
+              date: eventDate,
               venue: e['eventVenue'] ?? '',
               address: e['eventLocation'] ?? '',
               townCity: '',
@@ -109,7 +121,7 @@ class MyEventScreenState extends State<MyEventScreen> {
             );
           } catch (err) {
             debugPrint(
-                'MyEventScreen: Failed to map event: \\${e.toString()} | Error: \\${err.toString()}');
+                'MyEventScreen: Failed to map event: ${e.toString()} | Error: ${err.toString()}');
             return null;
           }
         })

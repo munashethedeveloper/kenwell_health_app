@@ -10,7 +10,7 @@ class UserEventService {
     final data = {
       'eventId': event.id,
       'eventTitle': event.title,
-      'eventDate': event.date,
+      'eventDate': Timestamp.fromDate(event.date), // Convert DateTime to Timestamp
       'eventVenue': event.venue,
       'eventLocation': event.address,
       'eventStartTime': event.startTime,
