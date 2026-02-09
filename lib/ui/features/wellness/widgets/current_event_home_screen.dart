@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/ui/shared/ui/containers/gradient_container.dart';
@@ -26,23 +25,9 @@ class CurrentEventHomeScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final viewModel = context.watch<WellnessFlowViewModel>();
 
-    return PopScope(
-      onPopInvokedWithResult: (didPop, result) {
-        debugPrint('Back pressed. didPop=$didPop');
-        debugPrint('canPop=${Navigator.of(context).canPop()}');
-        if (!didPop) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go('/member-search');
-            }
-          });
-        }
-      },
-      child: Scaffold(
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+    return Scaffold(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -170,13 +155,7 @@ class CurrentEventHomeScreen extends StatelessWidget {
               const SizedBox(height: 24),
               CustomPrimaryButton(
                 label: 'Back to Search',
-                onPressed: () {
-                  if (context.canPop()) {
-                    context.pop();
-                  } else {
-                    context.go('/member-search');
-                  }
-                },
+                onPressed: onBackToSearch,
               ),
               const SizedBox(height: 16),
             ],
