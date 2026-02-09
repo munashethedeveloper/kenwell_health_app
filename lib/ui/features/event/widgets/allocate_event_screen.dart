@@ -7,6 +7,7 @@ import '../../user_management/viewmodel/user_management_view_model.dart';
 import '../../user_management/widgets/sections/user_filter_chips.dart';
 import '../../user_management/widgets/sections/user_search_bar.dart';
 import 'package:kenwell_health_app/data/services/user_event_service.dart';
+import 'package:kenwell_health_app/data/repositories_dcl/user_event_repository.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../domain/models/user_model.dart';
 
@@ -30,15 +31,40 @@ class AllocateEventScreen extends StatefulWidget {
 class _AllocateEventScreenState extends State<AllocateEventScreen> {
   final Set<String> _selectedUserIds = {};
   final TextEditingController _searchController = TextEditingController();
+  final Set<String> _assignedUserIds = {};
+  bool _isLoadingAssignedUsers = true;
 
   // Initialize state
   @override
   void initState() {
     super.initState();
-    // Optionally, trigger user loading if needed
+    // Load users and fetch already assigned users
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<UserManagementViewModel>().loadUsers();
+      _fetchAssignedUsers();
     });
+  }
+
+  // Fetch users already assigned to this event
+  Future<void> _fetchAssignedUsers() async {
+    setState(() => _isLoadingAssignedUsers = true);
+    try {
+      final repo = UserEventRepository();
+      final assignedIds = await repo.fetchAssignedUserIds(widget.event.id);
+      if (mounted) {
+        setState(() {
+          _assignedUserIds.clear();
+          _assignedUserIds.addAll(assignedIds);
+          _isLoadingAssignedUsers = false;
+        });
+        debugPrint('AllocateEventScreen: Loaded ${assignedIds.length} already assigned users');
+      }
+    } catch (e) {
+      debugPrint('AllocateEventScreen: Error fetching assigned users: $e');
+      if (mounted) {
+        setState(() => _isLoadingAssignedUsers = false);
+      }
+    }
   }
 
   @override
@@ -49,6 +75,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
 
   Widget _buildUserCard(UserModel user, ThemeData theme) {
     final isSelected = _selectedUserIds.contains(user.id);
+    final isAssigned = _assignedUserIds.contains(user.id);
     
     final roleIcons = {
       'ADMIN': Icons.admin_panel_settings,
@@ -133,21 +160,21 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 2),
+                  // Show assigned/unassigned status instead of verified/not verified
                   Row(
                     children: [
                       Icon(
-                        user.emailVerified
-                            ? Icons.verified
-                            : Icons.error_outline,
-                        color: user.emailVerified ? Colors.green : Colors.red,
+                        isAssigned
+                            ? Icons.check_circle
+                            : Icons.radio_button_unchecked,
+                        color: isAssigned ? Colors.green : Colors.grey,
                         size: 16,
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        user.emailVerified ? 'Verified' : 'Not Verified',
+                        isAssigned ? 'Assigned' : 'Not Assigned',
                         style: theme.textTheme.labelSmall?.copyWith(
-                          color:
-                              user.emailVerified ? Colors.green : Colors.red,
+                          color: isAssigned ? Colors.green : Colors.grey,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -417,11 +444,20 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                               // Close loading dialog
                               Navigator.of(context).pop();
                               
+                              // Refresh assigned users list
+                              await _fetchAssignedUsers();
+                              
+                              // Clear selection
+                              setState(() {
+                                _selectedUserIds.clear();
+                              });
+                              
                               // Show success message
+                              if (!context.mounted) return;
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
-                                    'Event assigned to ${_selectedUserIds.length} user(s)',
+                                    'Event assigned to ${selectedUsers.length} user(s)',
                                   ),
                                   backgroundColor: Colors.green,
                                   behavior: SnackBarBehavior.floating,
@@ -431,10 +467,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                                 ),
                               );
                               
-                              widget.onAllocate(_selectedUserIds.toList());
-                              
-                              if (!context.mounted) return;
-                              context.pop(true); // Pass true to indicate assignment
+                              widget.onAllocate(selectedUsers.map((u) => u.id).toList());
                             }
                           : null,
                       style: ElevatedButton.styleFrom(

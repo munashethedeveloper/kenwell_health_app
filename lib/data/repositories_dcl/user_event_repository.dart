@@ -10,4 +10,16 @@ class UserEventRepository {
         .get();
     return snapshot.docs.map((doc) => doc.data()).toList();
   }
+
+  /// Fetch all user IDs that have been assigned to a specific event
+  Future<List<String>> fetchAssignedUserIds(String eventId) async {
+    final snapshot = await _firestore
+        .collection('user_events')
+        .where('eventId', isEqualTo: eventId)
+        .get();
+    return snapshot.docs
+        .map((doc) => doc.data()['userId'] as String?)
+        .whereType<String>()
+        .toList();
+  }
 }
