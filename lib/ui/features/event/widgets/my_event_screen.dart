@@ -48,10 +48,11 @@ class MyEventScreenState extends State<MyEventScreen> {
 
   // Fetch user events from Firestore
   Future<void> _fetchUserEvents() async {
+    debugPrint('MyEventScreen: Starting _fetchUserEvents...');
     // Get current user
     final authService = AuthService();
     final user = await authService.getCurrentUser();
-    debugPrint('MyEventScreen: Current user: \\${user?.id}');
+    debugPrint('MyEventScreen: Current user: ${user?.id}');
     // If no user, clear events and return
     if (user == null) {
       if (!mounted) return;
@@ -63,10 +64,12 @@ class MyEventScreenState extends State<MyEventScreen> {
     }
     // Fetch user events from repository
     final repo = UserEventRepository();
+    debugPrint('MyEventScreen: Fetching events for user ${user.id}...');
     final userEventMaps = await repo.fetchUserEvents(user.id);
+    debugPrint('MyEventScreen: Received ${userEventMaps.length} raw user events from Firestore');
     debugPrint('MyEventScreen: Raw userEventMaps from Firestore:');
     for (final map in userEventMaps) {
-      debugPrint('  - \\${map.toString()}');
+      debugPrint('  - ${map.toString()}');
     }
     // Convert Firestore maps to WellnessEvent objects
     final events = userEventMaps
@@ -112,15 +115,17 @@ class MyEventScreenState extends State<MyEventScreen> {
         })
         .whereType<WellnessEvent>()
         .toList();
+    debugPrint('MyEventScreen: Successfully mapped ${events.length} WellnessEvent objects');
     debugPrint('MyEventScreen: Mapped WellnessEvent list:');
     for (final event in events) {
       debugPrint(
-          '  - id: \\${event.id}, title: \\${event.title}, date: \\${event.date}');
+          '  - id: ${event.id}, title: ${event.title}, date: ${event.date}');
     }
     if (!mounted) return;
     setState(() {
       _userEvents = events;
     });
+    debugPrint('MyEventScreen: State updated with ${_userEvents.length} events');
   }
 
   @override
@@ -208,9 +213,8 @@ class MyEventScreenState extends State<MyEventScreen> {
             tooltip: 'Refresh',
             icon: const Icon(Icons.refresh, color: Color(0xFF201C58)),
             onPressed: () async {
-              // Refresh events from Firestore
-              final eventVM = context.read<EventViewModel>();
-              await eventVM.reloadEvents();
+              // Refresh user events from Firestore
+              await _fetchUserEvents();
               if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
