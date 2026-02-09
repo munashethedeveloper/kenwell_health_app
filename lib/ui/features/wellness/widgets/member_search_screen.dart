@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_member_repository.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/member_repository.dart';
 import 'package:kenwell_health_app/data/local/app_database.dart';
@@ -145,18 +144,9 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return PopScope(
-      onPopInvokedWithResult: (didPop, result) {
-        debugPrint('Back pressed. didPop=\u{24}didPop');
-        debugPrint('canPop=\u{24}{Navigator.of(context).canPop()}');
-        if (!didPop) {
-          // If we can't pop, navigate to the member search screen as root
-          context.go("/member-search");
-        }
-      },
-      child: Scaffold(
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+    return Scaffold(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [

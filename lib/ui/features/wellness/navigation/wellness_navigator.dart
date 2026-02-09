@@ -38,15 +38,13 @@ class WellnessNavigator {
   /// Start the wellness flow from member registration
   Future<void> startFlow() async {
     final wellnessVM = WellnessFlowViewModel(activeEvent: event);
-    final member = await _navigateToMemberRegistration();
-    if (member != null && context.mounted) {
-      await navigateToEventDetails(member, wellnessVM);
-    }
+    await _navigateToMemberRegistration(wellnessVM);
   }
 
   /// Navigate to member registration (first step)
-  Future<Member?> _navigateToMemberRegistration() async {
-    return await Navigator.push<Member>(
+  /// Keeps member search in the stack for proper back navigation
+  Future<void> _navigateToMemberRegistration(WellnessFlowViewModel wellnessVM) async {
+    await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => Scaffold(
@@ -79,15 +77,18 @@ class WellnessNavigator {
             onGoToMemberDetails: (searchQuery) async {
               final member = await _navigateToMemberDetails(null, searchQuery);
               if (member != null && context.mounted) {
-                context.pop(member);
+                // Navigate forward to event home instead of popping
+                await navigateToEventDetails(member, wellnessVM);
               }
             },
-            onMemberFound: (member) {
-              // Member found, go to event details
-              context.pop(member);
+            onMemberFound: (member) async {
+              // Member found, navigate forward to event details
+              if (context.mounted) {
+                await navigateToEventDetails(member, wellnessVM);
+              }
             },
             onPrevious: () {
-              context.pop();
+              Navigator.of(context).pop();
             },
           ),
         ),
@@ -126,7 +127,7 @@ class WellnessNavigator {
                 try {
                   await memberVM.saveLocally();
                   if (context.mounted && memberVM.savedMember != null) {
-                    context.pop(memberVM.savedMember);
+                    Navigator.of(context).pop(memberVM.savedMember);
                   }
                 } catch (e) {
                   debugPrint('Failed to save member: $e');
@@ -234,14 +235,18 @@ class WellnessNavigator {
                     }
                   case 'health_screenings':
                     {
-                      // Use stored flags from wellnessVM
-                      final result = await navigateToHealthScreenings(
-                        member,
-                        wellnessVM,
-                        hraEnabled: wellnessVM.hraEnabled,
-                        hivEnabled: wellnessVM.hivEnabled,
-                        tbEnabled: wellnessVM.tbEnabled,
-                      );
+                      // Loop until user submits all (returns true)
+                      bool? result;
+                      do {
+                        result = await navigateToHealthScreenings(
+                          member,
+                          wellnessVM,
+                          hraEnabled: wellnessVM.hraEnabled,
+                          hivEnabled: wellnessVM.hivEnabled,
+                          tbEnabled: wellnessVM.tbEnabled,
+                        );
+                      } while (result == false); // false means completed a screening, need to reshow
+                      
                       if (result == true) {
                         wellnessVM.screeningsCompleted = true;
                       }
@@ -281,7 +286,7 @@ class WellnessNavigator {
             event: event,
             onNext: () {
               final selectedScreenings = consentVM.selectedScreenings;
-              context.pop(selectedScreenings);
+              Navigator.of(context).pop(selectedScreenings);
             },
             appBar: KenwellAppBar(
               title: event.title,
@@ -321,14 +326,8 @@ class WellnessNavigator {
             if (!context.mounted) return;
             if (result == true) {
               wellnessVM.hraCompleted = true;
-              // Reopen health screenings to update UI
-              await navigateToHealthScreenings(
-                member,
-                wellnessVM,
-                hraEnabled: hraEnabled,
-                hivEnabled: hivEnabled,
-                tbEnabled: tbEnabled,
-              );
+              // Pop back to refresh the parent screen
+              Navigator.of(context).pop(false); // false = not final submit
             }
           },
           onHivTap: () async {
@@ -336,13 +335,8 @@ class WellnessNavigator {
             if (!context.mounted) return;
             if (result == true) {
               wellnessVM.hivCompleted = true;
-              await navigateToHealthScreenings(
-                member,
-                wellnessVM,
-                hraEnabled: hraEnabled,
-                hivEnabled: hivEnabled,
-                tbEnabled: tbEnabled,
-              );
+              // Pop back to refresh the parent screen
+              Navigator.of(context).pop(false); // false = not final submit
             }
           },
           onTbTap: () async {
@@ -350,17 +344,12 @@ class WellnessNavigator {
             if (!context.mounted) return;
             if (result == true) {
               wellnessVM.tbCompleted = true;
-              await navigateToHealthScreenings(
-                member,
-                wellnessVM,
-                hraEnabled: hraEnabled,
-                hivEnabled: hivEnabled,
-                tbEnabled: tbEnabled,
-              );
+              // Pop back to refresh the parent screen
+              Navigator.of(context).pop(false); // false = not final submit
             }
           },
           onSubmitAll: () {
-            context.pop(true);
+            Navigator.of(context).pop(true); // true = final submit
           },
           appBar: KenwellAppBar(
             title: event.title,
@@ -408,10 +397,10 @@ class WellnessNavigator {
           ],
           child: PersonalRiskAssessmentScreen(
             onNext: () {
-              context.pop(true);
+              Navigator.of(context).pop(true);
             },
             onPrevious: () {
-              context.pop();
+              Navigator.of(context).pop();
             },
             viewModel: riskVM,
             nurseViewModel: nurseVM,
@@ -447,10 +436,10 @@ class WellnessNavigator {
           value: hivTestVM,
           child: HIVTestScreen(
             onNext: () {
-              context.pop(true);
+              Navigator.of(context).pop(true);
             },
             onPrevious: () {
-              context.pop();
+              Navigator.of(context).pop();
             },
             appBar: KenwellAppBar(
               title: event.title,
@@ -481,10 +470,10 @@ class WellnessNavigator {
             value: hivResultsVM,
             child: HIVTestResultScreen(
               onNext: () {
-                context.pop(true);
+                Navigator.of(context).pop(true);
               },
               onPrevious: () {
-                context.pop();
+                Navigator.of(context).pop();
               },
               appBar: KenwellAppBar(
                 title: event.title,
@@ -519,10 +508,10 @@ class WellnessNavigator {
           value: tbTestVM,
           child: TBTestingScreen(
             onNext: () {
-              context.pop(true);
+              Navigator.of(context).pop(true);
             },
             onPrevious: () {
-              context.pop();
+              Navigator.of(context).pop();
             },
             appBar: KenwellAppBar(
               title: event.title,
@@ -552,10 +541,10 @@ class WellnessNavigator {
           value: surveyVM,
           child: SurveyScreen(
             onSubmit: () {
-              context.pop(true);
+              Navigator.of(context).pop(true);
             },
             onPrevious: () {
-              context.pop();
+              Navigator.of(context).pop();
             },
             appBar: KenwellAppBar(
               title: event.title,
