@@ -38,15 +38,13 @@ class WellnessNavigator {
   /// Start the wellness flow from member registration
   Future<void> startFlow() async {
     final wellnessVM = WellnessFlowViewModel(activeEvent: event);
-    final member = await _navigateToMemberRegistration();
-    if (member != null && context.mounted) {
-      await navigateToEventDetails(member, wellnessVM);
-    }
+    await _navigateToMemberRegistration(wellnessVM);
   }
 
   /// Navigate to member registration (first step)
-  Future<Member?> _navigateToMemberRegistration() async {
-    return await Navigator.push<Member>(
+  /// Keeps member search in the stack for proper back navigation
+  Future<void> _navigateToMemberRegistration(WellnessFlowViewModel wellnessVM) async {
+    await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => Scaffold(
@@ -79,12 +77,15 @@ class WellnessNavigator {
             onGoToMemberDetails: (searchQuery) async {
               final member = await _navigateToMemberDetails(null, searchQuery);
               if (member != null && context.mounted) {
-                Navigator.of(context).pop(member);
+                // Navigate forward to event home instead of popping
+                await navigateToEventDetails(member, wellnessVM);
               }
             },
-            onMemberFound: (member) {
-              // Member found, go to event details
-              Navigator.of(context).pop(member);
+            onMemberFound: (member) async {
+              // Member found, navigate forward to event details
+              if (context.mounted) {
+                await navigateToEventDetails(member, wellnessVM);
+              }
             },
             onPrevious: () {
               Navigator.of(context).pop();
