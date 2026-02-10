@@ -134,16 +134,6 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                   _unassignUser(user);
                 },
               ),
-            if (!isAssigned && isAssigned)
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  'No actions available',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
             const SizedBox(height: 16),
           ],
         ),
@@ -282,13 +272,14 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
       endActionPane: ActionPane(
         motion: const ScrollMotion(),
         children: [
-          SlidableAction(
-            onPressed: (_) => _assignUser(user),
-            backgroundColor: theme.colorScheme.primary,
-            foregroundColor: theme.colorScheme.onPrimary,
-            icon: Icons.person_add,
-            label: 'Assign',
-          ),
+          if (!isAssigned)
+            SlidableAction(
+              onPressed: (_) => _assignUser(user),
+              backgroundColor: theme.colorScheme.primary,
+              foregroundColor: theme.colorScheme.onPrimary,
+              icon: Icons.person_add,
+              label: 'Assign',
+            ),
           if (isAssigned)
             SlidableAction(
               onPressed: (_) => _unassignUser(user),
