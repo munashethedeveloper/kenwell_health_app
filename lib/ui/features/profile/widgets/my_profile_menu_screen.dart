@@ -99,14 +99,6 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
                       subtitle: 'Get assistance and FAQs',
                       onTap: () => context.pushNamed('help'),
                     ),
-                    //only visible to admin users
-                    if (vm.role.toLowerCase() == 'admin')
-                      _ProfileMenuItem(
-                        icon: Icons.admin_panel_settings,
-                        title: 'Admin Tools',
-                        subtitle: 'Manage users and settings',
-                        onTap: () => context.pushNamed('adminTools'),
-                      ),
                     _ProfileMenuItem(
                       icon: Icons.logout,
                       title: 'Logout',

@@ -370,7 +370,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                           // Show filter status and user counts
                           Text(
                             filterActive
-                                ? 'Showing ${filteredUsers.length} of $totalUsers'
+                                ? 'Showing Users: ${filteredUsers.length} of $totalUsers'
                                 : '$totalUsers Total Users',
                             style: const TextStyle(
                               color: Colors.white,

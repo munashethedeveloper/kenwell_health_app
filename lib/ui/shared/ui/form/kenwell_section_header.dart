@@ -35,7 +35,7 @@ class KenwellSectionHeader extends StatelessWidget {
             overflow: maxLines != null ? TextOverflow.ellipsis : null,
             style: theme?.copyWith(
               fontWeight: FontWeight.bold,
-              fontSize: 34,
+              fontSize: 28,
               color: const Color(0xFF201C58),
             ),
           ),
