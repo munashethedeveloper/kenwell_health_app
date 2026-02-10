@@ -286,11 +286,11 @@ class UserManagementViewModel extends ChangeNotifier {
         return false;
       }
     } on PasswordResetEmailFailedException catch (e) {
-      // User was created but password reset email failed
+      // User was created successfully but password reset email failed
       _setError(e.message);
       // Reload users list to include new user even though password reset failed
       await loadUsers();
-      return false; // Return false because the process didn't fully complete
+      return false; // Return false because password reset email failed (user exists but requires manual password reset)
     } catch (e) {
       _setError('Registration failed. Please try again.');
       debugPrint('Registration error: $e');

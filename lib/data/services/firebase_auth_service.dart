@@ -217,7 +217,7 @@ class FirebaseAuthService {
         passwordResetEmailSent = true;
       } catch (e) {
         debugPrint(
-            'FirebaseAuth: ERROR - Failed to send password reset email: $e');
+            'FirebaseAuth: Error - Failed to send password reset email: $e');
         passwordResetErrorDetails = e;
         // User is created, but password reset email failed
         // We'll save this error and throw it after saving user data
