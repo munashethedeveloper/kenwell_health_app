@@ -50,9 +50,14 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
   String _getWelcomeTitle() {
     final profileVM = context.read<ProfileViewModel>();
     final firstName = profileVM.firstName;
-    return firstName.isNotEmpty 
-        ? 'Welcome to KenWell365, $firstName'
-        : 'Welcome to KenWell365';
+    if (firstName.isEmpty) {
+      return 'Welcome to KenWell365';
+    }
+    // Capitalize the first character of the firstName
+    final capitalizedFirstName = firstName.length == 1
+        ? firstName.toUpperCase()
+        : firstName[0].toUpperCase() + firstName.substring(1);
+    return 'Welcome to KenWell365, $capitalizedFirstName';
   }
 
   // Initialize state
