@@ -3,7 +3,7 @@ class PasswordResetEmailFailedException implements Exception {
   final String userId;
   final String userEmail;
   final String message;
-  final dynamic originalError;
+  final Object? originalError;
 
   PasswordResetEmailFailedException({
     required this.userId,

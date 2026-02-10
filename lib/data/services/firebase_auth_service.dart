@@ -209,7 +209,7 @@ class FirebaseAuthService {
       // Send password reset email so user can set their own password
       // This is important because the admin-set password is not communicated to the user
       bool passwordResetEmailSent = false;
-      dynamic passwordResetErrorDetails;
+      Object? passwordResetErrorDetails;
       try {
         // Use main app's auth instance for password reset email
         await _auth.sendPasswordResetEmail(email: email);

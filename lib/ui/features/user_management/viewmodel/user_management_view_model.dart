@@ -290,7 +290,7 @@ class UserManagementViewModel extends ChangeNotifier {
       _setError(e.message);
       // Reload users list to include new user even though password reset failed
       await loadUsers();
-      return false; // Return false because password reset email failed (user exists but requires manual password reset)
+      return false; // Email sending failed
     } catch (e) {
       _setError('Registration failed. Please try again.');
       debugPrint('Registration error: $e');
