@@ -57,99 +57,105 @@ class UserCardWidget extends StatelessWidget {
           ),
         ],
       ),
-      child: GestureDetector(
-        onTap: onTap,
-        onLongPress: onTap,
-        child: Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: theme.primaryColor.withValues(alpha: 0.05),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: theme.primaryColor.withValues(alpha: 0.2),
+      child: Builder(
+        builder: (context) => GestureDetector(
+          onTap: () {
+            // Open the slide menu on tap
+            final slidable = Slidable.of(context);
+            slidable?.openEndActionPane();
+          },
+          onLongPress: onTap,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: theme.primaryColor.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: theme.primaryColor.withValues(alpha: 0.2),
+              ),
             ),
-          ),
-          child: Row(
-            children: [
-              // Icon instead of avatar with initials
-              Icon(
-                roleIcons[role] ?? Icons.person,
-                color: theme.primaryColor,
-                size: 20,
-              ),
-              const SizedBox(width: 12),
+            child: Row(
+              children: [
+                // Icon instead of avatar with initials
+                Icon(
+                  roleIcons[role] ?? Icons.person,
+                  color: theme.primaryColor,
+                  size: 20,
+                ),
+                const SizedBox(width: 12),
 
-              // User Info
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '$firstName $lastName',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: theme.primaryColor,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      email,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: Colors.grey[600],
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        Icon(
-                          user.emailVerified
-                              ? Icons.verified
-                              : Icons.error_outline,
-                          color: user.emailVerified ? Colors.green : Colors.red,
-                          size: 16,
+                // User Info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '$firstName $lastName',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: theme.primaryColor,
                         ),
-                        const SizedBox(width: 4),
-                        Text(
-                          user.emailVerified ? 'Verified' : 'Not Verified',
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color:
-                                user.emailVerified ? Colors.green : Colors.red,
-                            fontWeight: FontWeight.bold,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        email,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: Colors.grey[600],
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          Icon(
+                            user.emailVerified
+                                ? Icons.verified
+                                : Icons.error_outline,
+                            color: user.emailVerified ? Colors.green : Colors.red,
+                            size: 16,
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              // Role badge
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: theme.primaryColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  role,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.primaryColor,
+                          const SizedBox(width: 4),
+                          Text(
+                            user.emailVerified ? 'Verified' : 'Not Verified',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color:
+                                  user.emailVerified ? Colors.green : Colors.red,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Icon(
-                Icons.chevron_right,
-                color: theme.primaryColor,
-              ),
-            ],
+
+                // Role badge
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: theme.primaryColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    role,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: theme.primaryColor,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.chevron_right,
+                  color: theme.primaryColor,
+                ),
+              ],
+            ),
           ),
         ),
       ),
