@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/containers/gradient_container.dart';
@@ -29,7 +30,6 @@ class AllocateEventScreen extends StatefulWidget {
 
 // State class for AllocateEventScreen
 class _AllocateEventScreenState extends State<AllocateEventScreen> {
-  final Set<String> _selectedUserIds = {};
   final TextEditingController _searchController = TextEditingController();
   final Set<String> _assignedUserIds = {};
   bool _isLoadingAssignedUsers = true;
@@ -74,133 +74,311 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
     super.dispose();
   }
 
+  void _showUserOptions(UserModel user) {
+    final theme = Theme.of(context);
+    final isAssigned = _assignedUserIds.contains(user.id);
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 48,
+              height: 4,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.outline,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              '${user.firstName} ${user.lastName}',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              user.email,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 24),
+            ListTile(
+              leading: Icon(Icons.person_add, color: theme.colorScheme.primary),
+              title: Text('Assign', style: theme.textTheme.bodyMedium),
+              onTap: () {
+                context.pop();
+                _assignUser(user);
+              },
+            ),
+            if (isAssigned)
+              ListTile(
+                leading: Icon(Icons.person_remove, color: theme.colorScheme.error),
+                title: Text(
+                  'Unassign',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.error,
+                  ),
+                ),
+                onTap: () {
+                  context.pop();
+                  _unassignUser(user);
+                },
+              ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _assignUser(UserModel user) async {
+    final theme = Theme.of(context);
+    
+    // Show loading indicator
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    // Assign event to user
+    await UserEventService.addUserEvent(
+      event: widget.event,
+      user: user,
+    );
+
+    if (!mounted) return;
+
+    // Close loading dialog
+    Navigator.of(context).pop();
+
+    // Refresh assigned users list
+    await _fetchAssignedUsers();
+
+    // Show success message
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Event assigned to ${user.firstName} ${user.lastName}'),
+        backgroundColor: theme.colorScheme.primary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
+
+  Future<void> _unassignUser(UserModel user) async {
+    final theme = Theme.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Unassign User',
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to unassign ${user.firstName} ${user.lastName} from this event?',
+          style: theme.textTheme.bodyMedium,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => context.pop(false),
+            child: Text(
+              'Cancel',
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => context.pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.colorScheme.error,
+            ),
+            child: Text(
+              'Unassign',
+              style: theme.textTheme.titleSmall?.copyWith(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    // Show loading indicator
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    // Unassign event from user
+    final repo = UserEventRepository();
+    await repo.removeUserEvent(widget.event.id, user.id);
+
+    if (!mounted) return;
+
+    // Close loading dialog
+    Navigator.of(context).pop();
+
+    // Refresh assigned users list
+    await _fetchAssignedUsers();
+
+    // Show success message
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${user.firstName} ${user.lastName} unassigned successfully'),
+        backgroundColor: theme.colorScheme.error,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
+
   Widget _buildUserCard(UserModel user, ThemeData theme) {
-    final isSelected = _selectedUserIds.contains(user.id);
     final isAssigned = _assignedUserIds.contains(user.id);
 
     final roleIcons = {
       'ADMIN': Icons.admin_panel_settings,
-      'TOP MANAGEMENT': Icons.business_center,
-      'PROJECT MANAGER': Icons.manage_accounts,
-      'PROJECT COORDINATOR': Icons.event,
-      'HEALTH PRACTITIONER': Icons.medical_services,
+      'TOPMANAGEMENT': Icons.business_center,
+      'PROJECTMANAGER': Icons.manage_accounts,
+      'COORDINATOR': Icons.event,
+      'NURSE': Icons.medical_services,
       'CLIENT': Icons.person,
     };
 
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          if (isSelected) {
-            _selectedUserIds.remove(user.id);
-          } else {
-            _selectedUserIds.add(user.id);
-          }
-        });
-      },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? theme.primaryColor.withValues(alpha: 0.15)
-              : theme.primaryColor.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: isSelected
-                ? theme.primaryColor
-                : theme.primaryColor.withValues(alpha: 0.2),
-            width: isSelected ? 2 : 1,
+    return Slidable(
+      key: ValueKey(user.id),
+      endActionPane: ActionPane(
+        motion: const ScrollMotion(),
+        children: [
+          SlidableAction(
+            onPressed: (_) => _assignUser(user),
+            backgroundColor: theme.colorScheme.primary,
+            foregroundColor: theme.colorScheme.onPrimary,
+            icon: Icons.person_add,
+            label: 'Assign',
           ),
-        ),
-        child: Row(
-          children: [
-            // Checkbox
-            Checkbox(
-              value: isSelected,
-              onChanged: (checked) {
-                setState(() {
-                  if (checked == true) {
-                    _selectedUserIds.add(user.id);
-                  } else {
-                    _selectedUserIds.remove(user.id);
-                  }
-                });
-              },
+          if (isAssigned)
+            SlidableAction(
+              onPressed: (_) => _unassignUser(user),
+              backgroundColor: theme.colorScheme.error,
+              foregroundColor: theme.colorScheme.onError,
+              icon: Icons.person_remove,
+              label: 'Unassign',
             ),
-            const SizedBox(width: 8),
-
-            // Icon instead of avatar with initials
-            Icon(
-              roleIcons[user.role] ?? Icons.person,
-              color: theme.primaryColor,
-              size: 20,
+        ],
+      ),
+      child: GestureDetector(
+        onTap: () => _showUserOptions(user),
+        onLongPress: () => _showUserOptions(user),
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: theme.primaryColor.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: theme.primaryColor.withValues(alpha: 0.2),
             ),
-            const SizedBox(width: 12),
+          ),
+          child: Row(
+            children: [
+              // Icon instead of avatar with initials
+              Icon(
+                roleIcons[user.role] ?? Icons.person,
+                color: theme.primaryColor,
+                size: 20,
+              ),
+              const SizedBox(width: 12),
 
-            // User Info
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${user.firstName} ${user.lastName}',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: theme.primaryColor,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    user.email,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: Colors.grey[600],
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 2),
-                  // Show assigned/unassigned status instead of verified/not verified
-                  Row(
-                    children: [
-                      Icon(
-                        isAssigned
-                            ? Icons.check_circle
-                            : Icons.radio_button_unchecked,
-                        color: isAssigned ? Colors.green : Colors.grey,
-                        size: 16,
+              // User Info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${user.firstName} ${user.lastName}',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: theme.primaryColor,
                       ),
-                      const SizedBox(width: 4),
-                      Text(
-                        isAssigned ? 'Assigned' : 'Not Assigned',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: isAssigned ? Colors.green : Colors.grey,
-                          fontWeight: FontWeight.bold,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      user.email,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: Colors.grey[600],
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Icon(
+                          isAssigned ? Icons.verified : Icons.error_outline,
+                          color: isAssigned ? Colors.green : Colors.red,
+                          size: 16,
                         ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            // Role badge
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: theme.primaryColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                user.role,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.primaryColor,
+                        const SizedBox(width: 4),
+                        Text(
+                          isAssigned ? 'Assigned' : 'Not Assigned',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: isAssigned ? Colors.green : Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ],
+
+              // Role badge
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: theme.primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  user.role,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.primaryColor,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                Icons.chevron_right,
+                color: theme.primaryColor,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -259,7 +437,9 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
         builder: (context, viewModel, _) {
           final filteredUsers = viewModel.filteredUsers;
           final totalUsers = viewModel.users.length;
-          final filterActive = viewModel.selectedFilter != 'all' ||
+          final assignedCount = _assignedUserIds.length;
+          final notAssignedCount = totalUsers - assignedCount;
+          final filterActive = viewModel.selectedFilter != 'All' ||
               viewModel.searchQuery.isNotEmpty;
 
           if (viewModel.isLoading && viewModel.users.isEmpty) {
@@ -314,7 +494,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: const Icon(
-                          Icons.event,
+                          Icons.people,
                           color: Colors.white,
                           size: 28,
                         ),
@@ -324,25 +504,48 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              widget.event.title,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 4),
+                            // Show filter status and user counts
                             Text(
                               filterActive
-                                  ? 'Showing ${filteredUsers.length} of $totalUsers users'
-                                  : '$totalUsers users available • ${_selectedUserIds.length} selected',
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.9),
-                                fontSize: 14,
+                                  ? 'Showing ${filteredUsers.length} of $totalUsers'
+                                  : '$totalUsers Total Users',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
                               ),
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.verified,
+                                  color: Colors.white.withValues(alpha: 0.9),
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '$assignedCount assigned',
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Icon(
+                                  Icons.error_outline,
+                                  color: Colors.white.withValues(alpha: 0.9),
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '$notAssignedCount not assigned',
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -388,113 +591,17 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
               Expanded(
                 child: filteredUsers.isEmpty
                     ? _buildEmptyState(theme)
-                    : ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: filteredUsers.length,
-                        itemBuilder: (context, index) {
-                          final user = filteredUsers[index];
-                          return _buildUserCard(user, theme);
-                        },
-                      ),
-              ),
-              // Assign button
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: theme.scaffoldBackgroundColor,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 8,
-                      offset: const Offset(0, -2),
-                    ),
-                  ],
-                ),
-                child: SafeArea(
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: _selectedUserIds.isNotEmpty
-                          ? () async {
-                              final selectedUsers = filteredUsers
-                                  .where((u) => _selectedUserIds.contains(u.id))
-                                  .toList();
-
-                              // Show loading indicator
-                              if (!mounted) return;
-                              showDialog(
-                                context: context,
-                                barrierDismissible: false,
-                                builder: (context) => const Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                              );
-
-                              // Assign event to selected users
-                              for (final user in selectedUsers) {
-                                await UserEventService.addUserEvent(
-                                  event: widget.event,
-                                  user: user,
-                                );
-                              }
-
-                              if (!context.mounted) return;
-
-                              // Close loading dialog
-                              Navigator.of(context).pop();
-
-                              // Refresh assigned users list
-                              await _fetchAssignedUsers();
-
-                              // Clear selection
-                              setState(() {
-                                _selectedUserIds.clear();
-                              });
-
-                              // Show success message
-                              if (!context.mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Event assigned to ${selectedUsers.length} user(s)',
-                                  ),
-                                  backgroundColor: Colors.green,
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                              );
-
-                              widget.onAllocate(
-                                  selectedUsers.map((u) => u.id).toList());
-
-                              // Pop back to event details screen with success result
-                              if (!context.mounted) return;
-                              context.pop(true);
-                            }
-                          : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.primaryColor,
-                        disabledBackgroundColor: Colors.grey.shade300,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                    : RefreshIndicator(
+                        onRefresh: viewModel.loadUsers,
+                        child: ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          itemCount: filteredUsers.length,
+                          itemBuilder: (context, index) {
+                            final user = filteredUsers[index];
+                            return _buildUserCard(user, theme);
+                          },
                         ),
                       ),
-                      child: Text(
-                        _selectedUserIds.isEmpty
-                            ? 'Select Users to Assign'
-                            : 'Assign to ${_selectedUserIds.length} User(s)',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
               ),
             ],
           );
