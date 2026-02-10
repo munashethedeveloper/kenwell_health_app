@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../data/services/firebase_auth_service.dart';
+import '../../../../data/services/firebase_auth_exceptions.dart';
 import '../../../../domain/constants/user_roles.dart';
 import '../../../../domain/models/user_model.dart';
 
@@ -271,6 +272,12 @@ class UserManagementViewModel extends ChangeNotifier {
         _setError('Registration failed. Email may already exist.');
         return false;
       }
+    } on PasswordResetEmailFailedException catch (e) {
+      // User was created but password reset email failed
+      _setError(e.message);
+      // Reload users list to include new user even though password reset failed
+      await loadUsers();
+      return false; // Return false because the process didn't fully complete
     } catch (e) {
       _setError('Registration failed. Please try again.');
       debugPrint('Registration error: $e');

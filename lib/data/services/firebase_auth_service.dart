@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import '../../domain/models/user_model.dart';
 import 'package:flutter/foundation.dart';
 import '../../firebase_options.dart';
+import 'firebase_auth_exceptions.dart';
 
 class FirebaseAuthService {
   /// Real-time stream of all users (admin function)
@@ -207,14 +208,19 @@ class FirebaseAuthService {
 
       // Send password reset email so user can set their own password
       // This is important because the admin-set password is not communicated to the user
+      bool passwordResetEmailSent = false;
+      dynamic passwordResetError;
       try {
         // Use main app's auth instance for password reset email
         await _auth.sendPasswordResetEmail(email: email);
         debugPrint('FirebaseAuth: Password reset email sent to $email');
-      } catch (passwordResetError) {
+        passwordResetEmailSent = true;
+      } catch (error) {
         debugPrint(
-            'FirebaseAuth: Warning - Failed to send password reset email: $passwordResetError');
-        // Continue even if password reset email fails - user can request it later
+            'FirebaseAuth: ERROR - Failed to send password reset email: $error');
+        passwordResetError = error;
+        // User is created, but password reset email failed
+        // We'll save this error and throw it after saving user data
       }
 
       // Create UserModel
@@ -245,6 +251,19 @@ class FirebaseAuthService {
         // Note: User account was created in Firebase Auth even if Firestore fails
         // This could lead to inconsistent state, but we still return the user model
         // so the caller knows the user was created
+      }
+
+      // If password reset email failed, throw a specific exception
+      // This happens AFTER saving user data so the user is fully created
+      if (!passwordResetEmailSent) {
+        throw PasswordResetEmailFailedException(
+          userId: user.uid,
+          userEmail: email,
+          message:
+              'User account created successfully, but password reset email failed to send. '
+              'Please use the "Reset Password" option to manually send the password reset email to the user.',
+          originalError: passwordResetError,
+        );
       }
 
       return userModel;
