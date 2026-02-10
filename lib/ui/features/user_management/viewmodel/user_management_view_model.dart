@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../data/services/firebase_auth_service.dart';
+import '../../../../data/services/firebase_auth_exceptions.dart';
 import '../../../../domain/constants/user_roles.dart';
 import '../../../../domain/models/user_model.dart';
 
@@ -231,6 +232,19 @@ class UserManagementViewModel extends ChangeNotifier {
   }
 
   // Register user
+  /// Registers a new user account with the provided details.
+  /// 
+  /// Returns:
+  /// - `true` if both user creation AND password reset email succeed
+  /// - `false` if the process doesn't complete successfully (see behavior below)
+  /// 
+  /// Behavior when failures occur:
+  /// - If user creation fails: Returns false, user list NOT reloaded (user doesn't exist)
+  /// - If user creation succeeds but password reset email fails: 
+  ///   Returns false (incomplete success), user list IS reloaded (user exists)
+  /// 
+  /// Note: Even when returning false, check the error message to understand 
+  /// what failed and what action is needed.
   Future<bool> registerUser({
     required String email,
     required String password,
@@ -271,6 +285,12 @@ class UserManagementViewModel extends ChangeNotifier {
         _setError('Registration failed. Email may already exist.');
         return false;
       }
+    } on PasswordResetEmailFailedException catch (e) {
+      // User was created successfully but password reset email failed
+      _setError(e.message);
+      // Reload users list to include new user even though password reset failed
+      await loadUsers();
+      return false; // Email sending failed
     } catch (e) {
       _setError('Registration failed. Please try again.');
       debugPrint('Registration error: $e');
