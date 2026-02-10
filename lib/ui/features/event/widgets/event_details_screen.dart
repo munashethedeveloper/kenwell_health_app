@@ -44,7 +44,7 @@ class EventDetailsScreen extends StatelessWidget {
     return Scaffold(
       // App bar with title and actions
       appBar: KenwellAppBar(
-        title: 'Event Details: ${event.title}',
+        title: '${event.title} Event Details',
         titleColor: Colors.white,
         titleStyle: const TextStyle(
           color: Colors.white,
@@ -77,9 +77,9 @@ class EventDetailsScreen extends StatelessWidget {
           const AppLogo(size: 150),
           const SizedBox(height: 24),
           // Section header
-          const KenwellSectionHeader(
+          KenwellSectionHeader(
             title: 'Event Summary Details',
-            subtitle: 'Detailed information about the event',
+            subtitle: 'Detailed information about the ${event.title} event.',
             uppercase: true,
           ),
           // Event detail sections

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_member_repository.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/member_repository.dart';
 import 'package:kenwell_health_app/data/local/app_database.dart';
@@ -145,285 +144,270 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return PopScope(
-      onPopInvokedWithResult: (didPop, result) {
-        debugPrint('Back pressed. didPop=\u{24}didPop');
-        debugPrint('canPop=\u{24}{Navigator.of(context).canPop()}');
-        if (!didPop) {
-          // If we can't pop, navigate to the member search screen as root
-          context.go("/member-search");
-        }
-      },
-      child: Scaffold(
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 16),
-              const AppLogo(size: 200),
-              const SizedBox(height: 24),
-              const KenwellSectionHeader(
-                title: 'Search Member',
-                subtitle:
-                    'Find an existing member by their ID or Passport number',
-              ),
+    return Scaffold(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: 16),
+            const AppLogo(size: 200),
+            const SizedBox(height: 24),
+            const KenwellSectionHeader(
+              title: 'Search Member',
+              subtitle:
+                  'Find an existing member by their ID or Passport number',
+            ),
 
-              // Search section with background
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF5F5F5),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Colors.grey.shade300,
-                    width: 1,
-                  ),
+            // Search section with background
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF5F5F5),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: Colors.grey.shade300,
+                  width: 1,
                 ),
-                child: Column(
-                  children: [
-                    // Search type label and toggle buttons
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.touch_app,
-                              size: 16,
-                              color: Colors.grey.shade600,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              'Select Search Type:',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.grey.shade700,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: ToggleButtons(
-                                isSelected: [
-                                  _searchType == 0,
-                                  _searchType == 1
-                                ],
-                                onPressed: (index) {
-                                  if (mounted && !_isSearching) {
-                                    setState(() {
-                                      _searchType = index;
-                                      _idController.clear();
-                                      _memberFound = null;
-                                      _foundMember = null;
-                                    });
-                                  }
-                                },
-                                borderRadius: BorderRadius.circular(8),
-                                selectedColor: Colors.white,
-                                color: theme.colorScheme.primary,
-                                fillColor: theme.colorScheme.primary,
-                                constraints: const BoxConstraints(
-                                  minHeight: 42,
-                                  minWidth: 100,
-                                ),
-                                children: const [
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 16),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(Icons.badge, size: 18),
-                                        SizedBox(width: 6),
-                                        Text(
-                                          'ID Number',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 16),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(Icons.credit_card, size: 18),
-                                        SizedBox(width: 6),
-                                        Text(
-                                          'Passport',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Tap to switch between ID or Passport search',
-                          style: TextStyle(
-                            fontSize: 12,
+              ),
+              child: Column(
+                children: [
+                  // Search type label and toggle buttons
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.touch_app,
+                            size: 16,
                             color: Colors.grey.shade600,
-                            fontStyle: FontStyle.italic,
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: _idController,
-                      decoration: InputDecoration(
-                        labelText:
-                            _searchType == 0 ? 'ID Number' : 'Passport Number',
-                        hintText: _searchType == 0
-                            ? 'Enter 13-digit ID number'
-                            : 'Enter passport number',
-                        prefixIcon: const Icon(Icons.badge),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: theme.colorScheme.primary,
-                            width: 2,
+                          const SizedBox(width: 6),
+                          Text(
+                            'Select Search Type:',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey.shade700,
+                            ),
                           ),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                        enabled: !_isSearching,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ToggleButtons(
+                              isSelected: [_searchType == 0, _searchType == 1],
+                              onPressed: (index) {
+                                if (mounted && !_isSearching) {
+                                  setState(() {
+                                    _searchType = index;
+                                    _idController.clear();
+                                    _memberFound = null;
+                                    _foundMember = null;
+                                  });
+                                }
+                              },
+                              borderRadius: BorderRadius.circular(8),
+                              selectedColor: Colors.white,
+                              color: theme.colorScheme.primary,
+                              fillColor: theme.colorScheme.primary,
+                              constraints: const BoxConstraints(
+                                minHeight: 42,
+                                minWidth: 100,
+                              ),
+                              children: const [
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 16),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.badge, size: 18),
+                                      SizedBox(width: 6),
+                                      Text(
+                                        'ID Number',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 16),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.credit_card, size: 18),
+                                      SizedBox(width: 6),
+                                      Text(
+                                        'Passport',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Tap to switch between ID or Passport search',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                          fontStyle: FontStyle.italic,
                         ),
                       ),
-                      textCapitalization: TextCapitalization.characters,
-                      onSubmitted: (_) => _handleSearch(),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _idController,
+                    decoration: InputDecoration(
+                      labelText:
+                          _searchType == 0 ? 'ID Number' : 'Passport Number',
+                      hintText: _searchType == 0
+                          ? 'Enter 13-digit ID number'
+                          : 'Enter passport number',
+                      prefixIcon: const Icon(Icons.badge),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: Colors.grey.shade300),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: theme.colorScheme.primary,
+                          width: 2,
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      enabled: !_isSearching,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                     ),
-                    const SizedBox(height: 12),
+                    textCapitalization: TextCapitalization.characters,
+                    onSubmitted: (_) => _handleSearch(),
+                  ),
+                  const SizedBox(height: 12),
 
-                    // Search Button
+                  // Search Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: CustomPrimaryButton(
+                      label: _isSearching ? 'Searching...' : 'Search Member',
+                      onPressed: _isSearching ? null : _handleSearch,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Member Not Found Card
+            if (_memberFound == false) ...[
+              KenwellFormCard(
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.person_off,
+                        size: 48,
+                        color: Colors.orange,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Member Not Found',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'No member found with this ID. You can proceed to register a new member.',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
                     SizedBox(
                       width: double.infinity,
-                      child: CustomPrimaryButton(
-                        label: _isSearching ? 'Searching...' : 'Search Member',
-                        onPressed: _isSearching ? null : _handleSearch,
+                      child: CustomSecondaryButton(
+                        label: 'Register New Member',
+                        onPressed: _proceedToRegistration,
                       ),
                     ),
                   ],
                 ),
               ),
-
               const SizedBox(height: 16),
-
-              // Member Not Found Card
-              if (_memberFound == false) ...[
-                KenwellFormCard(
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.orange.withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.person_off,
-                          size: 48,
-                          color: Colors.orange,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Member Not Found',
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'No member found with this ID. You can proceed to register a new member.',
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      SizedBox(
-                        width: double.infinity,
-                        child: CustomSecondaryButton(
-                          label: 'Register New Member',
-                          onPressed: _proceedToRegistration,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-              ],
-
-              // Member Found Card (for future use)
-              if (_memberFound == true && _memberName != null) ...[
-                KenwellFormCard(
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.deepPurple.withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.check_circle,
-                          size: 48,
-                          color: Colors.deepPurple,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Member Found',
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        _memberName!,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: theme.primaryColor,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      SizedBox(
-                        width: double.infinity,
-                        child: CustomSecondaryButton(
-                          label: 'Continue with Member',
-                          onPressed: _proceedWithFoundMember,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-              ],
             ],
-          ),
+
+            // Member Found Card (for future use)
+            if (_memberFound == true && _memberName != null) ...[
+              KenwellFormCard(
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.deepPurple.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.check_circle,
+                        size: 48,
+                        color: Colors.deepPurple,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Member Found',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _memberName!,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: theme.primaryColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      child: CustomSecondaryButton(
+                        label: 'Continue with Member',
+                        onPressed: _proceedWithFoundMember,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ],
         ),
       ),
     );

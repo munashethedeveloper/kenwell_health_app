@@ -37,7 +37,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         _emailController.text.trim(),
       );
 
-      // Hide loading indicator
+      // Check if widget is still mounted before using context
       if (!mounted) return;
 
       // Show success or error message
@@ -45,33 +45,48 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text(
-              'Password reset email sent! Check your email and click the link to set a new password. After setting your new password, you can login immediately.',
+              'If an account exists with this email, a password reset link has been sent. '
+              'Please check your email and follow the instructions to reset your password.',
             ),
             duration: const Duration(seconds: 6),
             action: SnackBarAction(
               label: 'OK',
-              onPressed: () {},
+              onPressed: () {
+                // Check if context is still valid before using it
+                if (mounted) {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                }
+              },
             ),
           ),
         );
 
-        // Close the screen after success
-        context.pop();
+        // Close the screen after success - check mounted again
+        if (mounted) {
+          context.pop();
+        }
       } else {
-        // Show error if email not found
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'No account found with this email. Please check the email address and try again.',
+        // Show error if something went wrong - check mounted first
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Unable to send password reset email. Please try again later.',
+              ),
+              duration: Duration(seconds: 4),
             ),
-            duration: Duration(seconds: 4),
-          ),
-        );
+          );
+        }
       }
-      // Hide loading indicator
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error: $e')));
+      // Show generic error message
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('An error occurred: ${e.toString()}'),
+          duration: const Duration(seconds: 5),
+        ),
+      );
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -110,10 +125,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               const KenwellSectionHeader(
                 title: 'Reset Password',
                 subtitle:
-                    'Enter the email associated with your account and we will send a reset link.',
+                    'Enter the email address associated with your account and we will send you a reset link.',
               ),
               // Email field
               KenwellFormCard(
+                title: 'Account Details',
                 child: KenwellTextField(
                   label: 'Email',
                   controller: _emailController,

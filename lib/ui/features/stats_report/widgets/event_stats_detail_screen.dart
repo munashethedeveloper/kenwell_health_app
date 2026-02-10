@@ -128,7 +128,6 @@ class EventStatsDetailScreen extends StatelessWidget {
                     icon: Icons.people,
                     title: 'Screened',
                     value: event.screenedCount.toString(),
-                    color: theme.primaryColor,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -137,7 +136,6 @@ class EventStatsDetailScreen extends StatelessWidget {
                     icon: Icons.flag,
                     title: 'Expected',
                     value: event.expectedParticipation.toString(),
-                    color: Colors.orange,
                   ),
                 ),
               ],
@@ -150,7 +148,6 @@ class EventStatsDetailScreen extends StatelessWidget {
                     icon: Icons.trending_up,
                     title: 'Completion',
                     value: '$screeningPercentage%',
-                    color: Colors.deepPurple,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -160,7 +157,6 @@ class EventStatsDetailScreen extends StatelessWidget {
                     title: 'Remaining',
                     value: (event.expectedParticipation - event.screenedCount)
                         .toString(),
-                    color: Colors.red,
                   ),
                 ),
               ],
@@ -576,42 +572,38 @@ class _MetricCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final String value;
-  final Color color;
 
   const _MetricCard({
     required this.icon,
     required this.title,
     required this.value,
-    required this.color,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Icon(icon, color: color, size: 32),
-            const SizedBox(height: 8),
-            Text(
-              value,
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
+    return GradientContainer.purpleGreen(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Icon(icon, color: Colors.white, size: 32),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
-            const SizedBox(height: 4),
-            Text(
-              title,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: Colors.grey[600],
-              ),
-              textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            title,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: Colors.white,
             ),
-          ],
-        ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }

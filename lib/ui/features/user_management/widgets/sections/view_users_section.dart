@@ -332,6 +332,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
           );
         }
 
+        // Get filtered users and stats
         final filteredUsers = viewModel.filteredUsers;
         final totalUsers = viewModel.users.length;
         final verifiedCount = viewModel.verifiedUsersCount;
@@ -366,6 +367,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // Show filter status and user counts
                           Text(
                             filterActive
                                 ? 'Showing ${filteredUsers.length} of $totalUsers'

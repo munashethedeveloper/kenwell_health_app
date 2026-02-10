@@ -214,7 +214,13 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
   Widget _buildCalendarTab(CalendarViewModel viewModel) {
     return SingleChildScrollView(
       child: Column(
+        //Welcome Messaage and Calendar widget
         children: [
+          const KenwellSectionHeader(
+            title: 'Welcome to KenWell365',
+            subtitle:
+                'Supporting wellbeing, 365 days a year with your personalized wellness planner.',
+          ),
           const SizedBox(height: 16),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -305,6 +311,12 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
 
     return Column(
       children: [
+        const KenwellSectionHeader(
+          title: 'Welcome to KenWell365',
+          subtitle:
+              'Supporting wellbeing, 365 days a year with your personalized wellness planner.',
+        ),
+        const SizedBox(height: 16),
         // Month navigation header
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),

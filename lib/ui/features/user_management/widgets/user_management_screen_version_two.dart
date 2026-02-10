@@ -52,10 +52,10 @@ class _UserManagementScreenVersionTwoState
           // If user has no permissions, show a message
           if (tabs.isEmpty) {
             return Scaffold(
-              appBar: KenwellAppBar(
+              appBar: const KenwellAppBar(
                 title: 'User Management',
-                titleColor: const Color(0xFF201C58),
-                titleStyle: const TextStyle(
+                titleColor: Color(0xFF201C58),
+                titleStyle: TextStyle(
                   color: Color(0xFF201C58),
                   fontWeight: FontWeight.bold,
                 ),

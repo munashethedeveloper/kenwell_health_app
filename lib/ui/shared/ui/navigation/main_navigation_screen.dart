@@ -49,10 +49,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     ];
     final List<Widget> clientTabs = [
       const StatsReportScreen(),
+      //client should also be able to see the calendar but without the events displaying
+      const CalendarScreen(),
       const MyProfileMenuScreen(),
     ];
     final List<Widget> restrictedTabs = [
-      const CalendarScreen(),
+      //const CalendarScreen(),
       const MyProfileMenuScreen(),
       const MyEventScreen(),
     ];
@@ -90,17 +92,22 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         label: Text('Statistics'),
       ),
       const NavigationRailDestination(
+        icon: Icon(Icons.calendar_today_outlined),
+        selectedIcon: Icon(Icons.calendar_today),
+        label: Text('Planner'),
+      ),
+      const NavigationRailDestination(
         icon: Icon(Icons.person_outline),
         selectedIcon: Icon(Icons.person),
         label: Text('Profile'),
       ),
     ];
     final List<NavigationRailDestination> restrictedRailDestinations = [
-      const NavigationRailDestination(
-        icon: Icon(Icons.calendar_today_outlined),
-        selectedIcon: Icon(Icons.calendar_today),
-        label: Text('Planner'),
-      ),
+      //const NavigationRailDestination(
+      //icon: Icon(Icons.calendar_today_outlined),
+      //selectedIcon: Icon(Icons.calendar_today),
+      //label: Text('Planner'),
+      //),
       const NavigationRailDestination(
         icon: Icon(Icons.person_outline),
         selectedIcon: Icon(Icons.person),
@@ -146,17 +153,22 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         label: 'Statistics',
       ),
       const NavigationDestination(
+        icon: Icon(Icons.calendar_today_outlined),
+        selectedIcon: Icon(Icons.calendar_today),
+        label: 'Planner',
+      ),
+      const NavigationDestination(
         icon: Icon(Icons.person_outline),
         selectedIcon: Icon(Icons.person),
         label: 'Profile',
       ),
     ];
     final List<NavigationDestination> restrictedNavDestinations = [
-      const NavigationDestination(
-        icon: Icon(Icons.calendar_today_outlined),
-        selectedIcon: Icon(Icons.calendar_today),
-        label: 'Planner',
-      ),
+      //const NavigationDestination(
+      //icon: Icon(Icons.calendar_today_outlined),
+      //selectedIcon: Icon(Icons.calendar_today),
+      //label: 'Planner',
+      //),
       const NavigationDestination(
         icon: Icon(Icons.person_outline),
         selectedIcon: Icon(Icons.person),

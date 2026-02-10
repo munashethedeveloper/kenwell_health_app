@@ -117,6 +117,7 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
         // App bar
         appBar: const KenwellAppBar(
           title: 'Login',
+          titleColor: const Color(0xFFFFFFFF),
           automaticallyImplyLeading: false,
         ),
         // Body with form
@@ -136,8 +137,8 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
                     const SizedBox(height: 24),
                     // Section header
                     const KenwellSectionHeader(
-                      title: 'Welcome Back',
-                      subtitle: 'Log in to access your wellness planner',
+                      title: 'Welcome to KenWell365!',
+                      subtitle: 'Supporting wellbeing, 365 days a year.',
                     ),
                     // SizedBox for spacing
                     const SizedBox(height: 24),
@@ -197,21 +198,6 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
                       label: "Login",
                       onPressed: _handleLogin,
                       isBusy: viewModel.isLoading,
-                    ),
-                    const SizedBox(height: 16),
-                    // Register link
-                    TextButton(
-                      onPressed: () {
-                        context.go('/register');
-                      },
-                      // Text for register
-                      child: const Text(
-                        "Don’t have an account yet? Click here to Register",
-                        style: TextStyle(
-                            decoration: TextDecoration.underline,
-                            fontSize: 16,
-                            color: Color(0xFF201C58)),
-                      ),
                     ),
                     const SizedBox(height: 16),
                   ],

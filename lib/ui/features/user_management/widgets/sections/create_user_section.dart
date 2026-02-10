@@ -208,7 +208,7 @@ class _CreateUserSectionState extends State<CreateUserSection> {
                         ),
                         const SizedBox(height: 24),
                         KenwellTextField(
-                          label: "Password",
+                          label: "Temporary Password",
                           controller: _passwordController,
                           obscureText: _obscurePassword,
                           suffixIcon: IconButton(
@@ -222,7 +222,7 @@ class _CreateUserSectionState extends State<CreateUserSection> {
                         ),
                         const SizedBox(height: 24),
                         KenwellTextField(
-                          label: "Confirm Password",
+                          label: "Confirm Temporary Password",
                           controller: _confirmPasswordController,
                           obscureText: _obscureConfirmPassword,
                           suffixIcon: IconButton(

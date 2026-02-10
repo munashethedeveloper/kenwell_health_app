@@ -58,6 +58,7 @@ class UserCardWidget extends StatelessWidget {
         ],
       ),
       child: GestureDetector(
+        onTap: onTap,
         onLongPress: onTap,
         child: Container(
           margin: const EdgeInsets.only(bottom: 12),

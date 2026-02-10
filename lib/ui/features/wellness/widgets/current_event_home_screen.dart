@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/ui/shared/ui/containers/gradient_container.dart';
@@ -26,161 +25,138 @@ class CurrentEventHomeScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final viewModel = context.watch<WellnessFlowViewModel>();
 
-    return PopScope(
-      onPopInvokedWithResult: (didPop, result) {
-        debugPrint('Back pressed. didPop=$didPop');
-        debugPrint('canPop=${Navigator.of(context).canPop()}');
-        if (!didPop) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go('/member-search');
-            }
-          });
-        }
-      },
-      child: Scaffold(
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              GradientContainer.purpleGreen(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.event,
-                        size: 40,
-                        color: Colors.white,
-                      ),
+    return Scaffold(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            GradientContainer.purpleGreen(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      shape: BoxShape.circle,
                     ),
+                    child: const Icon(
+                      Icons.event,
+                      size: 40,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    event.title,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    event.venue,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: Colors.white.withValues(alpha: 0.9),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  if (viewModel.currentMember != null) ...[
+                    const SizedBox(height: 16),
+                    Divider(color: Colors.white.withValues(alpha: 0.3)),
                     const SizedBox(height: 12),
-                    Text(
-                      event.title,
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      event.venue,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: Colors.white.withValues(alpha: 0.9),
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    if (viewModel.currentMember != null) ...[
-                      const SizedBox(height: 16),
-                      Divider(color: Colors.white.withValues(alpha: 0.3)),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.person,
-                            size: 20,
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.person,
+                          size: 20,
+                          color: Colors.white,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Current Member',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Current Member',
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      _buildMemberInfoRow(
-                        'Name',
-                        '${viewModel.currentMember!.name} ${viewModel.currentMember!.surname}',
-                        theme,
-                      ),
-                      const SizedBox(height: 8),
-                      _buildMemberInfoRow(
-                        viewModel.currentMember!.idDocumentType == 'ID'
-                            ? 'ID Number'
-                            : 'Passport Number',
-                        viewModel.currentMember!.idDocumentType == 'ID'
-                            ? (viewModel.currentMember!.idNumber ?? 'N/A')
-                            : (viewModel.currentMember!.passportNumber ??
-                                'N/A'),
-                        theme,
-                      ),
-                    ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    _buildMemberInfoRow(
+                      'Name',
+                      '${viewModel.currentMember!.name} ${viewModel.currentMember!.surname}',
+                      theme,
+                    ),
+                    const SizedBox(height: 8),
+                    _buildMemberInfoRow(
+                      viewModel.currentMember!.idDocumentType == 'ID'
+                          ? 'ID Number'
+                          : 'Passport Number',
+                      viewModel.currentMember!.idDocumentType == 'ID'
+                          ? (viewModel.currentMember!.idNumber ?? 'N/A')
+                          : (viewModel.currentMember!.passportNumber ?? 'N/A'),
+                      theme,
+                    ),
                   ],
-                ),
+                ],
               ),
-              const SizedBox(height: 24),
-              const KenwellSectionHeader(
-                title: 'Event Process',
-                subtitle:
-                    'Complete the steps below to finish the wellness event process.',
-              ),
-              const SizedBox(height: 12),
-              _ProcessStepCard(
-                icon: Icons.person_add,
-                title: 'Section A: Member Registration',
-                status: viewModel.memberRegistrationCompleted
-                    ? 'Completed'
-                    : 'Not Completed',
-                isCompleted: viewModel.memberRegistrationCompleted,
-                onTap: () => onSectionTap(
-                    WellnessFlowViewModel.sectionMemberRegistration),
-              ),
-              _ProcessStepCard(
-                icon: Icons.assignment,
-                title: 'Section B: Informed Consent',
-                status:
-                    viewModel.consentCompleted ? 'Completed' : 'Not Completed',
-                isCompleted: viewModel.consentCompleted,
-                onTap: () => onSectionTap(WellnessFlowViewModel.sectionConsent),
-              ),
-              _ProcessStepCard(
-                icon: Icons.health_and_safety,
-                title: 'Section C: Health Screenings',
-                status: viewModel.screeningsCompleted
-                    ? 'Completed'
-                    : viewModel.screeningsInProgress
-                        ? 'In Progress'
-                        : 'Not Completed',
-                isCompleted: viewModel.screeningsCompleted,
-                isInProgress: viewModel.screeningsInProgress,
-                onTap: () =>
-                    onSectionTap(WellnessFlowViewModel.sectionHealthScreenings),
-              ),
-              _ProcessStepCard(
-                icon: Icons.poll,
-                title: 'Section D: Survey',
-                status:
-                    viewModel.surveyCompleted ? 'Completed' : 'Not Completed',
-                isCompleted: viewModel.surveyCompleted,
-                onTap: () => onSectionTap(WellnessFlowViewModel.sectionSurvey),
-              ),
-              const SizedBox(height: 24),
-              CustomPrimaryButton(
-                label: 'Back to Search',
-                onPressed: () {
-                  if (context.canPop()) {
-                    context.pop();
-                  } else {
-                    context.go('/member-search');
-                  }
-                },
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
+            ),
+            const SizedBox(height: 24),
+            const KenwellSectionHeader(
+              title: 'Event Process',
+              subtitle:
+                  'Complete the steps below to finish the wellness event process.',
+            ),
+            const SizedBox(height: 12),
+            _ProcessStepCard(
+              icon: Icons.person_add,
+              title: 'Section A: Member Registration',
+              status: viewModel.memberRegistrationCompleted
+                  ? 'Completed'
+                  : 'Not Completed',
+              isCompleted: viewModel.memberRegistrationCompleted,
+              onTap: () =>
+                  onSectionTap(WellnessFlowViewModel.sectionMemberRegistration),
+            ),
+            _ProcessStepCard(
+              icon: Icons.assignment,
+              title: 'Section B: Informed Consent',
+              status:
+                  viewModel.consentCompleted ? 'Completed' : 'Not Completed',
+              isCompleted: viewModel.consentCompleted,
+              onTap: () => onSectionTap(WellnessFlowViewModel.sectionConsent),
+            ),
+            _ProcessStepCard(
+              icon: Icons.health_and_safety,
+              title: 'Section C: Health Screenings',
+              status: viewModel.screeningsCompleted
+                  ? 'Completed'
+                  : viewModel.screeningsInProgress
+                      ? 'In Progress'
+                      : 'Not Completed',
+              isCompleted: viewModel.screeningsCompleted,
+              isInProgress: viewModel.screeningsInProgress,
+              onTap: () =>
+                  onSectionTap(WellnessFlowViewModel.sectionHealthScreenings),
+            ),
+            _ProcessStepCard(
+              icon: Icons.poll,
+              title: 'Section D: Survey',
+              status: viewModel.surveyCompleted ? 'Completed' : 'Not Completed',
+              isCompleted: viewModel.surveyCompleted,
+              onTap: () => onSectionTap(WellnessFlowViewModel.sectionSurvey),
+            ),
+            const SizedBox(height: 24),
+            CustomPrimaryButton(
+              label: 'Back to Search',
+              onPressed: onBackToSearch,
+            ),
+            const SizedBox(height: 16),
+          ],
         ),
       ),
     );

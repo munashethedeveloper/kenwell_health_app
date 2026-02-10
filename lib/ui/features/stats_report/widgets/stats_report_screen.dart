@@ -7,6 +7,7 @@ import '../../event/view_model/event_view_model.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/logo/app_logo.dart';
+import '../../../shared/ui/containers/gradient_container.dart';
 import '../../../../data/repositories_dcl/firestore_member_repository.dart';
 import 'event_stats_detail_screen.dart';
 
@@ -425,7 +426,6 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                     icon: Icons.flag,
                     title: 'Total Members Expected',
                     value: totalExpected.toString(),
-                    color: Colors.orange,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -434,7 +434,6 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                     icon: Icons.person_add,
                     title: 'Total Members Registered',
                     value: _isLoadingMembers ? '...' : _totalMembers.toString(),
-                    color: Colors.blue,
                   ),
                 ),
               ],
@@ -449,7 +448,6 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                     icon: Icons.people,
                     title: 'Total Members Screened',
                     value: totalScreened.toString(),
-                    color: theme.primaryColor,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -458,7 +456,6 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                     icon: Icons.person_off,
                     title: 'Total Members No Show',
                     value: (totalExpected - totalScreened).toString(),
-                    color: Colors.red,
                   ),
                 ),
               ],
@@ -473,7 +470,6 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                     icon: Icons.event,
                     title: 'Total Events',
                     value: events.length.toString(),
-                    color: Colors.purple,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -482,7 +478,6 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                     icon: Icons.trending_up,
                     title: 'Participation Rate',
                     value: '$participationRate%',
-                    color: Colors.teal,
                   ),
                 ),
               ],
@@ -507,32 +502,6 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
             ),
             const SizedBox(height: 16),
 
-            // HIGH PRIORITY: Monthly Trend
-            if (sortedMonths.isNotEmpty) ...[
-              KenwellFormCard(
-                title: 'Monthly Trend',
-                child: Column(
-                  children: sortedMonths.take(6).map((month) {
-                    final parts = month.split('-');
-                    final year = parts[0];
-                    final monthNum = int.parse(parts[1]);
-                    final monthName = _getMonthName(monthNum);
-                    final count = eventsByMonth[month] ?? 0;
-                    final isLast = month == sortedMonths.take(6).last;
-
-                    return Column(
-                      children: [
-                        _buildDetailRow('$monthName $year', count,
-                            Icons.calendar_month, theme.primaryColor, theme),
-                        if (!isLast) const Divider(),
-                      ],
-                    );
-                  }).toList(),
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
-
             // MEDIUM PRIORITY: Geographic Distribution
             if (eventsByProvince.isNotEmpty) ...[
               KenwellFormCard(
@@ -552,26 +521,6 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
               ),
               const SizedBox(height: 16),
             ],
-
-            // MEDIUM PRIORITY: Service Utilization
-            KenwellFormCard(
-              title: 'Service Utilization',
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Most Requested Services',
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[700],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildServiceUtilizationList(events, theme),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
 
             // Event Breakdown Card
             KenwellFormCard(
@@ -682,57 +631,6 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
-
-            // Summary Card
-            KenwellFormCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Summary',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildSummaryRow(
-                    'Total Events',
-                    events.length,
-                    Icons.event,
-                    theme,
-                  ),
-                  const SizedBox(height: 8),
-                  _buildSummaryRow(
-                    'Total Members Registered',
-                    _totalMembers,
-                    Icons.person_add,
-                    theme,
-                  ),
-                  const SizedBox(height: 8),
-                  _buildSummaryRow(
-                    'Total Expected',
-                    totalExpected,
-                    Icons.people_outline,
-                    theme,
-                  ),
-                  const SizedBox(height: 8),
-                  _buildSummaryRow(
-                    'Total Screened',
-                    totalScreened,
-                    Icons.people,
-                    theme,
-                  ),
-                  const SizedBox(height: 8),
-                  _buildSummaryRow(
-                    'Completed Events',
-                    completedEvents,
-                    Icons.check_circle,
-                    theme,
-                  ),
-                ],
-              ),
-            ),
             const SizedBox(height: 24),
           ],
         ),
@@ -774,174 +672,44 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
       ),
     );
   }
-
-  Widget _buildServiceUtilizationList(List events, ThemeData theme) {
-    // Aggregate service requests
-    final Map<String, int> serviceCount = {};
-
-    for (var event in events) {
-      // Count primary services
-      if (event.servicesRequested.isNotEmpty) {
-        final services = event.servicesRequested.split(',');
-        for (var service in services) {
-          final trimmed = service.trim();
-          if (trimmed.isNotEmpty) {
-            serviceCount[trimmed] = (serviceCount[trimmed] ?? 0) + 1;
-          }
-        }
-      }
-
-      // Count additional services
-      if (event.additionalServicesRequested.isNotEmpty) {
-        final services = event.additionalServicesRequested.split(',');
-        for (var service in services) {
-          final trimmed = service.trim();
-          if (trimmed.isNotEmpty) {
-            serviceCount[trimmed] = (serviceCount[trimmed] ?? 0) + 1;
-          }
-        }
-      }
-    }
-
-    if (serviceCount.isEmpty) {
-      return Text(
-        'No service data available',
-        style: theme.textTheme.bodyMedium?.copyWith(
-          color: Colors.grey[600],
-          fontStyle: FontStyle.italic,
-        ),
-      );
-    }
-
-    // Sort by count descending
-    final sortedServices = serviceCount.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
-
-    return Column(
-      children: sortedServices.take(5).map((entry) {
-        final isLast = entry == sortedServices.take(5).last;
-        return Column(
-          children: [
-            Row(
-              children: [
-                Icon(Icons.check_circle, color: theme.primaryColor, size: 16),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    entry.key,
-                    style: theme.textTheme.bodyMedium,
-                  ),
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: theme.primaryColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    entry.value.toString(),
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: theme.primaryColor,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            if (!isLast) const Divider(height: 16),
-          ],
-        );
-      }).toList(),
-    );
-  }
-
-  String _getMonthName(int month) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
-    ];
-    return months[month - 1];
-  }
-}
-
-Widget _buildSummaryRow(
-    String label, int count, IconData icon, ThemeData theme) {
-  return Row(
-    children: [
-      Icon(icon, color: theme.primaryColor, size: 20),
-      const SizedBox(width: 12),
-      Expanded(
-        child: Text(label, style: theme.textTheme.bodyMedium),
-      ),
-      Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        decoration: BoxDecoration(
-          color: theme.primaryColor.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Text(
-          count.toString(),
-          style: theme.textTheme.labelLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: theme.primaryColor,
-          ),
-        ),
-      ),
-    ],
-  );
 }
 
 class _StatCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final String value;
-  final Color color;
 
   const _StatCard({
     required this.icon,
     required this.title,
     required this.value,
-    required this.color,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, color: color, size: 32),
-            const SizedBox(height: 12),
-            Text(
-              value,
-              style: theme.textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
+    return GradientContainer.purpleGreen(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: Colors.white, size: 32),
+          const SizedBox(height: 12),
+          Text(
+            value,
+            style: theme.textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
-            const SizedBox(height: 4),
-            Text(
-              title,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: Colors.grey[600],
-              ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            title,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: Colors.white,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
