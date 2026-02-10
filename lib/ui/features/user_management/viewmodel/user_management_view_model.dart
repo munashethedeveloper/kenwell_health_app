@@ -234,17 +234,17 @@ class UserManagementViewModel extends ChangeNotifier {
   // Register user
   /// Registers a new user account with the provided details.
   /// 
-  /// Returns true if both user creation AND password reset email succeed.
-  /// Returns false if either user creation OR password reset email fails.
+  /// Returns:
+  /// - `true` if both user creation AND password reset email succeed
+  /// - `false` if the process doesn't complete successfully (see behavior below)
   /// 
   /// Behavior when failures occur:
-  /// - If user creation fails: User list is NOT reloaded (user doesn't exist)
+  /// - If user creation fails: Returns false, user list NOT reloaded (user doesn't exist)
   /// - If user creation succeeds but password reset email fails: 
-  ///   User list IS reloaded (user exists but needs manual password reset)
+  ///   Returns false (incomplete success), user list IS reloaded (user exists)
   /// 
-  /// Note: The method returns false to indicate the full process didn't 
-  /// complete successfully, but the error message will guide the admin
-  /// on the appropriate next steps based on which part failed.
+  /// Note: Even when returning false, check the error message to understand 
+  /// what failed and what action is needed.
   Future<bool> registerUser({
     required String email,
     required String password,

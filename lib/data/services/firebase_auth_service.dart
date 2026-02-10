@@ -261,10 +261,7 @@ class FirebaseAuthService {
           userEmail: email,
           message:
               'User account created successfully, but password reset email failed to send. '
-              'To send the password reset email manually: '
-              '1) Go to the "View Users" section, '
-              '2) Click on the user card, '
-              '3) Select "Reset Password" from the menu.',
+              'You can manually send a password reset email to this user from the user management screen.',
           originalError: passwordResetErrorDetails,
         );
       }
