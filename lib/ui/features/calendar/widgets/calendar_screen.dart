@@ -46,6 +46,15 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
     return RolePermissions.canAccessFeature(profileVM.role, 'create_event');
   }
 
+  // Helper to generate personalized welcome title
+  String _getWelcomeTitle() {
+    final profileVM = context.read<ProfileViewModel>();
+    final firstName = profileVM.firstName;
+    return firstName.isNotEmpty 
+        ? 'Welcome to KenWell365, $firstName'
+        : 'Welcome to KenWell365';
+  }
+
   // Initialize state
   @override
   void initState() {
@@ -212,18 +221,12 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
 
   // Build the calendar tab view
   Widget _buildCalendarTab(CalendarViewModel viewModel) {
-    final profileVM = context.read<ProfileViewModel>();
-    final firstName = profileVM.firstName;
-    final welcomeTitle = firstName.isNotEmpty 
-        ? 'Welcome to KenWell365, $firstName'
-        : 'Welcome to KenWell365';
-    
     return SingleChildScrollView(
       child: Column(
-        //Welcome Messaage and Calendar widget
+        //Welcome Message and Calendar widget
         children: [
           KenwellSectionHeader(
-            title: welcomeTitle,
+            title: _getWelcomeTitle(),
             subtitle:
                 'Stay on top of your wellbeing with ease. View and manage your wellness events for the month.',
           ),
@@ -314,17 +317,12 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
   Widget _buildEventsListTab(CalendarViewModel viewModel) {
     // Get events for the focused month
     final eventsThisMonth = viewModel.getEventsForMonth(viewModel.focusedDay);
-    final profileVM = context.read<ProfileViewModel>();
-    final firstName = profileVM.firstName;
-    final welcomeTitle = firstName.isNotEmpty 
-        ? 'Welcome to KenWell365, $firstName'
-        : 'Welcome to KenWell365';
 
     return Column(
       children: [
         //Welcome Message and Month Navigation Header
         KenwellSectionHeader(
-          title: welcomeTitle,
+          title: _getWelcomeTitle(),
           subtitle:
               'Stay on top of your wellbeing with ease. View and manage your wellness events for the month.',
         ),
