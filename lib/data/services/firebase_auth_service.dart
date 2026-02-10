@@ -209,7 +209,7 @@ class FirebaseAuthService {
       // Send password reset email so user can set their own password
       // This is important because the admin-set password is not communicated to the user
       bool passwordResetEmailSent = false;
-      Object? passwordResetErrorDetails;
+      Object? passwordResetError;
       try {
         // Use main app's auth instance for password reset email
         await _auth.sendPasswordResetEmail(email: email);
@@ -218,7 +218,7 @@ class FirebaseAuthService {
       } catch (e) {
         debugPrint(
             'FirebaseAuth: Error - Failed to send password reset email: $e');
-        passwordResetErrorDetails = e;
+        passwordResetError = e;
         // User is created, but password reset email failed
         // We'll save this error and throw it after saving user data
       }
@@ -262,7 +262,7 @@ class FirebaseAuthService {
           message:
               'User account created successfully, but password reset email failed to send. '
               'You can manually send a password reset email to this user from the user management screen.',
-          originalError: passwordResetErrorDetails,
+          originalError: passwordResetError,
         );
       }
 
