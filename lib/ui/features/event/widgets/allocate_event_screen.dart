@@ -111,14 +111,15 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            ListTile(
-              leading: Icon(Icons.person_add, color: theme.colorScheme.primary),
-              title: Text('Assign', style: theme.textTheme.bodyMedium),
-              onTap: () {
-                context.pop();
-                _assignUser(user);
-              },
-            ),
+            if (!isAssigned)
+              ListTile(
+                leading: Icon(Icons.person_add, color: theme.colorScheme.primary),
+                title: Text('Assign', style: theme.textTheme.bodyMedium),
+                onTap: () {
+                  context.pop();
+                  _assignUser(user);
+                },
+              ),
             if (isAssigned)
               ListTile(
                 leading: Icon(Icons.person_remove, color: theme.colorScheme.error),
@@ -132,6 +133,16 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                   context.pop();
                   _unassignUser(user);
                 },
+              ),
+            if (!isAssigned && isAssigned)
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'No actions available',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
               ),
             const SizedBox(height: 16),
           ],
@@ -259,10 +270,10 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
 
     final roleIcons = {
       'ADMIN': Icons.admin_panel_settings,
-      'TOPMANAGEMENT': Icons.business_center,
-      'PROJECTMANAGER': Icons.manage_accounts,
-      'COORDINATOR': Icons.event,
-      'NURSE': Icons.medical_services,
+      'TOP MANAGEMENT': Icons.business_center,
+      'PROJECT MANAGER': Icons.manage_accounts,
+      'PROJECT COORDINATOR': Icons.event,
+      'HEALTH PRACTITIONER': Icons.medical_services,
       'CLIENT': Icons.person,
     };
 
@@ -439,7 +450,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
           final totalUsers = viewModel.users.length;
           final assignedCount = _assignedUserIds.length;
           final notAssignedCount = totalUsers - assignedCount;
-          final filterActive = viewModel.selectedFilter != 'All' ||
+          final filterActive = viewModel.selectedFilter != 'all' ||
               viewModel.searchQuery.isNotEmpty;
 
           if (viewModel.isLoading && viewModel.users.isEmpty) {
