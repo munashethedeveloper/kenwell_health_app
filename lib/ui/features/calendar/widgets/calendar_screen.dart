@@ -46,6 +46,19 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
     return RolePermissions.canAccessFeature(profileVM.role, 'create_event');
   }
 
+  // Helper to generate personalized welcome title
+  String _getWelcomeTitle() {
+    final profileVM = context.read<ProfileViewModel>();
+    final firstName = profileVM.firstName;
+    if (firstName.isEmpty) {
+      return 'Welcome to KenWell365';
+    }
+    // Capitalize the first character of the firstName
+    final capitalizedFirstName = firstName[0].toUpperCase() + 
+        (firstName.length > 1 ? firstName.substring(1) : '');
+    return 'Welcome to KenWell365, $capitalizedFirstName';
+  }
+
   // Initialize state
   @override
   void initState() {
@@ -214,10 +227,10 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
   Widget _buildCalendarTab(CalendarViewModel viewModel) {
     return SingleChildScrollView(
       child: Column(
-        //Welcome Messaage and Calendar widget
+        //Welcome Message and Calendar widget
         children: [
-          const KenwellSectionHeader(
-            title: 'Welcome to KenWell365',
+          KenwellSectionHeader(
+            title: _getWelcomeTitle(),
             subtitle:
                 'Stay on top of your wellbeing with ease. View and manage your wellness events for the month.',
           ),
@@ -312,8 +325,8 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
     return Column(
       children: [
         //Welcome Message and Month Navigation Header
-        const KenwellSectionHeader(
-          title: 'Welcome to KenWell365',
+        KenwellSectionHeader(
+          title: _getWelcomeTitle(),
           subtitle:
               'Stay on top of your wellbeing with ease. View and manage your wellness events for the month.',
         ),
