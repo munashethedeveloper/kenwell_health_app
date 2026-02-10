@@ -54,9 +54,8 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
       return 'Welcome to KenWell365';
     }
     // Capitalize the first character of the firstName
-    final capitalizedFirstName = firstName.length == 1
-        ? firstName.toUpperCase()
-        : firstName[0].toUpperCase() + firstName.substring(1);
+    final capitalizedFirstName = firstName[0].toUpperCase() + 
+        (firstName.length > 1 ? firstName.substring(1) : '');
     return 'Welcome to KenWell365, $capitalizedFirstName';
   }
 
