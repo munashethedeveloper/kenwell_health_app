@@ -219,7 +219,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
           const KenwellSectionHeader(
             title: 'Welcome to KenWell365',
             subtitle:
-                'Supporting wellbeing, 365 days a year with your personalized wellness planner.',
+                'Stay on top of your wellbeing with ease. View and manage your wellness events for the month.',
           ),
           const SizedBox(height: 16),
           Padding(
@@ -311,10 +311,11 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
 
     return Column(
       children: [
+        //Welcome Message and Month Navigation Header
         const KenwellSectionHeader(
           title: 'Welcome to KenWell365',
           subtitle:
-              'Supporting wellbeing, 365 days a year with your personalized wellness planner.',
+              'Stay on top of your wellbeing with ease. View and manage your wellness events for the month.',
         ),
         const SizedBox(height: 16),
         // Month navigation header
