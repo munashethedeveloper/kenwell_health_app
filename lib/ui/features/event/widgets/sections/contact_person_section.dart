@@ -72,10 +72,6 @@ class ContactPersonSection extends StatelessWidget {
             controller: numberController,
             padding: EdgeInsets.zero,
             validator: Validators.validateInternationalPhoneNumber,
-            onChanged: (completeNumber) {
-              // Update the controller with the complete international number
-              numberController.text = completeNumber;
-            },
           ),
           const SizedBox(height: 24),
           // Contact Email field

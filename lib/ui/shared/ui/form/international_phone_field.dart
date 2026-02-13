@@ -61,10 +61,6 @@ class InternationalPhoneField extends StatelessWidget {
             onChanged!(phone.completeNumber);
           }
         },
-        onCountryChanged: (country) {
-          // Update controller when country changes
-          // This ensures the controller always has the complete number
-        },
       ),
     );
   }
