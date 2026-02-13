@@ -1,5 +1,11 @@
 # Quick Start Guide - International Phone Number Support
 
+## Latest Update - Bug Fixes ✅
+**Issues Resolved:**
+- Country code no longer duplicates when typing
+- Can now clear the text field normally
+- Smooth input experience
+
 ## What Changed?
 The Contact Number fields on the **Add Event screen** now support international phone numbers from any country, with an easy-to-use country picker and search functionality.
 

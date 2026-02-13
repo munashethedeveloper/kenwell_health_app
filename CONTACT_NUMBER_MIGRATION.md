@@ -3,6 +3,15 @@
 ## Overview
 The contact number fields in the "Add Event" screen have been refactored to support international phone numbers with country code selection.
 
+## Latest Update (Bug Fix)
+**Fixed Issues:**
+- ✅ Country code no longer duplicates when typing
+- ✅ Text field can now be cleared properly
+- ✅ Smooth typing experience without interference
+
+**Technical Fix:**
+The widget now uses an internal controller to manage the IntlPhoneField's display state separately from the data storage controller. This prevents circular update loops that were causing the duplication and clearing issues.
+
 ## What Changed
 
 ### Before
