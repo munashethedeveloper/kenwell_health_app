@@ -3,7 +3,10 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 import 'kenwell_form_styles.dart';
 
 /// International phone number input field with country picker
-class InternationalPhoneField extends StatelessWidget {
+/// 
+/// This widget wraps IntlPhoneField and manages storing the complete
+/// international phone number (with country code) in the provided controller.
+class InternationalPhoneField extends StatefulWidget {
   final String label;
   final TextEditingController controller;
   final EdgeInsetsGeometry padding;
@@ -22,19 +25,54 @@ class InternationalPhoneField extends StatelessWidget {
   });
 
   @override
+  State<InternationalPhoneField> createState() => _InternationalPhoneFieldState();
+}
+
+class _InternationalPhoneFieldState extends State<InternationalPhoneField> {
+  // Internal controller for the IntlPhoneField widget
+  // This prevents conflicts with the external controller
+  late TextEditingController _internalController;
+  String _completeNumber = '';
+
+  @override
+  void initState() {
+    super.initState();
+    // Create internal controller
+    _internalController = TextEditingController();
+    
+    // If the external controller has initial value, parse it
+    if (widget.controller.text.isNotEmpty) {
+      _completeNumber = widget.controller.text;
+      // Extract national number from complete number if it starts with +
+      if (_completeNumber.startsWith('+')) {
+        // Remove country code for display
+        // This is a simple approach - IntlPhoneField will handle parsing
+        _internalController.text = _completeNumber;
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _internalController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: padding,
+      padding: widget.padding,
       child: IntlPhoneField(
-        controller: controller,
+        // Use internal controller to avoid conflicts
+        controller: _internalController,
         decoration: KenwellFormStyles.decoration(
-          label: label,
+          label: widget.label,
           alwaysFloat: true,
         ).copyWith(
           // Remove the counter text to avoid clutter
           counterText: '',
         ),
-        initialCountryCode: initialCountryCode,
+        initialCountryCode: widget.initialCountryCode,
         // Show country code selector
         showCountryFlag: true,
         showDropdownIcon: true,
@@ -50,22 +88,26 @@ class InternationalPhoneField extends StatelessWidget {
         // Validation
         invalidNumberMessage: 'Invalid phone number',
         validator: (phone) {
-          if (validator != null) {
-            return validator!(phone?.completeNumber);
+          if (widget.validator != null) {
+            return widget.validator!(phone?.completeNumber);
           }
           return null;
         },
-        // On changed callback - update controller with complete international number
+        // On changed callback - store complete number without interfering with input
         onChanged: (phone) {
-          // The IntlPhoneField widget only stores the national number in the controller
-          // We need to manually update it with the complete international number
-          controller.text = phone.completeNumber;
-          controller.selection = TextSelection.fromPosition(
-            TextPosition(offset: controller.text.length),
-          );
+          // Store the complete international number
+          _completeNumber = phone.completeNumber;
           
-          if (onChanged != null) {
-            onChanged!(phone.completeNumber);
+          // Update the external controller without triggering rebuilds
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (widget.controller.text != _completeNumber) {
+              widget.controller.text = _completeNumber;
+            }
+          });
+          
+          // Notify parent if callback provided
+          if (widget.onChanged != null) {
+            widget.onChanged!(_completeNumber);
           }
         },
       ),
