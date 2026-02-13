@@ -74,7 +74,7 @@ class Validators {
 
     // International phone numbers typically range from 7 to 15 digits (E.164 standard)
     if (digitsOnly.length < 7 || digitsOnly.length > 15) {
-      return 'Invalid phone number length';
+      return 'Phone number must be between 7 and 15 digits';
     }
 
     return null;

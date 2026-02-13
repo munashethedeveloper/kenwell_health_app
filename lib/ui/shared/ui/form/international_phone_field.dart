@@ -55,8 +55,15 @@ class InternationalPhoneField extends StatelessWidget {
           }
           return null;
         },
-        // On changed callback
+        // On changed callback - update controller with complete international number
         onChanged: (phone) {
+          // The IntlPhoneField widget only stores the national number in the controller
+          // We need to manually update it with the complete international number
+          controller.text = phone.completeNumber;
+          controller.selection = TextSelection.fromPosition(
+            TextPosition(offset: controller.text.length),
+          );
+          
           if (onChanged != null) {
             onChanged!(phone.completeNumber);
           }
