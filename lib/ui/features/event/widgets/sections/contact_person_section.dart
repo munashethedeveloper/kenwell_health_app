@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
 import '../../../../shared/ui/form/custom_text_field.dart';
+import '../../../../shared/ui/form/international_phone_field.dart';
 import '../../../../shared/ui/form/kenwell_form_card.dart';
 import '../../view_model/event_view_model.dart';
 
@@ -65,14 +66,16 @@ class ContactPersonSection extends StatelessWidget {
                 requiredField('Contact Person Last Name', value),
           ),
           const SizedBox(height: 24),
-          // Contact Number field
-          KenwellTextField(
+          // Contact Number field with international country code picker
+          InternationalPhoneField(
             label: 'Contact Number',
             controller: numberController,
             padding: EdgeInsets.zero,
-            keyboardType: TextInputType.phone,
-            inputFormatters: [AppTextInputFormatters.saPhoneNumberFormatter()],
-            validator: Validators.validateSouthAfricanPhoneNumber,
+            validator: Validators.validateInternationalPhoneNumber,
+            onChanged: (completeNumber) {
+              // Update the controller with the complete international number
+              numberController.text = completeNumber;
+            },
           ),
           const SizedBox(height: 24),
           // Contact Email field
