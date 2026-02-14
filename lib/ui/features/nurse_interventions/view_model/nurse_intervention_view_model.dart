@@ -193,6 +193,9 @@ class NurseInterventionViewModel extends ChangeNotifier {
   }
 
   @override
+  bool get showInitialAssessment => false;
+
+  @override
   void dispose() {
     followUpOtherController.dispose();
     followUpDateController.dispose();
