@@ -6,6 +6,7 @@ import '../../../../../utils/validators.dart';
 import '../../../../shared/ui/buttons/custom_primary_button.dart';
 import '../../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../../shared/ui/form/custom_text_field.dart';
+import '../../../../shared/ui/form/international_phone_field.dart';
 import '../../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../../shared/ui/form/kenwell_section_header.dart';
 import '../../../../shared/ui/logo/app_logo.dart';
@@ -183,14 +184,11 @@ class _CreateUserSectionState extends State<CreateUserSection> {
                               setState(() => _selectedRole = value),
                         ),
                         const SizedBox(height: 24),
-                        KenwellTextField(
+                        InternationalPhoneField(
                           label: "Phone Number",
                           controller: _phoneController,
-                          keyboardType: TextInputType.phone,
-                          inputFormatters: [
-                            AppTextInputFormatters.saPhoneNumberFormatter()
-                          ],
-                          validator: Validators.validateSouthAfricanPhoneNumber,
+                          padding: EdgeInsets.zero,
+                          validator: Validators.validateInternationalPhoneNumber,
                         ),
                       ],
                     ),
