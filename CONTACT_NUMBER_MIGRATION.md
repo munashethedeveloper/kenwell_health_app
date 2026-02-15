@@ -1,7 +1,7 @@
 # Contact Number Field Migration Guide
 
 ## Overview
-The contact number fields in the "Add Event" screen have been refactored to support international phone numbers with country code selection.
+The contact number fields have been refactored to support international phone numbers with country code selection.
 
 ## Latest Update (Bug Fix)
 **Fixed Issues:**
@@ -11,6 +11,13 @@ The contact number fields in the "Add Event" screen have been refactored to supp
 
 **Technical Fix:**
 The widget now uses an internal controller to manage the IntlPhoneField's display state separately from the data storage controller. This prevents circular update loops that were causing the duplication and clearing issues.
+
+## Screens Updated
+The international phone field is now used in:
+1. **Event Screen** - Contact Person sections (Onsite & AE Contact)
+2. **User Management Screen** - Create User section
+
+See `USER_MANAGEMENT_PHONE_UPDATE.md` for details on the User Management update.
 
 ## What Changed
 

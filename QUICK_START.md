@@ -6,6 +6,11 @@
 - Can now clear the text field normally
 - Smooth input experience
 
+## Screens Updated ✅
+The international phone field is now used in:
+1. **Event Screen** - Contact Person sections (Onsite & AE Contact)
+2. **User Management Screen** - Create User section
+
 ## What Changed?
 The Contact Number fields on the **Add Event screen** now support international phone numbers from any country, with an easy-to-use country picker and search functionality.
 
