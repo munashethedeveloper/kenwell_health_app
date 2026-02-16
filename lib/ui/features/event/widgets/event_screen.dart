@@ -10,6 +10,7 @@ import '../../../shared/ui/dialogs/confirmation_dialog.dart';
 import '../utils/event_form_validator.dart';
 import '../view_model/event_view_model.dart';
 import 'sections/event_basic_info_section.dart';
+import 'sections/event_location_section.dart';
 import 'sections/contact_person_section.dart';
 import 'sections/event_time_section.dart';
 import 'sections/event_options_section.dart';
@@ -214,6 +215,11 @@ class _EventScreenState extends State<EventScreen> {
               EventBasicInfoSection(
                 viewModel: widget.viewModel,
                 date: widget.date,
+                requiredField: _requiredField,
+              ),
+              // Event Location Section (with geocoding)
+              EventLocationSection(
+                viewModel: widget.viewModel,
                 requiredField: _requiredField,
               ),
               // Contact Person Sections

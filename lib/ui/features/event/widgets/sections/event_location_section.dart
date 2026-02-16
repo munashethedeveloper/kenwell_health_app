@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../../shared/ui/form/custom_text_field.dart';
+import '../../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../../shared/ui/form/kenwell_form_styles.dart';
 import '../../../../domain/constants/provinces.dart';
 import '../../view_model/event_view_model.dart';
@@ -69,58 +70,62 @@ class _EventLocationSectionState extends State<EventLocationSection> {
   // Build method
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Address field
-        KenwellTextField(
-          label: 'Address',
-          controller: widget.viewModel.addressController,
-          padding: EdgeInsets.zero,
-          validator: (value) => widget.requiredField('Address', value),
-          focusNode: _addressFocusNode,
-          textInputAction: TextInputAction.next,
-          suffixIcon: _isGeocoding
-              ? const Padding(
-                  padding: EdgeInsets.all(12.0),
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                )
-              : null,
-        ),
-        const SizedBox(height: 24),
-        // Town/City field
-        KenwellTextField(
-          label: 'Town/City',
-          controller: widget.viewModel.townCityController,
-          padding: EdgeInsets.zero,
-          validator: (value) => widget.requiredField('Town/City', value),
-        ),
-        const SizedBox(height: 24),
-        // Province dropdown field
-        KenwellDropdownField<String>(
-          label: 'Province',
-          value: widget.viewModel.province,
-          items: SouthAfricanProvinces.all,
-          onChanged: (val) {
-            if (val != null) widget.viewModel.updateProvince(val);
-          },
-          decoration: KenwellFormStyles.decoration(
-            label: 'Province',
-            hint: 'Select Province',
+    return KenwellFormCard(
+      title: 'Event Location',
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        children: [
+          // Venue field
+          KenwellTextField(
+            label: 'Venue',
+            controller: widget.viewModel.venueController,
+            padding: EdgeInsets.zero,
+            validator: (value) => widget.requiredField('Venue', value),
           ),
-        ),
-        const SizedBox(height: 24),
-        // Venue field
-        KenwellTextField(
-          label: 'Venue',
-          controller: widget.viewModel.venueController,
-          padding: EdgeInsets.zero,
-          validator: (value) => widget.requiredField('Venue', value),
-        ),
-      ],
+          const SizedBox(height: 24),
+          // Address field
+          KenwellTextField(
+            label: 'Address',
+            controller: widget.viewModel.addressController,
+            padding: EdgeInsets.zero,
+            validator: (value) => widget.requiredField('Address', value),
+            focusNode: _addressFocusNode,
+            textInputAction: TextInputAction.next,
+            suffixIcon: _isGeocoding
+                ? const Padding(
+                    padding: EdgeInsets.all(12.0),
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  )
+                : null,
+          ),
+          const SizedBox(height: 24),
+          // Town/City field
+          KenwellTextField(
+            label: 'Town/City',
+            controller: widget.viewModel.townCityController,
+            padding: EdgeInsets.zero,
+            validator: (value) => widget.requiredField('Town/City', value),
+          ),
+          const SizedBox(height: 24),
+          // Province dropdown field
+          KenwellDropdownField<String>(
+            label: 'Province',
+            value: widget.viewModel.province,
+            items: SouthAfricanProvinces.all,
+            onChanged: (val) {
+              if (val != null) widget.viewModel.updateProvince(val);
+            },
+            decoration: KenwellFormStyles.decoration(
+              label: 'Province',
+              hint: 'Select Province',
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
