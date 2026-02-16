@@ -13,7 +13,8 @@ class SouthAfricanProvinces {
   ];
 
   // Cache lowercase province names for efficient matching
-  static final List<String> _lowerCaseProvinces = 
+  // Using late final for lazy initialization - only computed when match() is first called
+  static late final List<String> _lowerCaseProvinces = 
       all.map((p) => p.toLowerCase()).toList();
 
   /// Check if a province name is valid

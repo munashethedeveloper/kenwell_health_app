@@ -270,6 +270,7 @@ class EventViewModel extends ChangeNotifier {
       bool fieldsUpdated = false;
       
       // Auto-fill town/city
+      // Try locality first (e.g., "Johannesburg"), fall back to subAdministrativeArea if unavailable
       final city = placemark.locality ?? placemark.subAdministrativeArea ?? '';
       if (city.isNotEmpty && townCityController.text.isEmpty) {
         townCityController.text = city;
