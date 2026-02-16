@@ -111,18 +111,23 @@ class _EventLocationSectionState extends State<EventLocationSection> {
             validator: (value) => widget.requiredField('Town/City', value),
           ),
           const SizedBox(height: 24),
-          // Province dropdown field
-          KenwellDropdownField<String>(
-            label: 'Province',
-            value: widget.viewModel.province,
-            items: SouthAfricanProvinces.all,
-            onChanged: (val) {
-              if (val != null) widget.viewModel.updateProvince(val);
+          // Province dropdown field - wrapped in ListenableBuilder to update when ViewModel changes
+          ListenableBuilder(
+            listenable: widget.viewModel,
+            builder: (context, child) {
+              return KenwellDropdownField<String>(
+                label: 'Province',
+                value: widget.viewModel.province,
+                items: SouthAfricanProvinces.all,
+                onChanged: (val) {
+                  if (val != null) widget.viewModel.updateProvince(val);
+                },
+                decoration: KenwellFormStyles.decoration(
+                  label: 'Province',
+                  hint: 'Select Province',
+                ),
+              );
             },
-            decoration: KenwellFormStyles.decoration(
-              label: 'Province',
-              hint: 'Select Province',
-            ),
           ),
         ],
       ),
