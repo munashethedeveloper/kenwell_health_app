@@ -25,24 +25,12 @@ class CreateMemberSection extends StatefulWidget {
 }
 
 class _CreateMemberSectionState extends State<CreateMemberSection> {
-  late MemberDetailsViewModel _viewModel;
-
-  @override
-  void initState() {
-    super.initState();
-    _viewModel = MemberDetailsViewModel();
-  }
-
-  @override
-  void dispose() {
-    _viewModel.dispose();
-    super.dispose();
-  }
-
   Future<void> _submitMember() async {
-    if (!_viewModel.formKey.currentState!.validate()) return;
+    final viewModel = context.read<MemberDetailsViewModel>();
+    
+    if (!viewModel.formKey.currentState!.validate()) return;
 
-    final success = await _viewModel.saveMember();
+    final success = await viewModel.saveMember();
 
     if (!mounted) return;
 
@@ -54,8 +42,8 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
         ),
       );
       // Reset form
-      _viewModel.formKey.currentState?.reset();
-      _viewModel.resetForm();
+      viewModel.formKey.currentState?.reset();
+      viewModel.resetForm();
       widget.onMemberCreated?.call();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -69,16 +57,14 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
-      value: _viewModel,
-      child: Consumer<MemberDetailsViewModel>(
-        builder: (context, vm, _) {
-          return SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Form(
-                key: vm.formKey,
-                child: Column(
+    return Consumer<MemberDetailsViewModel>(
+      builder: (context, vm, _) {
+        return SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Form(
+              key: vm.formKey,
+              child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 16),

@@ -41,12 +41,12 @@ class _MemberRegistrationScreenVersionTwoState
           if (canCreateMember) {
             tabs.add(
                 const Tab(icon: Icon(Icons.person_add), text: 'Create Members'));
-            tabViews.add(const CreateMemberSection());
+            // Tab view will be created with callback later
           }
 
           if (canViewMembers) {
             tabs.add(const Tab(icon: Icon(Icons.group), text: 'View Members'));
-            tabViews.add(const ViewMembersSection());
+            // Tab view will be created later
           }
 
           // If user has no permissions, show a message
@@ -161,7 +161,7 @@ class _MemberRegistrationScreenVersionTwoState
               ),
               body: Consumer<MemberDetailsViewModel>(
                 builder: (context, viewModel, child) {
-                  // Update tab views with onMemberCreated callback
+                  // Build tab views with callbacks that use the view model
                   final dynamicTabViews = <Widget>[];
 
                   if (canCreateMember) {

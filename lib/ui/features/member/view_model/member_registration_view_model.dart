@@ -351,8 +351,7 @@ class MemberDetailsViewModel extends ChangeNotifier {
     try {
       final fetchedMembers = await _firestoreMemberRepository.fetchAllMembers();
       _members = fetchedMembers;
-      _isLoading = false;
-      notifyListeners();
+      _setLoading(false);
     } catch (e) {
       _setError('Failed to load members. Please try again.');
       debugPrint('Load members error: $e');
