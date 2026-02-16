@@ -16,8 +16,10 @@ The widget now uses an internal controller to manage the IntlPhoneField's displa
 The international phone field is now used in:
 1. **Event Screen** - Contact Person sections (Onsite & AE Contact)
 2. **User Management Screen** - Create User section
+3. **Member Registration Screen** - Cell Number field
 
-See `USER_MANAGEMENT_PHONE_UPDATE.md` for details on the User Management update.
+See `USER_MANAGEMENT_PHONE_UPDATE.md` for User Management details.
+See `MEMBER_REGISTRATION_PHONE_UPDATE.md` for Member Registration details.
 
 ## What Changed
 
