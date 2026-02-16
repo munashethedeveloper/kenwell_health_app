@@ -12,6 +12,10 @@ class SouthAfricanProvinces {
     'Northern Cape',
   ];
 
+  // Cache lowercase province names for efficient matching
+  static final List<String> _lowerCaseProvinces = 
+      all.map((p) => p.toLowerCase()).toList();
+
   /// Check if a province name is valid
   static bool isValid(String province) {
     return all.contains(province);
@@ -25,24 +29,24 @@ class SouthAfricanProvinces {
     final lowerProvinceName = provinceName.toLowerCase();
     
     // Try exact match first (case-insensitive)
-    for (final province in all) {
-      if (province.toLowerCase() == lowerProvinceName) {
-        return province;
+    for (int i = 0; i < all.length; i++) {
+      if (_lowerCaseProvinces[i] == lowerProvinceName) {
+        return all[i];
       }
     }
     
     // Try to find province that contains the input (more specific match)
-    for (final province in all) {
-      if (province.toLowerCase().contains(lowerProvinceName)) {
-        return province;
+    for (int i = 0; i < all.length; i++) {
+      if (_lowerCaseProvinces[i].contains(lowerProvinceName)) {
+        return all[i];
       }
     }
     
     // Try to find input that contains province name (less specific)
     // This handles cases like "North West Province" matching "North West"
-    for (final province in all) {
-      if (lowerProvinceName.contains(province.toLowerCase())) {
-        return province;
+    for (int i = 0; i < all.length; i++) {
+      if (lowerProvinceName.contains(_lowerCaseProvinces[i])) {
+        return all[i];
       }
     }
     

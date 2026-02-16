@@ -79,10 +79,6 @@ class _EventLocationSectionState extends State<EventLocationSection> {
           validator: (value) => widget.requiredField('Address', value),
           focusNode: _addressFocusNode,
           textInputAction: TextInputAction.next,
-          onEditingComplete: () {
-            // When user presses enter/done, geocode the address
-            _geocodeAddress();
-          },
           suffixIcon: _isGeocoding
               ? const Padding(
                   padding: EdgeInsets.all(12.0),
