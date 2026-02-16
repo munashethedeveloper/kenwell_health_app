@@ -14,6 +14,7 @@ class SouthAfricanProvinces {
 
   // Cache lowercase province names for efficient matching
   // Using late final for lazy initialization - only computed when match() is first called
+  // This is a constant lookup table and thread-safe once initialized
   static late final List<String> _lowerCaseProvinces = 
       all.map((p) => p.toLowerCase()).toList();
 

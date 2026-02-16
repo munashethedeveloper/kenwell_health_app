@@ -237,7 +237,8 @@ class EventViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Set province without notifying (for internal use during batch updates)
+  // Set province without notifying listeners
+  // Used by geocodeAddress to batch state changes and trigger single notification
   void _setProvince(String value) {
     province = value;
   }
@@ -270,7 +271,9 @@ class EventViewModel extends ChangeNotifier {
       bool fieldsUpdated = false;
       
       // Auto-fill town/city
-      // Try locality first (e.g., "Johannesburg"), fall back to subAdministrativeArea if unavailable
+      // Locality (e.g., "Johannesburg") is the primary city/town name
+      // SubAdministrativeArea is used as fallback when locality is unavailable
+      // This handles cases where geocoding services return different levels of detail
       final city = placemark.locality ?? placemark.subAdministrativeArea ?? '';
       if (city.isNotEmpty && townCityController.text.isEmpty) {
         townCityController.text = city;
