@@ -31,11 +31,17 @@ class SouthAfricanProvinces {
       }
     }
     
-    // Try partial match (case-insensitive)
+    // Try to find province that contains the input (more specific match)
     for (final province in all) {
-      final lowerProvince = province.toLowerCase();
-      if (lowerProvince.contains(lowerProvinceName) ||
-          lowerProvinceName.contains(lowerProvince)) {
+      if (province.toLowerCase().contains(lowerProvinceName)) {
+        return province;
+      }
+    }
+    
+    // Try to find input that contains province name (less specific)
+    // This handles cases like "North West Province" matching "North West"
+    for (final province in all) {
+      if (lowerProvinceName.contains(province.toLowerCase())) {
         return province;
       }
     }

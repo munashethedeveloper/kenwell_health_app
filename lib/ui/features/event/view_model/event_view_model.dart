@@ -237,6 +237,11 @@ class EventViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Set province without notifying (for internal use during batch updates)
+  void _setProvince(String value) {
+    province = value;
+  }
+
   /// Geocode address and auto-fill town/city and province
   Future<void> geocodeAddress(String address) async {
     if (address.trim().isEmpty) return;
@@ -279,7 +284,7 @@ class EventViewModel extends ChangeNotifier {
         // Try to match the geocoded province to our list
         final matchedProvince = SouthAfricanProvinces.match(provinceName);
         if (matchedProvince != null) {
-          updateProvince(matchedProvince);
+          _setProvince(matchedProvince);
           fieldsUpdated = true;
           debugPrint('EventViewModel: Geocoded - City: $city, Province: $matchedProvince');
         } else {
