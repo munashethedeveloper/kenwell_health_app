@@ -5,6 +5,7 @@ import '../../../../domain/models/wellness_event.dart';
 import '../../../../data/repositories_dcl/event_repository.dart';
 import '../../../../domain/enums/service_type.dart';
 import '../../../../domain/enums/additional_service_type.dart';
+import '../../../../domain/constants/provinces.dart';
 
 /// ViewModel for managing wellness events
 class EventViewModel extends ChangeNotifier {
@@ -270,33 +271,18 @@ class EventViewModel extends ChangeNotifier {
 
       // Auto-fill province - match to our province list
       final provinceName = placemark.administrativeArea ?? '';
-      if (provinceName.isNotEmpty) {
-        // Map province names to match our dropdown values
-        final provinceMapping = {
-          'Gauteng': 'Gauteng',
-          'Western Cape': 'Western Cape',
-          'KwaZulu-Natal': 'KwaZulu-Natal',
-          'Eastern Cape': 'Eastern Cape',
-          'Limpopo': 'Limpopo',
-          'Mpumalanga': 'Mpumalanga',
-          'North West': 'North West',
-          'Free State': 'Free State',
-          'Northern Cape': 'Northern Cape',
-        };
-
-        // Try to find matching province
-        final matchedProvince = provinceMapping.entries.firstWhere(
-          (entry) => provinceName.toLowerCase().contains(entry.key.toLowerCase()),
-          orElse: () => MapEntry(provinceName, provinceName),
-        );
-
-        if (province == null || province!.isEmpty) {
-          updateProvince(matchedProvince.value);
+      if (provinceName.isNotEmpty && (province == null || province!.isEmpty)) {
+        // Try to match the geocoded province to our list
+        final matchedProvince = SouthAfricanProvinces.match(provinceName);
+        if (matchedProvince != null) {
+          updateProvince(matchedProvince);
+          debugPrint('EventViewModel: Geocoded - City: $city, Province: $matchedProvince');
+        } else {
+          debugPrint('EventViewModel: Could not match province "$provinceName" to known provinces');
         }
       }
 
       notifyListeners();
-      debugPrint('EventViewModel: Geocoded - City: $city, Province: $provinceName');
     } catch (e) {
       debugPrint('EventViewModel: Error geocoding address: $e');
       // Silently fail - don't show error to user as this is a convenience feature

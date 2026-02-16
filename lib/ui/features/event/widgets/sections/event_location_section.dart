@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../../shared/ui/form/custom_text_field.dart';
 import '../../../../shared/ui/form/kenwell_form_styles.dart';
+import '../../../../domain/constants/provinces.dart';
 import '../../view_model/event_view_model.dart';
 
 /// Event location information form section
@@ -106,17 +107,7 @@ class _EventLocationSectionState extends State<EventLocationSection> {
         KenwellDropdownField<String>(
           label: 'Province',
           value: widget.viewModel.province,
-          items: const [
-            'Gauteng',
-            'Western Cape',
-            'KwaZulu-Natal',
-            'Eastern Cape',
-            'Limpopo',
-            'Mpumalanga',
-            'North West',
-            'Free State',
-            'Northern Cape'
-          ],
+          items: SouthAfricanProvinces.all,
           onChanged: (val) {
             if (val != null) widget.viewModel.updateProvince(val);
           },
