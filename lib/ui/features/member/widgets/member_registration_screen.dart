@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
+import '../../../shared/ui/form/international_phone_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_page.dart';
 import '../../../shared/ui/form/kenwell_date_field.dart';
@@ -104,13 +105,11 @@ class MemberDetailsScreen extends StatelessWidget {
           keyboardType: TextInputType.emailAddress,
           validator: Validators.validateEmail,
         ),
-        KenwellTextField(
+        InternationalPhoneField(
           label: 'Cell Number',
-          hintText: 'Enter cell number',
           controller: vm.cellNumberController,
-          keyboardType: TextInputType.phone,
-          inputFormatters: [AppTextInputFormatters.saPhoneNumberFormatter()],
-          validator: Validators.validateSouthAfricanPhoneNumber,
+          padding: EdgeInsets.zero,
+          validator: Validators.validateInternationalPhoneNumber,
         ),
       ],
     );
