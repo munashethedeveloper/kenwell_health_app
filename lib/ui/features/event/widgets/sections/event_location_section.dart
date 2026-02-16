@@ -172,13 +172,13 @@ class _EventLocationSectionState extends State<EventLocationSection> {
 
     try {
       // Auto-fill town/city if available
-      if (suggestion.city != null && suggestion.city!.isNotEmpty) {
-        widget.viewModel.townCityController.text = suggestion.city!;
+      if (suggestion.city != null && suggestion.city.isNotEmpty) {
+        widget.viewModel.townCityController.text = suggestion.city;
       }
 
       // Auto-fill province if available
-      if (suggestion.province != null && suggestion.province!.isNotEmpty) {
-        final matchedProvince = SouthAfricanProvinces.match(suggestion.province!);
+      if (suggestion.province != null && suggestion.province.isNotEmpty) {
+        final matchedProvince = SouthAfricanProvinces.match(suggestion.province);
         if (matchedProvince != null) {
           widget.viewModel.updateProvince(matchedProvince);
           debugPrint('Address selected: City=${suggestion.city}, Province=$matchedProvince');
