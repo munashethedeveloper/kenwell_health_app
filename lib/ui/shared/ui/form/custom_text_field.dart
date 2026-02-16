@@ -13,6 +13,7 @@ class KenwellTextField extends StatelessWidget {
     this.textInputAction,
     this.onChanged,
     this.onTap,
+    this.onEditingComplete,
     this.readOnly = false,
     this.obscureText = false,
     this.maxLines = 1,
@@ -39,6 +40,7 @@ class KenwellTextField extends StatelessWidget {
   final TextInputAction? textInputAction;
   final ValueChanged<String>? onChanged;
   final VoidCallback? onTap;
+  final VoidCallback? onEditingComplete;
   final bool readOnly;
   final bool obscureText;
   final int maxLines;
@@ -74,6 +76,7 @@ class KenwellTextField extends StatelessWidget {
         textInputAction: textInputAction,
         onChanged: onChanged,
         onTap: onTap,
+        onEditingComplete: onEditingComplete,
         readOnly: readOnly,
         obscureText: obscureText,
         maxLines: expands ? null : maxLines,

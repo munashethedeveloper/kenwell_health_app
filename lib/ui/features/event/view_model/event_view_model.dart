@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:geocoding/geocoding.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../data/repositories_dcl/event_repository.dart';
 import '../../../../domain/enums/service_type.dart';
 import '../../../../domain/enums/additional_service_type.dart';
+import '../../../../domain/constants/provinces.dart';
 
 /// ViewModel for managing wellness events
 class EventViewModel extends ChangeNotifier {
@@ -233,6 +235,74 @@ class EventViewModel extends ChangeNotifier {
   void updateProvince(String value) {
     province = value;
     notifyListeners();
+  }
+
+  // Set province without notifying listeners
+  // Used by geocodeAddress to batch state changes and trigger single notification
+  void _setProvince(String value) {
+    province = value;
+  }
+
+  /// Geocode address and auto-fill town/city and province
+  Future<void> geocodeAddress(String address) async {
+    if (address.trim().isEmpty) return;
+
+    try {
+      // Get locations from address
+      final locations = await locationFromAddress(address);
+      
+      if (locations.isEmpty) {
+        debugPrint('EventViewModel: No locations found for address: $address');
+        return;
+      }
+
+      // Get placemarks from coordinates
+      final placemarks = await placemarkFromCoordinates(
+        locations.first.latitude,
+        locations.first.longitude,
+      );
+
+      if (placemarks.isEmpty) {
+        debugPrint('EventViewModel: No placemarks found for coordinates');
+        return;
+      }
+
+      final placemark = placemarks.first;
+      bool fieldsUpdated = false;
+      
+      // Auto-fill town/city
+      // Locality (e.g., "Johannesburg") is the primary city/town name
+      // SubAdministrativeArea is used as fallback when locality is unavailable
+      // This handles cases where geocoding services return different levels of detail
+      final city = placemark.locality ?? placemark.subAdministrativeArea ?? '';
+      if (city.isNotEmpty && townCityController.text.isEmpty) {
+        townCityController.text = city;
+        fieldsUpdated = true;
+      }
+
+      // Auto-fill province - match to our province list
+      final provinceName = placemark.administrativeArea ?? '';
+      final hasNoProvince = province == null || province.isEmpty;
+      
+      if (provinceName.isNotEmpty && hasNoProvince) {
+        // Try to match the geocoded province to our list
+        final matchedProvince = SouthAfricanProvinces.match(provinceName);
+        if (matchedProvince != null) {
+          _setProvince(matchedProvince);
+          fieldsUpdated = true;
+          debugPrint('EventViewModel: Geocoded - City: $city, Province: $matchedProvince');
+        } else {
+          debugPrint('EventViewModel: Could not match province "$provinceName" to known provinces');
+        }
+      }
+
+      if (fieldsUpdated) {
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('EventViewModel: Error geocoding address: $e');
+      // Silently fail - don't show error to user as this is a convenience feature
+    }
   }
 
   // Pick time using TimePicker
