@@ -271,7 +271,9 @@ class EventViewModel extends ChangeNotifier {
 
       // Auto-fill province - match to our province list
       final provinceName = placemark.administrativeArea ?? '';
-      if (provinceName.isNotEmpty && (province == null || province!.isEmpty)) {
+      final hasNoProvince = province?.isEmpty ?? true;
+      
+      if (provinceName.isNotEmpty && hasNoProvince) {
         // Try to match the geocoded province to our list
         final matchedProvince = SouthAfricanProvinces.match(provinceName);
         if (matchedProvince != null) {

@@ -41,7 +41,7 @@ class _EventLocationSectionState extends State<EventLocationSection> {
 
   /// Handle address field focus change
   void _onAddressFocusChange() {
-    if (!_addressFocusNode.hasFocus && !_isGeocoding) {
+    if (!_addressFocusNode.hasFocus) {
       _geocodeAddress();
     }
   }
@@ -49,7 +49,7 @@ class _EventLocationSectionState extends State<EventLocationSection> {
   /// Geocode the address and auto-fill fields
   Future<void> _geocodeAddress() async {
     final address = widget.viewModel.addressController.text.trim();
-    if (address.isEmpty) return;
+    if (address.isEmpty || _isGeocoding) return;
 
     setState(() {
       _isGeocoding = true;
