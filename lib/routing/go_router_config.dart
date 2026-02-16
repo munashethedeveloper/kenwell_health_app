@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/domain/models/member.dart';
 import 'package:kenwell_health_app/ui/features/member/view_model/member_registration_view_model.dart';
 import 'package:kenwell_health_app/ui/features/member/widgets/member_registration_screen.dart';
+import 'package:kenwell_health_app/ui/features/member/widgets/member_registration_screen_version_two.dart';
 import 'package:kenwell_health_app/ui/features/user_management/widgets/my_user_management_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/ui/features/auth/view_models/auth_view_model.dart';
@@ -168,10 +169,17 @@ class AppRouterConfig {
           builder: (context, state) => const MyUserMangementScreen(),
         ),
 
-        /*   // Member Route
+        // Member Registration Route (Version Two - with tabs)
         GoRoute(
           path: '/member-registration',
           name: 'memberRegistration',
+          builder: (context, state) => const MemberRegistrationScreenVersionTwo(),
+        ),
+
+        /*   // Member Route (OLD - commented out)
+        GoRoute(
+          path: '/member-registration-old',
+          name: 'memberRegistrationOld',
           builder: (context, state) {
             final MemberDetailsViewModel? viewmodel = extra?['member'] as Member?;
           }=> MemberDetailsScreen(

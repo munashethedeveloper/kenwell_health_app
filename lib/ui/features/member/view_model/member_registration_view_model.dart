@@ -19,26 +19,42 @@ class MemberDetailsViewModel extends ChangeNotifier {
   Member? savedMember;
   String? _eventId; // Store the event ID for linking member to event
 
-  //New Properties
-  // final FirebaseAuthService _authService;
-  ////List<Member> _members = [];
-  //List<Member> get users => _members;
-  //String? _errorMessage;
-  //String? get errorMessage => _errorMessage;
-  // bool _isLoading = false;
-  // bool get isLoading => _isLoading;
-
+  // Member list management
+  List<Member> _members = [];
+  List<Member> get members => _members;
+  
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+  
+  String? _errorMessage;
+  String? get errorMessage => _errorMessage;
+  
+  String? _successMessage;
+  String? get successMessage => _successMessage;
+  
+  // Search and filter
+  String _searchQuery = '';
+  String get searchQuery => _searchQuery;
+  
+  String _selectedFilter = 'All';
+  String get selectedFilter => _selectedFilter;
+  
   // Private helper methods
-  ///void _setLoading(bool value) {
-  //  _isLoading = value;
-  //  notifyListeners();
-  // }
+  void _setLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
+  }
 
-  //void _setError(String message) {
-  //  _errorMessage = message;
-  //  _isLoading = false;
-  //  notifyListeners();
-  // }
+  void _setError(String message) {
+    _errorMessage = message;
+    _isLoading = false;
+    notifyListeners();
+  }
+  
+  void _setSuccess(String message) {
+    _successMessage = message;
+    notifyListeners();
+  }
 
   /// Set the event ID for this member registration
   void setEventId(String? eventId) {
@@ -325,6 +341,117 @@ class MemberDetailsViewModel extends ChangeNotifier {
       _isSubmitting = false;
       notifyListeners();
     }
+  }
+
+  // Load all members
+  Future<void> loadMembers() async {
+    _setLoading(true);
+    _errorMessage = null;
+
+    try {
+      final fetchedMembers = await _firestoreMemberRepository.fetchAllMembers();
+      _members = fetchedMembers;
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _setError('Failed to load members. Please try again.');
+      debugPrint('Load members error: $e');
+    }
+  }
+
+  // Delete member
+  Future<bool> deleteMember(String memberId, String memberName) async {
+    try {
+      _setLoading(true);
+      await _firestoreMemberRepository.deleteMember(memberId);
+      await _memberRepository.deleteMember(memberId);
+      
+      // Remove from local list
+      _members.removeWhere((m) => m.id == memberId);
+      
+      _setSuccess('$memberName deleted successfully');
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _setError('Failed to delete $memberName');
+      debugPrint('Delete member error: $e');
+      return false;
+    }
+  }
+
+  // Save member (used by create member section)
+  Future<bool> saveMember() async {
+    try {
+      await saveLocally();
+      return true;
+    } catch (e) {
+      debugPrint('Save member error: $e');
+      return false;
+    }
+  }
+
+  // Reset form
+  void resetForm() {
+    nameController.clear();
+    surnameController.clear();
+    dobController.clear();
+    idNumberController.clear();
+    passportNumberController.clear();
+    medicalAidNameController.clear();
+    medicalAidNumberController.clear();
+    emailController.clear();
+    cellNumberController.clear();
+    personalNumberController.clear();
+    
+    maritalStatus = null;
+    gender = null;
+    idDocumentChoice = 'ID';
+    medicalAidStatus = null;
+    citizenshipStatus = null;
+    selectedNationality = null;
+    
+    notifyListeners();
+  }
+
+  // Search and filter methods
+  void setSearchQuery(String query) {
+    _searchQuery = query;
+    notifyListeners();
+  }
+
+  void clearSearch() {
+    _searchQuery = '';
+    notifyListeners();
+  }
+
+  void setFilter(String filter) {
+    _selectedFilter = filter;
+    notifyListeners();
+  }
+
+  // Get filtered members
+  List<Member> get filteredMembers {
+    var filtered = _members;
+
+    // Apply search filter
+    if (_searchQuery.isNotEmpty) {
+      final query = _searchQuery.toLowerCase();
+      filtered = filtered.where((member) {
+        final fullName = '${member.name} ${member.surname}'.toLowerCase();
+        final email = member.email?.toLowerCase() ?? '';
+        return fullName.contains(query) || email.contains(query);
+      }).toList();
+    }
+
+    // Apply gender filter
+    if (_selectedFilter != 'All') {
+      filtered = filtered.where((member) {
+        return member.gender == _selectedFilter;
+      }).toList();
+    }
+
+    return filtered;
   }
 
   @override
