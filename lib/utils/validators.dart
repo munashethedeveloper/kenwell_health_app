@@ -57,6 +57,29 @@ class Validators {
     return null;
   }
 
+  // ------------------ International Phone validation ------------------
+  static String? validateInternationalPhoneNumber(String? value) {
+    if (value == null || value.isEmpty) return 'Please enter phone number';
+
+    // Remove all non-digit characters except +
+    final cleaned = value.replaceAll(RegExp(r'[^\d+]'), '');
+
+    // Check if the number starts with + (international format)
+    if (!cleaned.startsWith('+')) {
+      return 'Phone number must include country code (e.g., +27)';
+    }
+
+    // Remove the + for digit counting
+    final digitsOnly = cleaned.substring(1);
+
+    // International phone numbers typically range from 7 to 15 digits (E.164 standard)
+    if (digitsOnly.length < 7 || digitsOnly.length > 15) {
+      return 'Phone number must be between 7 and 15 digits';
+    }
+
+    return null;
+  }
+
   // ------------------ SA ID validation ------------------
   static String? validateSouthAfricanId(String? id) {
     if (id == null || id.isEmpty) return 'Please enter ID Number';

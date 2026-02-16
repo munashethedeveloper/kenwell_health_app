@@ -4,6 +4,7 @@ import 'package:kenwell_health_app/utils/input_formatters.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
 import '../../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../../shared/ui/form/custom_text_field.dart';
+import '../../../../shared/ui/form/international_phone_field.dart';
 import '../../../../shared/ui/form/kenwell_form_card.dart';
 import '../../view_model/profile_view_model.dart';
 
@@ -68,15 +69,11 @@ class _ProfileFormSectionState extends State<ProfileFormSection> {
                 onChanged: widget.onRoleChanged,
               ),
               const SizedBox(height: 24),
-              KenwellTextField(
+              InternationalPhoneField(
                 label: "Phone Number",
                 controller: widget.phoneController,
-                keyboardType: TextInputType.phone,
-                inputFormatters: [
-                  AppTextInputFormatters.saPhoneNumberFormatter()
-                ],
                 padding: EdgeInsets.zero,
-                validator: Validators.validateSouthAfricanPhoneNumber,
+                validator: Validators.validateInternationalPhoneNumber,
               ),
               const SizedBox(height: 24),
               KenwellTextField(
