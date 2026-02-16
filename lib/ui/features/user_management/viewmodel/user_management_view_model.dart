@@ -58,9 +58,11 @@ class UserManagementViewModel extends ChangeNotifier {
         final firstName = user.firstName.toLowerCase();
         final lastName = user.lastName.toLowerCase();
         final email = user.email.toLowerCase();
+        final fullName = '$firstName $lastName';
         return firstName.contains(query) ||
             lastName.contains(query) ||
-            email.contains(query);
+            email.contains(query) ||
+            fullName.contains(query);
       }).toList();
     }
 
@@ -155,14 +157,6 @@ class UserManagementViewModel extends ChangeNotifier {
     return value?.trim() ?? '';
   }
 
-  // Validation
-  String? validatePasswordMatch(String password, String confirmPassword) {
-    if (password != confirmPassword) {
-      return 'Passwords do not match';
-    }
-    return null;
-  }
-
   String? validateRequiredField(String fieldName, String? value) {
     final sanitized = _sanitizeString(value);
     if (sanitized.isEmpty) {
@@ -234,19 +228,11 @@ class UserManagementViewModel extends ChangeNotifier {
   Future<bool> registerUser({
     required String email,
     required String password,
-    required String confirmPassword,
     required String role,
     required String phoneNumber,
     required String firstName,
     required String lastName,
   }) async {
-    // Validate passwords match
-    final passwordError = validatePasswordMatch(password, confirmPassword);
-    if (passwordError != null) {
-      _setError(passwordError);
-      return false;
-    }
-
     _setLoading(true);
     _successMessage = null;
     _navigationTarget = null;

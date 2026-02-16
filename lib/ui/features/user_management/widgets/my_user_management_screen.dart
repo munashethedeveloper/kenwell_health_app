@@ -7,46 +7,17 @@ import 'package:kenwell_health_app/ui/shared/ui/dialogs/confirmation_dialog.dart
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
 
-class MyProfileMenuScreen extends StatelessWidget {
-  const MyProfileMenuScreen({super.key});
+class MyUserMangementScreen extends StatelessWidget {
+  const MyUserMangementScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Load profile when screen opens
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (context.mounted) {
-        context.read<ProfileViewModel>().loadProfile();
-      }
-    });
-
-    return const _MyProfileMenuScreenBody();
+    return const MyUserManagementScreenBody();
   }
 }
 
-class _MyProfileMenuScreenBody extends StatelessWidget {
-  const _MyProfileMenuScreenBody();
-
-  Future<void> _logout(BuildContext context) async {
-    final authVM = context.read<AuthViewModel>();
-
-    final confirmed = await ConfirmationDialog.show(
-      context,
-      title: 'Logout',
-      message: 'Are you sure you want to logout?',
-      confirmText: 'Logout',
-      cancelText: 'Cancel',
-      confirmColor: Colors.red,
-      icon: Icons.logout,
-    );
-
-    if (!confirmed) return;
-
-    await authVM.logout();
-
-    if (!context.mounted) return;
-
-    context.go('/login');
-  }
+class MyUserManagementScreenBody extends StatelessWidget {
+  const MyUserManagementScreenBody({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +25,7 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
       builder: (context, vm, _) => Scaffold(
         backgroundColor: Colors.white,
         appBar: const KenwellAppBar(
-          title: 'My Profile',
+          title: 'My User Management',
           titleColor: Color(0xFF201C58),
           titleStyle: TextStyle(
             color: Color(0xFF201C58),
@@ -77,7 +48,7 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.only(left: 4, bottom: 12),
                         child: Text(
-                          'Account Settings',
+                          'Accounts:',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -89,22 +60,18 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
                     // Menu items
                     _ProfileMenuItem(
                       icon: Icons.person,
-                      title: 'Edit Profile',
-                      subtitle: 'Update your personal information',
-                      onTap: () => context.pushNamed('profile'),
+                      title: 'User Registration',
+                      subtitle:
+                          'Register individuals who will manage and operate wellness events.',
+                      onTap: () =>
+                          context.pushNamed('userManagementVersionTwo'),
                     ),
                     _ProfileMenuItem(
                       icon: Icons.help_outline,
-                      title: 'Help & Support',
-                      subtitle: 'Get assistance and FAQs',
-                      onTap: () => context.pushNamed('help'),
-                    ),
-                    _ProfileMenuItem(
-                      icon: Icons.logout,
-                      title: 'Logout',
-                      subtitle: 'Sign out of your account',
-                      isDestructive: true,
-                      onTap: () => _logout(context),
+                      title: 'Member Registration',
+                      subtitle:
+                          'Register individuals who will participate in wellness events.',
+                      onTap: () => context.pushNamed('memberRegistration'),
                     ),
                   ],
                 ),

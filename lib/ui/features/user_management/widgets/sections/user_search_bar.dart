@@ -22,7 +22,7 @@ class UserSearchBar extends StatelessWidget {
       child: TextField(
         controller: controller,
         decoration: InputDecoration(
-          hintText: 'Search by name or email...',
+          hintText: 'Search user\'s by name or email...',
           prefixIcon: const Icon(Icons.search),
           suffixIcon: searchQuery.isNotEmpty
               ? IconButton(

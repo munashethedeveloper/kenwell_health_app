@@ -1,5 +1,6 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/international_form_field.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
@@ -104,13 +105,11 @@ class MemberDetailsScreen extends StatelessWidget {
           keyboardType: TextInputType.emailAddress,
           validator: Validators.validateEmail,
         ),
-        KenwellTextField(
+        InternationalPhoneField(
           label: 'Cell Number',
-          hintText: 'Enter cell number',
           controller: vm.cellNumberController,
-          keyboardType: TextInputType.phone,
-          inputFormatters: [AppTextInputFormatters.saPhoneNumberFormatter()],
-          validator: Validators.validateSouthAfricanPhoneNumber,
+          padding: EdgeInsets.zero,
+          validator: Validators.validateInternationalPhoneNumber,
         ),
       ],
     );

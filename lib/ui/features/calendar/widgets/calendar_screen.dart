@@ -235,9 +235,9 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
             subtitle: 'View and manage your wellness events for the month.',
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 16),
-          const AppLogo(size: 200),
-          const SizedBox(height: 16),
+          const SizedBox(height: 10),
+          const AppLogo(size: 150),
+          const SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             // Calendar widget inside a form card
@@ -333,9 +333,9 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
           subtitle: 'View and manage your wellness events for the month.',
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 16),
-        const AppLogo(size: 180),
-        const SizedBox(height: 16),
+        const SizedBox(height: 10),
+        const AppLogo(size: 150),
+        const SizedBox(height: 10),
         // Month navigation header
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),

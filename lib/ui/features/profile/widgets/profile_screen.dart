@@ -126,6 +126,7 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
             color: Color(0xFF201C58),
             fontWeight: FontWeight.bold,
           ),
+          automaticallyImplyLeading: true,
           actions: [
             IconButton(
               tooltip: 'Refresh',

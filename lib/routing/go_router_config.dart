@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kenwell_health_app/domain/models/member.dart';
+import 'package:kenwell_health_app/ui/features/member/view_model/member_registration_view_model.dart';
+import 'package:kenwell_health_app/ui/features/member/widgets/member_registration_screen.dart';
+import 'package:kenwell_health_app/ui/features/user_management/widgets/my_user_management_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/ui/features/auth/view_models/auth_view_model.dart';
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
@@ -156,6 +160,24 @@ class AppRouterConfig {
           name: 'calendar',
           builder: (context, state) => const CalendarScreen(),
         ),
+
+        // My User Management Route
+        GoRoute(
+          path: '/my-user-management',
+          name: 'myUserManagement',
+          builder: (context, state) => const MyUserMangementScreen(),
+        ),
+
+        /*   // Member Route
+        GoRoute(
+          path: '/member-registration',
+          name: 'memberRegistration',
+          builder: (context, state) {
+            final MemberDetailsViewModel? viewmodel = extra?['member'] as Member?;
+          }=> MemberDetailsScreen(
+            viewModel: null,      onNext: () {},
+          ),
+        ), */
 
         // Event Routes with path parameter support for deep linking
         GoRoute(
@@ -327,6 +349,13 @@ class AppRouterConfig {
           builder: (context, state) => const ProfileScreen(),
         ),
 
+        // Allocate Event Routes - FIX THIS ERROR
+        GoRoute(
+          path: '/allocate-event',
+          name: 'alocateEvent',
+          builder: (context, state) => const ProfileScreen(),
+        ),
+
         // Help Route
         GoRoute(
           path: '/help',
@@ -335,11 +364,11 @@ class AppRouterConfig {
         ),
 
         // User Management Routes
-        GoRoute(
+        /*      GoRoute(
           path: '/user-management',
           name: 'userManagement',
           builder: (context, state) => const UserManagementScreenVersionTwo(),
-        ),
+        ), */
         GoRoute(
           path: '/user-management-version-two',
           name: 'userManagementVersionTwo',

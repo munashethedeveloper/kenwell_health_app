@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:kenwell_health_app/domain/models/member.dart';
 import '../../domain/models/user_model.dart';
 import 'package:flutter/foundation.dart';
 import '../../firebase_options.dart';
@@ -15,6 +16,18 @@ class FirebaseAuthService {
               final userData = Map<String, dynamic>.from(doc.data());
               userData['id'] = doc.id;
               return UserModel.fromMap(userData);
+            }).toList());
+  }
+
+  /// Real-time stream of all users (admin function)
+  Stream<List<Member>> getAllMembersStream() {
+    return _firestore
+        .collection('members')
+        .snapshots()
+        .map((querySnapshot) => querySnapshot.docs.map((doc) {
+              final memberData = Map<String, dynamic>.from(doc.data());
+              memberData['id'] = doc.id;
+              return Member.fromMap(memberData);
             }).toList());
   }
 
@@ -203,7 +216,7 @@ class FirebaseAuthService {
       debugPrint('FirebaseAuth: User created with UID: ${user.uid}');
 
       // Send email verification
-      await user.sendEmailVerification();
+      //await user.sendEmailVerification();
 
       // Send password reset email so user can set their own password
       // This is important because the admin-set password is not communicated to the user
@@ -480,6 +493,22 @@ class FirebaseAuthService {
         final userData = Map<String, dynamic>.from(doc.data());
         userData['id'] = doc.id;
         return UserModel.fromMap(userData);
+      }).toList();
+    } catch (e, stackTrace) {
+      debugPrint('Get all users error: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      return [];
+    }
+  }
+
+  /// Get all members (admin function)
+  Future<List<Member>> getAllMembers() async {
+    try {
+      final querySnapshot = await _firestore.collection('users').get();
+      return querySnapshot.docs.map((doc) {
+        final memberData = Map<String, dynamic>.from(doc.data());
+        memberData['id'] = doc.id;
+        return Member.fromMap(memberData);
       }).toList();
     } catch (e, stackTrace) {
       debugPrint('Get all users error: $e');

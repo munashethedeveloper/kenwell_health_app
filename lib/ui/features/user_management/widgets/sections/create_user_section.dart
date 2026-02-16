@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/international_form_field.dart';
 import 'package:provider/provider.dart';
 import '../../../../../domain/constants/user_roles.dart';
 import '../../../../../utils/input_formatters.dart';
@@ -82,7 +83,7 @@ class _CreateUserSectionState extends State<CreateUserSection> {
     final success = await viewModel.registerUser(
       email: _emailController.text,
       password: _passwordController.text,
-      confirmPassword: _confirmPasswordController.text,
+      //confirmPassword: _confirmPasswordController.text,
       role: _selectedRole!,
       phoneNumber: _phoneController.text,
       firstName: _firstNameController.text,
@@ -183,14 +184,12 @@ class _CreateUserSectionState extends State<CreateUserSection> {
                               setState(() => _selectedRole = value),
                         ),
                         const SizedBox(height: 24),
-                        KenwellTextField(
+                        InternationalPhoneField(
                           label: "Phone Number",
                           controller: _phoneController,
-                          keyboardType: TextInputType.phone,
-                          inputFormatters: [
-                            AppTextInputFormatters.saPhoneNumberFormatter()
-                          ],
-                          validator: Validators.validateSouthAfricanPhoneNumber,
+                          padding: EdgeInsets.zero,
+                          validator:
+                              Validators.validateInternationalPhoneNumber,
                         ),
                       ],
                     ),
@@ -221,28 +220,28 @@ class _CreateUserSectionState extends State<CreateUserSection> {
                           validator: Validators.validateStrongPassword,
                         ),
                         const SizedBox(height: 24),
-                        KenwellTextField(
-                          label: "Confirm Temporary Password",
-                          controller: _confirmPasswordController,
-                          obscureText: _obscureConfirmPassword,
-                          suffixIcon: IconButton(
-                            icon: Icon(_obscureConfirmPassword
-                                ? Icons.visibility_off
-                                : Icons.visibility),
-                            onPressed: () => setState(() =>
-                                _obscureConfirmPassword =
-                                    !_obscureConfirmPassword),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please confirm your password';
-                            }
-                            if (value != _passwordController.text) {
-                              return 'Passwords do not match';
-                            }
-                            return null;
-                          },
-                        ),
+                        // KenwellTextField(
+                        //label: "Confirm Temporary Password",
+                        // controller: _confirmPasswordController,
+                        //  obscureText: _obscureConfirmPassword,
+                        //// suffixIcon: IconButton(
+                        //   icon: Icon(_obscureConfirmPassword
+                        //      ? Icons.visibility_off
+                        //      : Icons.visibility),
+                        // onPressed: () => setState(() =>
+                        //      _obscureConfirmPassword =
+                        //           !_obscureConfirmPassword),
+                        //  ),
+                        //  validator: (value) {
+                        //  if (value == null || value.isEmpty) {
+                        //    return 'Please confirm your password';
+                        //  }
+                        //  if (value != _passwordController.text) {
+                        //    return 'Passwords do not match';
+                        //   }
+                        //   return null;
+                        //  },
+                        // ),
                       ],
                     ),
                   ),

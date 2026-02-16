@@ -53,7 +53,7 @@ class EventDetailsScreen extends StatelessWidget {
         automaticallyImplyLeading: true,
         backgroundColor: const Color(0xFF201C58),
         centerTitle: true,
-        // Action buttons for edit and delete (with permission checks)
+        // Action buttons for edit and delete (with permission checks) - FIX THIS!!!!!!
         actions: [
           if (viewModel != null && canEdit)
             IconButton(

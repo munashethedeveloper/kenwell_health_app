@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/international_form_field.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
@@ -68,15 +69,11 @@ class _ProfileFormSectionState extends State<ProfileFormSection> {
                 onChanged: widget.onRoleChanged,
               ),
               const SizedBox(height: 24),
-              KenwellTextField(
+              InternationalPhoneField(
                 label: "Phone Number",
                 controller: widget.phoneController,
-                keyboardType: TextInputType.phone,
-                inputFormatters: [
-                  AppTextInputFormatters.saPhoneNumberFormatter()
-                ],
                 padding: EdgeInsets.zero,
-                validator: Validators.validateSouthAfricanPhoneNumber,
+                validator: Validators.validateInternationalPhoneNumber,
               ),
               const SizedBox(height: 24),
               KenwellTextField(

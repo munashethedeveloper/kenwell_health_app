@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kenwell_health_app/data/services/firebase_auth_service.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/member_repository.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_member_repository.dart';
@@ -17,6 +18,27 @@ class MemberDetailsViewModel extends ChangeNotifier {
 
   Member? savedMember;
   String? _eventId; // Store the event ID for linking member to event
+
+  //New Properties
+  // final FirebaseAuthService _authService;
+  ////List<Member> _members = [];
+  //List<Member> get users => _members;
+  //String? _errorMessage;
+  //String? get errorMessage => _errorMessage;
+  // bool _isLoading = false;
+  // bool get isLoading => _isLoading;
+
+  // Private helper methods
+  ///void _setLoading(bool value) {
+  //  _isLoading = value;
+  //  notifyListeners();
+  // }
+
+  //void _setError(String message) {
+  //  _errorMessage = message;
+  //  _isLoading = false;
+  //  notifyListeners();
+  // }
 
   /// Set the event ID for this member registration
   void setEventId(String? eventId) {
@@ -134,9 +156,9 @@ class MemberDetailsViewModel extends ChangeNotifier {
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
 
-  MemberDetailsViewModel() {
-    idNumberController.addListener(_handleIdNumberInput);
-  }
+  //MemberDetailsViewModel(this._authService) {
+  // idNumberController.addListener(_handleIdNumberInput);
+  //}
 
   void _handleIdNumberInput() {
     final id = idNumberController.text;
@@ -162,6 +184,24 @@ class MemberDetailsViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  // Load all members - performs a one-time fetch
+  // This is kept for manual refresh functionality
+  // The stream subscription (_startListeningToUsers) provides continuous updates
+  //Future<void> loadMembers() async {
+  // _setLoading(true);
+  // _errorMessage = null;
+
+  // try {
+  //   final fetchedMembers = await _authService.getAllMembers();
+  //  _members = fetchedMembers;
+  //  _isLoading = false;
+  //   notifyListeners();
+  //  } catch (e) {
+  //    _setError('Failed to load members. Please try again.');
+  //    debugPrint('Load members error: $e');
+  //  }
+  //}
 
   void setIdDocumentChoice(String? value) {
     if (value == null || idDocumentChoice == value) return;

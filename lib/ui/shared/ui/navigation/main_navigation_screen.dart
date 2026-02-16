@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/features/profile/widgets/my_profile_menu_screen.dart';
+import 'package:kenwell_health_app/ui/features/user_management/widgets/my_user_management_screen.dart';
 import 'package:kenwell_health_app/ui/features/user_management/widgets/user_management_screen_version_two.dart';
 import 'package:kenwell_health_app/ui/shared/ui/responsive/responsive_breakpoints.dart';
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
@@ -39,9 +40,18 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           role == 'PROJECT MANAGER';
     }
 
+    /*   bool isStaffRole(String role) {
+      return role == 'ADMIN' ||
+          role == 'TOP MANAGEMENT' ||
+          role == 'PROJECT MANAGER' ||
+          role == 'PROJECT COORDINATOR' ||
+          role == 'HEALTH PRACTITIONER';
+    } */
+
     // Define tabs and destinations based on role
     final List<Widget> allTabs = [
-      const UserManagementScreenVersionTwo(),
+      //const UserManagementScreenVersionTwo(),
+      const MyUserMangementScreen(),
       const StatsReportScreen(),
       const CalendarScreen(),
       const MyProfileMenuScreen(),
@@ -54,7 +64,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       const MyProfileMenuScreen(),
     ];
     final List<Widget> restrictedTabs = [
-      //const CalendarScreen(),
+      const CalendarScreen(),
       const MyProfileMenuScreen(),
       const MyEventScreen(),
     ];
@@ -103,11 +113,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       ),
     ];
     final List<NavigationRailDestination> restrictedRailDestinations = [
-      //const NavigationRailDestination(
-      //icon: Icon(Icons.calendar_today_outlined),
-      //selectedIcon: Icon(Icons.calendar_today),
-      //label: Text('Planner'),
-      //),
+      const NavigationRailDestination(
+        icon: Icon(Icons.calendar_today_outlined),
+        selectedIcon: Icon(Icons.calendar_today),
+        label: Text('Planner'),
+      ),
       const NavigationRailDestination(
         icon: Icon(Icons.person_outline),
         selectedIcon: Icon(Icons.person),
@@ -164,11 +174,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       ),
     ];
     final List<NavigationDestination> restrictedNavDestinations = [
-      //const NavigationDestination(
-      //icon: Icon(Icons.calendar_today_outlined),
-      //selectedIcon: Icon(Icons.calendar_today),
-      //label: 'Planner',
-      //),
+      const NavigationDestination(
+        icon: Icon(Icons.calendar_today_outlined),
+        selectedIcon: Icon(Icons.calendar_today),
+        label: 'Planner',
+      ),
       const NavigationDestination(
         icon: Icon(Icons.person_outline),
         selectedIcon: Icon(Icons.person),

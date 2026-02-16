@@ -227,7 +227,7 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
                                       Icon(Icons.badge, size: 18),
                                       SizedBox(width: 6),
                                       Text(
-                                        'ID Number',
+                                        'SA ID Number',
                                         style: TextStyle(
                                             fontWeight: FontWeight.w600),
                                       ),
@@ -242,7 +242,7 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
                                       Icon(Icons.credit_card, size: 18),
                                       SizedBox(width: 6),
                                       Text(
-                                        'Passport',
+                                        'Passport Number',
                                         style: TextStyle(
                                             fontWeight: FontWeight.w600),
                                       ),
@@ -270,9 +270,9 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
                     controller: _idController,
                     decoration: InputDecoration(
                       labelText:
-                          _searchType == 0 ? 'ID Number' : 'Passport Number',
+                          _searchType == 0 ? 'SA ID Number' : 'Passport Number',
                       hintText: _searchType == 0
-                          ? 'Enter 13-digit ID number'
+                          ? 'Enter 13-digit South African ID number'
                           : 'Enter passport number',
                       prefixIcon: const Icon(Icons.badge),
                       border: OutlineInputBorder(

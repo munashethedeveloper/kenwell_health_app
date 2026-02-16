@@ -12,21 +12,14 @@ class RolePermissions {
     '/forgot-password': [...UserRoles.values],
     '/': [...UserRoles.values],
     // Calendar is accessible to ALL users regardless of role
-    '/calendar': [
-      'ADMIN',
-      'TOP MANAGEMENT',
-      'PROJECT MANAGER',
-      'PROJECT COORDINATOR',
-      'HEALTH PRACTITIONER',
-      'CLIENT',
-    ],
+    '/calendar': [...UserRoles.values],
     '/event-details': [...UserRoles.values],
     '/profile': [...UserRoles.values],
     '/my-profile-menu': [...UserRoles.values],
     '/help': [...UserRoles.values],
 
     // Admin-only routes
-    '/user-management': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
+    '/my-user-management': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     '/user-management-version-two': [
       'ADMIN',
       'TOP MANAGEMENT',
@@ -130,6 +123,10 @@ class RolePermissions {
       'CLIENT',
     ],
     'allocate_events': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT COORDINATOR'],
+
+    //Member Management Permissions
+    'create_member': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
+    'edit_member': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
 
     // User Management Permissions
     'create_user': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
