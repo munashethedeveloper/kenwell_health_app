@@ -369,8 +369,7 @@ class MemberDetailsViewModel extends ChangeNotifier {
       _members.removeWhere((m) => m.id == memberId);
       
       _setSuccess('$memberName deleted successfully');
-      _isLoading = false;
-      notifyListeners();
+      _setLoading(false);
       return true;
     } catch (e) {
       _setError('Failed to delete $memberName');
