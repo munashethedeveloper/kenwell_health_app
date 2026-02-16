@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:geocoding/geocoding.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../data/repositories_dcl/event_repository.dart';
 import '../../../../domain/enums/service_type.dart';
@@ -233,6 +234,73 @@ class EventViewModel extends ChangeNotifier {
   void updateProvince(String value) {
     province = value;
     notifyListeners();
+  }
+
+  /// Geocode address and auto-fill town/city and province
+  Future<void> geocodeAddress(String address) async {
+    if (address.trim().isEmpty) return;
+
+    try {
+      // Get locations from address
+      final locations = await locationFromAddress(address);
+      
+      if (locations.isEmpty) {
+        debugPrint('EventViewModel: No locations found for address: $address');
+        return;
+      }
+
+      // Get placemarks from coordinates
+      final placemarks = await placemarkFromCoordinates(
+        locations.first.latitude,
+        locations.first.longitude,
+      );
+
+      if (placemarks.isEmpty) {
+        debugPrint('EventViewModel: No placemarks found for coordinates');
+        return;
+      }
+
+      final placemark = placemarks.first;
+      
+      // Auto-fill town/city
+      final city = placemark.locality ?? placemark.subAdministrativeArea ?? '';
+      if (city.isNotEmpty && townCityController.text.isEmpty) {
+        townCityController.text = city;
+      }
+
+      // Auto-fill province - match to our province list
+      final provinceName = placemark.administrativeArea ?? '';
+      if (provinceName.isNotEmpty) {
+        // Map province names to match our dropdown values
+        final provinceMapping = {
+          'Gauteng': 'Gauteng',
+          'Western Cape': 'Western Cape',
+          'KwaZulu-Natal': 'KwaZulu-Natal',
+          'Eastern Cape': 'Eastern Cape',
+          'Limpopo': 'Limpopo',
+          'Mpumalanga': 'Mpumalanga',
+          'North West': 'North West',
+          'Free State': 'Free State',
+          'Northern Cape': 'Northern Cape',
+        };
+
+        // Try to find matching province
+        final matchedProvince = provinceMapping.entries.firstWhere(
+          (entry) => provinceName.toLowerCase().contains(entry.key.toLowerCase()),
+          orElse: () => MapEntry(provinceName, provinceName),
+        );
+
+        if (province == null || province!.isEmpty) {
+          updateProvince(matchedProvince.value);
+        }
+      }
+
+      notifyListeners();
+      debugPrint('EventViewModel: Geocoded - City: $city, Province: $provinceName');
+    } catch (e) {
+      debugPrint('EventViewModel: Error geocoding address: $e');
+      // Silently fail - don't show error to user as this is a convenience feature
+    }
   }
 
   // Pick time using TimePicker

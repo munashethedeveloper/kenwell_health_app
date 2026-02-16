@@ -5,7 +5,7 @@ import '../../../../shared/ui/form/kenwell_form_styles.dart';
 import '../../view_model/event_view_model.dart';
 
 /// Event location information form section
-class EventLocationSection extends StatelessWidget {
+class EventLocationSection extends StatefulWidget {
   final EventViewModel viewModel;
   final String? Function(String?, String?) requiredField;
 
@@ -16,6 +16,55 @@ class EventLocationSection extends StatelessWidget {
     required this.requiredField,
   });
 
+  @override
+  State<EventLocationSection> createState() => _EventLocationSectionState();
+}
+
+class _EventLocationSectionState extends State<EventLocationSection> {
+  final FocusNode _addressFocusNode = FocusNode();
+  bool _isGeocoding = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Listen for focus changes on address field
+    _addressFocusNode.addListener(_onAddressFocusChange);
+  }
+
+  @override
+  void dispose() {
+    _addressFocusNode.removeListener(_onAddressFocusChange);
+    _addressFocusNode.dispose();
+    super.dispose();
+  }
+
+  /// Handle address field focus change
+  void _onAddressFocusChange() {
+    if (!_addressFocusNode.hasFocus && !_isGeocoding) {
+      _geocodeAddress();
+    }
+  }
+
+  /// Geocode the address and auto-fill fields
+  Future<void> _geocodeAddress() async {
+    final address = widget.viewModel.addressController.text.trim();
+    if (address.isEmpty) return;
+
+    setState(() {
+      _isGeocoding = true;
+    });
+
+    try {
+      await widget.viewModel.geocodeAddress(address);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isGeocoding = false;
+        });
+      }
+    }
+  }
+
   // Build method
   @override
   Widget build(BuildContext context) {
@@ -24,23 +73,39 @@ class EventLocationSection extends StatelessWidget {
         // Address field
         KenwellTextField(
           label: 'Address',
-          controller: viewModel.addressController,
+          controller: widget.viewModel.addressController,
           padding: EdgeInsets.zero,
-          validator: (value) => requiredField('Address', value),
+          validator: (value) => widget.requiredField('Address', value),
+          focusNode: _addressFocusNode,
+          textInputAction: TextInputAction.done,
+          onEditingComplete: () {
+            // When user presses enter/done, geocode the address
+            _geocodeAddress();
+          },
+          suffixIcon: _isGeocoding
+              ? const Padding(
+                  padding: EdgeInsets.all(12.0),
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                )
+              : null,
         ),
         const SizedBox(height: 24),
         // Town/City field
         KenwellTextField(
           label: 'Town/City',
-          controller: viewModel.townCityController,
+          controller: widget.viewModel.townCityController,
           padding: EdgeInsets.zero,
-          validator: (value) => requiredField('Town/City', value),
+          validator: (value) => widget.requiredField('Town/City', value),
         ),
         const SizedBox(height: 24),
         // Province dropdown field
         KenwellDropdownField<String>(
           label: 'Province',
-          value: viewModel.province,
+          value: widget.viewModel.province,
           items: const [
             'Gauteng',
             'Western Cape',
@@ -53,7 +118,7 @@ class EventLocationSection extends StatelessWidget {
             'Northern Cape'
           ],
           onChanged: (val) {
-            if (val != null) viewModel.updateProvince(val);
+            if (val != null) widget.viewModel.updateProvince(val);
           },
           decoration: KenwellFormStyles.decoration(
             label: 'Province',
@@ -64,9 +129,9 @@ class EventLocationSection extends StatelessWidget {
         // Venue field
         KenwellTextField(
           label: 'Venue',
-          controller: viewModel.venueController,
+          controller: widget.viewModel.venueController,
           padding: EdgeInsets.zero,
-          validator: (value) => requiredField('Venue', value),
+          validator: (value) => widget.requiredField('Venue', value),
         ),
       ],
     );
