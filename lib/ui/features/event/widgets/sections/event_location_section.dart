@@ -214,27 +214,32 @@ class _EventLocationSectionState extends State<EventLocationSection> {
           const SizedBox(height: 24),
           // Address field with autocomplete
           TypeAheadField<AddressSuggestion>(
-            textFieldConfiguration: TextFieldConfiguration(
-              controller: widget.viewModel.addressController,
-              focusNode: _addressFocusNode,
-              decoration: KenwellFormStyles.decoration(
-                label: 'Address',
-                hint: 'Start typing address...',
-                suffixIcon: _isGeocoding
-                    ? const Padding(
-                        padding: EdgeInsets.all(12.0),
-                        child: SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      )
-                    : const Icon(Icons.location_on, color: Color(0xFF201C58)),
-              ).copyWith(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              ),
-              textInputAction: TextInputAction.next,
-            ),
+            builder: (context, controller, focusNode) {
+              return TextFormField(
+                controller: controller,
+                focusNode: focusNode,
+                decoration: KenwellFormStyles.decoration(
+                  label: 'Address',
+                  hint: 'Start typing address...',
+                  suffixIcon: _isGeocoding
+                      ? const Padding(
+                          padding: EdgeInsets.all(12.0),
+                          child: SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        )
+                      : const Icon(Icons.location_on, color: Color(0xFF201C58)),
+                ).copyWith(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+                textInputAction: TextInputAction.next,
+                validator: (value) => widget.requiredField('Address', value),
+              );
+            },
+            controller: widget.viewModel.addressController,
+            focusNode: _addressFocusNode,
             suggestionsCallback: _searchAddresses,
             itemBuilder: (context, AddressSuggestion suggestion) {
               return ListTile(
@@ -246,8 +251,8 @@ class _EventLocationSectionState extends State<EventLocationSection> {
                 dense: true,
               );
             },
-            onSuggestionSelected: _onAddressSelected,
-            noItemsFoundBuilder: (context) {
+            onSelected: _onAddressSelected,
+            emptyBuilder: (context) {
               return const Padding(
                 padding: EdgeInsets.all(12.0),
                 child: Text(
