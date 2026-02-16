@@ -6,6 +6,7 @@ import '../../../../../domain/constants/role_permissions.dart';
 import '../../../../shared/ui/containers/gradient_container.dart';
 import '../../../profile/view_model/profile_view_model.dart';
 import '../../view_model/member_registration_view_model.dart';
+import '../member_events_screen.dart';
 import 'member_card_widget.dart';
 import 'member_filter_chips.dart';
 import 'member_search_bar.dart';
@@ -78,6 +79,18 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
               ),
             ),
             const SizedBox(height: 24),
+            // View Events option
+            ListTile(
+              leading: Icon(Icons.event, color: theme.colorScheme.primary),
+              title: Text(
+                'View Events',
+                style: theme.textTheme.bodyMedium,
+              ),
+              onTap: () {
+                context.pop();
+                _navigateToMemberEvents(member);
+              },
+            ),
             if (canDelete)
               ListTile(
                 leading: Icon(Icons.delete, color: theme.colorScheme.error),
@@ -96,7 +109,7 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
-                  'No actions available',
+                  'Tap an option above',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -105,6 +118,14 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
             const SizedBox(height: 16),
           ],
         ),
+      ),
+    );
+  }
+
+  void _navigateToMemberEvents(Member member) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => MemberEventsScreen(member: member),
       ),
     );
   }

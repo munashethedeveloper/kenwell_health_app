@@ -195,4 +195,110 @@ class FirestoreMemberRepository {
       'updatedAt': Timestamp.fromDate(member.updatedAt),
     };
   }
+
+  /// Fetch events attended by a member
+  /// Returns a list of event IDs and event data that this member participated in
+  Future<List<Map<String, dynamic>>> fetchMemberEvents(String memberId) async {
+    try {
+      // First, find the member
+      final member = await fetchMemberById(memberId);
+      if (member == null) {
+        debugPrint('Member not found: $memberId');
+        return [];
+      }
+
+      final events = <Map<String, dynamic>>[];
+
+      // Add the member's registered event if exists
+      if (member.eventId != null && member.eventId!.isNotEmpty) {
+        try {
+          final eventDoc = await FirebaseFirestore.instance
+              .collection('wellness_events')
+              .doc(member.eventId)
+              .get();
+          
+          if (eventDoc.exists) {
+            final eventData = eventDoc.data();
+            if (eventData != null) {
+              events.add({
+                'eventId': eventDoc.id,
+                'eventTitle': eventData['title'] ?? 'Unknown Event',
+                'eventDate': eventData['date'],
+                'eventVenue': eventData['venue'] ?? '',
+                'eventLocation': eventData['address'] ?? '',
+                'source': 'registration',
+              });
+            }
+          }
+        } catch (e) {
+          debugPrint('Error fetching member registration event: $e');
+        }
+      }
+
+      // Also check wellness_sessions for any sessions this member participated in
+      try {
+        final sessionsQuery = await FirebaseFirestore.instance
+            .collection('wellness_sessions')
+            .where('memberDetails.id', isEqualTo: memberId)
+            .get();
+
+        for (var sessionDoc in sessionsQuery.docs) {
+          final sessionData = sessionDoc.data();
+          final eventId = sessionData['eventId'] as String?;
+          
+          if (eventId != null) {
+            // Avoid duplicates
+            if (!events.any((e) => e['eventId'] == eventId)) {
+              try {
+                final eventDoc = await FirebaseFirestore.instance
+                    .collection('wellness_events')
+                    .doc(eventId)
+                    .get();
+                
+                if (eventDoc.exists) {
+                  final eventData = eventDoc.data();
+                  if (eventData != null) {
+                    events.add({
+                      'eventId': eventDoc.id,
+                      'eventTitle': eventData['title'] ?? 'Unknown Event',
+                      'eventDate': eventData['date'],
+                      'eventVenue': eventData['venue'] ?? '',
+                      'eventLocation': eventData['address'] ?? '',
+                      'source': 'wellness_session',
+                      'sessionId': sessionDoc.id,
+                    });
+                  }
+                }
+              } catch (e) {
+                debugPrint('Error fetching event for session: $e');
+              }
+            }
+          }
+        }
+      } catch (e) {
+        debugPrint('Error querying wellness sessions: $e');
+      }
+
+      // Sort events by date (most recent first)
+      events.sort((a, b) {
+        final aDate = a['eventDate'];
+        final bDate = b['eventDate'];
+        if (aDate == null || bDate == null) return 0;
+        
+        try {
+          final aTimestamp = aDate is Timestamp ? aDate.toDate() : DateTime.parse(aDate.toString());
+          final bTimestamp = bDate is Timestamp ? bDate.toDate() : DateTime.parse(bDate.toString());
+          return bTimestamp.compareTo(aTimestamp); // Most recent first
+        } catch (e) {
+          return 0;
+        }
+      });
+
+      return events;
+    } catch (e, stackTrace) {
+      debugPrint('Error fetching member events: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      return [];
+    }
+  }
 }
