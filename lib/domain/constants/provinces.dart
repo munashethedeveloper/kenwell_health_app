@@ -22,17 +22,20 @@ class SouthAfricanProvinces {
   static String? match(String provinceName) {
     if (provinceName.isEmpty) return null;
     
+    final lowerProvinceName = provinceName.toLowerCase();
+    
     // Try exact match first (case-insensitive)
     for (final province in all) {
-      if (province.toLowerCase() == provinceName.toLowerCase()) {
+      if (province.toLowerCase() == lowerProvinceName) {
         return province;
       }
     }
     
     // Try partial match (case-insensitive)
     for (final province in all) {
-      if (province.toLowerCase().contains(provinceName.toLowerCase()) ||
-          provinceName.toLowerCase().contains(province.toLowerCase())) {
+      final lowerProvince = province.toLowerCase();
+      if (lowerProvince.contains(lowerProvinceName) ||
+          lowerProvinceName.contains(lowerProvince)) {
         return province;
       }
     }

@@ -262,11 +262,13 @@ class EventViewModel extends ChangeNotifier {
       }
 
       final placemark = placemarks.first;
+      bool fieldsUpdated = false;
       
       // Auto-fill town/city
       final city = placemark.locality ?? placemark.subAdministrativeArea ?? '';
       if (city.isNotEmpty && townCityController.text.isEmpty) {
         townCityController.text = city;
+        fieldsUpdated = true;
       }
 
       // Auto-fill province - match to our province list
@@ -278,13 +280,16 @@ class EventViewModel extends ChangeNotifier {
         final matchedProvince = SouthAfricanProvinces.match(provinceName);
         if (matchedProvince != null) {
           updateProvince(matchedProvince);
+          fieldsUpdated = true;
           debugPrint('EventViewModel: Geocoded - City: $city, Province: $matchedProvince');
         } else {
           debugPrint('EventViewModel: Could not match province "$provinceName" to known provinces');
         }
       }
 
-      notifyListeners();
+      if (fieldsUpdated) {
+        notifyListeners();
+      }
     } catch (e) {
       debugPrint('EventViewModel: Error geocoding address: $e');
       // Silently fail - don't show error to user as this is a convenience feature
