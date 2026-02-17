@@ -461,18 +461,20 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                     child: _buildEmptyState(theme),
                   )
                 else
-                  Padding(
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                      children: filteredUsers.map((user) {
-                        return UserCardWidget(
-                          user: user,
-                          onTap: () => _showUserOptions(user),
-                          onResetPassword: () => _resetPassword(user, viewModel),
-                          onDelete: () => _deleteUser(user, viewModel),
-                        );
-                      }).toList(),
-                    ),
+                    itemCount: filteredUsers.length,
+                    itemBuilder: (context, index) {
+                      final user = filteredUsers[index];
+                      return UserCardWidget(
+                        user: user,
+                        onTap: () => _showUserOptions(user),
+                        onResetPassword: () => _resetPassword(user, viewModel),
+                        onDelete: () => _deleteUser(user, viewModel),
+                      );
+                    },
                   ),
                 const SizedBox(height: 16),
               ],

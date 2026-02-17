@@ -333,17 +333,19 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                     child: _buildEmptyState(theme),
                   )
                 else
-                  Padding(
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                      children: filteredMembers.map((member) {
-                        return MemberCardWidget(
-                          member: member,
-                          onTap: () => _showMemberOptions(member),
-                          onDelete: () => _deleteMember(member, viewModel),
-                        );
-                      }).toList(),
-                    ),
+                    itemCount: filteredMembers.length,
+                    itemBuilder: (context, index) {
+                      final member = filteredMembers[index];
+                      return MemberCardWidget(
+                        member: member,
+                        onTap: () => _showMemberOptions(member),
+                        onDelete: () => _deleteMember(member, viewModel),
+                      );
+                    },
                   ),
                 const SizedBox(height: 16),
               ],
