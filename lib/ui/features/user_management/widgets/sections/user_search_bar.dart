@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/custom_text_field.dart';
 
 /// Search bar for filtering users by name or email
 class UserSearchBar extends StatelessWidget {
@@ -20,6 +21,7 @@ class UserSearchBar extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: TextField(
+        //label: 'Search Users',
         controller: controller,
         decoration: InputDecoration(
           hintText: 'Search user\'s by name or email...',

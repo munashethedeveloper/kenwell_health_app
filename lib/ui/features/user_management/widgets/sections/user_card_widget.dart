@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import '../../../../../domain/models/user_model.dart';
+import '../../../../shared/ui/badges/number_badge.dart';
 
 /// Displays a user card with swipe actions for reset password and delete
 class UserCardWidget extends StatelessWidget {
@@ -8,6 +9,7 @@ class UserCardWidget extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback onResetPassword;
   final VoidCallback onDelete;
+  final int? number; // Optional numbering for the card
 
   const UserCardWidget({
     super.key,
@@ -15,6 +17,7 @@ class UserCardWidget extends StatelessWidget {
     required this.onTap,
     required this.onResetPassword,
     required this.onDelete,
+    this.number,
   });
 
   @override
@@ -46,14 +49,14 @@ class UserCardWidget extends StatelessWidget {
             backgroundColor: theme.colorScheme.primary,
             foregroundColor: theme.colorScheme.onPrimary,
             icon: Icons.lock_reset,
-            label: 'Reset',
+            label: 'Reset Password',
           ),
           SlidableAction(
             onPressed: (_) => onDelete(),
             backgroundColor: theme.colorScheme.error,
             foregroundColor: theme.colorScheme.onError,
             icon: Icons.delete,
-            label: 'Delete',
+            label: 'Delete User',
           ),
         ],
       ),
@@ -77,6 +80,12 @@ class UserCardWidget extends StatelessWidget {
             ),
             child: Row(
               children: [
+                // Number badge (if provided)
+                if (number != null) ...[
+                  NumberBadge(number: number!),
+                  const SizedBox(width: 12),
+                ],
+
                 // Icon instead of avatar with initials
                 Icon(
                   roleIcons[role] ?? Icons.person,

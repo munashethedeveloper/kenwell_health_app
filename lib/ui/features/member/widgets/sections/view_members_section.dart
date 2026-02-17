@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_section_header.dart';
+import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
 import '../../../../../domain/models/member.dart';
 import '../../../../../domain/constants/role_permissions.dart';
@@ -245,115 +246,147 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
         final filterActive = viewModel.selectedFilter != 'All' ||
             viewModel.searchQuery.isNotEmpty;
 
-        return Column(
-          children: [
-            const SizedBox(height: 16),
-            // const KenwellSectionHeader(
-            // title: "List of Members",
-            //subtitle: "View and manage your members here",
-            // ),
-            //const SizedBox(height: 16),
-            // Stats header
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: GradientContainer.purpleGreen(
-                padding: const EdgeInsets.all(16),
-                child: Row(
+        return RefreshIndicator(
+          onRefresh: viewModel.loadMembers,
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              SliverToBoxAdapter(
+                child: Column(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(
-                        Icons.people,
-                        color: Colors.white,
-                        size: 28,
+                    const AppLogo(size: 200),
+
+                    const SizedBox(height: 16), // Stats header
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: GradientContainer.purpleGreen(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(
+                                Icons.people,
+                                color: Colors.white,
+                                size: 28,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Show filter status and member counts
+                                  Text(
+                                    filterActive
+                                        ? 'Showing Members: ${filteredMembers.length} of $totalMembers'
+                                        : '$totalMembers Total Members',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
+                    const SizedBox(height: 16),
+                    // Search and filter section with background
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF5F5F5),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.grey.shade300,
+                          width: 1,
+                        ),
+                      ),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Show filter status and member counts
-                          Text(
-                            filterActive
-                                ? 'Showing Members: ${filteredMembers.length} of $totalMembers'
-                                : '$totalMembers Total Members',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          MemberSearchBar(
+                            controller: _searchController,
+                            searchQuery: viewModel.searchQuery,
+                            onChanged: (value) =>
+                                viewModel.setSearchQuery(value),
+                            onClear: () {
+                              _searchController.clear();
+                              viewModel.clearSearch();
+                            },
+                          ),
+                          const SizedBox(height: 8),
+                          MemberFilterChips(
+                            selectedFilter: viewModel.selectedFilter,
+                            onFilterChanged: viewModel.setFilter,
                           ),
                         ],
                       ),
                     ),
+                    const SizedBox(height: 50),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: KenwellSectionHeader(
+                          title: 'Registered Members',
+                          subtitle:
+                              'Quickly view and manage all registered members in one place.',
+                        ),
+                      ),
+                    ),
+                    Text(
+                      'Tap on a member to view extra options:',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
                   ],
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-            // Search and filter section with background
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF5F5F5),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Colors.grey.shade300,
-                  width: 1,
-                ),
-              ),
-              child: Column(
-                children: [
-                  MemberSearchBar(
-                    controller: _searchController,
-                    searchQuery: viewModel.searchQuery,
-                    onChanged: (value) => viewModel.setSearchQuery(value),
-                    onClear: () {
-                      _searchController.clear();
-                      viewModel.clearSearch();
-                    },
+              // Member list
+              if (filteredMembers.isEmpty)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 100),
+                    child: _buildEmptyState(theme),
                   ),
-                  const SizedBox(height: 8),
-                  MemberFilterChips(
-                    selectedFilter: viewModel.selectedFilter,
-                    onFilterChanged: viewModel.setFilter,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            const KenwellSectionHeader(
-              title: "List of Members",
-              //subtitle: "View and manage your members here",
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: filteredMembers.isEmpty
-                  ? _buildEmptyState(theme)
-                  : RefreshIndicator(
-                      onRefresh: viewModel.loadMembers,
-                      child: ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: filteredMembers.length,
-                        itemBuilder: (context, index) {
-                          final member = filteredMembers[index];
-                          return MemberCardWidget(
-                            member: member,
-                            onTap: () => _showMemberOptions(member),
-                            onDelete: () => _deleteMember(member, viewModel),
-                            onViewDetails: () => _showMemberOptions(member),
-                          );
-                        },
-                      ),
+                )
+              else
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final member = filteredMembers[index];
+                        return MemberCardWidget(
+                          member: member,
+                          number: index + 1, // Add sequential numbering
+                          onTap: () => _showMemberOptions(member),
+                          onDelete: () => _deleteMember(member, viewModel),
+                          onViewDetails: () => _showMemberOptions(member),
+                        );
+                      },
+                      childCount: filteredMembers.length,
                     ),
-            ),
-          ],
+                  ),
+                ),
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 16),
+              ),
+            ],
+          ),
         );
       },
     );

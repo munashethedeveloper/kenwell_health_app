@@ -23,7 +23,7 @@ class RegistrationManagementScreenBody extends StatelessWidget {
       builder: (context, vm, _) => Scaffold(
         backgroundColor: Colors.white,
         appBar: const KenwellAppBar(
-          title: 'My Registration Management',
+          title: 'Registration Management',
           titleColor: Color(0xFF201C58),
           titleStyle: TextStyle(
             color: Color(0xFF201C58),

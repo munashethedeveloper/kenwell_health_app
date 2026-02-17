@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import '../../../../../domain/models/member.dart';
+import '../../../../shared/ui/badges/number_badge.dart';
 
 /// Widget to display member information as a card
 /// Styled to match the user_card_widget look and feel
@@ -9,6 +10,7 @@ class MemberCardWidget extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback? onViewDetails;
   final VoidCallback? onDelete;
+  final int? number;
 
   const MemberCardWidget({
     super.key,
@@ -16,6 +18,7 @@ class MemberCardWidget extends StatelessWidget {
     required this.onTap,
     required this.onViewDetails,
     required this.onDelete,
+    this.number,
   });
 
   // Static constants to avoid recreating on each build
@@ -77,6 +80,11 @@ class MemberCardWidget extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
+                        // Number badge (if provided)
+                        if (number != null) ...[
+                          NumberBadge(number: number!),
+                          const SizedBox(width: 12),
+                        ],
                         // Gender icon (left side)
                         Icon(
                           genderIcon,

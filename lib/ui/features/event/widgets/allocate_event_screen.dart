@@ -2,8 +2,11 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_section_header.dart';
+import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/containers/gradient_container.dart';
+import '../../../shared/ui/badges/number_badge.dart';
 import '../../user_management/viewmodel/user_management_view_model.dart';
 import '../../user_management/widgets/sections/user_filter_chips.dart';
 import '../../user_management/widgets/sections/user_search_bar.dart';
@@ -258,7 +261,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
     );
   }
 
-  Widget _buildUserCard(UserModel user, ThemeData theme) {
+  Widget _buildUserCard(UserModel user, ThemeData theme, {int? number}) {
     final isAssigned = _assignedUserIds.contains(user.id);
 
     final roleIcons = {
@@ -308,6 +311,12 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
           ),
           child: Row(
             children: [
+              // Number badge (if provided)
+              if (number != null) ...[
+                NumberBadge(number: number),
+                const SizedBox(width: 12),
+              ],
+
               // Icon instead of avatar with initials
               Icon(
                 roleIcons[user.role] ?? Icons.person,
@@ -456,6 +465,8 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  const AppLogo(size: 200),
+                  const SizedBox(height: 16),
                   Icon(
                     Icons.people_outline,
                     size: 64,
@@ -482,133 +493,174 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
             );
           }
 
-          return Column(
-            children: [
-              const SizedBox(height: 16),
-              // Stats header
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: GradientContainer.purpleGreen(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
+          return RefreshIndicator(
+            onRefresh: viewModel.loadUsers,
+            child: CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Column(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(
-                          Icons.people,
-                          color: Colors.white,
-                          size: 28,
+                      const AppLogo(size: 200),
+
+                      const SizedBox(height: 16), // Stats header
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: GradientContainer.purpleGreen(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(
+                                  Icons.people,
+                                  color: Colors.white,
+                                  size: 28,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Show filter status and user counts
+                                    Text(
+                                      filterActive
+                                          ? 'Showing Users: ${filteredUsers.length} of $totalUsers'
+                                          : '$totalUsers Total Users',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.verified,
+                                          color: Colors.white
+                                              .withValues(alpha: 0.9),
+                                          size: 16,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          '$assignedCount assigned',
+                                          style: TextStyle(
+                                            color: Colors.white
+                                                .withValues(alpha: 0.9),
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Icon(
+                                          Icons.error_outline,
+                                          color: Colors.white
+                                              .withValues(alpha: 0.9),
+                                          size: 16,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          '$notAssignedCount not assigned',
+                                          style: TextStyle(
+                                            color: Colors.white
+                                                .withValues(alpha: 0.9),
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
+                      const SizedBox(height: 16),
+                      // Search and filter section with background
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF5F5F5),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.grey.shade300,
+                            width: 1,
+                          ),
+                        ),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Show filter status and user counts
-                            Text(
-                              filterActive
-                                  ? 'Showing Users: ${filteredUsers.length} of $totalUsers'
-                                  : '$totalUsers Total Users',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            UserSearchBar(
+                              controller: _searchController,
+                              searchQuery: viewModel.searchQuery,
+                              onChanged: (value) =>
+                                  viewModel.setSearchQuery(value),
+                              onClear: () {
+                                _searchController.clear();
+                                viewModel.clearSearch();
+                              },
                             ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.verified,
-                                  color: Colors.white.withValues(alpha: 0.9),
-                                  size: 16,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '$assignedCount assigned',
-                                  style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.9),
-                                    fontSize: 14,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Icon(
-                                  Icons.error_outline,
-                                  color: Colors.white.withValues(alpha: 0.9),
-                                  size: 16,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '$notAssignedCount not assigned',
-                                  style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.9),
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
+                            const SizedBox(height: 8),
+                            UserFilterChips(
+                              selectedFilter: viewModel.selectedFilter,
+                              onFilterChanged: viewModel.setFilter,
                             ),
                           ],
                         ),
                       ),
+                      const SizedBox(height: 50),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: KenwellSectionHeader(
+                            title: 'Assigned Users',
+                            subtitle:
+                                'Manage which users are assigned to this wellness event.',
+                          ),
+                        ),
+                      ),
+                      Text(
+                        'Tap on a user to assign or unassign them from this event.',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey.shade700,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
                     ],
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              // Search and filter section with background
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF5F5F5),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Colors.grey.shade300,
-                    width: 1,
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    UserSearchBar(
-                      controller: _searchController,
-                      searchQuery: viewModel.searchQuery,
-                      onChanged: (value) => viewModel.setSearchQuery(value),
-                      onClear: () {
-                        _searchController.clear();
-                        viewModel.clearSearch();
-                      },
-                    ),
-                    const SizedBox(height: 8),
-                    UserFilterChips(
-                      selectedFilter: viewModel.selectedFilter,
-                      onFilterChanged: viewModel.setFilter,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              // User list
-              Expanded(
-                child: filteredUsers.isEmpty
-                    ? _buildEmptyState(theme)
-                    : RefreshIndicator(
-                        onRefresh: viewModel.loadUsers,
-                        child: ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          itemCount: filteredUsers.length,
-                          itemBuilder: (context, index) {
-                            final user = filteredUsers[index];
-                            return _buildUserCard(user, theme);
-                          },
-                        ),
+                // User list
+                if (filteredUsers.isEmpty)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: _buildEmptyState(theme),
+                  )
+                else
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final user = filteredUsers[index];
+                          return _buildUserCard(user, theme, number: index + 1);
+                        },
+                        childCount: filteredUsers.length,
                       ),
-              ),
-            ],
+                    ),
+                  ),
+                const SliverToBoxAdapter(
+                  child: SizedBox(height: 16),
+                ),
+              ],
+            ),
           );
         },
       ),
