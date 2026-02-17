@@ -9,6 +9,15 @@ import 'sections/create_member_section.dart';
 import 'sections/view_members_section.dart';
 
 /// Member registration screen with create and view members functionality
+/// 
+/// This screen has TWO tabs:
+/// 1. "Create Members" tab - Form to register new event participants
+/// 2. "View Members" tab - List all members with search/filter functionality
+/// 
+/// Navigation Path: Main App → Users Tab → My User Management → Member Registration
+/// Route: /member-registration (name: 'memberRegistration')
+/// 
+/// See VIEW_MEMBERS_TAB_GUIDE.md for detailed navigation instructions
 class MemberRegistrationScreenVersionTwo extends StatefulWidget {
   const MemberRegistrationScreenVersionTwo({super.key});
 
