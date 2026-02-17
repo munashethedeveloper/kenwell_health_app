@@ -4,49 +4,58 @@ import 'package:provider/provider.dart';
 import '../../../../domain/constants/role_permissions.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../profile/view_model/profile_view_model.dart';
-import '../viewmodel/user_management_view_model.dart';
-import 'sections/create_user_section.dart';
-import 'sections/view_users_section.dart';
+import '../view_model/member_registration_view_model.dart';
+import 'sections/create_member_section.dart';
+import 'sections/view_members_section.dart';
 
-/// User management screen with create and view users functionality
-class UserManagementScreenVersionTwo extends StatefulWidget {
-  const UserManagementScreenVersionTwo({super.key});
+/// Member registration screen with create and view members functionality
+/// 
+/// This screen has TWO tabs:
+/// 1. "Create Members" tab - Form to register new event participants
+/// 2. "View Members" tab - List all members with search/filter functionality
+/// 
+/// Navigation Path: Main App → Users Tab → My User Management → Member Registration
+/// Route: /member-registration (name: 'memberRegistration')
+/// 
+/// See VIEW_MEMBERS_TAB_GUIDE.md for detailed navigation instructions
+class MemberRegistrationScreenVersionTwo extends StatefulWidget {
+  const MemberRegistrationScreenVersionTwo({super.key});
 
   @override
-  State<UserManagementScreenVersionTwo> createState() =>
-      _UserManagementScreenVersionTwoState();
+  State<MemberRegistrationScreenVersionTwo> createState() =>
+      _MemberRegistrationScreenVersionTwoState();
 }
 
-class _UserManagementScreenVersionTwoState
-    extends State<UserManagementScreenVersionTwo> {
+class _MemberRegistrationScreenVersionTwoState
+    extends State<MemberRegistrationScreenVersionTwo> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => UserManagementViewModel(),
+      create: (_) => MemberDetailsViewModel(),
       child: Builder(
         builder: (context) {
           final theme = Theme.of(context);
           final profileVM = context.watch<ProfileViewModel>();
 
           // Check permissions
-          final canCreateUser =
-              RolePermissions.canAccessFeature(profileVM.role, 'create_user');
-          final canViewUsers =
-              RolePermissions.canAccessFeature(profileVM.role, 'view_users');
+          final canCreateMember =
+              RolePermissions.canAccessFeature(profileVM.role, 'create_member');
+          final canViewMembers =
+              RolePermissions.canAccessFeature(profileVM.role, 'view_members');
 
           // Determine number of tabs based on permissions
           final List<Tab> tabs = [];
           final List<Widget> tabViews = [];
 
-          if (canCreateUser) {
+          if (canCreateMember) {
             tabs.add(
-                const Tab(icon: Icon(Icons.person_add), text: 'Create User'));
-            tabViews.add(const CreateUserSection());
+                const Tab(icon: Icon(Icons.person_add), text: 'Create Members'));
+            // Tab view will be created with callback later
           }
 
-          if (canViewUsers) {
-            tabs.add(const Tab(icon: Icon(Icons.group), text: 'View Users'));
-            tabViews.add(const ViewUsersSection());
+          if (canViewMembers) {
+            tabs.add(const Tab(icon: Icon(Icons.group), text: 'View Members'));
+            // Tab view will be created later
           }
 
           // If user has no permissions, show a message
@@ -54,7 +63,7 @@ class _UserManagementScreenVersionTwoState
             return Scaffold(
               appBar: const KenwellAppBar(
                 automaticallyImplyLeading: true,
-                title: 'User Management',
+                title: 'Member Management',
                 titleColor: Color(0xFF201C58),
                 titleStyle: TextStyle(
                   color: Color(0xFF201C58),
@@ -81,7 +90,7 @@ class _UserManagementScreenVersionTwoState
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'You do not have permission to access user management features.',
+                        'You do not have permission to access member management features.',
                         textAlign: TextAlign.center,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
@@ -98,7 +107,7 @@ class _UserManagementScreenVersionTwoState
             length: tabs.length,
             child: Scaffold(
               appBar: KenwellAppBar(
-                title: 'User Management',
+                title: 'Member Management',
                 titleColor: const Color(0xFF201C58),
                 titleStyle: const TextStyle(
                   color: Color(0xFF201C58),
@@ -128,21 +137,21 @@ class _UserManagementScreenVersionTwoState
                   tabs: tabs,
                 ),
                 actions: [
-                  // Refresh users button
+                  // Refresh members button
                   IconButton(
                     onPressed: () {
                       if (mounted) {
-                        context.read<UserManagementViewModel>().loadUsers();
+                        context.read<MemberDetailsViewModel>().loadMembers();
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Users refreshed'),
+                            content: Text('Members refreshed'),
                             duration: Duration(seconds: 1),
                           ),
                         );
                       }
                     },
                     icon: const Icon(Icons.refresh, color: Color(0xFF201C58)),
-                    tooltip: 'Refresh users',
+                    tooltip: 'Refresh members',
                   ),
                   TextButton.icon(
                     onPressed: () {
@@ -159,22 +168,22 @@ class _UserManagementScreenVersionTwoState
                   ),
                 ],
               ),
-              body: Consumer<UserManagementViewModel>(
+              body: Consumer<MemberDetailsViewModel>(
                 builder: (context, viewModel, child) {
-                  // Update tab views with onUserCreated callback
+                  // Build tab views with callbacks that use the view model
                   final dynamicTabViews = <Widget>[];
 
-                  if (canCreateUser) {
-                    dynamicTabViews.add(CreateUserSection(
-                      onUserCreated: () {
-                        // Reload users when a new user is created
-                        viewModel.loadUsers();
+                  if (canCreateMember) {
+                    dynamicTabViews.add(CreateMemberSection(
+                      onMemberCreated: () {
+                        // Reload members when a new member is created
+                        viewModel.loadMembers();
                       },
                     ));
                   }
 
-                  if (canViewUsers) {
-                    dynamicTabViews.add(const ViewUsersSection());
+                  if (canViewMembers) {
+                    dynamicTabViews.add(const ViewMembersSection());
                   }
 
                   return TabBarView(
