@@ -4,6 +4,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/containers/gradient_container.dart';
+import '../../../shared/ui/badges/number_badge.dart';
 import '../../user_management/viewmodel/user_management_view_model.dart';
 import '../../user_management/widgets/sections/user_filter_chips.dart';
 import '../../user_management/widgets/sections/user_search_bar.dart';
@@ -258,7 +259,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
     );
   }
 
-  Widget _buildUserCard(UserModel user, ThemeData theme) {
+  Widget _buildUserCard(UserModel user, ThemeData theme, {int? number}) {
     final isAssigned = _assignedUserIds.contains(user.id);
 
     final roleIcons = {
@@ -308,6 +309,12 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
           ),
           child: Row(
             children: [
+              // Number badge (if provided)
+              if (number != null) ...[
+                NumberBadge(number: number),
+                const SizedBox(width: 12),
+              ],
+              
               // Icon instead of avatar with initials
               Icon(
                 roleIcons[user.role] ?? Icons.person,
@@ -482,131 +489,143 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
             );
           }
 
-          return Column(
-            children: [
-              const SizedBox(height: 16),
-              // Stats header
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: GradientContainer.purpleGreen(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(
-                          Icons.people,
-                          color: Colors.white,
-                          size: 28,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+          return CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 16),
+                    // Stats header
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: GradientContainer.purpleGreen(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
                           children: [
-                            // Show filter status and user counts
-                            Text(
-                              filterActive
-                                  ? 'Showing Users: ${filteredUsers.length} of $totalUsers'
-                                  : '$totalUsers Total Users',
-                              style: const TextStyle(
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(
+                                Icons.people,
                                 color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
+                                size: 28,
                               ),
                             ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.verified,
-                                  color: Colors.white.withValues(alpha: 0.9),
-                                  size: 16,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '$assignedCount assigned',
-                                  style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.9),
-                                    fontSize: 14,
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Show filter status and user counts
+                                  Text(
+                                    filterActive
+                                        ? 'Showing Users: ${filteredUsers.length} of $totalUsers'
+                                        : '$totalUsers Total Users',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(width: 12),
-                                Icon(
-                                  Icons.error_outline,
-                                  color: Colors.white.withValues(alpha: 0.9),
-                                  size: 16,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '$notAssignedCount not assigned',
-                                  style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.9),
-                                    fontSize: 14,
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.verified,
+                                        color: Colors.white.withValues(alpha: 0.9),
+                                        size: 16,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '$assignedCount assigned',
+                                        style: TextStyle(
+                                          color: Colors.white.withValues(alpha: 0.9),
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Icon(
+                                        Icons.error_outline,
+                                        color: Colors.white.withValues(alpha: 0.9),
+                                        size: 16,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '$notAssignedCount not assigned',
+                                        style: TextStyle(
+                                          color: Colors.white.withValues(alpha: 0.9),
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              // Search and filter section with background
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF5F5F5),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Colors.grey.shade300,
-                    width: 1,
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    UserSearchBar(
-                      controller: _searchController,
-                      searchQuery: viewModel.searchQuery,
-                      onChanged: (value) => viewModel.setSearchQuery(value),
-                      onClear: () {
-                        _searchController.clear();
-                        viewModel.clearSearch();
-                      },
                     ),
-                    const SizedBox(height: 8),
-                    UserFilterChips(
-                      selectedFilter: viewModel.selectedFilter,
-                      onFilterChanged: viewModel.setFilter,
+                    const SizedBox(height: 16),
+                    // Search and filter section with background
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF5F5F5),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.grey.shade300,
+                          width: 1,
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          UserSearchBar(
+                            controller: _searchController,
+                            searchQuery: viewModel.searchQuery,
+                            onChanged: (value) => viewModel.setSearchQuery(value),
+                            onClear: () {
+                              _searchController.clear();
+                              viewModel.clearSearch();
+                            },
+                          ),
+                          const SizedBox(height: 8),
+                          UserFilterChips(
+                            selectedFilter: viewModel.selectedFilter,
+                            onFilterChanged: viewModel.setFilter,
+                          ),
+                        ],
+                      ),
                     ),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
               // User list
-              Expanded(
-                child: filteredUsers.isEmpty
-                    ? _buildEmptyState(theme)
-                    : RefreshIndicator(
-                        onRefresh: viewModel.loadUsers,
-                        child: ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          itemCount: filteredUsers.length,
-                          itemBuilder: (context, index) {
-                            final user = filteredUsers[index];
-                            return _buildUserCard(user, theme);
-                          },
-                        ),
-                      ),
+              if (filteredUsers.isEmpty)
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: _buildEmptyState(theme),
+                )
+              else
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final user = filteredUsers[index];
+                        return _buildUserCard(user, theme, number: index + 1);
+                      },
+                      childCount: filteredUsers.length,
+                    ),
+                  ),
+                ),
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 16),
               ),
             ],
           );
