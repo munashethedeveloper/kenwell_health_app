@@ -489,145 +489,148 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
             );
           }
 
-          return CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(
-                child: Column(
-                  children: [
-                    const SizedBox(height: 16),
-                    // Stats header
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: GradientContainer.purpleGreen(
-                        padding: const EdgeInsets.all(16),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(10),
+          return RefreshIndicator(
+            onRefresh: viewModel.loadUsers,
+            child: CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 16),
+                      // Stats header
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: GradientContainer.purpleGreen(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(
+                                  Icons.people,
+                                  color: Colors.white,
+                                  size: 28,
+                                ),
                               ),
-                              child: const Icon(
-                                Icons.people,
-                                color: Colors.white,
-                                size: 28,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Show filter status and user counts
-                                  Text(
-                                    filterActive
-                                        ? 'Showing Users: ${filteredUsers.length} of $totalUsers'
-                                        : '$totalUsers Total Users',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Show filter status and user counts
+                                    Text(
+                                      filterActive
+                                          ? 'Showing Users: ${filteredUsers.length} of $totalUsers'
+                                          : '$totalUsers Total Users',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.verified,
-                                        color: Colors.white.withValues(alpha: 0.9),
-                                        size: 16,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        '$assignedCount assigned',
-                                        style: TextStyle(
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.verified,
                                           color: Colors.white.withValues(alpha: 0.9),
-                                          fontSize: 14,
+                                          size: 16,
                                         ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Icon(
-                                        Icons.error_outline,
-                                        color: Colors.white.withValues(alpha: 0.9),
-                                        size: 16,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        '$notAssignedCount not assigned',
-                                        style: TextStyle(
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          '$assignedCount assigned',
+                                          style: TextStyle(
+                                            color: Colors.white.withValues(alpha: 0.9),
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Icon(
+                                          Icons.error_outline,
                                           color: Colors.white.withValues(alpha: 0.9),
-                                          fontSize: 14,
+                                          size: 16,
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          '$notAssignedCount not assigned',
+                                          style: TextStyle(
+                                            color: Colors.white.withValues(alpha: 0.9),
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Search and filter section with background
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF5F5F5),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.grey.shade300,
+                            width: 1,
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            UserSearchBar(
+                              controller: _searchController,
+                              searchQuery: viewModel.searchQuery,
+                              onChanged: (value) => viewModel.setSearchQuery(value),
+                              onClear: () {
+                                _searchController.clear();
+                                viewModel.clearSearch();
+                              },
+                            ),
+                            const SizedBox(height: 8),
+                            UserFilterChips(
+                              selectedFilter: viewModel.selectedFilter,
+                              onFilterChanged: viewModel.setFilter,
                             ),
                           ],
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    // Search and filter section with background
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 16),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF5F5F5),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Colors.grey.shade300,
-                          width: 1,
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-                          UserSearchBar(
-                            controller: _searchController,
-                            searchQuery: viewModel.searchQuery,
-                            onChanged: (value) => viewModel.setSearchQuery(value),
-                            onClear: () {
-                              _searchController.clear();
-                              viewModel.clearSearch();
-                            },
-                          ),
-                          const SizedBox(height: 8),
-                          UserFilterChips(
-                            selectedFilter: viewModel.selectedFilter,
-                            onFilterChanged: viewModel.setFilter,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                ),
-              ),
-              // User list
-              if (filteredUsers.isEmpty)
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: _buildEmptyState(theme),
-                )
-              else
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final user = filteredUsers[index];
-                        return _buildUserCard(user, theme, number: index + 1);
-                      },
-                      childCount: filteredUsers.length,
-                    ),
+                      const SizedBox(height: 16),
+                    ],
                   ),
                 ),
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 16),
-              ),
-            ],
+                // User list
+                if (filteredUsers.isEmpty)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: _buildEmptyState(theme),
+                  )
+                else
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final user = filteredUsers[index];
+                          return _buildUserCard(user, theme, number: index + 1);
+                        },
+                        childCount: filteredUsers.length,
+                      ),
+                    ),
+                  ),
+                const SliverToBoxAdapter(
+                  child: SizedBox(height: 16),
+                ),
+              ],
+            ),
           );
         },
       ),
