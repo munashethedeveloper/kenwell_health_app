@@ -29,6 +29,7 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
   String? _selectedProvince;
   DateTime? _startDate;
   DateTime? _endDate;
+  bool _isFilterExpanded = false;
 
   @override
   void initState() {
@@ -86,6 +87,15 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  int _getActiveFilterCount() {
+    int count = 0;
+    if (_selectedStatus != null) count++;
+    if (_selectedProvince != null) count++;
+    if (_startDate != null) count++;
+    if (_endDate != null) count++;
+    return count;
   }
 
   @override
@@ -254,147 +264,397 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Filter Section
-            KenwellFormCard(
+            // Modern Filter Section
+            Card(
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(
+                  color: Colors.grey.shade300,
+                  width: 1,
+                ),
+              ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Icon(Icons.filter_list,
-                          color: theme.primaryColor, size: 20),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Filters',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const Spacer(),
-                      if (_selectedStatus != null ||
-                          _selectedProvince != null ||
-                          _startDate != null ||
-                          _endDate != null)
-                        TextButton.icon(
-                          onPressed: () {
-                            setState(() {
-                              _selectedStatus = null;
-                              _selectedProvince = null;
-                              _startDate = null;
-                              _endDate = null;
-                            });
-                          },
-                          icon: const Icon(Icons.clear, size: 16),
-                          label: const Text('Clear'),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Status Filter
-                  DropdownButtonFormField<String>(
-                    value: _selectedStatus,
-                    decoration: InputDecoration(
-                      labelText: 'Status',
-                      prefixIcon: const Icon(Icons.assignment),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    items: ['All', 'Scheduled', 'In Progress', 'Completed']
-                        .map((status) => DropdownMenuItem(
-                              value: status,
-                              child: Text(status),
-                            ))
-                        .toList(),
-                    onChanged: (value) {
+                  // Filter Header
+                  InkWell(
+                    onTap: () {
                       setState(() {
-                        _selectedStatus = value;
+                        _isFilterExpanded = !_isFilterExpanded;
                       });
                     },
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Province Filter
-                  DropdownButtonFormField<String>(
-                    value: _selectedProvince,
-                    decoration: InputDecoration(
-                      labelText: 'Province',
-                      prefixIcon: const Icon(Icons.location_on),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: theme.primaryColor.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.tune,
+                              color: theme.primaryColor,
+                              size: 20,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'Filters',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          if (_selectedStatus != null ||
+                              _selectedProvince != null ||
+                              _startDate != null ||
+                              _endDate != null) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: theme.primaryColor,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                _getActiveFilterCount().toString(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                          const Spacer(),
+                          if (_selectedStatus != null ||
+                              _selectedProvince != null ||
+                              _startDate != null ||
+                              _endDate != null)
+                            TextButton.icon(
+                              onPressed: () {
+                                setState(() {
+                                  _selectedStatus = null;
+                                  _selectedProvince = null;
+                                  _startDate = null;
+                                  _endDate = null;
+                                });
+                              },
+                              icon: const Icon(Icons.clear_all, size: 16),
+                              label: const Text('Clear'),
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                              ),
+                            ),
+                          Icon(
+                            _isFilterExpanded
+                                ? Icons.expand_less
+                                : Icons.expand_more,
+                            color: Colors.grey[600],
+                          ),
+                        ],
                       ),
                     ),
-                    items: [
-                      'All',
-                      ...allEvents
-                          .map((e) => e.province)
-                          .where((p) => p.isNotEmpty)
-                          .toSet()
-                          .toList()
-                        ..sort()
-                    ]
-                        .map((province) => DropdownMenuItem(
-                              value: province,
-                              child: Text(province),
-                            ))
-                        .toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedProvince = value;
-                      });
-                    },
                   ),
-                  const SizedBox(height: 12),
+                  // Filter Content
+                  if (_isFilterExpanded)
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: const BorderRadius.vertical(
+                          bottom: Radius.circular(12),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Status Filter Chips
+                          Text(
+                            'Status',
+                            style: theme.textTheme.labelLarge?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              'Scheduled',
+                              'In Progress',
+                              'Completed'
+                            ].map((status) {
+                              final isSelected = _selectedStatus == status;
+                              return FilterChip(
+                                label: Text(status),
+                                selected: isSelected,
+                                onSelected: (selected) {
+                                  setState(() {
+                                    _selectedStatus = selected ? status : null;
+                                  });
+                                },
+                                backgroundColor: Colors.white,
+                                selectedColor:
+                                    theme.primaryColor.withValues(alpha: 0.2),
+                                checkmarkColor: theme.primaryColor,
+                                labelStyle: TextStyle(
+                                  color: isSelected
+                                      ? theme.primaryColor
+                                      : Colors.grey[700],
+                                  fontWeight: isSelected
+                                      ? FontWeight.w600
+                                      : FontWeight.normal,
+                                ),
+                                side: BorderSide(
+                                  color: isSelected
+                                      ? theme.primaryColor
+                                      : Colors.grey.shade300,
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                          const SizedBox(height: 16),
 
-                  // Date Range Filter
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () async {
-                            final picked = await showDatePicker(
-                              context: context,
-                              initialDate: _startDate ?? DateTime.now(),
-                              firstDate: DateTime(2020),
-                              lastDate: DateTime(2030),
-                            );
-                            if (picked != null) {
-                              setState(() {
-                                _startDate = picked;
-                              });
-                            }
-                          },
-                          icon: const Icon(Icons.calendar_today, size: 16),
-                          label: Text(_startDate == null
-                              ? 'Start Date'
-                              : 'From: ${_startDate!.day}/${_startDate!.month}/${_startDate!.year}'),
-                        ),
+                          // Province Filter Chips
+                          if (allEvents
+                              .map((e) => e.province)
+                              .where((p) => p.isNotEmpty)
+                              .toSet()
+                              .isNotEmpty) ...[
+                            Text(
+                              'Province',
+                              style: theme.textTheme.labelLarge?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: (allEvents
+                                      .map((e) => e.province)
+                                      .where((p) => p.isNotEmpty)
+                                      .toSet()
+                                      .toList()
+                                    ..sort())
+                                  .map((province) {
+                                final isSelected = _selectedProvince == province;
+                                return FilterChip(
+                                  label: Text(province),
+                                  selected: isSelected,
+                                  onSelected: (selected) {
+                                    setState(() {
+                                      _selectedProvince =
+                                          selected ? province : null;
+                                    });
+                                  },
+                                  backgroundColor: Colors.white,
+                                  selectedColor: theme.primaryColor
+                                      .withValues(alpha: 0.2),
+                                  checkmarkColor: theme.primaryColor,
+                                  labelStyle: TextStyle(
+                                    color: isSelected
+                                        ? theme.primaryColor
+                                        : Colors.grey[700],
+                                    fontWeight: isSelected
+                                        ? FontWeight.w600
+                                        : FontWeight.normal,
+                                  ),
+                                  side: BorderSide(
+                                    color: isSelected
+                                        ? theme.primaryColor
+                                        : Colors.grey.shade300,
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                            const SizedBox(height: 16),
+                          ],
+
+                          // Date Range Filter
+                          Text(
+                            'Date Range',
+                            style: theme.textTheme.labelLarge?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Material(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: InkWell(
+                                    onTap: () async {
+                                      final picked = await showDatePicker(
+                                        context: context,
+                                        initialDate: _startDate ?? DateTime.now(),
+                                        firstDate: DateTime(2020),
+                                        lastDate: DateTime(2030),
+                                      );
+                                      if (picked != null) {
+                                        setState(() {
+                                          _startDate = picked;
+                                        });
+                                      }
+                                    },
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 12,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: _startDate != null
+                                              ? theme.primaryColor
+                                              : Colors.grey.shade300,
+                                        ),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.calendar_today,
+                                            size: 16,
+                                            color: _startDate != null
+                                                ? theme.primaryColor
+                                                : Colors.grey[600],
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              _startDate == null
+                                                  ? 'Start Date'
+                                                  : '${_startDate!.day}/${_startDate!.month}/${_startDate!.year}',
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                color: _startDate != null
+                                                    ? theme.primaryColor
+                                                    : Colors.grey[600],
+                                                fontWeight: _startDate != null
+                                                    ? FontWeight.w600
+                                                    : FontWeight.normal,
+                                              ),
+                                            ),
+                                          ),
+                                          if (_startDate != null)
+                                            GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  _startDate = null;
+                                                });
+                                              },
+                                              child: Icon(
+                                                Icons.close,
+                                                size: 16,
+                                                color: Colors.grey[600],
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Material(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: InkWell(
+                                    onTap: () async {
+                                      final picked = await showDatePicker(
+                                        context: context,
+                                        initialDate: _endDate ?? DateTime.now(),
+                                        firstDate: DateTime(2020),
+                                        lastDate: DateTime(2030),
+                                      );
+                                      if (picked != null) {
+                                        setState(() {
+                                          _endDate = picked;
+                                        });
+                                      }
+                                    },
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 12,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: _endDate != null
+                                              ? theme.primaryColor
+                                              : Colors.grey.shade300,
+                                        ),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.calendar_today,
+                                            size: 16,
+                                            color: _endDate != null
+                                                ? theme.primaryColor
+                                                : Colors.grey[600],
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              _endDate == null
+                                                  ? 'End Date'
+                                                  : '${_endDate!.day}/${_endDate!.month}/${_endDate!.year}',
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                color: _endDate != null
+                                                    ? theme.primaryColor
+                                                    : Colors.grey[600],
+                                                fontWeight: _endDate != null
+                                                    ? FontWeight.w600
+                                                    : FontWeight.normal,
+                                              ),
+                                            ),
+                                          ),
+                                          if (_endDate != null)
+                                            GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  _endDate = null;
+                                                });
+                                              },
+                                              child: Icon(
+                                                Icons.close,
+                                                size: 16,
+                                                color: Colors.grey[600],
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () async {
-                            final picked = await showDatePicker(
-                              context: context,
-                              initialDate: _endDate ?? DateTime.now(),
-                              firstDate: DateTime(2020),
-                              lastDate: DateTime(2030),
-                            );
-                            if (picked != null) {
-                              setState(() {
-                                _endDate = picked;
-                              });
-                            }
-                          },
-                          icon: const Icon(Icons.calendar_today, size: 16),
-                          label: Text(_endDate == null
-                              ? 'End Date'
-                              : 'To: ${_endDate!.day}/${_endDate!.month}/${_endDate!.year}'),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
                 ],
               ),
             ),
