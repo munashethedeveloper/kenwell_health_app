@@ -220,51 +220,118 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const SizedBox(height: 16),
-            const AppLogo(size: 200),
-            const KenwellSectionHeader(
-              title: 'Overall Wellness Statistics',
-              subtitle: 'Summary of wellness events and participation metrics.',
-            ),
-            const SizedBox(height: 24),
-            // Search Field
-            TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search events by title...',
-                prefixIcon: Icon(Icons.search, color: theme.primaryColor),
-                suffixIcon: _searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          _searchController.clear();
-                        },
-                      )
-                    : null,
-                border: OutlineInputBorder(
+      body: RefreshIndicator(
+        onRefresh: _refreshData,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 8),
+              // Compact logo
+              const Center(
+                child: AppLogo(size: 100),
+              ),
+              const SizedBox(height: 16),
+              // Modern section header with background
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      theme.primaryColor.withValues(alpha: 0.08),
+                      theme.primaryColor.withValues(alpha: 0.02),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                   borderRadius: BorderRadius.circular(12),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey.shade300),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: theme.colorScheme.primary,
-                    width: 2,
+                  border: Border.all(
+                    color: theme.primaryColor.withValues(alpha: 0.1),
                   ),
                 ),
-                filled: true,
-                fillColor: Colors.grey[100],
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.analytics_outlined,
+                          color: theme.primaryColor,
+                          size: 24,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Overall Wellness Statistics',
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: theme.primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Summary of wellness events and participation metrics.',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 20),
+              // Enhanced Search Field with shadow
+              Container(
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.primaryColor.withValues(alpha: 0.08),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search events by title...',
+                    hintStyle: TextStyle(color: Colors.grey[400]),
+                    prefixIcon: Icon(Icons.search, color: theme.primaryColor),
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              _searchController.clear();
+                            },
+                          )
+                        : null,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: theme.colorScheme.primary,
+                        width: 2,
+                      ),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
 
             // Modern Filter Section
             Card(
@@ -656,16 +723,34 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Search results indicator
+            // Enhanced search results indicator
             if (_searchController.text.isNotEmpty || _hasActiveFilters)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: Text(
-                  'Found ${events.length} event${events.length != 1 ? 's' : ''}',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[600],
-                    fontStyle: FontStyle.italic,
+              Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: theme.primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: theme.primaryColor.withValues(alpha: 0.2),
                   ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.filter_list_alt,
+                      color: theme.primaryColor,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Found ${events.length} event${events.length != 1 ? 's' : ''}',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.primaryColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             const SizedBox(height: 8),
@@ -738,19 +823,39 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
 
             // HIGH PRIORITY: Events by Status - Only show when filters are active
             if (_hasActiveFilters) ...[
-              KenwellFormCard(
-                title: 'Events by Status',
-                child: Column(
-                  children: [
-                    _buildDetailRow('Scheduled', scheduledEvents, Icons.schedule,
-                        Colors.orange, theme),
-                    const Divider(),
-                    _buildDetailRow('In Progress', inProgressEvents,
-                        Icons.play_circle, Colors.blue, theme),
-                    const Divider(),
-                    _buildDetailRow('Completed', completedEvents,
-                        Icons.check_circle, Colors.deepPurple, theme),
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.white,
+                      Colors.grey.shade50,
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
                   ],
+                ),
+                child: KenwellFormCard(
+                  title: 'Events by Status',
+                  child: Column(
+                    children: [
+                      _buildDetailRow('Scheduled', scheduledEvents, Icons.schedule,
+                          Colors.orange, theme),
+                      const Divider(height: 24),
+                      _buildDetailRow('In Progress', inProgressEvents,
+                          Icons.play_circle, Colors.blue, theme),
+                      const Divider(height: 24),
+                      _buildDetailRow('Completed', completedEvents,
+                          Icons.check_circle, Colors.deepPurple, theme),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -758,19 +863,39 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
 
             // MEDIUM PRIORITY: Geographic Distribution - Only show when filters are active
             if (_hasActiveFilters && eventsByProvince.isNotEmpty) ...[
-              KenwellFormCard(
-                title: 'Geographic Distribution',
-                child: Column(
-                  children: eventsByProvince.entries.map((entry) {
-                    final isLast = entry == eventsByProvince.entries.last;
-                    return Column(
-                      children: [
-                        _buildDetailRow(entry.key, entry.value,
-                            Icons.location_on, Colors.red, theme),
-                        if (!isLast) const Divider(),
-                      ],
-                    );
-                  }).toList(),
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.white,
+                      Colors.grey.shade50,
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: KenwellFormCard(
+                  title: 'Geographic Distribution',
+                  child: Column(
+                    children: eventsByProvince.entries.map((entry) {
+                      final isLast = entry == eventsByProvince.entries.last;
+                      return Column(
+                        children: [
+                          _buildDetailRow(entry.key, entry.value,
+                              Icons.location_on, Colors.red, theme),
+                          if (!isLast) const Divider(height: 24),
+                        ],
+                      );
+                    }).toList(),
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -778,112 +903,203 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
 
             // Event Breakdown Card - Only show when search or filters are active
             if (_searchController.text.isNotEmpty || _hasActiveFilters)
-              KenwellFormCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Event Breakdown',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.white,
+                      Colors.grey.shade50,
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
                     ),
-                    const SizedBox(height: 16),
-                    if (events.isEmpty)
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(24),
-                          child: Text(
-                            'No event data yet',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: Colors.grey[600],
+                  ],
+                ),
+                child: KenwellFormCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.event_note,
+                            color: theme.primaryColor,
+                            size: 24,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Event Breakdown',
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                        ),
-                      )
-                    else
-                      ...events.map((event) => Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => EventStatsDetailScreen(
-                                      event: event,
-                                    ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      if (events.isEmpty)
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(32),
+                            child: Column(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(24),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade100,
+                                    shape: BoxShape.circle,
                                   ),
-                                );
-                              },
-                              borderRadius: BorderRadius.circular(8),
-                              child: Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color:
-                                      theme.primaryColor.withValues(alpha: 0.05),
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                    color:
-                                        theme.primaryColor.withValues(alpha: 0.2),
+                                  child: Icon(
+                                    Icons.event_busy,
+                                    size: 48,
+                                    color: Colors.grey[400],
                                   ),
                                 ),
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.event,
-                                        color: theme.primaryColor, size: 20),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            event.title,
-                                            style: theme.textTheme.bodyMedium
-                                                ?.copyWith(
-                                              fontWeight: FontWeight.w600,
-                                              color: theme.primaryColor,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 2),
-                                          Text(
-                                            '${event.screenedCount} screened',
-                                            style: theme.textTheme.bodySmall
-                                                ?.copyWith(
-                                              color: Colors.grey[600],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12, vertical: 6),
-                                      decoration: BoxDecoration(
-                                        color: theme.primaryColor
-                                            .withValues(alpha: 0.1),
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Text(
-                                        event.screenedCount.toString(),
-                                        style:
-                                            theme.textTheme.labelLarge?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          color: theme.primaryColor,
+                                const SizedBox(height: 16),
+                                Text(
+                                  'No event data yet',
+                                  style: theme.textTheme.bodyLarge?.copyWith(
+                                    color: Colors.grey[600],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Events matching your criteria will appear here',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: Colors.grey[500],
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      else
+                        ...events.map((event) => Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => EventStatsDetailScreen(
+                                          event: event,
                                         ),
                                       ),
+                                    );
+                                  },
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          theme.primaryColor.withValues(alpha: 0.05),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color:
+                                            theme.primaryColor.withValues(alpha: 0.15),
+                                        width: 1.5,
+                                      ),
                                     ),
-                                    const SizedBox(width: 8),
-                                    Icon(
-                                      Icons.chevron_right,
-                                      color: theme.primaryColor,
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            color: theme.primaryColor.withValues(alpha: 0.1),
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: Icon(
+                                            Icons.event,
+                                            color: theme.primaryColor,
+                                            size: 20,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                event.title,
+                                                style: theme.textTheme.bodyMedium
+                                                    ?.copyWith(
+                                                  fontWeight: FontWeight.w600,
+                                                  color: theme.primaryColor,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.people_outline,
+                                                    size: 14,
+                                                    color: Colors.grey[600],
+                                                  ),
+                                                  const SizedBox(width: 4),
+                                                  Text(
+                                                    '${event.screenedCount} screened',
+                                                    style: theme.textTheme.bodySmall
+                                                        ?.copyWith(
+                                                      color: Colors.grey[600],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 16, vertical: 8),
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                theme.primaryColor,
+                                                theme.primaryColor.withValues(alpha: 0.8),
+                                              ],
+                                            ),
+                                            borderRadius: BorderRadius.circular(8),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: theme.primaryColor.withValues(alpha: 0.3),
+                                                blurRadius: 8,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Text(
+                                            event.screenedCount.toString(),
+                                            style:
+                                                theme.textTheme.labelLarge?.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Icon(
+                                          Icons.chevron_right,
+                                          color: theme.primaryColor,
+                                        ),
+                                      ],
                                     ),
-                                  ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          )),
-                  ],
+                            )),
+                    ],
+                  ),
                 ),
               ),
             const SizedBox(height: 24),
@@ -895,29 +1111,45 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
 
   Widget _buildDetailRow(
       String label, int count, IconData icon, Color color, ThemeData theme) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
       child: Row(
         children: [
-          Icon(icon, color: color, size: 20),
-          const SizedBox(width: 12),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: color, size: 22),
+          ),
+          const SizedBox(width: 16),
           Expanded(
             child: Text(
               label,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w500,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(4),
+              gradient: LinearGradient(
+                colors: [
+                  color.withValues(alpha: 0.2),
+                  color.withValues(alpha: 0.1),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: color.withValues(alpha: 0.3),
+                width: 1,
+              ),
             ),
             child: Text(
               count.toString(),
-              style: theme.textTheme.labelLarge?.copyWith(
+              style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: color,
               ),
