@@ -98,6 +98,8 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
     return count;
   }
 
+  bool get _hasActiveFilters => _getActiveFilterCount() > 0;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -309,10 +311,7 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          if (_selectedStatus != null ||
-                              _selectedProvince != null ||
-                              _startDate != null ||
-                              _endDate != null) ...[
+                          if (_hasActiveFilters) ...[
                             const SizedBox(width: 8),
                             Container(
                               padding: const EdgeInsets.symmetric(
@@ -334,10 +333,7 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                             ),
                           ],
                           const Spacer(),
-                          if (_selectedStatus != null ||
-                              _selectedProvince != null ||
-                              _startDate != null ||
-                              _endDate != null)
+                          if (_hasActiveFilters)
                             TextButton.icon(
                               onPressed: () {
                                 setState(() {
@@ -661,11 +657,7 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
             const SizedBox(height: 16),
 
             // Search results indicator
-            if (_searchController.text.isNotEmpty ||
-                _selectedStatus != null ||
-                _selectedProvince != null ||
-                _startDate != null ||
-                _endDate != null)
+            if (_searchController.text.isNotEmpty || _hasActiveFilters)
               Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: Text(
@@ -783,11 +775,7 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
             ],
 
             // Event Breakdown Card - Only show when search or filters are active
-            if (_searchController.text.isNotEmpty ||
-                _selectedStatus != null ||
-                _selectedProvince != null ||
-                _startDate != null ||
-                _endDate != null)
+            if (_searchController.text.isNotEmpty || _hasActiveFilters)
               KenwellFormCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
