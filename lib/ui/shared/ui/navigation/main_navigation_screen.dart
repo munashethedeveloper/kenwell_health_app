@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/features/profile/widgets/my_profile_menu_screen.dart';
-import 'package:kenwell_health_app/ui/features/user_management/widgets/my_user_management_screen.dart';
-import 'package:kenwell_health_app/ui/features/user_management/widgets/user_management_screen_version_two.dart';
+import 'package:kenwell_health_app/ui/features/user_management/widgets/registration_management_screen.dart';
 import 'package:kenwell_health_app/ui/shared/ui/responsive/responsive_breakpoints.dart';
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
 import 'package:provider/provider.dart';
@@ -51,7 +50,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     // Define tabs and destinations based on role
     final List<Widget> allTabs = [
       //const UserManagementScreenVersionTwo(),
-      const MyUserMangementScreen(),
+      const RegistrationManagementScreen(),
       const StatsReportScreen(),
       const CalendarScreen(),
       const MyProfileMenuScreen(),

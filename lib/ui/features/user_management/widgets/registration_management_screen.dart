@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kenwell_health_app/ui/features/auth/view_models/auth_view_model.dart';
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
-import 'package:kenwell_health_app/ui/shared/ui/dialogs/confirmation_dialog.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
 
-class MyUserMangementScreen extends StatelessWidget {
-  const MyUserMangementScreen({super.key});
+class RegistrationManagementScreen extends StatelessWidget {
+  const RegistrationManagementScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MyUserManagementScreenBody();
+    return const RegistrationManagementScreenBody();
   }
 }
 
-class MyUserManagementScreenBody extends StatelessWidget {
-  const MyUserManagementScreenBody({super.key});
+class RegistrationManagementScreenBody extends StatelessWidget {
+  const RegistrationManagementScreenBody({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +23,7 @@ class MyUserManagementScreenBody extends StatelessWidget {
       builder: (context, vm, _) => Scaffold(
         backgroundColor: Colors.white,
         appBar: const KenwellAppBar(
-          title: 'My User Management',
+          title: 'My Registration Management',
           titleColor: Color(0xFF201C58),
           titleStyle: TextStyle(
             color: Color(0xFF201C58),
@@ -48,7 +46,7 @@ class MyUserManagementScreenBody extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.only(left: 4, bottom: 12),
                         child: Text(
-                          'Accounts:',
+                          'Register Users and Members:',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -71,7 +69,7 @@ class MyUserManagementScreenBody extends StatelessWidget {
                       title: 'Member Registration',
                       subtitle:
                           'Register individuals who will participate in wellness events.',
-                      onTap: () => context.pushNamed('memberRegistration'),
+                      onTap: () => context.pushNamed('memberManagement'),
                     ),
                   ],
                 ),

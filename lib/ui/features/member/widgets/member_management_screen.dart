@@ -1,22 +1,31 @@
-/* import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kenwell_health_app/ui/features/member/view_model/member_registration_view_model.dart';
-import 'package:kenwell_health_app/ui/features/member/widgets/member_registration_screen.dart';
 import 'package:provider/provider.dart';
 import '../../../../domain/constants/role_permissions.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../profile/view_model/profile_view_model.dart';
+import '../view_model/member_registration_view_model.dart';
+import 'sections/create_member_section.dart';
+import 'sections/view_members_section.dart';
 
-/// User management screen with create and view users functionality
-class MyMemberManagementScreen extends StatefulWidget {
-  const MyMemberManagementScreen({super.key});
+/// Member registration screen with create and view members functionality
+///
+/// This screen has TWO tabs:
+/// 1. "Create Members" tab - Form to register new event participants
+/// 2. "View Members" tab - List all members with search/filter functionality
+///
+/// Navigation Path: Main App → Users Tab → My User Management → Member Management
+/// Route: /member-management (name: 'memberManagement')
+///
+/// See VIEW_MEMBERS_TAB_GUIDE.md for detailed navigation instructions
+class MemberManagementScreen extends StatefulWidget {
+  const MemberManagementScreen({super.key});
 
   @override
-  State<MyMemberManagementScreen> createState() =>
-      _MyMemberManagementScreenState();
+  State<MemberManagementScreen> createState() => _MemberManagementScreenState();
 }
 
-class _MyMemberManagementScreenState extends State<MyMemberManagementScreen> {
+class _MemberManagementScreenState extends State<MemberManagementScreen> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -36,17 +45,16 @@ class _MyMemberManagementScreenState extends State<MyMemberManagementScreen> {
           final List<Tab> tabs = [];
           final List<Widget> tabViews = [];
 
-     /*      if (canCreateMember) {
-            tabs.add(
-                const Tab(icon: Icon(Icons.person_add), text: 'Create Member'));
-            tabViews.add(const MemberDetailsScreen(
-                viewModel: viewModel, onNext: onNext));
+          if (canCreateMember) {
+            tabs.add(const Tab(
+                icon: Icon(Icons.person_add), text: 'Create Members'));
+            // Tab view will be created with callback later
           }
 
           if (canViewMembers) {
             tabs.add(const Tab(icon: Icon(Icons.group), text: 'View Members'));
-            tabViews.add(const ViewMembersSection());
-          } */
+            // Tab view will be created later
+          }
 
           // If user has no permissions, show a message
           if (tabs.isEmpty) {
@@ -59,7 +67,6 @@ class _MyMemberManagementScreenState extends State<MyMemberManagementScreen> {
                   color: Color(0xFF201C58),
                   fontWeight: FontWeight.bold,
                 ),
-                //automaticallyImplyLeading: true,
               ),
               body: Center(
                 child: Padding(
@@ -104,7 +111,7 @@ class _MyMemberManagementScreenState extends State<MyMemberManagementScreen> {
                   color: Color(0xFF201C58),
                   fontWeight: FontWeight.bold,
                 ),
-                automaticallyImplyLeading: false,
+                automaticallyImplyLeading: true,
                 bottom: TabBar(
                   indicatorSize: TabBarIndicatorSize.label,
                   indicator: UnderlineTabIndicator(
@@ -161,12 +168,12 @@ class _MyMemberManagementScreenState extends State<MyMemberManagementScreen> {
               ),
               body: Consumer<MemberDetailsViewModel>(
                 builder: (context, viewModel, child) {
-                  // Update tab views with onUserCreated callback
+                  // Build tab views with callbacks that use the view model
                   final dynamicTabViews = <Widget>[];
 
-               /*    if (canCreateMember) {
+                  if (canCreateMember) {
                     dynamicTabViews.add(CreateMemberSection(
-                      onUserCreated: () {
+                      onMemberCreated: () {
                         // Reload members when a new member is created
                         viewModel.loadMembers();
                       },
@@ -175,7 +182,7 @@ class _MyMemberManagementScreenState extends State<MyMemberManagementScreen> {
 
                   if (canViewMembers) {
                     dynamicTabViews.add(const ViewMembersSection());
-                  } */
+                  }
 
                   return TabBarView(
                     children: dynamicTabViews,
@@ -189,4 +196,3 @@ class _MyMemberManagementScreenState extends State<MyMemberManagementScreen> {
     );
   }
 }
- */

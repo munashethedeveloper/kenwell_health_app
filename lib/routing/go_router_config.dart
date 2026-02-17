@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kenwell_health_app/domain/models/member.dart';
-import 'package:kenwell_health_app/ui/features/member/view_model/member_registration_view_model.dart';
-import 'package:kenwell_health_app/ui/features/member/widgets/member_registration_screen.dart';
-import 'package:kenwell_health_app/ui/features/user_management/widgets/my_user_management_screen.dart';
+import 'package:kenwell_health_app/ui/features/member/widgets/member_management_screen.dart';
+import 'package:kenwell_health_app/ui/features/user_management/widgets/registration_management_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/ui/features/auth/view_models/auth_view_model.dart';
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
@@ -161,23 +159,19 @@ class AppRouterConfig {
           builder: (context, state) => const CalendarScreen(),
         ),
 
-        // My User Management Route
+        // My Registration Management Route
         GoRoute(
-          path: '/my-user-management',
-          name: 'myUserManagement',
-          builder: (context, state) => const MyUserMangementScreen(),
+          path: '/my-registration-management',
+          name: 'myRegistrationManagement',
+          builder: (context, state) => const RegistrationManagementScreen(),
         ),
 
-        /*   // Member Route
+        // Member Management Route
         GoRoute(
-          path: '/member-registration',
-          name: 'memberRegistration',
-          builder: (context, state) {
-            final MemberDetailsViewModel? viewmodel = extra?['member'] as Member?;
-          }=> MemberDetailsScreen(
-            viewModel: null,      onNext: () {},
-          ),
-        ), */
+          path: '/member-management',
+          name: 'memberManagement',
+          builder: (context, state) => const MemberManagementScreen(),
+        ),
 
         // Event Routes with path parameter support for deep linking
         GoRoute(

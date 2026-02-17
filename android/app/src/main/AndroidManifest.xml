@@ -2,6 +2,12 @@
     <!-- Notification permission for Android 13+ -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     
+    <!-- Internet permission for geocoding API calls -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    
+    <!-- Location permissions for geocoding (optional but recommended) -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    
     <application
         android:label="kenwell_health_app"
         android:name="${applicationName}"

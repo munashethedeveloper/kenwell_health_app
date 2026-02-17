@@ -146,7 +146,7 @@ class _CreateUserSectionState extends State<CreateUserSection> {
                   const AppLogo(size: 200),
                   const SizedBox(height: 24),
                   const KenwellSectionHeader(
-                    title: "Register User Account",
+                    title: "User Registration Form",
                     subtitle:
                         "Complete the user's details below to create an account.",
                   ),
@@ -220,28 +220,6 @@ class _CreateUserSectionState extends State<CreateUserSection> {
                           validator: Validators.validateStrongPassword,
                         ),
                         const SizedBox(height: 24),
-                        // KenwellTextField(
-                        //label: "Confirm Temporary Password",
-                        // controller: _confirmPasswordController,
-                        //  obscureText: _obscureConfirmPassword,
-                        //// suffixIcon: IconButton(
-                        //   icon: Icon(_obscureConfirmPassword
-                        //      ? Icons.visibility_off
-                        //      : Icons.visibility),
-                        // onPressed: () => setState(() =>
-                        //      _obscureConfirmPassword =
-                        //           !_obscureConfirmPassword),
-                        //  ),
-                        //  validator: (value) {
-                        //  if (value == null || value.isEmpty) {
-                        //    return 'Please confirm your password';
-                        //  }
-                        //  if (value != _passwordController.text) {
-                        //    return 'Passwords do not match';
-                        //   }
-                        //   return null;
-                        //  },
-                        // ),
                       ],
                     ),
                   ),

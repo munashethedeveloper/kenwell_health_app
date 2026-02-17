@@ -47,5 +47,7 @@
 	<true/>
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>We need permission to send you event reminders and wellness updates</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We need location access to help auto-fill address details when creating events</string>
 </dict>
 </plist>

@@ -104,7 +104,7 @@ class _UserManagementScreenVersionTwoState
                   color: Color(0xFF201C58),
                   fontWeight: FontWeight.bold,
                 ),
-                automaticallyImplyLeading: false,
+                automaticallyImplyLeading: true,
                 bottom: TabBar(
                   indicatorSize: TabBarIndicatorSize.label,
                   indicator: UnderlineTabIndicator(

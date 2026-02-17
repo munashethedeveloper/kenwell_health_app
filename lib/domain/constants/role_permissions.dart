@@ -127,6 +127,11 @@ class RolePermissions {
     //Member Management Permissions
     'create_member': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     'edit_member': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
+    'view_members': [
+      'ADMIN',
+      'TOP MANAGEMENT',
+      'PROJECT MANAGER',
+    ],
 
     // User Management Permissions
     'create_user': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],

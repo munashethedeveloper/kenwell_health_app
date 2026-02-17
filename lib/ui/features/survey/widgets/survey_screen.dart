@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../../domain/constants/provinces.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_yes_no_question.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
@@ -55,17 +56,7 @@ class SurveyScreen extends StatelessWidget {
           child: KenwellDropdownField<String>(
             label: 'Province',
             value: vm.province,
-            items: const [
-              'Gauteng',
-              'Western Cape',
-              'KwaZulu-Natal',
-              'Eastern Cape',
-              'Limpopo',
-              'Mpumalanga',
-              'North West',
-              'Free State',
-              'Northern Cape'
-            ],
+            items: SouthAfricanProvinces.all,
             onChanged: (val) {
               if (val != null) vm.updateProvince(val);
             },
