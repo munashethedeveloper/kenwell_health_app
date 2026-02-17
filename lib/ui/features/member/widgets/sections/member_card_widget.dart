@@ -15,18 +15,20 @@ class MemberCardWidget extends StatelessWidget {
     this.onDelete,
   });
 
+  // Static constants to avoid recreating on each build
+  static const Map<String, IconData> _genderIcons = {
+    'Male': Icons.male,
+    'Female': Icons.female,
+  };
+  
+  static const String _defaultGenderLabel = 'Unknown';
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    // Get gender icon (similar to role icons in user_card_widget)
-    final genderIcons = {
-      'Male': Icons.male,
-      'Female': Icons.female,
-    };
-
-    final gender = member.gender ?? 'Unknown';
-    final genderIcon = genderIcons[gender] ?? Icons.person;
+    final gender = member.gender ?? _defaultGenderLabel;
+    final genderIcon = _genderIcons[gender] ?? Icons.person;
 
     return GestureDetector(
       onTap: onTap,
