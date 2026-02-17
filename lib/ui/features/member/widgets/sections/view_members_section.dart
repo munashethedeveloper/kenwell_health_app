@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_section_header.dart';
 import 'package:provider/provider.dart';
 import '../../../../../domain/models/member.dart';
 import '../../../../../domain/constants/role_permissions.dart';
@@ -247,6 +248,11 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
         return Column(
           children: [
             const SizedBox(height: 16),
+            // const KenwellSectionHeader(
+            // title: "List of Members",
+            //subtitle: "View and manage your members here",
+            // ),
+            //const SizedBox(height: 16),
             // Stats header
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -322,6 +328,11 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
               ),
             ),
             const SizedBox(height: 16),
+            const KenwellSectionHeader(
+              title: "List of Members",
+              //subtitle: "View and manage your members here",
+            ),
+            const SizedBox(height: 16),
             Expanded(
               child: filteredMembers.isEmpty
                   ? _buildEmptyState(theme)
@@ -336,6 +347,7 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                             member: member,
                             onTap: () => _showMemberOptions(member),
                             onDelete: () => _deleteMember(member, viewModel),
+                            onViewDetails: () => _showMemberOptions(member),
                           );
                         },
                       ),
