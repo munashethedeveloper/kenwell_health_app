@@ -522,115 +522,120 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
               const SizedBox(height: 16),
             ],
 
-            // Event Breakdown Card
-            KenwellFormCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Event Breakdown',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  if (events.isEmpty)
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Text(
-                          'No event data yet',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey[600],
-                          ),
-                        ),
+            // Event Breakdown Card - Only show when search or filters are active
+            if (_searchController.text.isNotEmpty ||
+                _selectedStatus != null ||
+                _selectedProvince != null ||
+                _startDate != null ||
+                _endDate != null)
+              KenwellFormCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Event Breakdown',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
                       ),
-                    )
-                  else
-                    ...events.map((event) => Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => EventStatsDetailScreen(
-                                    event: event,
-                                  ),
-                                ),
-                              );
-                            },
-                            borderRadius: BorderRadius.circular(8),
-                            child: Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color:
-                                    theme.primaryColor.withValues(alpha: 0.05),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color:
-                                      theme.primaryColor.withValues(alpha: 0.2),
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.event,
-                                      color: theme.primaryColor, size: 20),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          event.title,
-                                          style: theme.textTheme.bodyMedium
-                                              ?.copyWith(
-                                            fontWeight: FontWeight.w600,
-                                            color: theme.primaryColor,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          '${event.screenedCount} screened',
-                                          style: theme.textTheme.bodySmall
-                                              ?.copyWith(
-                                            color: Colors.grey[600],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 6),
-                                    decoration: BoxDecoration(
-                                      color: theme.primaryColor
-                                          .withValues(alpha: 0.1),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Text(
-                                      event.screenedCount.toString(),
-                                      style:
-                                          theme.textTheme.labelLarge?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: theme.primaryColor,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Icon(
-                                    Icons.chevron_right,
-                                    color: theme.primaryColor,
-                                  ),
-                                ],
-                              ),
+                    ),
+                    const SizedBox(height: 16),
+                    if (events.isEmpty)
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Text(
+                            'No event data yet',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: Colors.grey[600],
                             ),
                           ),
-                        )),
-                ],
+                        ),
+                      )
+                    else
+                      ...events.map((event) => Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => EventStatsDetailScreen(
+                                      event: event,
+                                    ),
+                                  ),
+                                );
+                              },
+                              borderRadius: BorderRadius.circular(8),
+                              child: Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color:
+                                      theme.primaryColor.withValues(alpha: 0.05),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color:
+                                        theme.primaryColor.withValues(alpha: 0.2),
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.event,
+                                        color: theme.primaryColor, size: 20),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            event.title,
+                                            style: theme.textTheme.bodyMedium
+                                                ?.copyWith(
+                                              fontWeight: FontWeight.w600,
+                                              color: theme.primaryColor,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            '${event.screenedCount} screened',
+                                            style: theme.textTheme.bodySmall
+                                                ?.copyWith(
+                                              color: Colors.grey[600],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        color: theme.primaryColor
+                                            .withValues(alpha: 0.1),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        event.screenedCount.toString(),
+                                        style:
+                                            theme.textTheme.labelLarge?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: theme.primaryColor,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Icon(
+                                      Icons.chevron_right,
+                                      color: theme.primaryColor,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )),
+                  ],
+                ),
               ),
-            ),
             const SizedBox(height: 24),
           ],
         ),
