@@ -325,138 +325,150 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
     // Get events for the focused month
     final eventsThisMonth = viewModel.getEventsForMonth(viewModel.focusedDay);
 
-    return Column(
-      children: [
-        //Welcome Message and Month Navigation Header
-        KenwellSectionHeader(
-          title: _getWelcomeTitle(),
-          subtitle: 'View and manage your wellness events for the month.',
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 10),
-        const AppLogo(size: 150),
-        const SizedBox(height: 10),
-        // Month navigation header
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: Column(
             children: [
-              // Previous month button
-              IconButton(
-                icon: const Icon(Icons.chevron_left),
-                onPressed: () => viewModel.goToPreviousMonth(),
+              //Welcome Message and Month Navigation Header
+              KenwellSectionHeader(
+                title: _getWelcomeTitle(),
+                subtitle: 'View and manage your wellness events for the month.',
+                textAlign: TextAlign.center,
               ),
-              // Month and year title
-              Text(
-                viewModel.getMonthYearTitle(),
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF201C58),
+              const SizedBox(height: 10),
+              const AppLogo(size: 150),
+              const SizedBox(height: 10),
+              // Month navigation header
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Previous month button
+                    IconButton(
+                      icon: const Icon(Icons.chevron_left),
+                      onPressed: () => viewModel.goToPreviousMonth(),
+                    ),
+                    // Month and year title
+                    Text(
+                      viewModel.getMonthYearTitle(),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF201C58),
+                      ),
+                    ),
+                    // Next month button
+                    IconButton(
+                      icon: const Icon(Icons.chevron_right),
+                      onPressed: () => viewModel.goToNextMonth(),
+                    ),
+                  ],
                 ),
-              ),
-              // Next month button
-              IconButton(
-                icon: const Icon(Icons.chevron_right),
-                onPressed: () => viewModel.goToNextMonth(),
               ),
             ],
           ),
         ),
         // Events list
-        Expanded(
-          child: eventsThisMonth.isEmpty
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(32),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // No events illustration and message
-                        Icon(
-                          Icons.event_busy,
-                          size: 100,
-                          color: Colors.grey.shade400,
-                        ),
-                        const SizedBox(height: 16),
-                        // Informative message
-                        Text(
-                          'No events this month',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey.shade700,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        // Suggestion to create events
-                        if (_canAddEvent(context))
-                          Text(
-                            'Create an event to get started',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey.shade600,
-                            ),
-                          ),
-                        const SizedBox(height: 24),
-                        // Button to create a new event
-                        if (_canAddEvent(context))
-                          CustomPrimaryButton(
-                            label: 'Create Event',
-                            onPressed: () => _openEventForm(
-                                context, viewModel, viewModel.focusedDay),
-                            leading: const Icon(Icons.add),
-                          ),
-                      ],
+        if (eventsThisMonth.isEmpty)
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // No events illustration and message
+                    Icon(
+                      Icons.event_busy,
+                      size: 100,
+                      color: Colors.grey.shade400,
                     ),
-                  ),
-                )
-              // List of events for the month
-              : Builder(
-                  builder: (_) {
-                    // Sort events
-                    final sortedEvents = [...eventsThisMonth];
-                    sortedEvents.sort(viewModel.compareEvents);
-
-                    // Group events by day
-                    final Map<DateTime, List<WellnessEvent>> groupedEvents = {};
-                    for (var event in sortedEvents) {
-                      final dayKey = viewModel.normalizeDate(event.date);
-                      groupedEvents.putIfAbsent(dayKey, () => []).add(event);
-                    }
-
-                    final sortedDates = groupedEvents.keys.toList()
-                      ..sort((a, b) => a.compareTo(b));
-
-                    return ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: sortedDates.length,
-                      itemBuilder: (context, index) {
-                        final day = sortedDates[index];
-                        final dayEvents = groupedEvents[day]!;
-
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Day header
-                            KenwellSectionHeader(
-                              title: viewModel.formatDateLong(day),
-                            ),
-                            const SizedBox(height: 8),
-                            // Event cards for the day
-                            ...dayEvents
-                                .map((event) => EventCard(
-                                    event: event, viewModel: viewModel))
-                                .toList(),
-                            const SizedBox(height: 16),
-                          ],
-                        );
-                      },
-                    );
-                  },
+                    const SizedBox(height: 16),
+                    // Informative message
+                    Text(
+                      'No events this month',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    // Suggestion to create events
+                    if (_canAddEvent(context))
+                      Text(
+                        'Create an event to get started',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    const SizedBox(height: 24),
+                    // Button to create a new event
+                    if (_canAddEvent(context))
+                      CustomPrimaryButton(
+                        label: 'Create Event',
+                        onPressed: () => _openEventForm(
+                            context, viewModel, viewModel.focusedDay),
+                        leading: const Icon(Icons.add),
+                      ),
+                  ],
                 ),
-        ),
+              ),
+            ),
+          )
+        else
+          // List of events for the month
+          Builder(
+            builder: (_) {
+              // Sort events
+              final sortedEvents = [...eventsThisMonth];
+              sortedEvents.sort(viewModel.compareEvents);
+
+              // Group events by day
+              final Map<DateTime, List<WellnessEvent>> groupedEvents = {};
+              for (var event in sortedEvents) {
+                final dayKey = viewModel.normalizeDate(event.date);
+                groupedEvents.putIfAbsent(dayKey, () => []).add(event);
+              }
+
+              final sortedDates = groupedEvents.keys.toList()
+                ..sort((a, b) => a.compareTo(b));
+
+              return SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final day = sortedDates[index];
+                      final dayEvents = groupedEvents[day]!;
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Day header
+                          KenwellSectionHeader(
+                            title: viewModel.formatDateLong(day),
+                          ),
+                          const SizedBox(height: 8),
+                          // Event cards for the day
+                          ...dayEvents
+                              .map((event) => EventCard(
+                                  event: event, viewModel: viewModel))
+                              .toList(),
+                          const SizedBox(height: 16),
+                        ],
+                      );
+                    },
+                    childCount: sortedDates.length,
+                  ),
+                ),
+              );
+            },
+          ),
       ],
     );
   }
