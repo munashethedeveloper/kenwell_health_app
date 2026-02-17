@@ -100,6 +100,18 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
 
   bool get _hasActiveFilters => _getActiveFilterCount() > 0;
 
+  Color _getStatusColor(String status) {
+    final statusLower = status.toLowerCase();
+    if (statusLower == 'scheduled') return Colors.orange;
+    if (statusLower == 'in progress' || statusLower == 'in_progress' || statusLower == 'ongoing') {
+      return Colors.blue;
+    }
+    if (statusLower == 'completed' || statusLower == 'finished') {
+      return Colors.deepPurple;
+    }
+    return Colors.grey;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -1042,16 +1054,36 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                                               Row(
                                                 children: [
                                                   Icon(
-                                                    Icons.people_outline,
+                                                    Icons.calendar_today,
                                                     size: 14,
                                                     color: Colors.grey[600],
                                                   ),
                                                   const SizedBox(width: 4),
                                                   Text(
-                                                    '${event.screenedCount} screened',
+                                                    '${event.date.day}/${event.date.month}/${event.date.year}',
                                                     style: theme.textTheme.bodySmall
                                                         ?.copyWith(
                                                       color: Colors.grey[600],
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 12),
+                                                  Container(
+                                                    padding: const EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 2,
+                                                    ),
+                                                    decoration: BoxDecoration(
+                                                      color: _getStatusColor(event.status)
+                                                          .withValues(alpha: 0.15),
+                                                      borderRadius: BorderRadius.circular(4),
+                                                    ),
+                                                    child: Text(
+                                                      event.status,
+                                                      style: theme.textTheme.labelSmall
+                                                          ?.copyWith(
+                                                        color: _getStatusColor(event.status),
+                                                        fontWeight: FontWeight.w600,
+                                                      ),
                                                     ),
                                                   ),
                                                 ],
