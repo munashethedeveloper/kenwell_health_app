@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../../domain/models/member.dart';
+import '../../../../shared/ui/badges/number_badge.dart';
 
 /// Widget to display member information as a card
 /// Styled to match the user_card_widget look and feel
@@ -48,22 +49,7 @@ class MemberCardWidget extends StatelessWidget {
           children: [
             // Number badge (if provided)
             if (number != null) ...[
-              Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  color: theme.primaryColor.withValues(alpha: 0.15),
-                  shape: BoxShape.circle,
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  '$number',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.primaryColor,
-                  ),
-                ),
-              ),
+              NumberBadge(number: number!),
               const SizedBox(width: 12),
             ],
             

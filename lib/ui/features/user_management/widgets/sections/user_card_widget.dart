@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import '../../../../../domain/models/user_model.dart';
+import '../../../../shared/ui/badges/number_badge.dart';
 
 /// Displays a user card with swipe actions for reset password and delete
 class UserCardWidget extends StatelessWidget {
@@ -81,22 +82,7 @@ class UserCardWidget extends StatelessWidget {
               children: [
                 // Number badge (if provided)
                 if (number != null) ...[
-                  Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: theme.primaryColor.withValues(alpha: 0.15),
-                      shape: BoxShape.circle,
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      '$number',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: theme.primaryColor,
-                      ),
-                    ),
-                  ),
+                  NumberBadge(number: number!),
                   const SizedBox(width: 12),
                 ],
                 
