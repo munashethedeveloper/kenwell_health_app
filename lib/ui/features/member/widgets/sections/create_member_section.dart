@@ -74,6 +74,7 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
                     title: "Member Registration Form",
                     subtitle:
                         "Complete the member's details below to register.",
+                    icon: Icons.how_to_reg,
                   ),
                   KenwellFormCard(
                     title: 'Basic Information',

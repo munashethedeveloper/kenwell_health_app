@@ -110,6 +110,7 @@ class CurrentEventHomeScreen extends StatelessWidget {
               title: 'Event Process',
               subtitle:
                   'Complete the steps below to finish the wellness event process.',
+              icon: Icons.checklist,
             ),
             const SizedBox(height: 12),
             _ProcessStepCard(

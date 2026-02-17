@@ -81,6 +81,7 @@ class EventDetailsScreen extends StatelessWidget {
             title: 'Event Summary Details',
             subtitle: 'Detailed information about the ${event.title} event.',
             uppercase: true,
+            icon: Icons.event_note,
           ),
           // Event detail sections
           _buildSectionCard('Client Organization', [

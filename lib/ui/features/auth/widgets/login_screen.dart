@@ -139,6 +139,7 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
                     const KenwellSectionHeader(
                       title: 'Welcome to KenWell365!',
                       subtitle: 'Supporting wellbeing, 365 days a year.',
+                      icon: Icons.waving_hand,
                     ),
                     // SizedBox for spacing
                     const SizedBox(height: 24),

@@ -42,6 +42,7 @@ class EventStatsDetailScreen extends StatelessWidget {
               title: 'Event Details',
               subtitle: 'Detailed information about the wellness event',
               uppercase: true,
+              icon: Icons.info,
             ),
             const SizedBox(height: 24),
 

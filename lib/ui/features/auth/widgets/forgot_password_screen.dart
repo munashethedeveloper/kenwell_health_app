@@ -126,6 +126,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 title: 'Reset Password',
                 subtitle:
                     'Enter the email address associated with your account and we will send you a reset link.',
+                icon: Icons.lock_reset,
               ),
               // Email field
               KenwellFormCard(
