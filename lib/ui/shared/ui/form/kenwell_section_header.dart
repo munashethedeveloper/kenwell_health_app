@@ -82,7 +82,7 @@ class KenwellSectionHeader extends StatelessWidget {
                   subtitle!,
                   textAlign: textAlign,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.grey[600],
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -104,7 +104,7 @@ class KenwellSectionHeader extends StatelessWidget {
               if (icon != null) ...[
                 Icon(
                   icon,
-                  color: const Color(0xFF201C58),
+                  color: theme.primaryColor,
                   size: 24,
                 ),
                 const SizedBox(width: 8),
@@ -118,7 +118,7 @@ class KenwellSectionHeader extends StatelessWidget {
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     fontSize: 28,
-                    color: const Color(0xFF201C58),
+                    color: theme.primaryColor,
                   ),
                 ),
               ),
@@ -130,7 +130,7 @@ class KenwellSectionHeader extends StatelessWidget {
               subtitle!,
               textAlign: textAlign,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: const Color(0xFF5C5C5C),
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
           ],
