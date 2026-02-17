@@ -736,26 +736,28 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
             ),
             const SizedBox(height: 24),
 
-            // HIGH PRIORITY: Events by Status
-            KenwellFormCard(
-              title: 'Events by Status',
-              child: Column(
-                children: [
-                  _buildDetailRow('Scheduled', scheduledEvents, Icons.schedule,
-                      Colors.orange, theme),
-                  const Divider(),
-                  _buildDetailRow('In Progress', inProgressEvents,
-                      Icons.play_circle, Colors.blue, theme),
-                  const Divider(),
-                  _buildDetailRow('Completed', completedEvents,
-                      Icons.check_circle, Colors.deepPurple, theme),
-                ],
+            // HIGH PRIORITY: Events by Status - Only show when filters are active
+            if (_hasActiveFilters) ...[
+              KenwellFormCard(
+                title: 'Events by Status',
+                child: Column(
+                  children: [
+                    _buildDetailRow('Scheduled', scheduledEvents, Icons.schedule,
+                        Colors.orange, theme),
+                    const Divider(),
+                    _buildDetailRow('In Progress', inProgressEvents,
+                        Icons.play_circle, Colors.blue, theme),
+                    const Divider(),
+                    _buildDetailRow('Completed', completedEvents,
+                        Icons.check_circle, Colors.deepPurple, theme),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
+            ],
 
-            // MEDIUM PRIORITY: Geographic Distribution
-            if (eventsByProvince.isNotEmpty) ...[
+            // MEDIUM PRIORITY: Geographic Distribution - Only show when filters are active
+            if (_hasActiveFilters && eventsByProvince.isNotEmpty) ...[
               KenwellFormCard(
                 title: 'Geographic Distribution',
                 child: Column(
