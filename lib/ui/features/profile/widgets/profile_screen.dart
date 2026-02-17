@@ -176,6 +176,7 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
                             title: 'Update Profile',
                             subtitle:
                                 'Complete your details or update your information',
+                            icon: Icons.person,
                           ),
                           ProfileFormSection(
                             firstNameController: _firstNameController,

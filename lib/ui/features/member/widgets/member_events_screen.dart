@@ -161,6 +161,7 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
               subtitle: _isLoading
                   ? 'Loading events...'
                   : '${_events.length} event${_events.length == 1 ? '' : 's'} attended',
+              icon: Icons.history,
             ),
 
             const SizedBox(height: 16),

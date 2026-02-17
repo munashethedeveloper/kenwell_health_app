@@ -234,6 +234,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
             title: _getWelcomeTitle(),
             subtitle: 'View and manage your wellness events for the month.',
             textAlign: TextAlign.center,
+            icon: Icons.calendar_month,
           ),
           const SizedBox(height: 10),
           const AppLogo(size: 150),
@@ -332,6 +333,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
           title: _getWelcomeTitle(),
           subtitle: 'View and manage your wellness events for the month.',
           textAlign: TextAlign.center,
+          icon: Icons.calendar_month,
         ),
         const SizedBox(height: 10),
         const AppLogo(size: 150),
@@ -442,6 +444,8 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                             // Day header
                             KenwellSectionHeader(
                               title: viewModel.formatDateLong(day),
+                              icon: Icons.event,
+                              showBackground: false,
                             ),
                             const SizedBox(height: 8),
                             // Event cards for the day
