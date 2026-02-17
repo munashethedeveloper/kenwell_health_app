@@ -348,6 +348,7 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                         final member = filteredMembers[index];
                         return MemberCardWidget(
                           member: member,
+                          number: index + 1, // Add sequential numbering
                           onTap: () => _showMemberOptions(member),
                           onDelete: () => _deleteMember(member, viewModel),
                         );

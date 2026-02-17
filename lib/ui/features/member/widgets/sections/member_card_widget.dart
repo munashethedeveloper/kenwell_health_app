@@ -7,12 +7,14 @@ class MemberCardWidget extends StatelessWidget {
   final Member member;
   final VoidCallback onTap;
   final VoidCallback? onDelete;
+  final int? number; // Optional numbering for the card
 
   const MemberCardWidget({
     super.key,
     required this.member,
     required this.onTap,
     this.onDelete,
+    this.number,
   });
 
   // Static constants to avoid recreating on each build
@@ -44,6 +46,27 @@ class MemberCardWidget extends StatelessWidget {
         ),
         child: Row(
           children: [
+            // Number badge (if provided)
+            if (number != null) ...[
+              Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: theme.primaryColor.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  '$number',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.primaryColor,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+            ],
+            
             // Gender icon (left side)
             Icon(
               genderIcon,

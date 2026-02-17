@@ -8,6 +8,7 @@ class UserCardWidget extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback onResetPassword;
   final VoidCallback onDelete;
+  final int? number; // Optional numbering for the card
 
   const UserCardWidget({
     super.key,
@@ -15,6 +16,7 @@ class UserCardWidget extends StatelessWidget {
     required this.onTap,
     required this.onResetPassword,
     required this.onDelete,
+    this.number,
   });
 
   @override
@@ -77,6 +79,27 @@ class UserCardWidget extends StatelessWidget {
             ),
             child: Row(
               children: [
+                // Number badge (if provided)
+                if (number != null) ...[
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: theme.primaryColor.withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      '$number',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.primaryColor,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                ],
+                
                 // Icon instead of avatar with initials
                 Icon(
                   roleIcons[role] ?? Icons.person,

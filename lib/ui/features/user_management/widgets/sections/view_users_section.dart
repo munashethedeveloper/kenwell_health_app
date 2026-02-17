@@ -476,6 +476,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                         final user = filteredUsers[index];
                         return UserCardWidget(
                           user: user,
+                          number: index + 1, // Add sequential numbering
                           onTap: () => _showUserOptions(user),
                           onResetPassword: () => _resetPassword(user, viewModel),
                           onDelete: () => _deleteUser(user, viewModel),
