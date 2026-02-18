@@ -43,7 +43,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
 
           // Determine number of tabs based on permissions
           final List<Tab> tabs = [];
-          final List<Widget> tabViews = [];
+          //final List<Widget> tabViews = [];
 
           if (canCreateMember) {
             tabs.add(const Tab(

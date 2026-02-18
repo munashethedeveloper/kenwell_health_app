@@ -57,6 +57,7 @@ class HealthMetricsScreen extends StatelessWidget {
                     const KenwellSectionHeader(
                       title: 'Section D: Health Metrics',
                       uppercase: true,
+                      icon: Icons.health_and_safety,
                     ),
                     const SizedBox(height: 16),
                     // Measurements form card

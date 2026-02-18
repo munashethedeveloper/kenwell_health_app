@@ -237,7 +237,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
     );
 
     // Unassign event from user
-    final repo = UserEventRepository();
+    //final repo = UserEventRepository();
     //await repo.removeUserEvent(widget.event.id, user.id);
 
     if (!mounted) return;

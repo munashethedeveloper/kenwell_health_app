@@ -209,6 +209,7 @@ class _EventScreenState extends State<EventScreen> {
                 title: isEditMode ? 'Edit Event' : 'Add New Event',
                 subtitle:
                     'Complete the event details or update the event information',
+                icon: isEditMode ? Icons.edit : Icons.add_circle_outline,
               ),
               // Event Basic Info Section
               EventBasicInfoSection(

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/custom_text_field.dart';
 
 /// Search bar for filtering users by name or email
 class UserSearchBar extends StatelessWidget {

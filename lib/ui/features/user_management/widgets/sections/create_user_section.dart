@@ -66,7 +66,7 @@ class _CreateUserSectionState extends State<CreateUserSection> {
 
   String? _selectedRole;
   bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
+  //bool _obscureConfirmPassword = true;
 
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) return;
@@ -149,6 +149,7 @@ class _CreateUserSectionState extends State<CreateUserSection> {
                     title: "User Registration Form",
                     subtitle:
                         "Complete the user's details below to create an account.",
+                    icon: Icons.person_add_alt_1,
                   ),
                   KenwellFormCard(
                     title: 'Personal Information',

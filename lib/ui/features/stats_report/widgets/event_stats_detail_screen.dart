@@ -42,6 +42,8 @@ class EventStatsDetailScreen extends StatelessWidget {
               title: 'Event Details',
               subtitle: 'Detailed information about the wellness event',
               uppercase: true,
+              icon: Icons.info,
+              //color: KenwellColors.secondaryNavyDark,
             ),
             const SizedBox(height: 24),
 

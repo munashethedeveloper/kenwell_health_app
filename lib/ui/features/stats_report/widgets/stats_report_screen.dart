@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:provider/provider.dart';
-
-import '../../../shared/ui/form/kenwell_section_header.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
@@ -204,7 +202,7 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
           '${event.date.year}-${event.date.month.toString().padLeft(2, '0')}';
       eventsByMonth[monthYear] = (eventsByMonth[monthYear] ?? 0) + 1;
     }
-    final sortedMonths = eventsByMonth.keys.toList()..sort();
+    //final sortedMonths = eventsByMonth.keys.toList()..sort();
 
     return Scaffold(
         appBar: KenwellAppBar(

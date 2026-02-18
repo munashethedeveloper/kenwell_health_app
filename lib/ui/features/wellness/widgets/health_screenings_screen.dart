@@ -48,6 +48,7 @@ class HealthScreeningsScreen extends StatelessWidget {
             const KenwellSectionHeader(
               title: 'Section C: Health Screenings',
               subtitle: 'Complete the health screenings you have consented to.',
+              icon: Icons.medical_services,
             ),
             const SizedBox(height: 12),
             Text(

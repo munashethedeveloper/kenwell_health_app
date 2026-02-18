@@ -157,6 +157,7 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
               title: 'Search Member',
               subtitle:
                   'Find an existing member by their ID or Passport number',
+              icon: Icons.person_search,
             ),
 
             // Search section with background

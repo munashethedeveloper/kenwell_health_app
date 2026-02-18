@@ -72,6 +72,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                     const KenwellSectionHeader(
                       title: 'Section C: Health Screening',
                       uppercase: true,
+                      icon: Icons.medical_information,
                     ),
 
                     // ===== Section 1: Chronic Conditions =====
@@ -319,6 +320,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                     const KenwellSectionHeader(
                       title: 'Section D: Health Metrics',
                       uppercase: true,
+                      icon: Icons.health_and_safety,
                     ),
 
                     KenwellFormCard(

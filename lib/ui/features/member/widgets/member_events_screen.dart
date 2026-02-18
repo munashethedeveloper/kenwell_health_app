@@ -78,15 +78,15 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: KenwellAppBar(
+      appBar: const KenwellAppBar(
         title: 'Events Attended',
         titleColor: Colors.white,
-        titleStyle: const TextStyle(
+        titleStyle: TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.bold,
         ),
         automaticallyImplyLeading: true,
-        backgroundColor: const Color(0xFF201C58),
+        backgroundColor: Color(0xFF201C58),
         centerTitle: true,
       ),
       body: RefreshIndicator(
@@ -161,6 +161,7 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
               subtitle: _isLoading
                   ? 'Loading events...'
                   : '${_events.length} event${_events.length == 1 ? '' : 's'} attended',
+              icon: Icons.history,
             ),
 
             const SizedBox(height: 16),

@@ -25,7 +25,7 @@ class CalendarViewModel extends ChangeNotifier {
   List<WellnessEvent> _events = [];
   bool _isLoading = false;
   String? _error;
-  String _role = '';
+  final _role = '';
 
   // Public getters
   DateTime get focusedDay => _focusedDay;

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:kenwell_health_app/utils/validators.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/member_repository.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_member_repository.dart';
 import 'package:kenwell_health_app/data/local/app_database.dart';
@@ -175,15 +174,15 @@ class MemberDetailsViewModel extends ChangeNotifier {
   // idNumberController.addListener(_handleIdNumberInput);
   //}
 
-  void _handleIdNumberInput() {
-    final id = idNumberController.text;
-    if (id.length == 13 && Validators.validateSouthAfricanId(id) == null) {
-      dob = Validators.getDateOfBirthFromId(id);
-      dobController.text = DateFormat('dd/MM/yyyy').format(dob!);
-      gender = Validators.getGenderFromId(id);
-      notifyListeners();
-    }
-  }
+  //void _handleIdNumberInput() {
+  //final id = idNumberController.text;
+  // if (id.length == 13 && Validators.validateSouthAfricanId(id) == null) {
+  // dob = Validators.getDateOfBirthFromId(id);
+  //dobController.text = DateFormat('dd/MM/yyyy').format(dob!);
+  //gender = Validators.getGenderFromId(id);
+  //notifyListeners();
+  //}
+  //}
 
   // --- Dropdown setters ---
   void setMaritalStatus(String? value) {

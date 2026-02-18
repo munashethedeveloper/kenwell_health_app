@@ -55,6 +55,7 @@ class HIVTestResultScreen extends StatelessWidget {
               const KenwellSectionHeader(
                 title: 'Section C: HIV Test Results',
                 uppercase: true,
+                icon: Icons.vaccines,
               ),
               // Spacing
               const SizedBox(height: 16),

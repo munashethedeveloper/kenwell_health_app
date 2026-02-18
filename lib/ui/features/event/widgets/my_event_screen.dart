@@ -294,6 +294,7 @@ class MyEventScreenState extends State<MyEventScreen> {
               title: 'Welcome to Your Events',
               subtitle:
                   'Switch tabs to view and manage your wellness events for the month.',
+              icon: Icons.event_available,
               //textAlign: TextAlign.center,
             ),
 
