@@ -52,7 +52,6 @@ class _UserManagementScreenVersionTwoState
           // If user has no permissions, show a message
           if (tabs.isEmpty) {
             return Scaffold(
-              backgroundColor: const Color(0xFFF8F9FA),
               appBar: const KenwellAppBar(
                 automaticallyImplyLeading: true,
                 title: 'User Management',
@@ -138,7 +137,6 @@ class _UserManagementScreenVersionTwoState
           return DefaultTabController(
             length: tabs.length,
             child: Scaffold(
-              backgroundColor: const Color(0xFFF8F9FA),
               appBar: KenwellAppBar(
                 title: 'User Management',
                 titleColor: const Color(0xFF201C58),
@@ -147,79 +145,44 @@ class _UserManagementScreenVersionTwoState
                   fontWeight: FontWeight.bold,
                 ),
                 automaticallyImplyLeading: true,
-                bottom: PreferredSize(
-                  preferredSize: const Size.fromHeight(56),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+                bottom: TabBar(
+                  indicatorSize: TabBarIndicatorSize.label,
+                  indicator: UnderlineTabIndicator(
+                    borderSide: BorderSide(
+                      width: 3.0,
+                      color: theme.colorScheme.onPrimary,
                     ),
-                    child: TabBar(
-                      indicatorSize: TabBarIndicatorSize.tab,
-                      indicator: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            theme.colorScheme.primary,
-                            theme.colorScheme.primary.withValues(alpha: 0.85),
-                          ],
-                        ),
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(12),
-                          topRight: Radius.circular(12),
-                        ),
-                      ),
-                      labelColor: Colors.white,
-                      unselectedLabelColor: const Color(0xFF201C58)
-                          .withValues(alpha: 0.6),
-                      labelStyle: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
-                        letterSpacing: 0.3,
-                      ),
-                      unselectedLabelStyle: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                      ),
-                      tabs: tabs,
-                    ),
+                    insets: const EdgeInsets.symmetric(horizontal: 16.0),
                   ),
+                  labelColor: theme.colorScheme.onPrimary,
+                  unselectedLabelColor:
+                      theme.colorScheme.onPrimary.withValues(alpha: 0.7),
+                  labelStyle: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                  unselectedLabelStyle: const TextStyle(
+                    fontWeight: FontWeight.normal,
+                    fontSize: 14,
+                  ),
+                  tabs: tabs,
                 ),
                 actions: [
                   // Refresh users button
-                  Container(
-                    margin: const EdgeInsets.only(right: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: IconButton(
-                      onPressed: () {
-                        if (mounted) {
-                          context.read<UserManagementViewModel>().loadUsers();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: const Text('Users refreshed'),
-                              duration: const Duration(seconds: 1),
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                      icon: const Icon(Icons.refresh_rounded,
-                          color: Color(0xFF201C58)),
-                      tooltip: 'Refresh users',
-                    ),
+                  IconButton(
+                    onPressed: () {
+                      if (mounted) {
+                        context.read<UserManagementViewModel>().loadUsers();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Users refreshed'),
+                            duration: Duration(seconds: 1),
+                          ),
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.refresh, color: Color(0xFF201C58)),
+                    tooltip: 'Refresh users',
                   ),
                   TextButton.icon(
                     onPressed: () {
@@ -227,20 +190,11 @@ class _UserManagementScreenVersionTwoState
                         context.pushNamed('help');
                       }
                     },
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                    ),
-                    icon: const Icon(Icons.help_outline_rounded,
+                    icon: const Icon(Icons.help_outline,
                         color: Color(0xFF201C58)),
                     label: const Text(
                       'Help',
-                      style: TextStyle(
-                        color: Color(0xFF201C58),
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: TextStyle(color: Color(0xFF201C58)),
                     ),
                   ),
                 ],
