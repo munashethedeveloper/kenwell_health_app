@@ -11,7 +11,7 @@ import '../../profile/view_model/profile_view_model.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/buttons/custom_primary_button.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
-import '../../../shared/ui/form/kenwell_section_header.dart';
+import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 import '../view_model/calendar_view_model.dart';
 import 'day_events_dialog.dart';
 import 'event_card.dart';
@@ -230,7 +230,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
       child: Column(
         //Welcome Message and Calendar widget
         children: [
-          KenwellSectionHeader(
+          KenwellModernSectionHeader(
             title: _getWelcomeTitle(),
             subtitle: 'View and manage your wellness events for the month.',
             textAlign: TextAlign.center,
@@ -330,7 +330,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
     return Column(
       children: [
         //Welcome Message and Month Navigation Header
-        KenwellSectionHeader(
+        KenwellModernSectionHeader(
           title: _getWelcomeTitle(),
           subtitle: 'View and manage your wellness events for the month.',
           textAlign: TextAlign.center,
