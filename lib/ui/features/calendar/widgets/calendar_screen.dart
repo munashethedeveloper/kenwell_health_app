@@ -325,6 +325,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
   Widget _buildEventsListTab(CalendarViewModel viewModel) {
     // Get events for the focused month
     final eventsThisMonth = viewModel.getEventsForMonth(viewModel.focusedDay);
+    final theme = Theme.of(context);
 
     return Column(
       children: [
@@ -338,30 +339,63 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
         const SizedBox(height: 10),
         const AppLogo(size: 150),
         const SizedBox(height: 10),
-        // Month navigation header
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        // Enhanced month navigation header
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                theme.primaryColor.withValues(alpha: 0.08),
+                theme.primaryColor.withValues(alpha: 0.02),
+              ],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: theme.primaryColor.withValues(alpha: 0.15),
+              width: 1,
+            ),
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Previous month button
+              // Previous month button with enhanced styling
               IconButton(
-                icon: const Icon(Icons.chevron_left),
+                icon: const Icon(Icons.chevron_left_rounded),
                 onPressed: () => viewModel.goToPreviousMonth(),
-              ),
-              // Month and year title
-              Text(
-                viewModel.getMonthYearTitle(),
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF201C58),
+                style: IconButton.styleFrom(
+                  backgroundColor: theme.colorScheme.surface,
+                  foregroundColor: const Color(0xFF201C58),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
-              // Next month button
+              const SizedBox(width: 16),
+              // Month and year title with enhanced typography
+              Text(
+                viewModel.getMonthYearTitle(),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF201C58),
+                  letterSpacing: -0.5,
+                ),
+              ),
+              const SizedBox(width: 16),
+              // Next month button with enhanced styling
               IconButton(
-                icon: const Icon(Icons.chevron_right),
+                icon: const Icon(Icons.chevron_right_rounded),
                 onPressed: () => viewModel.goToNextMonth(),
+                style: IconButton.styleFrom(
+                  backgroundColor: theme.colorScheme.surface,
+                  foregroundColor: const Color(0xFF201C58),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
               ),
             ],
           ),
@@ -375,20 +409,28 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // No events illustration and message
-                        Icon(
-                          Icons.event_busy,
-                          size: 100,
-                          color: Colors.grey.shade400,
+                        // Enhanced no events illustration
+                        Container(
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: theme.primaryColor.withValues(alpha: 0.08),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.event_busy_rounded,
+                            size: 80,
+                            color: theme.primaryColor.withValues(alpha: 0.6),
+                          ),
                         ),
-                        const SizedBox(height: 16),
-                        // Informative message
+                        const SizedBox(height: 24),
+                        // Informative message with enhanced typography
                         Text(
                           'No events this month',
                           style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey.shade700,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.onSurface,
+                            letterSpacing: -0.5,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -397,18 +439,18 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                           Text(
                             'Create an event to get started',
                             style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey.shade600,
+                              fontSize: 15,
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
-                        const SizedBox(height: 24),
-                        // Button to create a new event
+                        const SizedBox(height: 32),
+                        // Enhanced button to create a new event
                         if (_canAddEvent(context))
                           CustomPrimaryButton(
                             label: 'Create Event',
                             onPressed: () => _openEventForm(
                                 context, viewModel, viewModel.focusedDay),
-                            leading: const Icon(Icons.add),
+                            leading: const Icon(Icons.add_rounded),
                           ),
                       ],
                     ),
@@ -441,19 +483,61 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Day header
-                            KenwellSectionHeader(
-                              title: viewModel.formatDateLong(day),
-                              icon: Icons.event,
-                              showBackground: false,
+                            // Enhanced day header with better styling
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 16, bottom: 12, left: 4),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 4,
+                                    height: 24,
+                                    decoration: BoxDecoration(
+                                      color: theme.primaryColor,
+                                      borderRadius: BorderRadius.circular(2),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      viewModel.formatDateLong(day),
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: theme.colorScheme.onSurface,
+                                        letterSpacing: -0.3,
+                                      ),
+                                    ),
+                                  ),
+                                  // Event count badge
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: theme.primaryColor
+                                          .withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      '${dayEvents.length}',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
+                                        color: theme.primaryColor,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                            const SizedBox(height: 8),
                             // Event cards for the day
                             ...dayEvents
                                 .map((event) => EventCard(
                                     event: event, viewModel: viewModel))
                                 .toList(),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 8),
                           ],
                         );
                       },
