@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/containers/gradient_container.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
-import '../../../shared/ui/form/kenwell_section_header.dart';
+import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 
 class EventStatsDetailScreen extends StatelessWidget {
   final WellnessEvent event;
@@ -38,7 +38,7 @@ class EventStatsDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const KenwellSectionHeader(
+            const KenwellModernSectionHeader(
               title: 'Event Details',
               subtitle: 'Detailed information about the wellness event',
               uppercase: true,

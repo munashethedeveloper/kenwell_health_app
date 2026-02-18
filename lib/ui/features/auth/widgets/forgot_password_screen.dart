@@ -8,7 +8,7 @@ import '../../../shared/ui/colours/kenwell_colours.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_styles.dart';
-import '../../../shared/ui/form/kenwell_section_header.dart';
+import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 import '../../../shared/ui/logo/app_logo.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -122,7 +122,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               const AppLogo(size: 250),
               const SizedBox(height: 24),
               // Section header
-              const KenwellSectionHeader(
+              const KenwellModernSectionHeader(
                 title: 'Reset Password',
                 subtitle:
                     'Enter the email address associated with your account and we will send you a reset link.',

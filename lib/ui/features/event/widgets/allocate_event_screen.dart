@@ -2,7 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_section_header.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/containers/gradient_container.dart';
@@ -618,7 +618,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                         padding: EdgeInsets.symmetric(horizontal: 16),
                         child: Align(
                           alignment: Alignment.centerLeft,
-                          child: KenwellSectionHeader(
+                          child: KenwellModernSectionHeader(
                             title: 'Assigned Users',
                             subtitle:
                                 'Manage which users are assigned to this wellness event.',
