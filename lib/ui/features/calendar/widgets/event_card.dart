@@ -165,7 +165,7 @@ class EventCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(
-            Icons.event,
+            viewModel.getServiceIcon(event.servicesRequested),
             color: theme.primaryColor,
             size: 20,
           ),
@@ -197,7 +197,7 @@ class EventCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    '${event.date.day}/${event.date.month}/${event.date.year}',
+                    viewModel.formatDateShort(event.date),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: Colors.grey[600],
                     ),
