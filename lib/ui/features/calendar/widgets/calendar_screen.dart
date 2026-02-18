@@ -542,11 +542,34 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                                 ],
                               ),
                             ),
-                            // Event cards for the day
-                            ...dayEvents
-                                .map((event) => EventCard(
-                                    event: event, viewModel: viewModel))
-                                .toList(),
+                            // Event cards wrapped in Event Breakdown Card container
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.white,
+                                    Colors.grey.shade50,
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.05),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              padding: const EdgeInsets.all(12),
+                              child: Column(
+                                children: dayEvents
+                                    .map((event) => EventCard(
+                                        event: event, viewModel: viewModel))
+                                    .toList(),
+                              ),
+                            ),
                             const SizedBox(height: 8),
                           ],
                         );
