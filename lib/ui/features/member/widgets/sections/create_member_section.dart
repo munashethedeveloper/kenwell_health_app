@@ -59,6 +59,7 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
   Widget build(BuildContext context) {
     return Consumer<MemberDetailsViewModel>(
       builder: (context, vm, _) {
+        final theme = Theme.of(context);
         return SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -70,11 +71,60 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
                   const SizedBox(height: 16),
                   const AppLogo(size: 200),
                   const SizedBox(height: 24),
-                  const KenwellSectionHeader(
-                    title: "Member Registration Form",
-                    subtitle:
-                        "Complete the member's details below to register.",
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                theme.primaryColor.withValues(alpha: 0.15),
+                                theme.primaryColor.withValues(alpha: 0.08),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            Icons.list_alt_rounded,
+                            color: theme.primaryColor,
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              //Modern Section Title and Subtitle
+                              Text(
+                                'Member Registration Form',
+                                style: TextStyle(
+                                  fontSize: 34,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF201C58),
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
+                              SizedBox(height: 2),
+                              Text(
+                                'Complete the form below to register a new member',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(0xFF6B7280),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                  const SizedBox(height: 24),
                   KenwellFormCard(
                     title: 'Basic Information',
                     margin: const EdgeInsets.only(bottom: 16),

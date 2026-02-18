@@ -254,7 +254,7 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
               SliverToBoxAdapter(
                 child: Column(
                   children: [
-                    const AppLogo(size: 200),
+                    //const AppLogo(size: 200),
 
                     const SizedBox(height: 16), // Stats header
                     Padding(
@@ -332,23 +332,69 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                       ),
                     ),
                     const SizedBox(height: 50),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: KenwellSectionHeader(
-                          title: 'Registered Members',
-                          subtitle:
-                              'Quickly view and manage all registered members in one place.',
-                        ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  theme.primaryColor.withValues(alpha: 0.15),
+                                  theme.primaryColor.withValues(alpha: 0.08),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Icon(
+                              Icons.list_alt_rounded,
+                              color: theme.primaryColor,
+                              size: 24,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                //Modern Section Title and Subtitle
+                                Text(
+                                  'Registered Members',
+                                  style: TextStyle(
+                                    fontSize: 34,
+                                    fontWeight: FontWeight.w800,
+                                    color: Color(0xFF201C58),
+                                    letterSpacing: -0.5,
+                                  ),
+                                ),
+                                SizedBox(height: 2),
+                                Text(
+                                  'View and manage all registered members',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color(0xFF6B7280),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    Text(
-                      'Tap on a member to view extra options:',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade700,
+                    const SizedBox(height: 12),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        'Tap on a member to view extra options',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey.shade600,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 24),

@@ -22,7 +22,7 @@ class KenwellFormCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final titleStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
-          fontSize: 16,
+          fontSize: 18,
           fontWeight: FontWeight.bold,
           color: const Color(0xFF201C58),
         );

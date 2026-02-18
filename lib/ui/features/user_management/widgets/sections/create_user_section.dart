@@ -134,6 +134,8 @@ class _CreateUserSectionState extends State<CreateUserSection> {
   Widget build(BuildContext context) {
     return Consumer<UserManagementViewModel>(
       builder: (context, viewModel, child) {
+        final theme = Theme.of(context);
+
         return SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -145,12 +147,60 @@ class _CreateUserSectionState extends State<CreateUserSection> {
                   const SizedBox(height: 16),
                   const AppLogo(size: 200),
                   const SizedBox(height: 24),
-                  const KenwellSectionHeader(
-                    title: "User Registration Form",
-                    subtitle:
-                        "Complete the user's details below to create an account.",
-                    icon: Icons.person_add_alt_1,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                theme.primaryColor.withValues(alpha: 0.15),
+                                theme.primaryColor.withValues(alpha: 0.08),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            Icons.list_alt_rounded,
+                            color: theme.primaryColor,
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              //Modern Section Title and Subtitle
+                              Text(
+                                'User Registration Form',
+                                style: TextStyle(
+                                  fontSize: 34,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF201C58),
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
+                              SizedBox(height: 2),
+                              Text(
+                                'Complete the form below to register a new user',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(0xFF6B7280),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                  const SizedBox(height: 24),
                   KenwellFormCard(
                     title: 'Personal Information',
                     margin: const EdgeInsets.only(bottom: 16),

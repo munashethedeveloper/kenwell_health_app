@@ -403,56 +403,66 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
         // Events list
         Expanded(
           child: eventsThisMonth.isEmpty
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(32),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Enhanced no events illustration
-                        Container(
-                          padding: const EdgeInsets.all(24),
-                          decoration: BoxDecoration(
-                            color: theme.primaryColor.withValues(alpha: 0.08),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.event_busy_rounded,
-                            size: 80,
-                            color: theme.primaryColor.withValues(alpha: 0.6),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        // Informative message with enhanced typography
-                        Text(
-                          'No events this month',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: theme.colorScheme.onSurface,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        // Suggestion to create events
-                        if (_canAddEvent(context))
-                          Text(
-                            'Create an event to get started',
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: theme.colorScheme.onSurfaceVariant,
+              ? SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: MediaQuery.of(context).size.height * 0.5,
+                    ),
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(32),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Enhanced no events illustration
+                            Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                color:
+                                    theme.primaryColor.withValues(alpha: 0.08),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.event_busy_rounded,
+                                size: 80,
+                                color:
+                                    theme.primaryColor.withValues(alpha: 0.6),
+                              ),
                             ),
-                          ),
-                        const SizedBox(height: 32),
-                        // Enhanced button to create a new event
-                        if (_canAddEvent(context))
-                          CustomPrimaryButton(
-                            label: 'Create Event',
-                            onPressed: () => _openEventForm(
-                                context, viewModel, viewModel.focusedDay),
-                            leading: const Icon(Icons.add_rounded),
-                          ),
-                      ],
+                            const SizedBox(height: 24),
+                            // Informative message with enhanced typography
+                            Text(
+                              'No events this month',
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: theme.colorScheme.onSurface,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            // Suggestion to create events
+                            if (_canAddEvent(context))
+                              Text(
+                                'Create an event to get started',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            const SizedBox(height: 32),
+                            // Enhanced button to create a new event
+                            if (_canAddEvent(context))
+                              CustomPrimaryButton(
+                                label: 'Create Event',
+                                onPressed: () => _openEventForm(
+                                    context, viewModel, viewModel.focusedDay),
+                                leading: const Icon(Icons.add_rounded),
+                              ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 )

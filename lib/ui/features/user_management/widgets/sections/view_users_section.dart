@@ -441,21 +441,10 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
               SliverToBoxAdapter(
                 child: Column(
                   children: [
-                    const AppLogo(size: 200),
+                    // const AppLogo(size: 200),
 
                     const SizedBox(height: 16),
-                    //const Padding(
-                    //padding: EdgeInsets.symmetric(horizontal: 16),
-                    //child: Align(
-                    //alignment: Alignment.centerLeft,
-                    //child: KenwellSectionHeader(
-                    //title: 'Registered Users',
-                    //subtitle:
-                    //     'Quickly view and manage all registered users in one place.',
-                    // ),
-                    //),
-                    //),
-                    //const SizedBox(height: 16),
+
                     // Stats header with modern design
                     // Stats header
                     Padding(
@@ -608,7 +597,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                                 Text(
                                   'Registered Users',
                                   style: TextStyle(
-                                    fontSize: 20,
+                                    fontSize: 34,
                                     fontWeight: FontWeight.w800,
                                     color: Color(0xFF201C58),
                                     letterSpacing: -0.5,
