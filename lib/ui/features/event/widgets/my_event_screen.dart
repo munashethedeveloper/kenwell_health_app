@@ -417,17 +417,16 @@ class MyEventScreenState extends State<MyEventScreen> {
                 child: Column(
                   children: [
                     for (int i = 0; i < filteredEvents.length; i++) ...[
-                      Builder(
-                        builder: (context) {
-                          final event = filteredEvents[i];
-                          final isStarting = _startingEventId == event.id;
-                          final theme = Theme.of(context);
-                          final isLastEvent = i == filteredEvents.length - 1;
-                          
-                          return Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 12),
+                      () {
+                        final event = filteredEvents[i];
+                        final isStarting = _startingEventId == event.id;
+                        final theme = Theme.of(context);
+                        final isLastEvent = i == filteredEvents.length - 1;
+                        
+                        return Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
                                 child: Material(
                                   color: Colors.transparent,
                                   child: Container(
@@ -654,11 +653,10 @@ class MyEventScreenState extends State<MyEventScreen> {
                               ],
                             ],
                           );
-                        },
-                      ),
+                        }(),
+                      ],
                     ],
-                  ],
-                ),
+                  ),
               ),
           ],
         ),
