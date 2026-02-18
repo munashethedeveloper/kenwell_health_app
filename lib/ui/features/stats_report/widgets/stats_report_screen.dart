@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
+import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 import '../../../shared/ui/logo/app_logo.dart';
 import '../../../shared/ui/containers/gradient_container.dart';
 import '../../../../data/repositories_dcl/firestore_member_repository.dart';
@@ -247,53 +248,11 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                   child: AppLogo(size: 100),
                 ),
                 const SizedBox(height: 16),
-                // Modern section header with background
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        theme.primaryColor.withValues(alpha: 0.08),
-                        theme.primaryColor.withValues(alpha: 0.02),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: theme.primaryColor.withValues(alpha: 0.1),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.analytics_outlined,
-                            //color: theme.primaryColor,
-                            color: KenwellColors.secondaryNavyDark,
-                            size: 24,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Overall Wellness Statistics',
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: KenwellColors.secondaryNavyDark,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Summary of wellness events and participation metrics.',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
+                // Modern section header
+                const KenwellModernSectionHeader(
+                  title: 'Overall Wellness Statistics',
+                  subtitle: 'Summary of wellness events and participation metrics.',
+                  icon: Icons.analytics_outlined,
                 ),
                 const SizedBox(height: 20),
                 // Enhanced Search Field with shadow
