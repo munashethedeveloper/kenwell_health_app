@@ -63,9 +63,14 @@ class UserCardWidget extends StatelessWidget {
       child: Builder(
         builder: (context) => GestureDetector(
           onTap: () {
-            // Open the slide menu on tap
+            // Toggle the slide menu on tap (open if closed, close if open)
             final slidable = Slidable.of(context);
-            slidable?.openEndActionPane();
+            final isOpen = slidable?.actionPaneType.value != ActionPaneType.none;
+            if (isOpen) {
+              slidable?.close();
+            } else {
+              slidable?.openEndActionPane();
+            }
           },
           onLongPress: onTap,
           child: Container(
