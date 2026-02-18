@@ -46,6 +46,10 @@ class UserSearchBar extends StatelessWidget {
         TextField(
           controller: controller,
           onChanged: onChanged,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
           decoration: InputDecoration(
             hintText: 'Enter user name or email to search...',
             hintStyle: TextStyle(
@@ -69,6 +73,7 @@ class UserSearchBar extends StatelessWidget {
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey.shade300, width: 1),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
