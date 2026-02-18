@@ -5,7 +5,7 @@ import 'package:kenwell_health_app/ui/shared/ui/containers/gradient_container.da
 import 'package:kenwell_health_app/ui/features/wellness/view_model/wellness_flow_view_model.dart';
 import 'package:provider/provider.dart';
 
-import '../../../shared/ui/form/kenwell_section_header.dart';
+import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 // Removed unused import
 
 class CurrentEventHomeScreen extends StatelessWidget {
@@ -106,13 +106,13 @@ class CurrentEventHomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            const KenwellSectionHeader(
+            const KenwellModernSectionHeader(
               title: 'Event Process',
               subtitle:
                   'Complete the steps below to finish the wellness event process.',
               icon: Icons.checklist,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 24),
             _ProcessStepCard(
               icon: Icons.person_add,
               title: 'Section A: Member Registration',

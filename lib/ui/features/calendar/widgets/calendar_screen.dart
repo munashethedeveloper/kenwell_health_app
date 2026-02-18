@@ -11,7 +11,7 @@ import '../../profile/view_model/profile_view_model.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/buttons/custom_primary_button.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
-import '../../../shared/ui/form/kenwell_section_header.dart';
+import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 import '../view_model/calendar_view_model.dart';
 import 'day_events_dialog.dart';
 import 'event_card.dart';
@@ -230,14 +230,14 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
       child: Column(
         //Welcome Message and Calendar widget
         children: [
-          KenwellSectionHeader(
+          KenwellModernSectionHeader(
             title: _getWelcomeTitle(),
-            subtitle: 'View and manage your wellness events for the month.',
+            //subtitle: 'View and manage your wellness events for the month.',
             textAlign: TextAlign.center,
-            icon: Icons.calendar_month,
+            //icon: Icons.calendar_month,
           ),
-          const SizedBox(height: 10),
-          const AppLogo(size: 150),
+          //const SizedBox(height: 10),
+          //const AppLogo(size: 150),
           const SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -330,14 +330,14 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
     return Column(
       children: [
         //Welcome Message and Month Navigation Header
-        KenwellSectionHeader(
+        KenwellModernSectionHeader(
           title: _getWelcomeTitle(),
-          subtitle: 'View and manage your wellness events for the month.',
+          //subtitle: 'View and manage your wellness events for the month.',
           textAlign: TextAlign.center,
-          icon: Icons.calendar_month,
+          //icon: Icons.calendar_month,
         ),
-        const SizedBox(height: 10),
-        const AppLogo(size: 150),
+        // const SizedBox(height: 10),
+        //const AppLogo(size: 150),
         const SizedBox(height: 10),
         // Enhanced month navigation header
         Container(
@@ -377,10 +377,10 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
               // Month and year title with enhanced typography
               Text(
                 viewModel.getMonthYearTitle(),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF201C58),
+                  color: Color(0xFF201C58),
                   letterSpacing: -0.5,
                 ),
               ),

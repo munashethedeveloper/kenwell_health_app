@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 
-import '../../../shared/ui/form/kenwell_section_header.dart';
+import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 
 class HealthScreeningsScreen extends StatelessWidget {
   final bool hraEnabled;
@@ -45,7 +45,7 @@ class HealthScreeningsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const KenwellSectionHeader(
+            const KenwellModernSectionHeader(
               title: 'Section C: Health Screenings',
               subtitle: 'Complete the health screenings you have consented to.',
               icon: Icons.medical_services,

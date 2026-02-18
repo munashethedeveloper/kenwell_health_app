@@ -4,7 +4,7 @@ import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/buttons/form_action_buttons.dart';
-import '../../../shared/ui/form/kenwell_section_header.dart';
+import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/dialogs/confirmation_dialog.dart';
 import '../utils/event_form_validator.dart';
@@ -205,15 +205,17 @@ class _EventScreenState extends State<EventScreen> {
               const AppLogo(size: 200),
               const SizedBox(height: 16),
               // Section header
-              KenwellSectionHeader(
+              KenwellModernSectionHeader(
                 title: isEditMode ? 'Edit Event' : 'Add New Event',
                 subtitle:
                     'Complete the event details or update the event information',
                 icon: isEditMode ? Icons.edit : Icons.add_circle_outline,
               ),
+              const SizedBox(height: 24),
               // Event Basic Info Section
               EventBasicInfoSection(
                 viewModel: widget.viewModel,
+                //title: 'Event Basic Information',
                 date: widget.date,
                 requiredField: _requiredField,
               ),

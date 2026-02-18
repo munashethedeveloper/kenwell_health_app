@@ -9,7 +9,7 @@ import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_form_card.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 
-import '../../../shared/ui/form/kenwell_section_header.dart';
+import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 // ...existing code...
 
 class MemberSearchScreen extends StatefulWidget {
@@ -153,12 +153,13 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
             const SizedBox(height: 16),
             const AppLogo(size: 200),
             const SizedBox(height: 24),
-            const KenwellSectionHeader(
+            const KenwellModernSectionHeader(
               title: 'Search Member',
               subtitle:
                   'Find an existing member by their ID or Passport number',
               icon: Icons.person_search,
             ),
+            const SizedBox(height: 24),
 
             // Search section with background
             Container(

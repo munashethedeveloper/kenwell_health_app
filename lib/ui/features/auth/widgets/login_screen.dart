@@ -7,7 +7,7 @@ import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/logo/app_logo.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
-import '../../../shared/ui/form/kenwell_section_header.dart';
+import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
 import '../../profile/view_model/profile_view_model.dart';
 import '../view_models/auth_view_model.dart';
@@ -136,7 +136,7 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
                     const AppLogo(size: 200),
                     const SizedBox(height: 24),
                     // Section header
-                    const KenwellSectionHeader(
+                    const KenwellModernSectionHeader(
                       title: 'Welcome to KenWell365!',
                       subtitle: 'Supporting wellbeing, 365 days a year.',
                       icon: Icons.waving_hand,

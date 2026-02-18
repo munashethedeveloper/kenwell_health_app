@@ -8,7 +8,7 @@ import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/buttons/custom_primary_button.dart';
 import '../../../shared/ui/buttons/custom_secondary_button.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
-import '../../../shared/ui/form/kenwell_section_header.dart';
+import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 import '../../../shared/ui/logo/app_logo.dart';
 import '../../user_management/viewmodel/user_management_view_model.dart';
 import '../../profile/view_model/profile_view_model.dart';
@@ -77,12 +77,13 @@ class EventDetailsScreen extends StatelessWidget {
           const AppLogo(size: 150),
           const SizedBox(height: 24),
           // Section header
-          KenwellSectionHeader(
+          KenwellModernSectionHeader(
             title: 'Event Summary Details',
             subtitle: 'Detailed information about the ${event.title} event.',
             uppercase: true,
             icon: Icons.event_note,
           ),
+          const SizedBox(height: 24),
           // Event detail sections
           _buildSectionCard('Client Organization', [
             _buildDetailRow('Event Title', event.title, theme),

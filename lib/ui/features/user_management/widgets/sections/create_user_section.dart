@@ -8,7 +8,7 @@ import '../../../../shared/ui/buttons/custom_primary_button.dart';
 import '../../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../../shared/ui/form/custom_text_field.dart';
 import '../../../../shared/ui/form/kenwell_form_card.dart';
-import '../../../../shared/ui/form/kenwell_section_header.dart';
+import '../../../../shared/ui/form/kenwell_modern_section_header.dart';
 import '../../../../shared/ui/logo/app_logo.dart';
 import '../../viewmodel/user_management_view_model.dart';
 
@@ -147,58 +147,10 @@ class _CreateUserSectionState extends State<CreateUserSection> {
                   const SizedBox(height: 16),
                   const AppLogo(size: 200),
                   const SizedBox(height: 24),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                theme.primaryColor.withValues(alpha: 0.15),
-                                theme.primaryColor.withValues(alpha: 0.08),
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(
-                            Icons.list_alt_rounded,
-                            color: theme.primaryColor,
-                            size: 24,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        const Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              //Modern Section Title and Subtitle
-                              Text(
-                                'User Registration Form',
-                                style: TextStyle(
-                                  fontSize: 34,
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFF201C58),
-                                  letterSpacing: -0.5,
-                                ),
-                              ),
-                              SizedBox(height: 2),
-                              Text(
-                                'Complete the form below to register a new user',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xFF6B7280),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                  const KenwellModernSectionHeader(
+                    title: 'User Registration Form',
+                    subtitle: 'Complete the form below to register a new user',
+                    icon: Icons.list_alt_rounded,
                   ),
                   const SizedBox(height: 24),
                   KenwellFormCard(

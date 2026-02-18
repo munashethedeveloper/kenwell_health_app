@@ -7,7 +7,7 @@ import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
-import '../../../shared/ui/form/kenwell_section_header.dart';
+import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/health_metrics_view_model.dart';
 
@@ -54,7 +54,7 @@ class HealthMetricsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Section header
-                    const KenwellSectionHeader(
+                    const KenwellModernSectionHeader(
                       title: 'Section D: Health Metrics',
                       uppercase: true,
                       icon: Icons.health_and_safety,

@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
-import '../../../shared/ui/form/kenwell_section_header.dart';
+import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 import '../../../shared/ui/logo/app_logo.dart';
 import '../view_model/profile_view_model.dart';
 import 'sections/profile_form_section.dart';
@@ -172,7 +172,7 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
                           const SizedBox(height: 16),
                           const AppLogo(size: 200),
                           const SizedBox(height: 24),
-                          const KenwellSectionHeader(
+                          const KenwellModernSectionHeader(
                             title: 'Update Profile',
                             subtitle:
                                 'Complete your details or update your information',

@@ -9,7 +9,7 @@ import '../../../../data/services/auth_service.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../shared/ui/buttons/custom_primary_button.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
-import '../../../shared/ui/form/kenwell_section_header.dart';
+import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 import '../view_model/event_view_model.dart';
 import '../../wellness/widgets/wellness_flow_page.dart';
 
@@ -290,13 +290,14 @@ class MyEventScreenState extends State<MyEventScreen> {
             const SizedBox(height: 16),
             const AppLogo(size: 200),
             const SizedBox(height: 16),
-            const KenwellSectionHeader(
-              title: 'Welcome to Your Events',
+            const KenwellModernSectionHeader(
+              title: 'Welcome to the My Events Screen',
               subtitle:
                   'Switch tabs to view and manage your wellness events for the month.',
               icon: Icons.event_available,
               //textAlign: TextAlign.center,
             ),
+            const SizedBox(height: 24),
 
             // Row with left toggle, centered label, and right toggle
             Row(
