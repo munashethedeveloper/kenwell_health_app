@@ -500,7 +500,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                 SliverToBoxAdapter(
                   child: Column(
                     children: [
-                      const AppLogo(size: 200),
+                      //const AppLogo(size: 200),
 
                       const SizedBox(height: 16), // Stats header
                       Padding(
@@ -625,10 +625,11 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: 8),
                       Text(
-                        'Tap on a user to assign or unassign them from this event.',
+                        'Tap on a user to assign or unassign them from this event:',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: Colors.grey.shade700,
                         ),

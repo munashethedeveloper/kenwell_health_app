@@ -236,8 +236,8 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
             textAlign: TextAlign.center,
             //icon: Icons.calendar_month,
           ),
-          //const SizedBox(height: 10),
-          //const AppLogo(size: 150),
+          const SizedBox(height: 10),
+          const AppLogo(size: 150),
           const SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),

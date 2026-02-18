@@ -388,11 +388,11 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
-                        'Tap on a member to view extra options',
+                        'Tap on a member to view extra options:',
                         style: TextStyle(
                           fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey.shade600,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey.shade700,
                         ),
                       ),
                     ),

@@ -19,91 +19,76 @@ class UserSearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: theme.primaryColor.withValues(alpha: 0.08),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Explanatory label
+        Row(
+          children: [
+            Icon(
+              Icons.info_outline,
+              size: 16,
+              color: Colors.grey.shade600,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              'Search & Filter Users:',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey.shade700,
+              ),
             ),
           ],
         ),
-        child: TextField(
+        const SizedBox(height: 8),
+        // Search TextField
+        TextField(
           controller: controller,
+          onChanged: onChanged,
           style: const TextStyle(
-            fontSize: 15,
+            fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
           decoration: InputDecoration(
-            hintText: 'Search users by name or email...',
+            hintText: 'Enter user name or email to search...',
             hintStyle: TextStyle(
               color: Colors.grey.shade500,
-              fontSize: 15,
-              fontWeight: FontWeight.w400,
+              fontSize: 14,
             ),
-            prefixIcon: Container(
-              margin: const EdgeInsets.all(12),
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    theme.primaryColor.withValues(alpha: 0.15),
-                    theme.primaryColor.withValues(alpha: 0.08),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.search,
-                color: theme.primaryColor,
-                size: 20,
-              ),
-            ),
+            prefixIcon: const Icon(Icons.search),
             suffixIcon: searchQuery.isNotEmpty
-                ? Container(
-                    margin: const EdgeInsets.only(right: 8),
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.clear,
-                        color: Colors.grey.shade600,
-                      ),
-                      onPressed: onClear,
+                ? IconButton(
+                    icon: Icon(
+                      Icons.clear,
+                      color: Colors.grey.shade600,
+                      size: 20,
                     ),
+                    onPressed: onClear,
                   )
                 : null,
             filled: true,
             fillColor: Colors.white,
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey.shade300, width: 1),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide(
-                color: Colors.grey.shade200,
-                width: 1.5,
-              ),
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey.shade300, width: 1),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: theme.primaryColor,
+                color: theme.colorScheme.primary,
                 width: 2,
               ),
             ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 16,
-            ),
           ),
-          onChanged: onChanged,
         ),
-      ),
+      ],
     );
   }
 }

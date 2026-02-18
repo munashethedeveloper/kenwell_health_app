@@ -524,24 +524,17 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Search and filter section with modern background
+                    // Search and filter section with background
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 16),
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
+                        color: const Color(0xFFF5F5F5),
+                        borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: Colors.grey.shade200,
-                          width: 1.5,
+                          color: Colors.grey.shade300,
+                          width: 1,
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.06),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
                       ),
                       child: Column(
                         children: [
@@ -621,11 +614,11 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
-                        'Tap on a user to view extra options',
+                        'Tap on a user to view extra options:',
                         style: TextStyle(
                           fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey.shade600,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey.shade700,
                         ),
                       ),
                     ),
