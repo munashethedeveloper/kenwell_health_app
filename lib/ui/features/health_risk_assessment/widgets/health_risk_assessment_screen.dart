@@ -10,7 +10,7 @@ import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/custom_yes_no_question.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_styles.dart';
-import '../../../shared/ui/form/kenwell_section_header.dart';
+import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/health_risk_assessment_view_model.dart';
 
@@ -69,7 +69,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // ===== Section C: Health Screening =====
-                    const KenwellSectionHeader(
+                    const KenwellModernSectionHeader(
                       title: 'Section C: Health Screening',
                       uppercase: true,
                       icon: Icons.medical_information,
@@ -317,7 +317,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                     const SizedBox(height: 24),
 
                     // ===== Section D: Health Metrics =====
-                    const KenwellSectionHeader(
+                    const KenwellModernSectionHeader(
                       title: 'Section D: Health Metrics',
                       uppercase: true,
                       icon: Icons.health_and_safety,

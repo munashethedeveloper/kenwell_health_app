@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 
 import '../app_bar/kenwell_app_bar.dart';
-import 'kenwell_section_header.dart';
+import 'kenwell_modern_section_header.dart';
 
 /// Reusable page shell that standardizes Kenwell form layouts.
 class KenwellFormPage extends StatelessWidget {
@@ -33,7 +33,7 @@ class KenwellFormPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final contentChildren = <Widget>[
       if (sectionTitle != null) ...[
-        KenwellSectionHeader(
+        KenwellModernSectionHeader(
           title: sectionTitle!,
           uppercase: uppercaseSectionTitle,
         ),
