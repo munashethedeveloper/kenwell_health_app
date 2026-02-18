@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
+import 'package:kenwell_health_app/ui/shared/utils/event_status_colors.dart';
 
 /// Reusable Event Breakdown Card Widget
 /// Displays an event with consistent styling across the app
@@ -89,14 +90,14 @@ class EventBreakdownCard extends StatelessWidget {
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: _getStatusColor(event.status)
+                                color: EventStatusColors.getStatusColor(event.status)
                                     .withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
                                 event.status,
                                 style: theme.textTheme.labelSmall?.copyWith(
-                                  color: _getStatusColor(event.status),
+                                  color: EventStatusColors.getStatusColor(event.status),
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -150,19 +151,5 @@ class EventBreakdownCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Color _getStatusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'scheduled':
-        return Colors.orange;
-      case 'in progress':
-      case 'inprogress':
-        return Colors.blue;
-      case 'completed':
-        return Colors.deepPurple;
-      default:
-        return Colors.grey;
-    }
   }
 }

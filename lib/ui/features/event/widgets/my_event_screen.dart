@@ -9,6 +9,7 @@ import '../../../../data/services/auth_service.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../shared/ui/buttons/custom_primary_button.dart';
 import '../../../shared/ui/form/kenwell_modern_section_header.dart';
+import '../../../shared/utils/event_status_colors.dart';
 import '../view_model/event_view_model.dart';
 import '../../wellness/widgets/wellness_flow_page.dart';
 
@@ -391,7 +392,8 @@ class MyEventScreenState extends State<MyEventScreen> {
               )
             else
               // List of events for the selected tab
-              // Wrap in container with gradient background like Event Breakdown Card
+              // Using Event Breakdown Card styling inline to preserve custom action buttons
+              // (Start/Resume/Finish buttons are specific to this screen)
               Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -488,7 +490,7 @@ class MyEventScreenState extends State<MyEventScreen> {
                                                 vertical: 2,
                                               ),
                                               decoration: BoxDecoration(
-                                                color: _getStatusColor(
+                                                color: EventStatusColors.getStatusColor(
                                                         event.status)
                                                     .withValues(alpha: 0.15),
                                                 borderRadius:
@@ -499,7 +501,7 @@ class MyEventScreenState extends State<MyEventScreen> {
                                                 style: theme
                                                     .textTheme.labelSmall
                                                     ?.copyWith(
-                                                  color: _getStatusColor(
+                                                  color: EventStatusColors.getStatusColor(
                                                       event.status),
                                                   fontWeight: FontWeight.w600,
                                                 ),
@@ -720,21 +722,6 @@ class MyEventScreenState extends State<MyEventScreen> {
       await _fetchUserEvents();
     } catch (e) {
       debugPrint('MyEventScreen: Error refreshing events after finish: $e');
-    }
-  }
-
-  // Get status color for badges
-  Color _getStatusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'scheduled':
-        return Colors.orange;
-      case 'in progress':
-      case 'inprogress':
-        return Colors.blue;
-      case 'completed':
-        return Colors.deepPurple;
-      default:
-        return Colors.grey;
     }
   }
 }
