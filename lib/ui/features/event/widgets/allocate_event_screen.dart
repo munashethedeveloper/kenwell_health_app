@@ -283,7 +283,9 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
             backgroundColor: isAssigned 
                 ? theme.colorScheme.primary.withValues(alpha: 0.5)
                 : theme.colorScheme.primary,
-            foregroundColor: theme.colorScheme.onPrimary,
+            foregroundColor: isAssigned
+                ? theme.colorScheme.onPrimary.withValues(alpha: 0.5)
+                : theme.colorScheme.onPrimary,
             icon: Icons.person_add,
             label: 'Assign',
           ),
@@ -292,7 +294,9 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
             backgroundColor: isAssigned 
                 ? theme.colorScheme.error
                 : theme.colorScheme.error.withValues(alpha: 0.5),
-            foregroundColor: theme.colorScheme.onError,
+            foregroundColor: isAssigned
+                ? theme.colorScheme.onError
+                : theme.colorScheme.onError.withValues(alpha: 0.5),
             icon: Icons.person_remove,
             label: 'Unassign',
           ),
