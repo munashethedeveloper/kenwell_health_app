@@ -52,6 +52,7 @@ class _UserManagementScreenVersionTwoState
           // If user has no permissions, show a message
           if (tabs.isEmpty) {
             return Scaffold(
+              backgroundColor: const Color(0xFFF8F9FA),
               appBar: const KenwellAppBar(
                 automaticallyImplyLeading: true,
                 title: 'User Management',
@@ -62,29 +63,69 @@ class _UserManagementScreenVersionTwoState
                 ),
               ),
               body: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(32.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.lock,
-                        size: 64,
-                        color: theme.colorScheme.onSurfaceVariant,
+                child: Container(
+                  margin: const EdgeInsets.all(32),
+                  padding: const EdgeInsets.all(40),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Colors.white,
+                        theme.primaryColor.withValues(alpha: 0.03),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: Colors.red.withValues(alpha: 0.2),
+                      width: 2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.red.withValues(alpha: 0.1),
+                        blurRadius: 20,
+                        offset: const Offset(0, 6),
                       ),
-                      const SizedBox(height: 16),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Colors.red.withValues(alpha: 0.15),
+                              Colors.red.withValues(alpha: 0.08),
+                            ],
+                          ),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.lock_rounded,
+                          size: 64,
+                          color: Colors.red,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
                       Text(
                         'No Access',
                         style: theme.textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFF201C58),
+                          letterSpacing: -0.5,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 12),
                       Text(
                         'You do not have permission to access user management features.',
                         textAlign: TextAlign.center,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          color: const Color(0xFF6B7280),
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
@@ -97,6 +138,7 @@ class _UserManagementScreenVersionTwoState
           return DefaultTabController(
             length: tabs.length,
             child: Scaffold(
+              backgroundColor: const Color(0xFFF8F9FA),
               appBar: KenwellAppBar(
                 title: 'User Management',
                 titleColor: const Color(0xFF201C58),
@@ -105,44 +147,79 @@ class _UserManagementScreenVersionTwoState
                   fontWeight: FontWeight.bold,
                 ),
                 automaticallyImplyLeading: true,
-                bottom: TabBar(
-                  indicatorSize: TabBarIndicatorSize.label,
-                  indicator: UnderlineTabIndicator(
-                    borderSide: BorderSide(
-                      width: 3.0,
-                      color: theme.colorScheme.onPrimary,
+                bottom: PreferredSize(
+                  preferredSize: const Size.fromHeight(56),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    insets: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: TabBar(
+                      indicatorSize: TabBarIndicatorSize.tab,
+                      indicator: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            theme.colorScheme.primary,
+                            theme.colorScheme.primary.withValues(alpha: 0.85),
+                          ],
+                        ),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(12),
+                          topRight: Radius.circular(12),
+                        ),
+                      ),
+                      labelColor: Colors.white,
+                      unselectedLabelColor: const Color(0xFF201C58)
+                          .withValues(alpha: 0.6),
+                      labelStyle: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                        letterSpacing: 0.3,
+                      ),
+                      unselectedLabelStyle: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                      ),
+                      tabs: tabs,
+                    ),
                   ),
-                  labelColor: theme.colorScheme.onPrimary,
-                  unselectedLabelColor:
-                      theme.colorScheme.onPrimary.withValues(alpha: 0.7),
-                  labelStyle: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                  unselectedLabelStyle: const TextStyle(
-                    fontWeight: FontWeight.normal,
-                    fontSize: 14,
-                  ),
-                  tabs: tabs,
                 ),
                 actions: [
                   // Refresh users button
-                  IconButton(
-                    onPressed: () {
-                      if (mounted) {
-                        context.read<UserManagementViewModel>().loadUsers();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Users refreshed'),
-                            duration: Duration(seconds: 1),
-                          ),
-                        );
-                      }
-                    },
-                    icon: const Icon(Icons.refresh, color: Color(0xFF201C58)),
-                    tooltip: 'Refresh users',
+                  Container(
+                    margin: const EdgeInsets.only(right: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: IconButton(
+                      onPressed: () {
+                        if (mounted) {
+                          context.read<UserManagementViewModel>().loadUsers();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text('Users refreshed'),
+                              duration: const Duration(seconds: 1),
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      icon: const Icon(Icons.refresh_rounded,
+                          color: Color(0xFF201C58)),
+                      tooltip: 'Refresh users',
+                    ),
                   ),
                   TextButton.icon(
                     onPressed: () {
@@ -150,11 +227,20 @@ class _UserManagementScreenVersionTwoState
                         context.pushNamed('help');
                       }
                     },
-                    icon: const Icon(Icons.help_outline,
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                    ),
+                    icon: const Icon(Icons.help_outline_rounded,
                         color: Color(0xFF201C58)),
                     label: const Text(
                       'Help',
-                      style: TextStyle(color: Color(0xFF201C58)),
+                      style: TextStyle(
+                        color: Color(0xFF201C58),
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],
