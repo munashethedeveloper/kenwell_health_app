@@ -10,7 +10,6 @@ import '../../../../shared/ui/form/custom_text_field.dart';
 import '../../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../../shared/ui/form/kenwell_date_field.dart';
 import '../../../../shared/ui/form/kenwell_form_styles.dart';
-import '../../../../shared/ui/form/kenwell_section_header.dart';
 import '../../../../shared/ui/logo/app_logo.dart';
 import '../../view_model/member_registration_view_model.dart';
 
