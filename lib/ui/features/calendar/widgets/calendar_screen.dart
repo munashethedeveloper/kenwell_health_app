@@ -489,6 +489,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                       itemBuilder: (context, index) {
                         final day = sortedDates[index];
                         final dayEvents = groupedEvents[day]!;
+                        final isLastDay = index == sortedDates.length - 1;
 
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -571,6 +572,16 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                               ),
                             ),
                             const SizedBox(height: 8),
+                            // Divider between days (except after the last day)
+                            if (!isLastDay) ...[
+                              const SizedBox(height: 16),
+                              Divider(
+                                color: theme.primaryColor.withValues(alpha: 0.2),
+                                thickness: 1,
+                                height: 1,
+                              ),
+                              const SizedBox(height: 8),
+                            ],
                           ],
                         );
                       },
