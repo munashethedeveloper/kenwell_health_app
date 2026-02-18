@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
-import 'package:kenwell_health_app/ui/shared/ui/containers/gradient_container.dart';
 import 'package:kenwell_health_app/ui/features/wellness/view_model/wellness_flow_view_model.dart';
 import 'package:provider/provider.dart';
 
 import '../../../shared/ui/form/kenwell_modern_section_header.dart';
-// Removed unused import
 
 class CurrentEventHomeScreen extends StatelessWidget {
   final WellnessEvent event;
@@ -31,78 +29,133 @@ class CurrentEventHomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            GradientContainer.purpleGreen(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.event,
-                      size: 40,
-                      color: Colors.white,
-                    ),
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.white,
+                    Colors.grey.shade50,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
                   ),
-                  const SizedBox(height: 12),
-                  Text(
-                    event.title,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    // Event icon badge
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: theme.primaryColor.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.event,
+                        size: 40,
+                        color: theme.primaryColor,
+                      ),
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    event.venue,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: Colors.white.withValues(alpha: 0.9),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  if (viewModel.currentMember != null) ...[
-                    const SizedBox(height: 16),
-                    Divider(color: Colors.white.withValues(alpha: 0.3)),
                     const SizedBox(height: 12),
+                    Text(
+                      event.title,
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.primaryColor,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    // Date with icon
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(
-                          Icons.person,
-                          size: 20,
-                          color: Colors.white,
+                        Icon(
+                          Icons.calendar_today,
+                          size: 16,
+                          color: Colors.grey[600],
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 6),
                         Text(
-                          'Current Member',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                          '${event.date.day}/${event.date.month}/${event.date.year}',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    _buildMemberInfoRow(
-                      'Name',
-                      '${viewModel.currentMember!.name} ${viewModel.currentMember!.surname}',
-                      theme,
-                    ),
                     const SizedBox(height: 8),
-                    _buildMemberInfoRow(
-                      viewModel.currentMember!.idDocumentType == 'ID'
-                          ? 'ID Number'
-                          : 'Passport Number',
-                      viewModel.currentMember!.idDocumentType == 'ID'
-                          ? (viewModel.currentMember!.idNumber ?? 'N/A')
-                          : (viewModel.currentMember!.passportNumber ?? 'N/A'),
-                      theme,
+                    // Venue with icon
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.business,
+                          size: 16,
+                          color: Colors.grey[600],
+                        ),
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Text(
+                            event.venue,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: Colors.grey[600],
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
                     ),
+                    if (viewModel.currentMember != null) ...[
+                      const SizedBox(height: 16),
+                      Divider(color: Colors.grey.shade300),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.person,
+                            size: 20,
+                            color: theme.primaryColor,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Current Member',
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: theme.primaryColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      _buildMemberInfoRow(
+                        'Name',
+                        '${viewModel.currentMember!.name} ${viewModel.currentMember!.surname}',
+                        theme,
+                      ),
+                      const SizedBox(height: 8),
+                      _buildMemberInfoRow(
+                        viewModel.currentMember!.idDocumentType == 'ID'
+                            ? 'ID Number'
+                            : 'Passport Number',
+                        viewModel.currentMember!.idDocumentType == 'ID'
+                            ? (viewModel.currentMember!.idNumber ?? 'N/A')
+                            : (viewModel.currentMember!.passportNumber ?? 'N/A'),
+                        theme,
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
             const SizedBox(height: 24),
@@ -171,7 +224,7 @@ class CurrentEventHomeScreen extends StatelessWidget {
           child: Text(
             label,
             style: theme.textTheme.bodySmall?.copyWith(
-              color: Colors.white.withValues(alpha: 0.8),
+              color: Colors.grey[700],
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -181,7 +234,7 @@ class CurrentEventHomeScreen extends StatelessWidget {
             value,
             style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w600,
-              color: Colors.white,
+              color: theme.primaryColor,
             ),
           ),
         ),
