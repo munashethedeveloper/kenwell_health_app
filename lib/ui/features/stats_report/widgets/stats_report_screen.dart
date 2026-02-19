@@ -255,6 +255,80 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                       'Summary of wellness events and participation metrics.',
                   icon: Icons.analytics_outlined,
                 ),
+                const SizedBox(height: 16),
+                // Stats header card
+                GradientContainer.purpleGreen(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(
+                          Icons.analytics,
+                          color: Colors.white,
+                          size: 28,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              (_hasActiveFilters ||
+                                      _searchController.text.isNotEmpty)
+                                  ? 'Showing Events: ${events.length} of ${allEvents.length}'
+                                  : '${allEvents.length} Total Events',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.people,
+                                  color: Colors.white.withValues(alpha: 0.9),
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '$totalScreened screened',
+                                  style: TextStyle(
+                                    color:
+                                        Colors.white.withValues(alpha: 0.9),
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Icon(
+                                  Icons.flag,
+                                  color: Colors.white.withValues(alpha: 0.9),
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '$totalExpected expected',
+                                  style: TextStyle(
+                                    color:
+                                        Colors.white.withValues(alpha: 0.9),
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 const SizedBox(height: 20),
                 // Enhanced Search Field with shadow
                 Container(
@@ -704,6 +778,8 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
+                const Divider(thickness: 1),
+                const SizedBox(height: 16),
 
                 // Enhanced search results indicator
                 if (_searchController.text.isNotEmpty || _hasActiveFilters)
@@ -737,6 +813,67 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                     ),
                   ),
                 const SizedBox(height: 8),
+
+                // Section title and explanatory text
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            theme.primaryColor.withValues(alpha: 0.15),
+                            theme.primaryColor.withValues(alpha: 0.08),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        Icons.analytics_outlined,
+                        color: theme.primaryColor,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Wellness Statistics',
+                            style: TextStyle(
+                              fontSize: 34,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF201C58),
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            'View and analyse wellness events and participation',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF6B7280),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Tap on an event to view detailed statistics:',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey.shade700,
+                  ),
+                ),
+                const SizedBox(height: 24),
 
                 // Stat Cards Row 1 - Total Members Expected and Registered
                 Row(
