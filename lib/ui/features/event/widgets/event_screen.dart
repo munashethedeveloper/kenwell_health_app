@@ -190,8 +190,16 @@ class _EventScreenState extends State<EventScreen> {
 
     // Build the Scaffold
     return Scaffold(
-      appBar: KenwellAppBar(
-        title: isEditMode ? 'Edit Event' : 'Add Event',
+      appBar: const KenwellAppBar(
+        title: 'Kenwell365',
+        automaticallyImplyLeading: true,
+        //titleColor: const Color(0xFF201C58),
+        titleColor: Colors.white,
+        titleStyle: const TextStyle(
+          //color: Color(0xFF201C58),
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -207,8 +215,10 @@ class _EventScreenState extends State<EventScreen> {
               // Section header
               KenwellModernSectionHeader(
                 title: isEditMode ? 'Edit Event' : 'Add New Event',
-                subtitle:
-                    'Complete the event details or update the event information',
+                subtitle: isEditMode
+                    ? 'Update the event details below'
+                    : 'Please complete the form to add a new event',
+                //     'Please complete the event details or update the event information',
                 icon: isEditMode ? Icons.edit : Icons.add_circle_outline,
               ),
               const SizedBox(height: 24),

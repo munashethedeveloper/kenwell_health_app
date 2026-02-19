@@ -44,14 +44,14 @@ class EventDetailsScreen extends StatelessWidget {
     return Scaffold(
       // App bar with title and actions
       appBar: KenwellAppBar(
-        title: '${event.title} Event Details',
+        title: '${event.title} Details',
         titleColor: Colors.white,
         titleStyle: const TextStyle(
           color: Colors.white,
           //fontWeight: FontWeight.bold,
         ),
         automaticallyImplyLeading: true,
-        backgroundColor: const Color(0xFF201C58),
+        //backgroundColor: const Color(0xFF201C58),
         centerTitle: true,
         // Action buttons for edit and delete (with permission checks) - FIX THIS!!!!!!
         actions: [

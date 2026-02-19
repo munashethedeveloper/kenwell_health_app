@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
 
@@ -21,12 +22,14 @@ class RegistrationManagementScreenBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ProfileViewModel>(
       builder: (context, vm, _) => Scaffold(
-        backgroundColor: Colors.white,
+        //backgroundColor: Colors.white,
         appBar: const KenwellAppBar(
-          title: 'Registration Management',
-          titleColor: Color(0xFF201C58),
+          title: 'KenWell365',
+          titleColor: Colors.white,
+          //titleColor: Color(0xFF201C58),
           titleStyle: TextStyle(
-            color: Color(0xFF201C58),
+            //color: Color(0xFF201C58),
+            color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
           automaticallyImplyLeading: true,
@@ -41,23 +44,30 @@ class RegistrationManagementScreenBody extends StatelessWidget {
                     const AppLogo(size: 200),
                     const SizedBox(height: 24),
                     // Menu section header
-                    Align(
+                    const Align(
                       alignment: Alignment.centerLeft,
                       child: Padding(
-                        padding: const EdgeInsets.only(left: 4, bottom: 12),
-                        child: Text(
-                          'Register Users and Members:',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade700,
-                          ),
+                        padding: EdgeInsets.only(left: 4, bottom: 12),
+                        child: KenwellModernSectionHeader(
+                          title: 'Registration Management',
+                          subtitle: 'Manage user and member registrations.',
                         ),
+                        // SizedBox(height: 4),
+                        //Text(
+                        // 'Register Users and Members:',
+                        // style: TextStyle(
+                        //   fontSize: 16,
+                        //   fontWeight: FontWeight.bold,
+                        //  color: Colors.grey.shade700,
+                        // ),
+                        //),
                       ),
                     ),
+                    const SizedBox(height: 16),
                     // Menu items
                     _ProfileMenuItem(
                       icon: Icons.person,
+                      //color: const Color(0xFF90C048),
                       title: 'User Registration',
                       subtitle:
                           'Register individuals who will manage and operate wellness events.',
@@ -134,7 +144,7 @@ class _ProfileMenuItem extends StatelessWidget {
                   ),
                   child: Icon(
                     icon,
-                    color: isDestructive ? Colors.red : const Color(0xFF201C58),
+                    color: const Color(0xFF90C048),
                     size: 24,
                   ),
                 ),

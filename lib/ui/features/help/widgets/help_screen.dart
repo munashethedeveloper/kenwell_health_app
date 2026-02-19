@@ -19,9 +19,11 @@ class HelpScreen extends StatelessWidget {
         // App bar
         appBar: const KenwellAppBar(
           title: 'Help & Support',
-          titleColor: Color(0xFF201C58),
+          //titleColor: Color(0xFF201C58),
+          titleColor: Colors.white,
           titleStyle: TextStyle(
-            color: Color(0xFF201C58),
+            //color: Color(0xFF201C58),
+            color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
           automaticallyImplyLeading: true,
@@ -36,19 +38,6 @@ class HelpScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 const AppLogo(size: 200),
                 const SizedBox(height: 16),
-                //  About the App section
-                // KenwellFormCard(
-                //   margin: EdgeInsets.zero,
-                //   padding:
-                //    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                // child: ListTile(
-                // leading: const Icon(Icons.info_outline),
-                //  title: const Text('About the App'),
-                // subtitle: Text(
-                //   'Version: ${viewModel.appVersion}\nDeveloper: ${viewModel.developer}',
-                // ),
-                //),
-                // ),
                 const SizedBox(height: 12),
                 // Menu items
                 _ProfileMenuItem(
@@ -58,18 +47,15 @@ class HelpScreen extends StatelessWidget {
                       'Version: ${viewModel.appVersion}\nDeveloper: ${viewModel.developer}',
                   onTap: () {},
                 ),
-                // FAQs / Help Center section
-                //    KenwellFormCard(
-                // margin: EdgeInsets.zero,
-                // padding:
-                //    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                // child: ListTile(
-                //   leading: const Icon(Icons.help_outline),
-                //  title: const Text('FAQs / Help Center'),
-                //  onTap: viewModel.openFAQs,
-                //  ),
-                //),
                 const SizedBox(height: 12),
+                //Contact support menu item
+                _ProfileMenuItem(
+                  icon: Icons.email_outlined,
+                  title: 'Contact Support',
+                  subtitle: 'mapiyem@kenwellhealthcare.co.za',
+                  onTap: viewModel.contactSupport,
+                ),
+                const SizedBox(height: 24),
                 // Menu items
                 _ProfileMenuItem(
                   icon: Icons.help_outline,
@@ -77,38 +63,7 @@ class HelpScreen extends StatelessWidget {
                   subtitle: 'Find answers to common questions and get help',
                   onTap: viewModel.openFAQs,
                 ),
-                // Contact Support section
-                //  KenwellFormCard(
-                // margin: EdgeInsets.zero,
-                // padding:
-                //const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                // child: ListTile(
-                // leading: const Icon(Icons.email_outlined),
-                // title: const Text('Contact Support'),
-                //subtitle: const Text('mapiyem@kenwellhealthcare.co.za'),
-                //onTap: viewModel.contactSupport,
-                //  ),
-                //  ),
                 const SizedBox(height: 12),
-                // Menu items
-                _ProfileMenuItem(
-                  icon: Icons.email_outlined,
-                  title: 'Contact Support',
-                  subtitle: 'mapiyem@kenwellhealthcare.co.za',
-                  onTap: viewModel.contactSupport,
-                ),
-                // Terms & Conditions / Privacy Policy section
-                //KenwellFormCard(
-                //  margin: EdgeInsets.zero,
-                //  padding:
-                //     const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                //  child: ListTile(
-                //  leading: const Icon(Icons.description_outlined),
-                //  title: const Text('Terms & Conditions / Privacy Policy'),
-                // onTap: viewModel.openTermsAndPrivacy,
-                //),
-                // ),
-                const SizedBox(height: 24),
                 // Menu items
                 _ProfileMenuItem(
                   icon: Icons.description_outlined,
@@ -117,29 +72,6 @@ class HelpScreen extends StatelessWidget {
                   onTap: viewModel.openTermsAndPrivacy,
                 ),
                 const SizedBox(height: 24),
-                // Row(
-                //  children: [
-                // Cancel button
-                //  Expanded(
-                //   child: OutlinedButton(
-                //  onPressed: () => context.pop(),
-                //  style: OutlinedButton.styleFrom(
-                //     side: const BorderSide(
-                //        color: KenwellColors.primaryGreen, width: 2),
-                //   padding: const EdgeInsets.symmetric(vertical: 16),
-                //  ),
-                //  child: const Text(
-                //   'Cancel',
-                //   style: TextStyle(
-                //      color: KenwellColors.primaryGreen,
-                //      fontWeight: FontWeight.w600,
-                //     ),
-                //   ),
-                //    ),
-                //   ),
-                //   const SizedBox(width: 16),
-                // ],
-                // ),
               ],
             );
           },

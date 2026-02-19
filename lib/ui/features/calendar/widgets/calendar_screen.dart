@@ -83,11 +83,13 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
           child: Scaffold(
             // App bar with title and actions
             appBar: KenwellAppBar(
-              title: 'Wellness Planner',
+              title: 'KenWell365',
               automaticallyImplyLeading: false,
-              titleColor: const Color(0xFF201C58),
+              //titleColor: const Color(0xFF201C58),
+              titleColor: Colors.white,
               titleStyle: const TextStyle(
-                color: Color(0xFF201C58),
+                //color: Color(0xFF201C58),
+                color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
               actions: [
@@ -232,7 +234,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
         children: [
           KenwellModernSectionHeader(
             title: _getWelcomeTitle(),
-            //subtitle: 'View and manage your wellness events for the month.',
+            subtitle: 'View and manage your wellness events for the month.',
             textAlign: TextAlign.center,
             //icon: Icons.calendar_month,
           ),
@@ -330,9 +332,9 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
     return Column(
       children: [
         //Welcome Message and Month Navigation Header
-        KenwellModernSectionHeader(
-          title: _getWelcomeTitle(),
-          //subtitle: 'View and manage your wellness events for the month.',
+        const KenwellModernSectionHeader(
+          title: 'Events List',
+          subtitle: 'View and manage your wellness events for the month.',
           textAlign: TextAlign.center,
           //icon: Icons.calendar_month,
         ),
@@ -453,13 +455,13 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                               ),
                             const SizedBox(height: 32),
                             // Enhanced button to create a new event
-                            if (_canAddEvent(context))
-                              CustomPrimaryButton(
-                                label: 'Create Event',
-                                onPressed: () => _openEventForm(
-                                    context, viewModel, viewModel.focusedDay),
-                                leading: const Icon(Icons.add_rounded),
-                              ),
+                            //if (_canAddEvent(context))
+                            //CustomPrimaryButton(
+                            //   label: 'Create Event',
+                            //  onPressed: () => _openEventForm(
+                            //      context, viewModel, viewModel.focusedDay),
+                            //  leading: const Icon(Icons.add_rounded),
+                            //),
                           ],
                         ),
                       ),
@@ -489,6 +491,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                       itemBuilder: (context, index) {
                         final day = sortedDates[index];
                         final dayEvents = groupedEvents[day]!;
+                        final isLastDay = index == sortedDates.length - 1;
 
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -542,12 +545,46 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                                 ],
                               ),
                             ),
-                            // Event cards for the day
-                            ...dayEvents
-                                .map((event) => EventCard(
-                                    event: event, viewModel: viewModel))
-                                .toList(),
+                            // Event cards wrapped in Event Breakdown Card container
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.white,
+                                    Colors.grey.shade50,
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.05),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              padding: const EdgeInsets.all(12),
+                              child: Column(
+                                children: dayEvents
+                                    .map((event) => EventCard(
+                                        event: event, viewModel: viewModel))
+                                    .toList(),
+                              ),
+                            ),
                             const SizedBox(height: 8),
+                            // Divider between days (except after the last day)
+                            if (!isLastDay) ...[
+                              const SizedBox(height: 16),
+                              Divider(
+                                color:
+                                    theme.primaryColor.withValues(alpha: 0.2),
+                                thickness: 1,
+                                height: 1,
+                              ),
+                              const SizedBox(height: 8),
+                            ],
                           ],
                         );
                       },

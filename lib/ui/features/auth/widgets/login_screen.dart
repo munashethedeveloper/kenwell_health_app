@@ -117,7 +117,11 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
         // App bar
         appBar: const KenwellAppBar(
           title: 'Login',
-          titleColor: Color(0xFFFFFFFF),
+          //titleColor: Color(0xFFFFFFFF),
+          titleStyle: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
           automaticallyImplyLeading: false,
         ),
         // Body with form

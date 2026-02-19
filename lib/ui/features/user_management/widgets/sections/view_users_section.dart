@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
 import '../../../../../domain/models/user_model.dart';
@@ -586,6 +587,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 //Modern Section Title and Subtitle
+
                                 Text(
                                   'Registered Users',
                                   style: TextStyle(
@@ -611,14 +613,15 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
                         'Tap on a user to view extra options:',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          color: Colors.grey.shade700,
+                          //color: Colors.grey.shade700,
+                          color: KenwellColors.secondaryNavyDark,
                         ),
                       ),
                     ),

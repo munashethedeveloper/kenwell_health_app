@@ -118,12 +118,14 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
   Widget build(BuildContext context) {
     return Consumer<ProfileViewModel>(
       builder: (context, vm, _) => Scaffold(
-        backgroundColor: Colors.white,
+        //backgroundColor: Colors.white,
         appBar: KenwellAppBar(
-          title: 'Edit Profile',
-          titleColor: const Color(0xFF201C58),
+          title: 'KenWell365',
+          //titleColor: const Color(0xFF201C58),
+          titleColor: Colors.white,
           titleStyle: const TextStyle(
-            color: Color(0xFF201C58),
+            //color: Color(0xFF201C58),
+            color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
           automaticallyImplyLeading: true,
@@ -173,11 +175,12 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
                           const AppLogo(size: 200),
                           const SizedBox(height: 24),
                           const KenwellModernSectionHeader(
-                            title: 'Update Profile',
+                            title: 'Update Profile Form',
                             subtitle:
-                                'Complete your details or update your information',
+                                'Complete the form below to update your profile information',
                             icon: Icons.person,
                           ),
+                          const SizedBox(height: 16),
                           ProfileFormSection(
                             firstNameController: _firstNameController,
                             lastNameController: _lastNameController,

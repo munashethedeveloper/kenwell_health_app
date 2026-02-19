@@ -106,6 +106,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       //App bar
       appBar: const KenwellAppBar(
         title: 'Forgot Password',
+        titleColor: Colors.white,
+        titleStyle: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
         automaticallyImplyLeading: true,
       ),
       // Body with form

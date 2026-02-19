@@ -207,10 +207,12 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
 
     return Scaffold(
         appBar: KenwellAppBar(
-          title: 'Wellness Statistics',
-          titleColor: const Color(0xFF201C58),
+          title: 'KenWell365',
+          //titleColor: const Color(0xFF201C58),
+          titleColor: Colors.white,
           titleStyle: const TextStyle(
-            color: Color(0xFF201C58),
+            //color: Color(0xFF201C58),
+            color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
           automaticallyImplyLeading: false,

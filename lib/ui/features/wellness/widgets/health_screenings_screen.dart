@@ -50,9 +50,9 @@ class HealthScreeningsScreen extends StatelessWidget {
               subtitle: 'Complete the health screenings you have consented to.',
               icon: Icons.medical_services,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 24),
             Text(
-              'Select a screening to continue',
+              'Select a screening to continue:',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -144,7 +144,7 @@ class HealthScreeningsScreen extends StatelessWidget {
                       color: theme.colorScheme.primary,
                       size: 20,
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 24),
                     Expanded(
                       child: Text(
                         'Complete all consented screenings to submit',

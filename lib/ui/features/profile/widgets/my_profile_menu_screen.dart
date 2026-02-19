@@ -4,6 +4,7 @@ import 'package:kenwell_health_app/ui/features/auth/view_models/auth_view_model.
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/dialogs/confirmation_dialog.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
 
@@ -52,14 +53,15 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ProfileViewModel>(
       builder: (context, vm, _) => Scaffold(
-        backgroundColor: Colors.white,
+        //backgroundColor: Colors.white,
         appBar: const KenwellAppBar(
-          title: 'My Profile',
-          titleColor: Color(0xFF201C58),
+          title: 'KenWell365',
+          //titleColor: Color(0xFF201C58),
+          titleColor: Colors.white,
           titleStyle: TextStyle(
-            color: Color(0xFF201C58),
-            fontWeight: FontWeight.bold,
-          ),
+              //color: Color(0xFF201C58),
+              fontWeight: FontWeight.bold,
+              color: Colors.white),
           automaticallyImplyLeading: true,
         ),
         body: vm.isLoadingProfile
@@ -72,20 +74,31 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
                     const AppLogo(size: 200),
                     const SizedBox(height: 24),
                     // Menu section header
-                    Align(
+                    const Align(
                       alignment: Alignment.centerLeft,
                       child: Padding(
-                        padding: const EdgeInsets.only(left: 4, bottom: 12),
-                        child: Text(
-                          'Account Settings',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade700,
-                          ),
+                        padding: EdgeInsets.only(left: 4, bottom: 12),
+                        child: KenwellModernSectionHeader(
+                          title: 'My Profile',
+                          subtitle: 'Manage your profile and account settings',
                         ),
                       ),
                     ),
+                    const SizedBox(height: 16),
+                    // Align(
+                    //  alignment: Alignment.centerLeft,
+                    // child: Padding(
+                    //  padding: const EdgeInsets.only(left: 4, bottom: 12),
+                    //  child: Text(
+                    // 'Account Settings',
+                    //  style: TextStyle(
+                    //   fontSize: 16,
+                    //    fontWeight: FontWeight.bold,
+                    //    color: Colors.grey.shade700,
+                    //    ),
+                    //  ),
+                    // ),
+                    // ),
                     // Menu items
                     _ProfileMenuItem(
                       icon: Icons.person,

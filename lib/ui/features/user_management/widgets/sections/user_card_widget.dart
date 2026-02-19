@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import '../../../../../domain/models/user_model.dart';
 import '../../../../shared/ui/badges/number_badge.dart';
 
@@ -63,9 +64,15 @@ class UserCardWidget extends StatelessWidget {
       child: Builder(
         builder: (context) => GestureDetector(
           onTap: () {
-            // Open the slide menu on tap
+            // Toggle the slide menu on tap (open if closed, close if open)
             final slidable = Slidable.of(context);
-            slidable?.openEndActionPane();
+            final isOpen =
+                slidable?.actionPaneType.value != ActionPaneType.none;
+            if (isOpen) {
+              slidable?.close();
+            } else {
+              slidable?.openEndActionPane();
+            }
           },
           onLongPress: onTap,
           child: Container(
@@ -148,17 +155,19 @@ class UserCardWidget extends StatelessWidget {
                         const SizedBox(height: 4),
                         Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.email_outlined,
                               size: 14,
-                              color: Colors.grey[600],
+                              //color: Colors.grey[600],
+                              color: KenwellColors.secondaryNavyDark,
                             ),
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
                                 email,
                                 style: theme.textTheme.bodySmall?.copyWith(
-                                  color: Colors.grey[600],
+                                  //color: Colors.grey[600],
+                                  color: KenwellColors.secondaryNavyDark,
                                   fontSize: 13,
                                 ),
                                 maxLines: 1,
@@ -207,9 +216,10 @@ class UserCardWidget extends StatelessWidget {
                                         ? 'Verified'
                                         : 'Not Verified',
                                     style: theme.textTheme.labelSmall?.copyWith(
-                                      color: user.emailVerified
-                                          ? const Color(0xFF10B981)
-                                          : const Color(0xFFEF4444),
+                                      color: Colors.grey.shade800,
+                                      //user.emailVerified
+                                      // ? const Color(0xFF10B981)
+                                      //: const Color(0xFFEF4444),
                                       fontWeight: FontWeight.w600,
                                       fontSize: 11,
                                     ),
@@ -234,8 +244,10 @@ class UserCardWidget extends StatelessWidget {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          const Color(0xFF90C048),
-                          const Color(0xFF90C048).withValues(alpha: 0.8),
+                          //const Color(0xFF90C048),
+                          //const Color(0xFF90C048).withValues(alpha: 0.8),
+                          Colors.white,
+                          Colors.white.withValues(alpha: 0.8),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(8),
@@ -251,7 +263,10 @@ class UserCardWidget extends StatelessWidget {
                       role,
                       style: theme.textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        //color: Colors.white,
+                        //color: Colors.grey.shade700,
+                        color: KenwellColors.secondaryNavyDark,
+
                         fontSize: 10,
                         letterSpacing: 0.5,
                       ),
