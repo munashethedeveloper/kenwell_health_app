@@ -331,6 +331,7 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                       ),
                     ),
                     const SizedBox(height: 50),
+                    const Divider(),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Row(

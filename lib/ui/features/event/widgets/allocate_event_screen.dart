@@ -614,6 +614,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                         ),
                       ),
                       const SizedBox(height: 50),
+                      const Divider(),
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16),
                         child: Align(

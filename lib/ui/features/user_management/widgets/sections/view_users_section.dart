@@ -557,6 +557,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                       ),
                     ),
                     const SizedBox(height: 32),
+                    const Divider(),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Row(
