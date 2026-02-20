@@ -13,6 +13,8 @@ class KenwellModernSectionHeader extends StatelessWidget {
     this.uppercase = false,
     this.color,
     this.fontStyle,
+    this.fontFamily,
+    this.showIcon = true,
   });
 
   final String title;
@@ -23,6 +25,8 @@ class KenwellModernSectionHeader extends StatelessWidget {
   final bool uppercase;
   final Color? color;
   final FontStyle? fontStyle;
+  final String? fontFamily;
+  final bool showIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -33,26 +37,28 @@ class KenwellModernSectionHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: _mainAxisAlignmentFrom(textAlign),
         children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  theme.primaryColor.withValues(alpha: 0.15),
-                  theme.primaryColor.withValues(alpha: 0.08),
-                ],
+          if (showIcon) ...[
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    theme.primaryColor.withValues(alpha: 0.15),
+                    theme.primaryColor.withValues(alpha: 0.08),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(10),
               ),
-              borderRadius: BorderRadius.circular(10),
+              child: Icon(
+                icon,
+                color: theme.primaryColor,
+                size: 24,
+              ),
             ),
-            child: Icon(
-              icon,
-              color: theme.primaryColor,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 12),
+            const SizedBox(width: 12),
+          ],
           Expanded(
             child: Column(
               crossAxisAlignment: _alignmentFrom(textAlign),
@@ -66,6 +72,7 @@ class KenwellModernSectionHeader extends StatelessWidget {
                     color: color ?? const Color(0xFF201C58),
                     letterSpacing: -0.5,
                     fontStyle: fontStyle,
+                    fontFamily: fontFamily,
                   ),
                 ),
                 if (subtitle != null) ...[
