@@ -106,7 +106,7 @@ class MyEventScreenState extends State<MyEventScreen> {
               aeContactLastName: '',
               aeContactNumber: '',
               aeContactEmail: '',
-              servicesRequested: '',
+              servicesRequested: e['servicesRequested'] ?? '',
               additionalServicesRequested: '',
               expectedParticipation: 0,
               nurses: 0,
@@ -590,6 +590,24 @@ class MyEventScreenState extends State<MyEventScreen> {
                                     Expanded(
                                       child: Text(
                                         event.venue,
+                                        style: const TextStyle(
+                                            color: Colors.black54),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                              if (event.servicesRequested.isNotEmpty) ...[
+                                const SizedBox(height: 8),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Icon(Icons.medical_services,
+                                        size: 16, color: Colors.grey[700]),
+                                    const SizedBox(width: 6),
+                                    Expanded(
+                                      child: Text(
+                                        'Services: ${event.servicesRequested}',
                                         style: const TextStyle(
                                             color: Colors.black54),
                                       ),

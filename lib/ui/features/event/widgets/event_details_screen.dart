@@ -147,6 +147,23 @@ class EventDetailsScreen extends StatelessWidget {
               _buildDetailRow('Description', event.description!, theme),
             ],
           ]),
+          _buildSectionCard('Requested Services', [
+            _buildDetailRow(
+              'Services',
+              event.servicesRequested.isNotEmpty
+                  ? event.servicesRequested
+                  : 'None',
+              theme,
+            ),
+            if (event.additionalServicesRequested.isNotEmpty) ...[
+              const Divider(),
+              _buildDetailRow(
+                'Additional Services',
+                event.additionalServicesRequested,
+                theme,
+              ),
+            ],
+          ]),
           const SizedBox(height: 24),
           // Allocate Event button (with permission check)
           if (RolePermissions.canAccessFeature(

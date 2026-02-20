@@ -21,6 +21,8 @@ import '../../hiv_test_results/widgets/hiv_test_result_screen.dart';
 import '../../hiv_test_results/view_model/hiv_test_result_view_model.dart';
 import '../../tb_test/widgets/tb_testing_screen.dart';
 import '../../tb_test/view_model/tb_testing_view_model.dart';
+import '../../cancer/widgets/cancer_screen.dart';
+import '../../cancer/view_model/cancer_view_model.dart';
 import '../../survey/widgets/survey_screen.dart';
 import '../../survey/view_model/survey_view_model.dart';
 
@@ -232,6 +234,8 @@ class WellnessNavigator {
                           selectedScreenings?.contains('hiv') ?? false;
                       wellnessVM.tbEnabled =
                           selectedScreenings?.contains('tb') ?? false;
+                      wellnessVM.cancerEnabled =
+                          selectedScreenings?.contains('cancer') ?? false;
                       break;
                     }
                   case 'health_screenings':
@@ -245,6 +249,7 @@ class WellnessNavigator {
                           hraEnabled: wellnessVM.hraEnabled,
                           hivEnabled: wellnessVM.hivEnabled,
                           tbEnabled: wellnessVM.tbEnabled,
+                          cancerEnabled: wellnessVM.cancerEnabled,
                         );
                       } while (result ==
                           false); // false means completed a screening, need to reshow
@@ -312,7 +317,8 @@ class WellnessNavigator {
       Member member, WellnessFlowViewModel wellnessVM,
       {required bool hraEnabled,
       required bool hivEnabled,
-      required bool tbEnabled}) async {
+      required bool tbEnabled,
+      bool cancerEnabled = false}) async {
     return await Navigator.push<bool>(
       context,
       MaterialPageRoute(
@@ -320,9 +326,11 @@ class WellnessNavigator {
           hraEnabled: hraEnabled,
           hivEnabled: hivEnabled,
           tbEnabled: tbEnabled,
+          cancerEnabled: cancerEnabled,
           hraCompleted: wellnessVM.hraCompleted,
           hivCompleted: wellnessVM.hivCompleted,
           tbCompleted: wellnessVM.tbCompleted,
+          cancerCompleted: wellnessVM.cancerCompleted,
           onHraTap: () async {
             final result = await _navigateToHra(member);
             if (!context.mounted) return;
@@ -346,6 +354,15 @@ class WellnessNavigator {
             if (!context.mounted) return;
             if (result == true) {
               wellnessVM.tbCompleted = true;
+              // Pop back to refresh the parent screen
+              Navigator.of(context).pop(false); // false = not final submit
+            }
+          },
+          onCancerTap: () async {
+            final result = await _navigateToCancer(member);
+            if (!context.mounted) return;
+            if (result == true) {
+              wellnessVM.markCancerCompleted();
               // Pop back to refresh the parent screen
               Navigator.of(context).pop(false); // false = not final submit
             }
@@ -518,6 +535,40 @@ class WellnessNavigator {
             appBar: KenwellAppBar(
               title: event.title,
               subtitle: 'TB Form',
+              titleColor: Colors.white,
+              titleStyle: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+              backgroundColor: const Color(0xFF201C58),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Navigate to Cancer screening
+  Future<bool?> _navigateToCancer(Member member) async {
+    final cancerVM = CancerScreeningViewModel();
+    cancerVM.setMemberAndEventId(member.id, event.id);
+
+    return await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChangeNotifierProvider.value(
+          value: cancerVM,
+          child: CancerScreen(
+            onNext: () {
+              Navigator.of(context).pop(true);
+            },
+            onPrevious: () {
+              Navigator.of(context).pop();
+            },
+            appBar: KenwellAppBar(
+              title: event.title,
+              subtitle: 'Cancer Screening Form',
               titleColor: Colors.white,
               titleStyle: const TextStyle(
                 color: Colors.white,
