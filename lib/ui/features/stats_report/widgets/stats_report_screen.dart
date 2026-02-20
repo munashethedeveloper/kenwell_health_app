@@ -209,7 +209,6 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
         appBar: KenwellAppBar(
           title: 'KenWell365',
           //titleColor: const Color(0xFF201C58),
-          titleColor: Colors.white,
           titleStyle: const TextStyle(
             //color: Color(0xFF201C58),
             color: Colors.white,
@@ -249,16 +248,35 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                 const Center(
                   child: AppLogo(size: 100),
                 ),
-                const SizedBox(height: 16),
+                // const SizedBox(height: 16),
                 // Modern section header
-                const KenwellModernSectionHeader(
-                  title: 'Overall Wellness Statistics',
-                  subtitle:
-                      'Summary of wellness events and participation metrics.',
-                  icon: Icons.analytics_outlined,
-                ),
+                //  const KenwellModernSectionHeader(
+                //title: 'Overall Wellness Statistics',
+                // subtitle:
+                //     'Summary of wellness events and participation metrics.',
+                // icon: Icons.analytics_outlined,
+                // ),
                 const SizedBox(height: 20),
                 // Enhanced Search Field with shadow
+                Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline,
+                      size: 16,
+                      color: Colors.grey.shade600,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Search & Filter Events:',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
                 Container(
                   decoration: BoxDecoration(
                     boxShadow: [
@@ -299,7 +317,7 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                         ),
                       ),
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: Colors.grey.shade300,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 20,
                         vertical: 16,
@@ -738,7 +756,22 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                       ],
                     ),
                   ),
-                const SizedBox(height: 8),
+                //const SizedBox(height: 8),
+
+                const Divider(
+                  height: 24,
+                  thickness: 1,
+                  indent: 16,
+                  endIndent: 16,
+                ),
+                // Modern section header
+                const KenwellModernSectionHeader(
+                  title: 'Overall Wellness Statistics',
+                  subtitle:
+                      'Summary of wellness events and participation metrics.',
+                  icon: Icons.analytics_outlined,
+                ),
+                const SizedBox(height: 40),
 
                 // Stat Cards Row 1 - Total Members Expected and Registered
                 Row(

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
 import '../../../../../domain/models/member.dart';
@@ -331,7 +330,10 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 50),
+                    const SizedBox(height: 8),
+                    const Divider(),
+                    const SizedBox(height: 16),
+
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Row(
@@ -385,16 +387,15 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
+                    const SizedBox(height: 40),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
                         'Tap on a member to view extra options:',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          //color: Colors.grey.shade700,
-                          color: KenwellColors.secondaryNavyDark,
+                          color: Colors.grey.shade700,
                         ),
                       ),
                     ),

@@ -86,7 +86,6 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
               title: 'KenWell365',
               automaticallyImplyLeading: false,
               //titleColor: const Color(0xFF201C58),
-              titleColor: Colors.white,
               titleStyle: const TextStyle(
                 //color: Color(0xFF201C58),
                 color: Colors.white,
@@ -226,21 +225,121 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
     );
   }
 
+  // Build a stat chip for the stats strip
+  Widget _buildStatChip(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    final theme = Theme.of(context);
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: color.withValues(alpha: 0.18), width: 1),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, size: 18, color: color),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      color: color,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  Text(
+                    label,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   // Build the calendar tab view
   Widget _buildCalendarTab(CalendarViewModel viewModel) {
+    final theme = Theme.of(context);
+    final eventsThisMonth =
+        viewModel.getTotalEventsThisMonth(viewModel.focusedDay);
+    final upcomingEventsCount = viewModel.getUpcomingEvents();
+
     return SingleChildScrollView(
       child: Column(
         //Welcome Message and Calendar widget
         children: [
+          const SizedBox(height: 16),
+
           KenwellModernSectionHeader(
             title: _getWelcomeTitle(),
-            subtitle: 'View and manage your wellness events for the month.',
             textAlign: TextAlign.center,
+          ),
+          const AppLogo(size: 120),
+          // Divider separating the header from the calendar content
+          const Divider(
+            height: 24,
+            thickness: 1,
+            indent: 16,
+            endIndent: 16,
+          ),
+          const SizedBox(height: 16),
+          const KenwellModernSectionHeader(
+            title: 'Events Calendar',
+            subtitle: 'View and manage your wellness events for the month.',
+            textAlign: TextAlign.left,
             //icon: Icons.calendar_month,
           ),
-          const SizedBox(height: 10),
-          const AppLogo(size: 150),
-          const SizedBox(height: 10),
+          const SizedBox(height: 24),
+          // Stats strip: events this month and upcoming events
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                _buildStatChip(
+                  context,
+                  icon: Icons.calendar_month_rounded,
+                  label: 'This Month',
+                  value: '$eventsThisMonth',
+                  color: const Color(0xFF90C048),
+                ),
+                const SizedBox(width: 10),
+                _buildStatChip(
+                  context,
+                  icon: Icons.upcoming_rounded,
+                  label: 'Upcoming Month\'s',
+                  value: '$upcomingEventsCount',
+                  color: const Color(0xFF201C58),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             // Calendar widget inside a form card
@@ -273,11 +372,10 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                     color: Colors.red,
                   ),
                 ),
-                // Calendar day styles
+                // Calendar day styles (markersMaxCount 0 – custom builder used)
                 calendarStyle: CalendarStyle(
-                  // Styles for weekdays and weekends
+                  markersMaxCount: 0,
                   weekendTextStyle: const TextStyle(color: Colors.red),
-                  // Styles for today, selected day, and event markers
                   todayDecoration: BoxDecoration(
                     color: Colors.deepPurple.withValues(alpha: 0.3),
                     shape: BoxShape.circle,
@@ -286,10 +384,35 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                     color: Color(0xFF90C048),
                     shape: BoxShape.circle,
                   ),
-                  markerDecoration: const BoxDecoration(
-                    color: Color(0xFF201C58),
-                    shape: BoxShape.circle,
-                  ),
+                ),
+                // Custom marker builder: show event count badge instead of dots
+                calendarBuilders: CalendarBuilders(
+                  markerBuilder: (context, day, events) {
+                    if (events.isEmpty) return const SizedBox.shrink();
+                    return Positioned(
+                      right: 2,
+                      bottom: 2,
+                      child: Container(
+                        width: 18,
+                        height: 18,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF201C58),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 1.5),
+                        ),
+                        child: Center(
+                          child: Text(
+                            '${events.length}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
                 // Handle day selection and page changes
                 onDaySelected: (selectedDay, focusedDay) async {
@@ -318,6 +441,42 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
             ),
           ),
           const SizedBox(height: 16),
+          // Hint text to guide users
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 14,
+                  height: 14,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF201C58),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Center(
+                    child: Text(
+                      'N',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 8,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  'Number of events on that day — tap a date to view details',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
         ],
       ),
     );
@@ -331,16 +490,25 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
 
     return Column(
       children: [
+        const SizedBox(height: 16),
         //Welcome Message and Month Navigation Header
         const KenwellModernSectionHeader(
           title: 'Events List',
           subtitle: 'View and manage your wellness events for the month.',
-          textAlign: TextAlign.center,
+          textAlign: TextAlign.left,
           //icon: Icons.calendar_month,
+        ),
+        const SizedBox(height: 8),
+        // Divider separating the header from the calendar content
+        const Divider(
+          height: 24,
+          thickness: 1,
+          indent: 16,
+          endIndent: 16,
         ),
         // const SizedBox(height: 10),
         //const AppLogo(size: 150),
-        const SizedBox(height: 10),
+        const SizedBox(height: 16),
         // Enhanced month navigation header
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -455,13 +623,13 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                               ),
                             const SizedBox(height: 32),
                             // Enhanced button to create a new event
-                            //if (_canAddEvent(context))
-                            //CustomPrimaryButton(
-                            //   label: 'Create Event',
-                            //  onPressed: () => _openEventForm(
-                            //      context, viewModel, viewModel.focusedDay),
-                            //  leading: const Icon(Icons.add_rounded),
-                            //),
+                            if (_canAddEvent(context))
+                              CustomPrimaryButton(
+                                label: 'Create Event',
+                                onPressed: () => _openEventForm(
+                                    context, viewModel, viewModel.focusedDay),
+                                leading: const Icon(Icons.add_rounded),
+                              ),
                           ],
                         ),
                       ),
@@ -491,7 +659,6 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                       itemBuilder: (context, index) {
                         final day = sortedDates[index];
                         final dayEvents = groupedEvents[day]!;
-                        final isLastDay = index == sortedDates.length - 1;
 
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -545,46 +712,12 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                                 ],
                               ),
                             ),
-                            // Event cards wrapped in Event Breakdown Card container
-                            Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.white,
-                                    Colors.grey.shade50,
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.05),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              padding: const EdgeInsets.all(12),
-                              child: Column(
-                                children: dayEvents
-                                    .map((event) => EventCard(
-                                        event: event, viewModel: viewModel))
-                                    .toList(),
-                              ),
-                            ),
+                            // Event cards for the day
+                            ...dayEvents
+                                .map((event) => EventCard(
+                                    event: event, viewModel: viewModel))
+                                .toList(),
                             const SizedBox(height: 8),
-                            // Divider between days (except after the last day)
-                            if (!isLastDay) ...[
-                              const SizedBox(height: 16),
-                              Divider(
-                                color:
-                                    theme.primaryColor.withValues(alpha: 0.2),
-                                thickness: 1,
-                                height: 1,
-                              ),
-                              const SizedBox(height: 8),
-                            ],
                           ],
                         );
                       },

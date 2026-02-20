@@ -11,6 +11,7 @@ class KenwellModernSectionHeader extends StatelessWidget {
     this.padding = const EdgeInsets.symmetric(horizontal: 16),
     this.textAlign = TextAlign.start,
     this.uppercase = false,
+    this.color,
   });
 
   final String title;
@@ -19,6 +20,7 @@ class KenwellModernSectionHeader extends StatelessWidget {
   final EdgeInsetsGeometry padding;
   final TextAlign textAlign;
   final bool uppercase;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {

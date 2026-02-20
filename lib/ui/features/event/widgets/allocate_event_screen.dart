@@ -279,257 +279,120 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
       endActionPane: ActionPane(
         motion: const ScrollMotion(),
         children: [
-          SlidableAction(
-            onPressed: isAssigned ? null : (_) => _assignUser(user),
-            backgroundColor: isAssigned
-                ? theme.colorScheme.primary.withValues(alpha: 0.5)
-                : theme.colorScheme.primary,
-            foregroundColor: isAssigned
-                ? theme.colorScheme.onPrimary.withValues(alpha: 0.5)
-                : theme.colorScheme.onPrimary,
-            icon: Icons.person_add,
-            label: 'Assign',
-          ),
-          SlidableAction(
-            onPressed: isAssigned ? (_) => _unassignUser(user) : null,
-            backgroundColor: isAssigned
-                ? theme.colorScheme.error
-                : theme.colorScheme.error.withValues(alpha: 0.5),
-            foregroundColor: isAssigned
-                ? theme.colorScheme.onError
-                : theme.colorScheme.onError.withValues(alpha: 0.5),
-            icon: Icons.person_remove,
-            label: 'Unassign',
-          ),
+          if (!isAssigned)
+            SlidableAction(
+              onPressed: (_) => _assignUser(user),
+              backgroundColor: theme.colorScheme.primary,
+              foregroundColor: theme.colorScheme.onPrimary,
+              icon: Icons.person_add,
+              label: 'Assign',
+            ),
+          if (isAssigned)
+            SlidableAction(
+              onPressed: (_) => _unassignUser(user),
+              backgroundColor: theme.colorScheme.error,
+              foregroundColor: theme.colorScheme.onError,
+              icon: Icons.person_remove,
+              label: 'Unassign',
+            ),
         ],
       ),
-      child: Builder(
-        builder: (context) => GestureDetector(
-          onTap: () {
-            // Toggle the slide menu on tap (open if closed, close if open)
-            final slidable = Slidable.of(context);
-            final isOpen =
-                slidable?.actionPaneType.value != ActionPaneType.none;
-            if (isOpen) {
-              slidable?.close();
-            } else {
-              slidable?.openEndActionPane();
-            }
-          },
-          onLongPress: () => _showUserOptions(user),
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Colors.white,
-                  theme.primaryColor.withValues(alpha: 0.03),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: theme.primaryColor.withValues(alpha: 0.15),
-                width: 1.5,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: theme.primaryColor.withValues(alpha: 0.08),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                  spreadRadius: 0,
-                ),
+      child: GestureDetector(
+        onTap: () => _showUserOptions(user),
+        onLongPress: () => _showUserOptions(user),
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: theme.primaryColor.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: theme.primaryColor.withValues(alpha: 0.2),
+            ),
+          ),
+          child: Row(
+            children: [
+              // Number badge (if provided)
+              if (number != null) ...[
+                NumberBadge(number: number),
+                const SizedBox(width: 12),
               ],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  // Number badge (if provided)
-                  if (number != null) ...[
-                    NumberBadge(number: number),
-                    const SizedBox(width: 12),
-                  ],
 
-                  // Modern avatar with icon and gradient background
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          theme.primaryColor.withValues(alpha: 0.2),
-                          theme.primaryColor.withValues(alpha: 0.1),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: theme.primaryColor.withValues(alpha: 0.3),
-                        width: 1.5,
-                      ),
-                    ),
-                    child: Icon(
-                      roleIcons[user.role] ?? Icons.person,
-                      color: theme.primaryColor,
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-
-                  // User Info
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${user.firstName} ${user.lastName}',
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF201C58),
-                            letterSpacing: -0.2,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.email_outlined,
-                              size: 14,
-                              color: Colors.grey[600],
-                            ),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                user.email,
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: Colors.grey[600],
-                                  fontSize: 13,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: isAssigned
-                                    ? const Color(0xFF10B981)
-                                        .withValues(alpha: 0.1)
-                                    : const Color(0xFFEF4444)
-                                        .withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(
-                                  color: isAssigned
-                                      ? const Color(0xFF10B981)
-                                          .withValues(alpha: 0.3)
-                                      : const Color(0xFFEF4444)
-                                          .withValues(alpha: 0.3),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    isAssigned
-                                        ? Icons.verified
-                                        : Icons.error_outline,
-                                    color: isAssigned
-                                        ? const Color(0xFF10B981)
-                                        : const Color(0xFFEF4444),
-                                    size: 14,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    isAssigned ? 'Assigned' : 'Not Assigned',
-                                    style: theme.textTheme.labelSmall?.copyWith(
-                                      color: KenwellColors.secondaryNavyDark,
-
-                                      //isAssigned
-                                      //? const Color(0xFF10B981)
-                                      //: const Color(0xFFEF4444),
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 11,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(width: 12),
-
-                  // Role badge with modern styling
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          // const Color(0xFF90C048),
-                          //const Color(0xFF90C048).withValues(alpha: 0.8),
-
-                          Colors.white,
-                          Colors.white.withValues(alpha: 0.8),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          //color: KenwellColors.secondaryNavy
-                          // .withValues(alpha: 0.3),
-                          color: const Color(0xFF90C048).withValues(alpha: 0.3),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Text(
-                      user.role,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        //color: Colors.white,
-                        //color: Colors.grey.shade700,
-                        color: KenwellColors.secondaryNavyDark,
-
-                        fontSize: 10,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: theme.primaryColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      Icons.chevron_right,
-                      color: theme.primaryColor,
-                      size: 20,
-                    ),
-                  ),
-                ],
+              // Icon instead of avatar with initials
+              Icon(
+                roleIcons[user.role] ?? Icons.person,
+                color: theme.primaryColor,
+                size: 20,
               ),
-            ),
+              const SizedBox(width: 12),
+
+              // User Info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${user.firstName} ${user.lastName}',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: theme.primaryColor,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      user.email,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: Colors.grey[600],
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Icon(
+                          isAssigned ? Icons.verified : Icons.error_outline,
+                          color: isAssigned ? Colors.green : Colors.red,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          isAssigned ? 'Assigned' : 'Not Assigned',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: isAssigned ? Colors.green : Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              // Role badge
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: theme.primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  user.role,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.primaryColor,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                Icons.chevron_right,
+                color: theme.primaryColor,
+              ),
+            ],
           ),
         ),
       ),
@@ -581,7 +444,8 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
           fontWeight: FontWeight.bold,
         ),
         automaticallyImplyLeading: true,
-        // backgroundColor: Color(0xFF201C58),
+        //backgroundColor: Color(0xFF201C58),
+        backgroundColor: KenwellColors.primaryGreen,
         centerTitle: true,
       ),
       // Body of the screen
@@ -751,30 +615,29 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 50),
+                      const SizedBox(height: 8),
+                      const Divider(),
+                      const SizedBox(height: 16),
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16),
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: KenwellModernSectionHeader(
                             title: 'Allocate Event',
-                            // subtitle:
-                            //'Get started by assigning this event to users. You can assign it to as many users as needed, and easily manage their assignments from this screen.',
+                            subtitle: 'Manage event allocations.',
                           ),
                         ),
                       ),
-                      const SizedBox(height: 34),
-                      const Text(
+                      const SizedBox(height: 40),
+                      Text(
                         'Tap on a user to assign or unassign them from this event:',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          color: KenwellColors.secondaryNavyDark,
-
-                          //color: Colors.grey.shade700,
+                          color: Colors.grey.shade700,
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 8),
                     ],
                   ),
                 ),
