@@ -49,4 +49,18 @@ class UserEventRepository {
         .whereType<String>()
         .toList();
   }
+
+  /// Remove a user's assignment from a specific event
+  Future<void> removeUserEvent(String eventId, String userId) async {
+    final snapshot = await _firestore
+        .collection('user_events')
+        .where('eventId', isEqualTo: eventId)
+        .where('userId', isEqualTo: userId)
+        .get();
+    final batch = _firestore.batch();
+    for (final doc in snapshot.docs) {
+      batch.delete(doc.reference);
+    }
+    await batch.commit();
+  }
 }
