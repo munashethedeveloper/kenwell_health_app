@@ -30,133 +30,122 @@ class CurrentEventHomeScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.white,
-                    Colors.grey.shade50,
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+                color: theme.primaryColor.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: theme.primaryColor.withValues(alpha: 0.15),
+                  width: 1.5,
                 ),
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    // Event icon badge
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: theme.primaryColor.withValues(alpha: 0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.event,
-                        size: 40,
-                        color: theme.primaryColor,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      event.title,
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: theme.primaryColor,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    // Date with icon
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.calendar_today,
-                          size: 16,
-                          color: Colors.grey[600],
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header row with icon and title
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: theme.primaryColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        const SizedBox(width: 6),
-                        Text(
-                          '${event.date.day}/${event.date.month}/${event.date.year}',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.w600,
-                          ),
+                        child: Icon(
+                          Icons.event,
+                          color: theme.primaryColor,
+                          size: 20,
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    // Venue with icon
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.business,
-                          size: 16,
-                          color: Colors.grey[600],
-                        ),
-                        const SizedBox(width: 6),
-                        Flexible(
-                          child: Text(
-                            event.venue,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: Colors.grey[600],
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              event.title,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: theme.primaryColor,
+                              ),
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (viewModel.currentMember != null) ...[
-                      const SizedBox(height: 16),
-                      Divider(color: Colors.grey.shade300),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.person,
-                            size: 20,
-                            color: theme.primaryColor,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Current Member',
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: theme.primaryColor,
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.calendar_today,
+                                  size: 14,
+                                  color: Colors.grey[600],
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${event.date.day}/${event.date.month}/${event.date.year}',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      _buildMemberInfoRow(
-                        'Name',
-                        '${viewModel.currentMember!.name} ${viewModel.currentMember!.surname}',
-                        theme,
-                      ),
-                      const SizedBox(height: 8),
-                      _buildMemberInfoRow(
-                        viewModel.currentMember!.idDocumentType == 'ID'
-                            ? 'ID Number'
-                            : 'Passport Number',
-                        viewModel.currentMember!.idDocumentType == 'ID'
-                            ? (viewModel.currentMember!.idNumber ?? 'N/A')
-                            : (viewModel.currentMember!.passportNumber ??
-                                'N/A'),
-                        theme,
+                          ],
+                        ),
                       ),
                     ],
+                  ),
+                  if (event.venue.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(Icons.business,
+                            size: 16, color: Colors.grey[700]),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            event.venue,
+                            style: const TextStyle(color: Colors.black54),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
-                ),
+                  if (viewModel.currentMember != null) ...[
+                    const SizedBox(height: 16),
+                    Divider(color: Colors.grey.shade300),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.person,
+                          size: 20,
+                          color: theme.primaryColor,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Current Member',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: theme.primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    _buildMemberInfoRow(
+                      'Name',
+                      '${viewModel.currentMember!.name} ${viewModel.currentMember!.surname}',
+                      theme,
+                    ),
+                    const SizedBox(height: 8),
+                    _buildMemberInfoRow(
+                      viewModel.currentMember!.idDocumentType == 'ID'
+                          ? 'ID Number'
+                          : 'Passport Number',
+                      viewModel.currentMember!.idDocumentType == 'ID'
+                          ? (viewModel.currentMember!.idNumber ?? 'N/A')
+                          : (viewModel.currentMember!.passportNumber ?? 'N/A'),
+                      theme,
+                    ),
+                  ],
+                ],
               ),
             ),
             const SizedBox(height: 24),
@@ -263,90 +252,94 @@ class _ProcessStepCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    // Determine color based on state
-    Color backgroundColor;
+    Color iconContainerColor;
     Color iconColor;
-    Color statusBackgroundColor;
     Color statusTextColor;
 
     if (isCompleted) {
-      backgroundColor = theme.primaryColor.withValues(alpha: 0.1);
-      iconColor = theme.primaryColor;
-      statusBackgroundColor = Colors.deepPurple.withValues(alpha: 0.1);
+      iconContainerColor = const Color(0xFF90C048).withValues(alpha: 0.15);
+      iconColor = const Color(0xFF201C58);
       statusTextColor = Colors.deepPurple[700]!;
     } else if (isInProgress) {
-      backgroundColor = Colors.orange.withValues(alpha: 0.1);
+      iconContainerColor = Colors.orange.withValues(alpha: 0.15);
       iconColor = Colors.orange[700]!;
-      statusBackgroundColor = Colors.orange.withValues(alpha: 0.1);
       statusTextColor = Colors.orange[700]!;
     } else {
-      backgroundColor = Colors.grey[200]!;
+      iconContainerColor = Colors.grey.shade200;
       iconColor = Colors.grey[600]!;
-      statusBackgroundColor = Colors.grey.withValues(alpha: 0.1);
-      statusTextColor = Colors.grey[700]!;
+      statusTextColor = Colors.grey.shade600;
     }
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: InkWell(
-        onTap: onTap,
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: backgroundColor,
-                  borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.grey.shade200,
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: iconContainerColor,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    icon,
+                    color: iconColor,
+                    size: 24,
+                  ),
                 ),
-                child: Icon(
-                  icon,
-                  color: iconColor,
-                  size: 28,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: statusBackgroundColor,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        status,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: statusTextColor,
-                          fontWeight: FontWeight.bold,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF201C58),
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 2),
+                      Text(
+                        status,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: statusTextColor,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              if (onTap != null)
-                Icon(
-                  Icons.chevron_right,
-                  color: Colors.grey[600],
-                ),
-            ],
+                if (onTap != null)
+                  Icon(
+                    Icons.chevron_right,
+                    color: Colors.grey.shade400,
+                    size: 24,
+                  ),
+              ],
+            ),
           ),
         ),
       ),
