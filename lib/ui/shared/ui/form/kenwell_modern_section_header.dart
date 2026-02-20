@@ -12,6 +12,7 @@ class KenwellModernSectionHeader extends StatelessWidget {
     this.textAlign = TextAlign.start,
     this.uppercase = false,
     this.color,
+    this.fontStyle,
   });
 
   final String title;
@@ -21,6 +22,7 @@ class KenwellModernSectionHeader extends StatelessWidget {
   final TextAlign textAlign;
   final bool uppercase;
   final Color? color;
+  final FontStyle? fontStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -58,11 +60,12 @@ class KenwellModernSectionHeader extends StatelessWidget {
                 Text(
                   uppercase ? title.toUpperCase() : title,
                   textAlign: textAlign,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 34,
                     fontWeight: FontWeight.w800,
-                    color: Color(0xFF201C58),
+                    color: color ?? const Color(0xFF201C58),
                     letterSpacing: -0.5,
+                    fontStyle: fontStyle,
                   ),
                 ),
                 if (subtitle != null) ...[

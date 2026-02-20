@@ -11,6 +11,7 @@ import '../../profile/view_model/profile_view_model.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/buttons/custom_primary_button.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
+import '../../../shared/ui/colours/kenwell_colours.dart';
 import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 import '../view_model/calendar_view_model.dart';
 import 'day_events_dialog.dart';
@@ -299,6 +300,8 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
           KenwellModernSectionHeader(
             title: _getWelcomeTitle(),
             textAlign: TextAlign.center,
+            color: KenwellColors.primaryGreen,
+            fontStyle: FontStyle.italic,
           ),
           const AppLogo(size: 150),
           // Divider separating the header from the calendar content
