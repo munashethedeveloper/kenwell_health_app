@@ -6,6 +6,8 @@ import '../../../../data/repositories_dcl/firestore_member_repository.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/logo/app_logo.dart';
 import '../../../shared/ui/form/kenwell_modern_section_header.dart';
+import '../../../shared/ui/form/kenwell_form_card.dart';
+import '../../../shared/ui/form/custom_text_field.dart';
 
 /// Screen to display all events a member has attended
 class MemberEventsScreen extends StatefulWidget {
@@ -26,10 +28,36 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
   bool _isLoading = true;
   String? _errorMessage;
 
+  late final TextEditingController _nameController;
+  late final TextEditingController _emailController;
+  late final TextEditingController _genderController;
+  late final TextEditingController _medicalAidController;
+
   @override
   void initState() {
     super.initState();
+    _nameController = TextEditingController(
+      text: '${widget.member.name} ${widget.member.surname}',
+    );
+    _emailController = TextEditingController(
+      text: widget.member.email ?? '',
+    );
+    _genderController = TextEditingController(
+      text: widget.member.gender ?? '',
+    );
+    _medicalAidController = TextEditingController(
+      text: widget.member.medicalAidName ?? '',
+    );
     _loadMemberEvents();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _genderController.dispose();
+    _medicalAidController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadMemberEvents() async {
@@ -99,57 +127,32 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
             const SizedBox(height: 24),
 
             // Member information
-            Card(
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF90C048).withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: const Icon(
-                            Icons.person,
-                            color: Color(0xFF201C58),
-                            size: 32,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '${widget.member.name} ${widget.member.surname}',
-                                style: theme.textTheme.titleLarge?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: const Color(0xFF201C58),
-                                ),
-                              ),
-                              if (widget.member.email != null &&
-                                  widget.member.email!.isNotEmpty)
-                                Text(
-                                  widget.member.email!,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: Colors.grey.shade600,
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+            KenwellFormCard(
+              title: 'Personal Information',
+              child: Column(
+                children: [
+                  KenwellTextField(
+                    label: 'Name and Surname',
+                    controller: _nameController,
+                    readOnly: true,
+                  ),
+                  KenwellTextField(
+                    label: 'Email',
+                    controller: _emailController,
+                    readOnly: true,
+                  ),
+                  KenwellTextField(
+                    label: 'Gender',
+                    controller: _genderController,
+                    readOnly: true,
+                  ),
+                  KenwellTextField(
+                    label: 'Medical Aid',
+                    controller: _medicalAidController,
+                    readOnly: true,
+                    padding: EdgeInsets.zero,
+                  ),
+                ],
               ),
             ),
 
@@ -232,147 +235,106 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
               )
             else
               // Events list
-              ..._events.map((event) => _buildEventCard(event, theme)).toList(),
+              ..._events.map((event) => _buildEventCard(event)).toList(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildEventCard(Map<String, dynamic> event, ThemeData theme) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shape: RoundedRectangleBorder(
+  Widget _buildEventCard(Map<String, dynamic> event) {
+    final theme = Theme.of(context);
+    final location = (event['eventLocation'] != null &&
+            event['eventLocation'].toString().isNotEmpty)
+        ? event['eventLocation'] as String
+        : (event['eventVenue'] != null &&
+                event['eventVenue'].toString().isNotEmpty)
+            ? event['eventVenue'] as String
+            : null;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.primaryColor.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: Colors.grey.shade200,
-          width: 1,
+        border: Border.all(
+          color: theme.primaryColor.withValues(alpha: 0.15),
+          width: 1.5,
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: theme.primaryColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              Icons.event,
+              color: theme.primaryColor,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF201C58).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
+                Text(
+                  event['eventTitle'] ?? 'Unknown Event',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: theme.primaryColor,
                   ),
-                  child: const Icon(
-                    Icons.event,
-                    color: Color(0xFF201C58),
-                    size: 24,
-                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        event['eventTitle'] ?? 'Unknown Event',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF201C58),
-                        ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_today,
+                      size: 14,
+                      color: Colors.grey[600],
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      _formatDate(event['eventDate']),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: Colors.grey[600],
                       ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.calendar_today,
-                            size: 14,
-                            color: Colors.grey.shade600,
+                    ),
+                  ],
+                ),
+                if (location != null) ...[
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on,
+                        size: 14,
+                        color: Colors.grey[600],
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          location,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: Colors.grey[600],
                           ),
-                          const SizedBox(width: 4),
-                          Text(
-                            _formatDate(event['eventDate']),
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: Colors.grey.shade600,
-                            ),
-                          ),
-                        ],
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
                       ),
                     ],
                   ),
-                ),
+                ],
               ],
             ),
-
-            if (event['eventVenue'] != null &&
-                event['eventVenue'].toString().isNotEmpty) ...[
-              const SizedBox(height: 12),
-              const Divider(height: 1),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Icon(
-                    Icons.location_on_outlined,
-                    size: 16,
-                    color: Colors.grey.shade600,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      event['eventVenue'],
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: Colors.grey.shade700,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-
-            if (event['eventLocation'] != null &&
-                event['eventLocation'].toString().isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Icon(
-                    Icons.place_outlined,
-                    size: 16,
-                    color: Colors.grey.shade600,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      event['eventLocation'],
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-
-            // Source indicator
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: const Color(0xFF90C048).withOpacity(0.15),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Text(
-                event['source'] == 'registration'
-                    ? 'Registered Event'
-                    : 'Attended Session',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: const Color(0xFF201C58),
-                  fontWeight: FontWeight.w500,
-                  fontSize: 11,
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
