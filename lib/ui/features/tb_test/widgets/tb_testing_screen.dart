@@ -28,9 +28,12 @@ class TBTestingScreen extends StatelessWidget {
 
     return KenwellFormPage(
       title: 'TB Test Screening Form',
-      sectionTitle: 'Section I: TB Screening',
+      sectionTitle: 'Section C: TB Screening',
+      subtitle:
+          'Please complete the form below to provide your HIV testing history and risk behaviors.',
       appBar: appBar,
       children: [
+        const SizedBox(height: 16),
         KenwellFormCard(
           title: 'TB Symptom Screening',
           child: KenwellYesNoList<String>(

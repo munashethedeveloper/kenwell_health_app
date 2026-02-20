@@ -54,6 +54,8 @@ class HIVTestResultScreen extends StatelessWidget {
               //  Section Header
               const KenwellModernSectionHeader(
                 title: 'Section C: HIV Test Results',
+                subtitle:
+                    'Please complete the form below to provide your HIV testing history and risk behaviors.',
                 uppercase: true,
                 icon: Icons.vaccines,
               ),

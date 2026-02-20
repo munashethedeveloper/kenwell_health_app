@@ -246,7 +246,7 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                 const SizedBox(height: 8),
                 // Compact logo
                 const Center(
-                  child: AppLogo(size: 100),
+                  child: AppLogo(size: 150),
                 ),
                 // const SizedBox(height: 16),
                 // Modern section header
@@ -723,7 +723,7 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
 
                 // Enhanced search results indicator
                 if (_searchController.text.isNotEmpty || _hasActiveFilters)
@@ -764,6 +764,7 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                   indent: 16,
                   endIndent: 16,
                 ),
+                const SizedBox(height: 16),
                 // Modern section header
                 const KenwellModernSectionHeader(
                   title: 'Overall Wellness Statistics',

@@ -36,7 +36,7 @@ class HelpScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               children: [
                 const SizedBox(height: 16),
-                const AppLogo(size: 200),
+                const AppLogo(size: 150),
                 const SizedBox(height: 16),
                 const SizedBox(height: 12),
                 // Menu items

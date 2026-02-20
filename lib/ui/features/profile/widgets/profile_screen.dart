@@ -172,7 +172,7 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(height: 16),
-                          const AppLogo(size: 200),
+                          const AppLogo(size: 150),
                           const SizedBox(height: 24),
                           const KenwellModernSectionHeader(
                             title: 'Update Profile Form',

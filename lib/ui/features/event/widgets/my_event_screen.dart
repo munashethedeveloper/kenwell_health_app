@@ -288,7 +288,7 @@ class MyEventScreenState extends State<MyEventScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
-            const AppLogo(size: 200),
+            const AppLogo(size: 150),
             const SizedBox(height: 16),
             const KenwellModernSectionHeader(
               title: 'My Events Screen',

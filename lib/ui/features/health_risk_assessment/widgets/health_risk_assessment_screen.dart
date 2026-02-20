@@ -71,9 +71,12 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                     // ===== Section C: Health Screening =====
                     const KenwellModernSectionHeader(
                       title: 'Section C: Health Screening',
+                      subtitle:
+                          'Please complete the form below to provide your health information.',
                       uppercase: true,
                       icon: Icons.medical_information,
                     ),
+                    const SizedBox(height: 16),
 
                     // ===== Section 1: Chronic Conditions =====
                     KenwellFormCard(
@@ -314,14 +317,17 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                         ),
                       ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 32),
 
                     // ===== Section D: Health Metrics =====
                     const KenwellModernSectionHeader(
-                      title: 'Section D: Health Metrics',
+                      title: 'Health Metrics',
+                      subtitle:
+                          'Please complete the form below to provide your health information.',
                       uppercase: true,
                       icon: Icons.health_and_safety,
                     ),
+                    const SizedBox(height: 16),
 
                     KenwellFormCard(
                       title: 'Measurements',

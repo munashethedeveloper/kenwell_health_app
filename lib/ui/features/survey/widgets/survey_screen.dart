@@ -28,8 +28,11 @@ class SurveyScreen extends StatelessWidget {
     return KenwellFormPage(
       title: 'Survey Form',
       sectionTitle: 'Section D: Survey',
+      subtitle:
+          'Please complete the form below to provide your feedback on the Wellness Day event.',
       appBar: appBar,
       children: [
+        const SizedBox(height: 16),
         const Center(
           child: Text(
             'Welcome to Kenwell Consulting Wellness Day Survey.\n'

@@ -71,7 +71,7 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
                 child: Column(
                   children: [
                     const SizedBox(height: 16),
-                    const AppLogo(size: 200),
+                    const AppLogo(size: 150),
                     const SizedBox(height: 24),
                     // Menu section header
                     const Align(

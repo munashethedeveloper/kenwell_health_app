@@ -94,7 +94,7 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             const AppLogo(size: 150),
             const SizedBox(height: 24),
 

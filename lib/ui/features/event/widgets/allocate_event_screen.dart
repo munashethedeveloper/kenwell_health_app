@@ -372,18 +372,40 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
               ),
 
               // Role badge
+              // Role badge with modern styling
               Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: theme.primaryColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(4),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      //const Color(0xFF90C048),
+                      //const Color(0xFF90C048).withValues(alpha: 0.8),
+                      Colors.white,
+                      Colors.white.withValues(alpha: 0.8),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF90C048).withValues(alpha: 0.3),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: Text(
                   user.role,
                   style: theme.textTheme.labelSmall?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: theme.primaryColor,
+                    //color: Colors.white,
+                    //color: Colors.grey.shade700,
+                    color: KenwellColors.secondaryNavyDark,
+
+                    fontSize: 10,
+                    letterSpacing: 0.5,
                   ),
                 ),
               ),
@@ -616,7 +638,12 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Divider(),
+                      const Divider(
+                        height: 24,
+                        thickness: 1,
+                        indent: 16,
+                        endIndent: 16,
+                      ),
                       const SizedBox(height: 16),
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16),

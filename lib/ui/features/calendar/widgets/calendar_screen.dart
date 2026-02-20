@@ -294,13 +294,13 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
       child: Column(
         //Welcome Message and Calendar widget
         children: [
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
 
           KenwellModernSectionHeader(
             title: _getWelcomeTitle(),
             textAlign: TextAlign.center,
           ),
-          const AppLogo(size: 120),
+          const AppLogo(size: 150),
           // Divider separating the header from the calendar content
           const Divider(
             height: 24,
@@ -623,13 +623,13 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                               ),
                             const SizedBox(height: 32),
                             // Enhanced button to create a new event
-                            if (_canAddEvent(context))
-                              CustomPrimaryButton(
-                                label: 'Create Event',
-                                onPressed: () => _openEventForm(
-                                    context, viewModel, viewModel.focusedDay),
-                                leading: const Icon(Icons.add_rounded),
-                              ),
+                            //  if (_canAddEvent(context))
+                            //  CustomPrimaryButton(
+                            //  label: 'Create Event',
+                            //  onPressed: () => _openEventForm(
+                            //     context, viewModel, viewModel.focusedDay),
+                            //  leading: const Icon(Icons.add_rounded),
+                            //  ),
                           ],
                         ),
                       ),
