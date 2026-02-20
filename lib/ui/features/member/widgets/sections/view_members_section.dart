@@ -428,7 +428,7 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                           number: index + 1, // Add sequential numbering
                           onTap: () => _showMemberOptions(member),
                           onDelete: () => _deleteMember(member, viewModel),
-                          onViewDetails: () => _showMemberOptions(member),
+                          onViewDetails: () => _navigateToMemberEvents(member),
                         );
                       },
                       childCount: filteredMembers.length,
