@@ -146,7 +146,8 @@ class UserCardWidget extends StatelessWidget {
                           '$firstName $lastName',
                           style: theme.textTheme.bodyLarge?.copyWith(
                             fontWeight: FontWeight.w700,
-                            color: const Color(0xFF201C58),
+                            //color: const Color(0xFF201C58),
+                            color: Colors.black,
                             letterSpacing: -0.2,
                           ),
                           maxLines: 1,
@@ -159,7 +160,8 @@ class UserCardWidget extends StatelessWidget {
                               Icons.email_outlined,
                               size: 14,
                               //color: Colors.grey[600],
-                              color: KenwellColors.secondaryNavyDark,
+                              //color: KenwellColors.secondaryNavyDark,
+                              color: Colors.black,
                             ),
                             const SizedBox(width: 4),
                             Expanded(
@@ -167,7 +169,7 @@ class UserCardWidget extends StatelessWidget {
                                 email,
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   //color: Colors.grey[600],
-                                  color: KenwellColors.secondaryNavyDark,
+                                  color: Colors.black,
                                   fontSize: 13,
                                 ),
                                 maxLines: 1,
@@ -216,7 +218,8 @@ class UserCardWidget extends StatelessWidget {
                                         ? 'Verified'
                                         : 'Not Verified',
                                     style: theme.textTheme.labelSmall?.copyWith(
-                                      color: Colors.grey.shade800,
+                                      //color: Colors.grey.shade800,
+                                      color: Colors.black,
                                       //user.emailVerified
                                       // ? const Color(0xFF10B981)
                                       //: const Color(0xFFEF4444),
@@ -265,8 +268,8 @@ class UserCardWidget extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                         //color: Colors.white,
                         //color: Colors.grey.shade700,
-                        color: KenwellColors.secondaryNavyDark,
-
+                        //color: KenwellColors.secondaryNavyDark,
+                        color: Colors.black,
                         fontSize: 10,
                         letterSpacing: 0.5,
                       ),

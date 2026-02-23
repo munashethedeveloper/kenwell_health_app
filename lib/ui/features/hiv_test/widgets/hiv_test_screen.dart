@@ -27,15 +27,15 @@ class HIVTestScreen extends StatelessWidget {
 
     // Build the form page
     return KenwellFormPage(
-      title: 'HIV Test Screening Form',
-      sectionTitle: 'Section C: HIV Screening',
+      title: 'HCT Screening Form',
+      sectionTitle: 'Section C: HCT Screening',
       subtitle:
-          'Please complete the form below to provide your HIV testing history and risk behaviors.',
+          'Please complete the form below to provide your HCT testing history and risk behaviors.',
       formKey: viewModel.formKey,
       appBar: appBar,
       children: [
         const SizedBox(height: 16),
-        // HIV Testing History Card
+        // HCT Testing History Card
         KenwellFormCard(
           title: 'HIV Testing History',
           child: Column(

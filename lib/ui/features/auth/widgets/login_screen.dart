@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:provider/provider.dart';
 import '../../../../data/repositories_dcl/auth_repository_dcl.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
@@ -120,6 +121,7 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
           //titleColor: Color(0xFFFFFFFF),
           titleStyle: TextStyle(
             color: Colors.white,
+            //color: KenwellColors.secondaryNavyDark,
             fontWeight: FontWeight.bold,
           ),
           automaticallyImplyLeading: false,
@@ -201,6 +203,12 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
                     // Login button
                     CustomPrimaryButton(
                       label: "Login",
+                      labelStyle: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        //color: KenwellColors.secondaryNavy,
+                        color: Colors.white,
+                      ),
                       onPressed: _handleLogin,
                       isBusy: viewModel.isLoading,
                     ),

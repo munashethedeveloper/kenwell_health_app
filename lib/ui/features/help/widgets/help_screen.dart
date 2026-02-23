@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
@@ -18,7 +20,7 @@ class HelpScreen extends StatelessWidget {
       child: Scaffold(
         // App bar
         appBar: const KenwellAppBar(
-          title: 'Help & Support',
+          title: 'KenWell365',
           //titleColor: Color(0xFF201C58),
           titleColor: Colors.white,
           titleStyle: TextStyle(
@@ -38,7 +40,11 @@ class HelpScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 const AppLogo(size: 150),
                 const SizedBox(height: 16),
-                const SizedBox(height: 12),
+                const KenwellModernSectionHeader(
+                  title: 'Help & Support',
+                  subtitle: 'Get assistance and FAQs about the app',
+                ),
+                const SizedBox(height: 16),
                 // Menu items
                 _ProfileMenuItem(
                   icon: Icons.info_outline,
@@ -136,7 +142,8 @@ class _ProfileMenuItem extends StatelessWidget {
                   ),
                   child: Icon(
                     icon,
-                    color: isDestructive ? Colors.red : const Color(0xFF201C58),
+                    color:
+                        isDestructive ? Colors.red : KenwellColors.primaryGreen,
                     size: 24,
                   ),
                 ),

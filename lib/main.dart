@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:kenwell_health_app/ui/features/consent_form/view_model/consent_screen_view_model.dart';
+import 'package:kenwell_health_app/ui/features/consent_form/view_model/consent_view_model.dart';
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
 import 'package:provider/provider.dart';
 

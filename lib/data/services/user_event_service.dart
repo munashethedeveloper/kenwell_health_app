@@ -24,6 +24,7 @@ class UserEventService {
       'eventLocation': event.address,
       'eventStartTime': event.startTime,
       'eventEndTime': event.endTime,
+      'servicesRequested': event.servicesRequested,
       'userId': user.id,
       'userFirstName': user.firstName,
       'userLastName': user.lastName,

@@ -393,14 +393,15 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                       ),
                     ),
                     const SizedBox(height: 40),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
                         'Tap on a member to view extra options:',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          color: Colors.grey.shade700,
+                          //color: Colors.grey.shade700,
+                          color: Colors.black,
                         ),
                       ),
                     ),
@@ -428,7 +429,7 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                           number: index + 1, // Add sequential numbering
                           onTap: () => _showMemberOptions(member),
                           onDelete: () => _deleteMember(member, viewModel),
-                          onViewDetails: () => _showMemberOptions(member),
+                          onViewDetails: () => _navigateToMemberEvents(member),
                         );
                       },
                       childCount: filteredMembers.length,

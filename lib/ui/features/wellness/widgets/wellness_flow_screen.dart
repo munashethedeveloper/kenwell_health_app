@@ -102,13 +102,17 @@ class WellnessFlowScreen extends StatelessWidget {
         final consentVM = flowVM.consentVM;
         return HealthScreeningsScreen(
           hraEnabled: consentVM.hra,
-          hivEnabled: consentVM.hiv,
+          //hivEnabled: consentVM.hiv,
+          hctEnabled: consentVM.hct,
           tbEnabled: consentVM.tb,
           hraCompleted: flowVM.hraCompleted,
-          hivCompleted: flowVM.hivCompleted,
+          hctCompleted: flowVM.hctCompleted,
+          //hivCompleted: flowVM.hivCompleted,
           tbCompleted: flowVM.tbCompleted,
           onHraTap: () => flowVM.navigateToHraScreening(),
-          onHivTap: () => flowVM.navigateToHivScreening(),
+
+          ///onHivTap: () => flowVM.navigateToHivScreening(),
+          onHctTap: () => flowVM.navigateToHctScreening(),
           onTbTap: () => flowVM.navigateToTbScreening(),
           onSubmitAll: () {
             // Mark screenings as completed and update UI immediately
@@ -178,16 +182,16 @@ class WellnessFlowScreen extends StatelessWidget {
           ),
         ); */
 
-      case WellnessFlowViewModel.stepHivTest:
+      case WellnessFlowViewModel.stepHctTest:
         // Set member and event IDs before showing the screen
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          flowVM.hivTestVM.setMemberAndEventId(
+          flowVM.hctTestVM.setMemberAndEventId(
             flowVM.currentMember?.id ?? '',
             event?.id ?? '',
           );
         });
         return ChangeNotifierProvider.value(
-          value: flowVM.hivTestVM,
+          value: flowVM.hctTestVM,
           child: HIVTestScreen(
             onNext: flowVM.nextStep,
             onPrevious: () {
@@ -198,22 +202,22 @@ class WellnessFlowScreen extends StatelessWidget {
           ),
         );
 
-      case WellnessFlowViewModel.stepHivResults:
+      case WellnessFlowViewModel.stepHctResults:
         if (event != null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            flowVM.hivResultsVM.initialiseWithEvent(event!);
-            flowVM.hivResultsVM.setMemberAndEventId(
+            flowVM.hctResultsVM.initialiseWithEvent(event!);
+            flowVM.hctResultsVM.setMemberAndEventId(
               flowVM.currentMember?.id ?? '',
               event!.id,
             );
           });
         }
         return ChangeNotifierProvider.value(
-          value: flowVM.hivResultsVM,
+          value: flowVM.hctResultsVM,
           child: HIVTestResultScreen(
             onNext: () {
-              // Immediate update: mark HIV as completed in the parent ViewModel
-              flowVM.markHivCompleted();
+              // Immediate update: mark HCT as completed in the parent ViewModel
+              flowVM.markHctCompleted();
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 flowVM.navigateToSection(
                     WellnessFlowViewModel.sectionHealthScreenings);

@@ -218,7 +218,7 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
           actions: [
             IconButton(
               tooltip: 'Refresh',
-              icon: const Icon(Icons.refresh, color: Color(0xFF201C58)),
+              icon: const Icon(Icons.refresh, color: Colors.white),
               onPressed: _refreshData,
             ),
             TextButton.icon(
@@ -227,10 +227,10 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                   context.pushNamed('help');
                 }
               },
-              icon: const Icon(Icons.help_outline, color: Color(0xFF201C58)),
+              icon: const Icon(Icons.help_outline, color: Colors.white),
               label: const Text(
                 'Help',
-                style: TextStyle(color: Color(0xFF201C58)),
+                style: TextStyle(color: Colors.white),
               ),
             ),
           ],
@@ -258,468 +258,516 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                 // ),
                 const SizedBox(height: 20),
                 // Enhanced Search Field with shadow
-                Row(
-                  children: [
-                    Icon(
-                      Icons.info_outline,
-                      size: 16,
-                      color: Colors.grey.shade600,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Search & Filter Events:',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey.shade700,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: theme.primaryColor.withValues(alpha: 0.08),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Search events by title...',
-                      hintStyle: TextStyle(color: Colors.grey[400]),
-                      prefixIcon: Icon(Icons.search, color: theme.primaryColor),
-                      suffixIcon: _searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear),
-                              onPressed: () {
-                                _searchController.clear();
-                              },
-                            )
-                          : null,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide.none,
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(
-                          color: theme.colorScheme.primary,
-                          width: 2,
-                        ),
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey.shade300,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 16,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
 
-                // Modern Filter Section
-                Card(
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F5F5),
                     borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(
+                    border: Border.all(
                       color: Colors.grey.shade300,
                       width: 1,
                     ),
                   ),
                   child: Column(
                     children: [
-                      // Filter Header
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            _isFilterExpanded = !_isFilterExpanded;
-                          });
-                        },
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(12),
+                      const Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            size: 16,
+                            //color: Colors.grey.shade600,
+                            color: Colors.black,
+                          ),
+                          SizedBox(width: 6),
+                          Text(
+                            'Search & Filter Events:',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              //color: Colors.grey.shade700,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: _searchController,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color:
-                                      theme.primaryColor.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Icon(
-                                  Icons.tune,
-                                  color: theme.primaryColor,
-                                  size: 20,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                'Filters',
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              if (_hasActiveFilters) ...[
-                                const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 2,
+                        decoration: InputDecoration(
+                          hintText: 'Enter event title to search...',
+                          hintStyle: TextStyle(
+                            color: Colors.grey.shade500,
+                            fontSize: 14,
+                          ),
+                          prefixIcon: const Icon(Icons.search),
+                          suffixIcon: searchQuery.isNotEmpty
+                              ? IconButton(
+                                  icon: Icon(
+                                    Icons.clear,
+                                    color: Colors.grey.shade600,
+                                    size: 20,
                                   ),
-                                  decoration: BoxDecoration(
-                                    color: theme.primaryColor,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    _getActiveFilterCount().toString(),
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                              const Spacer(),
-                              if (_hasActiveFilters)
-                                TextButton.icon(
                                   onPressed: () {
-                                    setState(() {
-                                      _selectedStatus = null;
-                                      _selectedProvince = null;
-                                      _startDate = null;
-                                      _endDate = null;
-                                    });
+                                    _searchController.clear();
                                   },
-                                  icon: const Icon(Icons.clear_all, size: 16),
-                                  label: const Text('Clear'),
-                                  style: TextButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 8,
-                                    ),
-                                  ),
-                                ),
-                              Icon(
-                                _isFilterExpanded
-                                    ? Icons.expand_less
-                                    : Icons.expand_more,
-                                color: Colors.grey[600],
-                              ),
-                            ],
+                                )
+                              : null,
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                                color: Colors.grey.shade300, width: 1),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                                color: Colors.grey.shade300, width: 1),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: theme.colorScheme.primary,
+                              width: 2,
+                            ),
                           ),
                         ),
                       ),
-                      // Filter Content
-                      if (_isFilterExpanded)
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[50],
-                            borderRadius: const BorderRadius.vertical(
-                              bottom: Radius.circular(12),
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Status Filter Chips
-                              Text(
-                                'Status',
-                                style: theme.textTheme.labelLarge?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.grey[700],
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Wrap(
-                                spacing: 8,
-                                runSpacing: 8,
-                                children: [
-                                  'Scheduled',
-                                  'In Progress',
-                                  'Completed'
-                                ].map((status) {
-                                  final isSelected = _selectedStatus == status;
-                                  return FilterChip(
-                                    label: Text(status),
-                                    selected: isSelected,
-                                    onSelected: (selected) {
-                                      setState(() {
-                                        _selectedStatus =
-                                            selected ? status : null;
-                                      });
-                                    },
-                                    backgroundColor: Colors.white,
-                                    selectedColor: theme.primaryColor
-                                        .withValues(alpha: 0.2),
-                                    checkmarkColor: theme.primaryColor,
-                                    labelStyle: TextStyle(
-                                      color: isSelected
-                                          ? theme.primaryColor
-                                          : Colors.grey[700],
-                                      fontWeight: isSelected
-                                          ? FontWeight.w600
-                                          : FontWeight.normal,
-                                    ),
-                                    side: BorderSide(
-                                      color: isSelected
-                                          ? theme.primaryColor
-                                          : Colors.grey.shade300,
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                              const SizedBox(height: 16),
 
-                              // Province Filter Chips
-                              if (allEvents
-                                  .map((e) => e.province)
-                                  .where((p) => p.isNotEmpty)
-                                  .toSet()
-                                  .isNotEmpty) ...[
-                                Text(
-                                  'Province',
-                                  style: theme.textTheme.labelLarge?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.grey[700],
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Wrap(
-                                  spacing: 8,
-                                  runSpacing: 8,
-                                  children: (allEvents
-                                          .map((e) => e.province)
-                                          .where((p) => p.isNotEmpty)
-                                          .toSet()
-                                          .toList()
-                                        ..sort())
-                                      .map((province) {
-                                    final isSelected =
-                                        _selectedProvince == province;
-                                    return FilterChip(
-                                      label: Text(province),
-                                      selected: isSelected,
-                                      onSelected: (selected) {
-                                        setState(() {
-                                          _selectedProvince =
-                                              selected ? province : null;
-                                        });
-                                      },
-                                      backgroundColor: Colors.white,
-                                      selectedColor: theme.primaryColor
-                                          .withValues(alpha: 0.2),
-                                      checkmarkColor: theme.primaryColor,
-                                      labelStyle: TextStyle(
-                                        color: isSelected
-                                            ? theme.primaryColor
-                                            : Colors.grey[700],
-                                        fontWeight: isSelected
-                                            ? FontWeight.w600
-                                            : FontWeight.normal,
-                                      ),
-                                      side: BorderSide(
-                                        color: isSelected
-                                            ? theme.primaryColor
-                                            : Colors.grey.shade300,
-                                      ),
-                                    );
-                                  }).toList(),
-                                ),
-                                const SizedBox(height: 16),
-                              ],
+                      const SizedBox(height: 16),
 
-                              // Date Range Filter
-                              Text(
-                                'Date Range',
-                                style: theme.textTheme.labelLarge?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.grey[700],
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Material(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: InkWell(
-                                        onTap: () async {
-                                          final picked = await showDatePicker(
-                                            context: context,
-                                            initialDate:
-                                                _startDate ?? DateTime.now(),
-                                            firstDate: DateTime(2020),
-                                            lastDate: DateTime(2030),
-                                          );
-                                          if (picked != null) {
-                                            setState(() {
-                                              _startDate = picked;
-                                            });
-                                          }
-                                        },
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                            vertical: 12,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                              color: _startDate != null
-                                                  ? theme.primaryColor
-                                                  : Colors.grey.shade300,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Icon(
-                                                Icons.calendar_today,
-                                                size: 16,
-                                                color: _startDate != null
-                                                    ? theme.primaryColor
-                                                    : Colors.grey[600],
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Expanded(
-                                                child: Text(
-                                                  _startDate == null
-                                                      ? 'Start Date'
-                                                      : '${_startDate!.day}/${_startDate!.month}/${_startDate!.year}',
-                                                  style: TextStyle(
-                                                    fontSize: 13,
-                                                    color: _startDate != null
-                                                        ? theme.primaryColor
-                                                        : Colors.grey[600],
-                                                    fontWeight:
-                                                        _startDate != null
-                                                            ? FontWeight.w600
-                                                            : FontWeight.normal,
-                                                  ),
-                                                ),
-                                              ),
-                                              if (_startDate != null)
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _startDate = null;
-                                                    });
-                                                  },
-                                                  child: Icon(
-                                                    Icons.close,
-                                                    size: 16,
-                                                    color: Colors.grey[600],
-                                                  ),
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Material(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: InkWell(
-                                        onTap: () async {
-                                          final picked = await showDatePicker(
-                                            context: context,
-                                            initialDate:
-                                                _endDate ?? DateTime.now(),
-                                            firstDate: DateTime(2020),
-                                            lastDate: DateTime(2030),
-                                          );
-                                          if (picked != null) {
-                                            setState(() {
-                                              _endDate = picked;
-                                            });
-                                          }
-                                        },
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                            vertical: 12,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                              color: _endDate != null
-                                                  ? theme.primaryColor
-                                                  : Colors.grey.shade300,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Icon(
-                                                Icons.calendar_today,
-                                                size: 16,
-                                                color: _endDate != null
-                                                    ? theme.primaryColor
-                                                    : Colors.grey[600],
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Expanded(
-                                                child: Text(
-                                                  _endDate == null
-                                                      ? 'End Date'
-                                                      : '${_endDate!.day}/${_endDate!.month}/${_endDate!.year}',
-                                                  style: TextStyle(
-                                                    fontSize: 13,
-                                                    color: _endDate != null
-                                                        ? theme.primaryColor
-                                                        : Colors.grey[600],
-                                                    fontWeight: _endDate != null
-                                                        ? FontWeight.w600
-                                                        : FontWeight.normal,
-                                                  ),
-                                                ),
-                                              ),
-                                              if (_endDate != null)
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      _endDate = null;
-                                                    });
-                                                  },
-                                                  child: Icon(
-                                                    Icons.close,
-                                                    size: 16,
-                                                    color: Colors.grey[600],
-                                                  ),
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                      // Modern Filter Section
+                      Card(
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(
+                            color: Colors.grey.shade300,
+                            width: 1,
                           ),
                         ),
+                        child: Column(
+                          children: [
+                            // Filter Header
+                            InkWell(
+                              onTap: () {
+                                setState(() {
+                                  _isFilterExpanded = !_isFilterExpanded;
+                                });
+                              },
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(12),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: theme.primaryColor
+                                            .withValues(alpha: 0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Icon(
+                                        Icons.tune,
+                                        color: theme.primaryColor,
+                                        size: 20,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      'Filters',
+                                      style:
+                                          theme.textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    if (_hasActiveFilters) ...[
+                                      const SizedBox(width: 8),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: theme.primaryColor,
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        child: Text(
+                                          _getActiveFilterCount().toString(),
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                    const Spacer(),
+                                    if (_hasActiveFilters)
+                                      TextButton.icon(
+                                        onPressed: () {
+                                          setState(() {
+                                            _selectedStatus = null;
+                                            _selectedProvince = null;
+                                            _startDate = null;
+                                            _endDate = null;
+                                          });
+                                        },
+                                        icon: const Icon(Icons.clear_all,
+                                            size: 16),
+                                        label: const Text('Clear'),
+                                        style: TextButton.styleFrom(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 8,
+                                          ),
+                                        ),
+                                      ),
+                                    Icon(
+                                      _isFilterExpanded
+                                          ? Icons.expand_less
+                                          : Icons.expand_more,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            // Filter Content
+                            if (_isFilterExpanded)
+                              Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[50],
+                                  borderRadius: const BorderRadius.vertical(
+                                    bottom: Radius.circular(12),
+                                  ),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Status Filter Chips
+                                    Text(
+                                      'Status',
+                                      style:
+                                          theme.textTheme.labelLarge?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.grey[700],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Wrap(
+                                      spacing: 8,
+                                      runSpacing: 8,
+                                      children: [
+                                        'Scheduled',
+                                        'In Progress',
+                                        'Completed'
+                                      ].map((status) {
+                                        final isSelected =
+                                            _selectedStatus == status;
+                                        return FilterChip(
+                                          label: Text(status),
+                                          selected: isSelected,
+                                          onSelected: (selected) {
+                                            setState(() {
+                                              _selectedStatus =
+                                                  selected ? status : null;
+                                            });
+                                          },
+                                          backgroundColor: Colors.white,
+                                          selectedColor: theme.primaryColor
+                                              .withValues(alpha: 0.2),
+                                          checkmarkColor: theme.primaryColor,
+                                          labelStyle: TextStyle(
+                                            color: isSelected
+                                                ? theme.primaryColor
+                                                : Colors.grey[700],
+                                            fontWeight: isSelected
+                                                ? FontWeight.w600
+                                                : FontWeight.normal,
+                                          ),
+                                          side: BorderSide(
+                                            color: isSelected
+                                                ? theme.primaryColor
+                                                : Colors.grey.shade300,
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                    const SizedBox(height: 16),
+
+                                    // Province Filter Chips
+                                    if (allEvents
+                                        .map((e) => e.province)
+                                        .where((p) => p.isNotEmpty)
+                                        .toSet()
+                                        .isNotEmpty) ...[
+                                      Text(
+                                        'Province',
+                                        style: theme.textTheme.labelLarge
+                                            ?.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.grey[700],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Wrap(
+                                        spacing: 8,
+                                        runSpacing: 8,
+                                        children: (allEvents
+                                                .map((e) => e.province)
+                                                .where((p) => p.isNotEmpty)
+                                                .toSet()
+                                                .toList()
+                                              ..sort())
+                                            .map((province) {
+                                          final isSelected =
+                                              _selectedProvince == province;
+                                          return FilterChip(
+                                            label: Text(province),
+                                            selected: isSelected,
+                                            onSelected: (selected) {
+                                              setState(() {
+                                                _selectedProvince =
+                                                    selected ? province : null;
+                                              });
+                                            },
+                                            backgroundColor: Colors.white,
+                                            selectedColor: theme.primaryColor
+                                                .withValues(alpha: 0.2),
+                                            checkmarkColor: theme.primaryColor,
+                                            labelStyle: TextStyle(
+                                              color: isSelected
+                                                  ? theme.primaryColor
+                                                  : Colors.grey[700],
+                                              fontWeight: isSelected
+                                                  ? FontWeight.w600
+                                                  : FontWeight.normal,
+                                            ),
+                                            side: BorderSide(
+                                              color: isSelected
+                                                  ? theme.primaryColor
+                                                  : Colors.grey.shade300,
+                                            ),
+                                          );
+                                        }).toList(),
+                                      ),
+                                      const SizedBox(height: 16),
+                                    ],
+
+                                    // Date Range Filter
+                                    Text(
+                                      'Date Range',
+                                      style:
+                                          theme.textTheme.labelLarge?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.grey[700],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Material(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            child: InkWell(
+                                              onTap: () async {
+                                                final picked =
+                                                    await showDatePicker(
+                                                  context: context,
+                                                  initialDate: _startDate ??
+                                                      DateTime.now(),
+                                                  firstDate: DateTime(2020),
+                                                  lastDate: DateTime(2030),
+                                                );
+                                                if (picked != null) {
+                                                  setState(() {
+                                                    _startDate = picked;
+                                                  });
+                                                }
+                                              },
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 12,
+                                                  vertical: 12,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                    color: _startDate != null
+                                                        ? theme.primaryColor
+                                                        : Colors.grey.shade300,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    Icon(
+                                                      Icons.calendar_today,
+                                                      size: 16,
+                                                      color: _startDate != null
+                                                          ? theme.primaryColor
+                                                          : Colors.grey[600],
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                    Expanded(
+                                                      child: Text(
+                                                        _startDate == null
+                                                            ? 'Start Date'
+                                                            : '${_startDate!.day}/${_startDate!.month}/${_startDate!.year}',
+                                                        style: TextStyle(
+                                                          fontSize: 13,
+                                                          color: _startDate !=
+                                                                  null
+                                                              ? theme
+                                                                  .primaryColor
+                                                              : Colors
+                                                                  .grey[600],
+                                                          fontWeight:
+                                                              _startDate != null
+                                                                  ? FontWeight
+                                                                      .w600
+                                                                  : FontWeight
+                                                                      .normal,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    if (_startDate != null)
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          setState(() {
+                                                            _startDate = null;
+                                                          });
+                                                        },
+                                                        child: Icon(
+                                                          Icons.close,
+                                                          size: 16,
+                                                          color:
+                                                              Colors.grey[600],
+                                                        ),
+                                                      ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Material(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            child: InkWell(
+                                              onTap: () async {
+                                                final picked =
+                                                    await showDatePicker(
+                                                  context: context,
+                                                  initialDate: _endDate ??
+                                                      DateTime.now(),
+                                                  firstDate: DateTime(2020),
+                                                  lastDate: DateTime(2030),
+                                                );
+                                                if (picked != null) {
+                                                  setState(() {
+                                                    _endDate = picked;
+                                                  });
+                                                }
+                                              },
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 12,
+                                                  vertical: 12,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                    color: _endDate != null
+                                                        ? theme.primaryColor
+                                                        : Colors.grey.shade300,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    Icon(
+                                                      Icons.calendar_today,
+                                                      size: 16,
+                                                      color: _endDate != null
+                                                          ? theme.primaryColor
+                                                          : Colors.grey[600],
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                    Expanded(
+                                                      child: Text(
+                                                        _endDate == null
+                                                            ? 'End Date'
+                                                            : '${_endDate!.day}/${_endDate!.month}/${_endDate!.year}',
+                                                        style: TextStyle(
+                                                          fontSize: 13,
+                                                          color: _endDate !=
+                                                                  null
+                                                              ? theme
+                                                                  .primaryColor
+                                                              : Colors
+                                                                  .grey[600],
+                                                          fontWeight:
+                                                              _endDate != null
+                                                                  ? FontWeight
+                                                                      .w600
+                                                                  : FontWeight
+                                                                      .normal,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    if (_endDate != null)
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          setState(() {
+                                                            _endDate = null;
+                                                          });
+                                                        },
+                                                        child: Icon(
+                                                          Icons.close,
+                                                          size: 16,
+                                                          color:
+                                                              Colors.grey[600],
+                                                        ),
+                                                      ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),

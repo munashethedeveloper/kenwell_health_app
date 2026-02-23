@@ -91,7 +91,7 @@ class EventStatsDetailScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // Status Badge
+            /*   // Status Badge
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
@@ -121,7 +121,7 @@ class EventStatsDetailScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-
+ */
             // Key Metrics
             Row(
               children: [
@@ -164,6 +164,11 @@ class EventStatsDetailScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 24),
+
+//ADD THE EVENT LOCATION CARD BACK IN LATER IF NEEDED
+            // KenwellFormCard(
+            //  title: 'Event Location',
+            // ),
 
             // Event Details
             KenwellFormCard(

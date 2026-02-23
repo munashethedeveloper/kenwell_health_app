@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/international_form_field.dart';
 import 'package:provider/provider.dart';
 import '../../../../../domain/constants/user_roles.dart';
@@ -227,7 +228,14 @@ class _CreateUserSectionState extends State<CreateUserSection> {
                     ),
                   ),
                   CustomPrimaryButton(
-                    label: "Register",
+                    label: "Register User",
+                    labelStyle: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      //color: Colors.white,
+                      //color: KenwellColors.secondaryNavyDark,
+                      color: KenwellColors.secondaryNavy,
+                    ),
                     onPressed: _register,
                     isBusy: viewModel.isLoading,
                   ),

@@ -150,9 +150,9 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // const SizedBox(height: 8),
+            const AppLogo(size: 150),
             const SizedBox(height: 16),
-            const AppLogo(size: 200),
-            const SizedBox(height: 24),
             const KenwellModernSectionHeader(
               title: 'Search Member',
               subtitle:
@@ -314,6 +314,14 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
                   ),
                 ],
               ),
+            ),
+            const SizedBox(height: 8),
+
+            const Divider(
+              height: 24,
+              thickness: 1,
+              indent: 16,
+              endIndent: 16,
             ),
 
             const SizedBox(height: 16),

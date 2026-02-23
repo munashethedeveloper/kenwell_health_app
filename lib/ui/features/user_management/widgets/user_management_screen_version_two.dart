@@ -55,9 +55,11 @@ class _UserManagementScreenVersionTwoState
               appBar: const KenwellAppBar(
                 automaticallyImplyLeading: true,
                 title: 'User Management',
-                titleColor: Color(0xFF201C58),
+                //titleColor: Color(0xFF201C58),
+                titleColor: Colors.white,
                 titleStyle: TextStyle(
-                  color: Color(0xFF201C58),
+                  //color: Color(0xFF201C58),
+                  color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -139,9 +141,10 @@ class _UserManagementScreenVersionTwoState
             child: Scaffold(
               appBar: KenwellAppBar(
                 title: 'User Management',
-                titleColor: const Color(0xFF201C58),
+                //titleColor: const Color(0xFF201C58),
+                titleColor: Colors.white,
                 titleStyle: const TextStyle(
-                  color: Color(0xFF201C58),
+                  color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
                 automaticallyImplyLeading: true,
@@ -181,7 +184,7 @@ class _UserManagementScreenVersionTwoState
                         );
                       }
                     },
-                    icon: const Icon(Icons.refresh, color: Color(0xFF201C58)),
+                    icon: const Icon(Icons.refresh, color: Colors.white),
                     tooltip: 'Refresh users',
                   ),
                   TextButton.icon(
@@ -190,11 +193,10 @@ class _UserManagementScreenVersionTwoState
                         context.pushNamed('help');
                       }
                     },
-                    icon: const Icon(Icons.help_outline,
-                        color: Color(0xFF201C58)),
+                    icon: const Icon(Icons.help_outline, color: Colors.white),
                     label: const Text(
                       'Help',
-                      style: TextStyle(color: Color(0xFF201C58)),
+                      style: TextStyle(color: Colors.white),
                     ),
                   ),
                 ],

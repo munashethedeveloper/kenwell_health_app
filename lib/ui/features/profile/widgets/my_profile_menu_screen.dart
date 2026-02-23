@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/features/auth/view_models/auth_view_model.dart';
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/dialogs/confirmation_dialog.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
@@ -182,7 +183,8 @@ class _ProfileMenuItem extends StatelessWidget {
                   ),
                   child: Icon(
                     icon,
-                    color: isDestructive ? Colors.red : const Color(0xFF201C58),
+                    color:
+                        isDestructive ? Colors.red : KenwellColors.primaryGreen,
                     size: 24,
                   ),
                 ),

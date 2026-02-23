@@ -23,20 +23,22 @@ class MemberSearchBar extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Explanatory label
-        Row(
+        const Row(
           children: [
             Icon(
               Icons.info_outline,
               size: 16,
-              color: Colors.grey.shade600,
+              color: Colors.black,
+              //color: Colors.grey.shade600,
             ),
-            const SizedBox(width: 6),
+            SizedBox(width: 6),
             Text(
               'Search & Filter Members:',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey.shade700,
+                //color: Colors.grey.shade700,
+                color: Colors.black,
               ),
             ),
           ],

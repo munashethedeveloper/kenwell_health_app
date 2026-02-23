@@ -618,15 +618,15 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                       ),
                     ),
                     const SizedBox(height: 40),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
                         'Tap on a user to view extra options:',
                         style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey.shade700,
-                        ),
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            //color: Colors.grey.shade700,
+                            color: Colors.black),
                       ),
                     ),
                     const SizedBox(height: 24),

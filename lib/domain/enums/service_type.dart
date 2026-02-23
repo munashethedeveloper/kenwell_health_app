@@ -1,16 +1,16 @@
 /// Available wellness screening services
 enum ServiceType {
   breastScreening,
-  dentalScreening,
-  eyeTest,
+  //dentalScreening,
+  //eyeTest,
   hct,
-  hivTest,
+  //hivTest,
   hra,
   papSmear,
-  psychologicalAssessment,
-  postureScreening,
+  //psychologicalAssessment,
+  //postureScreening,
   psa,
-  psychologicalScreening,
+  //psychologicalScreening,
   tbTest,
 }
 
@@ -20,26 +20,26 @@ extension ServiceTypeExtension on ServiceType {
     switch (this) {
       case ServiceType.breastScreening:
         return 'Breast Screening';
-      case ServiceType.dentalScreening:
-        return 'Dental Screening';
-      case ServiceType.eyeTest:
-        return 'Eye Test';
+      //case ServiceType.dentalScreening:
+      // return 'Dental Screening';
+      // case ServiceType.eyeTest:
+      // return 'Eye Test';
       case ServiceType.hct:
         return 'HCT';
-      case ServiceType.hivTest:
-        return 'HIV Test';
+      //case ServiceType.hivTest:
+      //return 'HIV Test';
       case ServiceType.hra:
         return 'HRA';
       case ServiceType.papSmear:
         return 'Pap Smear';
-      case ServiceType.psychologicalAssessment:
-        return 'Psychological Assessment';
-      case ServiceType.postureScreening:
-        return 'Posture Screening';
+      // case ServiceType.psychologicalAssessment:
+      // return 'Psychological Assessment';
+      //case ServiceType.postureScreening:
+      //  return 'Posture Screening';
       case ServiceType.psa:
         return 'PSA';
-      case ServiceType.psychologicalScreening:
-        return 'Psychological Screening';
+      //case ServiceType.psychologicalScreening:
+      // return 'Psychological Screening';
       case ServiceType.tbTest:
         return 'TB Test';
     }

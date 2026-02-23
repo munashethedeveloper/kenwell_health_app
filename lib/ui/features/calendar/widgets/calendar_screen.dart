@@ -11,6 +11,8 @@ import '../../profile/view_model/profile_view_model.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/buttons/custom_primary_button.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../../shared/ui/colours/kenwell_colours.dart';
 import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 import '../view_model/calendar_view_model.dart';
 import 'day_events_dialog.dart';
@@ -89,6 +91,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
               titleStyle: const TextStyle(
                 //color: Color(0xFF201C58),
                 color: Colors.white,
+                //color: KenwellColors.secondaryNavyDark,
                 fontWeight: FontWeight.bold,
               ),
               actions: [
@@ -105,7 +108,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                       );
                     }
                   },
-                  icon: const Icon(Icons.refresh, color: Color(0xFF201C58)),
+                  icon: const Icon(Icons.refresh, color: Colors.white),
                   tooltip: 'Refresh events',
                 ),
                 // Help button
@@ -115,11 +118,10 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                       context.pushNamed('help');
                     }
                   },
-                  icon:
-                      const Icon(Icons.help_outline, color: Color(0xFF201C58)),
+                  icon: const Icon(Icons.help_outline, color: Colors.white),
                   label: const Text(
                     'Help',
-                    style: TextStyle(color: Color(0xFF201C58)),
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ],
@@ -299,6 +301,11 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
           KenwellModernSectionHeader(
             title: _getWelcomeTitle(),
             textAlign: TextAlign.center,
+            //color: KenwellColors.primaryGreen,
+            color: KenwellColors.secondaryNavy,
+            fontStyle: FontStyle.italic,
+            fontFamily: GoogleFonts.playfairDisplay().fontFamily,
+            showIcon: false,
           ),
           const AppLogo(size: 150),
           // Divider separating the header from the calendar content
