@@ -86,38 +86,44 @@ class CancerScreen extends StatelessWidget {
         const SizedBox(height: 24),
 
         // 2. Symptoms
+        // Only build the items that are relevant to the consented sub-types.
+        // persistent pain is common to all cancer types and is always shown.
         KenwellFormCard(
           title: 'Symptoms',
           child: KenwellYesNoList<String>(
             items: [
-              KenwellYesNoItem(
-                question: 'Breast lump?',
-                value: viewModel.breastLump,
-                onChanged: viewModel.setBreastLump,
-                yesValue: 'Yes',
-                noValue: 'No',
-              ),
-              KenwellYesNoItem(
-                question: 'Abnormal bleeding?',
-                value: viewModel.abnormalBleeding,
-                onChanged: viewModel.setAbnormalBleeding,
-                yesValue: 'Yes',
-                noValue: 'No',
-              ),
-              KenwellYesNoItem(
-                question: 'Urinary difficulty?',
-                value: viewModel.urinaryDifficulty,
-                onChanged: viewModel.setUrinaryDifficulty,
-                yesValue: 'Yes',
-                noValue: 'No',
-              ),
-              KenwellYesNoItem(
-                question: 'Weight loss?',
-                value: viewModel.weightLoss,
-                onChanged: viewModel.setWeightLoss,
-                yesValue: 'Yes',
-                noValue: 'No',
-              ),
+              if (viewModel.showBreastScreening)
+                KenwellYesNoItem(
+                  question: 'Breast lump?',
+                  value: viewModel.breastLump,
+                  onChanged: viewModel.setBreastLump,
+                  yesValue: 'Yes',
+                  noValue: 'No',
+                ),
+              if (viewModel.showPapSmear || viewModel.showPsa)
+                KenwellYesNoItem(
+                  question: 'Abnormal bleeding?',
+                  value: viewModel.abnormalBleeding,
+                  onChanged: viewModel.setAbnormalBleeding,
+                  yesValue: 'Yes',
+                  noValue: 'No',
+                ),
+              if (viewModel.showPapSmear || viewModel.showPsa)
+                KenwellYesNoItem(
+                  question: 'Urinary difficulty?',
+                  value: viewModel.urinaryDifficulty,
+                  onChanged: viewModel.setUrinaryDifficulty,
+                  yesValue: 'Yes',
+                  noValue: 'No',
+                ),
+              if (viewModel.showPapSmear || viewModel.showPsa)
+                KenwellYesNoItem(
+                  question: 'Weight loss?',
+                  value: viewModel.weightLoss,
+                  onChanged: viewModel.setWeightLoss,
+                  yesValue: 'Yes',
+                  noValue: 'No',
+                ),
               KenwellYesNoItem(
                 question: 'Persistent pain?',
                 value: viewModel.persistentPain,
@@ -130,64 +136,70 @@ class CancerScreen extends StatelessWidget {
         ),
         const SizedBox(height: 24),
 
-        // 3. Breast Light Exam
-        KenwellFormCard(
-          title: 'Breast Light Exam',
-          child: KenwellDropdownField<String>(
-            label: 'Findings',
-            value: viewModel.breastLightExamFindings,
-            items: const ['Normal', 'Abnormal'],
-            onChanged: viewModel.setBreastLightExamFindings,
-            decoration: KenwellFormStyles.decoration(
+        // 3. Breast Light Exam — only for Breast Screening
+        if (viewModel.showBreastScreening) ...[
+          KenwellFormCard(
+            title: 'Breast Light Exam',
+            child: KenwellDropdownField<String>(
               label: 'Findings',
-              hint: 'Select findings',
+              value: viewModel.breastLightExamFindings,
+              items: const ['Normal', 'Abnormal'],
+              onChanged: viewModel.setBreastLightExamFindings,
+              decoration: KenwellFormStyles.decoration(
+                label: 'Findings',
+                hint: 'Select findings',
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 24),
+          const SizedBox(height: 24),
+        ],
 
-        // 4. Liquid Cytology / Pap Smear
-        KenwellFormCard(
-          title: 'Liquid Cytology / Pap Smear',
-          child: Column(
-            children: [
-              KenwellYesNoQuestion<String>(
-                question: 'Specimen sample collected?',
-                value: viewModel.papSmearSpecimenCollected,
-                onChanged: viewModel.setPapSmearSpecimenCollected,
-                yesValue: 'Yes',
-                noValue: 'No',
-              ),
-              KenwellDropdownField<String>(
-                label: 'Results',
-                value: viewModel.papSmearResults,
-                items: const ['Normal', 'Abnormal', 'Pending'],
-                onChanged: viewModel.setPapSmearResults,
-                decoration: KenwellFormStyles.decoration(
-                  label: 'Results',
-                  hint: 'Select results',
+        // 4. Liquid Cytology / Pap Smear — only for Pap Smear
+        if (viewModel.showPapSmear) ...[
+          KenwellFormCard(
+            title: 'Liquid Cytology / Pap Smear',
+            child: Column(
+              children: [
+                KenwellYesNoQuestion<String>(
+                  question: 'Specimen sample collected?',
+                  value: viewModel.papSmearSpecimenCollected,
+                  onChanged: viewModel.setPapSmearSpecimenCollected,
+                  yesValue: 'Yes',
+                  noValue: 'No',
                 ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 24),
-
-        // 5. PSA
-        KenwellFormCard(
-          title: 'PSA',
-          child: KenwellDropdownField<String>(
-            label: 'Results',
-            value: viewModel.psaResults,
-            items: const ['Normal', 'Abnormal'],
-            onChanged: viewModel.setPsaResults,
-            decoration: KenwellFormStyles.decoration(
-              label: 'Results',
-              hint: 'Select results',
+                KenwellDropdownField<String>(
+                  label: 'Results',
+                  value: viewModel.papSmearResults,
+                  items: const ['Normal', 'Abnormal', 'Pending'],
+                  onChanged: viewModel.setPapSmearResults,
+                  decoration: KenwellFormStyles.decoration(
+                    label: 'Results',
+                    hint: 'Select results',
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
-        const SizedBox(height: 24),
+          const SizedBox(height: 24),
+        ],
+
+        // 5. PSA — only for PSA screening
+        if (viewModel.showPsa) ...[
+          KenwellFormCard(
+            title: 'PSA',
+            child: KenwellDropdownField<String>(
+              label: 'Results',
+              value: viewModel.psaResults,
+              items: const ['Normal', 'Abnormal'],
+              onChanged: viewModel.setPsaResults,
+              decoration: KenwellFormStyles.decoration(
+                label: 'Results',
+                hint: 'Select results',
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+        ],
 
         // 6. Outcome & Referral
         KenwellFormCard(

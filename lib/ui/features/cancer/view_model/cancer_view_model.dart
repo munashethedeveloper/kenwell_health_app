@@ -17,6 +17,27 @@ class CancerScreeningViewModel extends ChangeNotifier {
     _eventId = eventId;
   }
 
+  // --- Cancer sub-types from event services ---
+  // Empty means "show all" (fallback when no services are specified).
+  Set<String> _cancerSubTypes = {};
+
+  void setCancerSubTypes(Set<String> types) {
+    _cancerSubTypes = types;
+    notifyListeners();
+  }
+
+  /// True when Breast Screening is relevant (or no sub-types set → show all).
+  bool get showBreastScreening =>
+      _cancerSubTypes.isEmpty || _cancerSubTypes.contains('Breast Screening');
+
+  /// True when Pap Smear is relevant (or no sub-types set → show all).
+  bool get showPapSmear =>
+      _cancerSubTypes.isEmpty || _cancerSubTypes.contains('Pap Smear');
+
+  /// True when PSA is relevant (or no sub-types set → show all).
+  bool get showPsa =>
+      _cancerSubTypes.isEmpty || _cancerSubTypes.contains('PSA');
+
   // --- Medical History ---
   String? previousCancerDiagnosis;
   String? familyHistoryOfCancer;

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:provider/provider.dart';
+import '../../../../domain/enums/service_type.dart';
 import '../../../../domain/models/member.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../widgets/member_search_screen.dart';
@@ -553,6 +554,19 @@ class WellnessNavigator {
   Future<bool?> _navigateToCancer(Member member) async {
     final cancerVM = CancerScreeningViewModel();
     cancerVM.setMemberAndEventId(member.id, event.id);
+
+    // Determine which cancer sub-types were requested for this event so the
+    // screen can show only the relevant fields.
+    final allServices =
+        ServiceTypeConverter.fromStorageString(event.servicesRequested);
+    final cancerSubTypes = allServices
+        .where((s) =>
+            s == ServiceType.breastScreening ||
+            s == ServiceType.papSmear ||
+            s == ServiceType.psa)
+        .map((s) => s.displayName)
+        .toSet();
+    cancerVM.setCancerSubTypes(cancerSubTypes);
 
     return await Navigator.push<bool>(
       context,
