@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:kenwell_health_app/utils/event_status_colors.dart';
 import 'package:provider/provider.dart';
@@ -468,17 +469,24 @@ class MyEventScreenState extends State<MyEventScreen> {
                                         const SizedBox(height: 4),
                                         Row(
                                           children: [
-                                            Icon(
+                                            const Icon(
                                               Icons.calendar_today,
                                               size: 14,
-                                              color: Colors.grey[600],
+                                              //color: Colors.grey[600],
+                                              color: KenwellColors
+                                                  .secondaryNavyDark,
                                             ),
                                             const SizedBox(width: 4),
                                             Text(
                                               '${event.date.day}/${event.date.month}/${event.date.year}',
                                               style: theme.textTheme.bodySmall
                                                   ?.copyWith(
-                                                color: Colors.grey[600],
+                                                color: KenwellColors
+                                                    .secondaryNavyDark,
+                                                //color: Colors.black,
+                                                //color: Colors.grey[600],
+                                                //color: KenwellColors
+                                                // .secondaryNavyDark,
                                               ),
                                             ),
                                             const SizedBox(width: 12),
@@ -513,7 +521,7 @@ class MyEventScreenState extends State<MyEventScreen> {
                                       ],
                                     ),
                                   ),
-                                  // Screened count badge
+                                  /*    // Screened count badge
                                   Container(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 16, vertical: 8),
@@ -543,22 +551,27 @@ class MyEventScreenState extends State<MyEventScreen> {
                                         color: Colors.white,
                                       ),
                                     ),
-                                  ),
+                                  ), */
                                 ],
                               ),
                               const SizedBox(height: 16),
                               // Additional event details
                               Row(
                                 children: [
-                                  Icon(Icons.access_time,
-                                      size: 16, color: Colors.grey[700]),
+                                  const Icon(
+                                    Icons.access_time,
+                                    size: 16,
+                                    //color: Colors.grey[700]
+                                    color: KenwellColors.secondaryNavyDark,
+                                  ),
                                   const SizedBox(width: 6),
                                   Text(
                                     '${event.startTime} - ${event.endTime}',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.w600,
-                                      color:
-                                          Colors.black.withValues(alpha: 0.9),
+                                      color: KenwellColors.secondaryNavyDark,
+                                      // color:
+                                      //  Colors.black.withValues(alpha: 0.9),
                                     ),
                                   ),
                                 ],
@@ -567,15 +580,19 @@ class MyEventScreenState extends State<MyEventScreen> {
                                 const SizedBox(height: 8),
                                 Row(
                                   children: [
-                                    Icon(Icons.location_on,
-                                        size: 16, color: Colors.grey[700]),
+                                    const Icon(
+                                      Icons.location_on,
+                                      size: 16,
+                                      //color: Colors.grey[700]
+                                      color: KenwellColors.secondaryNavyDark,
+                                    ),
                                     const SizedBox(width: 6),
                                     Expanded(
-                                      child: Text(
-                                        event.address,
-                                        style: const TextStyle(
-                                            color: Colors.black54),
-                                      ),
+                                      child: Text(event.address,
+                                          style: const TextStyle(
+                                            color:
+                                                KenwellColors.secondaryNavyDark,
+                                          )),
                                     ),
                                   ],
                                 ),
@@ -584,14 +601,20 @@ class MyEventScreenState extends State<MyEventScreen> {
                                 const SizedBox(height: 8),
                                 Row(
                                   children: [
-                                    Icon(Icons.business,
-                                        size: 16, color: Colors.grey[700]),
+                                    const Icon(
+                                      Icons.business,
+                                      size: 16,
+                                      //color: Colors.grey[700]
+                                      color: KenwellColors.secondaryNavyDark,
+                                    ),
                                     const SizedBox(width: 6),
                                     Expanded(
                                       child: Text(
                                         event.venue,
                                         style: const TextStyle(
-                                            color: Colors.black54),
+                                          color:
+                                              KenwellColors.secondaryNavyDark,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -602,15 +625,21 @@ class MyEventScreenState extends State<MyEventScreen> {
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Icon(Icons.medical_services,
-                                        size: 16, color: Colors.grey[700]),
+                                    const Icon(
+                                      Icons.medical_services,
+                                      size: 16,
+                                      //color: Colors.grey[700]
+                                      color: KenwellColors.secondaryNavyDark,
+                                    ),
                                     const SizedBox(width: 6),
                                     Expanded(
                                       child: Text(
-                                        'Services: ${event.servicesRequested}',
-                                        style: const TextStyle(
-                                            color: Colors.black54),
-                                      ),
+                                          'Services: ${event.servicesRequested}',
+                                          style: const TextStyle(
+                                            //color: Colors.black54),
+                                            color:
+                                                KenwellColors.secondaryNavyDark,
+                                          )),
                                     ),
                                   ],
                                 ),

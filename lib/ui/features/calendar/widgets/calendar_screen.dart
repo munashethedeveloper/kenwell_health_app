@@ -271,7 +271,8 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                   Text(
                     label,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
+                      //color: theme.colorScheme.onSurfaceVariant,
+                      color: KenwellColors.secondaryNavyDark,
                       fontWeight: FontWeight.w500,
                     ),
                     overflow: TextOverflow.ellipsis,
@@ -476,7 +477,8 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                 Text(
                   'Number of events on that day — tap a date to view details',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+                    //color: theme.colorScheme.onSurfaceVariant,
+                    color: KenwellColors.secondaryNavyDark,
                     fontStyle: FontStyle.italic,
                   ),
                 ),
@@ -688,10 +690,12 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                                   Expanded(
                                     child: Text(
                                       viewModel.formatDateLong(day),
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
-                                        color: theme.colorScheme.onSurface,
+                                        color: KenwellColors.secondaryNavy,
+                                        //color: KenwellColors.secondaryNavyDark,
+                                        //color: theme.colorScheme.onSurface,
                                         letterSpacing: -0.3,
                                       ),
                                     ),

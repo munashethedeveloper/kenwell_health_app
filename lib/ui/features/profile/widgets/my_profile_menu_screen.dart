@@ -206,9 +206,10 @@ class _ProfileMenuItem extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         subtitle,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 13,
-                          color: Colors.grey.shade600,
+                          //color: Colors.grey.shade600,
+                          color: KenwellColors.secondaryNavyDark,
                         ),
                       ),
                     ],
@@ -218,7 +219,7 @@ class _ProfileMenuItem extends StatelessWidget {
                   Icons.chevron_right,
                   color: isDestructive
                       ? Colors.red.withValues(alpha: 0.5)
-                      : Colors.grey.shade400,
+                      : KenwellColors.primaryGreen.withValues(alpha: 0.5),
                   size: 24,
                 ),
               ],

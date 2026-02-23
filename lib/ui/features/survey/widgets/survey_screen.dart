@@ -85,22 +85,22 @@ class SurveyScreen extends StatelessWidget {
                   vm,
                   '5. Nurses were knowledgeable, professional and courteous?',
                   'nurseProfessional'),
-              _buildRatingRow(
-                  vm, '6. Did nurses explain results clearly?', 'clearResults'),
-              _buildRatingRow(
+              /*  _buildRatingRow(
+                  vm, '6. Did nurses explain results clearly?', 'clearResults'), */
+              /*   _buildRatingRow(
                   vm,
                   '7. Did this event help you realise the full value of attending?',
-                  'realisedValue'),
+                  'realisedValue'), */
               _buildRatingRow(
                   vm,
-                  '8. I will encourage colleagues to attend next Wellness Day.',
+                  '6. I will encourage colleagues to attend next Wellness Day.',
                   'encourageColleagues'),
             ],
           ),
         ),
         const SizedBox(height: 24),
         KenwellFormCard(
-          title: '9. Contact Consent',
+          title: '7. Contact Consent',
           child: KenwellYesNoQuestion<String>(
             question:
                 'Would you like Kenwell Consulting to contact you regarding your experience?',

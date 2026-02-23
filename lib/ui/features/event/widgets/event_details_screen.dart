@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:provider/provider.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../domain/constants/role_permissions.dart';
@@ -44,11 +45,12 @@ class EventDetailsScreen extends StatelessWidget {
     return Scaffold(
       // App bar with title and actions
       appBar: KenwellAppBar(
-        title: '${event.title} Details',
+        //title: '${event.title} Details',
+        title: 'KenWell365',
         titleColor: Colors.white,
         titleStyle: const TextStyle(
           color: Colors.white,
-          //fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.bold,
         ),
         automaticallyImplyLeading: true,
         //backgroundColor: const Color(0xFF201C58),
@@ -277,7 +279,8 @@ class EventDetailsScreen extends StatelessWidget {
               label,
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: Colors.grey[700],
+                //color: Colors.grey[700],
+                color: KenwellColors.secondaryNavyDark,
               ),
             ),
           ),

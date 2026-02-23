@@ -554,7 +554,8 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
 
     return Scaffold(
       appBar: KenwellAppBar(
-        title: 'Allocate Event: ${widget.event.title}',
+        //title: 'Allocate Event: ${widget.event.title}',
+        title: 'KenWell365',
         titleColor: Colors.white,
         titleStyle: const TextStyle(
           color: Colors.white,
@@ -771,7 +772,8 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                           //color: Colors.grey.shade700,
-                          color: Colors.black,
+                          //color: Colors.black,
+                          color: KenwellColors.secondaryNavyDark,
                         ),
                       ),
                       const SizedBox(height: 8),

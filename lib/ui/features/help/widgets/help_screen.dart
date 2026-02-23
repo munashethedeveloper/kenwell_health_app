@@ -165,19 +165,18 @@ class _ProfileMenuItem extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         subtitle,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 13,
-                          color: Colors.grey.shade600,
+                          //color: Colors.grey.shade600,
+                          color: KenwellColors.secondaryNavyDark,
                         ),
                       ),
                     ],
                   ),
                 ),
-                Icon(
+                const Icon(
                   Icons.chevron_right,
-                  color: isDestructive
-                      ? Colors.red.withValues(alpha: 0.5)
-                      : Colors.grey.shade400,
+                  color: KenwellColors.primaryGreen,
                   size: 24,
                 ),
               ],

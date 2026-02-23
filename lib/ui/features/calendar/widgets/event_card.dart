@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/utils/event_status_colors.dart';
 import 'package:provider/provider.dart';
 import '../../../../domain/models/wellness_event.dart';
@@ -190,16 +191,18 @@ class EventCard extends StatelessWidget {
               // Date and status row
               Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.calendar_today,
                     size: 14,
-                    color: Colors.grey[600],
+                    //color: Colors.grey[600],
+                    color: KenwellColors.secondaryNavyDark,
                   ),
                   const SizedBox(width: 4),
                   Text(
                     viewModel.formatDateShort(event.date),
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: Colors.grey[600],
+                      //color: Colors.grey[600],
+                      color: KenwellColors.secondaryNavyDark,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -228,13 +231,18 @@ class EventCard extends StatelessWidget {
               // Event time with icon
               Row(
                 children: [
-                  Icon(Icons.access_time, size: 14, color: Colors.grey[600]),
+                  const Icon(
+                    Icons.access_time, size: 14,
+                    //color: Colors.grey[600]
+                    color: KenwellColors.secondaryNavyDark,
+                  ),
                   const SizedBox(width: 4),
                   Expanded(
                     child: Text(
                       '${event.startTime}${event.endTime.isNotEmpty ? ' - ${event.endTime}' : ''}',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: Colors.grey[600],
+                        //color: Colors.grey[600],
+                        color: KenwellColors.secondaryNavyDark,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -246,13 +254,17 @@ class EventCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    Icon(Icons.location_on, size: 14, color: Colors.grey[600]),
+                    const Icon(Icons.location_on,
+                        size: 14,
+                        //color: Colors.grey[600]
+                        color: KenwellColors.secondaryNavyDark),
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
                         event.address.isNotEmpty ? event.address : event.venue,
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: Colors.grey[600],
+                          //color: Colors.grey[600],
+                          color: KenwellColors.secondaryNavyDark,
                         ),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -266,12 +278,14 @@ class EventCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    Icon(Icons.people, size: 14, color: Colors.grey[600]),
+                    const Icon(Icons.people,
+                        size: 14, color: KenwellColors.secondaryNavyDark),
                     const SizedBox(width: 4),
                     Text(
                       '${event.expectedParticipation} expected',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: Colors.grey[600],
+                        //color: Colors.grey[600],
+                        color: KenwellColors.secondaryNavyDark,
                       ),
                     ),
                   ],

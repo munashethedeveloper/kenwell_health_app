@@ -157,6 +157,13 @@ class CurrentEventHomeScreen extends StatelessWidget {
                 ],
               ),
             ),
+            const SizedBox(height: 8),
+            const Divider(
+              height: 24,
+              thickness: 1,
+              indent: 16,
+              endIndent: 16,
+            ),
             const SizedBox(height: 24),
             const KenwellModernSectionHeader(
               title: 'Event Process',

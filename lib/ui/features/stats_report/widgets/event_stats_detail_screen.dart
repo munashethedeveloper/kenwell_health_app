@@ -2,6 +2,7 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:intl/intl.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/containers/gradient_container.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
@@ -47,7 +48,7 @@ class EventStatsDetailScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // Event Title Card
+            /*   // Event Title Card
             GradientContainer.purpleGreen(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -90,7 +91,15 @@ class EventStatsDetailScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-
+             // Event Location
+            KenwellFormCard(
+                title: 'Client Organization',
+                child: Column(children: [
+                  _buildDetailRow('Event Title', event.title, theme),
+                  //const Divider(),
+                ])),
+            const SizedBox(height: 16),
+ */
             /*   // Status Badge
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -122,22 +131,28 @@ class EventStatsDetailScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
  */
+
             // Key Metrics
             Row(
               children: [
                 Expanded(
                   child: _MetricCard(
                     icon: Icons.people,
-                    title: 'Screened',
-                    value: event.screenedCount.toString(),
+                    title: 'Expected',
+                    value: event.expectedParticipation.toString(),
+                    // title: 'Screened',
+                    //value: event.screenedCount.toString(),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: _MetricCard(
-                    icon: Icons.flag,
-                    title: 'Expected',
-                    value: event.expectedParticipation.toString(),
+                    icon: Icons.trending_up,
+                    title: 'Registered',
+                    value: event.expectedParticipation
+                        .toString(), //Change this value to actual registered count when available
+                    //title: 'Expected',
+                    //value: event.expectedParticipation.toString(),
                   ),
                 ),
               ],
@@ -147,17 +162,28 @@ class EventStatsDetailScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: _MetricCard(
+                    icon: Icons.flag,
+                    title: 'Screened',
+                    value: event.screenedCount.toString(),
+                    //title: 'Expected',
+                    //value: event.expectedParticipation.toString(),
+                  ),
+                ),
+                /*   Expanded(
+                  child: _MetricCard(
                     icon: Icons.trending_up,
                     title: 'Completion',
                     value: '$screeningPercentage%',
                   ),
-                ),
+                ), */
                 const SizedBox(width: 12),
                 Expanded(
                   child: _MetricCard(
                     icon: Icons.group,
-                    title: 'Remaining',
-                    value: (event.expectedParticipation - event.screenedCount)
+                    title: 'No Show',
+                    value: (event.expectedParticipation -
+                            event
+                                .screenedCount) //Fix this when actual registered count is available (Registered - Screened)
                         .toString(),
                   ),
                 ),
@@ -165,10 +191,42 @@ class EventStatsDetailScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-//ADD THE EVENT LOCATION CARD BACK IN LATER IF NEEDED
-            // KenwellFormCard(
-            //  title: 'Event Location',
-            // ),
+            // Event Location
+            KenwellFormCard(
+                title: 'Client Organization',
+                child: Column(children: [
+                  _buildDetailRow('Event Title', event.title, theme),
+                  //const Divider(),
+                ])),
+            const SizedBox(height: 16),
+
+            // Event Location
+            KenwellFormCard(
+                title: 'Date & Time',
+                child: Column(children: [
+                  _buildDetailRow('Date',
+                      DateFormat('MMM dd, yyyy').format(event.date), theme),
+                  const Divider(),
+                  _buildDetailRow('Start Time', event.startTime, theme),
+                  const Divider(),
+                  _buildDetailRow('End Time', event.endTime, theme),
+                ])),
+
+            const SizedBox(height: 16),
+
+            // Event Location
+            KenwellFormCard(
+                title: 'Event Location',
+                child: Column(children: [
+                  _buildDetailRow('Venue', event.venue, theme),
+                  const Divider(),
+                  _buildDetailRow('Address', event.address, theme),
+                  const Divider(),
+                  _buildDetailRow('Town/City', event.townCity, theme),
+                  const Divider(),
+                  _buildDetailRow('Province', event.province, theme),
+                ])),
+            const SizedBox(height: 16),
 
             // Event Details
             KenwellFormCard(
@@ -523,7 +581,8 @@ class EventStatsDetailScreen extends StatelessWidget {
               label,
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: Colors.grey[700],
+                //color: Colors.grey[700],
+                color: KenwellColors.secondaryNavyDark,
               ),
             ),
           ),
