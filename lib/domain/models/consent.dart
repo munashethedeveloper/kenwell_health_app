@@ -8,6 +8,7 @@ class Consent {
   final bool hra; // Health Risk Assessment
   final bool hiv; // HIV screening
   final bool tb; // TB screening
+  final bool cancer; // Cancer screening
   final String? signatureData; // Base64 encoded signature image
   final DateTime createdAt;
   final DateTime? updatedAt;
@@ -22,6 +23,7 @@ class Consent {
     required this.hra,
     required this.hiv,
     required this.tb,
+    this.cancer = false,
     this.signatureData,
     required this.createdAt,
     this.updatedAt,
@@ -39,6 +41,7 @@ class Consent {
       'hra': hra,
       'hiv': hiv,
       'tb': tb,
+      'cancer': cancer,
       'signatureData': signatureData,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
@@ -57,6 +60,7 @@ class Consent {
       hra: map['hra'] as bool,
       hiv: map['hiv'] as bool,
       tb: map['tb'] as bool,
+      cancer: (map['cancer'] as bool?) ?? false,
       signatureData: map['signatureData'] as String?,
       createdAt: DateTime.parse(map['createdAt'] as String),
       updatedAt: map['updatedAt'] != null
@@ -76,6 +80,7 @@ class Consent {
     bool? hra,
     bool? hiv,
     bool? tb,
+    bool? cancer,
     String? signatureData,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -90,6 +95,7 @@ class Consent {
       hra: hra ?? this.hra,
       hiv: hiv ?? this.hiv,
       tb: tb ?? this.tb,
+      cancer: cancer ?? this.cancer,
       signatureData: signatureData ?? this.signatureData,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,

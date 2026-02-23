@@ -7,12 +7,15 @@ class HealthScreeningsScreen extends StatelessWidget {
   final bool hraEnabled;
   final bool hivEnabled;
   final bool tbEnabled;
+  final bool cancerEnabled;
   final bool hraCompleted;
   final bool hivCompleted;
   final bool tbCompleted;
+  final bool cancerCompleted;
   final VoidCallback? onHraTap;
   final VoidCallback? onHivTap;
   final VoidCallback? onTbTap;
+  final VoidCallback? onCancerTap;
   final VoidCallback? onSubmitAll;
   final PreferredSizeWidget? appBar;
 
@@ -21,12 +24,15 @@ class HealthScreeningsScreen extends StatelessWidget {
     required this.hraEnabled,
     required this.hivEnabled,
     required this.tbEnabled,
+    this.cancerEnabled = false,
     this.hraCompleted = false,
     this.hivCompleted = false,
     this.tbCompleted = false,
+    this.cancerCompleted = false,
     this.onHraTap,
     this.onHivTap,
     this.onTbTap,
+    this.onCancerTap,
     this.onSubmitAll,
     this.appBar,
   });
@@ -92,6 +98,19 @@ class HealthScreeningsScreen extends StatelessWidget {
                 isCompleted: tbCompleted,
                 onTap: onTbTap,
               ),
+              if (!cancerEnabled) const SizedBox(height: 24),
+            ],
+
+            if (cancerEnabled) ...[
+              const SizedBox(height: 12),
+              _ScreeningCard(
+                icon: Icons.biotech,
+                title: 'Cancer Screening',
+                subtitle: 'Breast, cervical & prostate cancer screening',
+                isEnabled: cancerEnabled,
+                isCompleted: cancerCompleted,
+                onTap: onCancerTap,
+              ),
               const SizedBox(height: 24),
             ],
 
@@ -101,9 +120,11 @@ class HealthScreeningsScreen extends StatelessWidget {
                   hraEnabled: hraEnabled,
                   hivEnabled: hivEnabled,
                   tbEnabled: tbEnabled,
+                  cancerEnabled: cancerEnabled,
                   hraCompleted: hraCompleted,
                   hivCompleted: hivCompleted,
                   tbCompleted: tbCompleted,
+                  cancerCompleted: cancerCompleted,
                 ))
               SizedBox(
                 width: double.infinity,
@@ -124,9 +145,11 @@ class HealthScreeningsScreen extends StatelessWidget {
                   hraEnabled: hraEnabled,
                   hivEnabled: hivEnabled,
                   tbEnabled: tbEnabled,
+                  cancerEnabled: cancerEnabled,
                   hraCompleted: hraCompleted,
                   hivCompleted: hivCompleted,
                   tbCompleted: tbCompleted,
+                  cancerCompleted: cancerCompleted,
                 ))
               Container(
                 padding: const EdgeInsets.all(16),
@@ -166,14 +189,17 @@ class HealthScreeningsScreen extends StatelessWidget {
     required bool hraEnabled,
     required bool hivEnabled,
     required bool tbEnabled,
+    bool cancerEnabled = false,
     required bool hraCompleted,
     required bool hivCompleted,
     required bool tbCompleted,
+    bool cancerCompleted = false,
   }) {
     // Check if all enabled screenings are completed
     if (hraEnabled && !hraCompleted) return false;
     if (hivEnabled && !hivCompleted) return false;
     if (tbEnabled && !tbCompleted) return false;
+    if (cancerEnabled && !cancerCompleted) return false;
     return true;
   }
 }

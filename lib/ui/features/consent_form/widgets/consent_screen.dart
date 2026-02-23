@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/domain/enums/service_type.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_checkbox_group.dart';
 import 'package:provider/provider.dart';
@@ -200,7 +201,7 @@ class ConsentScreen extends StatelessWidget {
       KenwellFormStep(
         builder: (_) => KenwellCheckboxListCard(
           title: 'Please select applicable screenings',
-          options: _screeningOptions(vm),
+          options: _screeningOptions(vm, event),
         ),
       ),
     ];
@@ -223,12 +224,35 @@ class ConsentScreen extends StatelessWidget {
     'I understand and agree that I may receive a follow up regarding my medical condition.',
   ];
 
-  // Screening options
-  List<KenwellCheckboxOption> _screeningOptions(ConsentScreenViewModel vm) {
-    final screenings = [
-      {'label': 'HIV', 'value': vm.hiv, 'field': 'hiv'},
-      {'label': 'HRA', 'value': vm.hra, 'field': 'hra'},
-      {'label': 'TB', 'value': vm.tb, 'field': 'tb'},
+  // Screening options — filtered by which services the event has requested
+  List<KenwellCheckboxOption> _screeningOptions(
+      ConsentScreenViewModel vm, WellnessEvent event) {
+    final requestedServices =
+        ServiceTypeConverter.fromStorageString(event.servicesRequested);
+    final displayNames =
+        requestedServices.map((s) => s.displayName).toSet();
+
+    // If no services are set on the event, fall back to showing all
+    final bool showAll = displayNames.isEmpty;
+
+    final showHra =
+        showAll || displayNames.contains(ServiceType.hra.displayName);
+    final showHiv = showAll ||
+        displayNames.contains(ServiceType.hct.displayName) ||
+        displayNames.contains(ServiceType.hivTest.displayName);
+    final showTb =
+        showAll || displayNames.contains(ServiceType.tbTest.displayName);
+    final showCancer = showAll ||
+        displayNames.contains(ServiceType.breastScreening.displayName) ||
+        displayNames.contains(ServiceType.papSmear.displayName) ||
+        displayNames.contains(ServiceType.psa.displayName);
+
+    final List<Map<String, dynamic>> screenings = [
+      if (showHra) {'label': 'HRA', 'value': vm.hra, 'field': 'hra'},
+      if (showHiv) {'label': 'HIV', 'value': vm.hiv, 'field': 'hiv'},
+      if (showTb) {'label': 'TB', 'value': vm.tb, 'field': 'tb'},
+      if (showCancer)
+        {'label': 'Cancer Screening', 'value': vm.cancer, 'field': 'cancer'},
     ];
 
     return screenings

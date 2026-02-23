@@ -32,6 +32,7 @@ class ConsentScreenViewModel extends ChangeNotifier {
   //bool vct = false;
   bool hiv = false;
   bool tb = false;
+  bool cancer = false;
   //bool hiv = false;
 
   // Submission state
@@ -50,7 +51,7 @@ class ConsentScreenViewModel extends ChangeNotifier {
   // Validate form
   bool get isFormValid =>
       //(hra || vct || tb || hiv) && // At least one checkbox must be selected
-      (hra || hiv || tb) && // At least one checkbox must be selected
+      (hra || hiv || tb || cancer) && // At least one checkbox must be selected
       venueController.text.isNotEmpty &&
       dateController.text.isNotEmpty &&
       practitionerController.text.isNotEmpty &&
@@ -60,7 +61,7 @@ class ConsentScreenViewModel extends ChangeNotifier {
   //bool get hasAtLeastOneScreening => hra || vct || tb || hiv;
 
   // Helper to check if at least one screening is selected
-  bool get hasAtLeastOneScreening => hra || hiv || tb;
+  bool get hasAtLeastOneScreening => hra || hiv || tb || cancer;
 
   // Get list of selected screenings
   List<String> get selectedScreenings {
@@ -69,6 +70,7 @@ class ConsentScreenViewModel extends ChangeNotifier {
     if (hiv) selected.add('hiv');
     //if (vct) selected.add('vct');
     if (tb) selected.add('tb');
+    if (cancer) selected.add('cancer');
     //if (hiv) selected.add('hiv');
     return selected;
   }
@@ -119,6 +121,9 @@ class ConsentScreenViewModel extends ChangeNotifier {
       case 'tb':
         tb = value ?? false;
         break;
+      case 'cancer':
+        cancer = value ?? false;
+        break;
       //case 'hiv':
       // hiv = value ?? false;
       //break;
@@ -160,6 +165,7 @@ class ConsentScreenViewModel extends ChangeNotifier {
         hra: hra,
         hiv: hiv,
         tb: tb,
+        cancer: cancer,
         signatureData: signatureBase64,
         createdAt: DateTime.now(),
       );
@@ -195,6 +201,7 @@ class ConsentScreenViewModel extends ChangeNotifier {
           'hra': consent.hra,
           'hiv': consent.hiv,
           'tb': consent.tb,
+          'cancer': consent.cancer,
         },
         'signatureProvided': consent.signatureData != null,
         'createdAt': consent.createdAt.toIso8601String(),
@@ -220,6 +227,7 @@ class ConsentScreenViewModel extends ChangeNotifier {
         'hiv': hiv,
         // 'vct': vct,
         'tb': tb,
+        'cancer': cancer,
         //'hiv': hiv,
         'hasSignature': signatureController.isNotEmpty,
       };

@@ -17,12 +17,14 @@ import '../../../../data/repositories_dcl/firestore_consent_repository.dart';
 import '../../../../data/repositories_dcl/firestore_hra_repository.dart';
 import '../../../../data/repositories_dcl/firestore_hiv_screening_repository.dart';
 import '../../../../data/repositories_dcl/firestore_tb_screening_repository.dart';
+import '../../../../data/repositories_dcl/firestore_cancer_screening_repository.dart';
 
 class WellnessFlowViewModel extends ChangeNotifier {
   // Consent flags for screenings
   bool hraEnabled = false;
   bool hivEnabled = false;
   bool tbEnabled = false;
+  bool cancerEnabled = false;
 
   /// Loads all completion flags (consent, HRA, HIV, TB, survey) for the given member and event from Firestore
   Future<void> loadAllCompletionFlags(String? memberId, String? eventId) async {
@@ -33,6 +35,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
     hraCompleted = false;
     hivCompleted = false;
     tbCompleted = false;
+    cancerCompleted = false;
     screeningsCompleted = false;
     surveyCompleted = false;
 
@@ -90,6 +93,21 @@ class WellnessFlowViewModel extends ChangeNotifier {
       }
     } catch (e) {
       debugPrint('Error loading TB completion: $e');
+    }
+
+    // Cancer
+    try {
+      final cancerRepo = FirestoreCancerScreeningRepository();
+      final cancerList = await cancerRepo.getCancerScreeningsByMember(memberId);
+      debugPrint(
+          'Loaded Cancer for $memberId: ${cancerList.map((c) => c.eventId).toList()}');
+      final hasCancerScreening =
+          cancerList.any((cancer) => cancer.eventId == eventId);
+      if (hasCancerScreening) {
+        cancerCompleted = true;
+      }
+    } catch (e) {
+      debugPrint('Error loading Cancer completion: $e');
     }
 
     // If all enabled screenings are completed, set screeningsCompleted
@@ -154,6 +172,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
   bool hraCompleted = false;
   bool hivCompleted = false;
   bool tbCompleted = false;
+  bool cancerCompleted = false;
 
   int _currentStep = 0;
   int get currentStep => _currentStep;
@@ -356,6 +375,12 @@ class WellnessFlowViewModel extends ChangeNotifier {
   /// Mark TB screening as completed
   void markTbCompleted() {
     tbCompleted = true;
+    notifyListeners();
+  }
+
+  /// Mark Cancer screening as completed
+  void markCancerCompleted() {
+    cancerCompleted = true;
     notifyListeners();
   }
 
