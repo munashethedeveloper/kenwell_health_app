@@ -262,7 +262,7 @@ class _EventScreenState extends State<EventScreen> {
                 viewModel: widget.viewModel,
                 isAdditionalServices: false,
               ),
-              // Additional Services Dropdown
+              /*    // Additional Services Dropdown
               KenwellFormCard(
                 title: 'Additional Services',
                 margin: const EdgeInsets.only(bottom: 16),
@@ -341,7 +341,7 @@ class _EventScreenState extends State<EventScreen> {
               HealthcareProfessionalsSection(
                 viewModel: widget.viewModel,
                 requiredSelection: _requiredSelection,
-              ),
+              ), */
               // Event Time Section
               EventTimeSection(
                 viewModel: widget.viewModel,

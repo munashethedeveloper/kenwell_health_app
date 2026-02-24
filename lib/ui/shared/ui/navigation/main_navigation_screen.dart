@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/features/profile/widgets/my_profile_menu_screen.dart';
 import 'package:kenwell_health_app/ui/features/user_management/widgets/registration_management_screen.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/responsive/responsive_breakpoints.dart';
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
 import 'package:provider/provider.dart';
@@ -233,7 +234,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               },
               extended: ResponsiveBreakpoints.isExpanded(context),
               backgroundColor: theme.colorScheme.surfaceContainerHighest,
-              indicatorColor: theme.colorScheme.secondaryContainer,
+              // indicatorColor: theme.colorScheme.secondaryContainer,
+              indicatorColor: KenwellColors.primaryGreen,
               labelType: ResponsiveBreakpoints.isExpanded(context)
                   ? NavigationRailLabelType.none
                   : NavigationRailLabelType.all,
@@ -260,14 +262,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       bottomNavigationBar: NavigationBarTheme(
         data: NavigationBarThemeData(
           backgroundColor: theme.colorScheme.surfaceContainerHighest,
-          indicatorColor: theme.colorScheme.secondaryContainer,
+          //indicatorColor: theme.colorScheme.secondaryContainer,
+          indicatorColor: KenwellColors.primaryGreen,
           indicatorShape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
           labelTextStyle: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.selected)) {
-              return TextStyle(
-                color: theme.colorScheme.onSurface,
+              return const TextStyle(
+                //color: theme.colorScheme.onSurface,
+                color: KenwellColors.primaryGreen,
                 fontWeight: FontWeight.w600,
                 fontSize: 12,
               );
@@ -280,13 +284,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           }),
           iconTheme: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.selected)) {
-              return IconThemeData(
-                color: theme.colorScheme.onSecondaryContainer,
+              return const IconThemeData(
+                //color: theme.colorScheme.onSecondaryContainer,
+                color: KenwellColors.primaryGreen,
                 size: 26,
               );
             }
-            return IconThemeData(
-              color: theme.colorScheme.onSurfaceVariant,
+            return const IconThemeData(
+              //color: theme.colorScheme.onSurfaceVariant,
+              color: KenwellColors.primaryGreen,
               size: 24,
             );
           }),
