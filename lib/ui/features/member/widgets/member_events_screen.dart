@@ -105,7 +105,7 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
     });
 
     try {
-      final events = await _repository.fetchMemberEvents(widget.member.id);
+      final events = await _repository.fetchMemberEvents(widget.member);
       setState(() {
         _events = events;
         _isLoading = false;
@@ -315,6 +315,19 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
             ? event['eventVenue'] as String
             : null;
 
+    final isScreened = event['isScreened'] as bool? ?? false;
+    final hraCompleted = event['hraCompleted'] as bool? ?? false;
+    final hctCompleted = event['hctCompleted'] as bool? ?? false;
+    final tbCompleted = event['tbCompleted'] as bool? ?? false;
+    final cancerCompleted = event['cancerCompleted'] as bool? ?? false;
+
+    final completedScreenings = <String>[
+      if (hraCompleted) 'HRA',
+      if (hctCompleted) 'HCT',
+      if (tbCompleted) 'TB',
+      if (cancerCompleted) 'Cancer',
+    ];
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
       padding: const EdgeInsets.all(16),
@@ -327,6 +340,7 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
         ),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             padding: const EdgeInsets.all(10),
@@ -345,14 +359,23 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  event['eventTitle'] ?? 'Unknown Event',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: theme.primaryColor,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        event['eventTitle'] ?? 'Unknown Event',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: theme.primaryColor,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    _buildScreeningBadge(isScreened, theme),
+                  ],
                 ),
                 const SizedBox(height: 4),
                 Row(
@@ -372,7 +395,7 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
                   ],
                 ),
                 if (location != null) ...[
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 4),
                   Row(
                     children: [
                       Icon(
@@ -394,10 +417,75 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
                     ],
                   ),
                 ],
+                if (completedScreenings.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 4,
+                    runSpacing: 4,
+                    children: completedScreenings
+                        .map((s) => _buildScreeningChip(s, theme))
+                        .toList(),
+                  ),
+                ],
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildScreeningBadge(bool isScreened, ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: isScreened
+            ? Colors.green.withValues(alpha: 0.12)
+            : Colors.orange.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isScreened
+              ? Colors.green.withValues(alpha: 0.4)
+              : Colors.orange.withValues(alpha: 0.4),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            isScreened ? Icons.check_circle_outline : Icons.app_registration,
+            size: 12,
+            color: isScreened ? Colors.green[700] : Colors.orange[700],
+          ),
+          const SizedBox(width: 3),
+          Text(
+            isScreened ? 'Screened' : 'Registered',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: isScreened ? Colors.green[700] : Colors.orange[700],
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScreeningChip(String label, ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: theme.primaryColor.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: theme.primaryColor.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Text(
+        label,
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: theme.primaryColor,
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }
