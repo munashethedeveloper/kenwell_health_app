@@ -3,6 +3,7 @@ import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/custom_dropdown_field.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_referral_card.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/health_metric_status_badge.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
@@ -52,6 +53,17 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
       value: viewModel,
       child: Consumer<PersonalRiskAssessmentViewModel>(
         builder: (context, vm, _) {
+          // Auto-refer when any metric is in the danger zone
+          if (vm.hasRedMetrics) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (nurseViewModel.nursingReferralSelection == null ||
+                  nurseViewModel.nursingReferralSelection ==
+                      NursingReferralOption.patientNotReferred) {
+                nurseViewModel.setNursingReferralSelection(
+                    NursingReferralOption.referredToStateClinic);
+              }
+            });
+          }
           return Scaffold(
             // App bar
             appBar: appBar ??
@@ -384,28 +396,42 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                           Row(
                             children: [
                               Expanded(
-                                child: KenwellTextField(
-                                  label: 'Systolic (mmHg)',
-                                  hintText: 'e.g., 120',
-                                  controller: vm.systolicBpController,
-                                  keyboardType: TextInputType.number,
-                                  inputFormatters:
-                                      AppTextInputFormatters.numbersOnly(),
-                                  validator: (val) =>
-                                      _validateRequired(val, 'Systolic (mmHg)'),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    KenwellTextField(
+                                      label: 'Systolic (mmHg)',
+                                      hintText: 'e.g., 120',
+                                      controller: vm.systolicBpController,
+                                      keyboardType: TextInputType.number,
+                                      inputFormatters:
+                                          AppTextInputFormatters.numbersOnly(),
+                                      validator: (val) => _validateRequired(
+                                          val, 'Systolic (mmHg)'),
+                                    ),
+                                    HealthMetricStatusBadge(
+                                        status: vm.systolicStatus),
+                                  ],
                                 ),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
-                                child: KenwellTextField(
-                                  label: 'Diastolic (mmHg)',
-                                  hintText: 'e.g., 80',
-                                  controller: vm.diastolicBpController,
-                                  keyboardType: TextInputType.number,
-                                  inputFormatters:
-                                      AppTextInputFormatters.numbersOnly(),
-                                  validator: (val) => _validateRequired(
-                                      val, 'Diastolic (mmHg)'),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    KenwellTextField(
+                                      label: 'Diastolic (mmHg)',
+                                      hintText: 'e.g., 80',
+                                      controller: vm.diastolicBpController,
+                                      keyboardType: TextInputType.number,
+                                      inputFormatters:
+                                          AppTextInputFormatters.numbersOnly(),
+                                      validator: (val) => _validateRequired(
+                                          val, 'Diastolic (mmHg)'),
+                                    ),
+                                    HealthMetricStatusBadge(
+                                        status: vm.diastolicStatus),
+                                  ],
                                 ),
                               ),
                             ],
@@ -421,6 +447,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                             validator: (val) =>
                                 _validateRequired(val, 'Cholesterol (mmol/L)'),
                           ),
+                          HealthMetricStatusBadge(status: vm.cholesterolStatus),
                           const SizedBox(height: 12),
                           KenwellTextField(
                             label: 'Blood Sugar (mmol/L)',
@@ -432,9 +459,16 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                             validator: (val) =>
                                 _validateRequired(val, 'Blood Sugar (mmol/L)'),
                           ),
+                          HealthMetricStatusBadge(status: vm.bloodSugarStatus),
                         ],
                       ),
                     ),
+
+                    // Auto-referral alert shown when any metric is in the red zone
+                    if (vm.hasRedMetrics) ...[
+                      const SizedBox(height: 12),
+                      const HealthMetricRedAlert(),
+                    ],
 
                     const SizedBox(height: 24),
                     _buildReferrals(),
