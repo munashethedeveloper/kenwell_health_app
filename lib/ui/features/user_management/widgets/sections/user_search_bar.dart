@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 
 /// Search bar for filtering users by name or email
 class UserSearchBar extends StatelessWidget {
@@ -25,20 +26,23 @@ class UserSearchBar extends StatelessWidget {
         // Explanatory label
         const Row(
           children: [
-            Icon(
+            /*   Icon(
               Icons.info_outline,
               size: 16,
               //color: Colors.grey.shade600,
-              color: Colors.black,
+              //color: Colors.black,
+              color: KenwellColors.secondaryNavyDark,
             ),
-            const SizedBox(width: 6),
+            SizedBox(width: 6), */
             Text(
-              'Search & Filter Users:',
+              'Search & Filter User\'s:',
               style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   //color: Colors.grey.shade700,
-                  color: Colors.black),
+                  //color: Colors.black
+                  color: KenwellColors.secondaryNavyDark),
+              //color: KenwellColors.primaryGreen),
             ),
           ],
         ),

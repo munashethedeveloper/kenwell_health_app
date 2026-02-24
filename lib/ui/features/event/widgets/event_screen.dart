@@ -5,7 +5,6 @@ import '../../../../domain/models/wellness_event.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/buttons/form_action_buttons.dart';
 import '../../../shared/ui/form/kenwell_modern_section_header.dart';
-import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/dialogs/confirmation_dialog.dart';
 import '../utils/event_form_validator.dart';
 import '../view_model/event_view_model.dart';
@@ -13,7 +12,6 @@ import 'sections/event_basic_info_section.dart';
 import 'sections/contact_person_section.dart';
 import 'sections/event_time_section.dart';
 import 'sections/event_options_section.dart';
-import 'sections/healthcare_professionals_section.dart';
 import 'sections/services_selection_section.dart';
 import 'sections/medical_aid_section.dart';
 import 'sections/participation_section.dart';
@@ -195,7 +193,7 @@ class _EventScreenState extends State<EventScreen> {
         automaticallyImplyLeading: true,
         //titleColor: const Color(0xFF201C58),
         titleColor: Colors.white,
-        titleStyle: const TextStyle(
+        titleStyle: TextStyle(
           //color: Color(0xFF201C58),
           color: Colors.white,
           fontWeight: FontWeight.bold,

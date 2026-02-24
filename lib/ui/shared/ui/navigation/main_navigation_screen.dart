@@ -286,7 +286,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             if (states.contains(WidgetState.selected)) {
               return const IconThemeData(
                 //color: theme.colorScheme.onSecondaryContainer,
-                color: KenwellColors.primaryGreen,
+                //color: KenwellColors.primaryGreen,
+                color: Colors.white,
                 size: 26,
               );
             }

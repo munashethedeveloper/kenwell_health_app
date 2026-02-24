@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
-import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
 import '../../../../../domain/models/user_model.dart';
 import '../../../../../domain/constants/role_permissions.dart';
@@ -448,13 +448,13 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                     // Stats header with modern design
                     // Stats header
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: GradientContainer.purpleGreen(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(8),
                         child: Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
                                 color: Colors.white.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(10),
@@ -462,7 +462,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                               child: const Icon(
                                 Icons.people,
                                 color: Colors.white,
-                                size: 28,
+                                size: 18,
                               ),
                             ),
                             const SizedBox(width: 16),
@@ -477,7 +477,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                                         : '$totalUsers Total Users',
                                     style: const TextStyle(
                                       color: Colors.white,
-                                      fontSize: 20,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -524,56 +524,32 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 8),
 
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  theme.primaryColor.withValues(alpha: 0.15),
-                                  theme.primaryColor.withValues(alpha: 0.08),
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            /*  child: Icon(
-                              Icons.list_alt_rounded,
-                              color: theme.primaryColor,
-                              size: 24,
-                            ), */
-                          ),
-                          const SizedBox(width: 12),
-                          const Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                //Modern Section Title and Subtitle
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16),
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: KenwellModernSectionHeader(
-                                      title: 'Registered Users',
-                                      subtitle:
-                                          'View and manage all registered users',
-                                    ),
+                    //Modern Section Title and Subtitle
+                    const Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 1),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: KenwellModernSectionHeader(
+                                    title: 'Registered Users',
+                                    subtitle:
+                                        'View and manage all registered users',
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 32),
 
                     // Search and filter section with background
                     Container(
@@ -600,6 +576,31 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                             },
                           ),
                           const SizedBox(height: 8),
+                          // Explanatory label
+                          const Row(
+                            children: [
+                              Icon(
+                                Icons.info,
+                                size: 16,
+                                color: KenwellColors.primaryGreen,
+                                // color: KenwellColors.secondaryNavyDark,
+                                //color: Colors.black,
+                                //color: Colors.grey.shade600,
+                              ),
+                              SizedBox(width: 6),
+                              Text(
+                                'Scroll the roles to view all filters:',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.normal,
+                                  //fontWeight: FontWeight.w600,
+                                  //color: Colors.grey.shade700,
+                                  //color: Colors.black,
+                                  color: KenwellColors.secondaryNavyDark,
+                                ),
+                              ),
+                            ],
+                          ),
                           UserFilterChips(
                             selectedFilter: viewModel.selectedFilter,
                             onFilterChanged: viewModel.setFilter,
@@ -608,79 +609,48 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                       ),
                     ),
                     const SizedBox(height: 8),
+
+                    //Divider
                     const Divider(
+                      color: KenwellColors.primaryGreen,
                       height: 24,
                       thickness: 1,
                       indent: 16,
                       endIndent: 16,
                     ),
+
                     const SizedBox(height: 16),
-                    /*   Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  theme.primaryColor.withValues(alpha: 0.15),
-                                  theme.primaryColor.withValues(alpha: 0.08),
+
+                    const Row(children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.info,
+                                    color: KenwellColors.primaryGreen,
+                                    size: 24,
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Tap on a user to view extra options:',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal,
+                                      color: KenwellColors.secondaryNavy,
+                                    ),
+                                  ),
                                 ],
                               ),
-                              borderRadius: BorderRadius.circular(10),
                             ),
-                            child: Icon(
-                              Icons.list_alt_rounded,
-                              color: theme.primaryColor,
-                              size: 24,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          const Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                //Modern Section Title and Subtitle
-                                Text(
-                                  'Registered Users',
-                                  style: TextStyle(
-                                    fontSize: 34,
-                                    fontWeight: FontWeight.w800,
-                                    color: Color(0xFF201C58),
-                                    letterSpacing: -0.5,
-                                  ),
-                                ),
-                                SizedBox(height: 2),
-                                Text(
-                                  'View and manage all registered users',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color(0xFF6B7280),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ), */
-                    const SizedBox(height: 40),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      child: Text(
-                        'Tap on a user to view extra options:',
-                        style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            //color: Colors.grey.shade700,
-                            color: Colors.black),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
+                    ]),
                   ],
                 ),
               ),

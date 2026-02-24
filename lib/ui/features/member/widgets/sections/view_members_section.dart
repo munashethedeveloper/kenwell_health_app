@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
-import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
 import '../../../../../domain/models/member.dart';
 import '../../../../../domain/constants/role_permissions.dart';
@@ -258,13 +258,13 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
 
                     const SizedBox(height: 16), // Stats header
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: GradientContainer.purpleGreen(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(8),
                         child: Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
                                 color: Colors.white.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(10),
@@ -272,10 +272,10 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                               child: const Icon(
                                 Icons.people,
                                 color: Colors.white,
-                                size: 28,
+                                size: 18,
                               ),
                             ),
-                            const SizedBox(width: 16),
+                            const SizedBox(width: 8),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -287,7 +287,7 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                                         : '$totalMembers Total Members',
                                     style: const TextStyle(
                                       color: Colors.white,
-                                      fontSize: 20,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -298,56 +298,32 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 8),
 
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  theme.primaryColor.withValues(alpha: 0.15),
-                                  theme.primaryColor.withValues(alpha: 0.08),
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            /*  child: Icon(
-                              Icons.list_alt_rounded,
-                              color: theme.primaryColor,
-                              size: 24,
-                            ), */
-                          ),
-                          const SizedBox(width: 12),
-                          const Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                //Modern Section Title and Subtitle
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16),
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: KenwellModernSectionHeader(
-                                      title: 'Registered Members',
-                                      subtitle:
-                                          'View and manage all registered members',
-                                    ),
+                    //Modern Section Title and Subtitle
+                    const Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 1),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: KenwellModernSectionHeader(
+                                    title: 'Registered Members',
+                                    subtitle:
+                                        'View and manage all registered members',
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 32),
 
                     // Search and filter section with background
                     Container(
@@ -374,6 +350,27 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                             },
                           ),
                           const SizedBox(height: 8),
+                          /*   // Explanatory label
+                          const Row(
+                            children: [
+                              Icon(
+                                Icons.info_outline,
+                                size: 16,
+                                color: Colors.black,
+                                //color: Colors.grey.shade600,
+                              ),
+                              SizedBox(width: 6),
+                              Text(
+                                'Filter Member\'s:',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  //color: Colors.grey.shade700,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ), */
                           MemberFilterChips(
                             selectedFilter: viewModel.selectedFilter,
                             onFilterChanged: viewModel.setFilter,
@@ -383,6 +380,7 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                     ),
                     const SizedBox(height: 8),
                     const Divider(
+                      color: KenwellColors.primaryGreen,
                       height: 24,
                       thickness: 1,
                       indent: 16,
@@ -390,19 +388,36 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                     ),
                     const SizedBox(height: 16),
 
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      child: Text(
-                        'Tap on a member to view extra options:',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          //color: Colors.grey.shade700,
-                          color: Colors.black,
+                    const Row(children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.info,
+                                    color: KenwellColors.primaryGreen,
+                                    size: 24,
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Tap on a user to view extra options:',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal,
+                                      color: KenwellColors.secondaryNavy,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
+                    ]),
                   ],
                 ),
               ),

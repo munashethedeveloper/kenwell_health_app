@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 
 /// Search bar widget for members
 class MemberSearchBar extends StatelessWidget {
@@ -25,20 +26,21 @@ class MemberSearchBar extends StatelessWidget {
         // Explanatory label
         const Row(
           children: [
-            Icon(
+            /*    Icon(
               Icons.info_outline,
               size: 16,
               color: Colors.black,
               //color: Colors.grey.shade600,
             ),
-            SizedBox(width: 6),
+            SizedBox(width: 6), */
             Text(
-              'Search & Filter Members:',
+              'Search & Filter Member\'s:',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
+                color: KenwellColors.secondaryNavyDark,
                 //color: Colors.grey.shade700,
-                color: Colors.black,
+                //color: Colors.black,
               ),
             ),
           ],
@@ -53,7 +55,7 @@ class MemberSearchBar extends StatelessWidget {
             fontWeight: FontWeight.w500,
           ),
           decoration: InputDecoration(
-            hintText: 'Enter member details to search...',
+            hintText: 'Enter the member\'s name, ID, or passport to search...',
             hintStyle: TextStyle(
               color: Colors.grey.shade500,
               fontSize: 14,

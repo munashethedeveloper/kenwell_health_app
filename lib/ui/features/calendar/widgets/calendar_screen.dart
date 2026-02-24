@@ -9,7 +9,6 @@ import '../../event/view_model/event_view_model.dart';
 import '../../event/widgets/event_screen.dart';
 import '../../profile/view_model/profile_view_model.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
-import '../../../shared/ui/buttons/custom_primary_button.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../shared/ui/colours/kenwell_colours.dart';
@@ -311,6 +310,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
           const AppLogo(size: 150),
           // Divider separating the header from the calendar content
           const Divider(
+            color: KenwellColors.primaryGreen,
             height: 24,
             thickness: 1,
             indent: 16,
@@ -510,6 +510,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
         const SizedBox(height: 8),
         // Divider separating the header from the calendar content
         const Divider(
+          color: KenwellColors.primaryGreen,
           height: 24,
           thickness: 1,
           indent: 16,

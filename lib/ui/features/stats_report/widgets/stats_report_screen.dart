@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:provider/provider.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
@@ -243,7 +242,7 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 8),
+                //const SizedBox(height: 8),
                 // Compact logo
                 const Center(
                   child: AppLogo(size: 150),
@@ -256,7 +255,7 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                 //     'Summary of wellness events and participation metrics.',
                 // icon: Icons.analytics_outlined,
                 // ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
 
                 const KenwellModernSectionHeader(
                   title: 'Overall Wellness Statistics',
@@ -265,7 +264,7 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                   icon: Icons.analytics_outlined,
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 32),
 
                 // Enhanced Search Field with shadow
                 Container(
@@ -821,7 +820,7 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                   indent: 16,
                   endIndent: 16,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
                 // Modern section header
                 /* const KenwellModernSectionHeader(
                   title: 'Overall Wellness Statistics',
@@ -829,7 +828,7 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                       'Summary of wellness events and participation metrics.',
                   icon: Icons.analytics_outlined,
                 ), */
-                const SizedBox(height: 40),
+                //const SizedBox(height: 40),
 
                 // Stat Cards Row 1 - Total Members Expected and Registered
                 Row(

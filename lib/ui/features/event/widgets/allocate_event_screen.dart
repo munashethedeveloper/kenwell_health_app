@@ -637,13 +637,13 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
 
                       const SizedBox(height: 16), // Stats header
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: GradientContainer.purpleGreen(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(8),
                           child: Row(
                             children: [
                               Container(
-                                padding: const EdgeInsets.all(12),
+                                padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
                                   color: Colors.white.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(10),
@@ -651,10 +651,10 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                                 child: const Icon(
                                   Icons.people,
                                   color: Colors.white,
-                                  size: 28,
+                                  size: 18,
                                 ),
                               ),
-                              const SizedBox(width: 16),
+                              const SizedBox(width: 8),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -666,7 +666,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                                           : '$totalUsers Total Users',
                                       style: const TextStyle(
                                         color: Colors.white,
-                                        fontSize: 20,
+                                        fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -715,7 +715,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                       ),
                       const SizedBox(height: 16),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: const EdgeInsets.symmetric(horizontal: 1),
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: KenwellModernSectionHeader(
@@ -760,34 +760,44 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                       ),
                       const SizedBox(height: 8),
                       const Divider(
+                        color: KenwellColors.primaryGreen,
                         height: 24,
                         thickness: 1,
                         indent: 16,
                         endIndent: 16,
                       ),
                       const SizedBox(height: 16),
-                      /*  Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: KenwellModernSectionHeader(
-                            title: 'Allocate Event',
-                            subtitle:
-                                'Manage allocations for the ${widget.event.title} event',
+
+                      const Row(children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 16),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.info,
+                                      color: KenwellColors.primaryGreen,
+                                      size: 24,
+                                    ),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'Tap on a user to assign or unassign them from the event:',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                        color: KenwellColors.secondaryNavy,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 40), */
-                      const Text(
-                        'Tap on a user to assign or unassign them from this event:',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          //color: Colors.grey.shade700,
-                          //color: Colors.black,
-                          color: KenwellColors.secondaryNavyDark,
-                        ),
-                      ),
+                      ]),
                       const SizedBox(height: 8),
                     ],
                   ),
