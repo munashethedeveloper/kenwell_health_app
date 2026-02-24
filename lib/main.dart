@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, kIsWeb, TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:kenwell_health_app/ui/features/consent_form/view_model/consent_view_model.dart';
@@ -16,16 +18,26 @@ import 'ui/shared/themes/app_theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase - skip on Windows desktop for now due to build issues
-  // Use web config for Windows which doesn't require C++ SDK
-  try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    debugPrint('Firebase initialized successfully');
-  } catch (e) {
-    debugPrint('Firebase initialization error: $e');
-    debugPrint('App will run with limited functionality (local database only)');
+  // Skip Firebase on Windows: the Windows FirebaseOptions use a web app ID,
+  // which causes the native Firebase C++ SDK to call abort() at the C++ level.
+  // That crash cannot be caught by Dart's try-catch, producing the
+  // "Microsoft Visual C++ Runtime Library: abort has been called" dialog.
+  // Firebase features (auth, Firestore) will be unavailable on Windows until
+  // a real Windows app is registered in the Firebase console and its app ID
+  // is added to firebase_options.dart.
+  if (defaultTargetPlatform != TargetPlatform.windows || kIsWeb) {
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+      debugPrint('Firebase initialized successfully');
+    } catch (e) {
+      debugPrint('Firebase initialization error: $e');
+      debugPrint('App will continue with limited functionality');
+    }
+  } else {
+    debugPrint(
+        'Firebase initialization skipped on Windows (not configured for Windows native)');
   }
 
   runApp(const MyApp());
