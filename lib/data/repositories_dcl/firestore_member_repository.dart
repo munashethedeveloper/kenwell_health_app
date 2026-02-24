@@ -221,7 +221,7 @@ class FirestoreMemberRepository {
         for (final record in memberEventRecords) {
           try {
             final eventDoc = await FirebaseFirestore.instance
-                .collection('wellness_events')
+                .collection(FirestoreService.eventsCollection)
                 .doc(record.eventId)
                 .get();
 
@@ -271,7 +271,7 @@ class FirestoreMemberRepository {
         if (!events.any((e) => e['eventId'] == member.eventId)) {
           try {
             final eventDoc = await FirebaseFirestore.instance
-                .collection('wellness_events')
+                .collection(FirestoreService.eventsCollection)
                 .doc(member.eventId)
                 .get();
 
@@ -311,7 +311,7 @@ class FirestoreMemberRepository {
             if (!events.any((e) => e['eventId'] == eventId)) {
               try {
                 final eventDoc = await FirebaseFirestore.instance
-                    .collection('wellness_events')
+                    .collection(FirestoreService.eventsCollection)
                     .doc(eventId)
                     .get();
 

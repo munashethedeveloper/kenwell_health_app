@@ -142,4 +142,50 @@ class FirestoreMemberEventRepository {
       rethrow;
     }
   }
+
+  /// Ensure a member-event record exists, creating one with full event details
+  /// if it does not already exist. Used when an existing member is found via
+  /// search and enters the wellness flow without going through registration.
+  Future<void> ensureMemberEventExists({
+    required String memberId,
+    required String eventId,
+    required String eventTitle,
+    Timestamp? eventDate,
+    String? eventVenue,
+    String? eventLocation,
+  }) async {
+    try {
+      final docId = _docId(memberId, eventId);
+      final ref = FirebaseFirestore.instance
+          .collection(memberEventsCollection)
+          .doc(docId);
+
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        final snapshot = await transaction.get(ref);
+        if (!snapshot.exists) {
+          transaction.set(ref, {
+            'id': docId,
+            'memberId': memberId,
+            'eventId': eventId,
+            'eventTitle': eventTitle,
+            'eventDate': eventDate,
+            'eventVenue': eventVenue,
+            'eventLocation': eventLocation,
+            'isScreened': false,
+            'hraCompleted': false,
+            'hctCompleted': false,
+            'tbCompleted': false,
+            'cancerCompleted': false,
+            'registeredAt': Timestamp.now(),
+            'screenedAt': null,
+          });
+          debugPrint('Created member_events record for existing member: $docId');
+        }
+      });
+    } catch (e, stackTrace) {
+      debugPrint('Error ensuring member_events record: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      rethrow;
+    }
+  }
 }

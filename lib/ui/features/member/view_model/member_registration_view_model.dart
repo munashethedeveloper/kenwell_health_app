@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/member_repository.dart';
@@ -21,6 +22,9 @@ class MemberDetailsViewModel extends ChangeNotifier {
   Member? savedMember;
   String? _eventId; // Store the event ID for linking member to event
   String? _eventTitle; // Store the event title for member_events record
+  DateTime? _eventDate; // Store the event date for member_events record
+  String? _eventVenue; // Store the event venue for member_events record
+  String? _eventLocation; // Store the event location for member_events record
 
   // Member list management
   List<Member> _members = [];
@@ -64,10 +68,21 @@ class MemberDetailsViewModel extends ChangeNotifier {
     _eventId = eventId;
   }
 
-  /// Set the event ID and title for this member registration
-  void setEventDetails(String? eventId, {String? eventTitle}) {
+  /// Set the event ID and full event details for this member registration.
+  /// Called from WellnessNavigator before navigating to the registration form
+  /// so the resulting member_events record is populated with event metadata.
+  void setEventDetails(
+    String? eventId, {
+    String? eventTitle,
+    DateTime? eventDate,
+    String? eventVenue,
+    String? eventLocation,
+  }) {
     _eventId = eventId;
     _eventTitle = eventTitle;
+    _eventDate = eventDate;
+    _eventVenue = eventVenue;
+    _eventLocation = eventLocation;
   }
 
   // Controllers
@@ -351,6 +366,11 @@ class MemberDetailsViewModel extends ChangeNotifier {
             memberId: savedMember!.id,
             eventId: _eventId!,
             eventTitle: _eventTitle ?? 'Unknown Event',
+            eventDate: _eventDate != null
+                ? Timestamp.fromDate(_eventDate!)
+                : null,
+            eventVenue: _eventVenue,
+            eventLocation: _eventLocation,
           );
           await _memberEventRepository.addMemberEvent(memberEvent);
           debugPrint(
