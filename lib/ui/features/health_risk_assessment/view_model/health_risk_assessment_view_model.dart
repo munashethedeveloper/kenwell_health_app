@@ -4,6 +4,7 @@ import 'package:kenwell_health_app/domain/models/hra_screening.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_hra_repository.dart';
 import 'package:kenwell_health_app/utils/logger.dart';
 import 'package:kenwell_health_app/domain/constants/enums.dart';
+import 'package:kenwell_health_app/utils/health_metric_classification.dart';
 
 // ViewModel for Personal Risk Assessment
 class PersonalRiskAssessmentViewModel extends ChangeNotifier {
@@ -59,6 +60,11 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
   PersonalRiskAssessmentViewModel() {
     heightController.addListener(_calculateBMI);
     weightController.addListener(_calculateBMI);
+    // Notify listeners when metric values change so UI badges update live
+    systolicBpController.addListener(notifyListeners);
+    diastolicBpController.addListener(notifyListeners);
+    cholesterolController.addListener(notifyListeners);
+    bloodSugarController.addListener(notifyListeners);
   }
 
   // Height threshold to determine if input is in centimeters (> 3) or meters
@@ -199,6 +205,41 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
   // Submission state
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
+
+  // ---------------------------------------------------------------------------
+  // Health metric classification (Green / Orange / Red)
+  // ---------------------------------------------------------------------------
+
+  HealthMetricStatus? get systolicStatus =>
+      HealthMetricClassifier.classifyFromString(
+        systolicBpController.text,
+        HealthMetricClassifier.classifySystolic,
+      );
+
+  HealthMetricStatus? get diastolicStatus =>
+      HealthMetricClassifier.classifyFromString(
+        diastolicBpController.text,
+        HealthMetricClassifier.classifyDiastolic,
+      );
+
+  HealthMetricStatus? get bloodSugarStatus =>
+      HealthMetricClassifier.classifyFromString(
+        bloodSugarController.text,
+        HealthMetricClassifier.classifyBloodGlucose,
+      );
+
+  HealthMetricStatus? get cholesterolStatus =>
+      HealthMetricClassifier.classifyFromString(
+        cholesterolController.text,
+        HealthMetricClassifier.classifyCholesterol,
+      );
+
+  /// True when at least one metric is in the danger (red) zone.
+  bool get hasRedMetrics =>
+      systolicStatus == HealthMetricStatus.red ||
+      diastolicStatus == HealthMetricStatus.red ||
+      bloodSugarStatus == HealthMetricStatus.red ||
+      cholesterolStatus == HealthMetricStatus.red;
 
   //Show Fields
   bool get showSmokingFields => smokingStatus == 'Yes';
