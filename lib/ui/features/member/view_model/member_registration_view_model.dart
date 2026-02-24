@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/member_repository.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_member_repository.dart';
+import 'package:kenwell_health_app/data/repositories_dcl/firestore_member_event_repository.dart';
 import 'package:kenwell_health_app/data/local/app_database.dart';
 import 'package:kenwell_health_app/domain/models/member.dart';
+import 'package:kenwell_health_app/domain/models/member_event.dart';
 import 'package:kenwell_health_app/domain/constants/enums.dart';
 import 'package:kenwell_health_app/domain/constants/nationalities.dart';
 
@@ -13,9 +15,12 @@ class MemberDetailsViewModel extends ChangeNotifier {
       MemberRepository(AppDatabase.instance);
   final FirestoreMemberRepository _firestoreMemberRepository =
       FirestoreMemberRepository();
+  final FirestoreMemberEventRepository _memberEventRepository =
+      FirestoreMemberEventRepository();
 
   Member? savedMember;
   String? _eventId; // Store the event ID for linking member to event
+  String? _eventTitle; // Store the event title for member_events record
 
   // Member list management
   List<Member> _members = [];
@@ -57,6 +62,12 @@ class MemberDetailsViewModel extends ChangeNotifier {
   /// Set the event ID for this member registration
   void setEventId(String? eventId) {
     _eventId = eventId;
+  }
+
+  /// Set the event ID and title for this member registration
+  void setEventDetails(String? eventId, {String? eventTitle}) {
+    _eventId = eventId;
+    _eventTitle = eventTitle;
   }
 
   // Controllers
@@ -332,6 +343,23 @@ class MemberDetailsViewModel extends ChangeNotifier {
       // Save to Firestore
       await _firestoreMemberRepository.addMember(savedMember!);
       debugPrint('Member saved to Firestore: ${savedMember!.id}');
+
+      // Write to member_events collection to track event registration
+      if (_eventId != null && _eventId!.isNotEmpty) {
+        try {
+          final memberEvent = MemberEvent(
+            memberId: savedMember!.id,
+            eventId: _eventId!,
+            eventTitle: _eventTitle ?? 'Unknown Event',
+          );
+          await _memberEventRepository.addMemberEvent(memberEvent);
+          debugPrint(
+              'Member event record created for ${savedMember!.id} / $_eventId');
+        } catch (e) {
+          // Non-fatal: log but don't fail the registration
+          debugPrint('Failed to create member_events record: $e');
+        }
+      }
     } catch (e) {
       debugPrint('Error saving member: $e');
       rethrow;

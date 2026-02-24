@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../../../domain/enums/service_type.dart';
 import '../../../../domain/models/member.dart';
 import '../../../../domain/models/wellness_event.dart';
+import '../../../../data/repositories_dcl/firestore_member_event_repository.dart';
 import '../widgets/member_search_screen.dart';
 import '../widgets/current_event_home_screen.dart';
 import '../widgets/health_screenings_screen.dart';
@@ -32,6 +33,7 @@ import '../../survey/view_model/survey_view_model.dart';
 class WellnessNavigator {
   final BuildContext context;
   final WellnessEvent event;
+  final _memberEventRepository = FirestoreMemberEventRepository();
 
   WellnessNavigator({
     required this.context,
@@ -104,7 +106,7 @@ class WellnessNavigator {
   Future<Member?> _navigateToMemberDetails(Member? existingMember,
       [String? searchQuery]) async {
     final memberVM = MemberDetailsViewModel();
-    memberVM.setEventId(event.id);
+    memberVM.setEventDetails(event.id, eventTitle: event.title);
 
     // Pre-populate ID/Passport field if search query exists
     if (searchQuery != null && searchQuery.isNotEmpty) {
@@ -337,6 +339,11 @@ class WellnessNavigator {
             if (!context.mounted) return;
             if (result == true) {
               wellnessVM.hraCompleted = true;
+              _memberEventRepository
+                  .updateScreeningStatus(member.id, event.id,
+                      hraCompleted: true)
+                  .catchError((e) =>
+                      debugPrint('Failed to update HRA screening status: $e'));
               // Pop back to refresh the parent screen
               Navigator.of(context).pop(false); // false = not final submit
             }
@@ -346,6 +353,11 @@ class WellnessNavigator {
             if (!context.mounted) return;
             if (result == true) {
               wellnessVM.hctCompleted = true;
+              _memberEventRepository
+                  .updateScreeningStatus(member.id, event.id,
+                      hctCompleted: true)
+                  .catchError((e) =>
+                      debugPrint('Failed to update HCT screening status: $e'));
               // Pop back to refresh the parent screen
               Navigator.of(context).pop(false); // false = not final submit
             }
@@ -355,6 +367,11 @@ class WellnessNavigator {
             if (!context.mounted) return;
             if (result == true) {
               wellnessVM.tbCompleted = true;
+              _memberEventRepository
+                  .updateScreeningStatus(member.id, event.id,
+                      tbCompleted: true)
+                  .catchError((e) =>
+                      debugPrint('Failed to update TB screening status: $e'));
               // Pop back to refresh the parent screen
               Navigator.of(context).pop(false); // false = not final submit
             }
@@ -364,6 +381,11 @@ class WellnessNavigator {
             if (!context.mounted) return;
             if (result == true) {
               wellnessVM.markCancerCompleted();
+              _memberEventRepository
+                  .updateScreeningStatus(member.id, event.id,
+                      cancerCompleted: true)
+                  .catchError((e) => debugPrint(
+                      'Failed to update Cancer screening status: $e'));
               // Pop back to refresh the parent screen
               Navigator.of(context).pop(false); // false = not final submit
             }
