@@ -105,7 +105,7 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
     });
 
     try {
-      final events = await _repository.fetchMemberEvents(widget.member.id);
+      final events = await _repository.fetchMemberEvents(widget.member);
       setState(() {
         _events = events;
         _isLoading = false;

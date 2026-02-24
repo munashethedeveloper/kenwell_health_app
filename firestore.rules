@@ -253,6 +253,36 @@ service cloud.firestore {
       allow delete: if isAuthenticated() && isManagement();
     }
     
+    // Cancer Screenings collection - Staff can manage
+    match /cancer_screenings/{screeningId} {
+      // Staff can read all cancer screenings
+      allow read: if isAuthenticated() && isStaff();
+      
+      // Staff can create cancer screenings
+      allow create: if isAuthenticated() && isStaff();
+      
+      // Staff can update cancer screenings
+      allow update: if isAuthenticated() && isStaff();
+      
+      // Only management can delete cancer screenings
+      allow delete: if isAuthenticated() && isManagement();
+    }
+
+    // Member Events collection - tracks member registration and screening participation
+    match /member_events/{recordId} {
+      // Staff can read all member event participation records
+      allow read: if isAuthenticated() && isStaff();
+      
+      // Staff can create member event records (on registration or screening)
+      allow create: if isAuthenticated() && isStaff();
+      
+      // Staff can update member event records (e.g. update screening status)
+      allow update: if isAuthenticated() && isStaff();
+      
+      // Only management can delete member event records
+      allow delete: if isAuthenticated() && isManagement();
+    }
+    
     // Screening results (HIV, TB, HRA) - Staff only
     match /screening_results/{resultId} {
       // Only staff can access screening results (sensitive health data)

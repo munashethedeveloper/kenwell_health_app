@@ -198,19 +198,13 @@ class FirestoreMemberRepository {
     };
   }
 
-  /// Fetch events attended by a member
-  /// Returns a list of event IDs and event data that this member participated in.
+  /// Fetch events attended by a member.
+  /// Accepts the [Member] object directly to avoid a redundant Firestore read.
   /// Checks the `member_events` collection first, then falls back to
   /// `member.eventId` and `wellness_sessions` for backward compatibility.
-  Future<List<Map<String, dynamic>>> fetchMemberEvents(String memberId) async {
+  Future<List<Map<String, dynamic>>> fetchMemberEvents(Member member) async {
+    final memberId = member.id;
     try {
-      // First, find the member
-      final member = await fetchMemberById(memberId);
-      if (member == null) {
-        debugPrint('Member not found: $memberId');
-        return [];
-      }
-
       final events = <Map<String, dynamic>>[];
 
       // --- Primary source: member_events collection ---

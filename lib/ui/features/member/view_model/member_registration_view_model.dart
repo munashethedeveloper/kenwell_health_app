@@ -355,9 +355,10 @@ class MemberDetailsViewModel extends ChangeNotifier {
       savedMember = await _memberRepository.createMember(member);
       debugPrint('Member saved to local database: ${savedMember!.id}');
 
-      // Save to Firestore
-      await _firestoreMemberRepository.addMember(savedMember!);
-      debugPrint('Member saved to Firestore: ${savedMember!.id}');
+      // Save to Firestore using the original member object (not savedMember) so
+      // that eventId is preserved — the local DB schema has no eventId column,
+      // so savedMember.eventId is always null after the local DB round-trip.
+      await _firestoreMemberRepository.addMember(member);
 
       // Write to member_events collection to track event registration
       if (_eventId != null && _eventId!.isNotEmpty) {
