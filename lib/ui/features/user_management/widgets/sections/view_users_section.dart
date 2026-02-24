@@ -629,6 +629,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                             Padding(
                               padding: EdgeInsets.symmetric(horizontal: 16),
                               child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
                                     Icons.info,

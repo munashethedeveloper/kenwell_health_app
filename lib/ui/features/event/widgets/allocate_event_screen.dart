@@ -776,6 +776,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                               Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 16),
                                 child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Icon(
                                       Icons.info,

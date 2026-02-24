@@ -396,6 +396,7 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                             Padding(
                               padding: EdgeInsets.symmetric(horizontal: 16),
                               child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
                                     Icons.info,
