@@ -394,6 +394,7 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                       padding: EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
                         'Tap on a member to view extra options:',
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,

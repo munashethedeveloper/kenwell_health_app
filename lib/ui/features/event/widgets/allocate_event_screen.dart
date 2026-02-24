@@ -780,6 +780,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                       const SizedBox(height: 40), */
                       const Text(
                         'Tap on a user to assign or unassign them from this event:',
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,

@@ -673,6 +673,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                       padding: EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
                         'Tap on a user to view extra options:',
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
