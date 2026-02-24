@@ -714,6 +714,18 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: KenwellModernSectionHeader(
+                            title: 'Allocate Event',
+                            subtitle:
+                                'Manage allocations for the ${widget.event.title} event',
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
                       // Search and filter section with background
                       Container(
                         margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -754,7 +766,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                         endIndent: 16,
                       ),
                       const SizedBox(height: 16),
-                      Padding(
+                      /*  Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Align(
                           alignment: Alignment.centerLeft,
@@ -765,7 +777,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 40), */
                       const Text(
                         'Tap on a user to assign or unassign them from this event:',
                         style: TextStyle(

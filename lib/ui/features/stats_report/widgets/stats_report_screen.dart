@@ -257,8 +257,17 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                 // icon: Icons.analytics_outlined,
                 // ),
                 const SizedBox(height: 20),
-                // Enhanced Search Field with shadow
 
+                const KenwellModernSectionHeader(
+                  title: 'Overall Wellness Statistics',
+                  subtitle:
+                      'Summary of wellness events and participation metrics.',
+                  icon: Icons.analytics_outlined,
+                ),
+
+                const SizedBox(height: 24),
+
+                // Enhanced Search Field with shadow
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 16),
                   padding: const EdgeInsets.all(12),
@@ -814,12 +823,12 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                 ),
                 const SizedBox(height: 16),
                 // Modern section header
-                const KenwellModernSectionHeader(
+                /* const KenwellModernSectionHeader(
                   title: 'Overall Wellness Statistics',
                   subtitle:
                       'Summary of wellness events and participation metrics.',
                   icon: Icons.analytics_outlined,
-                ),
+                ), */
                 const SizedBox(height: 40),
 
                 // Stat Cards Row 1 - Total Members Expected and Registered

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
 import '../../../../../domain/models/user_model.dart';
@@ -524,6 +525,56 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                       ),
                     ),
                     const SizedBox(height: 20),
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  theme.primaryColor.withValues(alpha: 0.15),
+                                  theme.primaryColor.withValues(alpha: 0.08),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            /*  child: Icon(
+                              Icons.list_alt_rounded,
+                              color: theme.primaryColor,
+                              size: 24,
+                            ), */
+                          ),
+                          const SizedBox(width: 12),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                //Modern Section Title and Subtitle
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16),
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: KenwellModernSectionHeader(
+                                      title: 'Registered Users',
+                                      subtitle:
+                                          'View and manage all registered users',
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+
                     // Search and filter section with background
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -564,7 +615,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                       endIndent: 16,
                     ),
                     const SizedBox(height: 16),
-                    Padding(
+                    /*   Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Row(
                         children: [
@@ -616,7 +667,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                           ),
                         ],
                       ),
-                    ),
+                    ), */
                     const SizedBox(height: 40),
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16),
