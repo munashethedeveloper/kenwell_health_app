@@ -298,7 +298,17 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                         ),
                       ),
                     ),
+                    //const SizedBox(height: 8),
+
                     const SizedBox(height: 8),
+                    /*  const Divider(
+                      color: KenwellColors.primaryGreen,
+                      height: 24,
+                      thickness: 1,
+                      indent: 16,
+                      endIndent: 16,
+                    ),
+                    const SizedBox(height: 16), */
 
                     //Modern Section Title and Subtitle
                     const Row(

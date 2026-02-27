@@ -9,6 +9,7 @@ import '../../../shared/ui/logo/app_logo.dart';
 import '../../../shared/ui/containers/gradient_container.dart';
 import '../../../../data/repositories_dcl/firestore_member_repository.dart';
 import 'event_stats_detail_screen.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 
 class StatsReportScreen extends StatefulWidget {
   const StatsReportScreen({super.key});
@@ -351,6 +352,14 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                       ),
 
                       const SizedBox(height: 16),
+
+                      const Divider(
+                        //color: KenwellColors.primaryGreen,
+                        height: 14,
+                        thickness: 1,
+                        indent: 10,
+                        endIndent: 10,
+                      ),
 
                       // Modern Filter Section
                       Card(
@@ -814,21 +823,15 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                   ),
                 //const SizedBox(height: 8),
 
+                //const SizedBox(height: 8),
                 const Divider(
+                  color: KenwellColors.primaryGreen,
                   height: 24,
                   thickness: 1,
                   indent: 16,
                   endIndent: 16,
                 ),
-                const SizedBox(height: 24),
-                // Modern section header
-                /* const KenwellModernSectionHeader(
-                  title: 'Overall Wellness Statistics',
-                  subtitle:
-                      'Summary of wellness events and participation metrics.',
-                  icon: Icons.analytics_outlined,
-                ), */
-                //const SizedBox(height: 40),
+                const SizedBox(height: 16),
 
                 // Stat Cards Row 1 - Total Members Expected and Registered
                 Row(

@@ -524,7 +524,16 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                         ),
                       ),
                     ),
+                    // const SizedBox(height: 8),
                     const SizedBox(height: 8),
+                    /*   const Divider(
+                      color: KenwellColors.primaryGreen,
+                      height: 24,
+                      thickness: 1,
+                      indent: 16,
+                      endIndent: 16,
+                    ),
+                    const SizedBox(height: 16), */
 
                     //Modern Section Title and Subtitle
                     const Row(
@@ -575,7 +584,39 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                               viewModel.clearSearch();
                             },
                           ),
+
                           const SizedBox(height: 8),
+
+                          const Divider(
+                            //color: KenwellColors.primaryGreen,
+                            height: 14,
+                            thickness: 1,
+                            indent: 10,
+                            endIndent: 10,
+                          ),
+                          const SizedBox(height: 8),
+                          // Explanatory label
+                          const Row(
+                            children: [
+                              /*  Icon(
+                                Icons.info_outline,
+                                size: 16,
+                                color: Colors.black,
+                                //color: Colors.grey.shade600,
+                              ), */
+                              SizedBox(width: 6),
+                              Text(
+                                'Filter User\'s:',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  //color: Colors.grey.shade700,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+
                           // Explanatory label
                           const Row(
                             children: [
@@ -589,7 +630,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                               ),
                               SizedBox(width: 6),
                               Text(
-                                'Scroll the roles to view all filters:',
+                                'Scroll the list of roles to view all filters:',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.normal,
@@ -601,6 +642,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                               ),
                             ],
                           ),
+
                           UserFilterChips(
                             selectedFilter: viewModel.selectedFilter,
                             onFilterChanged: viewModel.setFilter,

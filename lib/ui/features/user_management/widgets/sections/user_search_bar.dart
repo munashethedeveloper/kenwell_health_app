@@ -35,7 +35,7 @@ class UserSearchBar extends StatelessWidget {
             ),
             SizedBox(width: 6), */
             Text(
-              'Search & Filter User\'s:',
+              'Search User\'s:',
               style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
