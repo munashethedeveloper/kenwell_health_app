@@ -42,6 +42,10 @@ class _CalendarScreenBody extends StatefulWidget {
 
 // State class for the calendar screen body
 class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
+  // Marker colours reused by both the calendar builder and the legend
+  static const Color _dotColor = Color(0xFF90C048);
+  static const Color _badgeColor = Color(0xFF201C58);
+
   // Helper to check if user can add events using RolePermissions
   bool _canAddEvent(BuildContext context) {
     final profileVM = context.read<ProfileViewModel>();
@@ -393,10 +397,37 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                     shape: BoxShape.circle,
                   ),
                 ),
-                // Custom marker builder: show event count badge instead of dots
+                // Custom marker builder:
+                //  • 1–2 events → coloured dots below the day number
+                //  • 3+ events  → count badge (navy circle with number)
                 calendarBuilders: CalendarBuilders(
                   markerBuilder: (context, day, events) {
                     if (events.isEmpty) return const SizedBox.shrink();
+                    if (events.length <= 2) {
+                      // Show one dot per event, centred below the day cell
+                      return Positioned(
+                        bottom: 4,
+                        left: 0,
+                        right: 0,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(
+                            events.length,
+                            (_) => Container(
+                              width: 6,
+                              height: 6,
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 1.5),
+                              decoration: const BoxDecoration(
+                                color: _dotColor,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+                    // 3+ events: show count badge
                     return Positioned(
                       right: 2,
                       bottom: 2,
@@ -404,7 +435,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                         width: 18,
                         height: 18,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF201C58),
+                          color: _badgeColor,
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 1.5),
                         ),
@@ -449,38 +480,68 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
             ),
           ),
           const SizedBox(height: 16),
-          // Hint text to guide users
+          // Legend: dots for 1–2 events, number badge for 3+
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 16,
               children: [
-                Container(
-                  width: 14,
-                  height: 14,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF201C58),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'N',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 8,
-                        fontWeight: FontWeight.bold,
+                // Dot legend
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: _dotColor,
+                        shape: BoxShape.circle,
                       ),
                     ),
-                  ),
+                    const SizedBox(width: 6),
+                    Text(
+                      '1–2 events',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: KenwellColors.secondaryNavyDark,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 6),
-                Text(
-                  'Number of events on that day — tap a date to view details',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    //color: theme.colorScheme.onSurfaceVariant,
-                    color: KenwellColors.secondaryNavyDark,
-                    fontStyle: FontStyle.italic,
-                  ),
+                // Badge legend
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 16,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        color: _badgeColor,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 1.5),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          '3',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 8,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      '3+ events — tap a date to view details',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: KenwellColors.secondaryNavyDark,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
