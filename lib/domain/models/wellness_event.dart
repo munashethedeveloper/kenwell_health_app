@@ -29,10 +29,10 @@ class WellnessEvent {
   final String aeContactNumber;
   final String aeContactEmail;
   final String servicesRequested;
-  final String additionalServicesRequested;
+  //final String additionalServicesRequested;
   final int expectedParticipation;
   final int nurses;
-  final int coordinators;
+  //final int coordinators;
   final String setUpTime;
   final String startTime;
   final String endTime;
@@ -64,10 +64,10 @@ class WellnessEvent {
     required this.aeContactNumber,
     required this.aeContactEmail,
     required this.servicesRequested,
-    required this.additionalServicesRequested,
+    //required this.additionalServicesRequested,
     required this.expectedParticipation,
     required this.nurses,
-    required this.coordinators,
+    //required this.coordinators,
     required this.setUpTime,
     required this.startTime,
     required this.endTime,
@@ -113,10 +113,10 @@ class WellnessEvent {
     String? aeContactNumber,
     String? aeContactEmail,
     String? servicesRequested,
-    String? additionalServicesRequested,
+    //String? additionalServicesRequested,
     int? expectedParticipation,
     int? nurses,
-    int? coordinators,
+    //int? coordinators,
     String? setUpTime,
     String? startTime,
     String? endTime,
@@ -148,12 +148,12 @@ class WellnessEvent {
       aeContactNumber: aeContactNumber ?? this.aeContactNumber,
       aeContactEmail: aeContactEmail ?? this.aeContactEmail,
       servicesRequested: servicesRequested ?? this.servicesRequested,
-      additionalServicesRequested:
-          additionalServicesRequested ?? this.additionalServicesRequested,
+      //additionalServicesRequested:
+      //    additionalServicesRequested ?? this.additionalServicesRequested,
       expectedParticipation:
           expectedParticipation ?? this.expectedParticipation,
       nurses: nurses ?? this.nurses,
-      coordinators: coordinators ?? this.coordinators,
+      //coordinators: coordinators ?? this.coordinators,
       setUpTime: setUpTime ?? this.setUpTime,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
@@ -189,10 +189,10 @@ class WellnessEvent {
         other.aeContactNumber == aeContactNumber &&
         other.aeContactEmail == aeContactEmail &&
         other.servicesRequested == servicesRequested &&
-        other.additionalServicesRequested == additionalServicesRequested &&
+        //other.additionalServicesRequested == additionalServicesRequested &&
         other.expectedParticipation == expectedParticipation &&
         other.nurses == nurses &&
-        other.coordinators == coordinators &&
+        //other.coordinators == coordinators &&
         other.setUpTime == setUpTime &&
         other.startTime == startTime &&
         other.endTime == endTime &&
@@ -224,10 +224,10 @@ class WellnessEvent {
         aeContactNumber.hashCode ^
         aeContactEmail.hashCode ^
         servicesRequested.hashCode ^
-        additionalServicesRequested.hashCode ^
+        //additionalServicesRequested.hashCode ^
         expectedParticipation.hashCode ^
         nurses.hashCode ^
-        coordinators.hashCode ^
+        //coordinators.hashCode ^
         setUpTime.hashCode ^
         startTime.hashCode ^
         endTime.hashCode ^

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
+import 'package:kenwell_health_app/utils/health_metric_classification.dart';
 import 'dart:math';
 
 // ViewModel for managing health metrics input and submission
@@ -25,6 +26,11 @@ class HealthMetricsViewModel extends ChangeNotifier {
   HealthMetricsViewModel() {
     heightController.addListener(_calculateBMI);
     weightController.addListener(_calculateBMI);
+    // Notify listeners when metric values change so UI badges update live
+    systolicBpController.addListener(notifyListeners);
+    diastolicBpController.addListener(notifyListeners);
+    cholesterolController.addListener(notifyListeners);
+    bloodSugarController.addListener(notifyListeners);
   }
 
   // Calculate BMI based on height and weight inputs
@@ -50,6 +56,41 @@ class HealthMetricsViewModel extends ChangeNotifier {
 
   // Check if the form is valid
   bool get isFormValid => formKey.currentState?.validate() ?? false;
+
+  // ---------------------------------------------------------------------------
+  // Health metric classification (Green / Orange / Red)
+  // ---------------------------------------------------------------------------
+
+  HealthMetricStatus? get systolicStatus =>
+      HealthMetricClassifier.classifyFromString(
+        systolicBpController.text,
+        HealthMetricClassifier.classifySystolic,
+      );
+
+  HealthMetricStatus? get diastolicStatus =>
+      HealthMetricClassifier.classifyFromString(
+        diastolicBpController.text,
+        HealthMetricClassifier.classifyDiastolic,
+      );
+
+  HealthMetricStatus? get bloodSugarStatus =>
+      HealthMetricClassifier.classifyFromString(
+        bloodSugarController.text,
+        HealthMetricClassifier.classifyBloodGlucose,
+      );
+
+  HealthMetricStatus? get cholesterolStatus =>
+      HealthMetricClassifier.classifyFromString(
+        cholesterolController.text,
+        HealthMetricClassifier.classifyCholesterol,
+      );
+
+  /// True when at least one metric is in the danger (red) zone.
+  bool get hasRedMetrics =>
+      systolicStatus == HealthMetricStatus.red ||
+      diastolicStatus == HealthMetricStatus.red ||
+      bloodSugarStatus == HealthMetricStatus.red ||
+      cholesterolStatus == HealthMetricStatus.red;
 
   // Convert health metrics to a map
   Map<String, dynamic> toMap() {

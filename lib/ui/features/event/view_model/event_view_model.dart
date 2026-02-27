@@ -210,13 +210,13 @@ class EventViewModel extends ChangeNotifier {
 
     dateController.text =
         "${e.date.year}-${e.date.month.toString().padLeft(2, '0')}-${e.date.day.toString().padLeft(2, '0')}";
-    coordinatorsOption = e.coordinators > 0 ? 'Yes' : 'No';
-    coordinatorsCount = e.coordinators;
+    //coordinatorsOption = e.coordinators > 0 ? 'Yes' : 'No';
+    //coordinatorsCount = e.coordinators;
     mobileBoothsOption = e.mobileBooths;
     nursesCount = e.nurses;
     nursesOption = e.nurses > 0 ? 'Yes' : 'No';
     _setServicesFromString(e.servicesRequested);
-    _setAdditionalServicesFromString(e.additionalServicesRequested);
+    //_setAdditionalServicesFromString(e.additionalServicesRequested);
     medicalAid = e.medicalAid;
 
     notifyListeners();
@@ -271,10 +271,10 @@ class EventViewModel extends ChangeNotifier {
       aeContactNumber: _sanitizeString(aeNumberController.text),
       aeContactEmail: _sanitizeString(aeEmailController.text),
       servicesRequested: servicesRequested,
-      additionalServicesRequested: additionalServicesRequested,
+      //  additionalServicesRequested: additionalServicesRequested,
       expectedParticipation: _sanitizeInt(expectedParticipationController.text),
       nurses: nursesCount,
-      coordinators: coordinatorsOption == 'Yes' ? coordinatorsCount : 0,
+      //   coordinators: coordinatorsOption == 'Yes' ? coordinatorsCount : 0,
       setUpTime: _sanitizeString(setUpTimeController.text),
       startTime: _sanitizeString(startTimeController.text),
       endTime: _sanitizeString(endTimeController.text),

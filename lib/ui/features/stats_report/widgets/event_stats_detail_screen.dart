@@ -256,8 +256,8 @@ class EventStatsDetailScreen extends StatelessWidget {
             const SizedBox(height: 16),
 
             // Services Offered
-            if (event.servicesRequested.isNotEmpty ||
-                event.additionalServicesRequested.isNotEmpty) ...[
+            if (event.servicesRequested.isNotEmpty) ...[
+              // || event.additionalServicesRequested.isNotEmpty) ...[
               KenwellFormCard(
                 title: 'Services Offered',
                 child: Column(
@@ -293,39 +293,39 @@ class EventStatsDetailScreen extends StatelessWidget {
                                 ),
                               )),
                     ],
-                    if (event.servicesRequested.isNotEmpty &&
-                        event.additionalServicesRequested.isNotEmpty)
+                    if (event.servicesRequested.isNotEmpty) //&&
+                      // event.additionalServicesRequested.isNotEmpty)
                       const SizedBox(height: 16),
-                    if (event.additionalServicesRequested.isNotEmpty) ...[
-                      Text(
-                        'Additional Services:',
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      ...event.additionalServicesRequested
-                          .split(',')
-                          .map((service) => Padding(
-                                padding: const EdgeInsets.only(bottom: 4),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.check_circle_outline,
-                                      size: 16,
-                                      color: Colors.grey[600],
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        service.trim(),
-                                        style: theme.textTheme.bodyMedium,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )),
-                    ],
+                    //  if (event.additionalServicesRequested.isNotEmpty) ...[
+                    //   Text(
+                    //    'Additional Services:',
+                    //   style: theme.textTheme.titleSmall?.copyWith(
+                    //     fontWeight: FontWeight.bold,
+                    //  ),
+                    // ),
+                    //  const SizedBox(height: 8),
+                    // ...event.additionalServicesRequested
+                    //     .split(',')
+                    //    .map((service) => Padding(
+                    //         padding: const EdgeInsets.only(bottom: 4),
+                    //         child: Row(
+                    //           children: [
+                    //             Icon(
+                    //               Icons.check_circle_outline,
+                    //               size: 16,
+                    //               color: Colors.grey[600],
+                    //             ),
+                    //             const SizedBox(width: 8),
+                    //             Expanded(
+                    //               child: Text(
+                    //                 service.trim(),
+                    //                 style: theme.textTheme.bodyMedium,
+                    //               ),
+                    //             ),
+                    //           ],
+                    //         ),
+                    //      )),
+                    //   ],
                   ],
                 ),
               ),

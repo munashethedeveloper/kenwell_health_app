@@ -26,7 +26,7 @@ class _EventOptionsSectionState extends State<EventOptionsSection> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Coordinators
+        /*  // Coordinators
         KenwellFormCard(
           title: 'Coordinators Option',
           margin: const EdgeInsets.only(bottom: 16),
@@ -47,7 +47,7 @@ class _EventOptionsSectionState extends State<EventOptionsSection> {
             validator: (val) => widget.requiredSelection('Coordinators', val),
             maxCount: 10,
           ),
-        ),
+        ), */
 
         // Mobile Booths
         KenwellFormCard(

@@ -138,8 +138,8 @@ class EventDetailsScreen extends StatelessWidget {
             const Divider(),
             _buildDetailRow('Nurses', event.nurses.toString(), theme),
             const Divider(),
-            _buildDetailRow(
-                'Coordinators', event.coordinators.toString(), theme),
+            //   _buildDetailRow(
+            //       'Coordinators', event.coordinators.toString(), theme),
             const Divider(),
             _buildDetailRow('Mobile Booths', event.mobileBooths, theme),
             const Divider(),
@@ -157,14 +157,14 @@ class EventDetailsScreen extends StatelessWidget {
                   : 'None',
               theme,
             ),
-            if (event.additionalServicesRequested.isNotEmpty) ...[
-              const Divider(),
-              _buildDetailRow(
-                'Additional Services',
-                event.additionalServicesRequested,
-                theme,
-              ),
-            ],
+            //  if (event.additionalServicesRequested.isNotEmpty) ...[
+            //   const Divider(),
+            //   _buildDetailRow(
+            //     'Additional Services',
+            //     event.additionalServicesRequested,
+            //     theme,
+            //   ),
+            // ],
           ]),
           const SizedBox(height: 24),
           // Allocate Event button (with permission check)

@@ -234,8 +234,28 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               },
               extended: ResponsiveBreakpoints.isExpanded(context),
               backgroundColor: theme.colorScheme.surfaceContainerHighest,
-              // indicatorColor: theme.colorScheme.secondaryContainer,
               indicatorColor: KenwellColors.primaryGreen,
+              indicatorShape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              selectedIconTheme: const IconThemeData(
+                color: Colors.white,
+                size: 26,
+              ),
+              unselectedIconTheme: const IconThemeData(
+                color: KenwellColors.primaryGreen,
+                size: 24,
+              ),
+              selectedLabelTextStyle: const TextStyle(
+                color: KenwellColors.primaryGreen,
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+              ),
+              unselectedLabelTextStyle: TextStyle(
+                color: theme.colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w500,
+                fontSize: 11,
+              ),
               labelType: ResponsiveBreakpoints.isExpanded(context)
                   ? NavigationRailLabelType.none
                   : NavigationRailLabelType.all,

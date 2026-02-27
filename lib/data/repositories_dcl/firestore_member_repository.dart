@@ -2,11 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import '../services/firestore_service.dart';
 import '../../domain/models/member.dart';
+import 'firestore_member_event_repository.dart';
 
 /// Repository for managing members in Firestore
 class FirestoreMemberRepository {
   final FirestoreService _firestore;
   static const String membersCollection = 'members';
+  final _memberEventRepository = FirestoreMemberEventRepository();
 
   FirestoreMemberRepository({FirestoreService? firestoreService})
       : _firestore = firestoreService ?? FirestoreService();
@@ -196,46 +198,98 @@ class FirestoreMemberRepository {
     };
   }
 
-  /// Fetch events attended by a member
-  /// Returns a list of event IDs and event data that this member participated in
-  Future<List<Map<String, dynamic>>> fetchMemberEvents(String memberId) async {
+  /// Fetch events attended by a member.
+  /// Accepts the [Member] object directly to avoid a redundant Firestore read.
+  /// Checks the `member_events` collection first, then falls back to
+  /// `member.eventId` and `wellness_sessions` for backward compatibility.
+  Future<List<Map<String, dynamic>>> fetchMemberEvents(Member member) async {
+    final memberId = member.id;
     try {
-      // First, find the member
-      final member = await fetchMemberById(memberId);
-      if (member == null) {
-        debugPrint('Member not found: $memberId');
-        return [];
-      }
-
       final events = <Map<String, dynamic>>[];
 
-      // Add the member's registered event if exists
-      if (member.eventId != null && member.eventId!.isNotEmpty) {
-        try {
-          final eventDoc = await FirebaseFirestore.instance
-              .collection('wellness_events')
-              .doc(member.eventId)
-              .get();
+      // --- Primary source: member_events collection ---
+      try {
+        final memberEventRecords =
+            await _memberEventRepository.getMemberEventsByMemberId(memberId);
 
-          if (eventDoc.exists) {
-            final eventData = eventDoc.data();
-            if (eventData != null) {
-              events.add({
-                'eventId': eventDoc.id,
-                'eventTitle': eventData['title'] ?? 'Unknown Event',
-                'eventDate': eventData['date'],
-                'eventVenue': eventData['venue'] ?? '',
-                'eventLocation': eventData['address'] ?? '',
-                'source': 'registration',
-              });
-            }
+        for (final record in memberEventRecords) {
+          try {
+            final eventDoc = await FirebaseFirestore.instance
+                .collection(FirestoreService.eventsCollection)
+                .doc(record.eventId)
+                .get();
+
+            final eventData = eventDoc.exists ? eventDoc.data() : null;
+            events.add({
+              'eventId': record.eventId,
+              'eventTitle': eventData?['title'] ?? record.eventTitle,
+              'eventDate': eventData?['date'] ?? record.eventDate,
+              'eventVenue': eventData?['venue'] ?? record.eventVenue ?? '',
+              'eventLocation':
+                  eventData?['address'] ?? record.eventLocation ?? '',
+              'source': 'member_events',
+              'isScreened': record.isScreened,
+              'hraCompleted': record.hraCompleted,
+              'hctCompleted': record.hctCompleted,
+              'tbCompleted': record.tbCompleted,
+              'cancerCompleted': record.cancerCompleted,
+              'registeredAt': record.registeredAt,
+              'screenedAt': record.screenedAt,
+            });
+          } catch (e) {
+            debugPrint('Error fetching event ${record.eventId}: $e');
+            // Include record even if event doc fetch fails
+            events.add({
+              'eventId': record.eventId,
+              'eventTitle': record.eventTitle,
+              'eventDate': record.eventDate,
+              'eventVenue': record.eventVenue ?? '',
+              'eventLocation': record.eventLocation ?? '',
+              'source': 'member_events',
+              'isScreened': record.isScreened,
+              'hraCompleted': record.hraCompleted,
+              'hctCompleted': record.hctCompleted,
+              'tbCompleted': record.tbCompleted,
+              'cancerCompleted': record.cancerCompleted,
+              'registeredAt': record.registeredAt,
+              'screenedAt': record.screenedAt,
+            });
           }
-        } catch (e) {
-          debugPrint('Error fetching member registration event: $e');
+        }
+      } catch (e) {
+        debugPrint('Error querying member_events collection: $e');
+      }
+
+      // --- Fallback: member.eventId (backward compatibility) ---
+      if (member.eventId != null && member.eventId!.isNotEmpty) {
+        if (!events.any((e) => e['eventId'] == member.eventId)) {
+          try {
+            final eventDoc = await FirebaseFirestore.instance
+                .collection(FirestoreService.eventsCollection)
+                .doc(member.eventId)
+                .get();
+
+            if (eventDoc.exists) {
+              final eventData = eventDoc.data();
+              if (eventData != null) {
+                events.add({
+                  'eventId': eventDoc.id,
+                  'eventTitle': eventData['title'] ?? 'Unknown Event',
+                  'eventDate': eventData['date'],
+                  'eventVenue': eventData['venue'] ?? '',
+                  'eventLocation': eventData['address'] ?? '',
+                  'source': 'registration',
+                  'isScreened': false,
+                });
+              }
+            }
+          } catch (e) {
+            debugPrint('Error fetching member registration event: $e');
+          }
         }
       }
 
-      // Also check wellness_sessions for any sessions this member participated in
+      // --- Fallback: wellness_sessions (backward compatibility) ---
       try {
         final sessionsQuery = await FirebaseFirestore.instance
             .collection('wellness_sessions')
@@ -251,7 +305,7 @@ class FirestoreMemberRepository {
             if (!events.any((e) => e['eventId'] == eventId)) {
               try {
                 final eventDoc = await FirebaseFirestore.instance
-                    .collection('wellness_events')
+                    .collection(FirestoreService.eventsCollection)
                     .doc(eventId)
                     .get();
 
@@ -266,6 +320,7 @@ class FirestoreMemberRepository {
                       'eventLocation': eventData['address'] ?? '',
                       'source': 'wellness_session',
                       'sessionId': sessionDoc.id,
+                      'isScreened': true,
                     });
                   }
                 }

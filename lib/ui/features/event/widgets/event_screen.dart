@@ -42,7 +42,7 @@ class EventScreen extends StatefulWidget {
 class _EventScreenState extends State<EventScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _didLoadExistingEvent = false;
-  String _wantsAdditionalServices = 'No'; // 'Yes' or 'No'
+  // String _wantsAdditionalServices = 'No'; // 'Yes' or 'No'
 
   // Initialize state
   @override
@@ -57,11 +57,11 @@ class _EventScreenState extends State<EventScreen> {
         if (!_didLoadExistingEvent) {
           widget.viewModel.loadExistingEvent(eventToEdit);
           // Check if event has additional services
-          final hasAdditionalServices =
-              eventToEdit.additionalServicesRequested.isNotEmpty;
+          //final hasAdditionalServices =
+          // eventToEdit.additionalServicesRequested.isNotEmpty;
           setState(() {
             _didLoadExistingEvent = true;
-            _wantsAdditionalServices = hasAdditionalServices ? 'Yes' : 'No';
+            // _wantsAdditionalServices = hasAdditionalServices ? 'Yes' : 'No';
           });
         }
       });
