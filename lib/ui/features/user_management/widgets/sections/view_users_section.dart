@@ -455,8 +455,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'Swipe card\nfor options',
-                                  textAlign: TextAlign.end,
+                                  'Swipe for options',
                                   style: TextStyle(
                                     color: Colors.white.withValues(alpha: 0.7),
                                     fontSize: 10,
