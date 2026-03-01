@@ -8,6 +8,7 @@ import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 import '../../../shared/ui/logo/app_logo.dart';
 import '../../../shared/ui/containers/gradient_container.dart';
 import '../../../../data/repositories_dcl/firestore_member_repository.dart';
+import '../../../../domain/models/wellness_event.dart';
 import 'event_stats_detail_screen.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 
@@ -18,11 +19,15 @@ class StatsReportScreen extends StatefulWidget {
   State<StatsReportScreen> createState() => _StatsReportScreenState();
 }
 
-class _StatsReportScreenState extends State<StatsReportScreen> {
+class _StatsReportScreenState extends State<StatsReportScreen>
+    with SingleTickerProviderStateMixin {
   final _searchController = TextEditingController();
   final _memberRepository = FirestoreMemberRepository();
   int _totalMembers = 0;
   bool _isLoadingMembers = true;
+
+  // Tab controller for Live vs Past events
+  late TabController _tabController;
 
   // Filter states
   String? _selectedStatus;
@@ -33,6 +38,12 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        setState(() {});
+      }
+    });
     _loadMemberCount();
     _searchController.addListener(() {
       setState(() {}); // Rebuild when search text changes
@@ -84,6 +95,7 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
 
   @override
   void dispose() {
+    _tabController.dispose();
     _searchController.dispose();
     super.dispose();
   }
@@ -119,11 +131,25 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
     final eventVM = context.watch<EventViewModel>();
     final allEvents = eventVM.events;
 
+    // Filter events based on active tab (Live = in-progress, Past = completed)
+    final isLiveTab = _tabController.index == 0;
+    final tabFilteredEvents = isLiveTab
+        ? allEvents.where((e) {
+            final s = e.status.toLowerCase();
+            return s == WellnessEventStatus.inProgress ||
+                s == 'in progress' ||
+                s == 'ongoing';
+          }).toList()
+        : allEvents.where((e) {
+            final s = e.status.toLowerCase();
+            return s == WellnessEventStatus.completed || s == 'finished';
+          }).toList();
+
     // Filter events based on search query
     final searchQuery = _searchController.text.toLowerCase();
     var events = searchQuery.isEmpty
-        ? allEvents
-        : allEvents
+        ? tabFilteredEvents
+        : tabFilteredEvents
             .where((event) => event.title.toLowerCase().contains(searchQuery))
             .toList();
 
@@ -266,6 +292,40 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
 
                 const SizedBox(height: 16),
 
+                // Tab bar for Live vs Past events
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade200),
+                  ),
+                  child: TabBar(
+                    controller: _tabController,
+                    tabs: const [
+                      Tab(
+                        icon: Icon(Icons.play_circle_outline),
+                        text: 'Live Events',
+                      ),
+                      Tab(
+                        icon: Icon(Icons.history),
+                        text: 'Past Events',
+                      ),
+                    ],
+                    labelColor: theme.primaryColor,
+                    unselectedLabelColor: Colors.grey[600],
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    indicator: BoxDecoration(
+                      color: theme.primaryColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                          color: theme.primaryColor.withValues(alpha: 0.3)),
+                    ),
+                    dividerColor: Colors.transparent,
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
                 // Search bar with inline filter button
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -332,7 +392,7 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                           borderRadius: BorderRadius.circular(12),
                           child: InkWell(
                             onTap: () => _showFilterBottomSheet(
-                                context, theme, allEvents),
+                                context, theme, tabFilteredEvents),
                             borderRadius: BorderRadius.circular(12),
                             child: Container(
                               padding: const EdgeInsets.all(12),
@@ -628,9 +688,8 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                   const SizedBox(height: 16),
                 ],
 
-                // Event Breakdown Card - Only show when search or filters are active
-                if (_searchController.text.isNotEmpty || _hasActiveFilters)
-                  Container(
+                // Event Breakdown Card - Always visible, filtered by active tab
+                Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
@@ -656,13 +715,17 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                           Row(
                             children: [
                               Icon(
-                                Icons.event_note,
+                                isLiveTab
+                                    ? Icons.play_circle_outline
+                                    : Icons.history,
                                 color: theme.primaryColor,
                                 size: 24,
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                'Event Breakdown',
+                                isLiveTab
+                                    ? 'Live Event Breakdown'
+                                    : 'Past Event Breakdown',
                                 style: theme.textTheme.titleLarge?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -690,7 +753,9 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                                     ),
                                     const SizedBox(height: 16),
                                     Text(
-                                      'No event data yet',
+                                      isLiveTab
+                                          ? 'No live events'
+                                          : 'No past events',
                                       style:
                                           theme.textTheme.bodyLarge?.copyWith(
                                         color: Colors.grey[600],
@@ -699,7 +764,9 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
-                                      'Events matching your criteria will appear here',
+                                      isLiveTab
+                                          ? 'Events currently in progress will appear here'
+                                          : 'Completed events will appear here',
                                       style:
                                           theme.textTheme.bodySmall?.copyWith(
                                         color: Colors.grey[500],
