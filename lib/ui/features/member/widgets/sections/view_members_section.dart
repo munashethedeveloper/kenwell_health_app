@@ -210,13 +210,19 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
           backgroundColor: theme.colorScheme.error,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          margin: const EdgeInsets.all(16),
         ),
       );
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content:
-                Text(viewModel.errorMessage ?? 'Failed to delete member')),
+          content: Text(viewModel.errorMessage ?? 'Failed to delete member'),
+          backgroundColor: theme.colorScheme.error,
+          behavior: SnackBarBehavior.floating,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          margin: const EdgeInsets.all(16),
+        ),
       );
     }
   }

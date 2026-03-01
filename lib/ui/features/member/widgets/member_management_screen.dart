@@ -164,14 +164,19 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
                       if (mounted) {
                         context.read<MemberDetailsViewModel>().loadMembers();
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Members refreshed'),
-                            duration: Duration(seconds: 1),
+                          SnackBar(
+                            content: const Text('Members refreshed'),
+                            duration: const Duration(seconds: 1),
+                            backgroundColor: Colors.green.shade600,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                            margin: const EdgeInsets.all(16),
                           ),
                         );
                       }
                     },
-                    icon: const Icon(Icons.refresh, color: Colors.white),
+                    icon: const Icon(Icons.refresh_rounded, color: Colors.white),
                     tooltip: 'Refresh members',
                   ),
                   TextButton.icon(
@@ -180,7 +185,8 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
                         context.pushNamed('help');
                       }
                     },
-                    icon: const Icon(Icons.help_outline, color: Colors.white),
+                    icon: const Icon(Icons.help_outline_rounded,
+                        color: Colors.white),
                     label: const Text(
                       'Help',
                       style: TextStyle(color: Colors.white),
