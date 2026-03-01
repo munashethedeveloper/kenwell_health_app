@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_hra_repository.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_cancer_screening_repository.dart';
@@ -13,14 +14,23 @@ import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 
 /// Displays health-screening-specific statistics for HRA, Cancer, TB and HCT.
 ///
-/// When [eventId] is provided the stats are scoped to that single event.
-/// When [eventId] is null the stats are aggregated across ALL records in the
+/// When [eventIds] is provided the stats are scoped to those events.
+/// When [eventIds] is null the stats are aggregated across ALL records in the
 /// respective Firestore collections.
+/// When [eventIds] is an empty list no data is fetched and the section shows
+/// an empty-state message.
 class HealthScreeningStatsSection extends StatefulWidget {
-  /// The wellness event ID to scope stats to, or null for an aggregate view.
-  final String? eventId;
+  /// The wellness event IDs to scope stats to, or null for an aggregate view.
+  final List<String>? eventIds;
 
-  const HealthScreeningStatsSection({super.key, this.eventId});
+  /// Optional subtitle override for the section header.
+  final String? sectionSubtitle;
+
+  const HealthScreeningStatsSection({
+    super.key,
+    this.eventIds,
+    this.sectionSubtitle,
+  });
 
   @override
   State<HealthScreeningStatsSection> createState() =>
@@ -50,26 +60,45 @@ class _HealthScreeningStatsSectionState
   @override
   void didUpdateWidget(HealthScreeningStatsSection oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.eventId != widget.eventId) {
-      _loadData();
-    }
+    // Reload when the list of event IDs changes.
+    final oldIds = oldWidget.eventIds;
+    final newIds = widget.eventIds;
+    final changed = oldIds == null
+        ? newIds != null
+        : newIds == null || !listEquals(oldIds, newIds);
+    if (changed) _loadData();
   }
 
   Future<void> _loadData() async {
     if (!mounted) return;
+
+    // If an empty list is explicitly passed, clear the data immediately.
+    final eventIds = widget.eventIds;
+    if (eventIds != null && eventIds.isEmpty) {
+      setState(() {
+        _hraScreenings = [];
+        _cancerScreenings = [];
+        _tbScreenings = [];
+        _hivScreenings = [];
+        _isLoading = false;
+        _error = null;
+      });
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _error = null;
     });
     try {
-      final eventId = widget.eventId;
       final List<Future<dynamic>> futures;
-      if (eventId != null) {
+      if (eventIds != null) {
+        // Scope to the provided event IDs (Firestore whereIn, max 30).
         futures = [
-          _hraRepo.getHraScreeningsByEvent(eventId),
-          _cancerRepo.getCancerScreeningsByEvent(eventId),
-          _tbRepo.getTbScreeningsByEvent(eventId),
-          _hivRepo.getHivScreeningsByEvent(eventId),
+          _hraRepo.getHraScreeningsByEvents(eventIds),
+          _cancerRepo.getCancerScreeningsByEvents(eventIds),
+          _tbRepo.getTbScreeningsByEvents(eventIds),
+          _hivRepo.getHivScreeningsByEvents(eventIds),
         ];
       } else {
         // Global aggregate – fetch from each collection without event filter.
@@ -312,9 +341,9 @@ class _HealthScreeningStatsSectionState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const KenwellModernSectionHeader(
+        KenwellModernSectionHeader(
           title: 'Health Screening Analytics',
-          subtitle:
+          subtitle: widget.sectionSubtitle ??
               'Statistics derived from HRA, Cancer, TB and HCT screenings',
           icon: Icons.health_and_safety,
         ),

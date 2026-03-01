@@ -358,7 +358,7 @@ class EventStatsDetailScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             // ── Health Screening Analytics ────────────────────────────────
-            HealthScreeningStatsSection(eventId: event.id),
+            HealthScreeningStatsSection(eventIds: [event.id]),
             const SizedBox(height: 24),
 
             // Export Button

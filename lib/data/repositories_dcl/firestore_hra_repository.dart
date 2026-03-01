@@ -148,4 +148,22 @@ class FirestoreHraRepository {
       rethrow;
     }
   }
+
+  /// Get HRA screenings for a specific set of events (up to 30 IDs).
+  Future<List<HraScreening>> getHraScreeningsByEvents(
+      List<String> eventIds) async {
+    if (eventIds.isEmpty) return [];
+    try {
+      final querySnapshot = await _firestore
+          .collection(_collectionName)
+          .where('eventId', whereIn: eventIds)
+          .get();
+      return querySnapshot.docs
+          .map((doc) => HraScreening.fromMap(doc.data()))
+          .toList();
+    } catch (e) {
+      AppLogger.error('Failed to get HRA screenings by events', e);
+      rethrow;
+    }
+  }
 }

@@ -609,8 +609,17 @@ class _StatsReportScreenState extends State<StatsReportScreen>
                 ),
                 const SizedBox(height: 24),
 
-                // ── Health Screening Analytics (aggregate) ────────────────
-                const HealthScreeningStatsSection(),
+                // ── Health Screening Analytics (scoped to current tab) ────
+                HealthScreeningStatsSection(
+                  eventIds: events.map((e) => e.id).toList(),
+                  sectionSubtitle: isLiveTab
+                      ? 'Live screening data from '
+                          '${events.length} currently running '
+                          'event${events.length != 1 ? "s" : ""}'
+                      : 'Screening data from '
+                          '${events.length} past '
+                          'event${events.length != 1 ? "s" : ""}',
+                ),
                 const SizedBox(height: 24),
 
                 // HIGH PRIORITY: Events by Status - Only show when filters are active
