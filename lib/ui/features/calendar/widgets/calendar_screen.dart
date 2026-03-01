@@ -297,42 +297,37 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
       child: Column(
         children: [
           const SizedBox(height: 16),
-          // Compact welcome header
+          // Centered welcome header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
+            child: Column(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: KenwellColors.primaryGreen.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: const Icon(Icons.calendar_month_rounded,
-                      color: KenwellColors.primaryGreen, size: 22),
+                      color: KenwellColors.primaryGreen, size: 28),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _getWelcomeTitle(),
-                        style: const TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF201C58),
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const Text(
-                        'View and manage your wellness events.',
-                        style:
-                            TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
-                      ),
-                    ],
+                const SizedBox(height: 10),
+                Text(
+                  _getWelcomeTitle(),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF201C58),
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'View and manage your wellness events.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
                 ),
               ],
             ),
@@ -364,8 +359,16 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
           const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            // Calendar widget inside a form card
-            child: KenwellFormCard(
+            // Green border wrapper makes the calendar pop
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: KenwellColors.primaryGreen,
+                  width: 2.5,
+                ),
+              ),
+              child: KenwellFormCard(
               child: TableCalendar(
                 // Calendar configuration
                 firstDay: DateTime.utc(2020, 1, 1),
@@ -488,6 +491,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                 onPageChanged: (focusedDay) {
                   viewModel.setFocusedDay(focusedDay);
                 },
+              ),
               ),
             ),
           ),
