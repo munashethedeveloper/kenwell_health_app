@@ -51,7 +51,7 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ProfileViewModel>(
       builder: (context, vm, _) => Scaffold(
-        backgroundColor: const Color(0xFF201C58),
+        backgroundColor: KenwellColors.primaryGreen,
         body: SafeArea(
           child: Column(
             children: [

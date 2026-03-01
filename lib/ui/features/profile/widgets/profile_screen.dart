@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/profile_view_model.dart';
@@ -116,7 +117,7 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
   Widget build(BuildContext context) {
     return Consumer<ProfileViewModel>(
       builder: (context, vm, _) => Scaffold(
-        backgroundColor: const Color(0xFF201C58),
+        backgroundColor: KenwellColors.primaryGreen,
         appBar: KenwellAppBar(
           title: 'Edit Profile',
           titleColor: Colors.white,
@@ -124,7 +125,7 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
-          backgroundColor: const Color(0xFF201C58),
+          backgroundColor: KenwellColors.primaryGreen,
           automaticallyImplyLeading: true,
           actions: [
             IconButton(

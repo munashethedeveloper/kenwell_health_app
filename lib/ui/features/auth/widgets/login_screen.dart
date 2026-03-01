@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:provider/provider.dart';
 import '../../../../data/repositories_dcl/auth_repository_dcl.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
@@ -109,7 +110,7 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
 
       // Build the login screen UI
       return Scaffold(
-        backgroundColor: const Color(0xFF201C58),
+        backgroundColor: KenwellColors.primaryGreen,
         body: SafeArea(
           child: Column(
             children: [
