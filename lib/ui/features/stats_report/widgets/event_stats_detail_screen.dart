@@ -7,6 +7,7 @@ import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/containers/gradient_container.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_modern_section_header.dart';
+import 'health_screening_stats_section.dart';
 
 class EventStatsDetailScreen extends StatelessWidget {
   final WellnessEvent event;
@@ -354,6 +355,10 @@ class EventStatsDetailScreen extends StatelessWidget {
                 ),
               ),
             ],
+            const SizedBox(height: 24),
+
+            // ── Health Screening Analytics ────────────────────────────────
+            HealthScreeningStatsSection(eventIds: [event.id]),
             const SizedBox(height: 24),
 
             // Export Button
