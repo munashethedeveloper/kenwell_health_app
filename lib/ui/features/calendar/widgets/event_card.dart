@@ -30,7 +30,7 @@ class EventCard extends StatelessWidget {
         RolePermissions.canAccessFeature(profileVM.role, 'delete_event');
     final theme = Theme.of(context);
 
-    // Event Breakdown Card design
+    // Event card with white background, shadow, and left accent strip
     final cardContent = Material(
       color: Colors.transparent,
       child: InkWell(
@@ -40,20 +40,42 @@ class EventCard extends StatelessWidget {
             extra: {'event': event},
           );
         },
-        borderRadius: BorderRadius.circular(12),
-        // Event Breakdown Card container
+        borderRadius: BorderRadius.circular(16),
         child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 0),
-          padding: const EdgeInsets.all(16),
+          margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 0),
           decoration: BoxDecoration(
-            color: theme.primaryColor.withValues(alpha: 0.05),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: theme.primaryColor.withValues(alpha: 0.15),
-              width: 1.5,
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Left accent strip colored by status, stretches with content
+                Container(
+                  width: 4,
+                  decoration: BoxDecoration(
+                    color: EventStatusColors.getStatusColor(event.status),
+                    borderRadius: const BorderRadius.horizontal(
+                        left: Radius.circular(16)),
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 14, 14, 14),
+                    child: _buildCardContent(context),
+                  ),
+                ),
+              ],
             ),
           ),
-          child: _buildCardContent(context),
         ),
       ),
     )
@@ -94,7 +116,7 @@ class EventCard extends StatelessWidget {
       },
       // Background shown when swiping to delete
       background: Container(
-        margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 0),
+        margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 0),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -104,7 +126,7 @@ class EventCard extends StatelessWidget {
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
           ),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
         ),
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 24),

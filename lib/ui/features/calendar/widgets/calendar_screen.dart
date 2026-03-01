@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../../../domain/models/wellness_event.dart';
@@ -10,9 +9,7 @@ import '../../event/widgets/event_screen.dart';
 import '../../profile/view_model/profile_view_model.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../shared/ui/colours/kenwell_colours.dart';
-import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 import '../view_model/calendar_view_model.dart';
 import 'day_events_dialog.dart';
 import 'event_card.dart';
@@ -298,36 +295,44 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
 
     return SingleChildScrollView(
       child: Column(
-        //Welcome Message and Calendar widget
         children: [
-          const SizedBox(height: 8),
-
-          KenwellModernSectionHeader(
-            title: _getWelcomeTitle(),
-            textAlign: TextAlign.center,
-            //color: KenwellColors.primaryGreen,
-            color: KenwellColors.secondaryNavy,
-            fontStyle: FontStyle.italic,
-            fontFamily: GoogleFonts.playfairDisplay().fontFamily,
-            showIcon: false,
-          ),
-          const AppLogo(size: 150),
-          // Divider separating the header from the calendar content
-          const Divider(
-            color: KenwellColors.primaryGreen,
-            height: 24,
-            thickness: 1,
-            indent: 16,
-            endIndent: 16,
-          ),
           const SizedBox(height: 16),
-          const KenwellModernSectionHeader(
-            title: 'Events Calendar',
-            subtitle: 'View and manage your wellness events for the month.',
-            textAlign: TextAlign.left,
-            //icon: Icons.calendar_month,
+          // Centered welcome header
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: KenwellColors.primaryGreen.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Icon(Icons.calendar_month_rounded,
+                      color: KenwellColors.primaryGreen, size: 28),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  _getWelcomeTitle(),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF201C58),
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'View and manage your wellness events.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           // Stats strip: events this month and upcoming events
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -354,8 +359,16 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
           const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            // Calendar widget inside a form card
-            child: KenwellFormCard(
+            // Green border wrapper makes the calendar pop
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: KenwellColors.primaryGreen,
+                  width: 2.5,
+                ),
+              ),
+              child: KenwellFormCard(
               child: TableCalendar(
                 // Calendar configuration
                 firstDay: DateTime.utc(2020, 1, 1),
@@ -459,8 +472,10 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                   viewModel.setFocusedDay(focusedDay);
                   // Show dialog with events for the selected day
                   final eventsForDay = viewModel.getEventsForDay(selectedDay);
-                  showDialog(
+                  showModalBottomSheet(
                     context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
                     builder: (ctx) => DayEventsDialog(
                       selectedDay: selectedDay,
                       events: eventsForDay,
@@ -476,6 +491,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                 onPageChanged: (focusedDay) {
                   viewModel.setFocusedDay(focusedDay);
                 },
+              ),
               ),
             ),
           ),
@@ -561,26 +577,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
     return Column(
       children: [
         const SizedBox(height: 16),
-        //Welcome Message and Month Navigation Header
-        const KenwellModernSectionHeader(
-          title: 'Events List',
-          subtitle: 'View and manage your wellness events for the month.',
-          textAlign: TextAlign.left,
-          //icon: Icons.calendar_month,
-        ),
-        const SizedBox(height: 8),
-        // Divider separating the header from the calendar content
-        const Divider(
-          color: KenwellColors.primaryGreen,
-          height: 24,
-          thickness: 1,
-          indent: 16,
-          endIndent: 16,
-        ),
-        // const SizedBox(height: 10),
-        //const AppLogo(size: 150),
-        const SizedBox(height: 16),
-        // Enhanced month navigation header
+        // Month navigation header
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),

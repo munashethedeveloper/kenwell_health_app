@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
-import '../../../shared/ui/form/kenwell_modern_section_header.dart';
-import '../../../shared/ui/logo/app_logo.dart';
 import '../view_model/profile_view_model.dart';
 import 'sections/profile_form_section.dart';
 
@@ -118,21 +117,20 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
   Widget build(BuildContext context) {
     return Consumer<ProfileViewModel>(
       builder: (context, vm, _) => Scaffold(
-        //backgroundColor: Colors.white,
+        backgroundColor: KenwellColors.primaryGreen,
         appBar: KenwellAppBar(
-          title: 'KenWell365',
-          //titleColor: const Color(0xFF201C58),
+          title: 'Edit Profile',
           titleColor: Colors.white,
           titleStyle: const TextStyle(
-            //color: Color(0xFF201C58),
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
+          backgroundColor: KenwellColors.primaryGreen,
           automaticallyImplyLeading: true,
           actions: [
             IconButton(
               tooltip: 'Refresh',
-              icon: const Icon(Icons.refresh, color: Color(0xFF201C58)),
+              icon: const Icon(Icons.refresh, color: Colors.white),
               onPressed: () async {
                 await _loadAndPopulateProfile();
                 if (!context.mounted) return;
@@ -150,69 +148,148 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
                   context.pushNamed('help');
                 }
               },
-              icon: const Icon(Icons.help_outline, color: Color(0xFF201C58)),
+              icon: const Icon(Icons.help_outline, color: Colors.white),
               label: const Text(
                 'Help',
-                style: TextStyle(color: Color(0xFF201C58)),
+                style: TextStyle(color: Colors.white),
               ),
             ),
           ],
         ),
-        body: SafeArea(
-          child: Stack(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: AbsorbPointer(
-                  absorbing: vm.isLoading,
-                  child: SingleChildScrollView(
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 16),
-                          const AppLogo(size: 150),
-                          const SizedBox(height: 24),
-                          const KenwellModernSectionHeader(
-                            title: 'Update Profile Form',
-                            subtitle:
-                                'Complete the form below to update your profile information',
-                            icon: Icons.person,
-                          ),
-                          const SizedBox(height: 16),
-                          ProfileFormSection(
-                            firstNameController: _firstNameController,
-                            lastNameController: _lastNameController,
-                            phoneController: _phoneController,
-                            emailController: _emailController,
-                            selectedRole: _selectedRole,
-                            onRoleChanged: (value) =>
-                                setState(() => _selectedRole = value),
-                          ),
-                          CustomPrimaryButton(
-                            label: "Save Profile",
-                            onPressed: vm.isLoading ? null : _saveProfile,
-                            isBusy: vm.isLoading,
-                          ),
-                          const SizedBox(height: 16),
-                        ],
+        body: Column(
+          children: [
+            // Profile summary on navy background
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+              child: Row(
+                children: [
+                  Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF90C048),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.3), width: 2),
+                    ),
+                    child: Center(
+                      child: Text(
+                        vm.firstName.isNotEmpty
+                            ? vm.firstName[0].toUpperCase()
+                            : '?',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
-              if (vm.isLoading)
-                const Positioned.fill(
-                  child: IgnorePointer(
-                    child: ColoredBox(
-                      color: Color(0x66FFFFFF),
-                      child: Center(child: CircularProgressIndicator()),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${vm.firstName} ${vm.lastName}'.trim().isEmpty
+                              ? 'Your Profile'
+                              : '${vm.firstName} ${vm.lastName}'.trim(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        if (vm.email.isNotEmpty)
+                          Text(
+                            vm.email,
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 13,
+                            ),
+                          ),
+                      ],
                     ),
                   ),
+                ],
+              ),
+            ),
+
+            // Form section — white panel with rounded top corners
+            Expanded(
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(32),
+                  ),
                 ),
-            ],
-          ),
+                child: SafeArea(
+                  top: false,
+                  child: Stack(
+                    children: [
+                      AbsorbPointer(
+                        absorbing: vm.isLoading,
+                        child: SingleChildScrollView(
+                          padding:
+                              const EdgeInsets.fromLTRB(20, 24, 20, 24),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Personal Information',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF201C58),
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                const Text(
+                                  'Update the fields below to save your profile',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Color(0xFF6B7280),
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                ProfileFormSection(
+                                  firstNameController: _firstNameController,
+                                  lastNameController: _lastNameController,
+                                  phoneController: _phoneController,
+                                  emailController: _emailController,
+                                  selectedRole: _selectedRole,
+                                  onRoleChanged: (value) =>
+                                      setState(() => _selectedRole = value),
+                                ),
+                                CustomPrimaryButton(
+                                  label: "Save Profile",
+                                  onPressed: vm.isLoading ? null : _saveProfile,
+                                  isBusy: vm.isLoading,
+                                ),
+                                const SizedBox(height: 16),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      if (vm.isLoading)
+                        const Positioned.fill(
+                          child: IgnorePointer(
+                            child: ColoredBox(
+                              color: Color(0x66FFFFFF),
+                              child: Center(child: CircularProgressIndicator()),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
