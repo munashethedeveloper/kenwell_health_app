@@ -47,13 +47,12 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
 
           if (canCreateMember) {
             tabs.add(const Tab(
-                icon: Icon(Icons.person_add), text: 'Create Members'));
-            // Tab view will be created with callback later
+                icon: Icon(Icons.person_add_rounded), text: 'Create Members'));
           }
 
           if (canViewMembers) {
-            tabs.add(const Tab(icon: Icon(Icons.group), text: 'View Members'));
-            // Tab view will be created later
+            tabs.add(
+                const Tab(icon: Icon(Icons.group_rounded), text: 'View Members'));
           }
 
           // If user has no permissions, show a message
@@ -62,38 +61,60 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
               appBar: const KenwellAppBar(
                 automaticallyImplyLeading: true,
                 title: 'Member Management',
-                //titleColor: Color(0xFF201C58),
                 titleColor: Colors.white,
                 titleStyle: TextStyle(
-                  //color: Color(0xFF201C58),
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               body: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(32.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.lock,
-                        size: 64,
-                        color: theme.colorScheme.onSurfaceVariant,
+                child: Container(
+                  margin: const EdgeInsets.all(32),
+                  padding: const EdgeInsets.all(40),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: Colors.red.withValues(alpha: 0.2),
+                      width: 2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.red.withValues(alpha: 0.08),
+                        blurRadius: 20,
+                        offset: const Offset(0, 6),
                       ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No Access',
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.lock_rounded,
+                          size: 56,
+                          color: Colors.red,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 20),
+                      Text(
+                        'No Access',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFF201C58),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
                       Text(
                         'You do not have permission to access member management features.',
                         textAlign: TextAlign.center,
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
+                          color: const Color(0xFF6B7280),
                         ),
                       ),
                     ],
@@ -108,7 +129,6 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
             child: Scaffold(
               appBar: KenwellAppBar(
                 title: 'Member Management',
-                //titleColor: const Color(0xFF201C58),
                 titleColor: Colors.white,
                 titleStyle: const TextStyle(
                   color: Colors.white,

@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
-import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/containers/gradient_container.dart';
 import '../../../shared/ui/badges/number_badge.dart';
@@ -85,41 +83,74 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 48,
+              width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: theme.colorScheme.outline,
+                color: Colors.grey.shade300,
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: theme.primaryColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(Icons.person_rounded,
+                      color: theme.primaryColor, size: 22),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${user.firstName} ${user.lastName}',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF201C58),
+                        ),
+                      ),
+                      Text(
+                        user.email,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: const Color(0xFF6B7280),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 16),
-            Text(
-              '${user.firstName} ${user.lastName}',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              user.email,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 24),
+            const Divider(),
             if (!isAssigned)
               ListTile(
-                leading:
-                    Icon(Icons.person_add, color: theme.colorScheme.primary),
-                title: Text('Assign', style: theme.textTheme.bodyMedium),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(Icons.person_add_rounded,
+                      color: theme.colorScheme.primary, size: 18),
+                ),
+                title: const Text('Assign'),
+                subtitle: const Text('Add this user to the event'),
                 onTap: () {
                   context.pop();
                   _assignUser(user);
@@ -127,20 +158,27 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
               ),
             if (isAssigned)
               ListTile(
-                leading:
-                    Icon(Icons.person_remove, color: theme.colorScheme.error),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.error.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(Icons.person_remove_rounded,
+                      color: theme.colorScheme.error, size: 18),
+                ),
                 title: Text(
                   'Unassign',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.error,
-                  ),
+                  style: TextStyle(color: theme.colorScheme.error),
                 ),
+                subtitle: const Text('Remove this user from the event'),
                 onTap: () {
                   context.pop();
                   _unassignUser(user);
                 },
               ),
-            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -241,12 +279,12 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
     final isAssigned = _assignedUserIds.contains(user.id);
 
     final roleIcons = {
-      'ADMIN': Icons.admin_panel_settings,
-      'TOP MANAGEMENT': Icons.business_center,
-      'PROJECT MANAGER': Icons.manage_accounts,
-      'PROJECT COORDINATOR': Icons.event,
-      'HEALTH PRACTITIONER': Icons.medical_services,
-      'CLIENT': Icons.person,
+      'ADMIN': Icons.admin_panel_settings_rounded,
+      'TOP MANAGEMENT': Icons.business_center_rounded,
+      'PROJECT MANAGER': Icons.manage_accounts_rounded,
+      'PROJECT COORDINATOR': Icons.event_rounded,
+      'HEALTH PRACTITIONER': Icons.medical_services_rounded,
+      'CLIENT': Icons.person_rounded,
     };
 
     return Slidable(
@@ -259,23 +297,24 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
               onPressed: (_) => _assignUser(user),
               backgroundColor: theme.colorScheme.primary,
               foregroundColor: theme.colorScheme.onPrimary,
-              icon: Icons.person_add,
+              icon: Icons.person_add_rounded,
               label: 'Assign',
+              borderRadius: BorderRadius.circular(12),
             ),
           if (isAssigned)
             SlidableAction(
               onPressed: (_) => _unassignUser(user),
               backgroundColor: theme.colorScheme.error,
               foregroundColor: theme.colorScheme.onError,
-              icon: Icons.person_remove,
+              icon: Icons.person_remove_rounded,
               label: 'Unassign',
+              borderRadius: BorderRadius.circular(12),
             ),
         ],
       ),
       child: Builder(
         builder: (context) => GestureDetector(
           onTap: () {
-            // Toggle the slide menu on tap (open if closed, close if open)
             final slidable = Slidable.of(context);
             final isOpen =
                 slidable?.actionPaneType.value != ActionPaneType.none;
@@ -287,66 +326,47 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
           },
           onLongPress: () => _showUserOptions(user),
           child: Container(
-            margin: const EdgeInsets.only(bottom: 12),
+            margin: const EdgeInsets.only(bottom: 10),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Colors.white,
-                  theme.primaryColor.withValues(alpha: 0.03),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(16),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: theme.primaryColor.withValues(alpha: 0.15),
-                width: 1.5,
+                color: theme.primaryColor.withValues(alpha: 0.12),
+                width: 1,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: theme.primaryColor.withValues(alpha: 0.08),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                  spreadRadius: 0,
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               child: Row(
                 children: [
-                  // Number badge (if provided)
                   if (number != null) ...[
                     NumberBadge(number: number),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 10),
                   ],
 
-                  // Modern avatar with icon and gradient background
+                  // Avatar
                   Container(
-                    width: 48,
-                    height: 48,
+                    width: 46,
+                    height: 46,
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          theme.primaryColor.withValues(alpha: 0.2),
-                          theme.primaryColor.withValues(alpha: 0.1),
-                        ],
-                      ),
+                      color: theme.primaryColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: theme.primaryColor.withValues(alpha: 0.3),
-                        width: 1.5,
-                      ),
                     ),
                     child: Icon(
-                      roleIcons[user.role] ?? Icons.person,
+                      roleIcons[user.role] ?? Icons.person_rounded,
                       color: theme.primaryColor,
-                      size: 24,
+                      size: 22,
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 12),
 
                   // User Info
                   Expanded(
@@ -355,31 +375,28 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                       children: [
                         Text(
                           '${user.firstName} ${user.lastName}',
-                          style: theme.textTheme.bodyLarge?.copyWith(
+                          style: theme.textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.w700,
-                            color: Colors.black,
-                            letterSpacing: -0.2,
+                            color: const Color(0xFF201C58),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 3),
                         Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.email_outlined,
-                              size: 14,
-                              //color: KenwellColors.secondaryNavyDark,
-                              color: Colors.black,
+                              size: 12,
+                              color: Colors.grey.shade500,
                             ),
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
                                 user.email,
                                 style: theme.textTheme.bodySmall?.copyWith(
-                                  //color: KenwellColors.secondaryNavyDark,
-                                  color: Colors.black,
-                                  fontSize: 13,
+                                  color: const Color(0xFF6B7280),
+                                  fontSize: 12,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -387,104 +404,70 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(
+                        const SizedBox(height: 5),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 7, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: isAssigned
+                                ? const Color(0xFF10B981)
+                                    .withValues(alpha: 0.1)
+                                : const Color(0xFFEF4444)
+                                    .withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                isAssigned
+                                    ? Icons.check_circle_rounded
+                                    : Icons.radio_button_unchecked_rounded,
                                 color: isAssigned
                                     ? const Color(0xFF10B981)
-                                        .withValues(alpha: 0.1)
-                                    : const Color(0xFFEF4444)
-                                        .withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(
+                                    : const Color(0xFFEF4444),
+                                size: 12,
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                isAssigned ? 'Assigned' : 'Unassigned',
+                                style: TextStyle(
                                   color: isAssigned
                                       ? const Color(0xFF10B981)
-                                          .withValues(alpha: 0.3)
-                                      : const Color(0xFFEF4444)
-                                          .withValues(alpha: 0.3),
-                                  width: 1,
+                                      : const Color(0xFFEF4444),
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 10,
                                 ),
                               ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    isAssigned
-                                        ? Icons.verified
-                                        : Icons.error_outline,
-                                    color: isAssigned
-                                        ? const Color(0xFF10B981)
-                                        : const Color(0xFFEF4444),
-                                    size: 14,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    isAssigned ? 'Assigned' : 'Not Assigned',
-                                    style: theme.textTheme.labelSmall?.copyWith(
-                                      //color: Colors.grey.shade800,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 11,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
 
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 10),
 
-                  // Role badge with modern styling
+                  // Role badge
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.white,
-                          Colors.white.withValues(alpha: 0.8),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF90C048).withValues(alpha: 0.3),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Text(
-                      user.role,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: KenwellColors.secondaryNavyDark,
-                        fontSize: 10,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.all(6),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: theme.primaryColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: theme.primaryColor.withValues(alpha: 0.2),
+                        width: 1,
+                      ),
                     ),
-                    child: Icon(
-                      Icons.chevron_right,
-                      color: theme.primaryColor,
-                      size: 20,
+                    child: Text(
+                      user.role,
+                      style: TextStyle(
+                        color: theme.primaryColor,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 10,
+                        letterSpacing: 0.3,
+                      ),
                     ),
                   ),
                 ],
@@ -498,31 +481,41 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
 
   Widget _buildEmptyState(ThemeData theme) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.people_outline,
-            color: theme.colorScheme.onSurfaceVariant,
-            size: 64,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'No users found',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onSurface,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: theme.primaryColor.withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.people_outline_rounded,
+                color: theme.primaryColor,
+                size: 48,
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Try adjusting your search or filter',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+            const SizedBox(height: 16),
+            Text(
+              'No users found',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF201C58),
+              ),
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+            const SizedBox(height: 8),
+            Text(
+              'Try adjusting your search or filter',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: const Color(0xFF6B7280),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -595,33 +588,42 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
 
           if (viewModel.users.isEmpty) {
             return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const AppLogo(size: 200),
-                  const SizedBox(height: 16),
-                  Icon(
-                    Icons.people_outline,
-                    size: 64,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No users available',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.onSurface,
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: theme.primaryColor.withValues(alpha: 0.08),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.people_outline_rounded,
+                        color: theme.primaryColor,
+                        size: 48,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Create users first to allocate events',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
+                    const SizedBox(height: 16),
+                    Text(
+                      'No users available',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF201C58),
+                      ),
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+                    const SizedBox(height: 8),
+                    Text(
+                      'Create users first to allocate events',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: const Color(0xFF6B7280),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
             );
           }
@@ -632,14 +634,16 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
               slivers: [
                 SliverToBoxAdapter(
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      //const AppLogo(size: 200),
+                      const SizedBox(height: 16),
 
-                      const SizedBox(height: 16), // Stats header
+                      // Stats header
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: GradientContainer.purpleGreen(
-                          padding: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 14),
                           child: Row(
                             children: [
                               Container(
@@ -649,59 +653,58 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: const Icon(
-                                  Icons.people,
+                                  Icons.people_rounded,
                                   color: Colors.white,
-                                  size: 18,
+                                  size: 20,
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 14),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    // Show filter status and user counts
                                     Text(
                                       filterActive
-                                          ? 'Showing Users: ${filteredUsers.length} of $totalUsers'
+                                          ? 'Showing ${filteredUsers.length} of $totalUsers Users'
                                           : '$totalUsers Total Users',
                                       style: const TextStyle(
                                         color: Colors.white,
-                                        fontSize: 16,
+                                        fontSize: 15,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    const SizedBox(height: 4),
+                                    const SizedBox(height: 3),
                                     Row(
                                       children: [
                                         Icon(
-                                          Icons.verified,
+                                          Icons.check_circle_rounded,
                                           color: Colors.white
                                               .withValues(alpha: 0.9),
-                                          size: 16,
+                                          size: 13,
                                         ),
-                                        const SizedBox(width: 4),
+                                        const SizedBox(width: 3),
                                         Text(
                                           '$assignedCount assigned',
                                           style: TextStyle(
                                             color: Colors.white
                                                 .withValues(alpha: 0.9),
-                                            fontSize: 14,
+                                            fontSize: 12,
                                           ),
                                         ),
-                                        const SizedBox(width: 12),
+                                        const SizedBox(width: 10),
                                         Icon(
-                                          Icons.error_outline,
+                                          Icons.radio_button_unchecked_rounded,
                                           color: Colors.white
                                               .withValues(alpha: 0.9),
-                                          size: 16,
+                                          size: 13,
                                         ),
-                                        const SizedBox(width: 4),
+                                        const SizedBox(width: 3),
                                         Text(
-                                          '$notAssignedCount not assigned',
+                                          '$notAssignedCount unassigned',
                                           style: TextStyle(
                                             color: Colors.white
                                                 .withValues(alpha: 0.9),
-                                            fontSize: 14,
+                                            fontSize: 12,
                                           ),
                                         ),
                                       ],
@@ -709,45 +712,101 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                                   ],
                                 ),
                               ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  const Icon(
+                                    Icons.swipe_left_rounded,
+                                    color: Colors.white70,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Swipe for options',
+                                    style: TextStyle(
+                                      color:
+                                          Colors.white.withValues(alpha: 0.7),
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
                         ),
                       ),
-                      //const SizedBox(height: 16),
-                      const SizedBox(height: 8),
-                      /*   const Divider(
-                        color: KenwellColors.primaryGreen,
-                        height: 24,
-                        thickness: 1,
-                        indent: 16,
-                        endIndent: 16,
-                      ),
-                      const SizedBox(height: 16), */
+                      const SizedBox(height: 16),
+
+                      // Section title
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 1),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: KenwellModernSectionHeader(
-                            title: 'Allocate Event',
-                            subtitle:
-                                'Manage allocations for the ${widget.event.title} event',
-                          ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color:
+                                    theme.primaryColor.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                Icons.event_rounded,
+                                color: theme.primaryColor,
+                                size: 18,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Allocate Event',
+                                    style:
+                                        theme.textTheme.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                      color: const Color(0xFF201C58),
+                                    ),
+                                  ),
+                                  Text(
+                                    widget.event.title,
+                                    style:
+                                        theme.textTheme.bodySmall?.copyWith(
+                                      color: const Color(0xFF6B7280),
+                                      fontSize: 11,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 24),
-                      // Search and filter section with background
+                      const SizedBox(height: 12),
+
+                      // Search and filter card
                       Container(
                         margin: const EdgeInsets.symmetric(horizontal: 16),
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF5F5F5),
-                          borderRadius: BorderRadius.circular(12),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: Colors.grey.shade300,
+                            color: Colors.grey.shade200,
                             width: 1,
                           ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.04),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             UserSearchBar(
                               controller: _searchController,
@@ -759,58 +818,21 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                                 viewModel.clearSearch();
                               },
                             ),
-                            const SizedBox(height: 8),
-                            const Divider(
-                              //color: KenwellColors.primaryGreen,
-                              height: 14,
-                              thickness: 1,
-                              indent: 10,
-                              endIndent: 10,
-                            ),
-                            const SizedBox(height: 8),
-                            // Explanatory label
-                            const Row(
-                              children: [
-                                /*  Icon(
-                                Icons.info_outline,
-                                size: 16,
-                                color: Colors.black,
-                                //color: Colors.grey.shade600,
-                              ), */
-                                SizedBox(width: 6),
-                                Text(
-                                  'Filter User\'s:',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    //color: Colors.grey.shade700,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            // Explanatory label
-                            const Row(
+                            const SizedBox(height: 12),
+                            Row(
                               children: [
                                 Icon(
-                                  Icons.info,
-                                  size: 16,
+                                  Icons.tune_rounded,
+                                  size: 15,
                                   color: KenwellColors.primaryGreen,
-                                  // color: KenwellColors.secondaryNavyDark,
-                                  //color: Colors.black,
-                                  //color: Colors.grey.shade600,
                                 ),
-                                SizedBox(width: 6),
+                                const SizedBox(width: 6),
                                 Text(
-                                  'Scroll the list of roles to view all filters:',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.normal,
-                                    //fontWeight: FontWeight.w600,
-                                    //color: Colors.grey.shade700,
-                                    //color: Colors.black,
-                                    color: KenwellColors.secondaryNavyDark,
+                                  'Filter by role',
+                                  style:
+                                      theme.textTheme.labelMedium?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFF201C58),
                                   ),
                                 ),
                               ],
@@ -822,48 +844,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      const Divider(
-                        color: KenwellColors.primaryGreen,
-                        height: 24,
-                        thickness: 1,
-                        indent: 16,
-                        endIndent: 16,
-                      ),
                       const SizedBox(height: 16),
-
-                      const Row(children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 16),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.info,
-                                      color: KenwellColors.primaryGreen,
-                                      size: 24,
-                                    ),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      'Tap on a user to assign or unassign them from the event:',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.normal,
-                                        color: KenwellColors.secondaryNavy,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ]),
-                      //const SizedBox(height: 8),
                     ],
                   ),
                 ),
@@ -880,14 +861,15 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
                           final user = filteredUsers[index];
-                          return _buildUserCard(user, theme, number: index + 1);
+                          return _buildUserCard(user, theme,
+                              number: index + 1);
                         },
                         childCount: filteredUsers.length,
                       ),
                     ),
                   ),
                 const SliverToBoxAdapter(
-                  child: SizedBox(height: 16),
+                  child: SizedBox(height: 24),
                 ),
               ],
             ),

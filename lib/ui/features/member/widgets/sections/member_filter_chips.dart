@@ -13,42 +13,76 @@ class MemberFilterChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final filters = ['All', 'Male', 'Female'];
 
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: filters.map((filter) {
-        final isSelected = selectedFilter == filter;
-        return FilterChip(
-          label: Text(
-            filter,
-            style: TextStyle(
-              color: isSelected ? Colors.white : const Color(0xFF201C58),
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-              fontSize: 13,
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: filters.map((filter) {
+          final isSelected = selectedFilter == filter;
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: GestureDetector(
+              onTap: () => onFilterChanged(filter),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeInOut,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                decoration: BoxDecoration(
+                  gradient: isSelected
+                      ? LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            theme.colorScheme.primary,
+                            theme.colorScheme.primary.withValues(alpha: 0.85),
+                          ],
+                        )
+                      : null,
+                  color: isSelected ? null : Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: isSelected
+                        ? theme.colorScheme.primary
+                        : Colors.grey.shade300,
+                    width: isSelected ? 2 : 1.5,
+                  ),
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: theme.colorScheme.primary
+                                .withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ]
+                      : [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                ),
+                child: Text(
+                  filter,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color:
+                        isSelected ? Colors.white : const Color(0xFF201C58),
+                    fontWeight:
+                        isSelected ? FontWeight.w700 : FontWeight.w500,
+                    fontSize: 13,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+              ),
             ),
-          ),
-          selected: isSelected,
-          onSelected: (selected) {
-            if (selected) {
-              onFilterChanged(filter);
-            }
-          },
-          backgroundColor: Colors.white,
-          selectedColor: const Color(0xFF201C58),
-          checkmarkColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-            side: BorderSide(
-              color:
-                  isSelected ? const Color(0xFF201C58) : Colors.grey.shade400,
-              width: 1,
-            ),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        );
-      }).toList(),
+          );
+        }).toList(),
+      ),
     );
   }
 }

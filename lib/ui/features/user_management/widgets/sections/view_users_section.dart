@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
 import 'package:provider/provider.dart';
 import '../../../../../domain/models/user_model.dart';
 import '../../../../../domain/constants/role_permissions.dart';
@@ -26,7 +25,6 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
   @override
   void initState() {
     super.initState();
-    // Load users when section is created
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<UserManagementViewModel>().loadUsers();
     });
@@ -52,42 +50,75 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 48,
+              width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: theme.colorScheme.outline,
+                color: Colors.grey.shade300,
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: theme.primaryColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(Icons.person_rounded,
+                      color: theme.primaryColor, size: 22),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${user.firstName} ${user.lastName}',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF201C58),
+                        ),
+                      ),
+                      Text(
+                        user.email,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: const Color(0xFF6B7280),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 16),
-            Text(
-              '${user.firstName} ${user.lastName}',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              user.email,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 24),
+            const Divider(),
             if (canResetPassword)
               ListTile(
-                leading:
-                    Icon(Icons.lock_reset, color: theme.colorScheme.primary),
-                title:
-                    Text('Reset Password', style: theme.textTheme.bodyMedium),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(Icons.lock_reset_rounded,
+                      color: theme.colorScheme.primary, size: 18),
+                ),
+                title: const Text('Reset Password'),
+                subtitle:
+                    const Text('Send password reset link to this user\'s email'),
                 onTap: () {
                   context.pop();
                   _resetPassword(user, viewModel);
@@ -95,13 +126,22 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
               ),
             if (canDelete)
               ListTile(
-                leading: Icon(Icons.delete, color: theme.colorScheme.error),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.error.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(Icons.delete_rounded,
+                      color: theme.colorScheme.error, size: 18),
+                ),
                 title: Text(
                   'Delete User',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.error,
-                  ),
+                  style: TextStyle(color: theme.colorScheme.error),
                 ),
+                subtitle: const Text('Permanently remove this user'),
                 onTap: () {
                   context.pop();
                   _deleteUser(user, viewModel);
@@ -117,7 +157,6 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                   ),
                 ),
               ),
-            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -262,70 +301,38 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
     }
   }
 
-  Widget _buildEmptyState(ThemeData theme) {
+  Widget _buildEmptyState(ThemeData theme, String title, String message) {
     return Center(
-      child: Container(
-        margin: const EdgeInsets.all(24),
-        padding: const EdgeInsets.all(32),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.white,
-              theme.primaryColor.withValues(alpha: 0.03),
-            ],
-          ),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: theme.primaryColor.withValues(alpha: 0.15),
-            width: 1.5,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: theme.primaryColor.withValues(alpha: 0.08),
-              blurRadius: 16,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    theme.primaryColor.withValues(alpha: 0.15),
-                    theme.primaryColor.withValues(alpha: 0.08),
-                  ],
-                ),
+                color: theme.primaryColor.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.people_outline_rounded,
                 color: theme.primaryColor,
-                size: 56,
+                size: 48,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
             Text(
-              'No users found',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w800,
+              title,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
                 color: const Color(0xFF201C58),
-                letterSpacing: -0.5,
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             Text(
-              'Try adjusting your search or filter',
+              message,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: const Color(0xFF6B7280),
-                fontWeight: FontWeight.w500,
               ),
               textAlign: TextAlign.center,
             ),
@@ -345,92 +352,12 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (viewModel.users.isEmpty) {
-          return Center(
-            child: Container(
-              margin: const EdgeInsets.all(24),
-              padding: const EdgeInsets.all(40),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.white,
-                    theme.primaryColor.withValues(alpha: 0.05),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: theme.primaryColor.withValues(alpha: 0.2),
-                  width: 2,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: theme.primaryColor.withValues(alpha: 0.1),
-                    blurRadius: 20,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          theme.primaryColor.withValues(alpha: 0.2),
-                          theme.primaryColor.withValues(alpha: 0.1),
-                        ],
-                      ),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: theme.primaryColor.withValues(alpha: 0.2),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Icon(
-                      Icons.people_outline_rounded,
-                      size: 64,
-                      color: theme.primaryColor,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    'No users found',
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: const Color(0xFF201C58),
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Create your first user to get started',
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: const Color(0xFF6B7280),
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
-
         // Get filtered users and stats
         final filteredUsers = viewModel.filteredUsers;
         final totalUsers = viewModel.users.length;
         final verifiedCount = viewModel.verifiedUsersCount;
         final unverifiedCount = viewModel.unverifiedUsersCount;
-        final filterActive = viewModel.selectedFilter != 'All' ||
+        final filterActive = viewModel.selectedFilter != 'all' ||
             viewModel.searchQuery.isNotEmpty;
 
         return RefreshIndicator(
@@ -440,17 +367,16 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
             slivers: [
               SliverToBoxAdapter(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // const AppLogo(size: 200),
-
                     const SizedBox(height: 16),
 
-                    // Stats header with modern design
                     // Stats header
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: GradientContainer.purpleGreen(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 14),
                         child: Row(
                           children: [
                             Container(
@@ -460,59 +386,58 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: const Icon(
-                                Icons.people,
+                                Icons.people_rounded,
                                 color: Colors.white,
-                                size: 18,
+                                size: 20,
                               ),
                             ),
-                            const SizedBox(width: 16),
+                            const SizedBox(width: 14),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // Show filter status and user counts
                                   Text(
                                     filterActive
-                                        ? 'Showing Users: ${filteredUsers.length} of $totalUsers'
+                                        ? 'Showing ${filteredUsers.length} of $totalUsers Users'
                                         : '$totalUsers Total Users',
                                     style: const TextStyle(
                                       color: Colors.white,
-                                      fontSize: 16,
+                                      fontSize: 15,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
+                                  const SizedBox(height: 3),
                                   Row(
                                     children: [
                                       Icon(
-                                        Icons.verified,
+                                        Icons.verified_rounded,
                                         color:
                                             Colors.white.withValues(alpha: 0.9),
-                                        size: 16,
+                                        size: 13,
                                       ),
-                                      const SizedBox(width: 4),
+                                      const SizedBox(width: 3),
                                       Text(
                                         '$verifiedCount verified',
                                         style: TextStyle(
                                           color: Colors.white
                                               .withValues(alpha: 0.9),
-                                          fontSize: 14,
+                                          fontSize: 12,
                                         ),
                                       ),
-                                      const SizedBox(width: 12),
+                                      const SizedBox(width: 10),
                                       Icon(
-                                        Icons.error_outline,
+                                        Icons.error_outline_rounded,
                                         color:
                                             Colors.white.withValues(alpha: 0.9),
-                                        size: 16,
+                                        size: 13,
                                       ),
-                                      const SizedBox(width: 4),
+                                      const SizedBox(width: 3),
                                       Text(
-                                        '$unverifiedCount not verified',
+                                        '$unverifiedCount unverified',
                                         style: TextStyle(
                                           color: Colors.white
                                               .withValues(alpha: 0.9),
-                                          fontSize: 14,
+                                          fontSize: 12,
                                         ),
                                       ),
                                     ],
@@ -520,59 +445,93 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                                 ],
                               ),
                             ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                const Icon(
+                                  Icons.swipe_left_rounded,
+                                  color: Colors.white70,
+                                  size: 16,
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Swipe for options',
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.7),
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
                     ),
-                    // const SizedBox(height: 8),
-                    const SizedBox(height: 8),
-                    /*   const Divider(
-                      color: KenwellColors.primaryGreen,
-                      height: 24,
-                      thickness: 1,
-                      indent: 16,
-                      endIndent: 16,
-                    ),
-                    const SizedBox(height: 16), */
+                    const SizedBox(height: 16),
 
-                    //Modern Section Title and Subtitle
-                    const Row(
-                      children: [
-                        Expanded(
-                          child: Column(
+                    // Section title
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: theme.primaryColor.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.group_rounded,
+                              color: theme.primaryColor,
+                              size: 18,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 1),
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: KenwellModernSectionHeader(
-                                    title: 'Registered Users',
-                                    subtitle:
-                                        'View and manage all registered users',
-                                  ),
+                              Text(
+                                'Registered Users',
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: const Color(0xFF201C58),
+                                ),
+                              ),
+                              Text(
+                                'Tap a user card to long-press for more options',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: const Color(0xFF6B7280),
+                                  fontSize: 11,
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 12),
 
-                    // Search and filter section with background
+                    // Search and filter card
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 16),
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF5F5F5),
-                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: Colors.grey.shade300,
+                          color: Colors.grey.shade200,
                           width: 1,
                         ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.04),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           UserSearchBar(
                             controller: _searchController,
@@ -584,65 +543,24 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                               viewModel.clearSearch();
                             },
                           ),
-
-                          const SizedBox(height: 8),
-
-                          const Divider(
-                            //color: KenwellColors.primaryGreen,
-                            height: 14,
-                            thickness: 1,
-                            indent: 10,
-                            endIndent: 10,
-                          ),
-                          const SizedBox(height: 8),
-                          // Explanatory label
-                          const Row(
-                            children: [
-                              /*  Icon(
-                                Icons.info_outline,
-                                size: 16,
-                                color: Colors.black,
-                                //color: Colors.grey.shade600,
-                              ), */
-                              SizedBox(width: 6),
-                              Text(
-                                'Filter User\'s:',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  //color: Colors.grey.shade700,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          // Explanatory label
-                          const Row(
+                          const SizedBox(height: 12),
+                          Row(
                             children: [
                               Icon(
-                                Icons.info,
-                                size: 16,
+                                Icons.tune_rounded,
+                                size: 15,
                                 color: KenwellColors.primaryGreen,
-                                // color: KenwellColors.secondaryNavyDark,
-                                //color: Colors.black,
-                                //color: Colors.grey.shade600,
                               ),
-                              SizedBox(width: 6),
+                              const SizedBox(width: 6),
                               Text(
-                                'Scroll the list of roles to view all filters:',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.normal,
-                                  //fontWeight: FontWeight.w600,
-                                  //color: Colors.grey.shade700,
-                                  //color: Colors.black,
-                                  color: KenwellColors.secondaryNavyDark,
+                                'Filter by role',
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xFF201C58),
                                 ),
                               ),
                             ],
                           ),
-
                           UserFilterChips(
                             selectedFilter: viewModel.selectedFilter,
                             onFilterChanged: viewModel.setFilter,
@@ -650,60 +568,26 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 8),
-
-                    //Divider
-                    const Divider(
-                      color: KenwellColors.primaryGreen,
-                      height: 24,
-                      thickness: 1,
-                      indent: 16,
-                      endIndent: 16,
-                    ),
-
                     const SizedBox(height: 16),
-
-                    const Row(children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 16),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.info,
-                                    color: KenwellColors.primaryGreen,
-                                    size: 24,
-                                  ),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    'Tap on a user to view extra options:',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.normal,
-                                      color: KenwellColors.secondaryNavy,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ]),
                   ],
                 ),
               ),
 
-              // User list
-              if (filteredUsers.isEmpty)
+              // User list or empty states
+              if (viewModel.users.isEmpty)
                 SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 100),
-                    child: _buildEmptyState(theme),
+                  child: _buildEmptyState(
+                    theme,
+                    'No users yet',
+                    'Create your first user to get started',
+                  ),
+                )
+              else if (filteredUsers.isEmpty)
+                SliverToBoxAdapter(
+                  child: _buildEmptyState(
+                    theme,
+                    'No users found',
+                    'Try adjusting your search or filter',
                   ),
                 )
               else
@@ -715,7 +599,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                         final user = filteredUsers[index];
                         return UserCardWidget(
                           user: user,
-                          number: index + 1, // Add sequential numbering
+                          number: index + 1,
                           onTap: () => _showUserOptions(user),
                           onResetPassword: () =>
                               _resetPassword(user, viewModel),
@@ -727,7 +611,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                   ),
                 ),
               const SliverToBoxAdapter(
-                child: SizedBox(height: 16),
+                child: SizedBox(height: 24),
               ),
             ],
           ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
 import 'package:provider/provider.dart';
 import '../../../../../domain/models/member.dart';
 import '../../../../../domain/constants/role_permissions.dart';
@@ -27,7 +26,6 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
   @override
   void initState() {
     super.initState();
-    // Load members when section is created
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<MemberDetailsViewModel>().loadMembers();
     });
@@ -44,50 +42,79 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
     final viewModel = context.read<MemberDetailsViewModel>();
     final profileVM = context.read<ProfileViewModel>();
 
-    // Check permissions
     final canDelete =
         RolePermissions.canAccessFeature(profileVM.role, 'delete_member');
 
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 48,
+              width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: theme.colorScheme.outline,
+                color: Colors.grey.shade300,
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: theme.primaryColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(Icons.person_rounded,
+                      color: theme.primaryColor, size: 22),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${member.name} ${member.surname}',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF201C58),
+                        ),
+                      ),
+                      Text(
+                        member.email ?? 'No email',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: const Color(0xFF6B7280),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 16),
-            Text(
-              '${member.name} ${member.surname}',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              member.email ?? 'No email',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 24),
-            // View Events option
+            const Divider(),
             ListTile(
-              leading: Icon(Icons.event, color: theme.colorScheme.primary),
-              title: Text(
-                'View Events',
-                style: theme.textTheme.bodyMedium,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(Icons.event_rounded,
+                    color: theme.colorScheme.primary, size: 18),
               ),
+              title: const Text('View Events'),
+              subtitle: const Text('See events assigned to this member'),
               onTap: () {
                 context.pop();
                 _navigateToMemberEvents(member);
@@ -95,29 +122,27 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
             ),
             if (canDelete)
               ListTile(
-                leading: Icon(Icons.delete, color: theme.colorScheme.error),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.error.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(Icons.delete_rounded,
+                      color: theme.colorScheme.error, size: 18),
+                ),
                 title: Text(
                   'Delete Member',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.error,
-                  ),
+                  style: TextStyle(color: theme.colorScheme.error),
                 ),
+                subtitle: const Text('Permanently remove this member'),
                 onTap: () {
                   context.pop();
                   _deleteMember(member, viewModel);
                 },
               ),
-            if (!canDelete)
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  'Tap an option above',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -190,38 +215,49 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text(viewModel.errorMessage ?? 'Failed to delete member')),
+            content:
+                Text(viewModel.errorMessage ?? 'Failed to delete member')),
       );
     }
   }
 
-  Widget _buildEmptyState(ThemeData theme) {
+  Widget _buildEmptyState(ThemeData theme, String title, String message) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.people_outline,
-            color: theme.colorScheme.onSurfaceVariant,
-            size: 64,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'No members found',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onSurface,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: theme.primaryColor.withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.people_outline_rounded,
+                color: theme.primaryColor,
+                size: 48,
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Try adjusting your search or filter',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF201C58),
+              ),
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+            const SizedBox(height: 8),
+            Text(
+              message,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: const Color(0xFF6B7280),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -236,11 +272,6 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (viewModel.members.isEmpty) {
-          return _buildEmptyState(theme);
-        }
-
-        // Get filtered members and stats
         final filteredMembers = viewModel.filteredMembers;
         final totalMembers = viewModel.members.length;
         final filterActive = viewModel.selectedFilter != 'All' ||
@@ -253,14 +284,16 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
             slivers: [
               SliverToBoxAdapter(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    //const AppLogo(size: 200),
+                    const SizedBox(height: 16),
 
-                    const SizedBox(height: 16), // Stats header
+                    // Stats header
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: GradientContainer.purpleGreen(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 14),
                         child: Row(
                           children: [
                             Container(
@@ -270,85 +303,135 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: const Icon(
-                                Icons.people,
+                                Icons.people_rounded,
                                 color: Colors.white,
-                                size: 18,
+                                size: 20,
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 14),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // Show filter status and member counts
                                   Text(
                                     filterActive
-                                        ? 'Showing Members: ${filteredMembers.length} of $totalMembers'
+                                        ? 'Showing ${filteredMembers.length} of $totalMembers Members'
                                         : '$totalMembers Total Members',
                                     style: const TextStyle(
                                       color: Colors.white,
-                                      fontSize: 16,
+                                      fontSize: 15,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                const Icon(
+                                  Icons.swipe_left_rounded,
+                                  color: Colors.white70,
+                                  size: 16,
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Swipe for options',
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.7),
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
                     ),
-                    //const SizedBox(height: 8),
+                    const SizedBox(height: 16),
 
-                    const SizedBox(height: 8),
-                    /*  const Divider(
-                      color: KenwellColors.primaryGreen,
-                      height: 24,
-                      thickness: 1,
-                      indent: 16,
-                      endIndent: 16,
-                    ),
-                    const SizedBox(height: 16), */
-
-                    //Modern Section Title and Subtitle
-                    const Row(
-                      children: [
-                        Expanded(
-                          child: Column(
+                    // Section title
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: theme.primaryColor.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.group_rounded,
+                              color: theme.primaryColor,
+                              size: 18,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 1),
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: KenwellModernSectionHeader(
-                                    title: 'Registered Members',
-                                    subtitle:
-                                        'View and manage all registered members',
-                                  ),
+                              Text(
+                                'Registered Members',
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: const Color(0xFF201C58),
+                                ),
+                              ),
+                              Text(
+                                'Swipe or long-press for options',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: const Color(0xFF6B7280),
+                                  fontSize: 11,
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 12),
 
-                    // Search and filter section with background
+                    // Search and filter card
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 16),
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF5F5F5),
-                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: Colors.grey.shade300,
+                          color: Colors.grey.shade200,
                           width: 1,
                         ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.04),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.search_rounded,
+                                size: 18,
+                                color: theme.primaryColor,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                'Search Members',
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xFF201C58),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
                           MemberSearchBar(
                             controller: _searchController,
                             searchQuery: viewModel.searchQuery,
@@ -359,28 +442,30 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                               viewModel.clearSearch();
                             },
                           ),
-                          const SizedBox(height: 8),
-                          /*   // Explanatory label
-                          const Row(
+                          const SizedBox(height: 12),
+                          Divider(
+                            height: 1,
+                            thickness: 1,
+                            color: Colors.grey.shade100,
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
                             children: [
                               Icon(
-                                Icons.info_outline,
-                                size: 16,
-                                color: Colors.black,
-                                //color: Colors.grey.shade600,
+                                Icons.tune_rounded,
+                                size: 15,
+                                color: KenwellColors.primaryGreen,
                               ),
-                              SizedBox(width: 6),
+                              const SizedBox(width: 6),
                               Text(
-                                'Filter Member\'s:',
-                                style: TextStyle(
-                                  fontSize: 14,
+                                'Filter by gender',
+                                style: theme.textTheme.labelMedium?.copyWith(
                                   fontWeight: FontWeight.w600,
-                                  //color: Colors.grey.shade700,
-                                  color: Colors.black,
+                                  color: const Color(0xFF201C58),
                                 ),
                               ),
                             ],
-                          ), */
+                          ),
                           MemberFilterChips(
                             selectedFilter: viewModel.selectedFilter,
                             onFilterChanged: viewModel.setFilter,
@@ -388,56 +473,26 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    const Divider(
-                      color: KenwellColors.primaryGreen,
-                      height: 24,
-                      thickness: 1,
-                      indent: 16,
-                      endIndent: 16,
-                    ),
                     const SizedBox(height: 16),
-
-                    const Row(children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 16),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.info,
-                                    color: KenwellColors.primaryGreen,
-                                    size: 24,
-                                  ),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    'Tap on a user to view extra options:',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.normal,
-                                      color: KenwellColors.secondaryNavy,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ]),
                   ],
                 ),
               ),
-              // Member list
-              if (filteredMembers.isEmpty)
+
+              // Member list or empty states
+              if (viewModel.members.isEmpty)
                 SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 100),
-                    child: _buildEmptyState(theme),
+                  child: _buildEmptyState(
+                    theme,
+                    'No members yet',
+                    'Create your first member to get started',
+                  ),
+                )
+              else if (filteredMembers.isEmpty)
+                SliverToBoxAdapter(
+                  child: _buildEmptyState(
+                    theme,
+                    'No members found',
+                    'Try adjusting your search or filter',
                   ),
                 )
               else
@@ -449,10 +504,11 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                         final member = filteredMembers[index];
                         return MemberCardWidget(
                           member: member,
-                          number: index + 1, // Add sequential numbering
+                          number: index + 1,
                           onTap: () => _showMemberOptions(member),
                           onDelete: () => _deleteMember(member, viewModel),
-                          onViewDetails: () => _navigateToMemberEvents(member),
+                          onViewDetails: () =>
+                              _navigateToMemberEvents(member),
                         );
                       },
                       childCount: filteredMembers.length,
@@ -460,7 +516,7 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                   ),
                 ),
               const SliverToBoxAdapter(
-                child: SizedBox(height: 16),
+                child: SizedBox(height: 24),
               ),
             ],
           ),
