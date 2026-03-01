@@ -430,7 +430,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                               ),
                               const SizedBox(width: 3),
                               Text(
-                                isAssigned ? 'Assigned' : 'Not Assigned',
+                                isAssigned ? 'Assigned' : 'Unassigned',
                                 style: TextStyle(
                                   color: isAssigned
                                       ? const Color(0xFF10B981)

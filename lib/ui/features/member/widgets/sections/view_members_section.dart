@@ -379,7 +379,7 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                                 ),
                               ),
                               Text(
-                                'Long-press a card for more options',
+                                'Swipe or long-press for options',
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: const Color(0xFF6B7280),
                                   fontSize: 11,
