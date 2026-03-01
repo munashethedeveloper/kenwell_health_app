@@ -212,7 +212,7 @@ class EventDetailsScreen extends StatelessWidget {
               const Divider(height: 1),
               _buildDetailRow('Mobile Booths', event.mobileBooths, theme),
               const Divider(height: 1),
-              _buildDetailRow('Medical Aid', event.medicalAid, theme),
+              _buildDetailRow('Medical Aid Option', event.medicalAid, theme),
               if (event.description != null &&
                   event.description!.isNotEmpty) ...[
                 const Divider(height: 1),
