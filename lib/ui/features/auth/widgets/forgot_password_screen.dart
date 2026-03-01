@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
 import '../../../../data/services/auth_service.dart';
 import '../../../shared/ui/colours/kenwell_colours.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
-import '../../../shared/ui/form/kenwell_form_card.dart';
-import '../../../shared/ui/form/kenwell_form_styles.dart';
-import '../../../shared/ui/form/kenwell_modern_section_header.dart';
-import '../../../shared/ui/logo/app_logo.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -103,61 +98,116 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //App bar
-      appBar: const KenwellAppBar(
-        title: 'Forgot Password',
-        titleColor: Colors.white,
-        titleStyle: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-        ),
-        automaticallyImplyLeading: true,
-      ),
-      // Body with form
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            // Form fields and buttons
-            children: [
-              const SizedBox(height: 40),
-              //Custom app logo
-              const AppLogo(size: 250),
-              const SizedBox(height: 24),
-              // Section header
-              const KenwellModernSectionHeader(
-                title: 'Reset Password',
-                subtitle:
-                    'Enter the email address associated with your account and we will send you a reset link.',
-                icon: Icons.lock_reset,
+      backgroundColor: const Color(0xFF201C58),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Back button row
+            Align(
+              alignment: Alignment.centerLeft,
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                    color: Colors.white),
+                onPressed: () => context.pop(),
               ),
-              const SizedBox(height: 24),
-              // Email field
-              KenwellFormCard(
-                title: 'Account Details',
-                child: KenwellTextField(
-                  label: 'Email',
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: KenwellFormStyles.decoration(
-                    label: 'Email',
-                    hint: 'Enter your email',
+            ),
+
+            // Hero section — icon + title + subtitle on navy background
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+              child: Column(
+                children: [
+                  Container(
+                    width: 88,
+                    height: 88,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.12),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.lock_reset_rounded,
+                      color: Colors.white,
+                      size: 44,
+                    ),
                   ),
-                  validator: Validators.validateEmail,
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Forgot Password?',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Enter your email and we\'ll send\nyou a reset link.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Form section — white panel with rounded top corners
+            Expanded(
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(32),
+                  ),
+                ),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Reset Password',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF201C58),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        const Text(
+                          'Enter the email associated with your account.',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF6B7280),
+                          ),
+                        ),
+                        const SizedBox(height: 28),
+                        // Email field
+                        KenwellTextField(
+                          label: 'Email',
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          padding: EdgeInsets.zero,
+                          validator: Validators.validateEmail,
+                        ),
+                        const SizedBox(height: 24),
+                        // Reset button
+                        CustomPrimaryButton(
+                          label: 'Send Reset Link',
+                          onPressed: _resetPassword,
+                          isBusy: _isLoading,
+                          backgroundColor: KenwellColors.primaryGreen,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-              const SizedBox(height: 20),
-              // Reset button
-              CustomPrimaryButton(
-                label: 'Send Reset Link',
-                onPressed: _resetPassword,
-                isBusy: _isLoading,
-                backgroundColor: KenwellColors.primaryGreen,
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
