@@ -230,6 +230,32 @@ class _StatsReportScreenState extends State<StatsReportScreen>
     }
     //final sortedMonths = eventsByMonth.keys.toList()..sort();
 
+    // ── Screening Performance aggregate metrics ───────────────────────────────
+    final totalNurses =
+        events.fold<int>(0, (sum, e) => sum + e.nurses);
+    final avgScreenedPerEvent =
+        events.isNotEmpty ? (totalScreened / events.length) : 0.0;
+    final avgScreeningRate = totalExpected > 0
+        ? (totalScreened / totalExpected * 100)
+        : 0.0;
+    final avgScreenedPerNurse =
+        totalNurses > 0 ? (totalScreened / totalNurses) : 0.0;
+
+    // Tally how often each service appears across events
+    final Map<String, int> serviceFrequency = {};
+    for (final event in events) {
+      if (event.servicesRequested.isEmpty) continue;
+      for (final service in event.servicesRequested.split(',')) {
+        final s = service.trim();
+        if (s.isNotEmpty) {
+          serviceFrequency[s] = (serviceFrequency[s] ?? 0) + 1;
+        }
+      }
+    }
+    final topServices = serviceFrequency.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    // ─────────────────────────────────────────────────────────────────────────
+
     return Scaffold(
         appBar: KenwellAppBar(
           title: 'KenWell365',
@@ -607,6 +633,106 @@ class _StatsReportScreenState extends State<StatsReportScreen>
                   ],
                 ),
                 const SizedBox(height: 24),
+
+                // ── Screening Performance section ─────────────────────────
+                const KenwellModernSectionHeader(
+                  title: 'Screening Performance',
+                  subtitle:
+                      'Aggregate metrics across the selected events',
+                  icon: Icons.bar_chart,
+                ),
+                const SizedBox(height: 16),
+
+                // Row A: Avg Screening Rate + Total Nurses Deployed
+                Row(
+                  children: [
+                    Expanded(
+                      child: _StatCard(
+                        icon: Icons.percent,
+                        title: 'Avg. Screening Rate',
+                        value: events.isEmpty
+                            ? 'N/A'
+                            : '${avgScreeningRate.toStringAsFixed(1)}%',
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _StatCard(
+                        icon: Icons.medical_services_outlined,
+                        title: 'Nurses Deployed',
+                        value: totalNurses.toString(),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+
+                // Row B: Avg Screened per Event + Avg Screened per Nurse
+                Row(
+                  children: [
+                    Expanded(
+                      child: _StatCard(
+                        icon: Icons.person_search,
+                        title: 'Avg. Screened / Event',
+                        value: events.isEmpty
+                            ? 'N/A'
+                            : avgScreenedPerEvent.toStringAsFixed(1),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _StatCard(
+                        icon: Icons.speed,
+                        title: 'Avg. Screened / Nurse',
+                        value: totalNurses == 0
+                            ? 'N/A'
+                            : avgScreenedPerNurse.toStringAsFixed(1),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Top services card (always visible when there are events)
+                if (topServices.isNotEmpty) ...[
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: KenwellFormCard(
+                      title: 'Most Popular Services',
+                      child: Builder(builder: (context) {
+                        final top5 = topServices.take(5).toList();
+                        return Column(
+                          children: top5.map((entry) {
+                            final isLast = entry == top5.last;
+                            return Column(
+                              children: [
+                                _buildDetailRow(
+                                    entry.key,
+                                    entry.value,
+                                    Icons.health_and_safety_outlined,
+                                    theme.primaryColor,
+                                    theme),
+                                if (!isLast) const Divider(height: 20),
+                              ],
+                            );
+                          }).toList(),
+                        );
+                      }),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+                // ─────────────────────────────────────────────────────────
 
                 // HIGH PRIORITY: Events by Status - Only show when filters are active
                 if (_hasActiveFilters) ...[
