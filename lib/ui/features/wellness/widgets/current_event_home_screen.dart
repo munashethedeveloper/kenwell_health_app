@@ -41,57 +41,46 @@ class CurrentEventHomeScreen extends StatelessWidget {
                 ),
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Header row with icon and title
+                  // Icon centered at top
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: theme.primaryColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.event,
+                      color: KenwellColors.secondaryNavyDark,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // Title centered
+                  Text(
+                    event.title,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: KenwellColors.secondaryNavyDark,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  // Date row centered
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: theme.primaryColor.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(
-                          Icons.event,
-                          //color: theme.primaryColor,
-                          color: KenwellColors.secondaryNavyDark,
-                          size: 20,
-                        ),
+                      const Icon(
+                        Icons.calendar_today,
+                        size: 16,
+                        color: KenwellColors.secondaryNavyDark,
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              event.title,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                //color: theme.primaryColor,
-                                color: KenwellColors.secondaryNavyDark,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.calendar_today,
-                                  size: 14,
-                                  //color: Colors.grey[600],
-                                  color: KenwellColors.secondaryNavyDark,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '${event.date.day}/${event.date.month}/${event.date.year}',
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    //color: Colors.grey[600],
-                                    color: KenwellColors.secondaryNavyDark,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                      const SizedBox(width: 4),
+                      Text(
+                        '${event.date.day}/${event.date.month}/${event.date.year}',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: KenwellColors.secondaryNavyDark,
                         ),
                       ),
                     ],
@@ -99,17 +88,16 @@ class CurrentEventHomeScreen extends StatelessWidget {
                   if (event.venue.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        //Icon(Icons.business, size: 16, color: Colors.grey[700]),
                         const Icon(Icons.business,
                             size: 16, color: KenwellColors.secondaryNavyDark),
                         const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            event.venue,
-                            style: const TextStyle(
-                              color: KenwellColors.secondaryNavyDark,
-                            ),
+                        Text(
+                          event.venue,
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: KenwellColors.secondaryNavyDark,
                           ),
                         ),
                       ],
@@ -159,6 +147,7 @@ class CurrentEventHomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             const Divider(
+              color: KenwellColors.primaryGreen,
               height: 24,
               thickness: 1,
               indent: 16,

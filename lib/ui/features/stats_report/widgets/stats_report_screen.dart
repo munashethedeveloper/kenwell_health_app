@@ -29,7 +29,6 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
   String? _selectedProvince;
   DateTime? _startDate;
   DateTime? _endDate;
-  bool _isFilterExpanded = false;
 
   @override
   void initState() {
@@ -265,51 +264,21 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                   icon: Icons.analytics_outlined,
                 ),
 
-                const SizedBox(height: 32),
+                const SizedBox(height: 16),
 
-                // Enhanced Search Field with shadow
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF5F5F5),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.grey.shade300,
-                      width: 1,
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      const Row(
-                        children: [
-                          Icon(
-                            Icons.info_outline,
-                            size: 16,
-                            //color: Colors.grey.shade600,
-                            color: Colors.black,
-                          ),
-                          SizedBox(width: 6),
-                          Text(
-                            'Search & Filter Events:',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              //color: Colors.grey.shade700,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      TextField(
+                // Search bar with inline filter button
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: TextField(
                         controller: _searchController,
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
                         decoration: InputDecoration(
-                          hintText: 'Enter event title to search...',
+                          hintText: 'Search events...',
                           hintStyle: TextStyle(
                             color: Colors.grey.shade500,
                             fontSize: 14,
@@ -350,444 +319,122 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                           ),
                         ),
                       ),
-
-                      const SizedBox(height: 16),
-
-                      const Divider(
-                        //color: KenwellColors.primaryGreen,
-                        height: 14,
-                        thickness: 1,
-                        indent: 10,
-                        endIndent: 10,
-                      ),
-
-                      // Modern Filter Section
-                      Card(
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
+                    ),
+                    const SizedBox(width: 8),
+                    // Small filter button with active count badge
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Material(
+                          color: _hasActiveFilters
+                              ? theme.primaryColor
+                              : Colors.white,
                           borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(
-                            color: Colors.grey.shade300,
-                            width: 1,
+                          child: InkWell(
+                            onTap: () => _showFilterBottomSheet(
+                                context, theme, allEvents),
+                            borderRadius: BorderRadius.circular(12),
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: _hasActiveFilters
+                                      ? theme.primaryColor
+                                      : Colors.grey.shade300,
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.tune,
+                                size: 22,
+                                color: _hasActiveFilters
+                                    ? Colors.white
+                                    : Colors.grey[700],
+                              ),
+                            ),
                           ),
                         ),
-                        child: Column(
-                          children: [
-                            // Filter Header
-                            InkWell(
-                              onTap: () {
-                                setState(() {
-                                  _isFilterExpanded = !_isFilterExpanded;
-                                });
-                              },
-                              borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(12),
+                        if (_hasActiveFilters)
+                          Positioned(
+                            right: -4,
+                            top: -4,
+                            child: Container(
+                              width: 18,
+                              height: 18,
+                              decoration: BoxDecoration(
+                                color: Colors.red.shade600,
+                                shape: BoxShape.circle,
+                                border:
+                                    Border.all(color: Colors.white, width: 1.5),
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color: theme.primaryColor
-                                            .withValues(alpha: 0.1),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Icon(
-                                        Icons.tune,
-                                        color: theme.primaryColor,
-                                        size: 20,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      'Filters',
-                                      style:
-                                          theme.textTheme.titleMedium?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    if (_hasActiveFilters) ...[
-                                      const SizedBox(width: 8),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                          vertical: 2,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: theme.primaryColor,
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                        ),
-                                        child: Text(
-                                          _getActiveFilterCount().toString(),
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                    const Spacer(),
-                                    if (_hasActiveFilters)
-                                      TextButton.icon(
-                                        onPressed: () {
-                                          setState(() {
-                                            _selectedStatus = null;
-                                            _selectedProvince = null;
-                                            _startDate = null;
-                                            _endDate = null;
-                                          });
-                                        },
-                                        icon: const Icon(Icons.clear_all,
-                                            size: 16),
-                                        label: const Text('Clear'),
-                                        style: TextButton.styleFrom(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                            vertical: 8,
-                                          ),
-                                        ),
-                                      ),
-                                    Icon(
-                                      _isFilterExpanded
-                                          ? Icons.expand_less
-                                          : Icons.expand_more,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ],
+                              child: Center(
+                                child: Text(
+                                  _getActiveFilterCount().toString(),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ),
-                            // Filter Content
-                            if (_isFilterExpanded)
-                              Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[50],
-                                  borderRadius: const BorderRadius.vertical(
-                                    bottom: Radius.circular(12),
-                                  ),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // Status Filter Chips
-                                    Text(
-                                      'Status',
-                                      style:
-                                          theme.textTheme.labelLarge?.copyWith(
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.grey[700],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Wrap(
-                                      spacing: 8,
-                                      runSpacing: 8,
-                                      children: [
-                                        'Scheduled',
-                                        'In Progress',
-                                        'Completed'
-                                      ].map((status) {
-                                        final isSelected =
-                                            _selectedStatus == status;
-                                        return FilterChip(
-                                          label: Text(status),
-                                          selected: isSelected,
-                                          onSelected: (selected) {
-                                            setState(() {
-                                              _selectedStatus =
-                                                  selected ? status : null;
-                                            });
-                                          },
-                                          backgroundColor: Colors.white,
-                                          selectedColor: theme.primaryColor
-                                              .withValues(alpha: 0.2),
-                                          checkmarkColor: theme.primaryColor,
-                                          labelStyle: TextStyle(
-                                            color: isSelected
-                                                ? theme.primaryColor
-                                                : Colors.grey[700],
-                                            fontWeight: isSelected
-                                                ? FontWeight.w600
-                                                : FontWeight.normal,
-                                          ),
-                                          side: BorderSide(
-                                            color: isSelected
-                                                ? theme.primaryColor
-                                                : Colors.grey.shade300,
-                                          ),
-                                        );
-                                      }).toList(),
-                                    ),
-                                    const SizedBox(height: 16),
-
-                                    // Province Filter Chips
-                                    if (allEvents
-                                        .map((e) => e.province)
-                                        .where((p) => p.isNotEmpty)
-                                        .toSet()
-                                        .isNotEmpty) ...[
-                                      Text(
-                                        'Province',
-                                        style: theme.textTheme.labelLarge
-                                            ?.copyWith(
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.grey[700],
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Wrap(
-                                        spacing: 8,
-                                        runSpacing: 8,
-                                        children: (allEvents
-                                                .map((e) => e.province)
-                                                .where((p) => p.isNotEmpty)
-                                                .toSet()
-                                                .toList()
-                                              ..sort())
-                                            .map((province) {
-                                          final isSelected =
-                                              _selectedProvince == province;
-                                          return FilterChip(
-                                            label: Text(province),
-                                            selected: isSelected,
-                                            onSelected: (selected) {
-                                              setState(() {
-                                                _selectedProvince =
-                                                    selected ? province : null;
-                                              });
-                                            },
-                                            backgroundColor: Colors.white,
-                                            selectedColor: theme.primaryColor
-                                                .withValues(alpha: 0.2),
-                                            checkmarkColor: theme.primaryColor,
-                                            labelStyle: TextStyle(
-                                              color: isSelected
-                                                  ? theme.primaryColor
-                                                  : Colors.grey[700],
-                                              fontWeight: isSelected
-                                                  ? FontWeight.w600
-                                                  : FontWeight.normal,
-                                            ),
-                                            side: BorderSide(
-                                              color: isSelected
-                                                  ? theme.primaryColor
-                                                  : Colors.grey.shade300,
-                                            ),
-                                          );
-                                        }).toList(),
-                                      ),
-                                      const SizedBox(height: 16),
-                                    ],
-
-                                    // Date Range Filter
-                                    Text(
-                                      'Date Range',
-                                      style:
-                                          theme.textTheme.labelLarge?.copyWith(
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.grey[700],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: Material(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            child: InkWell(
-                                              onTap: () async {
-                                                final picked =
-                                                    await showDatePicker(
-                                                  context: context,
-                                                  initialDate: _startDate ??
-                                                      DateTime.now(),
-                                                  firstDate: DateTime(2020),
-                                                  lastDate: DateTime(2030),
-                                                );
-                                                if (picked != null) {
-                                                  setState(() {
-                                                    _startDate = picked;
-                                                  });
-                                                }
-                                              },
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  horizontal: 12,
-                                                  vertical: 12,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                    color: _startDate != null
-                                                        ? theme.primaryColor
-                                                        : Colors.grey.shade300,
-                                                  ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                                child: Row(
-                                                  children: [
-                                                    Icon(
-                                                      Icons.calendar_today,
-                                                      size: 16,
-                                                      color: _startDate != null
-                                                          ? theme.primaryColor
-                                                          : Colors.grey[600],
-                                                    ),
-                                                    const SizedBox(width: 8),
-                                                    Expanded(
-                                                      child: Text(
-                                                        _startDate == null
-                                                            ? 'Start Date'
-                                                            : '${_startDate!.day}/${_startDate!.month}/${_startDate!.year}',
-                                                        style: TextStyle(
-                                                          fontSize: 13,
-                                                          color: _startDate !=
-                                                                  null
-                                                              ? theme
-                                                                  .primaryColor
-                                                              : Colors
-                                                                  .grey[600],
-                                                          fontWeight:
-                                                              _startDate != null
-                                                                  ? FontWeight
-                                                                      .w600
-                                                                  : FontWeight
-                                                                      .normal,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    if (_startDate != null)
-                                                      GestureDetector(
-                                                        onTap: () {
-                                                          setState(() {
-                                                            _startDate = null;
-                                                          });
-                                                        },
-                                                        child: Icon(
-                                                          Icons.close,
-                                                          size: 16,
-                                                          color:
-                                                              Colors.grey[600],
-                                                        ),
-                                                      ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Expanded(
-                                          child: Material(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            child: InkWell(
-                                              onTap: () async {
-                                                final picked =
-                                                    await showDatePicker(
-                                                  context: context,
-                                                  initialDate: _endDate ??
-                                                      DateTime.now(),
-                                                  firstDate: DateTime(2020),
-                                                  lastDate: DateTime(2030),
-                                                );
-                                                if (picked != null) {
-                                                  setState(() {
-                                                    _endDate = picked;
-                                                  });
-                                                }
-                                              },
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  horizontal: 12,
-                                                  vertical: 12,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                    color: _endDate != null
-                                                        ? theme.primaryColor
-                                                        : Colors.grey.shade300,
-                                                  ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                                child: Row(
-                                                  children: [
-                                                    Icon(
-                                                      Icons.calendar_today,
-                                                      size: 16,
-                                                      color: _endDate != null
-                                                          ? theme.primaryColor
-                                                          : Colors.grey[600],
-                                                    ),
-                                                    const SizedBox(width: 8),
-                                                    Expanded(
-                                                      child: Text(
-                                                        _endDate == null
-                                                            ? 'End Date'
-                                                            : '${_endDate!.day}/${_endDate!.month}/${_endDate!.year}',
-                                                        style: TextStyle(
-                                                          fontSize: 13,
-                                                          color: _endDate !=
-                                                                  null
-                                                              ? theme
-                                                                  .primaryColor
-                                                              : Colors
-                                                                  .grey[600],
-                                                          fontWeight:
-                                                              _endDate != null
-                                                                  ? FontWeight
-                                                                      .w600
-                                                                  : FontWeight
-                                                                      .normal,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    if (_endDate != null)
-                                                      GestureDetector(
-                                                        onTap: () {
-                                                          setState(() {
-                                                            _endDate = null;
-                                                          });
-                                                        },
-                                                        child: Icon(
-                                                          Icons.close,
-                                                          size: 16,
-                                                          color:
-                                                              Colors.grey[600],
-                                                        ),
-                                                      ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                          ),
+                      ],
+                    ),
+                  ],
                 ),
+                // Active filter chips shown below search bar
+                if (_hasActiveFilters) ...[
+                  const SizedBox(height: 10),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        if (_selectedStatus != null)
+                          _buildActiveFilterChip(
+                            'Status: $_selectedStatus',
+                            () => setState(() => _selectedStatus = null),
+                            theme,
+                          ),
+                        if (_selectedProvince != null)
+                          _buildActiveFilterChip(
+                            'Province: $_selectedProvince',
+                            () => setState(() => _selectedProvince = null),
+                            theme,
+                          ),
+                        if (_startDate != null)
+                          _buildActiveFilterChip(
+                            'From: ${_startDate!.day}/${_startDate!.month}/${_startDate!.year}',
+                            () => setState(() => _startDate = null),
+                            theme,
+                          ),
+                        if (_endDate != null)
+                          _buildActiveFilterChip(
+                            'To: ${_endDate!.day}/${_endDate!.month}/${_endDate!.year}',
+                            () => setState(() => _endDate = null),
+                            theme,
+                          ),
+                        const SizedBox(width: 4),
+                        GestureDetector(
+                          onTap: () => setState(() {
+                            _selectedStatus = null;
+                            _selectedProvince = null;
+                            _startDate = null;
+                            _endDate = null;
+                          }),
+                          child: Text(
+                            'Clear all',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: theme.primaryColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 8),
 
                 // Enhanced search results indicator
@@ -1235,6 +882,342 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
             ),
           ),
         ));
+  }
+
+  void _showFilterBottomSheet(
+      BuildContext context, ThemeData theme, List<dynamic> allEvents) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setSheetState) {
+            return Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              padding: EdgeInsets.fromLTRB(
+                  20, 12, 20, MediaQuery.of(ctx).viewInsets.bottom + 32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Handle bar
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Header
+                  Row(
+                    children: [
+                      Text(
+                        'Filters',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const Spacer(),
+                      if (_hasActiveFilters)
+                        TextButton(
+                          onPressed: () {
+                            setState(() {
+                              _selectedStatus = null;
+                              _selectedProvince = null;
+                              _startDate = null;
+                              _endDate = null;
+                            });
+                            setSheetState(() {});
+                          },
+                          child: const Text('Clear all'),
+                        ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.pop(ctx),
+                      ),
+                    ],
+                  ),
+                  const Divider(),
+                  const SizedBox(height: 8),
+                  // Status
+                  Text(
+                    'Status',
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children:
+                        ['Scheduled', 'In Progress', 'Completed'].map((status) {
+                      final isSelected = _selectedStatus == status;
+                      return FilterChip(
+                        label: Text(status),
+                        selected: isSelected,
+                        onSelected: (selected) {
+                          setState(
+                              () => _selectedStatus = selected ? status : null);
+                          setSheetState(() {});
+                        },
+                        backgroundColor: Colors.white,
+                        selectedColor:
+                            theme.primaryColor.withValues(alpha: 0.2),
+                        checkmarkColor: theme.primaryColor,
+                        labelStyle: TextStyle(
+                          color: isSelected
+                              ? theme.primaryColor
+                              : Colors.grey[700],
+                          fontWeight:
+                              isSelected ? FontWeight.w600 : FontWeight.normal,
+                        ),
+                        side: BorderSide(
+                          color: isSelected
+                              ? theme.primaryColor
+                              : Colors.grey.shade300,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 16),
+                  // Province
+                  if (allEvents
+                      .map((e) => e.province)
+                      .where((p) => p.isNotEmpty)
+                      .toSet()
+                      .isNotEmpty) ...[
+                    Text(
+                      'Province',
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: (allEvents
+                              .map((e) => e.province)
+                              .where((p) => p.isNotEmpty)
+                              .toSet()
+                              .toList()
+                            ..sort())
+                          .map((province) {
+                        final isSelected = _selectedProvince == province;
+                        return FilterChip(
+                          label: Text(province),
+                          selected: isSelected,
+                          onSelected: (selected) {
+                            setState(() =>
+                                _selectedProvince = selected ? province : null);
+                            setSheetState(() {});
+                          },
+                          backgroundColor: Colors.white,
+                          selectedColor:
+                              theme.primaryColor.withValues(alpha: 0.2),
+                          checkmarkColor: theme.primaryColor,
+                          labelStyle: TextStyle(
+                            color: isSelected
+                                ? theme.primaryColor
+                                : Colors.grey[700],
+                            fontWeight: isSelected
+                                ? FontWeight.w600
+                                : FontWeight.normal,
+                          ),
+                          side: BorderSide(
+                            color: isSelected
+                                ? theme.primaryColor
+                                : Colors.grey.shade300,
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                  // Date Range
+                  Text(
+                    'Date Range',
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildDateButton(
+                          label: _startDate == null
+                              ? 'Start Date'
+                              : '${_startDate!.day}/${_startDate!.month}/${_startDate!.year}',
+                          isSet: _startDate != null,
+                          theme: theme,
+                          onTap: () async {
+                            final picked = await showDatePicker(
+                              context: context,
+                              initialDate: _startDate ?? DateTime.now(),
+                              firstDate: DateTime(2020),
+                              lastDate: DateTime(2030),
+                            );
+                            if (picked != null) {
+                              setState(() => _startDate = picked);
+                              setSheetState(() {});
+                            }
+                          },
+                          onClear: _startDate != null
+                              ? () {
+                                  setState(() => _startDate = null);
+                                  setSheetState(() {});
+                                }
+                              : null,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildDateButton(
+                          label: _endDate == null
+                              ? 'End Date'
+                              : '${_endDate!.day}/${_endDate!.month}/${_endDate!.year}',
+                          isSet: _endDate != null,
+                          theme: theme,
+                          onTap: () async {
+                            final picked = await showDatePicker(
+                              context: context,
+                              initialDate: _endDate ?? DateTime.now(),
+                              firstDate: DateTime(2020),
+                              lastDate: DateTime(2030),
+                            );
+                            if (picked != null) {
+                              setState(() => _endDate = picked);
+                              setSheetState(() {});
+                            }
+                          },
+                          onClear: _endDate != null
+                              ? () {
+                                  setState(() => _endDate = null);
+                                  setSheetState(() {});
+                                }
+                              : null,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  // Apply button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: theme.primaryColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Apply Filters',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildActiveFilterChip(
+      String label, VoidCallback onRemove, ThemeData theme) {
+    return Container(
+      margin: const EdgeInsets.only(right: 6),
+      child: Chip(
+        label: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: theme.primaryColor,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        deleteIcon: Icon(Icons.close, size: 14, color: theme.primaryColor),
+        onDeleted: onRemove,
+        backgroundColor: theme.primaryColor.withValues(alpha: 0.1),
+        side: BorderSide(color: theme.primaryColor.withValues(alpha: 0.3)),
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        visualDensity: VisualDensity.compact,
+      ),
+    );
+  }
+
+  Widget _buildDateButton({
+    required String label,
+    required bool isSet,
+    required ThemeData theme,
+    required VoidCallback onTap,
+    VoidCallback? onClear,
+  }) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(8),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: isSet ? theme.primaryColor : Colors.grey.shade300,
+            ),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.calendar_today,
+                size: 16,
+                color: isSet ? theme.primaryColor : Colors.grey[600],
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: isSet ? theme.primaryColor : Colors.grey[600],
+                    fontWeight: isSet ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                ),
+              ),
+              if (onClear != null)
+                GestureDetector(
+                  onTap: onClear,
+                  child: Icon(Icons.close, size: 16, color: Colors.grey[600]),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildDetailRow(

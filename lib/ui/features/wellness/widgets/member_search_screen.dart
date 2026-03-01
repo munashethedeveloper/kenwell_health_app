@@ -5,6 +5,7 @@ import 'package:kenwell_health_app/data/local/app_database.dart';
 import 'package:kenwell_health_app/domain/models/member.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_secondary_button.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_form_card.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
@@ -318,6 +319,7 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
             const SizedBox(height: 8),
 
             const Divider(
+              color: KenwellColors.primaryGreen,
               height: 24,
               thickness: 1,
               indent: 16,
