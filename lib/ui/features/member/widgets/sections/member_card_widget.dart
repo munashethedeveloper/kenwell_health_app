@@ -21,10 +21,9 @@ class MemberCardWidget extends StatelessWidget {
     this.number,
   });
 
-  // Static constants to avoid recreating on each build
   static const Map<String, IconData> _genderIcons = {
-    'Male': Icons.male,
-    'Female': Icons.female,
+    'Male': Icons.male_rounded,
+    'Female': Icons.female_rounded,
   };
 
   static const String _defaultGenderLabel = 'Unknown';
@@ -34,210 +33,170 @@ class MemberCardWidget extends StatelessWidget {
     final theme = Theme.of(context);
 
     final gender = member.gender ?? _defaultGenderLabel;
-    final genderIcon = _genderIcons[gender] ?? Icons.person;
+    final genderIcon = _genderIcons[gender] ?? Icons.person_rounded;
     final idNumber = member.idNumber ?? member.passportNumber;
 
     return Slidable(
-        key: ValueKey(member.id),
-        endActionPane: ActionPane(
-          motion: const ScrollMotion(),
-          children: [
-            if (onViewDetails != null)
-              SlidableAction(
-                onPressed: (_) => onViewDetails!(),
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: theme.colorScheme.onPrimary,
-                icon: Icons.visibility,
-                label: 'View Member Details',
+      key: ValueKey(member.id),
+      endActionPane: ActionPane(
+        motion: const ScrollMotion(),
+        children: [
+          if (onViewDetails != null)
+            SlidableAction(
+              onPressed: (_) => onViewDetails!(),
+              backgroundColor: theme.colorScheme.primary,
+              foregroundColor: theme.colorScheme.onPrimary,
+              icon: Icons.visibility_rounded,
+              label: 'View',
+              borderRadius: onDelete != null
+                  ? const BorderRadius.only(
+                      topLeft: Radius.circular(12),
+                      bottomLeft: Radius.circular(12),
+                    )
+                  : BorderRadius.circular(12),
+            ),
+          if (onDelete != null)
+            SlidableAction(
+              onPressed: (_) => onDelete!(),
+              backgroundColor: theme.colorScheme.error,
+              foregroundColor: theme.colorScheme.onError,
+              icon: Icons.delete_rounded,
+              label: 'Delete',
+              borderRadius: onViewDetails != null
+                  ? const BorderRadius.only(
+                      topRight: Radius.circular(12),
+                      bottomRight: Radius.circular(12),
+                    )
+                  : BorderRadius.circular(12),
+            ),
+        ],
+      ),
+      child: Builder(
+        builder: (context) => GestureDetector(
+          onTap: () {
+            final slidable = Slidable.of(context);
+            final isOpen =
+                slidable?.actionPaneType.value != ActionPaneType.none;
+            if (isOpen) {
+              slidable?.close();
+            } else {
+              slidable?.openEndActionPane();
+            }
+          },
+          onLongPress: onTap,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: theme.primaryColor.withValues(alpha: 0.12),
+                width: 1,
               ),
-            if (onDelete != null)
-              SlidableAction(
-                onPressed: (_) => onDelete!(),
-                backgroundColor: theme.colorScheme.error,
-                foregroundColor: theme.colorScheme.onError,
-                icon: Icons.delete,
-                label: 'Delete Member',
-              ),
-          ],
-        ),
-        child: Builder(
-            builder: (context) => GestureDetector(
-                  onTap: () {
-                    // Toggle the slide menu on tap (open if closed, close if open)
-                    final slidable = Slidable.of(context);
-                    final isOpen =
-                        slidable?.actionPaneType.value != ActionPaneType.none;
-                    if (isOpen) {
-                      slidable?.close();
-                    } else {
-                      slidable?.openEndActionPane();
-                    }
-                  },
-                  onLongPress: onTap,
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              child: Row(
+                children: [
+                  if (number != null) ...[
+                    NumberBadge(number: number!),
+                    const SizedBox(width: 10),
+                  ],
+
+                  // Avatar
+                  Container(
+                    width: 46,
+                    height: 46,
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.white,
-                          theme.primaryColor.withValues(alpha: 0.03),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: theme.primaryColor.withValues(alpha: 0.15),
-                        width: 1.5,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: theme.primaryColor.withValues(alpha: 0.08),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                          spreadRadius: 0,
+                      color: theme.primaryColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      genderIcon,
+                      color: theme.primaryColor,
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+
+                  // Member info
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${member.name} ${member.surname}',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF201C58),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 3),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.badge_outlined,
+                              size: 12,
+                              color: Colors.grey.shade500,
+                            ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                'ID: $idNumber',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: const Color(0xFF6B7280),
+                                  fontSize: 12,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        children: [
-                          // Number badge (if provided)
-                          if (number != null) ...[
-                            NumberBadge(number: number!),
-                            const SizedBox(width: 12),
-                          ],
+                  ),
 
-                          // Modern avatar with icon and gradient background
-                          Container(
-                            width: 48,
-                            height: 48,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  theme.primaryColor.withValues(alpha: 0.2),
-                                  theme.primaryColor.withValues(alpha: 0.1),
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color:
-                                    theme.primaryColor.withValues(alpha: 0.3),
-                                width: 1.5,
-                              ),
-                            ),
-                            child: Icon(
-                              genderIcon,
-                              color: theme.primaryColor,
-                              size: 24,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
+                  const SizedBox(width: 10),
 
-                          // Member Info
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '${member.name} ${member.surname}',
-                                  style: theme.textTheme.bodyLarge?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    //color: const Color(0xFF201C58),
-                                    color: Colors.black,
-                                    letterSpacing: -0.2,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.badge_outlined,
-                                      size: 14,
-                                      color: Colors.grey[600],
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Expanded(
-                                      child: Text(
-                                        'ID: $idNumber',
-                                        style:
-                                            theme.textTheme.bodySmall?.copyWith(
-                                          color: Colors.grey[600],
-                                          fontSize: 13,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(width: 12),
-
-                          // Gender badge with modern styling
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 8),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  Colors.white,
-                                  Colors.white.withValues(alpha: 0.8),
-                                  //const Color(0xFF90C048),
-                                  // const Color(0xFF90C048)
-                                  //.withValues(alpha: 0.8),
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFF90C048)
-                                      .withValues(alpha: 0.3),
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Text(
-                              gender,
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                //color: Colors.white,
-                                //color: Colors.grey[800],
-                                //color: KenwellColors.secondaryNavyDark,
-                                color: Colors.black,
-                                fontSize: 10,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: theme.primaryColor.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Icon(
-                              Icons.chevron_right,
-                              color: theme.primaryColor,
-                              size: 20,
-                            ),
-                          ),
-                        ],
+                  // Gender badge
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: theme.primaryColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: theme.primaryColor.withValues(alpha: 0.2),
+                        width: 1,
+                      ),
+                    ),
+                    child: Text(
+                      gender,
+                      style: TextStyle(
+                        color: theme.primaryColor,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 10,
+                        letterSpacing: 0.3,
                       ),
                     ),
                   ),
-                )));
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

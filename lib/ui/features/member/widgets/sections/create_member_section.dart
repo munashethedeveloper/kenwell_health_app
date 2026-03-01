@@ -11,7 +11,6 @@ import '../../../../shared/ui/form/custom_text_field.dart';
 import '../../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../../shared/ui/form/kenwell_date_field.dart';
 import '../../../../shared/ui/form/kenwell_form_styles.dart';
-import '../../../../shared/ui/logo/app_logo.dart';
 import '../../view_model/member_registration_view_model.dart';
 
 /// Create member form section
@@ -68,30 +67,21 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 16),
-                  const AppLogo(size: 200),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                theme.primaryColor.withValues(alpha: 0.15),
-                                theme.primaryColor.withValues(alpha: 0.08),
-                              ],
-                            ),
+                            color: theme.primaryColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Icon(
-                            Icons.list_alt_rounded,
+                            Icons.person_add_rounded,
                             color: theme.primaryColor,
-                            size: 24,
+                            size: 22,
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -99,22 +89,20 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              //Modern Section Title and Subtitle
                               Text(
-                                'Member Registration Form',
+                                'New Member Registration',
                                 style: TextStyle(
-                                  fontSize: 34,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.w800,
                                   color: Color(0xFF201C58),
-                                  letterSpacing: -0.5,
                                 ),
                               ),
                               SizedBox(height: 2),
                               Text(
                                 'Complete the form below to register a new member',
                                 style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w400,
                                   color: Color(0xFF6B7280),
                                 ),
                               ),
@@ -124,7 +112,7 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
                   KenwellFormCard(
                     title: 'Basic Information',
                     margin: const EdgeInsets.only(bottom: 16),
@@ -150,11 +138,8 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
                     labelStyle: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      //color: Colors.white,
-                      //color: KenwellColors.secondaryNavyDark,
                       color: KenwellColors.secondaryNavy,
                     ),
-                    //  backgroundColor: KenwellColors.primaryGreen,
                     onPressed: _submitMember,
                     isBusy: vm.isSubmitting,
                   ),
