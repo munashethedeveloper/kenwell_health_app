@@ -263,6 +263,7 @@ class MyEventScreenState extends State<MyEventScreen> {
                 SnackBar(
                   content: const Text('Events refreshed'),
                   duration: const Duration(seconds: 1),
+                  backgroundColor: Colors.green.shade600,
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
@@ -299,7 +300,7 @@ class MyEventScreenState extends State<MyEventScreen> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF201C58).withValues(alpha: 0.08),
+                      color: const Color(0xFF201C58).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(

@@ -418,7 +418,7 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                             children: [
                               Icon(
                                 Icons.search_rounded,
-                                size: 15,
+                                size: 18,
                                 color: theme.primaryColor,
                               ),
                               const SizedBox(width: 6),
