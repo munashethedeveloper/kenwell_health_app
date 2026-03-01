@@ -414,6 +414,24 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.search_rounded,
+                                size: 15,
+                                color: theme.primaryColor,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                'Search Members',
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xFF201C58),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
                           MemberSearchBar(
                             controller: _searchController,
                             searchQuery: viewModel.searchQuery,
@@ -425,6 +443,12 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                             },
                           ),
                           const SizedBox(height: 12),
+                          Divider(
+                            height: 1,
+                            thickness: 1,
+                            color: Colors.grey.shade100,
+                          ),
+                          const SizedBox(height: 10),
                           Row(
                             children: [
                               Icon(

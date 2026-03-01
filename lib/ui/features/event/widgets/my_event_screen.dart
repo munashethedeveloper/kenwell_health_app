@@ -3,14 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
-import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:kenwell_health_app/utils/event_status_colors.dart';
 import 'package:provider/provider.dart';
 import '../../../../data/repositories_dcl/user_event_repository.dart';
 import '../../../../data/services/auth_service.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../shared/ui/buttons/custom_primary_button.dart';
-import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 import '../view_model/event_view_model.dart';
 import '../../wellness/widgets/wellness_flow_page.dart';
 
@@ -243,7 +241,7 @@ class MyEventScreenState extends State<MyEventScreen> {
     }
 
     // Build the Scaffold
-    final eventVM = context.read<EventViewModel>();
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: KenwellAppBar(
         title: 'KenWell365',
@@ -256,15 +254,19 @@ class MyEventScreenState extends State<MyEventScreen> {
         actions: [
           IconButton(
             tooltip: 'Refresh',
-            icon: const Icon(Icons.refresh, color: Color(0xFF201C58)),
+            icon: const Icon(Icons.refresh_rounded, color: Colors.white),
             onPressed: () async {
               // Refresh user events from Firestore
               await _fetchUserEvents();
               if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Events refreshed'),
-                  duration: Duration(seconds: 1),
+                SnackBar(
+                  content: const Text('Events refreshed'),
+                  duration: const Duration(seconds: 1),
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  margin: const EdgeInsets.all(16),
                 ),
               );
             },
@@ -275,10 +277,10 @@ class MyEventScreenState extends State<MyEventScreen> {
                 context.pushNamed('help');
               }
             },
-            icon: const Icon(Icons.help_outline, color: Color(0xFF201C58)),
+            icon: const Icon(Icons.help_outline_rounded, color: Colors.white),
             label: const Text(
               'Help',
-              style: TextStyle(color: Color(0xFF201C58)),
+              style: TextStyle(color: Colors.white),
             ),
           ),
         ],
@@ -289,103 +291,134 @@ class MyEventScreenState extends State<MyEventScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
-            const AppLogo(size: 150),
-            const SizedBox(height: 16),
-            const KenwellModernSectionHeader(
-              title: 'My Events Screen',
-              subtitle:
-                  'Switch between the \'Today\' and \'Upcoming\' tabs to view and manage your wellness events.',
-              icon: Icons.event_available,
-              //textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
-
-            // Row with left toggle, centered label, and right toggle
-            Row(
-              children: [
-                // Left single-button Toggle for "Today"
-                ToggleButtons(
-                  isSelected: [_selectedWeek == 0],
-                  onPressed: (index) {
-                    if (mounted) {
-                      setState(() {
-                        _selectedWeek = 0;
-                      });
-                    }
-                  },
-                  borderRadius: BorderRadius.circular(6),
-                  selectedColor: Colors.white,
-                  color: const Color(0xFF201C58),
-                  fillColor: const Color(0xFF201C58),
-                  constraints: const BoxConstraints(minWidth: 96),
-                  children: const [
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      child: Text('Today'),
+            // Compact section header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF201C58).withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                  ],
-                ),
-
-                // Centered label
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      _selectedWeek == 0
-                          ? 'Today\'s Events'
-                          : 'Upcoming Events',
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600),
+                    child: const Icon(
+                      Icons.event_available_rounded,
+                      color: Color(0xFF201C58),
+                      size: 22,
                     ),
                   ),
-                ),
-
-                // Right single-button Toggle for "Upcoming"
-                ToggleButtons(
-                  isSelected: [_selectedWeek == 1],
-                  onPressed: (index) {
-                    if (mounted) {
-                      setState(() {
-                        _selectedWeek = 1;
-                      });
-                    }
-                  },
-                  borderRadius: BorderRadius.circular(6),
-                  selectedColor: Colors.white,
-                  color: const Color(0xFF201C58),
-                  fillColor: const Color(0xFF201C58),
-                  constraints: const BoxConstraints(minWidth: 96),
-                  children: const [
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      child: Text('Upcoming'),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'My Events',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF201C58),
+                          ),
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          'View and manage your assigned wellness events',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400,
+                            color: Color(0xFF6B7280),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            // Modern pill tab selector
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(14),
+                    border:
+                        Border.all(color: Colors.grey.shade200, width: 1),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildEventTab(
+                          'Today', 0, Icons.today_rounded, theme),
+                      _buildEventTab('Upcoming', 1,
+                          Icons.calendar_month_rounded, theme),
+                    ],
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  _selectedWeek == 0 ? 'Today\'s Events' : 'Upcoming Events',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF201C58),
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
 
             // If no events for selected tab, show friendly empty state
             if (filteredEvents.isEmpty)
               Center(
                 child: Padding(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 32, vertical: 48),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.event_available,
-                          size: 64, color: Color(0xFF90C048)),
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF90C048).withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          _selectedWeek == 0
+                              ? Icons.today_rounded
+                              : Icons.calendar_month_rounded,
+                          color: const Color(0xFF90C048),
+                          size: 40,
+                        ),
+                      ),
                       const SizedBox(height: 16),
                       Text(
                         _selectedWeek == 0
-                            ? 'No events scheduled for today.\nCheck the "Upcoming" tab for future events.'
-                            : allEvents.isEmpty
-                                ? 'No upcoming events.\nCreate an event to get started!'
-                                : 'No upcoming events.\nAll your events are scheduled for today.',
+                            ? 'No Events Today'
+                            : 'No Upcoming Events',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF201C58),
+                        ),
                         textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _selectedWeek == 0
+                            ? 'No events scheduled for today. Check the "Upcoming" tab for future events.'
+                            : allEvents.isEmpty
+                                ? 'No events have been assigned to you yet.'
+                                : 'All your events are scheduled for today.',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: Color(0xFF6B7280),
+                          height: 1.5,
+                        ),
                       ),
                     ],
                   ),
@@ -447,7 +480,7 @@ class MyEventScreenState extends State<MyEventScreen> {
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: Icon(
-                                      Icons.event,
+                                      Icons.event_rounded,
                                       color: theme.primaryColor,
                                       size: 20,
                                     ),
@@ -470,9 +503,8 @@ class MyEventScreenState extends State<MyEventScreen> {
                                         Row(
                                           children: [
                                             const Icon(
-                                              Icons.calendar_today,
+                                              Icons.calendar_today_rounded,
                                               size: 14,
-                                              //color: Colors.grey[600],
                                               color: KenwellColors
                                                   .secondaryNavyDark,
                                             ),
@@ -483,9 +515,6 @@ class MyEventScreenState extends State<MyEventScreen> {
                                                   ?.copyWith(
                                                 color: KenwellColors
                                                     .secondaryNavyDark,
-                                                //color: Colors.black,
-                                                //color: Colors.grey[600],
-                                                //color: KenwellColors
                                                 // .secondaryNavyDark,
                                               ),
                                             ),
@@ -502,7 +531,7 @@ class MyEventScreenState extends State<MyEventScreen> {
                                                             event.status)
                                                     .withValues(alpha: 0.15),
                                                 borderRadius:
-                                                    BorderRadius.circular(4),
+                                                    BorderRadius.circular(8),
                                               ),
                                               child: Text(
                                                 event.status,
@@ -521,37 +550,6 @@ class MyEventScreenState extends State<MyEventScreen> {
                                       ],
                                     ),
                                   ),
-                                  /*    // Screened count badge
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 8),
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          theme.primaryColor,
-                                          theme.primaryColor
-                                              .withValues(alpha: 0.8),
-                                        ],
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: theme.primaryColor
-                                              .withValues(alpha: 0.3),
-                                          blurRadius: 8,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Text(
-                                      event.screenedCount.toString(),
-                                      style:
-                                          theme.textTheme.labelLarge?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ), */
                                 ],
                               ),
                               const SizedBox(height: 16),
@@ -559,9 +557,8 @@ class MyEventScreenState extends State<MyEventScreen> {
                               Row(
                                 children: [
                                   const Icon(
-                                    Icons.access_time,
+                                    Icons.schedule_rounded,
                                     size: 16,
-                                    //color: Colors.grey[700]
                                     color: KenwellColors.secondaryNavyDark,
                                   ),
                                   const SizedBox(width: 6),
@@ -570,8 +567,6 @@ class MyEventScreenState extends State<MyEventScreen> {
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w600,
                                       color: KenwellColors.secondaryNavyDark,
-                                      // color:
-                                      //  Colors.black.withValues(alpha: 0.9),
                                     ),
                                   ),
                                 ],
@@ -581,9 +576,8 @@ class MyEventScreenState extends State<MyEventScreen> {
                                 Row(
                                   children: [
                                     const Icon(
-                                      Icons.location_on,
+                                      Icons.location_on_rounded,
                                       size: 16,
-                                      //color: Colors.grey[700]
                                       color: KenwellColors.secondaryNavyDark,
                                     ),
                                     const SizedBox(width: 6),
@@ -602,9 +596,8 @@ class MyEventScreenState extends State<MyEventScreen> {
                                 Row(
                                   children: [
                                     const Icon(
-                                      Icons.business,
+                                      Icons.business_rounded,
                                       size: 16,
-                                      //color: Colors.grey[700]
                                       color: KenwellColors.secondaryNavyDark,
                                     ),
                                     const SizedBox(width: 6),
@@ -626,9 +619,8 @@ class MyEventScreenState extends State<MyEventScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     const Icon(
-                                      Icons.medical_services,
+                                      Icons.medical_services_rounded,
                                       size: 16,
-                                      //color: Colors.grey[700]
                                       color: KenwellColors.secondaryNavyDark,
                                     ),
                                     const SizedBox(width: 6),
@@ -636,7 +628,6 @@ class MyEventScreenState extends State<MyEventScreen> {
                                       child: Text(
                                           'Services: ${event.servicesRequested}',
                                           style: const TextStyle(
-                                            //color: Colors.black54),
                                             color:
                                                 KenwellColors.secondaryNavyDark,
                                           )),
@@ -686,6 +677,58 @@ class MyEventScreenState extends State<MyEventScreen> {
                   }).toList(),
                 ),
               ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Build animated pill tab button for the Today/Upcoming selector
+  Widget _buildEventTab(
+      String label, int index, IconData icon, ThemeData theme) {
+    final isSelected = _selectedWeek == index;
+    return GestureDetector(
+      onTap: () {
+        if (mounted) setState(() => _selectedWeek = index);
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        padding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF201C58) : Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color:
+                        const Color(0xFF201C58).withValues(alpha: 0.2),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 14,
+              color: isSelected ? Colors.white : const Color(0xFF6B7280),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight:
+                    isSelected ? FontWeight.w700 : FontWeight.w500,
+                color:
+                    isSelected ? Colors.white : const Color(0xFF6B7280),
+              ),
+            ),
           ],
         ),
       ),
@@ -762,7 +805,14 @@ class MyEventScreenState extends State<MyEventScreen> {
     if (!mounted) return;
 
     messenger.showSnackBar(
-      const SnackBar(content: Text('Event finished successfully')),
+      SnackBar(
+        content: const Text('Event finished successfully'),
+        backgroundColor: Colors.green.shade600,
+        behavior: SnackBarBehavior.floating,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: const EdgeInsets.all(16),
+      ),
     );
 
     // Refresh events after finishing
