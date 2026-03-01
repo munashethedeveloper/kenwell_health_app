@@ -9,7 +9,7 @@ class UserCardWidget extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback onResetPassword;
   final VoidCallback onDelete;
-  final int? number; // Optional numbering for the card
+  final int? number;
 
   const UserCardWidget({
     super.key,
@@ -24,19 +24,13 @@ class UserCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final firstName = user.firstName;
-    final lastName = user.lastName;
-    final email = user.email;
-    final role = user.role;
-
     final roleIcons = {
-      'ADMIN': Icons.admin_panel_settings,
-      'TOPMANAGEMENT': Icons.business_center,
-      'PROJECTMANAGER': Icons.manage_accounts,
-      'COORDINATOR': Icons.event,
-      'NURSE': Icons.medical_services,
-      //'DATA CAPTURER': Icons.data_usage,
-      'CLIENT': Icons.person,
+      'ADMIN': Icons.admin_panel_settings_rounded,
+      'TOPMANAGEMENT': Icons.business_center_rounded,
+      'PROJECTMANAGER': Icons.manage_accounts_rounded,
+      'COORDINATOR': Icons.event_rounded,
+      'NURSE': Icons.medical_services_rounded,
+      'CLIENT': Icons.person_rounded,
     };
 
     return Slidable(
@@ -48,22 +42,29 @@ class UserCardWidget extends StatelessWidget {
             onPressed: (_) => onResetPassword(),
             backgroundColor: theme.colorScheme.primary,
             foregroundColor: theme.colorScheme.onPrimary,
-            icon: Icons.lock_reset,
-            label: 'Reset Password',
+            icon: Icons.lock_reset_rounded,
+            label: 'Reset',
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(12),
+              bottomLeft: Radius.circular(12),
+            ),
           ),
           SlidableAction(
             onPressed: (_) => onDelete(),
             backgroundColor: theme.colorScheme.error,
             foregroundColor: theme.colorScheme.onError,
-            icon: Icons.delete,
-            label: 'Delete User',
+            icon: Icons.delete_rounded,
+            label: 'Delete',
+            borderRadius: const BorderRadius.only(
+              topRight: Radius.circular(12),
+              bottomRight: Radius.circular(12),
+            ),
           ),
         ],
       ),
       child: Builder(
         builder: (context) => GestureDetector(
           onTap: () {
-            // Toggle the slide menu on tap (open if closed, close if open)
             final slidable = Slidable.of(context);
             final isOpen =
                 slidable?.actionPaneType.value != ActionPaneType.none;
@@ -75,101 +76,76 @@ class UserCardWidget extends StatelessWidget {
           },
           onLongPress: onTap,
           child: Container(
-            margin: const EdgeInsets.only(bottom: 12),
+            margin: const EdgeInsets.only(bottom: 10),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Colors.white,
-                  theme.primaryColor.withValues(alpha: 0.03),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(16),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: theme.primaryColor.withValues(alpha: 0.15),
-                width: 1.5,
+                color: theme.primaryColor.withValues(alpha: 0.12),
+                width: 1,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: theme.primaryColor.withValues(alpha: 0.08),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                  spreadRadius: 0,
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               child: Row(
                 children: [
-                  // Number badge (if provided)
                   if (number != null) ...[
                     NumberBadge(number: number!),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 10),
                   ],
 
-                  // Modern avatar with icon and gradient background
+                  // Avatar
                   Container(
-                    width: 48,
-                    height: 48,
+                    width: 46,
+                    height: 46,
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          theme.primaryColor.withValues(alpha: 0.2),
-                          theme.primaryColor.withValues(alpha: 0.1),
-                        ],
-                      ),
+                      color: theme.primaryColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: theme.primaryColor.withValues(alpha: 0.3),
-                        width: 1.5,
-                      ),
                     ),
                     child: Icon(
-                      roleIcons[role] ?? Icons.person,
+                      roleIcons[user.role] ?? Icons.person_rounded,
                       color: theme.primaryColor,
-                      size: 24,
+                      size: 22,
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 12),
 
-                  // User Info
+                  // User info
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '$firstName $lastName',
-                          style: theme.textTheme.bodyLarge?.copyWith(
+                          '${user.firstName} ${user.lastName}',
+                          style: theme.textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.w700,
-                            //color: const Color(0xFF201C58),
-                            color: Colors.black,
-                            letterSpacing: -0.2,
+                            color: const Color(0xFF201C58),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 3),
                         Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.email_outlined,
-                              size: 14,
-                              //color: Colors.grey[600],
-                              //color: KenwellColors.secondaryNavyDark,
-                              color: Colors.black,
+                              size: 12,
+                              color: Colors.grey.shade500,
                             ),
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
-                                email,
+                                user.email,
                                 style: theme.textTheme.bodySmall?.copyWith(
-                                  //color: Colors.grey[600],
-                                  color: Colors.black,
-                                  fontSize: 13,
+                                  color: const Color(0xFF6B7280),
+                                  fontSize: 12,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -177,114 +153,71 @@ class UserCardWidget extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(
+                        const SizedBox(height: 5),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 7, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: user.emailVerified
+                                ? const Color(0xFF10B981).withValues(alpha: 0.1)
+                                : const Color(0xFFEF4444)
+                                    .withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                user.emailVerified
+                                    ? Icons.verified_rounded
+                                    : Icons.error_outline_rounded,
                                 color: user.emailVerified
                                     ? const Color(0xFF10B981)
-                                        .withValues(alpha: 0.1)
-                                    : const Color(0xFFEF4444)
-                                        .withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(
+                                    : const Color(0xFFEF4444),
+                                size: 12,
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                user.emailVerified
+                                    ? 'Verified'
+                                    : 'Not Verified',
+                                style: TextStyle(
                                   color: user.emailVerified
                                       ? const Color(0xFF10B981)
-                                          .withValues(alpha: 0.3)
-                                      : const Color(0xFFEF4444)
-                                          .withValues(alpha: 0.3),
-                                  width: 1,
+                                      : const Color(0xFFEF4444),
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 10,
                                 ),
                               ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    user.emailVerified
-                                        ? Icons.verified
-                                        : Icons.error_outline,
-                                    color: user.emailVerified
-                                        ? const Color(0xFF10B981)
-                                        : const Color(0xFFEF4444),
-                                    size: 14,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    user.emailVerified
-                                        ? 'Verified'
-                                        : 'Not Verified',
-                                    style: theme.textTheme.labelSmall?.copyWith(
-                                      //color: Colors.grey.shade800,
-                                      color: Colors.black,
-                                      //user.emailVerified
-                                      // ? const Color(0xFF10B981)
-                                      //: const Color(0xFFEF4444),
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 11,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
 
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 10),
 
-                  // Role badge with modern styling
+                  // Role badge
                   Container(
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          //const Color(0xFF90C048),
-                          //const Color(0xFF90C048).withValues(alpha: 0.8),
-                          Colors.white,
-                          Colors.white.withValues(alpha: 0.8),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF90C048).withValues(alpha: 0.3),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Text(
-                      role,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        //color: Colors.white,
-                        //color: Colors.grey.shade700,
-                        //color: KenwellColors.secondaryNavyDark,
-                        color: Colors.black,
-                        fontSize: 10,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.all(6),
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: theme.primaryColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: theme.primaryColor.withValues(alpha: 0.2),
+                        width: 1,
+                      ),
                     ),
-                    child: Icon(
-                      Icons.chevron_right,
-                      color: theme.primaryColor,
-                      size: 20,
+                    child: Text(
+                      user.role,
+                      style: TextStyle(
+                        color: theme.primaryColor,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 10,
+                        letterSpacing: 0.3,
+                      ),
                     ),
                   ),
                 ],

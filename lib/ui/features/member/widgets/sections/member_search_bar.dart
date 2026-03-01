@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 
 /// Search bar widget for members
 class MemberSearchBar extends StatelessWidget {
@@ -20,79 +19,54 @@ class MemberSearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Explanatory label
-        const Row(
-          children: [
-            /*    Icon(
-              Icons.info_outline,
-              size: 16,
-              color: Colors.black,
-              //color: Colors.grey.shade600,
-            ),
-            SizedBox(width: 6), */
-            Text(
-              'Search & Filter Member\'s:',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: KenwellColors.secondaryNavyDark,
-                //color: Colors.grey.shade700,
-                //color: Colors.black,
-              ),
-            ),
-          ],
+    return TextField(
+      controller: controller,
+      onChanged: onChanged,
+      style: const TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+      ),
+      decoration: InputDecoration(
+        hintText: 'Search by name, ID or passport...',
+        hintStyle: TextStyle(
+          color: Colors.grey.shade400,
+          fontSize: 14,
         ),
-        const SizedBox(height: 8),
-        // Search TextField
-        TextField(
-          controller: controller,
-          onChanged: onChanged,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-          decoration: InputDecoration(
-            hintText: 'Enter the member\'s name, ID, or passport to search...',
-            hintStyle: TextStyle(
-              color: Colors.grey.shade500,
-              fontSize: 14,
-            ),
-            prefixIcon: const Icon(Icons.search),
-            suffixIcon: searchQuery.isNotEmpty
-                ? IconButton(
-                    icon: Icon(
-                      Icons.clear,
-                      color: Colors.grey.shade600,
-                      size: 20,
-                    ),
-                    onPressed: onClear,
-                  )
-                : null,
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey.shade300, width: 1),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey.shade300, width: 1),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: theme.colorScheme.primary,
-                width: 2,
-              ),
-            ),
+        prefixIcon: Icon(
+          Icons.search_rounded,
+          color: theme.colorScheme.primary,
+          size: 20,
+        ),
+        suffixIcon: searchQuery.isNotEmpty
+            ? IconButton(
+                icon: Icon(
+                  Icons.close_rounded,
+                  color: Colors.grey.shade500,
+                  size: 18,
+                ),
+                onPressed: onClear,
+              )
+            : null,
+        filled: true,
+        fillColor: Colors.grey.shade50,
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade200, width: 1),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade200, width: 1),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color: theme.colorScheme.primary,
+            width: 2,
           ),
         ),
-      ],
+      ),
     );
   }
 }

@@ -132,4 +132,38 @@ class FirestoreHraRepository {
             .map((doc) => HraScreening.fromMap(doc.data()))
             .toList());
   }
+
+  /// Get all HRA screenings across all events
+  Future<List<HraScreening>> getAllHraScreenings() async {
+    try {
+      final querySnapshot = await _firestore
+          .collection(_collectionName)
+          .orderBy('createdAt', descending: true)
+          .get();
+      return querySnapshot.docs
+          .map((doc) => HraScreening.fromMap(doc.data()))
+          .toList();
+    } catch (e) {
+      AppLogger.error('Failed to get all HRA screenings', e);
+      rethrow;
+    }
+  }
+
+  /// Get HRA screenings for a specific set of events (up to 30 IDs).
+  Future<List<HraScreening>> getHraScreeningsByEvents(
+      List<String> eventIds) async {
+    if (eventIds.isEmpty) return [];
+    try {
+      final querySnapshot = await _firestore
+          .collection(_collectionName)
+          .where('eventId', whereIn: eventIds)
+          .get();
+      return querySnapshot.docs
+          .map((doc) => HraScreening.fromMap(doc.data()))
+          .toList();
+    } catch (e) {
+      AppLogger.error('Failed to get HRA screenings by events', e);
+      rethrow;
+    }
+  }
 }

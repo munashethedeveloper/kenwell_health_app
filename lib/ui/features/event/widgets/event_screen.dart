@@ -1,10 +1,8 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
-import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/buttons/form_action_buttons.dart';
-import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 import '../../../shared/ui/dialogs/confirmation_dialog.dart';
 import '../utils/event_form_validator.dart';
 import '../view_model/event_view_model.dart';
@@ -42,7 +40,6 @@ class EventScreen extends StatefulWidget {
 class _EventScreenState extends State<EventScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _didLoadExistingEvent = false;
-  // String _wantsAdditionalServices = 'No'; // 'Yes' or 'No'
 
   // Initialize state
   @override
@@ -56,12 +53,8 @@ class _EventScreenState extends State<EventScreen> {
         if (!mounted) return;
         if (!_didLoadExistingEvent) {
           widget.viewModel.loadExistingEvent(eventToEdit);
-          // Check if event has additional services
-          //final hasAdditionalServices =
-          // eventToEdit.additionalServicesRequested.isNotEmpty;
           setState(() {
             _didLoadExistingEvent = true;
-            // _wantsAdditionalServices = hasAdditionalServices ? 'Yes' : 'No';
           });
         }
       });
@@ -113,9 +106,12 @@ class _EventScreenState extends State<EventScreen> {
       final message = invalidFields.join(', ');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Please complete the following fields: $message"),
+          content: Text("Please complete: $message"),
           duration: const Duration(seconds: 4),
           behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.orange.shade700,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           margin: const EdgeInsets.all(16),
         ),
       );
@@ -146,14 +142,15 @@ class _EventScreenState extends State<EventScreen> {
       debugPrint('EventScreen: ERROR saving event: $e');
       debugPrintStack(stackTrace: stackTrace);
 
-      // Show error SnackBar at the top
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Error saving event: $e"),
           duration: const Duration(seconds: 5),
-          backgroundColor: Colors.red,
+          backgroundColor: Colors.red.shade700,
           behavior: SnackBarBehavior.floating,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           margin: const EdgeInsets.all(16),
         ),
       );
@@ -164,15 +161,17 @@ class _EventScreenState extends State<EventScreen> {
     if (!mounted) return;
     widget.viewModel.clearControllers();
 
-    // Show success SnackBar at the top
+    // Show success SnackBar
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(isEditMode
             ? "Event updated successfully"
             : "Event created successfully"),
         duration: const Duration(seconds: 3),
+        backgroundColor: Colors.green.shade600,
         behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: const EdgeInsets.all(16),
       ),
     );
 
@@ -185,16 +184,15 @@ class _EventScreenState extends State<EventScreen> {
   Widget build(BuildContext context) {
     final WellnessEvent? eventToEdit = widget.existingEvent;
     final bool isEditMode = eventToEdit != null;
+    final theme = Theme.of(context);
 
     // Build the Scaffold
     return Scaffold(
-      appBar: const KenwellAppBar(
-        title: 'Kenwell365',
+      appBar: KenwellAppBar(
+        title: 'KenWell365',
         automaticallyImplyLeading: true,
-        //titleColor: const Color(0xFF201C58),
         titleColor: Colors.white,
-        titleStyle: TextStyle(
-          //color: Color(0xFF201C58),
+        titleStyle: const TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.bold,
         ),
@@ -208,22 +206,59 @@ class _EventScreenState extends State<EventScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 16),
-              const AppLogo(size: 200),
-              const SizedBox(height: 16),
-              // Section header
-              KenwellModernSectionHeader(
-                title: isEditMode ? 'Edit Event' : 'Add New Event',
-                subtitle: isEditMode
-                    ? 'Update the event details below'
-                    : 'Please complete the form to add a new event',
-                //     'Please complete the event details or update the event information',
-                icon: isEditMode ? Icons.edit : Icons.add_circle_outline,
+              // Compact section header
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: theme.primaryColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        isEditMode
+                            ? Icons.edit_rounded
+                            : Icons.add_circle_outline_rounded,
+                        color: theme.primaryColor,
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            isEditMode ? 'Edit Event' : 'Add New Event',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF201C58),
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            isEditMode
+                                ? 'Update the event details below'
+                                : 'Complete the form to add a new event',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xFF6B7280),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               // Event Basic Info Section
               EventBasicInfoSection(
                 viewModel: widget.viewModel,
-                //title: 'Event Basic Information',
                 date: widget.date,
                 requiredField: _requiredField,
               ),
@@ -260,86 +295,6 @@ class _EventScreenState extends State<EventScreen> {
                 viewModel: widget.viewModel,
                 isAdditionalServices: false,
               ),
-              /*    // Additional Services Dropdown
-              KenwellFormCard(
-                title: 'Additional Services',
-                margin: const EdgeInsets.only(bottom: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Would you like to request additional services?',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    // Dropdown for additional services selection
-                    DropdownButtonFormField<String>(
-                      initialValue: _wantsAdditionalServices,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF201C58),
-                            width: 2,
-                          ),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                      ),
-                      items: ['No', 'Yes'].map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          _wantsAdditionalServices = newValue ?? 'No';
-                          // Clear additional services if user selects No
-                          if (_wantsAdditionalServices == 'No') {
-                            // Clear all additional service selections
-                            final additionalServices = widget
-                                .viewModel.selectedAdditionalServices
-                                .toList();
-                            for (var service in additionalServices) {
-                              widget.viewModel.toggleAdditionalServiceSelection(
-                                  service, false);
-                            }
-                          }
-                        });
-                      },
-                    ),
-                    // Show additional services checkboxes only if 'Yes' is selected
-                    if (_wantsAdditionalServices == 'Yes') ...[
-                      const SizedBox(height: 16),
-                      const Divider(),
-                      const SizedBox(height: 16),
-                      ServicesSelectionSection(
-                        viewModel: widget.viewModel,
-                        isAdditionalServices: true,
-                        isRequired: false, // Additional services are optional
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              // Healthcare Professionals Section
-              HealthcareProfessionalsSection(
-                viewModel: widget.viewModel,
-                requiredSelection: _requiredSelection,
-              ), */
               // Event Time Section
               EventTimeSection(
                 viewModel: widget.viewModel,

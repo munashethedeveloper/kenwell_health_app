@@ -9,8 +9,6 @@ import '../../../../shared/ui/buttons/custom_primary_button.dart';
 import '../../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../../shared/ui/form/custom_text_field.dart';
 import '../../../../shared/ui/form/kenwell_form_card.dart';
-import '../../../../shared/ui/form/kenwell_modern_section_header.dart';
-import '../../../../shared/ui/logo/app_logo.dart';
 import '../../viewmodel/user_management_view_model.dart';
 
 /// Create user form section
@@ -145,15 +143,47 @@ class _CreateUserSectionState extends State<CreateUserSection> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 16),
-                  const AppLogo(size: 200),
-                  const SizedBox(height: 24),
-                  const KenwellModernSectionHeader(
-                    title: 'User Registration Form',
-                    subtitle: 'Complete the form below to register a new user',
-                    icon: Icons.list_alt_rounded,
+                  const SizedBox(height: 20),
+
+                  // Compact section header
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: theme.primaryColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          Icons.person_add_rounded,
+                          color: theme.primaryColor,
+                          size: 22,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'New User Registration',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: const Color(0xFF201C58),
+                            ),
+                          ),
+                          Text(
+                            'Complete the form to register a new user',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: const Color(0xFF6B7280),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 24),
+
+                  const SizedBox(height: 20),
+
                   KenwellFormCard(
                     title: 'Personal Information',
                     margin: const EdgeInsets.only(bottom: 16),
@@ -232,8 +262,6 @@ class _CreateUserSectionState extends State<CreateUserSection> {
                     labelStyle: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      //color: Colors.white,
-                      //color: KenwellColors.secondaryNavyDark,
                       color: KenwellColors.secondaryNavy,
                     ),
                     onPressed: _register,
@@ -241,26 +269,75 @@ class _CreateUserSectionState extends State<CreateUserSection> {
                   ),
                   if (_verificationSent) ...[
                     const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(_isVerified
-                              ? 'Email verified!'
-                              : 'Please verify your email (check inbox)'),
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: _isVerified
+                            ? const Color(0xFF10B981).withValues(alpha: 0.08)
+                            : theme.primaryColor.withValues(alpha: 0.06),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: _isVerified
+                              ? const Color(0xFF10B981).withValues(alpha: 0.3)
+                              : theme.primaryColor.withValues(alpha: 0.2),
+                          width: 1,
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.refresh),
-                          tooltip: 'Check verification',
-                          onPressed: _checkEmailVerified,
-                        ),
-                        TextButton(
-                          onPressed: _resendVerification,
-                          child: const Text('Resend Email'),
-                        ),
-                      ],
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            _isVerified
+                                ? Icons.verified_rounded
+                                : Icons.mark_email_unread_rounded,
+                            color: _isVerified
+                                ? const Color(0xFF10B981)
+                                : theme.primaryColor,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              _isVerified
+                                  ? 'Email verified successfully!'
+                                  : 'Verification email sent – check inbox',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: _isVerified
+                                    ? const Color(0xFF10B981)
+                                    : const Color(0xFF201C58),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.refresh_rounded,
+                              size: 18,
+                              color: theme.primaryColor,
+                            ),
+                            tooltip: 'Check verification status',
+                            onPressed: _checkEmailVerified,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                          const SizedBox(width: 4),
+                          TextButton(
+                            onPressed: _resendVerification,
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            child: const Text(
+                              'Resend',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                 ],
               ),
             ),

@@ -67,4 +67,37 @@ class FirestoreCancerScreeningRepository {
       rethrow;
     }
   }
+
+  Future<List<CancerScreening>> getAllCancerScreenings() async {
+    try {
+      final querySnapshot = await _firestore
+          .collection(_collectionName)
+          .orderBy('createdAt', descending: true)
+          .get();
+      return querySnapshot.docs
+          .map((doc) => CancerScreening.fromMap(doc.data()))
+          .toList();
+    } catch (e) {
+      AppLogger.error('Failed to get all cancer screenings', e);
+      rethrow;
+    }
+  }
+
+  /// Get cancer screenings for a specific set of events (up to 30 IDs).
+  Future<List<CancerScreening>> getCancerScreeningsByEvents(
+      List<String> eventIds) async {
+    if (eventIds.isEmpty) return [];
+    try {
+      final querySnapshot = await _firestore
+          .collection(_collectionName)
+          .where('eventId', whereIn: eventIds)
+          .get();
+      return querySnapshot.docs
+          .map((doc) => CancerScreening.fromMap(doc.data()))
+          .toList();
+    } catch (e) {
+      AppLogger.error('Failed to get cancer screenings by events', e);
+      rethrow;
+    }
+  }
 }

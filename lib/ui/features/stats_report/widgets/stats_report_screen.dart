@@ -8,7 +8,9 @@ import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 import '../../../shared/ui/logo/app_logo.dart';
 import '../../../shared/ui/containers/gradient_container.dart';
 import '../../../../data/repositories_dcl/firestore_member_repository.dart';
+import '../../../../domain/models/wellness_event.dart';
 import 'event_stats_detail_screen.dart';
+import 'health_screening_stats_section.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 
 class StatsReportScreen extends StatefulWidget {
@@ -18,11 +20,15 @@ class StatsReportScreen extends StatefulWidget {
   State<StatsReportScreen> createState() => _StatsReportScreenState();
 }
 
-class _StatsReportScreenState extends State<StatsReportScreen> {
+class _StatsReportScreenState extends State<StatsReportScreen>
+    with SingleTickerProviderStateMixin {
   final _searchController = TextEditingController();
   final _memberRepository = FirestoreMemberRepository();
   int _totalMembers = 0;
   bool _isLoadingMembers = true;
+
+  // Tab controller for Live vs Past events
+  late TabController _tabController;
 
   // Filter states
   String? _selectedStatus;
@@ -33,6 +39,12 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        setState(() {});
+      }
+    });
     _loadMemberCount();
     _searchController.addListener(() {
       setState(() {}); // Rebuild when search text changes
@@ -84,6 +96,7 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
 
   @override
   void dispose() {
+    _tabController.dispose();
     _searchController.dispose();
     super.dispose();
   }
@@ -119,11 +132,25 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
     final eventVM = context.watch<EventViewModel>();
     final allEvents = eventVM.events;
 
+    // Filter events based on active tab (Live = in-progress, Past = completed)
+    final isLiveTab = _tabController.index == 0;
+    final tabFilteredEvents = isLiveTab
+        ? allEvents.where((e) {
+            final s = e.status.toLowerCase();
+            return s == WellnessEventStatus.inProgress ||
+                s == 'in progress' ||
+                s == 'ongoing';
+          }).toList()
+        : allEvents.where((e) {
+            final s = e.status.toLowerCase();
+            return s == WellnessEventStatus.completed || s == 'finished';
+          }).toList();
+
     // Filter events based on search query
     final searchQuery = _searchController.text.toLowerCase();
     var events = searchQuery.isEmpty
-        ? allEvents
-        : allEvents
+        ? tabFilteredEvents
+        : tabFilteredEvents
             .where((event) => event.title.toLowerCase().contains(searchQuery))
             .toList();
 
@@ -266,6 +293,40 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
 
                 const SizedBox(height: 16),
 
+                // Tab bar for Live vs Past events
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade200),
+                  ),
+                  child: TabBar(
+                    controller: _tabController,
+                    tabs: const [
+                      Tab(
+                        icon: Icon(Icons.play_circle_outline),
+                        text: 'Live Events',
+                      ),
+                      Tab(
+                        icon: Icon(Icons.history),
+                        text: 'Past Events',
+                      ),
+                    ],
+                    labelColor: theme.primaryColor,
+                    unselectedLabelColor: Colors.grey[600],
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    indicator: BoxDecoration(
+                      color: theme.primaryColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                          color: theme.primaryColor.withValues(alpha: 0.3)),
+                    ),
+                    dividerColor: Colors.transparent,
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
                 // Search bar with inline filter button
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -332,7 +393,7 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                           borderRadius: BorderRadius.circular(12),
                           child: InkWell(
                             onTap: () => _showFilterBottomSheet(
-                                context, theme, allEvents),
+                                context, theme, tabFilteredEvents),
                             borderRadius: BorderRadius.circular(12),
                             child: Container(
                               padding: const EdgeInsets.all(12),
@@ -548,6 +609,19 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                 ),
                 const SizedBox(height: 24),
 
+                // ── Health Screening Analytics (scoped to current tab) ────
+                HealthScreeningStatsSection(
+                  eventIds: events.map((e) => e.id).toList(),
+                  sectionSubtitle: isLiveTab
+                      ? 'Live screening data from '
+                          '${events.length} currently running '
+                          'event${events.length != 1 ? "s" : ""}'
+                      : 'Screening data from '
+                          '${events.length} past '
+                          'event${events.length != 1 ? "s" : ""}',
+                ),
+                const SizedBox(height: 24),
+
                 // HIGH PRIORITY: Events by Status - Only show when filters are active
                 if (_hasActiveFilters) ...[
                   Container(
@@ -628,255 +702,251 @@ class _StatsReportScreenState extends State<StatsReportScreen> {
                   const SizedBox(height: 16),
                 ],
 
-                // Event Breakdown Card - Only show when search or filters are active
-                if (_searchController.text.isNotEmpty || _hasActiveFilters)
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.white,
-                          Colors.grey.shade50,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
+                // Event Breakdown Card - Always visible, filtered by active tab
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.white,
+                        Colors.grey.shade50,
                       ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
-                    child: KenwellFormCard(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.event_note,
-                                color: theme.primaryColor,
-                                size: 24,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: KenwellFormCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              isLiveTab
+                                  ? Icons.play_circle_outline
+                                  : Icons.history,
+                              color: theme.primaryColor,
+                              size: 24,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              isLiveTab
+                                  ? 'Live Event Breakdown'
+                                  : 'Past Event Breakdown',
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
                               ),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Event Breakdown',
-                                style: theme.textTheme.titleLarge?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        if (events.isEmpty)
+                          Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(32),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(24),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.shade100,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.event_busy,
+                                      size: 48,
+                                      color: Colors.grey[400],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    isLiveTab
+                                        ? 'No live events'
+                                        : 'No past events',
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                      color: Colors.grey[600],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    isLiveTab
+                                        ? 'Events currently in progress will appear here'
+                                        : 'Completed events will appear here',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: Colors.grey[500],
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          if (events.isEmpty)
-                            Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(32),
-                                child: Column(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(24),
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade100,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(
-                                        Icons.event_busy,
-                                        size: 48,
-                                        color: Colors.grey[400],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Text(
-                                      'No event data yet',
-                                      style:
-                                          theme.textTheme.bodyLarge?.copyWith(
-                                        color: Colors.grey[600],
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      'Events matching your criteria will appear here',
-                                      style:
-                                          theme.textTheme.bodySmall?.copyWith(
-                                        color: Colors.grey[500],
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          else
-                            ...events.map((event) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 12),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                EventStatsDetailScreen(
-                                              event: event,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      borderRadius: BorderRadius.circular(12),
-                                      child: Container(
-                                        padding: const EdgeInsets.all(16),
-                                        decoration: BoxDecoration(
-                                          color: theme.primaryColor
-                                              .withValues(alpha: 0.05),
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                          border: Border.all(
-                                            color: theme.primaryColor
-                                                .withValues(alpha: 0.15),
-                                            width: 1.5,
+                            ),
+                          )
+                        else
+                          ...events.map((event) => Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              EventStatsDetailScreen(
+                                            event: event,
                                           ),
                                         ),
-                                        child: Row(
-                                          children: [
-                                            Container(
-                                              padding: const EdgeInsets.all(10),
-                                              decoration: BoxDecoration(
-                                                color: theme.primaryColor
-                                                    .withValues(alpha: 0.1),
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              child: Icon(
-                                                Icons.event,
-                                                color: theme.primaryColor,
-                                                size: 20,
-                                              ),
+                                      );
+                                    },
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(16),
+                                      decoration: BoxDecoration(
+                                        color: theme.primaryColor
+                                            .withValues(alpha: 0.05),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: theme.primaryColor
+                                              .withValues(alpha: 0.15),
+                                          width: 1.5,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.all(10),
+                                            decoration: BoxDecoration(
+                                              color: theme.primaryColor
+                                                  .withValues(alpha: 0.1),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
                                             ),
-                                            const SizedBox(width: 12),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    event.title,
-                                                    style: theme
-                                                        .textTheme.bodyMedium
-                                                        ?.copyWith(
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      color: theme.primaryColor,
-                                                    ),
+                                            child: Icon(
+                                              Icons.event,
+                                              color: theme.primaryColor,
+                                              size: 20,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  event.title,
+                                                  style: theme
+                                                      .textTheme.bodyMedium
+                                                      ?.copyWith(
+                                                    fontWeight: FontWeight.w600,
+                                                    color: theme.primaryColor,
                                                   ),
-                                                  const SizedBox(height: 4),
-                                                  Row(
-                                                    children: [
-                                                      Icon(
-                                                        Icons.calendar_today,
-                                                        size: 14,
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Row(
+                                                  children: [
+                                                    Icon(
+                                                      Icons.calendar_today,
+                                                      size: 14,
+                                                      color: Colors.grey[600],
+                                                    ),
+                                                    const SizedBox(width: 4),
+                                                    Text(
+                                                      '${event.date.day}/${event.date.month}/${event.date.year}',
+                                                      style: theme
+                                                          .textTheme.bodySmall
+                                                          ?.copyWith(
                                                         color: Colors.grey[600],
                                                       ),
-                                                      const SizedBox(width: 4),
-                                                      Text(
-                                                        '${event.date.day}/${event.date.month}/${event.date.year}',
-                                                        style: theme
-                                                            .textTheme.bodySmall
+                                                    ),
+                                                    const SizedBox(width: 12),
+                                                    Container(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                        horizontal: 8,
+                                                        vertical: 2,
+                                                      ),
+                                                      decoration: BoxDecoration(
+                                                        color: _getStatusColor(
+                                                                event.status)
+                                                            .withValues(
+                                                                alpha: 0.15),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(4),
+                                                      ),
+                                                      child: Text(
+                                                        event.status,
+                                                        style: theme.textTheme
+                                                            .labelSmall
                                                             ?.copyWith(
                                                           color:
-                                                              Colors.grey[600],
+                                                              _getStatusColor(
+                                                                  event.status),
+                                                          fontWeight:
+                                                              FontWeight.w600,
                                                         ),
                                                       ),
-                                                      const SizedBox(width: 12),
-                                                      Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                          horizontal: 8,
-                                                          vertical: 2,
-                                                        ),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          color: _getStatusColor(
-                                                                  event.status)
-                                                              .withValues(
-                                                                  alpha: 0.15),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(4),
-                                                        ),
-                                                        child: Text(
-                                                          event.status,
-                                                          style: theme.textTheme
-                                                              .labelSmall
-                                                              ?.copyWith(
-                                                            color:
-                                                                _getStatusColor(
-                                                                    event
-                                                                        .status),
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 16,
-                                                      vertical: 8),
-                                              decoration: BoxDecoration(
-                                                gradient: LinearGradient(
-                                                  colors: [
-                                                    theme.primaryColor,
-                                                    theme.primaryColor
-                                                        .withValues(alpha: 0.8),
+                                                    ),
                                                   ],
                                                 ),
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: theme.primaryColor
-                                                        .withValues(alpha: 0.3),
-                                                    blurRadius: 8,
-                                                    offset: const Offset(0, 2),
-                                                  ),
+                                              ],
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 16, vertical: 8),
+                                            decoration: BoxDecoration(
+                                              gradient: LinearGradient(
+                                                colors: [
+                                                  theme.primaryColor,
+                                                  theme.primaryColor
+                                                      .withValues(alpha: 0.8),
                                                 ],
                                               ),
-                                              child: Text(
-                                                event.screenedCount.toString(),
-                                                style: theme
-                                                    .textTheme.labelLarge
-                                                    ?.copyWith(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: theme.primaryColor
+                                                      .withValues(alpha: 0.3),
+                                                  blurRadius: 8,
+                                                  offset: const Offset(0, 2),
                                                 ),
+                                              ],
+                                            ),
+                                            child: Text(
+                                              event.screenedCount.toString(),
+                                              style: theme.textTheme.labelLarge
+                                                  ?.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
                                               ),
                                             ),
-                                            const SizedBox(width: 8),
-                                            Icon(
-                                              Icons.chevron_right,
-                                              color: theme.primaryColor,
-                                            ),
-                                          ],
-                                        ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Icon(
+                                            Icons.chevron_right,
+                                            color: theme.primaryColor,
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
-                                )),
-                        ],
-                      ),
+                                ),
+                              )),
+                      ],
                     ),
                   ),
+                ),
                 const SizedBox(height: 24),
               ],
             ),
