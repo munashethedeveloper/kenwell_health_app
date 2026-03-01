@@ -7,6 +7,7 @@ import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/containers/gradient_container.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_modern_section_header.dart';
+import 'health_screening_stats_section.dart';
 
 class EventStatsDetailScreen extends StatelessWidget {
   final WellnessEvent event;
@@ -16,58 +17,9 @@ class EventStatsDetailScreen extends StatelessWidget {
     required this.event,
   });
 
-  // ── Computed screening-performance metrics ────────────────────────────────
-
-  /// Percentage of expected participants who were actually screened.
-  String get _screeningRate => event.expectedParticipation > 0
-      ? '${(event.screenedCount / event.expectedParticipation * 100).toStringAsFixed(1)}%'
-      : 'N/A';
-
-  /// Percentage of expected participants who did not show up.
-  String get _noShowRate => event.expectedParticipation > 0
-      ? '${((event.expectedParticipation - event.screenedCount) / event.expectedParticipation * 100).toStringAsFixed(1)}%'
-      : 'N/A';
-
-  /// Average number of participants screened per nurse deployed.
-  String get _screenedPerNurse =>
-      event.nurses > 0 ? (event.screenedCount / event.nurses).toStringAsFixed(1) : 'N/A';
-
-  /// Duration between actual start and end times (if recorded).
-  Duration? get _eventDuration {
-    if (event.actualStartTime != null && event.actualEndTime != null) {
-      return event.actualEndTime!.difference(event.actualStartTime!);
-    }
-    return null;
-  }
-
-  String get _durationLabel {
-    final d = _eventDuration;
-    if (d == null) return 'N/A';
-    final hours = d.inHours;
-    final minutes = d.inMinutes.remainder(60);
-    if (hours > 0) return '${hours}h ${minutes}m';
-    return '${minutes}m';
-  }
-
-  /// Participants screened per hour of actual event time.
-  String get _throughputPerHour {
-    final d = _eventDuration;
-    if (d == null || d.inMinutes == 0) return 'N/A';
-    final hours = d.inMinutes / 60.0;
-    return (event.screenedCount / hours).toStringAsFixed(1);
-  }
-
-  /// Number of distinct services offered at this event.
-  int _computeServicesCount() => event.servicesRequested.isEmpty
-      ? 0
-      : event.servicesRequested.split(',').where((s) => s.trim().isNotEmpty).length;
-
-  // ─────────────────────────────────────────────────────────────────────────
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final servicesCount = _computeServicesCount();
     final screeningPercentage = event.expectedParticipation > 0
         ? (event.screenedCount / event.expectedParticipation * 100)
             .toStringAsFixed(1)
@@ -240,75 +192,6 @@ class EventStatsDetailScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // ── Screening Performance ─────────────────────────────────────
-            const KenwellModernSectionHeader(
-              title: 'Screening Performance',
-              subtitle: 'Key metrics derived from this wellness event',
-              icon: Icons.bar_chart,
-            ),
-            const SizedBox(height: 16),
-            KenwellFormCard(
-              title: 'Screening Metrics',
-              child: Column(
-                children: [
-                  _buildMetricRow(
-                    Icons.percent,
-                    'Screening Rate',
-                    _screeningRate,
-                    'Percentage of expected participants screened',
-                    Colors.green,
-                    theme,
-                  ),
-                  const Divider(),
-                  _buildMetricRow(
-                    Icons.person_off_outlined,
-                    'No-Show Rate',
-                    _noShowRate,
-                    'Percentage of expected participants who did not attend',
-                    Colors.orange,
-                    theme,
-                  ),
-                  const Divider(),
-                  _buildMetricRow(
-                    Icons.medical_services_outlined,
-                    'Screened per Nurse',
-                    _screenedPerNurse,
-                    'Average participants screened per nurse deployed',
-                    Colors.blue,
-                    theme,
-                  ),
-                  const Divider(),
-                  _buildMetricRow(
-                    Icons.timer_outlined,
-                    'Event Duration',
-                    _durationLabel,
-                    'Total time from event start to end',
-                    Colors.purple,
-                    theme,
-                  ),
-                  const Divider(),
-                  _buildMetricRow(
-                    Icons.speed,
-                    'Throughput (per hr)',
-                    _throughputPerHour,
-                    'Average participants screened per hour',
-                    Colors.teal,
-                    theme,
-                  ),
-                  const Divider(),
-                  _buildMetricRow(
-                    Icons.health_and_safety_outlined,
-                    'Services Offered',
-                    servicesCount.toString(),
-                    'Number of distinct screening services provided',
-                    Colors.deepPurple,
-                    theme,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-
             // Event Location
             KenwellFormCard(
                 title: 'Client Organization',
@@ -472,6 +355,10 @@ class EventStatsDetailScreen extends StatelessWidget {
                 ),
               ),
             ],
+            const SizedBox(height: 24),
+
+            // ── Health Screening Analytics ────────────────────────────────
+            HealthScreeningStatsSection(eventId: event.id),
             const SizedBox(height: 24),
 
             // Export Button
@@ -708,60 +595,6 @@ class EventStatsDetailScreen extends StatelessWidget {
             child: Text(
               value,
               style: theme.textTheme.bodyMedium,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMetricRow(
-    IconData icon,
-    String label,
-    String value,
-    String description,
-    Color color,
-    ThemeData theme,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: KenwellColors.secondaryNavyDark,
-                  ),
-                ),
-                Text(
-                  description,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            value,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: color,
             ),
           ),
         ],

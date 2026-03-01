@@ -132,4 +132,20 @@ class FirestoreHraRepository {
             .map((doc) => HraScreening.fromMap(doc.data()))
             .toList());
   }
+
+  /// Get all HRA screenings across all events
+  Future<List<HraScreening>> getAllHraScreenings() async {
+    try {
+      final querySnapshot = await _firestore
+          .collection(_collectionName)
+          .orderBy('createdAt', descending: true)
+          .get();
+      return querySnapshot.docs
+          .map((doc) => HraScreening.fromMap(doc.data()))
+          .toList();
+    } catch (e) {
+      AppLogger.error('Failed to get all HRA screenings', e);
+      rethrow;
+    }
+  }
 }
