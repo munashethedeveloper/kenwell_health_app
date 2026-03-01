@@ -16,22 +16,20 @@ class UserFilterChips extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            _buildFilterChip('all', 'All Users', theme),
-            const SizedBox(width: 8),
-            ...UserRoles.values.map((role) {
-              return Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: _buildFilterChip(role, role, theme),
-              );
-            }),
-          ],
-        ),
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          _buildFilterChip('all', 'All', theme),
+          const SizedBox(width: 8),
+          ...UserRoles.values.map((role) {
+            return Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: _buildFilterChip(role, role, theme),
+            );
+          }),
+        ],
       ),
     );
   }
