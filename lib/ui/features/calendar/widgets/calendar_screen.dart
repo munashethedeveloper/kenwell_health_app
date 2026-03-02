@@ -343,7 +343,8 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                   icon: Icons.calendar_month_rounded,
                   label: 'This Month',
                   value: '$eventsThisMonth',
-                  color: const Color(0xFF90C048),
+                  color: const Color(0xFF201C58),
+                  //color: const Color(0xFF90C048),
                 ),
                 const SizedBox(width: 10),
                 _buildStatChip(
@@ -364,7 +365,9 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: KenwellColors.primaryGreen,
+                  // color: KenwellColors.primaryGreen,
+                  //color: KenwellColors.secondaryNavy,
+                  color: KenwellColors.secondaryNavy.withValues(alpha: 0.08),
                   width: 2.5,
                 ),
               ),
@@ -585,8 +588,10 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                theme.primaryColor.withValues(alpha: 0.08),
-                theme.primaryColor.withValues(alpha: 0.02),
+                KenwellColors.secondaryNavy.withValues(alpha: 0.08),
+                KenwellColors.secondaryNavy.withValues(alpha: 0.02),
+                //theme.primaryColor.withValues(alpha: 0.08),
+                //theme.primaryColor.withValues(alpha: 0.02),
               ],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,

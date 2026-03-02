@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
 import 'package:provider/provider.dart';
 import '../../../../../domain/models/member.dart';
 import '../../../../../domain/constants/role_permissions.dart';
@@ -349,7 +350,7 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Section title
+                    /*   // Section title
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Row(
@@ -388,8 +389,8 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(height: 12),
+                    ), */
+                    // const SizedBox(height: 12),
 
                     // Search and filter card
                     Container(
@@ -413,7 +414,7 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
+                          /*       Row(
                             children: [
                               Icon(
                                 Icons.search_rounded,
@@ -421,15 +422,15 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                                 color: theme.primaryColor,
                               ),
                               const SizedBox(width: 6),
-                              Text(
+                              /*  Text(
                                 'Search Members',
                                 style: theme.textTheme.labelMedium?.copyWith(
                                   fontWeight: FontWeight.w600,
                                   color: const Color(0xFF201C58),
                                 ),
-                              ),
+                              ), */
                             ],
-                          ),
+                          ), */
                           const SizedBox(height: 8),
                           MemberSearchBar(
                             controller: _searchController,
@@ -472,6 +473,13 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                         ],
                       ),
                     ),
+                    const SizedBox(height: 24),
+
+                    const KenwellModernSectionHeader(
+                      title: 'Registered Users',
+                      subtitle: 'Swipe or long-press for options',
+                    ),
+
                     const SizedBox(height: 16),
                   ],
                 ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
 import 'package:provider/provider.dart';
 import '../../../../../domain/models/user_model.dart';
 import '../../../../../domain/constants/role_permissions.dart';
@@ -470,7 +471,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                     const SizedBox(height: 16),
 
                     // Section title
-                    Padding(
+                    /*    Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Row(
                         children: [
@@ -480,36 +481,28 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                               color: theme.primaryColor.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Icon(
+                            /*  child: Icon(
                               Icons.group_rounded,
                               color: theme.primaryColor,
                               size: 18,
-                            ),
+                            ), */
                           ),
                           const SizedBox(width: 10),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Registered Users',
-                                style: theme.textTheme.titleSmall?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                  color: const Color(0xFF201C58),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                KenwellModernSectionHeader(
+                                  title: 'Registered Users',
+                                  subtitle: 'Swipe or long-press for options',
                                 ),
-                              ),
-                              Text(
-                                'Tap a user card to long-press for more options',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: const Color(0xFF6B7280),
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(height: 12),
+                    ), */
+                    //const SizedBox(height: 12),
 
                     // Search and filter card
                     Container(
@@ -568,6 +561,47 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                         ],
                       ),
                     ),
+
+                    /*             // Section title
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: theme.primaryColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.group_rounded,
+                        color: theme.primaryColor,
+                        size: 18,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          KenwellModernSectionHeader(
+                            title: 'Registered Users',
+                            subtitle: 'Swipe or long-press for options',
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),*/
+
+                    const SizedBox(height: 24),
+
+                    const KenwellModernSectionHeader(
+                      title: 'Registered Users',
+                      subtitle: 'Swipe or long-press for options',
+                    ),
+
                     const SizedBox(height: 16),
                   ],
                 ),

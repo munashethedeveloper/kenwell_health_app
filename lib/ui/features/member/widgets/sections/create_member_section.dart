@@ -2,6 +2,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/international_form_field.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
@@ -68,7 +69,11 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 20),
-                  Padding(
+                  const KenwellModernSectionHeader(
+                    title: 'New Member Registration',
+                    subtitle: 'Complete the form to register a new user',
+                  ),
+                  /* Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Row(
                       children: [
@@ -78,18 +83,18 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
                             color: theme.primaryColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Icon(
+                          /*  child: Icon(
                             Icons.person_add_rounded,
                             color: theme.primaryColor,
                             size: 22,
-                          ),
+                          ), */
                         ),
                         const SizedBox(width: 12),
                         const Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              /*  Text(
                                 'New Member Registration',
                                 style: TextStyle(
                                   fontSize: 16,
@@ -105,13 +110,18 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
                                   fontWeight: FontWeight.w400,
                                   color: Color(0xFF6B7280),
                                 ),
+                              ), */
+                              const KenwellModernSectionHeader(
+                                title: 'New Member Registration',
+                                subtitle:
+                                    'Complete the form to register a new user',
                               ),
                             ],
                           ),
                         ),
                       ],
                     ),
-                  ),
+                  ), */
                   const SizedBox(height: 20),
                   KenwellFormCard(
                     title: 'Basic Information',
@@ -138,7 +148,8 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
                     labelStyle: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: KenwellColors.secondaryNavy,
+                      //color: KenwellColors.secondaryNavy,
+                      color: Colors.white,
                     ),
                     onPressed: _submitMember,
                     isBusy: vm.isSubmitting,
