@@ -157,9 +157,26 @@ class HIVTestResultViewModel extends ChangeNotifier {
     }
   }
 
+  /// True when the screening result indicates the patient is at risk (Positive).
+  bool get isAtRisk => screeningResult == 'Positive';
+
+  /// True when the screening result indicates a healthy/negative status.
+  bool get isHealthy => screeningResult == 'Negative';
+
   // --- Setters ---
   void setScreeningResult(String value) {
     screeningResult = value;
+    // Auto-set nursing referral based on test result
+    if (value == 'Positive') {
+      if (nursingReferralSelection == null ||
+          nursingReferralSelection == NursingReferralOption.patientNotReferred) {
+        nursingReferralSelection = NursingReferralOption.referredToStateClinic;
+        notReferredReasonController.clear();
+      }
+    } else {
+      // Negative result → no referral needed
+      nursingReferralSelection = NursingReferralOption.patientNotReferred;
+    }
     notifyListeners();
   }
 
@@ -189,8 +206,10 @@ class HIVTestResultViewModel extends ChangeNotifier {
       return false;
     }
 
-    // Validate referral reason if patient not referred
-    if (nursingReferralSelection == NursingReferralOption.patientNotReferred &&
+    // Validate referral reason only when the referral card is visible (Positive result)
+    // and the nurse manually selected "not referred"
+    if (isAtRisk &&
+        nursingReferralSelection == NursingReferralOption.patientNotReferred &&
         notReferredReasonController.text.isEmpty) {
       return false;
     }

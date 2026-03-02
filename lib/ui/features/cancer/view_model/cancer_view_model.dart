@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_cancer_screening_repository.dart';
 import 'package:kenwell_health_app/domain/models/cander_screening.dart';
+import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 import 'package:uuid/uuid.dart';
 
@@ -119,6 +120,7 @@ class CancerScreeningViewModel extends ChangeNotifier {
   void setBreastLightExamFindings(String? value) {
     if (breastLightExamFindings == value) return;
     breastLightExamFindings = value;
+    _autoApplyReferral();
     notifyListeners();
   }
 
@@ -135,6 +137,7 @@ class CancerScreeningViewModel extends ChangeNotifier {
   void setPapSmearResults(String? value) {
     if (papSmearResults == value) return;
     papSmearResults = value;
+    _autoApplyReferral();
     notifyListeners();
   }
 
@@ -144,7 +147,54 @@ class CancerScreeningViewModel extends ChangeNotifier {
   void setPsaResults(String? value) {
     if (psaResults == value) return;
     psaResults = value;
+    _autoApplyReferral();
     notifyListeners();
+  }
+
+  // --- Nursing Referral ---
+  NursingReferralOption? nursingReferralSelection;
+  final TextEditingController notReferredReasonController =
+      TextEditingController();
+
+  void setNursingReferralSelection(NursingReferralOption? value) {
+    if (nursingReferralSelection == value) return;
+    nursingReferralSelection = value;
+    if (value != NursingReferralOption.patientNotReferred) {
+      notReferredReasonController.clear();
+    }
+    notifyListeners();
+  }
+
+  // --- Risk classification ---
+
+  /// True when all relevant exam findings are entered and none are abnormal.
+  bool get isHealthy {
+    // Determine which finding fields are relevant based on the consented sub-types
+    final breastRelevant = showBreastScreening;
+    final papRelevant = showPapSmear;
+    final psaRelevant = showPsa;
+
+    final breastOk = !breastRelevant || breastLightExamFindings == 'Normal';
+    final papOk = !papRelevant ||
+        (papSmearResults == 'Normal' || papSmearResults == 'Pending');
+    final psaOk = !psaRelevant || psaResults == 'Normal';
+
+    // At least one finding type must be present for the "healthy" state
+    final anyRelevant = breastRelevant || papRelevant || psaRelevant;
+    return anyRelevant && breastOk && papOk && psaOk && !isAtRisk;
+  }
+
+  /// Automatically set the nursing referral based on current finding state.
+  void _autoApplyReferral() {
+    if (isAtRisk) {
+      if (nursingReferralSelection == null ||
+          nursingReferralSelection == NursingReferralOption.patientNotReferred) {
+        nursingReferralSelection = NursingReferralOption.referredToStateClinic;
+        notReferredReasonController.clear();
+      }
+    } else if (isHealthy) {
+      nursingReferralSelection = NursingReferralOption.patientNotReferred;
+    }
   }
 
   // --- Outcome & Referral ---
@@ -159,10 +209,47 @@ class CancerScreeningViewModel extends ChangeNotifier {
   final TextEditingController clinicianNotesController =
       TextEditingController();
 
+  // --- Nursing Referral ---
+  NursingReferralOption? nursingReferralSelection;
+  final TextEditingController notReferredReasonController =
+      TextEditingController();
+
+  void setNursingReferralSelection(NursingReferralOption? value) {
+    if (nursingReferralSelection == value) return;
+    nursingReferralSelection = value;
+    if (value != NursingReferralOption.patientNotReferred) {
+      notReferredReasonController.clear();
+    }
+    notifyListeners();
+  }
+
+  /// True when any symptom, exam finding, or medical history flag indicates
+  /// that the patient requires follow-up (at risk).
+  bool get isAtRisk =>
+      previousCancerDiagnosis == 'Yes' ||
+      familyHistoryOfCancer == 'Yes' ||
+      breastLump == 'Yes' ||
+      abnormalBleeding == 'Yes' ||
+      urinaryDifficulty == 'Yes' ||
+      weightLoss == 'Yes' ||
+      persistentPain == 'Yes' ||
+      breastLightExamFindings == 'Abnormal' ||
+      papSmearResults == 'Abnormal' ||
+      psaResults == 'Abnormal';
+
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
 
-  bool get isFormValid => formKey.currentState?.validate() == true;
+  bool get isFormValid {
+    if (formKey.currentState?.validate() != true) return false;
+    // Validate nursing referral only when the patient is at risk
+    if (isAtRisk) {
+      if (nursingReferralSelection == null) return false;
+      if (nursingReferralSelection == NursingReferralOption.patientNotReferred &&
+          notReferredReasonController.text.isEmpty) return false;
+    }
+    return true;
+  }
 
   Future<void> submitCancerScreening(
     BuildContext context, {
@@ -225,6 +312,10 @@ class CancerScreeningViewModel extends ChangeNotifier {
         clinicianNotes: clinicianNotesController.text.isEmpty
             ? null
             : clinicianNotesController.text,
+        nursingReferral: isAtRisk ? nursingReferralSelection?.name : null,
+        notReferredReason: isAtRisk && notReferredReasonController.text.isNotEmpty
+            ? notReferredReasonController.text
+            : null,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
@@ -255,12 +346,14 @@ class CancerScreeningViewModel extends ChangeNotifier {
   @override
   void dispose() {
     otherConditionController.dispose();
+    notReferredReasonController.dispose();
     referredFacilityController.dispose();
     followUpDateController.dispose();
     consentObtainedController.dispose();
     clinicianNameController.dispose();
     clinicianSignatureController.dispose();
     clinicianNotesController.dispose();
+    notReferredReasonController.dispose();
     super.dispose();
   }
 }

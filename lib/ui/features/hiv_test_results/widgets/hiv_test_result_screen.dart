@@ -34,6 +34,18 @@ class HIVTestResultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<HIVTestResultViewModel>();
 
+    // Auto-refer when the screening result is Positive (at risk)
+    if (viewModel.isAtRisk) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (viewModel.nursingReferralSelection == null ||
+            viewModel.nursingReferralSelection ==
+                NursingReferralOption.patientNotReferred) {
+          viewModel.setNursingReferralSelection(
+              NursingReferralOption.referredToStateClinic);
+        }
+      });
+    }
+
     // Build the scaffold
     return Scaffold(
       // App bar
@@ -102,9 +114,15 @@ class HIVTestResultScreen extends StatelessWidget {
               // Confirmatory Test Card
               _buildInitialAssessment(viewModel),
               const SizedBox(height: 24),
-              // Confirmatory Test Card
-              _buildReferrals(viewModel),
-              const SizedBox(height: 24),
+              // Show referral card only for positive (at-risk) results;
+              // hide it for negative results and show a healthy status banner
+              if (viewModel.isAtRisk) ...[
+                _buildReferrals(viewModel),
+                const SizedBox(height: 24),
+              ] else ...[
+                _buildNegativeBanner(),
+                const SizedBox(height: 24),
+              ],
               // Nurse Details Card
               _buildNurseDetails(viewModel),
               const SizedBox(height: 24),
@@ -258,6 +276,36 @@ class HIVTestResultScreen extends StatelessWidget {
           label: 'Patient referred to State Clinic',
         ),
       ],
+    );
+  }
+
+  // Green banner shown when the HIV test result is negative (healthy)
+  Widget _buildNegativeBanner() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE8F5E9),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFF2E7D32), width: 1),
+      ),
+      child: const Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.check_circle, color: Color(0xFF2E7D32), size: 20),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'HIV test result is Negative. No nursing referral is required.',
+              style: TextStyle(
+                color: Color(0xFF2E7D32),
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

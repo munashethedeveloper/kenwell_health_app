@@ -26,6 +26,18 @@ class TBTestingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<TBTestingViewModel>();
 
+    // Auto-refer when any TB symptom is present (at risk)
+    if (viewModel.isAtRisk) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (viewModel.nursingReferralSelection == null ||
+            viewModel.nursingReferralSelection ==
+                NursingReferralOption.patientNotReferred) {
+          viewModel.setNursingReferralSelection(
+              NursingReferralOption.referredToStateClinic);
+        }
+      });
+    }
+
     return KenwellFormPage(
       title: 'TB Test Screening Form',
       sectionTitle: 'Section C: TB Screening',
@@ -151,10 +163,15 @@ class TBTestingScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
-        _buildReferrals(viewModel),
-        // const SizedBox(height: 24),
-        // _buildNurseDetails(viewModel),
-        const SizedBox(height: 24),
+        // Show referral card only when at-risk (any 'Yes' symptom) or undetermined;
+        // show a healthy banner when all symptoms are answered and none are 'Yes'
+        if (viewModel.isHealthy) ...[
+          _buildTbHealthyBanner(),
+          const SizedBox(height: 24),
+        ] else ...[
+          _buildReferrals(viewModel),
+          const SizedBox(height: 24),
+        ],
         KenwellSignatureActions(
           title: 'Signature',
           controller: viewModel.signatureController,
@@ -167,6 +184,35 @@ class TBTestingScreen extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildTbHealthyBanner() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE8F5E9),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFF2E7D32), width: 1),
+      ),
+      child: const Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.check_circle, color: Color(0xFF2E7D32), size: 20),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'No TB symptoms detected. No nursing referral is required.',
+              style: TextStyle(
+                color: Color(0xFF2E7D32),
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

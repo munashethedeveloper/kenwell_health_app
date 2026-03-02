@@ -106,7 +106,19 @@ class ConsentScreen extends StatelessWidget {
 
         // Validate and submit the form
         if (vm.formKey.currentState!.validate() && vm.isFormValid) {
-          await vm.submitConsent();
+          try {
+            await vm.submitConsent();
+          } catch (e) {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content:
+                      Text('Failed to save consent: $e'),
+                ),
+              );
+            }
+            return;
+          }
           // FIX: Always use markConsentCompleted() to update and notify listeners
           try {
             if (context.mounted) {
