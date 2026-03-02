@@ -40,6 +40,7 @@ class TBTestingViewModel extends ChangeNotifier {
   void setCoughTwoWeeks(String? value) {
     if (coughTwoWeeks == value) return;
     coughTwoWeeks = value;
+    _autoApplyReferral();
     notifyListeners();
   }
 
@@ -52,19 +53,52 @@ class TBTestingViewModel extends ChangeNotifier {
   void setBloodInSputum(String? value) {
     if (bloodInSputum == value) return;
     bloodInSputum = value;
+    _autoApplyReferral();
     notifyListeners();
   }
 
   void setWeightLoss(String? value) {
     if (weightLoss == value) return;
     weightLoss = value;
+    _autoApplyReferral();
     notifyListeners();
   }
 
   void setNightSweats(String? value) {
     if (nightSweats == value) return;
     nightSweats = value;
+    _autoApplyReferral();
     notifyListeners();
+  }
+
+  // --- Risk classification helpers ---
+
+  /// True when any active TB symptom is answered 'Yes'.
+  bool get isAtRisk =>
+      coughTwoWeeks == 'Yes' ||
+      bloodInSputum == 'Yes' ||
+      weightLoss == 'Yes' ||
+      nightSweats == 'Yes';
+
+  /// True when all required TB symptom questions are answered and none are 'Yes'.
+  bool get isHealthy =>
+      coughTwoWeeks != null &&
+      bloodInSputum != null &&
+      weightLoss != null &&
+      nightSweats != null &&
+      !isAtRisk;
+
+  /// Automatically set the nursing referral based on the current symptom state.
+  void _autoApplyReferral() {
+    if (isAtRisk) {
+      if (nursingReferralSelection == null ||
+          nursingReferralSelection == NursingReferralOption.patientNotReferred) {
+        nursingReferralSelection = NursingReferralOption.referredToStateClinic;
+        notReferredReasonController.clear();
+      }
+    } else if (isHealthy) {
+      nursingReferralSelection = NursingReferralOption.patientNotReferred;
+    }
   }
 
   //void setFeverChills(String? value) {
@@ -239,7 +273,11 @@ class TBTestingViewModel extends ChangeNotifier {
     final nurseInterventionValid = initialAssessmentValid &&
         followUpValid &&
         nursingReferralSelection != null &&
-        (nursingReferralSelection != NursingReferralOption.patientNotReferred ||
+        // Only require a reason when the referral card is visible (at-risk or undetermined)
+        // and the nurse manually selected "not referred"
+        (isHealthy ||
+            nursingReferralSelection !=
+                NursingReferralOption.patientNotReferred ||
             notReferredReasonController.text.isNotEmpty) &&
         signatureController.isNotEmpty;
 

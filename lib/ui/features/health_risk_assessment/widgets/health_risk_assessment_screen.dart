@@ -4,6 +4,7 @@ import 'package:kenwell_health_app/ui/shared/ui/form/custom_dropdown_field.dart'
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_referral_card.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/health_metric_status_badge.dart';
+import 'package:kenwell_health_app/ui/features/nurse_interventions/view_model/nurse_intervention_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
@@ -18,7 +19,7 @@ import '../view_model/health_risk_assessment_view_model.dart';
 // PersonalRiskAssessmentScreen displays the personal risk assessment form
 class PersonalRiskAssessmentScreen extends StatelessWidget {
   final PersonalRiskAssessmentViewModel viewModel;
-  final dynamic nurseViewModel;
+  final NurseInterventionViewModel nurseViewModel;
   final VoidCallback? onNext;
   final VoidCallback? onPrevious;
   final bool isFemale;
@@ -61,6 +62,16 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                       NursingReferralOption.patientNotReferred) {
                 nurseViewModel.setNursingReferralSelection(
                     NursingReferralOption.referredToStateClinic);
+              }
+            });
+          } else if (vm.isHealthy) {
+            // When all metrics are healthy, auto-clear the referral to "not referred"
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (nurseViewModel.nursingReferralSelection == null ||
+                  nurseViewModel.nursingReferralSelection !=
+                      NursingReferralOption.patientNotReferred) {
+                nurseViewModel.setNursingReferralSelection(
+                    NursingReferralOption.patientNotReferred);
               }
             });
           }
@@ -470,8 +481,15 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                       const HealthMetricRedAlert(),
                     ],
 
+                    // Healthy status indicator — hide referral card, show green banner
+                    if (vm.isHealthy) ...[
+                      const SizedBox(height: 12),
+                      _buildHealthyBanner(),
+                    ],
+
                     const SizedBox(height: 24),
-                    _buildReferrals(),
+                    // Show referral card only when NOT healthy (at-risk or undetermined)
+                    if (!vm.isHealthy) _buildReferrals(),
                     const SizedBox(height: 24),
 
                     // ===== Navigation Buttons =====
@@ -541,6 +559,37 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
           label: 'Patient referred to State HIV clinic',
         ),
       ],
+    );
+  }
+
+  // Green banner shown when all metrics are healthy
+  Widget _buildHealthyBanner() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE8F5E9),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFF2E7D32), width: 1),
+      ),
+      child: const Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.check_circle, color: Color(0xFF2E7D32), size: 20),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'All health metrics are in a healthy range. '
+              'No nursing referral is required.',
+              style: TextStyle(
+                color: Color(0xFF2E7D32),
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

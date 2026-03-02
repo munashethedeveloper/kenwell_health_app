@@ -242,6 +242,16 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
       bloodSugarStatus == HealthMetricStatus.red ||
       cholesterolStatus == HealthMetricStatus.red;
 
+  /// True when all four key health metrics have been entered.
+  bool get allMetricsEntered =>
+      systolicBpController.text.isNotEmpty &&
+      diastolicBpController.text.isNotEmpty &&
+      bloodSugarController.text.isNotEmpty &&
+      cholesterolController.text.isNotEmpty;
+
+  /// True when all metrics are entered and none are in the danger zone.
+  bool get isHealthy => allMetricsEntered && !hasRedMetrics;
+
   //Show Fields
   bool get showSmokingFields => smokingStatus == 'Yes';
   bool get showDrinkingFields => drinkingStatus == 'Yes';
