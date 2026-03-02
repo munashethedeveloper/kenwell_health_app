@@ -157,6 +157,12 @@ class HIVTestResultViewModel extends ChangeNotifier {
     }
   }
 
+  /// True when the screening result indicates the patient is at risk (Positive).
+  bool get isAtRisk => screeningResult == 'Positive';
+
+  /// True when the screening result indicates a healthy/negative status.
+  bool get isHealthy => screeningResult == 'Negative';
+
   // --- Setters ---
   void setScreeningResult(String value) {
     screeningResult = value;
@@ -173,12 +179,6 @@ class HIVTestResultViewModel extends ChangeNotifier {
     }
     notifyListeners();
   }
-
-  /// True when the screening result indicates the patient is at risk.
-  bool get isAtRisk => screeningResult == 'Positive';
-
-  /// True when the screening result indicates a healthy/negative status.
-  bool get isHealthy => screeningResult == 'Negative';
 
   // --- Form validation ---
   bool get isFormValid {

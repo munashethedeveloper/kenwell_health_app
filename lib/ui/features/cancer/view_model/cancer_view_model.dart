@@ -167,13 +167,7 @@ class CancerScreeningViewModel extends ChangeNotifier {
 
   // --- Risk classification ---
 
-  /// True when any exam finding is abnormal.
-  bool get isAtRisk =>
-      breastLightExamFindings == 'Abnormal' ||
-      papSmearResults == 'Abnormal' ||
-      psaResults == 'Abnormal';
-
-  /// True when all relevant findings are entered and none are abnormal.
+  /// True when all relevant exam findings are entered and none are abnormal.
   bool get isHealthy {
     // Determine which finding fields are relevant based on the consented sub-types
     final breastRelevant = showBreastScreening;
@@ -215,10 +209,47 @@ class CancerScreeningViewModel extends ChangeNotifier {
   final TextEditingController clinicianNotesController =
       TextEditingController();
 
+  // --- Nursing Referral ---
+  NursingReferralOption? nursingReferralSelection;
+  final TextEditingController notReferredReasonController =
+      TextEditingController();
+
+  void setNursingReferralSelection(NursingReferralOption? value) {
+    if (nursingReferralSelection == value) return;
+    nursingReferralSelection = value;
+    if (value != NursingReferralOption.patientNotReferred) {
+      notReferredReasonController.clear();
+    }
+    notifyListeners();
+  }
+
+  /// True when any symptom, exam finding, or medical history flag indicates
+  /// that the patient requires follow-up (at risk).
+  bool get isAtRisk =>
+      previousCancerDiagnosis == 'Yes' ||
+      familyHistoryOfCancer == 'Yes' ||
+      breastLump == 'Yes' ||
+      abnormalBleeding == 'Yes' ||
+      urinaryDifficulty == 'Yes' ||
+      weightLoss == 'Yes' ||
+      persistentPain == 'Yes' ||
+      breastLightExamFindings == 'Abnormal' ||
+      papSmearResults == 'Abnormal' ||
+      psaResults == 'Abnormal';
+
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
 
-  bool get isFormValid => formKey.currentState?.validate() == true;
+  bool get isFormValid {
+    if (formKey.currentState?.validate() != true) return false;
+    // Validate nursing referral only when the patient is at risk
+    if (isAtRisk) {
+      if (nursingReferralSelection == null) return false;
+      if (nursingReferralSelection == NursingReferralOption.patientNotReferred &&
+          notReferredReasonController.text.isEmpty) return false;
+    }
+    return true;
+  }
 
   Future<void> submitCancerScreening(
     BuildContext context, {
@@ -281,6 +312,10 @@ class CancerScreeningViewModel extends ChangeNotifier {
         clinicianNotes: clinicianNotesController.text.isEmpty
             ? null
             : clinicianNotesController.text,
+        nursingReferral: isAtRisk ? nursingReferralSelection?.name : null,
+        notReferredReason: isAtRisk && notReferredReasonController.text.isNotEmpty
+            ? notReferredReasonController.text
+            : null,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
@@ -318,6 +353,7 @@ class CancerScreeningViewModel extends ChangeNotifier {
     clinicianNameController.dispose();
     clinicianSignatureController.dispose();
     clinicianNotesController.dispose();
+    notReferredReasonController.dispose();
     super.dispose();
   }
 }

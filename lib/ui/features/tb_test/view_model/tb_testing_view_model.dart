@@ -380,10 +380,10 @@ class TBTestingViewModel extends ChangeNotifier {
         followUpDate: followUpDateController.text.isEmpty
             ? null
             : followUpDateController.text,
-        nursingReferral: nursingReferralSelection?.name,
-        notReferredReason: notReferredReasonController.text.isEmpty
-            ? null
-            : notReferredReasonController.text,
+        nursingReferral: isAtRisk ? nursingReferralSelection?.name : null,
+        notReferredReason: isAtRisk && notReferredReasonController.text.isNotEmpty
+            ? notReferredReasonController.text
+            : null,
         nurseFirstName: nurseFirstNameController.text,
         nurseLastName: nurseLastNameController.text,
         rank: rankController.text,
