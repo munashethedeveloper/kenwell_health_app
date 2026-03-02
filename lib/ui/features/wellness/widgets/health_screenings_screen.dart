@@ -19,7 +19,6 @@ class HealthScreeningsScreen extends StatelessWidget {
   final VoidCallback? onHctTap;
   final VoidCallback? onTbTap;
   final VoidCallback? onCancerTap;
-  final VoidCallback? onSubmitAll;
   final PreferredSizeWidget? appBar;
 
   const HealthScreeningsScreen({
@@ -39,7 +38,6 @@ class HealthScreeningsScreen extends StatelessWidget {
     this.onHctTap,
     this.onTbTap,
     this.onCancerTap,
-    this.onSubmitAll,
     this.appBar,
   });
 
@@ -112,94 +110,10 @@ class HealthScreeningsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
             ],
-
-            // Submit All Button
-            if (onSubmitAll != null &&
-                _allEnabledScreeningsCompleted(
-                  hraEnabled: hraEnabled,
-                  hctEnabled: hctEnabled,
-                  tbEnabled: tbEnabled,
-                  cancerEnabled: cancerEnabled,
-                  hraCompleted: hraCompleted,
-                  hctCompleted: hctCompleted,
-                  tbCompleted: tbCompleted,
-                  cancerCompleted: cancerCompleted,
-                ))
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: onSubmitAll,
-                  icon: const Icon(Icons.check_circle),
-                  label: const Text('Complete & Save All Screenings'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    backgroundColor: theme.colorScheme.primary,
-                    foregroundColor: Colors.white,
-                  ),
-                ),
-              ),
-
-            if (onSubmitAll != null &&
-                !_allEnabledScreeningsCompleted(
-                  hraEnabled: hraEnabled,
-                  hctEnabled: hctEnabled,
-                  tbEnabled: tbEnabled,
-                  cancerEnabled: cancerEnabled,
-                  hraCompleted: hraCompleted,
-                  hctCompleted: hctCompleted,
-                  tbCompleted: tbCompleted,
-                  cancerCompleted: cancerCompleted,
-                ))
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: theme.colorScheme.outline.withValues(alpha: 0.5),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.info_outline,
-                      color: theme.colorScheme.primary,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 24),
-                    Expanded(
-                      child: Text(
-                        'Complete all consented screenings to submit',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
           ],
         ),
       ),
     );
-  }
-
-  bool _allEnabledScreeningsCompleted({
-    required bool hraEnabled,
-    required bool hctEnabled,
-    required bool tbEnabled,
-    bool cancerEnabled = false,
-    required bool hraCompleted,
-    required bool hctCompleted,
-    required bool tbCompleted,
-    bool cancerCompleted = false,
-  }) {
-    // Check if all enabled screenings are completed
-    if (hraEnabled && !hraCompleted) return false;
-    if (hctEnabled && !hctCompleted) return false;
-    if (tbEnabled && !tbCompleted) return false;
-    if (cancerEnabled && !cancerCompleted) return false;
-    return true;
   }
 }
 

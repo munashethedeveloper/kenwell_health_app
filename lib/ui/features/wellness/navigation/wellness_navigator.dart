@@ -348,6 +348,13 @@ class WellnessNavigator {
       required bool hctEnabled,
       required bool tbEnabled,
       bool cancerEnabled = false}) async {
+    // Helper: check if all enabled screenings are now complete.
+    bool allDone() =>
+        (!hraEnabled || wellnessVM.hraCompleted) &&
+        (!hctEnabled || wellnessVM.hctCompleted) &&
+        (!tbEnabled || wellnessVM.tbCompleted) &&
+        (!cancerEnabled || wellnessVM.cancerCompleted);
+
     return await Navigator.push<bool>(
       context,
       MaterialPageRoute(
@@ -370,8 +377,7 @@ class WellnessNavigator {
                       hraCompleted: true)
                   .catchError((e) =>
                       debugPrint('Failed to update HRA screening status: $e'));
-              // Pop back to refresh the parent screen
-              Navigator.of(context).pop(false); // false = not final submit
+              Navigator.of(context).pop(allDone());
             }
           },
           onHctTap: () async {
@@ -384,8 +390,7 @@ class WellnessNavigator {
                       hctCompleted: true)
                   .catchError((e) =>
                       debugPrint('Failed to update HCT screening status: $e'));
-              // Pop back to refresh the parent screen
-              Navigator.of(context).pop(false); // false = not final submit
+              Navigator.of(context).pop(allDone());
             }
           },
           onTbTap: () async {
@@ -397,8 +402,7 @@ class WellnessNavigator {
                   .updateScreeningStatus(member.id, event.id, tbCompleted: true)
                   .catchError((e) =>
                       debugPrint('Failed to update TB screening status: $e'));
-              // Pop back to refresh the parent screen
-              Navigator.of(context).pop(false); // false = not final submit
+              Navigator.of(context).pop(allDone());
             }
           },
           onCancerTap: () async {
@@ -411,12 +415,8 @@ class WellnessNavigator {
                       cancerCompleted: true)
                   .catchError((e) => debugPrint(
                       'Failed to update Cancer screening status: $e'));
-              // Pop back to refresh the parent screen
-              Navigator.of(context).pop(false); // false = not final submit
+              Navigator.of(context).pop(allDone());
             }
-          },
-          onSubmitAll: () {
-            Navigator.of(context).pop(true); // true = final submit
           },
           appBar: KenwellAppBar(
             title: event.title,

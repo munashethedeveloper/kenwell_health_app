@@ -18,8 +18,6 @@ class SurveyViewModel extends ChangeNotifier {
     'overallExperience': -1,
     'friendlyStaff': -1,
     'nurseProfessional': -1,
-    'clearResults': -1,
-    'realisedValue': -1,
     'encourageColleagues': -1,
   };
   String? contactConsent; // Yes/No
