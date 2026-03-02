@@ -114,13 +114,6 @@ class WellnessFlowScreen extends StatelessWidget {
           ///onHivTap: () => flowVM.navigateToHivScreening(),
           onHctTap: () => flowVM.navigateToHctScreening(),
           onTbTap: () => flowVM.navigateToTbScreening(),
-          onSubmitAll: () {
-            // Mark screenings as completed and update UI immediately
-            flowVM.markScreeningsCompleted();
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              flowVM.navigateToSection(WellnessFlowViewModel.sectionSurvey);
-            });
-          },
         );
 
       case WellnessFlowViewModel.stepPersonalDetails:
@@ -145,10 +138,8 @@ class WellnessFlowScreen extends StatelessWidget {
           onNext: () {
             // Immediate update: mark HRA as completed in the parent ViewModel
             flowVM.markHraCompleted();
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              flowVM.navigateToSection(
-                  WellnessFlowViewModel.sectionHealthScreenings);
-            });
+            WidgetsBinding.instance.addPostFrameCallback(
+                (_) => _navigateAfterScreeningComplete(flowVM));
           },
           onPrevious: () {
             flowVM.navigateToSection(
@@ -218,10 +209,8 @@ class WellnessFlowScreen extends StatelessWidget {
             onNext: () {
               // Immediate update: mark HCT as completed in the parent ViewModel
               flowVM.markHctCompleted();
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                flowVM.navigateToSection(
-                    WellnessFlowViewModel.sectionHealthScreenings);
-              });
+              WidgetsBinding.instance.addPostFrameCallback(
+                  (_) => _navigateAfterScreeningComplete(flowVM));
             },
             onPrevious: flowVM.previousStep,
           ),
@@ -243,10 +232,8 @@ class WellnessFlowScreen extends StatelessWidget {
             onNext: () {
               // Immediate update: mark TB as completed in the parent ViewModel
               flowVM.markTbCompleted();
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                flowVM.navigateToSection(
-                    WellnessFlowViewModel.sectionHealthScreenings);
-              });
+              WidgetsBinding.instance.addPostFrameCallback(
+                  (_) => _navigateAfterScreeningComplete(flowVM));
             },
             onPrevious: () {
               flowVM.navigateToSection(
@@ -348,6 +335,21 @@ class WellnessFlowScreen extends StatelessWidget {
         return Center(
           child: Text('Invalid step: ${flowVM.currentStepName}'),
         );
+    }
+  }
+
+  /// After a screening completes, navigate to the survey if all consented
+  /// screenings are done, or return to the health screenings menu otherwise.
+  void _navigateAfterScreeningComplete(WellnessFlowViewModel flowVM) {
+    final c = flowVM.consentVM;
+    final allDone = (!c.hra || flowVM.hraCompleted) &&
+        (!c.hct || flowVM.hctCompleted) &&
+        (!c.tb || flowVM.tbCompleted);
+    if (allDone) {
+      flowVM.markScreeningsCompleted();
+      flowVM.navigateToSection(WellnessFlowViewModel.sectionSurvey);
+    } else {
+      flowVM.navigateToSection(WellnessFlowViewModel.sectionHealthScreenings);
     }
   }
 }
