@@ -1,6 +1,17 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
+import 'package:kenwell_health_app/utils/logger.dart';
 
 class SurveyViewModel extends ChangeNotifier {
+  String? _memberId;
+  String? _eventId;
+
+  void setMemberAndEventId(String memberId, String eventId) {
+    _memberId = memberId;
+    _eventId = eventId;
+  }
+
   String? heardAbout; // e.g., Intranet, Flyer, etc.
   String? province;
   Map<String, int> ratings = {
@@ -50,11 +61,28 @@ class SurveyViewModel extends ChangeNotifier {
       return;
     }
 
-    debugPrint('✅ Survey Submitted:');
-    debugPrint('Heard About: $heardAbout');
-    debugPrint('Province: $province');
-    debugPrint('Ratings: $ratings');
-    debugPrint('Contact Consent: $contactConsent');
+    try {
+      if (_memberId == null || _eventId == null) {
+        throw StateError('Member or event information is missing');
+      }
+      final id = const Uuid().v4();
+      await FirebaseFirestore.instance
+          .collection('survey_results')
+          .doc(id)
+          .set({...toMap(), 'id': id});
+      AppLogger.info('Survey saved successfully');
+    } catch (e) {
+      AppLogger.error('Failed to save survey', e);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Failed to save survey. Please try again.')),
+        );
+      }
+      return;
+    }
+
+    if (!context.mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Survey submitted successfully!')),
@@ -65,9 +93,12 @@ class SurveyViewModel extends ChangeNotifier {
   }
 
   Map<String, dynamic> toMap() => {
+        'memberId': _memberId,
+        'eventId': _eventId,
         'heardAbout': heardAbout,
         'province': province,
         'ratings': ratings,
         'contactConsent': contactConsent,
+        'createdAt': DateTime.now().toIso8601String(),
       };
 }

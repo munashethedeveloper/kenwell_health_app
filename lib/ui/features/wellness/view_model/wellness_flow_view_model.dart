@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/features/consent_form/view_model/consent_view_model.dart';
 
@@ -131,7 +132,20 @@ class WellnessFlowViewModel extends ChangeNotifier {
       screeningsCompleted = true;
     }
 
-    // TO DO: Survey loading logic (if survey is persisted in Firestore, add here)
+    // Survey
+    try {
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('survey_results')
+          .where('memberId', isEqualTo: memberId)
+          .where('eventId', isEqualTo: eventId)
+          .limit(1)
+          .get();
+      if (querySnapshot.docs.isNotEmpty) {
+        surveyCompleted = true;
+      }
+    } catch (e) {
+      debugPrint('Error loading survey completion: $e');
+    }
 
     notifyListeners();
   }

@@ -647,6 +647,7 @@ class WellnessNavigator {
   /// Navigate to survey
   Future<bool?> _navigateToSurvey(Member member) async {
     final surveyVM = SurveyViewModel();
+    surveyVM.setMemberAndEventId(member.id, event.id);
 
     return await Navigator.push<bool>(
       context,
