@@ -97,7 +97,7 @@ class MemberEvent {
   }
 
   factory MemberEvent.fromMap(String id, Map<String, dynamic> data) {
-    DateTime _parseTimestamp(dynamic value) {
+    DateTime parseTimestamp(dynamic value) {
       if (value is Timestamp) return value.toDate();
       if (value is String) return DateTime.parse(value);
       return DateTime.now();
@@ -117,10 +117,10 @@ class MemberEvent {
       tbCompleted: data['tbCompleted'] as bool? ?? false,
       cancerCompleted: data['cancerCompleted'] as bool? ?? false,
       registeredAt: data['registeredAt'] != null
-          ? _parseTimestamp(data['registeredAt'])
+          ? parseTimestamp(data['registeredAt'])
           : DateTime.now(),
       screenedAt: data['screenedAt'] != null
-          ? _parseTimestamp(data['screenedAt'])
+          ? parseTimestamp(data['screenedAt'])
           : null,
     );
   }

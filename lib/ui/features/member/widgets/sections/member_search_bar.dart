@@ -35,7 +35,7 @@ class MemberSearchBar extends StatelessWidget {
         prefixIcon: Icon(
           Icons.search_rounded,
           color: theme.colorScheme.primary,
-          size: 20,
+          size: 22,
         ),
         suffixIcon: searchQuery.isNotEmpty
             ? IconButton(
@@ -48,19 +48,19 @@ class MemberSearchBar extends StatelessWidget {
               )
             : null,
         filled: true,
-        fillColor: Colors.grey.shade50,
+        fillColor: Colors.white,
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(color: Colors.grey.shade200, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(color: Colors.grey.shade200, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(
             color: theme.colorScheme.primary,
             width: 2,

@@ -20,10 +20,10 @@ class EventStatsDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final screeningPercentage = event.expectedParticipation > 0
+    /*  final screeningPercentage = event.expectedParticipation > 0
         ? (event.screenedCount / event.expectedParticipation * 100)
             .toStringAsFixed(1)
-        : '0.0';
+        : '0.0'; */
 
     return Scaffold(
       appBar: KenwellAppBar(
@@ -557,7 +557,7 @@ class EventStatsDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String text, ThemeData theme) {
+  /*  Widget _buildInfoRow(IconData icon, String text, ThemeData theme) {
     return Row(
       children: [
         Icon(icon, size: 16, color: Colors.white.withValues(alpha: 0.9)),
@@ -572,7 +572,7 @@ class EventStatsDetailScreen extends StatelessWidget {
         ),
       ],
     );
-  }
+  } */
 
   Widget _buildDetailRow(String label, String value, ThemeData theme) {
     return Padding(

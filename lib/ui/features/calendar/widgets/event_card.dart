@@ -28,7 +28,7 @@ class EventCard extends StatelessWidget {
     final profileVM = context.watch<ProfileViewModel>();
     final canDelete =
         RolePermissions.canAccessFeature(profileVM.role, 'delete_event');
-    final theme = Theme.of(context);
+    //final theme = Theme.of(context);
 
     // Event card with white background, shadow, and left accent strip
     final cardContent = Material(

@@ -495,12 +495,12 @@ class EventViewModel extends ChangeNotifier {
     _selectedServices.addAll(ServiceTypeConverter.fromStorageString(raw));
   }
 
-  // Helper to set additional services from storage string
+/*   // Helper to set additional services from storage string
   void _setAdditionalServicesFromString(String raw) {
     _selectedAdditionalServices.clear();
     _selectedAdditionalServices
         .addAll(AdditionalServiceTypeConverter.fromStorageString(raw));
-  }
+  } */
 
   // Reset selections
   void _resetServiceSelections() {

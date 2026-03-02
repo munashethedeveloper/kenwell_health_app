@@ -188,11 +188,11 @@ class _EventScreenState extends State<EventScreen> {
 
     // Build the Scaffold
     return Scaffold(
-      appBar: KenwellAppBar(
+      appBar: const KenwellAppBar(
         title: 'KenWell365',
         automaticallyImplyLeading: true,
         titleColor: Colors.white,
-        titleStyle: const TextStyle(
+        titleStyle: TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.bold,
         ),

@@ -546,7 +546,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                           const SizedBox(height: 12),
                           Row(
                             children: [
-                              Icon(
+                              const Icon(
                                 Icons.tune_rounded,
                                 size: 15,
                                 color: KenwellColors.primaryGreen,
