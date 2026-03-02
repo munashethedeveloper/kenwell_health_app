@@ -75,31 +75,26 @@ class HealthScreeningsScreen extends StatelessWidget {
               _ScreeningCard(
                 icon: Icons.psychology,
                 title: 'Health Risk Assessment',
-                subtitle: 'Evaluate your health risks',
                 isEnabled: hraEnabled,
                 isCompleted: hraCompleted,
                 onTap: onHraTap,
               ),
-              const SizedBox(height: 12),
             ],
 
             if (hctEnabled) ...[
               _ScreeningCard(
                 icon: Icons.vaccines,
                 title: 'HCT Screening',
-                subtitle: 'HCT testing and counseling',
                 isEnabled: hctEnabled,
                 isCompleted: hctCompleted,
                 onTap: onHctTap,
               ),
-              const SizedBox(height: 12),
             ],
 
             if (tbEnabled) ...[
               _ScreeningCard(
                 icon: Icons.healing,
                 title: 'TB Screening',
-                subtitle: 'Tuberculosis testing',
                 isEnabled: tbEnabled,
                 isCompleted: tbCompleted,
                 onTap: onTbTap,
@@ -108,11 +103,9 @@ class HealthScreeningsScreen extends StatelessWidget {
             ],
 
             if (cancerEnabled) ...[
-              const SizedBox(height: 12),
               _ScreeningCard(
                 icon: Icons.biotech,
                 title: 'Cancer Screening',
-                subtitle: 'Breast, cervical & prostate cancer screening',
                 isEnabled: cancerEnabled,
                 isCompleted: cancerCompleted,
                 onTap: onCancerTap,
@@ -213,7 +206,6 @@ class HealthScreeningsScreen extends StatelessWidget {
 class _ScreeningCard extends StatelessWidget {
   final IconData icon;
   final String title;
-  final String subtitle;
   final bool isEnabled;
   final bool isCompleted;
   final VoidCallback? onTap;
@@ -221,7 +213,6 @@ class _ScreeningCard extends StatelessWidget {
   const _ScreeningCard({
     required this.icon,
     required this.title,
-    required this.subtitle,
     required this.isEnabled,
     this.isCompleted = false,
     this.onTap,
@@ -229,104 +220,110 @@ class _ScreeningCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    Color iconContainerColor;
+    Color iconColor;
+    Color statusTextColor;
+    String statusText;
 
-    final backgroundColor = isEnabled
-        ? theme.primaryColor.withValues(alpha: 0.1)
-        : Colors.grey[200]!;
-    final iconColor = isEnabled ? theme.primaryColor : Colors.grey[400]!;
-    final textColor = isEnabled ? Colors.black87 : Colors.grey[500]!;
+    if (isCompleted) {
+      iconContainerColor = const Color(0xFF90C048).withValues(alpha: 0.15);
+      iconColor = const Color(0xFF90C048);
+      statusTextColor = const Color(0xFF90C048);
+      statusText = 'Completed';
+    } else if (isEnabled) {
+      iconContainerColor = Colors.grey.shade200;
+      iconColor = Colors.grey.shade600;
+      statusTextColor = Colors.grey.shade600;
+      statusText = 'Tap to begin';
+    } else {
+      iconContainerColor = Colors.grey.shade200;
+      iconColor = Colors.grey.shade400;
+      statusTextColor = Colors.grey.shade400;
+      statusText = 'Not consented';
+    }
 
-    return Card(
-      elevation: isEnabled ? 2 : 0,
-      child: InkWell(
-        onTap: onTap,
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: backgroundColor,
-                  borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.grey.shade200,
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: isEnabled ? onTap : null,
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: iconContainerColor,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    icon,
+                    color: iconColor,
+                    size: 24,
+                  ),
                 ),
-                child: Icon(
-                  icon,
-                  color: iconColor,
-                  size: 32,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: textColor,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: textColor,
-                      ),
-                    ),
-                    if (!isEnabled) ...[
-                      const SizedBox(height: 4),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
-                        'Not consented',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: Colors.grey[600],
-                          fontStyle: FontStyle.italic,
+                        title,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF201C58),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        statusText,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: statusTextColor,
                         ),
                       ),
                     ],
-                    if (isEnabled && isCompleted) ...[
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.check_circle,
-                            size: 16,
-                            color: Colors.deepPurple[700],
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Completed',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: Colors.deepPurple[700],
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ],
+                  ),
                 ),
-              ),
-              if (isCompleted)
-                Icon(
-                  Icons.check_circle,
-                  color: Colors.deepPurple[700],
-                  size: 28,
-                )
-              else if (isEnabled)
-                Icon(
-                  Icons.chevron_right,
-                  color: Colors.grey[600],
-                )
-              else
-                Icon(
-                  Icons.lock_outline,
-                  color: Colors.grey[400],
-                ),
-            ],
+                if (isCompleted)
+                  const Icon(
+                    Icons.check_circle,
+                    color: Color(0xFF90C048),
+                    size: 24,
+                  )
+                else if (isEnabled)
+                  Icon(
+                    Icons.chevron_right,
+                    color: Colors.grey.shade400,
+                    size: 24,
+                  )
+                else
+                  Icon(
+                    Icons.lock_outline,
+                    color: Colors.grey.shade400,
+                    size: 24,
+                  ),
+              ],
+            ),
           ),
         ),
       ),
