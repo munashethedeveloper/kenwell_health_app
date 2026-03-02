@@ -4,6 +4,7 @@ import 'package:kenwell_health_app/ui/features/auth/view_models/auth_view_model.
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/dialogs/confirmation_dialog.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
 import 'package:provider/provider.dart';
 
 class MyProfileMenuScreen extends StatelessWidget {
@@ -73,7 +74,7 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
                         ),
                         const Expanded(
                           child: Text(
-                            'My Profile',
+                            'KenWell365',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.white,
@@ -171,7 +172,7 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        /*    const Text(
                           'ACCOUNT SETTINGS',
                           style: TextStyle(
                             fontSize: 12,
@@ -179,6 +180,10 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
                             color: Color(0xFF6B7280),
                             letterSpacing: 1.2,
                           ),
+                        ), */
+                        const KenwellModernSectionHeader(
+                          title: 'My Profile',
+                          subtitle: 'View your profile',
                         ),
                         const SizedBox(height: 16),
                         // Menu items
@@ -196,7 +201,16 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
                         ),
                         const Padding(
                           padding: EdgeInsets.symmetric(vertical: 8),
-                          child: Divider(height: 1),
+                          child: const Divider(
+                            color: KenwellColors.primaryGreen,
+                            height: 1,
+                            thickness: 1,
+                            indent: 16,
+                            endIndent: 16,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 8,
                         ),
                         _ProfileMenuItem(
                           icon: Icons.logout_rounded,

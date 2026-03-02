@@ -401,6 +401,8 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: Colors.grey.shade200,
+                          //color: KenwellColors.secondaryNavy
+                          //   .withValues(alpha: 0.08),
                           width: 1,
                         ),
                         boxShadow: [

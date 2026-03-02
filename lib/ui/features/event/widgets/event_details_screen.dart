@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
 import 'package:provider/provider.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../domain/constants/role_permissions.dart';
@@ -67,8 +68,11 @@ class EventDetailsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const SizedBox(height: 16),
-          // Event title header card
+          const KenwellModernSectionHeader(
+            title: 'Event Details',
+            subtitle: 'Detailed information about the event',
+          ), //const SizedBox(height: 16),
+          /*  // Event title header card
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -129,7 +133,7 @@ class EventDetailsScreen extends StatelessWidget {
                 ),
               ],
             ),
-          ),
+          ), */
           const SizedBox(height: 20),
           // Event detail sections
           _buildSectionCard(
