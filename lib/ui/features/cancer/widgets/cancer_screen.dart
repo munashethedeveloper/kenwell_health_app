@@ -7,7 +7,9 @@ import '../../../shared/ui/form/kenwell_date_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_page.dart';
 import '../../../shared/ui/form/kenwell_form_styles.dart';
+import '../../../shared/ui/form/kenwell_referral_card.dart';
 import '../../../shared/ui/form/kenwell_yes_no_list.dart';
+import '../../../shared/models/nursing_referral_option.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/cancer_view_model.dart';
 
@@ -21,6 +23,18 @@ class CancerScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<CancerScreeningViewModel>();
+
+    // Auto-refer when any at-risk indicator is present
+    if (viewModel.isAtRisk) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (viewModel.nursingReferralSelection == null ||
+            viewModel.nursingReferralSelection ==
+                NursingReferralOption.patientNotReferred) {
+          viewModel.setNursingReferralSelection(
+              NursingReferralOption.referredToStateClinic);
+        }
+      });
+    }
 
     return KenwellFormPage(
       title: 'Cancer Screening Form',
@@ -237,7 +251,36 @@ class CancerScreen extends StatelessWidget {
           const SizedBox(height: 24),
         ],
 
-        // 7. Outcome & Referral
+        // 7. Nursing Referrals Card — only shown when patient is at risk
+        if (viewModel.isAtRisk) ...[
+          KenwellReferralCard<NursingReferralOption>(
+            title: 'Nursing Referrals',
+            selectedValue: viewModel.nursingReferralSelection,
+            onChanged: viewModel.setNursingReferralSelection,
+            reasonValidator: (val) =>
+                (val == null || val.isEmpty) ? 'Please enter a reason' : null,
+            options: [
+              KenwellReferralOption(
+                value: NursingReferralOption.patientNotReferred,
+                label: 'Patient not referred',
+                requiresReason: true,
+                reasonController: viewModel.notReferredReasonController,
+                reasonLabel: 'Reason patient not referred',
+              ),
+              const KenwellReferralOption(
+                value: NursingReferralOption.referredToGP,
+                label: 'Patient referred to GP',
+              ),
+              const KenwellReferralOption(
+                value: NursingReferralOption.referredToStateClinic,
+                label: 'Patient referred to State Clinic',
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+        ],
+
+        // 8. Outcome & Referral
         KenwellFormCard(
           title: 'Outcome & Referral',
           child: Column(

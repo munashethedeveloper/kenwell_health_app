@@ -34,6 +34,10 @@ class CancerScreening {
   final String? clinicianSignature;
   final String? clinicianNotes;
 
+  // Nursing Referral
+  final String? nursingReferral;
+  final String? notReferredReason;
+
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -60,6 +64,8 @@ class CancerScreening {
     this.clinicianName,
     this.clinicianSignature,
     this.clinicianNotes,
+    this.nursingReferral,
+    this.notReferredReason,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -88,6 +94,8 @@ class CancerScreening {
       'clinicianName': clinicianName,
       'clinicianSignature': clinicianSignature,
       'clinicianNotes': clinicianNotes,
+      'nursingReferral': nursingReferral,
+      'notReferredReason': notReferredReason,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };
@@ -119,6 +127,8 @@ class CancerScreening {
       clinicianName: map['clinicianName'] as String?,
       clinicianSignature: map['clinicianSignature'] as String?,
       clinicianNotes: map['clinicianNotes'] as String?,
+      nursingReferral: map['nursingReferral'] as String?,
+      notReferredReason: map['notReferredReason'] as String?,
       createdAt: DateTime.parse(map['createdAt'] as String),
       updatedAt: DateTime.parse(map['updatedAt'] as String),
     );

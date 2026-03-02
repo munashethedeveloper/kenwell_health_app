@@ -157,9 +157,17 @@ class HIVTestResultViewModel extends ChangeNotifier {
     }
   }
 
+  /// True when the screening result indicates the patient is at risk (Positive).
+  bool get isAtRisk => screeningResult == 'Positive';
+
   // --- Setters ---
   void setScreeningResult(String value) {
     screeningResult = value;
+    // Clear referral when the result is no longer at risk
+    if (!isAtRisk) {
+      nursingReferralSelection = null;
+      notReferredReasonController.clear();
+    }
     notifyListeners();
   }
 
@@ -184,15 +192,15 @@ class HIVTestResultViewModel extends ChangeNotifier {
       return false;
     }
 
-    // Validate nursing referral
-    if (nursingReferralSelection == null) {
-      return false;
-    }
-
-    // Validate referral reason if patient not referred
-    if (nursingReferralSelection == NursingReferralOption.patientNotReferred &&
-        notReferredReasonController.text.isEmpty) {
-      return false;
+    // Validate nursing referral only when the patient is at risk
+    if (isAtRisk) {
+      if (nursingReferralSelection == null) {
+        return false;
+      }
+      if (nursingReferralSelection == NursingReferralOption.patientNotReferred &&
+          notReferredReasonController.text.isEmpty) {
+        return false;
+      }
     }
 
     // Validate nurse details

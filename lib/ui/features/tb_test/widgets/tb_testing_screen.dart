@@ -26,6 +26,18 @@ class TBTestingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<TBTestingViewModel>();
 
+    // Auto-refer when any TB symptom is present (at risk)
+    if (viewModel.isAtRisk) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (viewModel.nursingReferralSelection == null ||
+            viewModel.nursingReferralSelection ==
+                NursingReferralOption.patientNotReferred) {
+          viewModel.setNursingReferralSelection(
+              NursingReferralOption.referredToStateClinic);
+        }
+      });
+    }
+
     return KenwellFormPage(
       title: 'TB Test Screening Form',
       sectionTitle: 'Section C: TB Screening',
@@ -151,10 +163,13 @@ class TBTestingScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
-        _buildReferrals(viewModel),
+        // Nursing Referrals Card — only shown when patient is at risk
+        if (viewModel.isAtRisk) ...[
+          _buildReferrals(viewModel),
+          const SizedBox(height: 24),
+        ],
         // const SizedBox(height: 24),
         // _buildNurseDetails(viewModel),
-        const SizedBox(height: 24),
         KenwellSignatureActions(
           title: 'Signature',
           controller: viewModel.signatureController,

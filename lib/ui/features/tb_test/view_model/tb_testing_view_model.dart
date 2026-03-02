@@ -27,6 +27,13 @@ class TBTestingViewModel extends ChangeNotifier {
   /// Controls whether the Initial Assessment card (and related validations) show.
   bool get showInitialAssessment => false;
 
+  /// True when the patient has any active TB symptoms (at risk).
+  bool get isAtRisk =>
+      coughTwoWeeks == 'Yes' ||
+      bloodInSputum == 'Yes' ||
+      weightLoss == 'Yes' ||
+      nightSweats == 'Yes';
+
   // --- TB screening questions ---
   String? coughTwoWeeks;
   //String? sputumColour;
@@ -238,9 +245,11 @@ class TBTestingViewModel extends ChangeNotifier {
 
     final nurseInterventionValid = initialAssessmentValid &&
         followUpValid &&
-        nursingReferralSelection != null &&
-        (nursingReferralSelection != NursingReferralOption.patientNotReferred ||
-            notReferredReasonController.text.isNotEmpty) &&
+        (!isAtRisk ||
+            (nursingReferralSelection != null &&
+                (nursingReferralSelection !=
+                        NursingReferralOption.patientNotReferred ||
+                    notReferredReasonController.text.isNotEmpty))) &&
         signatureController.isNotEmpty;
 
     return baseTBValid && nurseInterventionValid;
@@ -342,10 +351,10 @@ class TBTestingViewModel extends ChangeNotifier {
         followUpDate: followUpDateController.text.isEmpty
             ? null
             : followUpDateController.text,
-        nursingReferral: nursingReferralSelection?.name,
-        notReferredReason: notReferredReasonController.text.isEmpty
-            ? null
-            : notReferredReasonController.text,
+        nursingReferral: isAtRisk ? nursingReferralSelection?.name : null,
+        notReferredReason: isAtRisk && notReferredReasonController.text.isNotEmpty
+            ? notReferredReasonController.text
+            : null,
         nurseFirstName: nurseFirstNameController.text,
         nurseLastName: nurseLastNameController.text,
         rank: rankController.text,

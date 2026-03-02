@@ -34,6 +34,18 @@ class HIVTestResultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<HIVTestResultViewModel>();
 
+    // Auto-refer when the screening result is Positive (at risk)
+    if (viewModel.isAtRisk) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (viewModel.nursingReferralSelection == null ||
+            viewModel.nursingReferralSelection ==
+                NursingReferralOption.patientNotReferred) {
+          viewModel.setNursingReferralSelection(
+              NursingReferralOption.referredToStateClinic);
+        }
+      });
+    }
+
     // Build the scaffold
     return Scaffold(
       // App bar
@@ -102,9 +114,11 @@ class HIVTestResultScreen extends StatelessWidget {
               // Confirmatory Test Card
               _buildInitialAssessment(viewModel),
               const SizedBox(height: 24),
-              // Confirmatory Test Card
-              _buildReferrals(viewModel),
-              const SizedBox(height: 24),
+              // Nursing Referrals Card — only shown when patient is at risk
+              if (viewModel.isAtRisk) ...[
+                _buildReferrals(viewModel),
+                const SizedBox(height: 24),
+              ],
               // Nurse Details Card
               _buildNurseDetails(viewModel),
               const SizedBox(height: 24),

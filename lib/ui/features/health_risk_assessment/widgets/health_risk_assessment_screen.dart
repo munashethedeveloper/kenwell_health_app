@@ -470,8 +470,10 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                       const HealthMetricRedAlert(),
                     ],
 
-                    const SizedBox(height: 24),
-                    _buildReferrals(),
+                    if (vm.hasRedMetrics) ...[
+                      const SizedBox(height: 24),
+                      _buildReferrals(),
+                    ],
                     const SizedBox(height: 24),
 
                     // ===== Navigation Buttons =====
