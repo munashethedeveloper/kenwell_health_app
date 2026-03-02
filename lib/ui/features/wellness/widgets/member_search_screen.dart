@@ -8,10 +8,7 @@ import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_secondary_button.
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_form_card.dart';
-import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
-
-import '../../../shared/ui/form/kenwell_modern_section_header.dart';
-// ...existing code...
+import 'package:kenwell_health_app/ui/shared/ui/containers/gradient_container.dart';
 
 class MemberSearchScreen extends StatefulWidget {
   final Function(String searchQuery) onGoToMemberDetails;
@@ -151,14 +148,56 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // const SizedBox(height: 8),
-            const AppLogo(size: 150),
-            const SizedBox(height: 16),
-            const KenwellModernSectionHeader(
-              title: 'Search Member',
-              subtitle:
-                  'Find an existing member by their ID or Passport number',
-              icon: Icons.person_search,
+            GradientContainer.purple(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+              borderRadius: 16,
+              child: Column(
+                children: [
+                  Container(
+                    width: 88,
+                    height: 88,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: ClipOval(
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Image.asset(
+                          'assets/app_logo.jpg',
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Search Member',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Find an existing member by their ID or Passport number',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 24),
 
@@ -382,13 +421,13 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.deepPurple.withValues(alpha: 0.1),
+                        color: KenwellColors.secondaryNavy.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
                         Icons.check_circle,
                         size: 48,
-                        color: Colors.deepPurple,
+                        color: KenwellColors.secondaryNavy,
                       ),
                     ),
                     const SizedBox(height: 16),
