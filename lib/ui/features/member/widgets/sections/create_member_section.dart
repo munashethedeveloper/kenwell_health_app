@@ -122,7 +122,7 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
                       ],
                     ),
                   ), */
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
                   KenwellFormCard(
                     title: 'Basic Information',
                     margin: const EdgeInsets.only(bottom: 16),
@@ -175,7 +175,7 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
         validator: (val) =>
             (val == null || val.isEmpty) ? 'Please enter Name' : null,
       ),
-      const SizedBox(height: 24),
+      const SizedBox(height: 8),
       KenwellTextField(
         label: 'Surname',
         hintText: 'Enter surname',
@@ -184,7 +184,7 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
         validator: (val) =>
             (val == null || val.isEmpty) ? 'Please enter Surname' : null,
       ),
-      const SizedBox(height: 24),
+      const SizedBox(height: 8),
       KenwellDropdownField<String>(
         label: 'Marital Status',
         value: vm.maritalStatus,
@@ -206,7 +206,7 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
           keyboardType: TextInputType.emailAddress,
           validator: Validators.validateEmail,
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 8),
         InternationalPhoneField(
           label: 'Cell Number',
           controller: vm.cellNumberController,
@@ -229,7 +229,7 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
             fontWeight: FontWeight.w500,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
         Column(
           children: [
             RadioListTile<String>(
@@ -255,7 +255,7 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
 
         // Nationality field - read-only for SA Citizens, editable for others
         if (vm.citizenshipStatus == 'SA Citizen')
@@ -320,7 +320,7 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
         if (vm.showIdField)
           Column(
             children: [
-              const SizedBox(height: 24),
+              const SizedBox(height: 8),
               KenwellTextField(
                 label: 'RSA ID Number',
                 hintText: 'Enter RSA ID number',
@@ -335,7 +335,7 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
         if (vm.showPassportField)
           Column(
             children: [
-              const SizedBox(height: 24),
+              const SizedBox(height: 8),
               KenwellTextField(
                 label: 'Passport Number',
                 hintText: 'Enter passport number',
@@ -346,7 +346,7 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
               ),
             ],
           ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
         KenwellDateField(
           label: 'Date of Birth',
           controller: vm.dobController,
@@ -356,7 +356,7 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
           readOnly: true,
           onChanged: (value) => vm.setDob(value),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 8),
         KenwellDropdownField<String>(
           label: 'Gender',
           value: vm.gender,
@@ -381,7 +381,7 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
               (val == null || val.isEmpty) ? 'Select Medical Aid status' : null,
         ),
         if (vm.showMedicalAidFields) ...[
-          const SizedBox(height: 24),
+          const SizedBox(height: 8),
           KenwellTextField(
             label: 'Medical Aid Name',
             hintText: 'Enter medical aid name',
@@ -390,7 +390,7 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
                 ? 'Please enter Medical Aid Name'
                 : null,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 8),
           KenwellTextField(
             label: 'Medical Aid Number',
             hintText: 'Enter medical aid number',

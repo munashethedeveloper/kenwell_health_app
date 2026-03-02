@@ -187,7 +187,7 @@ class _CreateUserSectionState extends State<CreateUserSection> {
                     title: 'New User Registration',
                     subtitle: 'Complete the form to register a new user',
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
                   KenwellFormCard(
                     title: 'Personal Information',
                     margin: const EdgeInsets.only(bottom: 16),
@@ -202,7 +202,7 @@ class _CreateUserSectionState extends State<CreateUserSection> {
                               ? 'Enter First Name'
                               : null,
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 8),
                         KenwellTextField(
                           label: "Last Name",
                           controller: _lastNameController,
@@ -211,7 +211,7 @@ class _CreateUserSectionState extends State<CreateUserSection> {
                           validator: (v) =>
                               v == null || v.isEmpty ? 'Enter Last Name' : null,
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 8),
                         KenwellDropdownField<String>(
                           label: "Role",
                           value: _selectedRole,
@@ -221,7 +221,7 @@ class _CreateUserSectionState extends State<CreateUserSection> {
                           onChanged: (value) =>
                               setState(() => _selectedRole = value),
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 8),
                         InternationalPhoneField(
                           label: "Phone Number",
                           controller: _phoneController,
@@ -243,7 +243,7 @@ class _CreateUserSectionState extends State<CreateUserSection> {
                           keyboardType: TextInputType.emailAddress,
                           validator: Validators.validateEmail,
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 8),
                         KenwellTextField(
                           label: "Temporary Password",
                           controller: _passwordController,
@@ -257,7 +257,7 @@ class _CreateUserSectionState extends State<CreateUserSection> {
                           ),
                           validator: Validators.validateStrongPassword,
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 8),
                       ],
                     ),
                   ),

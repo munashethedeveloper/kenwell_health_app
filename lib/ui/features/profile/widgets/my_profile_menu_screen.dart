@@ -199,10 +199,11 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
                           subtitle: 'Get assistance and FAQs',
                           onTap: () => context.pushNamed('help'),
                         ),
-                        const Padding(
+                        /*  const Padding(
                           padding: EdgeInsets.symmetric(vertical: 8),
                           child: const Divider(
-                            color: KenwellColors.primaryGreen,
+                            color: KenwellColors.primaryGreenLight,
+                            //color: KenwellColors.secondaryNavy,
                             height: 1,
                             thickness: 1,
                             indent: 16,
@@ -211,7 +212,7 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
                         ),
                         const SizedBox(
                           height: 8,
-                        ),
+                        ), */
                         _ProfileMenuItem(
                           icon: Icons.logout_rounded,
                           title: 'Logout',

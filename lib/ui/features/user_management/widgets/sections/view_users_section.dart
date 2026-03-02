@@ -446,7 +446,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                                 ],
                               ),
                             ),
-                            Column(
+                            /*   Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 const Icon(
@@ -463,7 +463,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                                   ),
                                 ),
                               ],
-                            ),
+                            ), */
                           ],
                         ),
                       ),

@@ -3,6 +3,7 @@ import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/ui/features/wellness/view_model/wellness_flow_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/containers/gradient_container.dart';
 import 'package:provider/provider.dart';
 
 import '../../../shared/ui/form/kenwell_modern_section_header.dart';
@@ -30,16 +31,9 @@ class CurrentEventHomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: theme.primaryColor.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: theme.primaryColor.withValues(alpha: 0.15),
-                  width: 1.5,
-                ),
-              ),
+            GradientContainer.purple(
+              padding: const EdgeInsets.all(20),
+              borderRadius: 16,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -47,23 +41,24 @@ class CurrentEventHomeScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: theme.primaryColor.withValues(alpha: 0.1),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(
                       Icons.event,
-                      color: KenwellColors.secondaryNavyDark,
+                      color: Colors.white,
                       size: 24,
                     ),
                   ),
                   const SizedBox(height: 12),
                   // Title centered
                   Text(
-                    event.title,
+                    'Client Organization: ${event.title}',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: KenwellColors.secondaryNavyDark,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                      fontSize: 18,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -74,13 +69,13 @@ class CurrentEventHomeScreen extends StatelessWidget {
                       const Icon(
                         Icons.calendar_today,
                         size: 16,
-                        color: KenwellColors.secondaryNavyDark,
+                        color: Colors.white70,
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '${event.date.day}/${event.date.month}/${event.date.year}',
+                        'Date: ${event.date.day}/${event.date.month}/${event.date.year}',
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: KenwellColors.secondaryNavyDark,
+                          color: Colors.white70,
                         ),
                       ),
                     ],
@@ -91,13 +86,13 @@ class CurrentEventHomeScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Icon(Icons.business,
-                            size: 16, color: KenwellColors.secondaryNavyDark),
+                            size: 16, color: Colors.white70),
                         const SizedBox(width: 6),
                         Text(
-                          event.venue,
+                          'Venue: ${event.venue}',
                           textAlign: TextAlign.center,
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: KenwellColors.secondaryNavyDark,
+                            color: Colors.white70,
                           ),
                         ),
                       ],
@@ -105,22 +100,24 @@ class CurrentEventHomeScreen extends StatelessWidget {
                   ],
                   if (viewModel.currentMember != null) ...[
                     const SizedBox(height: 16),
-                    Divider(color: Colors.grey.shade300),
+                    const Divider(color: Colors.white24),
                     const SizedBox(height: 12),
                     Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.person,
                           size: 20,
-                          color: theme.primaryColor,
+                          //color: Colors.white70,
+                          color: KenwellColors.primaryGreen,
                         ),
                         const SizedBox(width: 8),
                         Text(
                           'Current Member:',
                           style: theme.textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: theme.primaryColor,
-                            fontSize: 20,
+                            //color: Colors.white,
+                            color: KenwellColors.primaryGreen,
+                            fontSize: 16,
                           ),
                         ),
                       ],
@@ -129,7 +126,6 @@ class CurrentEventHomeScreen extends StatelessWidget {
                     _buildMemberInfoRow(
                       'Name',
                       '${viewModel.currentMember!.name} ${viewModel.currentMember!.surname}',
-                      theme,
                     ),
                     const SizedBox(height: 8),
                     _buildMemberInfoRow(
@@ -139,19 +135,10 @@ class CurrentEventHomeScreen extends StatelessWidget {
                       viewModel.currentMember!.idDocumentType == 'ID'
                           ? (viewModel.currentMember!.idNumber ?? 'N/A')
                           : (viewModel.currentMember!.passportNumber ?? 'N/A'),
-                      theme,
                     ),
                   ],
                 ],
               ),
-            ),
-            const SizedBox(height: 8),
-            const Divider(
-              color: KenwellColors.primaryGreen,
-              height: 24,
-              thickness: 1,
-              indent: 16,
-              endIndent: 16,
             ),
             const SizedBox(height: 24),
             const KenwellModernSectionHeader(
@@ -211,25 +198,31 @@ class CurrentEventHomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMemberInfoRow(String label, String value, ThemeData theme) {
+  Widget _buildMemberInfoRow(String label, String value) {
     return Row(
       children: [
         SizedBox(
-          width: 100,
+          width: 120,
           child: Text(
             label,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: Colors.grey[700],
+            style: const TextStyle(
+              //color: Colors.white70,
+              color: KenwellColors.primaryGreen,
+
               fontWeight: FontWeight.w500,
+              fontSize: 13,
             ),
           ),
         ),
         Expanded(
           child: Text(
             value,
-            style: theme.textTheme.bodyMedium?.copyWith(
+            style: const TextStyle(
               fontWeight: FontWeight.w600,
-              color: theme.primaryColor,
+              //color: Colors.white,
+              color: KenwellColors.primaryGreen,
+
+              fontSize: 14,
             ),
           ),
         ),

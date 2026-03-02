@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/profile_view_model.dart';
@@ -119,7 +120,7 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
       builder: (context, vm, _) => Scaffold(
         backgroundColor: KenwellColors.primaryGreen,
         appBar: KenwellAppBar(
-          title: 'Edit Profile',
+          title: 'KenWell365',
           titleColor: Colors.white,
           titleStyle: const TextStyle(
             color: Colors.white,
@@ -237,21 +238,9 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  'Personal Information',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF201C58),
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                const Text(
-                                  'Update the fields below to save your profile',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Color(0xFF6B7280),
-                                  ),
+                                const KenwellModernSectionHeader(
+                                  title: 'Edit Profile',
+                                  subtitle: 'Update your profile information',
                                 ),
                                 const SizedBox(height: 20),
                                 ProfileFormSection(

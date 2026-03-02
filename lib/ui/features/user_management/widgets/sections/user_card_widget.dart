@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import '../../../../../domain/models/user_model.dart';
 import '../../../../shared/ui/badges/number_badge.dart';
 
@@ -79,9 +80,12 @@ class UserCardWidget extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 10),
             decoration: BoxDecoration(
               color: Colors.white,
+              //color: KenwellColors.secondaryNavy,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: theme.primaryColor.withValues(alpha: 0.12),
+                color: KenwellColors.secondaryNavy.withValues(alpha: 0.08),
+
+                //color: theme.primaryColor.withValues(alpha: 0.12),
                 width: 1,
               ),
               boxShadow: [
@@ -106,12 +110,16 @@ class UserCardWidget extends StatelessWidget {
                     width: 46,
                     height: 46,
                     decoration: BoxDecoration(
+                      // color:
+                      //   KenwellColors.secondaryNavy.withValues(alpha: 0.15),
+
                       color: theme.primaryColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
                       roleIcons[user.role] ?? Icons.person_rounded,
                       color: theme.primaryColor,
+                      // color: KenwellColors.secondaryNavy,
                       size: 22,
                     ),
                   ),
@@ -181,10 +189,11 @@ class UserCardWidget extends StatelessWidget {
                                 user.emailVerified
                                     ? 'Verified'
                                     : 'Not Verified',
-                                style: TextStyle(
-                                  color: user.emailVerified
-                                      ? const Color(0xFF10B981)
-                                      : const Color(0xFFEF4444),
+                                style: const TextStyle(
+                                  color: KenwellColors.secondaryNavyDark,
+                                  //   color: user.emailVerified
+                                  //      ? const Color(0xFF10B981)
+                                  //      : const Color(0xFFEF4444),
                                   fontWeight: FontWeight.w600,
                                   fontSize: 10,
                                 ),
@@ -204,8 +213,11 @@ class UserCardWidget extends StatelessWidget {
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: theme.primaryColor.withValues(alpha: 0.1),
+                      //  color: KenwellColors.secondaryNavy.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
+                        // color:
+                        //  KenwellColors.secondaryNavy.withValues(alpha: 0.2),
                         color: theme.primaryColor.withValues(alpha: 0.2),
                         width: 1,
                       ),
@@ -213,6 +225,7 @@ class UserCardWidget extends StatelessWidget {
                     child: Text(
                       user.role,
                       style: TextStyle(
+                        //color: KenwellColors.secondaryNavy,
                         color: theme.primaryColor,
                         fontWeight: FontWeight.w700,
                         fontSize: 10,

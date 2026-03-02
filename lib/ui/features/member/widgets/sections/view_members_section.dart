@@ -326,7 +326,7 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                                 ],
                               ),
                             ),
-                            Column(
+                            /*    Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 const Icon(
@@ -343,7 +343,7 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                                   ),
                                 ),
                               ],
-                            ),
+                            ), */
                           ],
                         ),
                       ),

@@ -33,7 +33,7 @@ class EventBasicInfoSection extends StatelessWidget {
           initialDate: date,
           enabled: false,
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 8),
         // Client Organization
         KenwellFormCard(
           title: 'Client Organization',
@@ -63,7 +63,7 @@ class EventBasicInfoSection extends StatelessWidget {
                 padding: EdgeInsets.zero,
                 validator: (value) => requiredField('Venue', value),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 8),
               // Address
               KenwellTextField(
                 label: 'Address',
@@ -71,7 +71,7 @@ class EventBasicInfoSection extends StatelessWidget {
                 padding: EdgeInsets.zero,
                 validator: (value) => requiredField('Address', value),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 8),
               KenwellTextField(
                 // Town/City
                 label: 'Town/City',
@@ -79,7 +79,7 @@ class EventBasicInfoSection extends StatelessWidget {
                 padding: EdgeInsets.zero,
                 validator: (value) => requiredField('Town/City', value),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 8),
               //  Province
               KenwellDropdownField<String>(
                 label: 'Province',

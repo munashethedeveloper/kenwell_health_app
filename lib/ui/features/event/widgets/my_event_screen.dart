@@ -288,8 +288,8 @@ class MyEventScreenState extends State<MyEventScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 16),
-            const AppLogo(size: 150),
+            //const SizedBox(height: 16),
+            //const AppLogo(size: 150),
             const SizedBox(height: 16),
             const KenwellModernSectionHeader(
               title: 'My Events Screen',
@@ -692,25 +692,24 @@ class MyEventScreenState extends State<MyEventScreen> {
     );
   }
 
-  // Determine if the event can be started based on current time and event start time
+  // Determine if the event can be started based on the event date
   bool _canStartEvent(WellnessEvent event) {
     // Allow resuming events that are already in progress
     if (event.status == WellnessEventStatus.inProgress) {
       return true;
     }
 
-    // Check if start time has been reached
-    final startTime = event.startDateTime;
-    if (startTime == null) {
-      // If no start time is set, don't allow starting
+    // Don't allow starting already completed events
+    if (event.status == WellnessEventStatus.completed) {
       return false;
     }
 
+    // Allow starting any event whose day has arrived (today or earlier)
     final now = DateTime.now();
-    // Allow starting the event 5 minutes before the start time
-    final fiveMinutesBeforeStart =
-        startTime.subtract(const Duration(minutes: 5));
-    return !now.isBefore(fiveMinutesBeforeStart);
+    final today = DateTime(now.year, now.month, now.day);
+    final eventDay =
+        DateTime(event.date.year, event.date.month, event.date.day);
+    return !today.isBefore(eventDay);
   }
 
   // Start the event and navigate to WellnessFlowPage

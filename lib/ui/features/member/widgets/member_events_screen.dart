@@ -6,8 +6,6 @@ import '../../../../data/repositories_dcl/firestore_member_repository.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/logo/app_logo.dart';
 import '../../../shared/ui/form/kenwell_modern_section_header.dart';
-import '../../../shared/ui/form/kenwell_form_card.dart';
-import '../../../shared/ui/form/custom_text_field.dart';
 
 /// Screen to display all events a member has attended
 class MemberEventsScreen extends StatefulWidget {
@@ -28,73 +26,14 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
   bool _isLoading = true;
   String? _errorMessage;
 
-  late final TextEditingController _nameController;
-  late final TextEditingController _emailController;
-  late final TextEditingController _genderController;
-  late final TextEditingController _medicalAidController;
-  late final TextEditingController _phoneNumberController;
-  // late final TextEditingController _maritalStatusController;
-  late final TextEditingController _nationalityController;
-  late final TextEditingController _citizenshipStatusController;
-  late final TextEditingController _idNumberController;
-  late final TextEditingController _passportNumberController;
-  // late final TextEditingController _dateOfBirthController;
-
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(
-      text: '${widget.member.name} ${widget.member.surname}',
-    );
-    _emailController = TextEditingController(
-      text: widget.member.email ?? '',
-    );
-    _phoneNumberController = TextEditingController(
-      text: widget.member.cellNumber ?? '',
-    );
-    _genderController = TextEditingController(
-      text: widget.member.gender ?? '',
-    );
-    _medicalAidController = TextEditingController(
-      text: widget.member.medicalAidName ?? '',
-    );
-    //_maritalStatusController = TextEditingController(
-    //  text: widget.member.maritalStatus ?? '',
-    //);
-    _nationalityController = TextEditingController(
-      text: widget.member.nationality ?? '',
-    );
-    _citizenshipStatusController = TextEditingController(
-      text: widget.member.citizenshipStatus ?? '',
-    );
-    _idNumberController = TextEditingController(
-      text: widget.member.idNumber ?? '',
-    );
-    _passportNumberController = TextEditingController(
-      text: widget.member.passportNumber ?? '',
-    );
-
-    /*  _dateOfBirthController = TextEditingController(
-      text: widget.member.dateOfBirth != null
-          ? DateFormat('dd MMM yyyy').format(widget.member.dateOfBirth! as DateTime)
-          : '',
-    ); */
     _loadMemberEvents();
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _phoneNumberController.dispose();
-    _genderController.dispose();
-    _medicalAidController.dispose();
-    //_maritalStatusController.dispose();
-    _nationalityController.dispose();
-    _citizenshipStatusController.dispose();
-    _idNumberController.dispose();
-    _passportNumberController.dispose();
-    // _dateOfBirthController.dispose();
     super.dispose();
   }
 
@@ -164,74 +103,36 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
             const AppLogo(size: 150),
             const SizedBox(height: 24),
 
-//FIX THIS PART:
-            /*        _buildSectionCard(
-            'Personal Information',
-            Icons.person,
-            [
-              _buildDetailRow(
-                'Name and Surname', 
-                event.servicesRequested.isNotEmpty
-                    ? event.servicesRequested
-                    : 'None',
-                theme,
-              ),
-            ],
-          ), */
-
             // Member information
-            KenwellFormCard(
-              title: 'Personal Information',
-              child: Column(
-                children: [
-                  KenwellTextField(
-                    label: 'Name and Surname',
-                    controller: _nameController,
-                    readOnly: true,
-                  ),
-                  KenwellTextField(
-                    label: 'Gender',
-                    controller: _genderController,
-                    readOnly: true,
-                  ),
-                  KenwellTextField(
-                    label: 'Email',
-                    controller: _emailController,
-                    readOnly: true,
-                  ),
-                  KenwellTextField(
-                    label: 'Phone Number',
-                    controller: _phoneNumberController,
-                    readOnly: true,
-                  ),
-                  KenwellTextField(
-                    label: 'Citizenship Status',
-                    controller: _citizenshipStatusController,
-                    readOnly: true,
-                  ),
-                  KenwellTextField(
-                    label: 'Nationality',
-                    controller: _nationalityController,
-                    readOnly: true,
-                  ),
-                  KenwellTextField(
-                    label: 'ID Number',
-                    controller: _idNumberController,
-                    readOnly: true,
-                  ),
-                  KenwellTextField(
-                    label: 'Passport Number',
-                    controller: _passportNumberController,
-                    readOnly: true,
-                  ),
-                  KenwellTextField(
-                    label: 'Medical Aid',
-                    controller: _medicalAidController,
-                    readOnly: true,
-                    padding: EdgeInsets.zero,
-                  ),
-                ],
-              ),
+            _buildSectionCard(
+              'Personal Information',
+              Icons.person,
+              [
+                _buildDetailRow('Name and Surname',
+                    '${widget.member.name} ${widget.member.surname}', theme),
+                const Divider(height: 1),
+                _buildDetailRow('Gender', widget.member.gender ?? '', theme),
+                const Divider(height: 1),
+                _buildDetailRow('Email', widget.member.email ?? '', theme),
+                const Divider(height: 1),
+                _buildDetailRow(
+                    'Phone Number', widget.member.cellNumber ?? '', theme),
+                const Divider(height: 1),
+                _buildDetailRow('Citizenship Status',
+                    widget.member.citizenshipStatus ?? '', theme),
+                const Divider(height: 1),
+                _buildDetailRow(
+                    'Nationality', widget.member.nationality ?? '', theme),
+                const Divider(height: 1),
+                _buildDetailRow(
+                    'ID Number', widget.member.idNumber ?? '', theme),
+                const Divider(height: 1),
+                _buildDetailRow('Passport Number',
+                    widget.member.passportNumber ?? '', theme),
+                const Divider(height: 1),
+                _buildDetailRow(
+                    'Medical Aid', widget.member.medicalAidName ?? '', theme),
+              ],
             ),
 
             const SizedBox(height: 24),

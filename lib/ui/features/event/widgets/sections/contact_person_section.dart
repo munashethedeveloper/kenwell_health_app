@@ -65,7 +65,7 @@ class ContactPersonSection extends StatelessWidget {
             validator: (value) =>
                 requiredField('Contact Person Last Name', value),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           // Contact Number field with international country code picker
           InternationalPhoneField(
             label: 'Contact Number',
@@ -73,7 +73,7 @@ class ContactPersonSection extends StatelessWidget {
             padding: EdgeInsets.zero,
             validator: Validators.validateInternationalPhoneNumber,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           // Contact Email field
           KenwellTextField(
             label: 'Email',
