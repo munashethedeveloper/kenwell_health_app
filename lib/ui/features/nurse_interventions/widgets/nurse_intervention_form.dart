@@ -8,6 +8,7 @@ import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_page.dart';
 import '../../../shared/ui/form/kenwell_signature_actions.dart';
 import '../../../shared/ui/form/kenwell_referral_card.dart';
+import '../../../shared/ui/form/nursing_referral_status_card.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../../../shared/models/nursing_referral_option.dart';
 
@@ -113,28 +114,39 @@ class NurseInterventionForm extends StatelessWidget {
   }
 
   Widget _buildReferrals() {
-    return KenwellReferralCard<NursingReferralOption>(
-      title: 'Clinical Outcomes',
-      selectedValue: viewModel.nursingReferralSelection,
-      onChanged: viewModel.setNursingReferralSelection,
-      reasonValidator: (val) =>
-          (val == null || val.isEmpty) ? 'Please enter a reason' : null,
-      options: [
-        KenwellReferralOption(
-          value: NursingReferralOption.patientNotReferred,
-          label: 'Member not referred',
-          requiresReason: true,
-          reasonController: viewModel.notReferredReasonController,
-          reasonLabel: 'Reason member not referred',
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        KenwellReferralCard<NursingReferralOption>(
+          title: 'Clinical Outcomes',
+          selectedValue: viewModel.nursingReferralSelection,
+          onChanged: viewModel.setNursingReferralSelection,
+          reasonValidator: (val) =>
+              (val == null || val.isEmpty) ? 'Please enter a reason' : null,
+          options: [
+            KenwellReferralOption(
+              value: NursingReferralOption.patientNotReferred,
+              label: 'Member not referred',
+              requiresReason: true,
+              reasonController: viewModel.notReferredReasonController,
+              reasonLabel: 'Reason member not referred',
+            ),
+            const KenwellReferralOption(
+              value: NursingReferralOption.referredToGP,
+              label: 'Member referred to GP',
+            ),
+            const KenwellReferralOption(
+              value: NursingReferralOption.referredToStateClinic,
+              label: 'Member referred to State HIV clinic',
+            ),
+          ],
         ),
-        const KenwellReferralOption(
-          value: NursingReferralOption.referredToGP,
-          label: 'Member referred to GP',
-        ),
-        const KenwellReferralOption(
-          value: NursingReferralOption.referredToStateClinic,
-          label: 'Member referred to State HIV clinic',
-        ),
+        if (viewModel.nursingReferralSelection != null) ...[
+          const SizedBox(height: 12),
+          NursingReferralStatusCard(
+            referralSelection: viewModel.nursingReferralSelection,
+          ),
+        ],
       ],
     );
   }
