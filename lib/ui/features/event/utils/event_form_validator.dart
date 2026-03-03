@@ -26,7 +26,7 @@ class EventFormValidator {
     if (_isEmpty(viewModel.onsiteContactLastNameController.text)) {
       invalidFields.add('Onsite Contact Last Name');
     }
-    if (Validators.validateSouthAfricanPhoneNumber(
+    if (Validators.validateLocalPhoneNumber(
             viewModel.onsiteNumberController.text) !=
         null) {
       invalidFields.add('Onsite Contact Number');
@@ -43,7 +43,7 @@ class EventFormValidator {
     if (_isEmpty(viewModel.aeContactLastNameController.text)) {
       invalidFields.add('AE Contact Last Name');
     }
-    if (Validators.validateSouthAfricanPhoneNumber(
+    if (Validators.validateLocalPhoneNumber(
             viewModel.aeNumberController.text) !=
         null) {
       invalidFields.add('AE Contact Number');
