@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/utils/event_status_colors.dart';
+import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../domain/constants/role_permissions.dart';
@@ -182,7 +183,7 @@ class EventCard extends StatelessWidget {
                   Text(
                     'Client Organization: ${event.title}',
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w800,
                       color: theme.primaryColor,
                     ),
                     maxLines: 2,
@@ -285,7 +286,7 @@ class EventCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   'Address: ${event.address}',
-                  style: const TextStyle(
+                  style: theme.textTheme.bodySmall?.copyWith(
                     color: KenwellColors.secondaryNavyDark,
                   ),
                   overflow: TextOverflow.ellipsis,
@@ -295,7 +296,7 @@ class EventCard extends StatelessWidget {
             ],
           ),
         ],
-        // Venue row
+        /* // Venue row
         if (event.venue.isNotEmpty) ...[
           const SizedBox(height: 8),
           Row(
@@ -318,7 +319,8 @@ class EventCard extends StatelessWidget {
               ),
             ],
           ),
-        ],
+        ], */
+
         // Expected participation row
         if (event.expectedParticipation > 0) ...[
           const SizedBox(height: 8),
@@ -331,9 +333,34 @@ class EventCard extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Text(
-                'Expected Participation: ${event.expectedParticipation}',
-                style: const TextStyle(
+                '${event.expectedParticipation} Expected Members',
+                style: theme.textTheme.bodySmall?.copyWith(
                   color: KenwellColors.secondaryNavyDark,
+                ),
+              ),
+            ],
+          ),
+        ],
+
+        // Requested Services row
+        if (event.servicesRequested.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              const Icon(
+                Icons.medical_services,
+                size: 16,
+                color: KenwellColors.secondaryNavyDark,
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  'Services Requested: ${event.servicesRequested}',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: KenwellColors.secondaryNavyDark,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                 ),
               ),
             ],
