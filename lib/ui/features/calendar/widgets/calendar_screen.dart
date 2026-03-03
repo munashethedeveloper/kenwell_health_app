@@ -826,14 +826,23 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
           existingEvent: existingEvent,
           onSave: (event) async {
             if (existingEvent == null) {
-              await viewModel.addEvent(event);
+              await eventViewModel.addEvent(event);
             } else {
-              await viewModel.updateEvent(event);
+              await eventViewModel.updateEvent(event);
             }
           },
           viewModel: eventViewModel,
         ),
       ),
     );
+
+    // Reload calendar events to reflect any changes
+    if (context.mounted) {
+      try {
+        await viewModel.loadEvents();
+      } catch (e) {
+        debugPrint('CalendarScreen: Error reloading events after save: $e');
+      }
+    }
   }
 }
