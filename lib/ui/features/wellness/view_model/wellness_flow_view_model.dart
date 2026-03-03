@@ -32,25 +32,39 @@ class WellnessFlowViewModel extends ChangeNotifier {
   Future<void> loadAllCompletionFlags(String? memberId, String? eventId) async {
     if (memberId == null || eventId == null) return;
 
-    // Reset all flags
+    // Reset all flags (including enabled flags so stale values from a previous
+    // member don't leak when the same WellnessFlowViewModel is reused)
     consentCompleted = false;
+    hraEnabled = false;
+    hctEnabled = false;
+    tbEnabled = false;
+    cancerEnabled = false;
     hraCompleted = false;
     hctCompleted = false; // Added HCT flag
     //hivCompleted = false;
     tbCompleted = false;
     cancerCompleted = false;
     screeningsCompleted = false;
+    screeningsInProgress = false;
     surveyCompleted = false;
 
-    // Consent
+    // Consent — also restore which screenings were enabled from the saved record
     try {
       final consentRepo = FirestoreConsentRepository();
       final consents = await consentRepo.getConsentsByMember(memberId);
       debugPrint(
           'Loaded consents for $memberId: ${consents.map((c) => c.eventId).toList()}');
-      final hasConsent = consents.any((consent) => consent.eventId == eventId);
-      if (hasConsent) {
+      final matching =
+          consents.where((c) => c.eventId == eventId).toList();
+      if (matching.isNotEmpty) {
         consentCompleted = true;
+        // Restore enabled-screening flags from the persisted consent record so
+        // refresh and first-load both know which screenings were consented to.
+        final consent = matching.first;
+        hraEnabled = consent.hra;
+        hctEnabled = consent.hct;
+        tbEnabled = consent.tb;
+        cancerEnabled = consent.cancer;
       }
     } catch (e) {
       debugPrint('Error loading consent completion: $e');
@@ -127,9 +141,26 @@ class WellnessFlowViewModel extends ChangeNotifier {
       debugPrint('Error loading Cancer completion: $e');
     }
 
-    // If all enabled screenings are completed, set screeningsCompleted
-    if (hraCompleted && hctCompleted && tbCompleted) {
-      screeningsCompleted = true;
+    // Determine screeningsCompleted / screeningsInProgress based on which
+    // screenings were consented to (now correctly loaded from Firestore above).
+    final anyEnabled =
+        hraEnabled || hctEnabled || tbEnabled || cancerEnabled;
+    if (anyEnabled) {
+      final allConsentedScreeningsCompleted = (!hraEnabled || hraCompleted) &&
+          (!hctEnabled || hctCompleted) &&
+          (!tbEnabled || tbCompleted) &&
+          (!cancerEnabled || cancerCompleted);
+      if (allConsentedScreeningsCompleted) {
+        screeningsCompleted = true;
+        screeningsInProgress = false;
+      } else {
+        screeningsCompleted = false;
+        screeningsInProgress = true;
+      }
+    } else {
+      // No consent found (or no screenings selected): leave as Not Completed.
+      screeningsCompleted = false;
+      screeningsInProgress = false;
     }
 
     // Survey
@@ -138,6 +169,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
           .collection('survey_results')
           .where('memberId', isEqualTo: memberId)
           .where('eventId', isEqualTo: eventId)
+          .where('type', isEqualTo: 'survey')
           .limit(1)
           .get();
       if (querySnapshot.docs.isNotEmpty) {

@@ -351,14 +351,29 @@ class MemberDetailsViewModel extends ChangeNotifier {
         eventId: _eventId, // Link member to the event
       );
 
-      // Save to local database
-      savedMember = await _memberRepository.createMember(member);
-      debugPrint('Member saved to local database: ${savedMember!.id}');
+      if (kIsWeb) {
+        // On web, local SQLite is unavailable (sqlite3.wasm not loaded by the
+        // browser). Firestore is the primary persistent store on web.
+        await _firestoreMemberRepository.addMember(member);
+        savedMember = member;
+        debugPrint('Member saved to Firestore (web): ${savedMember!.id}');
+      } else {
+        // Save to local database (native platforms)
+        savedMember = await _memberRepository.createMember(member);
+        debugPrint('Member saved to local database: ${savedMember!.id}');
 
-      // Save to Firestore using the original member object (not savedMember) so
-      // that eventId is preserved — the local DB schema has no eventId column,
-      // so savedMember.eventId is always null after the local DB round-trip.
-      await _firestoreMemberRepository.addMember(member);
+        // Sync to Firestore — uses the original member object (not savedMember)
+        // so that eventId is preserved; the local DB schema has no eventId
+        // column, so savedMember.eventId is always null after the round-trip.
+        // Non-fatal: if Firestore is unavailable the local save still lets the
+        // flow continue; the member search screen tries Firestore first with
+        // local DB as fallback, so locally-saved members remain discoverable.
+        try {
+          await _firestoreMemberRepository.addMember(member);
+        } catch (e) {
+          debugPrint('Failed to sync member to Firestore (non-fatal): $e');
+        }
+      }
 
       // Write to member_events collection to track event registration
       if (_eventId != null && _eventId!.isNotEmpty) {

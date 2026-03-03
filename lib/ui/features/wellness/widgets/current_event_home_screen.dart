@@ -98,30 +98,53 @@ class CurrentEventHomeScreen extends StatelessWidget {
                       ],
                     ),
                   ],
-                  if (viewModel.currentMember != null) ...[
-                    const SizedBox(height: 16),
-                    const Divider(color: Colors.white24),
-                    const SizedBox(height: 12),
+                ],
+              ),
+            ),
+            if (viewModel.currentMember != null) ...[
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: KenwellColors.primaryGreen.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: KenwellColors.primaryGreen,
+                    width: 1.5,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Row(
                       children: [
-                        const Icon(
-                          Icons.person,
-                          size: 20,
-                          //color: Colors.white70,
-                          color: KenwellColors.primaryGreen,
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: KenwellColors.primaryGreen
+                                .withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.person,
+                            color: KenwellColors.primaryGreen,
+                            size: 20,
+                          ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 12),
                         Text(
-                          'Current Member:',
+                          'Current Member',
                           style: theme.textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.bold,
-                            //color: Colors.white,
-                            color: KenwellColors.primaryGreen,
+                            color: KenwellColors.secondaryNavy,
                             fontSize: 16,
                           ),
                         ),
                       ],
                     ),
+                    const SizedBox(height: 12),
+                    const Divider(
+                        color: KenwellColors.primaryGreen, height: 1),
                     const SizedBox(height: 12),
                     _buildMemberInfoRow(
                       'Name',
@@ -137,9 +160,9 @@ class CurrentEventHomeScreen extends StatelessWidget {
                           : (viewModel.currentMember!.passportNumber ?? 'N/A'),
                     ),
                   ],
-                ],
+                ),
               ),
-            ),
+            ],
             const SizedBox(height: 24),
             const KenwellModernSectionHeader(
               title: 'Event Process',
@@ -206,9 +229,7 @@ class CurrentEventHomeScreen extends StatelessWidget {
           child: Text(
             label,
             style: const TextStyle(
-              //color: Colors.white70,
-              color: KenwellColors.primaryGreen,
-
+              color: KenwellColors.neutralGrey,
               fontWeight: FontWeight.w500,
               fontSize: 13,
             ),
@@ -219,9 +240,7 @@ class CurrentEventHomeScreen extends StatelessWidget {
             value,
             style: const TextStyle(
               fontWeight: FontWeight.w600,
-              //color: Colors.white,
-              color: KenwellColors.primaryGreen,
-
+              color: KenwellColors.secondaryNavy,
               fontSize: 14,
             ),
           ),

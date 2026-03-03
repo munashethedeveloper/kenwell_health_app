@@ -23,6 +23,14 @@ class Validators {
     return null;
   }
 
+  /// Validates email only when a value is provided; allows empty/null.
+  /// Use this for fields where email is optional (e.g. member registration).
+  static String? validateOptionalEmail(String? value) {
+    if (value == null || value.trim().isEmpty) return null;
+    if (!isValidEmail(value)) return 'Enter a valid email address';
+    return null;
+  }
+
   static String? validatePasswordPresence(String? value) {
     if (value == null || value.isEmpty) return 'Password is required';
     return null;
