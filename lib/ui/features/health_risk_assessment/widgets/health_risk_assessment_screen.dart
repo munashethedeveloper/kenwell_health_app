@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/custom_dropdown_field.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_referral_card.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/health_metric_status_badge.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/nursing_referral_status_card.dart';
@@ -530,40 +529,13 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
 
   // Build referrals widget
   Widget _buildReferrals() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        KenwellReferralCard<NursingReferralOption>(
-          title: 'Nursing Referrals',
-          selectedValue: nurseViewModel.nursingReferralSelection,
-          onChanged: nurseViewModel.setNursingReferralSelection,
-          reasonValidator: (val) =>
-              (val == null || val.isEmpty) ? 'Please enter a reason' : null,
-          options: [
-            KenwellReferralOption(
-              value: NursingReferralOption.patientNotReferred,
-              label: 'Patient not referred',
-              requiresReason: true,
-              reasonController: nurseViewModel.notReferredReasonController,
-              reasonLabel: 'Reason patient not referred',
-            ),
-            const KenwellReferralOption(
-              value: NursingReferralOption.referredToGP,
-              label: 'Patient referred to GP',
-            ),
-            const KenwellReferralOption(
-              value: NursingReferralOption.referredToStateClinic,
-              label: 'Patient referred to State HIV clinic',
-            ),
-          ],
-        ),
-        if (nurseViewModel.nursingReferralSelection != null) ...[
-          const SizedBox(height: 12),
-          NursingReferralStatusCard(
-            referralSelection: nurseViewModel.nursingReferralSelection,
-          ),
-        ],
-      ],
+    return NursingReferralStatusCard(
+      title: 'Nursing Referrals',
+      selectedValue: nurseViewModel.nursingReferralSelection,
+      onChanged: nurseViewModel.setNursingReferralSelection,
+      notReferredReasonController: nurseViewModel.notReferredReasonController,
+      reasonValidator: (val) =>
+          (val == null || val.isEmpty) ? 'Please enter a reason' : null,
     );
   }
 
