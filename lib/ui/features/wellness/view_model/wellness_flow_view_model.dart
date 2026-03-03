@@ -127,9 +127,21 @@ class WellnessFlowViewModel extends ChangeNotifier {
       debugPrint('Error loading Cancer completion: $e');
     }
 
-    // If all enabled screenings are completed, set screeningsCompleted
-    if (hraCompleted && hctCompleted && tbCompleted) {
-      screeningsCompleted = true;
+    // Determine screeningsCompleted based on which screenings were enabled.
+    // Use the session-level enabled flags when available; otherwise fall back
+    // to treating any completed screening as "done".
+    final anyEnabled =
+        hraEnabled || hctEnabled || tbEnabled || cancerEnabled;
+    if (anyEnabled) {
+      screeningsCompleted = (!hraEnabled || hraCompleted) &&
+          (!hctEnabled || hctCompleted) &&
+          (!tbEnabled || tbCompleted) &&
+          (!cancerEnabled || cancerCompleted);
+    } else {
+      // Fallback for cases where enabled flags weren't set (e.g. app restart):
+      // if any individual screening record was found, consider screenings done.
+      screeningsCompleted =
+          hraCompleted || hctCompleted || tbCompleted || cancerCompleted;
     }
 
     // Survey
@@ -138,6 +150,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
           .collection('survey_results')
           .where('memberId', isEqualTo: memberId)
           .where('eventId', isEqualTo: eventId)
+          .where('type', isEqualTo: 'survey')
           .limit(1)
           .get();
       if (querySnapshot.docs.isNotEmpty) {
