@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import '../../../../../domain/models/member.dart';
 import '../../../../shared/ui/badges/number_badge.dart';
 
@@ -83,15 +84,14 @@ class MemberCardWidget extends StatelessWidget {
               slidable?.openEndActionPane();
             }
           },
-          onLongPress: onTap,
           child: Container(
             margin: const EdgeInsets.only(bottom: 10),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: theme.primaryColor.withValues(alpha: 0.12),
-                width: 1,
+                color: KenwellColors.primaryGreen.withValues(alpha: 0.4),
+                width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(

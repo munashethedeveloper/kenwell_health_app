@@ -75,7 +75,6 @@ class UserCardWidget extends StatelessWidget {
               slidable?.openEndActionPane();
             }
           },
-          onLongPress: onTap,
           child: Container(
             margin: const EdgeInsets.only(bottom: 10),
             decoration: BoxDecoration(
@@ -83,10 +82,10 @@ class UserCardWidget extends StatelessWidget {
               //color: KenwellColors.secondaryNavy,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: KenwellColors.secondaryNavy.withValues(alpha: 0.08),
+                color: KenwellColors.primaryGreen.withValues(alpha: 0.4),
 
                 //color: theme.primaryColor.withValues(alpha: 0.12),
-                width: 1,
+                width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(

@@ -512,8 +512,9 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: Colors.grey.shade200,
-                          width: 1,
+                          color: KenwellColors.secondaryNavy
+                              .withValues(alpha: 0.08),
+                          width: 2.5,
                         ),
                         boxShadow: [
                           BoxShadow(
