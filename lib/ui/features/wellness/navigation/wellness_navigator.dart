@@ -142,6 +142,14 @@ class WellnessNavigator {
                   await memberVM.saveLocally();
                   if (context.mounted && memberVM.savedMember != null) {
                     Navigator.of(context).pop(memberVM.savedMember);
+                  } else if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                            'Registration failed. Please try again.'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
                   }
                 } catch (e) {
                   debugPrint('Failed to save member: $e');
