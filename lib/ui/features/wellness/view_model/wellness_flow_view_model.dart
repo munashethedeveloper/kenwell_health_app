@@ -40,17 +40,26 @@ class WellnessFlowViewModel extends ChangeNotifier {
     tbCompleted = false;
     cancerCompleted = false;
     screeningsCompleted = false;
+    screeningsInProgress = false;
     surveyCompleted = false;
 
-    // Consent
+    // Consent — also restore which screenings were enabled from the saved record
     try {
       final consentRepo = FirestoreConsentRepository();
       final consents = await consentRepo.getConsentsByMember(memberId);
       debugPrint(
           'Loaded consents for $memberId: ${consents.map((c) => c.eventId).toList()}');
-      final hasConsent = consents.any((consent) => consent.eventId == eventId);
-      if (hasConsent) {
+      final matching =
+          consents.where((c) => c.eventId == eventId).toList();
+      if (matching.isNotEmpty) {
         consentCompleted = true;
+        // Restore enabled-screening flags from the persisted consent record so
+        // refresh and first-load both know which screenings were consented to.
+        final consent = matching.first;
+        hraEnabled = consent.hra;
+        hctEnabled = consent.hct;
+        tbEnabled = consent.tb;
+        cancerEnabled = consent.cancer;
       }
     } catch (e) {
       debugPrint('Error loading consent completion: $e');
@@ -127,21 +136,26 @@ class WellnessFlowViewModel extends ChangeNotifier {
       debugPrint('Error loading Cancer completion: $e');
     }
 
-    // Determine screeningsCompleted based on which screenings were enabled.
-    // Use the session-level enabled flags when available; otherwise fall back
-    // to treating any completed screening as "done".
+    // Determine screeningsCompleted / screeningsInProgress based on which
+    // screenings were consented to (now correctly loaded from Firestore above).
     final anyEnabled =
         hraEnabled || hctEnabled || tbEnabled || cancerEnabled;
     if (anyEnabled) {
-      screeningsCompleted = (!hraEnabled || hraCompleted) &&
+      final allConsentedScreeningsCompleted = (!hraEnabled || hraCompleted) &&
           (!hctEnabled || hctCompleted) &&
           (!tbEnabled || tbCompleted) &&
           (!cancerEnabled || cancerCompleted);
+      if (allConsentedScreeningsCompleted) {
+        screeningsCompleted = true;
+        screeningsInProgress = false;
+      } else {
+        screeningsCompleted = false;
+        screeningsInProgress = true;
+      }
     } else {
-      // Fallback for cases where enabled flags weren't set (e.g. app restart):
-      // if any individual screening record was found, consider screenings done.
-      screeningsCompleted =
-          hraCompleted || hctCompleted || tbCompleted || cancerCompleted;
+      // No consent found (or no screenings selected): leave as Not Completed.
+      screeningsCompleted = false;
+      screeningsInProgress = false;
     }
 
     // Survey

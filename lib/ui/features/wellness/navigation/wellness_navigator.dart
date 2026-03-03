@@ -171,7 +171,9 @@ class WellnessNavigator {
       Member member, WellnessFlowViewModel wellnessVM) async {
     wellnessVM.currentMember = member;
     wellnessVM.memberRegistrationCompleted = true;
-    await wellnessVM.checkConsentCompletion(member.id, event.id);
+    // Load all completion flags from Firestore so the event home screen
+    // immediately shows the correct consent, screenings and survey status.
+    await wellnessVM.loadAllCompletionFlags(member.id, event.id);
 
     // Ensure a member_events record exists for this member-event pair.
     // This covers the case where an existing member is found via search
