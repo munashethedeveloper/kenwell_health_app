@@ -145,6 +145,15 @@ class WellnessNavigator {
                   }
                 } catch (e) {
                   debugPrint('Failed to save member: $e');
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                            'Failed to register member. Please try again.'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
                 }
               }
             },

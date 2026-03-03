@@ -358,7 +358,13 @@ class MemberDetailsViewModel extends ChangeNotifier {
       // Save to Firestore using the original member object (not savedMember) so
       // that eventId is preserved — the local DB schema has no eventId column,
       // so savedMember.eventId is always null after the local DB round-trip.
-      await _firestoreMemberRepository.addMember(member);
+      // Non-fatal: if Firestore is unavailable the local save still lets the
+      // flow continue; the member search screen has a local-DB fallback.
+      try {
+        await _firestoreMemberRepository.addMember(member);
+      } catch (e) {
+        debugPrint('Failed to sync member to Firestore (non-fatal): $e');
+      }
 
       // Write to member_events collection to track event registration
       if (_eventId != null && _eventId!.isNotEmpty) {
