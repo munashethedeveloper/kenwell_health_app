@@ -204,7 +204,7 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
           hintText: 'Enter email address',
           controller: vm.emailController,
           keyboardType: TextInputType.emailAddress,
-          validator: Validators.validateEmail,
+          validator: Validators.validateOptionalEmail,
         ),
         const SizedBox(height: 8),
         InternationalPhoneField(
