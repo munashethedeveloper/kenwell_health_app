@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/custom_dropdown_field.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_referral_card.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/health_metric_status_badge.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/nursing_referral_status_card.dart';
 import 'package:kenwell_health_app/ui/features/nurse_interventions/view_model/nurse_intervention_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
@@ -481,15 +481,8 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                       const HealthMetricRedAlert(),
                     ],
 
-                    // Healthy status indicator — hide referral card, show green banner
-                    if (vm.isHealthy) ...[
-                      const SizedBox(height: 12),
-                      _buildHealthyBanner(),
-                    ],
-
                     const SizedBox(height: 24),
-                    // Show referral card only when NOT healthy (at-risk or undetermined)
-                    if (!vm.isHealthy) _buildReferrals(),
+                    _buildReferrals(),
                     const SizedBox(height: 24),
 
                     // ===== Navigation Buttons =====
@@ -536,60 +529,13 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
 
   // Build referrals widget
   Widget _buildReferrals() {
-    return KenwellReferralCard<NursingReferralOption>(
+    return NursingReferralStatusCard(
       title: 'Nursing Referrals',
       selectedValue: nurseViewModel.nursingReferralSelection,
       onChanged: nurseViewModel.setNursingReferralSelection,
+      notReferredReasonController: nurseViewModel.notReferredReasonController,
       reasonValidator: (val) =>
           (val == null || val.isEmpty) ? 'Please enter a reason' : null,
-      options: [
-        KenwellReferralOption(
-          value: NursingReferralOption.patientNotReferred,
-          label: 'Patient not referred',
-          requiresReason: true,
-          reasonController: nurseViewModel.notReferredReasonController,
-          reasonLabel: 'Reason patient not referred',
-        ),
-        const KenwellReferralOption(
-          value: NursingReferralOption.referredToGP,
-          label: 'Patient referred to GP',
-        ),
-        const KenwellReferralOption(
-          value: NursingReferralOption.referredToStateClinic,
-          label: 'Patient referred to State HIV clinic',
-        ),
-      ],
-    );
-  }
-
-  // Green banner shown when all metrics are healthy
-  Widget _buildHealthyBanner() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE8F5E9),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFF2E7D32), width: 1),
-      ),
-      child: const Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.check_circle, color: Color(0xFF2E7D32), size: 20),
-          SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'All health metrics are in a healthy range. '
-              'No nursing referral is required.',
-              style: TextStyle(
-                color: Color(0xFF2E7D32),
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
