@@ -36,6 +36,14 @@ class Validators {
     return null;
   }
 
+  // ------------------ Local phone number validation ------------------
+  static String? validateLocalPhoneNumber(String? value) {
+    if (value == null || value.isEmpty) return 'Please enter phone number';
+    final cleaned = value.replaceAll(RegExp(r'\D'), '');
+    if (cleaned.length != 8) return 'Phone number must be 8 digits (xx xxx xxx)';
+    return null;
+  }
+
   // ------------------ SA Phone validation ------------------
   static String? validateSouthAfricanPhoneNumber(String? value) {
     if (value == null || value.isEmpty) return 'Please enter phone number';

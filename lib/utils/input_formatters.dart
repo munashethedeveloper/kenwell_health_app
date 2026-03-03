@@ -43,6 +43,35 @@ class AppTextInputFormatters {
     });
   }
 
+  /// Local phone number formatter.
+  /// Formats digits in xx xxx xxx pattern (2-3-3, max 8 digits).
+  /// Non-digit characters are silently discarded.
+  static TextInputFormatter localPhoneNumberFormatter() {
+    return TextInputFormatter.withFunction((oldValue, newValue) {
+      // Strip all non-digits
+      String digits = newValue.text.replaceAll(RegExp(r'\D'), '');
+
+      // Enforce 8-digit limit
+      if (digits.length > 8) digits = digits.substring(0, 8);
+
+      // Build formatted string: xx xxx xxx
+      String formatted;
+      if (digits.length <= 2) {
+        formatted = digits;
+      } else if (digits.length <= 5) {
+        formatted = '${digits.substring(0, 2)} ${digits.substring(2)}';
+      } else {
+        formatted =
+            '${digits.substring(0, 2)} ${digits.substring(2, 5)} ${digits.substring(5)}';
+      }
+
+      return TextEditingValue(
+        text: formatted,
+        selection: TextSelection.collapsed(offset: formatted.length),
+      );
+    });
+  }
+
   /// Live format South African phone numbers.
   /// Converts:
   /// - 0XXXXXXXXX -> +27 XX XXX XXXX
