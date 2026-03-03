@@ -190,36 +190,55 @@ class EventCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
-                  // Date and status row
+                  // Date, time and status row
                   Row(
                     children: [
-                      const Icon(
-                        Icons.calendar_today,
-                        size: 14,
-                        color: KenwellColors.secondaryNavyDark,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Date: ${viewModel.formatDateShort(event.date)}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: KenwellColors.secondaryNavyDark,
+                      // Date
+                      Expanded(
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.calendar_today,
+                              size: 14,
+                              color: KenwellColors.secondaryNavyDark,
+                            ),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                'Date: ${viewModel.formatDateShort(event.date)}',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: KenwellColors.secondaryNavyDark,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      //Time
-                      const SizedBox(width: 200),
-                      const Icon(
-                        Icons.access_time,
-                        size: 16,
-                        color: KenwellColors.secondaryNavyDark,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Time: ${event.startTime}${event.endTime.isNotEmpty ? ' - ${event.endTime}' : ''}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: KenwellColors.secondaryNavyDark,
+                      const SizedBox(width: 8),
+                      // Time
+                      Expanded(
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.access_time,
+                              size: 14,
+                              color: KenwellColors.secondaryNavyDark,
+                            ),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                'Time: ${event.startTime}${event.endTime.isNotEmpty ? ' - ${event.endTime}' : ''}',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: KenwellColors.secondaryNavyDark,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(width: 200),
+                      const SizedBox(width: 8),
                       // Status badge
                       Container(
                         padding: const EdgeInsets.symmetric(
