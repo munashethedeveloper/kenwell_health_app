@@ -325,15 +325,14 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
               slidable?.openEndActionPane();
             }
           },
-          onLongPress: () => _showUserOptions(user),
           child: Container(
             margin: const EdgeInsets.only(bottom: 10),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: theme.primaryColor.withValues(alpha: 0.12),
-                width: 1,
+                color: KenwellColors.primaryGreen.withValues(alpha: 0.4),
+                width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
@@ -791,8 +790,9 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: Colors.grey.shade200,
-                            width: 1,
+                            color: KenwellColors.secondaryNavy
+                                .withValues(alpha: 0.08),
+                            width: 2.5,
                           ),
                           boxShadow: [
                             BoxShadow(
@@ -805,6 +805,14 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            Text(
+                              'Search users:',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF201C58),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
                             UserSearchBar(
                               controller: _searchController,
                               searchQuery: viewModel.searchQuery,
@@ -825,7 +833,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
-                                  'Filter by role',
+                                  'Filter by role:',
                                   style: theme.textTheme.labelMedium?.copyWith(
                                     fontWeight: FontWeight.w600,
                                     color: const Color(0xFF201C58),
@@ -841,8 +849,8 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                         ),
                       ),
                       const SizedBox(height: 32),
-                      const KenwellModernSectionHeader(
-                        title: 'Allocate Event',
+                      KenwellModernSectionHeader(
+                        title: 'Allocate Event: ${widget.event.title}',
                         subtitle:
                             'Swipe on a user to assign or unassign them from this event',
                       ),

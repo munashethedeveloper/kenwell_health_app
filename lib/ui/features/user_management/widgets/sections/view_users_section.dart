@@ -512,8 +512,9 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: Colors.grey.shade200,
-                          width: 1,
+                          color: KenwellColors.secondaryNavy
+                              .withValues(alpha: 0.08),
+                          width: 2.5,
                         ),
                         boxShadow: [
                           BoxShadow(
@@ -526,6 +527,14 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Text(
+                            'Search users:',
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF201C58),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
                           UserSearchBar(
                             controller: _searchController,
                             searchQuery: viewModel.searchQuery,
@@ -546,7 +555,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                               ),
                               const SizedBox(width: 6),
                               Text(
-                                'Filter by role',
+                                'Filter by role:',
                                 style: theme.textTheme.labelMedium?.copyWith(
                                   fontWeight: FontWeight.w600,
                                   color: const Color(0xFF201C58),

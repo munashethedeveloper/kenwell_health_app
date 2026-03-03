@@ -400,10 +400,9 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: Colors.grey.shade200,
-                          //color: KenwellColors.secondaryNavy
-                          //   .withValues(alpha: 0.08),
-                          width: 1,
+                          color: KenwellColors.secondaryNavy
+                              .withValues(alpha: 0.08),
+                          width: 2.5,
                         ),
                         boxShadow: [
                           BoxShadow(
@@ -433,6 +432,14 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                               ), */
                             ],
                           ), */
+                          //const SizedBox(height: 8),
+                          Text(
+                            'Search members:',
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF201C58),
+                            ),
+                          ),
                           const SizedBox(height: 8),
                           MemberSearchBar(
                             controller: _searchController,
@@ -460,7 +467,7 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                               ),
                               const SizedBox(width: 6),
                               Text(
-                                'Filter by gender',
+                                'Filter by gender:',
                                 style: theme.textTheme.labelMedium?.copyWith(
                                   fontWeight: FontWeight.w600,
                                   color: const Color(0xFF201C58),
