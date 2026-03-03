@@ -158,7 +158,7 @@ class EventCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header row with icon badge and title/date
+        // Header row with icon badge and title/date+status
         Row(
           children: [
             Container(
@@ -168,7 +168,7 @@ class EventCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
-                viewModel.getServiceIcon(event.servicesRequested),
+                Icons.event,
                 color: theme.primaryColor,
                 size: 20,
               ),
@@ -178,9 +178,9 @@ class EventCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Event title with primary color
+                  // Event title
                   Text(
-                    'Client Organization: ${event.title}',
+                    event.title,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: theme.primaryColor,
@@ -189,55 +189,22 @@ class EventCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
-                  // Date, time and status row
+                  // Date and status row (matching My Events)
                   Row(
                     children: [
-                      // Date
-                      Expanded(
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.calendar_today,
-                              size: 14,
-                              color: KenwellColors.secondaryNavyDark,
-                            ),
-                            const SizedBox(width: 4),
-                            Flexible(
-                              child: Text(
-                                'Date: ${viewModel.formatDateShort(event.date)}',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: KenwellColors.secondaryNavyDark,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
+                      const Icon(
+                        Icons.calendar_today,
+                        size: 14,
+                        color: KenwellColors.secondaryNavyDark,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${event.date.day}/${event.date.month}/${event.date.year}',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: KenwellColors.secondaryNavyDark,
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      // Time
-                      Expanded(
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.access_time,
-                              size: 14,
-                              color: KenwellColors.secondaryNavyDark,
-                            ),
-                            const SizedBox(width: 4),
-                            Flexible(
-                              child: Text(
-                                'Time: ${event.startTime}${event.endTime.isNotEmpty ? ' - ${event.endTime}' : ''}',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: KenwellColors.secondaryNavyDark,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 12),
                       // Status badge
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -266,7 +233,7 @@ class EventCard extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        /*   // Event time row
+        // Time row (separate row, matching My Events)
         Row(
           children: [
             const Icon(
@@ -275,21 +242,15 @@ class EventCard extends StatelessWidget {
               color: KenwellColors.secondaryNavyDark,
             ),
             const SizedBox(width: 6),
-            /*  Text(
-              'Time: ${event.startTime}${event.endTime.isNotEmpty ? ' - ${event.endTime}' : ''}',
+            Text(
+              '${event.startTime}${event.endTime.isNotEmpty ? ' - ${event.endTime}' : ''}',
               style: const TextStyle(
                 fontWeight: FontWeight.w600,
                 color: KenwellColors.secondaryNavyDark,
               ),
-            ), */
-          /*   Text(
-              'Time: ${event.startTime}${event.endTime.isNotEmpty ? ' - ${event.endTime}' : ''}',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: KenwellColors.secondaryNavyDark,
-              ),
-            ), */
+            ),
           ],
-        ), */
+        ),
         // Address row
         if (event.address.isNotEmpty) ...[
           const SizedBox(height: 8),
@@ -303,7 +264,7 @@ class EventCard extends StatelessWidget {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  'Address: ${event.address}',
+                  event.address,
                   style: const TextStyle(
                     color: KenwellColors.secondaryNavyDark,
                   ),
@@ -327,12 +288,35 @@ class EventCard extends StatelessWidget {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  'Venue: ${event.venue}',
+                  event.venue,
                   style: const TextStyle(
                     color: KenwellColors.secondaryNavyDark,
                   ),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
+                ),
+              ),
+            ],
+          ),
+        ],
+        // Services row (matching My Events)
+        if (event.servicesRequested.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(
+                Icons.medical_services,
+                size: 16,
+                color: KenwellColors.secondaryNavyDark,
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  'Services: ${event.servicesRequested}',
+                  style: const TextStyle(
+                    color: KenwellColors.secondaryNavyDark,
+                  ),
                 ),
               ),
             ],
