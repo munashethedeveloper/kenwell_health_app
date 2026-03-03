@@ -32,8 +32,13 @@ class WellnessFlowViewModel extends ChangeNotifier {
   Future<void> loadAllCompletionFlags(String? memberId, String? eventId) async {
     if (memberId == null || eventId == null) return;
 
-    // Reset all flags
+    // Reset all flags (including enabled flags so stale values from a previous
+    // member don't leak when the same WellnessFlowViewModel is reused)
     consentCompleted = false;
+    hraEnabled = false;
+    hctEnabled = false;
+    tbEnabled = false;
+    cancerEnabled = false;
     hraCompleted = false;
     hctCompleted = false; // Added HCT flag
     //hivCompleted = false;

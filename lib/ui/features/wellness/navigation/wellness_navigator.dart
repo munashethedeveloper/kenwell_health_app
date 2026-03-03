@@ -286,7 +286,13 @@ class WellnessNavigator {
                           false); // false means completed a screening, need to reshow
 
                       if (result == true) {
-                        wellnessVM.screeningsCompleted = true;
+                        wellnessVM.markScreeningsCompleted();
+                      } else if (wellnessVM.hraCompleted ||
+                          wellnessVM.hctCompleted ||
+                          wellnessVM.tbCompleted ||
+                          wellnessVM.cancerCompleted) {
+                        // Some screenings done but not all — mark as in progress
+                        wellnessVM.markScreeningsInProgress();
                       }
                       break;
                     }
@@ -294,7 +300,7 @@ class WellnessNavigator {
                     {
                       final result = await _navigateToSurvey(member);
                       if (result == true) {
-                        wellnessVM.surveyCompleted = true;
+                        wellnessVM.markSurveyCompleted();
                       }
                       break;
                     }
@@ -373,7 +379,7 @@ class WellnessNavigator {
             final result = await _navigateToHra(member);
             if (!context.mounted) return;
             if (result == true) {
-              wellnessVM.hraCompleted = true;
+              wellnessVM.markHraCompleted();
               _memberEventRepository
                   .updateScreeningStatus(member.id, event.id,
                       hraCompleted: true)
@@ -386,7 +392,7 @@ class WellnessNavigator {
             final result = await _navigateToHctFlow(member);
             if (!context.mounted) return;
             if (result == true) {
-              wellnessVM.hctCompleted = true;
+              wellnessVM.markHctCompleted();
               _memberEventRepository
                   .updateScreeningStatus(member.id, event.id,
                       hctCompleted: true)
@@ -399,7 +405,7 @@ class WellnessNavigator {
             final result = await _navigateToTb(member);
             if (!context.mounted) return;
             if (result == true) {
-              wellnessVM.tbCompleted = true;
+              wellnessVM.markTbCompleted();
               _memberEventRepository
                   .updateScreeningStatus(member.id, event.id, tbCompleted: true)
                   .catchError((e) =>
