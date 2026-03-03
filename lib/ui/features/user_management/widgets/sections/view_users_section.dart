@@ -598,8 +598,8 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                     const SizedBox(height: 24),
 
                     const KenwellModernSectionHeader(
-                      title: 'Registered Users',
-                      subtitle: 'Swipe or long-press for options',
+                      title: 'View Registered Users',
+                      subtitle: 'Swipe on a user for options',
                     ),
 
                     const SizedBox(height: 16),

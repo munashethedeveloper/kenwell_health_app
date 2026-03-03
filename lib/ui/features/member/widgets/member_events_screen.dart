@@ -84,7 +84,7 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
 
     return Scaffold(
       appBar: const KenwellAppBar(
-        title: 'Events Attended',
+        title: 'KenWell365',
         titleColor: Colors.white,
         titleStyle: TextStyle(
           color: Colors.white,
@@ -102,6 +102,12 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
             const SizedBox(height: 8),
             const AppLogo(size: 150),
             const SizedBox(height: 24),
+            // Events section
+            const KenwellModernSectionHeader(
+              title: 'Member Details',
+              subtitle:
+                  'Detailed information about the member and their event history',
+            ),
 
             // Member information
             _buildSectionCard(

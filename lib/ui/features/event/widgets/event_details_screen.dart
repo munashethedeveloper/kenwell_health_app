@@ -38,6 +38,11 @@ class EventDetailsScreen extends StatelessWidget {
 
     String fullName(String first, String last) => '$first $last';
 
+    String eventTitle = event.title.toLowerCase();
+    String eventTitleCapitalized = eventTitle.isNotEmpty
+        ? '${eventTitle[0].toUpperCase()}${eventTitle.substring(1)}'
+        : '';
+
     return Scaffold(
       // App bar with title and actions
       appBar: KenwellAppBar(
@@ -68,9 +73,9 @@ class EventDetailsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const KenwellModernSectionHeader(
-            title: 'Event Details',
-            subtitle: 'Detailed information about the event',
+          KenwellModernSectionHeader(
+            title: '$eventTitleCapitalized Event Details',
+            subtitle: 'Detailed information about the $eventTitle event',
           ), //const SizedBox(height: 16),
           /*  // Event title header card
           Container(

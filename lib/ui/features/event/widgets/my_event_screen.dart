@@ -256,7 +256,7 @@ class MyEventScreenState extends State<MyEventScreen> {
         actions: [
           IconButton(
             tooltip: 'Refresh',
-            icon: const Icon(Icons.refresh, color: Color(0xFF201C58)),
+            icon: const Icon(Icons.refresh, color: Colors.white),
             onPressed: () async {
               // Refresh user events from Firestore
               await _fetchUserEvents();
@@ -275,10 +275,10 @@ class MyEventScreenState extends State<MyEventScreen> {
                 context.pushNamed('help');
               }
             },
-            icon: const Icon(Icons.help_outline, color: Color(0xFF201C58)),
+            icon: const Icon(Icons.help_outline, color: Colors.white),
             label: const Text(
               'Help',
-              style: TextStyle(color: Color(0xFF201C58)),
+              style: TextStyle(color: Colors.white),
             ),
           ),
         ],

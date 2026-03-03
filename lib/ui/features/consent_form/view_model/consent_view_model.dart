@@ -6,6 +6,7 @@ import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/domain/models/consent.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_consent_repository.dart';
 import 'package:kenwell_health_app/utils/logger.dart';
+import 'package:uuid/uuid.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -161,7 +162,7 @@ class ConsentScreenViewModel extends ChangeNotifier {
 
       // Create consent object
       final consent = Consent(
-        id: '${DateTime.now().millisecondsSinceEpoch}', // Simple timestamp-based ID
+        id: const Uuid().v4(),
         memberId: _memberId,
         eventId: _eventId,
         venue: venueController.text,
@@ -185,7 +186,7 @@ class ConsentScreenViewModel extends ChangeNotifier {
       AppLogger.info('Consent saved to survey_results collection');
     } catch (e) {
       AppLogger.error('Failed to save consent', e);
-      // Continue with flow even if Firestore save fails
+      rethrow;
     } finally {
       _isSubmitting = false;
       notifyListeners();

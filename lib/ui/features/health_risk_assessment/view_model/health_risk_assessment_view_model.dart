@@ -5,6 +5,7 @@ import 'package:kenwell_health_app/data/repositories_dcl/firestore_hra_repositor
 import 'package:kenwell_health_app/utils/logger.dart';
 import 'package:kenwell_health_app/domain/constants/enums.dart';
 import 'package:kenwell_health_app/utils/health_metric_classification.dart';
+import 'package:uuid/uuid.dart';
 
 // ViewModel for Personal Risk Assessment
 class PersonalRiskAssessmentViewModel extends ChangeNotifier {
@@ -241,6 +242,16 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
       bloodSugarStatus == HealthMetricStatus.red ||
       cholesterolStatus == HealthMetricStatus.red;
 
+  /// True when all four key health metrics have been entered.
+  bool get allMetricsEntered =>
+      systolicBpController.text.isNotEmpty &&
+      diastolicBpController.text.isNotEmpty &&
+      bloodSugarController.text.isNotEmpty &&
+      cholesterolController.text.isNotEmpty;
+
+  /// True when all metrics are entered and none are in the danger zone.
+  bool get isHealthy => allMetricsEntered && !hasRedMetrics;
+
   //Show Fields
   bool get showSmokingFields => smokingStatus == 'Yes';
   bool get showDrinkingFields => drinkingStatus == 'Yes';
@@ -317,7 +328,7 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
     required VoidCallback onNext,
   }) async {
     debugPrint('Saving HRA for memberId=$_memberId, eventId=$_eventId');
-    if (!isFormValid || !formKey.currentState!.validate()) {
+    if (!isFormValid) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please complete all required fields.')),
       );
@@ -330,7 +341,7 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
     try {
       // Create HRA screening object
       final hraScreening = HraScreening(
-        id: '${DateTime.now().millisecondsSinceEpoch}',
+        id: const Uuid().v4(),
         memberId: _memberId,
         eventId: _eventId,
         chronicConditions: chronicConditions,

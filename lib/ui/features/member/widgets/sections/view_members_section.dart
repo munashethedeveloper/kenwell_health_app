@@ -475,11 +475,11 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 32),
 
                     const KenwellModernSectionHeader(
-                      title: 'Registered Users',
-                      subtitle: 'Swipe or long-press for options',
+                      title: 'View Registered Members',
+                      subtitle: 'Swipe on a member for options',
                     ),
 
                     const SizedBox(height: 16),

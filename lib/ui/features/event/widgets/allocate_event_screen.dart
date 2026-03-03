@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/containers/gradient_container.dart';
 import '../../../shared/ui/badges/number_badge.dart';
@@ -710,7 +711,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                                   ],
                                 ),
                               ),
-                              Column(
+                              /*  Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   const Icon(
@@ -728,14 +729,14 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                                     ),
                                   ),
                                 ],
-                              ),
+                              ), */
                             ],
                           ),
                         ),
                       ),
                       const SizedBox(height: 16),
 
-                      // Section title
+                      /*             // Section title
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Row(
@@ -780,7 +781,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 12), */
 
                       // Search and filter card
                       Container(
@@ -839,6 +840,13 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                           ],
                         ),
                       ),
+                      const SizedBox(height: 32),
+                      const KenwellModernSectionHeader(
+                        title: 'Allocate Event',
+                        subtitle:
+                            'Swipe on a user to assign or unassign them from this event',
+                      ),
+                      //const SizedBox(height: 24),
                       const SizedBox(height: 16),
                     ],
                   ),

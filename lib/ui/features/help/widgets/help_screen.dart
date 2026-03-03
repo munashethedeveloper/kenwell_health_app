@@ -61,7 +61,7 @@ class HelpScreen extends StatelessWidget {
                   subtitle: 'mapiyem@kenwellhealthcare.co.za',
                   onTap: viewModel.contactSupport,
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 8),
                 // Menu items
                 _ProfileMenuItem(
                   icon: Icons.help_outline,
