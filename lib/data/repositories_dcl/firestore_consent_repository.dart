@@ -64,10 +64,15 @@ class FirestoreConsentRepository {
   /// Get all consents for a specific member
   Future<List<Consent>> getConsentsByMember(String memberId) async {
     try {
+      // NOTE: No orderBy here — adding .orderBy('createdAt') alongside
+      // .where('memberId') requires a Firestore composite index.  Without
+      // that index Firestore throws, the error is swallowed in callers like
+      // loadAllCompletionFlags, and all completion flags silently stay false.
+      // A single-field equality filter uses the auto-created index on
+      // 'memberId' and needs no composite index.
       final querySnapshot = await _firestore
           .collection(_collectionName)
           .where('memberId', isEqualTo: memberId)
-          .orderBy('createdAt', descending: true)
           .get();
 
       return querySnapshot.docs
