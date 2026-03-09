@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
@@ -393,298 +394,306 @@ class MyEventScreenState extends State<MyEventScreen> {
               )
             else
               // List of events for the selected tab
-              // Using Event Breakdown Card styling inline to preserve custom action buttons
-              // (Start/Resume/Finish buttons are specific to this screen)
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.white,
-                      Colors.grey.shade50,
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: filteredEvents.map((event) {
-                    final isStarting = _startingEventId == event.id;
-                    final theme = Theme.of(context);
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: theme.primaryColor.withValues(alpha: 0.05),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: theme.primaryColor.withValues(alpha: 0.15),
-                              width: 1.5,
-                            ),
+              Column(
+                children: filteredEvents.map((event) {
+                  final isStarting = _startingEventId == event.id;
+                  final theme = Theme.of(context);
+                  return Material(
+                    color: Colors.transparent,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.07),
+                            blurRadius: 12,
+                            offset: const Offset(0, 3),
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: IntrinsicHeight(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              // Header row with icon and title
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: theme.primaryColor
-                                          .withValues(alpha: 0.1),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Icon(
-                                      Icons.event,
-                                      color: theme.primaryColor,
-                                      size: 20,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          event.title,
-                                          style: theme.textTheme.bodyMedium
-                                              ?.copyWith(
-                                            fontWeight: FontWeight.w600,
-                                            color: theme.primaryColor,
+                              // Left green accent bar
+                              Container(
+                                width: 5,
+                                color: KenwellColors.primaryGreen,
+                              ),
+                              // Main card body
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.fromLTRB(
+                                      14, 14, 14, 12),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // Header: icon badge + org label + title + address
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          // Calendar icon badge
+                                          Container(
+                                            width: 46,
+                                            height: 46,
+                                            decoration: BoxDecoration(
+                                              color: KenwellColors.primaryGreen
+                                                  .withValues(alpha: 0.12),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                            child: const Icon(
+                                              Icons.event_rounded,
+                                              color: KenwellColors.primaryGreen,
+                                              size: 22,
+                                            ),
                                           ),
-                                        ),
-                                        const SizedBox(height: 4),
+                                          const SizedBox(width: 12),
+                                          // Organization label, title and address
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'CLIENT ORGANIZATION',
+                                                  style: theme
+                                                      .textTheme.labelSmall
+                                                      ?.copyWith(
+                                                    color: KenwellColors
+                                                        .primaryGreen,
+                                                    fontWeight: FontWeight.w700,
+                                                    letterSpacing: 0.8,
+                                                    fontSize: 10,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 2),
+                                                Text(
+                                                  event.title,
+                                                  style: theme
+                                                      .textTheme.titleSmall
+                                                      ?.copyWith(
+                                                    fontWeight: FontWeight.w700,
+                                                    fontSize: 15,
+                                                    color: KenwellColors
+                                                        .secondaryNavy,
+                                                  ),
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                                if (event
+                                                    .address.isNotEmpty) ...[
+                                                  const SizedBox(height: 4),
+                                                  Row(
+                                                    children: [
+                                                      const Icon(
+                                                        Icons
+                                                            .location_on_outlined,
+                                                        size: 13,
+                                                        color: KenwellColors
+                                                            .neutralGrey,
+                                                      ),
+                                                      const SizedBox(width: 3),
+                                                      Expanded(
+                                                        child: Text(
+                                                          event.address,
+                                                          style: theme.textTheme
+                                                              .bodySmall
+                                                              ?.copyWith(
+                                                            color: KenwellColors
+                                                                .neutralGrey,
+                                                            fontSize: 12,
+                                                          ),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          maxLines: 1,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 12),
+                                      const Divider(
+                                          height: 1,
+                                          thickness: 1,
+                                          color: KenwellColors.neutralDivider),
+                                      const SizedBox(height: 10),
+                                      // Meta chips: date, time, and status badge
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: _MyEventMetaChip(
+                                              icon: Icons.calendar_today_outlined,
+                                              label:
+                                                  '${event.date.day}/${event.date.month}/${event.date.year}',
+                                            ),
+                                          ),
+                                          if (event.startTime.isNotEmpty) ...[
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: _MyEventMetaChip(
+                                                icon: Icons.access_time_rounded,
+                                                label: event.endTime.isNotEmpty
+                                                    ? '${event.startTime} – ${event.endTime}'
+                                                    : event.startTime,
+                                              ),
+                                            ),
+                                          ],
+                                          const SizedBox(width: 8),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 9, vertical: 5),
+                                            decoration: BoxDecoration(
+                                              color: EventStatusColors
+                                                      .getStatusColor(
+                                                          event.status)
+                                                  .withValues(alpha: 0.15),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              border: Border.all(
+                                                color: KenwellColors
+                                                    .neutralDivider,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            child: Text(
+                                              event.status,
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w600,
+                                                color: EventStatusColors
+                                                    .getStatusColor(
+                                                        event.status),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      if (event.venue.isNotEmpty) ...[
+                                        const SizedBox(height: 8),
                                         Row(
                                           children: [
                                             const Icon(
-                                              Icons.calendar_today,
-                                              size: 14,
-                                              //color: Colors.grey[600],
-                                              color: KenwellColors
-                                                  .secondaryNavyDark,
+                                              Icons.business,
+                                              size: 13,
+                                              color: KenwellColors.neutralGrey,
                                             ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              '${event.date.day}/${event.date.month}/${event.date.year}',
-                                              style: theme.textTheme.bodySmall
-                                                  ?.copyWith(
-                                                color: KenwellColors
-                                                    .secondaryNavyDark,
-                                                //color: Colors.black,
-                                                //color: Colors.grey[600],
-                                                //color: KenwellColors
-                                                // .secondaryNavyDark,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 12),
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 8,
-                                                vertical: 2,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color: EventStatusColors
-                                                        .getStatusColor(
-                                                            event.status)
-                                                    .withValues(alpha: 0.15),
-                                                borderRadius:
-                                                    BorderRadius.circular(4),
-                                              ),
+                                            const SizedBox(width: 6),
+                                            Expanded(
                                               child: Text(
-                                                event.status,
-                                                style: theme
-                                                    .textTheme.labelSmall
+                                                event.venue,
+                                                style: theme.textTheme.bodySmall
                                                     ?.copyWith(
-                                                  color: EventStatusColors
-                                                      .getStatusColor(
-                                                          event.status),
-                                                  fontWeight: FontWeight.w600,
+                                                  color:
+                                                      KenwellColors.neutralGrey,
+                                                  fontSize: 12,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 1,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                      if (event
+                                          .servicesRequested.isNotEmpty) ...[
+                                        const SizedBox(height: 8),
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Icon(
+                                              Icons.medical_services,
+                                              size: 13,
+                                              color: KenwellColors.neutralGrey,
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Expanded(
+                                              child: Text(
+                                                'Services: ${event.servicesRequested}',
+                                                style: theme.textTheme.bodySmall
+                                                    ?.copyWith(
+                                                  color:
+                                                      KenwellColors.neutralGrey,
+                                                  fontSize: 12,
                                                 ),
                                               ),
                                             ),
                                           ],
                                         ),
                                       ],
-                                    ),
-                                  ),
-                                  /*    // Screened count badge
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 8),
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          theme.primaryColor,
-                                          theme.primaryColor
-                                              .withValues(alpha: 0.8),
+                                      const SizedBox(height: 12),
+                                      const Divider(
+                                          height: 1,
+                                          thickness: 1,
+                                          color: KenwellColors.neutralDivider),
+                                      const SizedBox(height: 12),
+                                      // Action buttons
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: CustomPrimaryButton(
+                                              label: event.status ==
+                                                      WellnessEventStatus
+                                                          .inProgress
+                                                  ? 'Resume Event'
+                                                  : 'Start Event',
+                                              onPressed: isStarting ||
+                                                      !_canStartEvent(event)
+                                                  ? null
+                                                  : () => _startEvent(
+                                                      context, event),
+                                              isBusy: isStarting,
+                                              fullWidth: true,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: CustomPrimaryButton(
+                                              label: 'Finish Event',
+                                              fullWidth: true,
+                                              onPressed: event.status ==
+                                                          WellnessEventStatus
+                                                              .inProgress &&
+                                                      event.screenedCount > 0
+                                                  ? () => _finishEvent(
+                                                      context, event)
+                                                  : null,
+                                              backgroundColor: Colors.red,
+                                            ),
+                                          ),
                                         ],
                                       ),
-                                      borderRadius: BorderRadius.circular(8),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: theme.primaryColor
-                                              .withValues(alpha: 0.3),
-                                          blurRadius: 8,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Text(
-                                      event.screenedCount.toString(),
-                                      style:
-                                          theme.textTheme.labelLarge?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ), */
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              // Additional event details
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.access_time,
-                                    size: 16,
-                                    //color: Colors.grey[700]
-                                    color: KenwellColors.secondaryNavyDark,
+                                    ],
                                   ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    '${event.startTime} - ${event.endTime}',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      color: KenwellColors.secondaryNavyDark,
-                                      // color:
-                                      //  Colors.black.withValues(alpha: 0.9),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              if (event.address.isNotEmpty) ...[
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.location_on,
-                                      size: 16,
-                                      //color: Colors.grey[700]
-                                      color: KenwellColors.secondaryNavyDark,
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Expanded(
-                                      child: Text(event.address,
-                                          style: const TextStyle(
-                                            color:
-                                                KenwellColors.secondaryNavyDark,
-                                          )),
-                                    ),
-                                  ],
                                 ),
-                              ],
-                              if (event.venue.isNotEmpty) ...[
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.business,
-                                      size: 16,
-                                      //color: Colors.grey[700]
-                                      color: KenwellColors.secondaryNavyDark,
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Expanded(
-                                      child: Text(
-                                        event.venue,
-                                        style: const TextStyle(
-                                          color:
-                                              KenwellColors.secondaryNavyDark,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                              if (event.servicesRequested.isNotEmpty) ...[
-                                const SizedBox(height: 8),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Icon(
-                                      Icons.medical_services,
-                                      size: 16,
-                                      //color: Colors.grey[700]
-                                      color: KenwellColors.secondaryNavyDark,
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Expanded(
-                                      child: Text(
-                                          'Services: ${event.servicesRequested}',
-                                          style: const TextStyle(
-                                            //color: Colors.black54),
-                                            color:
-                                                KenwellColors.secondaryNavyDark,
-                                          )),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                              const SizedBox(height: 16),
-                              // Action buttons
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: CustomPrimaryButton(
-                                      label: event.status ==
-                                              WellnessEventStatus.inProgress
-                                          ? 'Resume Event'
-                                          : 'Start Event',
-                                      onPressed: isStarting ||
-                                              !_canStartEvent(event)
-                                          ? null
-                                          : () => _startEvent(context, event),
-                                      isBusy: isStarting,
-                                      fullWidth: true,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: CustomPrimaryButton(
-                                      label: 'Finish Event',
-                                      fullWidth: true,
-                                      onPressed: event.status ==
-                                                  WellnessEventStatus
-                                                      .inProgress &&
-                                              event.screenedCount > 0
-                                          ? () => _finishEvent(context, event)
-                                          : null,
-                                      backgroundColor: Colors.red,
-                                    ),
-                                  ),
-                                ],
                               ),
                             ],
                           ),
                         ),
                       ),
-                    );
-                  }).toList(),
-                ),
+                    ),
+                  )
+                      .animate()
+                      .fadeIn(duration: 300.ms, curve: Curves.easeOut)
+                      .slideY(
+                          begin: 0.1,
+                          end: 0,
+                          duration: 300.ms,
+                          curve: Curves.easeOut);
+                }).toList(),
               ),
           ],
         ),
@@ -771,5 +780,47 @@ class MyEventScreenState extends State<MyEventScreen> {
     } catch (e) {
       debugPrint('MyEventScreen: Error refreshing events after finish: $e');
     }
+  }
+}
+
+// ── Small pill chip used in the meta row ──────────────────────────────────────
+class _MyEventMetaChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _MyEventMetaChip({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+      decoration: BoxDecoration(
+        color: KenwellColors.neutralBackground,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: KenwellColors.neutralDivider,
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 12, color: KenwellColors.secondaryNavy),
+          const SizedBox(width: 5),
+          Flexible(
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: KenwellColors.secondaryNavy,
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
