@@ -305,6 +305,27 @@ class EventCard extends StatelessWidget {
             ],
           ),
         ],
+        // Down arrow with "Click for more details" hint
+        const SizedBox(height: 8),
+        const Center(
+          child: Column(
+            children: [
+              Text(
+                'Click for more details',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: KenwellColors.secondaryNavyDark,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+              Icon(
+                Icons.keyboard_arrow_down,
+                size: 20,
+                color: KenwellColors.secondaryNavyDark,
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
