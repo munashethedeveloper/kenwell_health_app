@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +6,7 @@ import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:kenwell_health_app/utils/event_status_colors.dart';
 import 'package:provider/provider.dart';
+import '../../../../data/repositories_dcl/event_repository.dart';
 import '../../../../data/repositories_dcl/user_event_repository.dart';
 import '../../../../data/services/auth_service.dart';
 import '../../../../domain/models/wellness_event.dart';
@@ -65,80 +65,45 @@ class MyEventScreenState extends State<MyEventScreen> {
       debugPrint('MyEventScreen: No user logged in.');
       return;
     }
-    // Fetch user events from repository
-    final repo = UserEventRepository();
-    debugPrint('MyEventScreen: Fetching events for user ${user.id}...');
-    final userEventMaps = await repo.fetchUserEvents(user.id);
+    // Fetch assigned event IDs from user_events collection
+    final userEventRepo = UserEventRepository();
+    final eventRepo = EventRepository();
+    debugPrint('MyEventScreen: Fetching assigned event IDs for user ${user.id}...');
+    final userEventMaps = await userEventRepo.fetchUserEvents(user.id);
     debugPrint(
-        'MyEventScreen: Received ${userEventMaps.length} raw user events from Firestore');
-    debugPrint('MyEventScreen: Raw userEventMaps from Firestore:');
-    for (final map in userEventMaps) {
-      debugPrint('  - ${map.toString()}');
-    }
-    // Convert Firestore maps to WellnessEvent objects
-    final events = userEventMaps
-        .map((e) {
-          try {
-            // Handle eventDate - could be Timestamp or DateTime
-            DateTime eventDate;
-            final rawDate = e['eventDate'];
-            if (rawDate is Timestamp) {
-              eventDate = rawDate.toDate();
-            } else if (rawDate is DateTime) {
-              eventDate = rawDate;
-            } else {
-              debugPrint(
-                  'MyEventScreen: Invalid date type: ${rawDate.runtimeType}');
-              return null;
-            }
+        'MyEventScreen: Received ${userEventMaps.length} user_event records');
 
-            return WellnessEvent(
-              id: e['eventId'] ?? '',
-              title: e['eventTitle'] ?? '',
-              date: eventDate,
-              venue: e['eventVenue'] ?? '',
-              address: e['eventLocation'] ?? '',
-              townCity: '',
-              province: '',
-              onsiteContactFirstName: '',
-              onsiteContactLastName: '',
-              onsiteContactNumber: '',
-              onsiteContactEmail: '',
-              aeContactFirstName: '',
-              aeContactLastName: '',
-              aeContactNumber: '',
-              aeContactEmail: '',
-              servicesRequested: e['servicesRequested'] ?? '',
-              // additionalServicesRequested: '',
-              expectedParticipation: 0,
-              nurses: 0,
-              //  coordinators: 0,
-              setUpTime: '',
-              startTime: e['eventStartTime'] ?? '',
-              endTime: e['eventEndTime'] ?? '',
-              strikeDownTime: '',
-              mobileBooths: '',
-              description: '',
-              medicalAid: '',
-              status: 'scheduled',
-              actualStartTime: null,
-              actualEndTime: null,
-            );
-          } catch (err) {
-            debugPrint(
-                'MyEventScreen: Failed to map event: ${e.toString()} | Error: ${err.toString()}');
-            return null;
-          }
-        })
-        .whereType<WellnessEvent>()
+    // For each assigned event ID, fetch the full event from the events collection
+    final eventIds = userEventMaps
+        .map((m) => m['eventId'] as String?)
+        .where((id) => id != null && id.isNotEmpty)
+        .cast<String>()
         .toList();
+
+    final results = await Future.wait(
+      eventIds.map((eventId) async {
+        try {
+          final event = await eventRepo.fetchEventById(eventId);
+          if (event != null) {
+            debugPrint(
+                'MyEventScreen: Loaded full event "$eventId" | townCity: ${event.townCity} | province: ${event.province} | expectedParticipation: ${event.expectedParticipation} | status: ${event.status}');
+          } else {
+            debugPrint(
+                'MyEventScreen: Event "$eventId" not found in events collection');
+          }
+          return event;
+        } catch (err) {
+          debugPrint(
+              'MyEventScreen: Failed to fetch event "$eventId": ${err.toString()}');
+          return null;
+        }
+      }),
+    );
+
+    final events = results.whereType<WellnessEvent>().toList();
+
     debugPrint(
-        'MyEventScreen: Successfully mapped ${events.length} WellnessEvent objects');
-    debugPrint('MyEventScreen: Mapped WellnessEvent list:');
-    for (final event in events) {
-      debugPrint(
-          '  - id: ${event.id}, title: ${event.title}, date: ${event.date}');
-    }
+        'MyEventScreen: Successfully loaded ${events.length} full WellnessEvent objects');
     if (!mounted) return;
     setState(() {
       _userEvents = events;
