@@ -99,6 +99,24 @@ class ConsentScreenViewModel extends ChangeNotifier {
     });
   }
 
+  /// Resets all form state so the VM can be re-initialised for a new member.
+  /// Call this when the wellness flow moves to a new member (e.g. back to
+  /// search) so that stale memberId / event values don't bleed through.
+  void reset() {
+    event = null;
+    _memberId = null;
+    _eventId = null;
+    hra = false;
+    hct = false;
+    tb = false;
+    cancer = false;
+    signatureController.clear();
+    venueController.clear();
+    dateController.clear();
+    practitionerController.clear();
+    notifyListeners();
+  }
+
   // Toggle checkbox values
   void toggleCheckbox(String field, bool? value) {
     switch (field) {
