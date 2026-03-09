@@ -488,37 +488,66 @@ class MyEventScreenState extends State<MyEventScreen> {
                                                   overflow:
                                                       TextOverflow.ellipsis,
                                                 ),
-                                                if (event
-                                                    .address.isNotEmpty) ...[
-                                                  const SizedBox(height: 4),
-                                                  Row(
-                                                    children: [
-                                                      const Icon(
-                                                        Icons
-                                                            .location_on_outlined,
-                                                        size: 13,
-                                                        color: KenwellColors
-                                                            .neutralGrey,
-                                                      ),
-                                                      const SizedBox(width: 3),
-                                                      Expanded(
-                                                        child: Text(
-                                                          event.address,
-                                                          style: theme.textTheme
-                                                              .bodySmall
-                                                              ?.copyWith(
-                                                            color: KenwellColors
-                                                                .neutralGrey,
-                                                            fontSize: 12,
+                                                Builder(
+                                                  builder: (_) {
+                                                    final fullAddress = [
+                                                      event.venue,
+                                                      event.address,
+                                                      event.townCity,
+                                                      event.province,
+                                                    ]
+                                                        .where((s) =>
+                                                            s.isNotEmpty)
+                                                        .join(', ');
+                                                    if (fullAddress.isEmpty) {
+                                                      return const SizedBox
+                                                          .shrink();
+                                                    }
+                                                    return Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 4),
+                                                      child: Row(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          const Padding(
+                                                            padding:
+                                                                EdgeInsets.only(
+                                                                    top: 1),
+                                                            child: Icon(
+                                                              Icons
+                                                                  .location_on_outlined,
+                                                              size: 13,
+                                                              color: KenwellColors
+                                                                  .neutralGrey,
+                                                            ),
                                                           ),
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          maxLines: 1,
-                                                        ),
+                                                          const SizedBox(
+                                                              width: 3),
+                                                          Expanded(
+                                                            child: Text(
+                                                              fullAddress,
+                                                              style: theme
+                                                                  .textTheme
+                                                                  .bodySmall
+                                                                  ?.copyWith(
+                                                                color: KenwellColors
+                                                                    .neutralGrey,
+                                                                fontSize: 12,
+                                                              ),
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              maxLines: 2,
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ),
-                                                    ],
-                                                  ),
-                                                ],
+                                                    );
+                                                  },
+                                                ),
                                               ],
                                             ),
                                           ),
@@ -581,27 +610,22 @@ class MyEventScreenState extends State<MyEventScreen> {
                                           ),
                                         ],
                                       ),
-                                      if (event.venue.isNotEmpty) ...[
+                                      if (event.expectedParticipation > 0) ...[
                                         const SizedBox(height: 8),
                                         Row(
                                           children: [
                                             const Icon(
-                                              Icons.business,
+                                              Icons.people_outline_rounded,
                                               size: 13,
                                               color: KenwellColors.neutralGrey,
                                             ),
                                             const SizedBox(width: 6),
-                                            Expanded(
-                                              child: Text(
-                                                event.venue,
-                                                style: theme.textTheme.bodySmall
-                                                    ?.copyWith(
-                                                  color:
-                                                      KenwellColors.neutralGrey,
-                                                  fontSize: 12,
-                                                ),
-                                                overflow: TextOverflow.ellipsis,
-                                                maxLines: 1,
+                                            Text(
+                                              '${event.expectedParticipation} expected participant${event.expectedParticipation == 1 ? '' : 's'}',
+                                              style: theme.textTheme.bodySmall
+                                                  ?.copyWith(
+                                                color: KenwellColors.neutralGrey,
+                                                fontSize: 12,
                                               ),
                                             ),
                                           ],
