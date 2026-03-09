@@ -156,7 +156,10 @@ enum ScreeningType {
   riskAssessment('risk_assessment'),
   hivTest('hiv_test'),
   hivResults('hiv_results'),
-  tbTest('tb_test');
+  hctTest('hct_test'),
+  hctResults('hct_results'),
+  tbTest('tb_test'),
+  cancerScreening('cancer_screening');
 
   final String value;
   const ScreeningType(this.value);

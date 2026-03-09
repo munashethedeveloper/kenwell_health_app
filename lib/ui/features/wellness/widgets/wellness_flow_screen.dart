@@ -5,14 +5,14 @@ import 'package:kenwell_health_app/ui/features/wellness/widgets/current_event_ho
 import 'package:kenwell_health_app/ui/features/wellness/widgets/member_search_screen.dart';
 import 'package:kenwell_health_app/ui/features/wellness/widgets/health_screenings_screen.dart';
 import 'package:provider/provider.dart';
+import '../../cancer/view_model/cancer_view_model.dart';
+import '../../cancer/widgets/cancer_screen.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../hiv_test_results/widgets/hiv_test_result_screen.dart';
-//import '../../nurse_interventions/widgets/nurse_intervention_screen.dart';
 import '../view_model/wellness_flow_view_model.dart';
 import '../../survey/widgets/survey_screen.dart';
 import '../../consent_form/widgets/consent_screen.dart';
 import '../../health_risk_assessment/widgets/health_risk_assessment_screen.dart';
-//import '../../health_metrics/widgets/health_metrics_screen.dart';
 import '../../hiv_test/widgets/hiv_test_screen.dart';
 import '../../tb_test/widgets/tb_testing_screen.dart';
 
@@ -99,21 +99,19 @@ class WellnessFlowScreen extends StatelessWidget {
 
       case WellnessFlowViewModel.stepHealthScreeningsMenu:
         // Show health screenings menu with enabled/disabled cards based on consent
-        final consentVM = flowVM.consentVM;
         return HealthScreeningsScreen(
-          hraEnabled: consentVM.hra,
-          //hivEnabled: consentVM.hiv,
-          hctEnabled: consentVM.hct,
-          tbEnabled: consentVM.tb,
+          hraEnabled: flowVM.hraEnabled,
+          hctEnabled: flowVM.hctEnabled,
+          tbEnabled: flowVM.tbEnabled,
+          cancerEnabled: flowVM.cancerEnabled,
           hraCompleted: flowVM.hraCompleted,
           hctCompleted: flowVM.hctCompleted,
-          //hivCompleted: flowVM.hivCompleted,
           tbCompleted: flowVM.tbCompleted,
+          cancerCompleted: flowVM.cancerCompleted,
           onHraTap: () => flowVM.navigateToHraScreening(),
-
-          ///onHivTap: () => flowVM.navigateToHivScreening(),
           onHctTap: () => flowVM.navigateToHctScreening(),
           onTbTap: () => flowVM.navigateToTbScreening(),
+          onCancerTap: () => flowVM.navigateToCancerScreening(),
         );
 
       case WellnessFlowViewModel.stepPersonalDetails:
@@ -242,6 +240,31 @@ class WellnessFlowScreen extends StatelessWidget {
           ),
         );
 
+      case WellnessFlowViewModel.stepCancerScreening:
+        if (event != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            flowVM.cancerVM.setMemberAndEventId(
+              flowVM.currentMember?.id ?? '',
+              event!.id,
+            );
+          });
+        }
+        return ChangeNotifierProvider.value(
+          value: flowVM.cancerVM,
+          child: CancerScreen(
+            onNext: () {
+              // Immediate update: mark Cancer as completed in the parent ViewModel
+              flowVM.markCancerCompleted();
+              WidgetsBinding.instance.addPostFrameCallback(
+                  (_) => _navigateAfterScreeningComplete(flowVM));
+            },
+            onPrevious: () {
+              flowVM.navigateToSection(
+                  WellnessFlowViewModel.sectionHealthScreenings);
+            },
+          ),
+        );
+
       case WellnessFlowViewModel.stepSurvey:
         return ChangeNotifierProvider.value(
           value: flowVM.surveyVM,
@@ -291,10 +314,10 @@ class WellnessFlowScreen extends StatelessWidget {
                   Future.microtask(() async {
                     try {
                       debugPrint(
-                          'WellnessFlow: incrementScreened (background) for \\${active.id}');
+                          'WellnessFlow: incrementScreened (background) for ${active.id}');
                       await eventVM.incrementScreened(active.id);
                       debugPrint(
-                          'WellnessFlow: incrementScreened done for \\${active.id}');
+                          'WellnessFlow: incrementScreened done for ${active.id}');
                     } catch (e, st) {
                       debugPrint(
                           'WellnessFlow: incrementScreened failed: $e\n$st');
@@ -326,7 +349,7 @@ class WellnessFlowScreen extends StatelessWidget {
               }
 
               debugPrint(
-                  'WellnessFlow: survey onSubmit finished (isStandalone: \\${flowVM.isStandaloneSurvey})');
+                  'WellnessFlow: survey onSubmit finished (isStandalone: ${flowVM.isStandaloneSurvey})');
             },
           ),
         );
@@ -341,10 +364,11 @@ class WellnessFlowScreen extends StatelessWidget {
   /// After a screening completes, navigate to the survey if all consented
   /// screenings are done, or return to the health screenings menu otherwise.
   void _navigateAfterScreeningComplete(WellnessFlowViewModel flowVM) {
-    final c = flowVM.consentVM;
-    final allDone = (!c.hra || flowVM.hraCompleted) &&
-        (!c.hct || flowVM.hctCompleted) &&
-        (!c.tb || flowVM.tbCompleted);
+    final allDone =
+        (!flowVM.hraEnabled || flowVM.hraCompleted) &&
+        (!flowVM.hctEnabled || flowVM.hctCompleted) &&
+        (!flowVM.tbEnabled || flowVM.tbCompleted) &&
+        (!flowVM.cancerEnabled || flowVM.cancerCompleted);
     if (allDone) {
       flowVM.markScreeningsCompleted();
       flowVM.navigateToSection(WellnessFlowViewModel.sectionSurvey);

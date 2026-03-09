@@ -251,36 +251,7 @@ class CancerScreen extends StatelessWidget {
           const SizedBox(height: 24),
         ],
 
-        // 7. Nursing Referrals Card — only shown when patient is at risk
-        if (viewModel.isAtRisk) ...[
-          KenwellReferralCard<NursingReferralOption>(
-            title: 'Nursing Referrals',
-            selectedValue: viewModel.nursingReferralSelection,
-            onChanged: viewModel.setNursingReferralSelection,
-            reasonValidator: (val) =>
-                (val == null || val.isEmpty) ? 'Please enter a reason' : null,
-            options: [
-              KenwellReferralOption(
-                value: NursingReferralOption.patientNotReferred,
-                label: 'Patient not referred',
-                requiresReason: true,
-                reasonController: viewModel.notReferredReasonController,
-                reasonLabel: 'Reason patient not referred',
-              ),
-              const KenwellReferralOption(
-                value: NursingReferralOption.referredToGP,
-                label: 'Patient referred to GP',
-              ),
-              const KenwellReferralOption(
-                value: NursingReferralOption.referredToStateClinic,
-                label: 'Patient referred to State Clinic',
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-        ],
-
-        // 8. Outcome & Referral
+        // 7. Outcome & Referral
         KenwellFormCard(
           title: 'Outcome & Referral',
           child: Column(
