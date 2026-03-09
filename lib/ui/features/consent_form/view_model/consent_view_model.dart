@@ -30,12 +30,9 @@ class ConsentScreenViewModel extends ChangeNotifier {
 
   // Checkbox states
   bool hra = false;
-  //bool vct = false;
-  //bool hiv = false;
   bool hct = false;
   bool tb = false;
   bool cancer = false;
-  //bool hiv = false;
 
   // Submission state
   bool _isSubmitting = false;
@@ -52,15 +49,11 @@ class ConsentScreenViewModel extends ChangeNotifier {
 
   // Validate form
   bool get isFormValid =>
-      //(hra || vct || tb || hiv) && // At least one checkbox must be selected
       (hra || hct || tb || cancer) && // At least one checkbox must be selected
       venueController.text.isNotEmpty &&
       dateController.text.isNotEmpty &&
       practitionerController.text.isNotEmpty &&
       signatureController.isNotEmpty;
-
-  // Helper to check if at least one screening is selected
-  //bool get hasAtLeastOneScreening => hra || vct || tb || hiv;
 
   // Helper to check if at least one screening is selected
   bool get hasAtLeastOneScreening => hra || hct || tb || cancer;
@@ -70,11 +63,8 @@ class ConsentScreenViewModel extends ChangeNotifier {
     final List<String> selected = [];
     if (hra) selected.add('hra');
     if (hct) selected.add('hct');
-    //if (hiv) selected.add('hiv');
-    //if (vct) selected.add('vct');
     if (tb) selected.add('tb');
     if (cancer) selected.add('cancer');
-    //if (hiv) selected.add('hiv');
     return selected;
   }
 
@@ -115,12 +105,6 @@ class ConsentScreenViewModel extends ChangeNotifier {
       case 'hra':
         hra = value ?? false;
         break;
-      //case 'vct':
-      //vct = value ?? false;
-      // break;
-      //   case 'hiv':
-      // hiv = value ?? false;
-      // break;
       case 'hct':
         hct = value ?? false;
         break;
@@ -130,9 +114,6 @@ class ConsentScreenViewModel extends ChangeNotifier {
       case 'cancer':
         cancer = value ?? false;
         break;
-      //case 'hiv':
-      // hiv = value ?? false;
-      //break;
     }
     notifyListeners();
   }
@@ -169,7 +150,6 @@ class ConsentScreenViewModel extends ChangeNotifier {
         date: DateFormat('yyyy-MM-dd').parse(dateController.text),
         practitioner: practitionerController.text,
         hra: hra,
-        // hiv: hiv,
         hct: hct,
         tb: tb,
         cancer: cancer,
@@ -206,7 +186,6 @@ class ConsentScreenViewModel extends ChangeNotifier {
         'practitioner': consent.practitioner,
         'screenings': {
           'hra': consent.hra,
-          //'hiv': consent.hiv,
           'hct': consent.hct,
           'tb': consent.tb,
           'cancer': consent.cancer,
@@ -233,11 +212,8 @@ class ConsentScreenViewModel extends ChangeNotifier {
         'practitioner': practitionerController.text,
         'hra': hra,
         'hct': hct,
-        // 'hiv': hiv,
-        // 'vct': vct,
         'tb': tb,
         'cancer': cancer,
-        //'hiv': hiv,
         'hasSignature': signatureController.isNotEmpty,
       };
 
