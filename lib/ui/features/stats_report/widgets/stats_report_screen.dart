@@ -4,9 +4,6 @@ import 'package:provider/provider.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
-import '../../../shared/ui/form/kenwell_modern_section_header.dart';
-import '../../../shared/ui/logo/app_logo.dart';
-import '../../../shared/ui/containers/gradient_container.dart';
 import '../../../../data/repositories_dcl/firestore_member_repository.dart';
 import '../../../../domain/models/wellness_event.dart';
 import 'event_stats_detail_screen.dart';
@@ -265,63 +262,103 @@ class _StatsReportScreenState extends State<StatsReportScreen>
           onRefresh: _refreshData,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                //const SizedBox(height: 8),
-                // Compact logo
-                const Center(
-                  child: AppLogo(size: 150),
+                // ── Page title row ─────────────────────────────────────────
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: KenwellColors.primaryGreen.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.analytics_outlined,
+                        color: KenwellColors.secondaryNavy,
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Wellness Statistics',
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: KenwellColors.secondaryNavy,
+                              fontSize: 22,
+                            ),
+                          ),
+                          Text(
+                            'Events and participation overview',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                // const SizedBox(height: 16),
-                // Modern section header
-                //  const KenwellModernSectionHeader(
-                //title: 'Overall Wellness Statistics',
-                // subtitle:
-                //     'Summary of wellness events and participation metrics.',
-                // icon: Icons.analytics_outlined,
-                // ),
+
                 const SizedBox(height: 16),
 
-                const KenwellModernSectionHeader(
-                  title: 'Overall Wellness Statistics',
-                  subtitle:
-                      'Summary of wellness events and participation metrics.',
-                  icon: Icons.analytics_outlined,
-                ),
+                // ── Hero summary banner ────────────────────────────────────
+                _buildHeroBanner(events.length, participationRate, isLiveTab),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
 
-                // Tab bar for Live vs Past events
+                // ── Tab bar ────────────────────────────────────────────────
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Colors.grey.shade100,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade200),
                   ),
+                  padding: const EdgeInsets.all(4),
                   child: TabBar(
                     controller: _tabController,
                     tabs: const [
                       Tab(
-                        icon: Icon(Icons.play_circle_outline),
+                        icon: Icon(Icons.play_circle_outline, size: 20),
                         text: 'Live Events',
+                        iconMargin: EdgeInsets.only(bottom: 2),
                       ),
                       Tab(
-                        icon: Icon(Icons.history),
+                        icon: Icon(Icons.history, size: 20),
                         text: 'Past Events',
+                        iconMargin: EdgeInsets.only(bottom: 2),
                       ),
                     ],
-                    labelColor: theme.primaryColor,
-                    unselectedLabelColor: Colors.grey[600],
+                    labelColor: KenwellColors.secondaryNavy,
+                    unselectedLabelColor: Colors.grey.shade500,
+                    labelStyle: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
+                    ),
+                    unselectedLabelStyle: const TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 13,
+                    ),
                     indicatorSize: TabBarIndicatorSize.tab,
                     indicator: BoxDecoration(
-                      color: theme.primaryColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                          color: theme.primaryColor.withValues(alpha: 0.3)),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(9),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.08),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                     dividerColor: Colors.transparent,
+                    splashFactory: NoSplash.splashFactory,
                   ),
                 ),
 
@@ -498,15 +535,15 @@ class _StatsReportScreenState extends State<StatsReportScreen>
                 ],
                 const SizedBox(height: 8),
 
-                // Enhanced search results indicator
+                // Search results indicator
                 if (_searchController.text.isNotEmpty || _hasActiveFilters)
                   Container(
-                    margin: const EdgeInsets.only(bottom: 16),
+                    margin: const EdgeInsets.only(bottom: 0),
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
+                        horizontal: 14, vertical: 10),
                     decoration: BoxDecoration(
-                      color: theme.primaryColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
+                      color: theme.primaryColor.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: theme.primaryColor.withValues(alpha: 0.2),
                       ),
@@ -516,11 +553,11 @@ class _StatsReportScreenState extends State<StatsReportScreen>
                         Icon(
                           Icons.filter_list_alt,
                           color: theme.primaryColor,
-                          size: 20,
+                          size: 18,
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'Found ${events.length} event${events.length != 1 ? 's' : ''}',
+                          '${events.length} event${events.length != 1 ? 's' : ''} found',
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.primaryColor,
                             fontWeight: FontWeight.w600,
@@ -529,80 +566,51 @@ class _StatsReportScreenState extends State<StatsReportScreen>
                       ],
                     ),
                   ),
-                //const SizedBox(height: 8),
 
-                //const SizedBox(height: 8),
-                const Divider(
-                  color: KenwellColors.primaryGreen,
-                  height: 24,
-                  thickness: 1,
-                  indent: 16,
-                  endIndent: 16,
-                ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
 
-                // Stat Cards Row 1 - Total Members Expected and Registered
+                // ── Stat Cards ────────────────────────────────────────────
                 Row(
                   children: [
                     Expanded(
                       child: _StatCard(
-                        icon: Icons.flag,
-                        title: 'Total Members Expected',
+                        icon: Icons.flag_outlined,
+                        title: 'Expected',
                         value: totalExpected.toString(),
+                        color: Colors.blue.shade600,
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: _StatCard(
-                        icon: Icons.person_add,
-                        title: 'Total Members Registered',
+                        icon: Icons.how_to_reg_outlined,
+                        title: 'Registered',
                         value: _isLoadingMembers
                             ? '...'
                             : _totalMembers.toString(),
+                        color: KenwellColors.primaryGreen,
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
-
-                // Stat Cards Row 2 - Total Members Screened and No Show
                 Row(
                   children: [
                     Expanded(
                       child: _StatCard(
-                        icon: Icons.people,
-                        title: 'Total Members Screened',
+                        icon: Icons.health_and_safety_outlined,
+                        title: 'Screened',
                         value: totalScreened.toString(),
+                        color: Colors.teal.shade600,
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: _StatCard(
-                        icon: Icons.person_off,
-                        title: 'Total Members No Show',
+                        icon: Icons.person_off_outlined,
+                        title: 'No Show',
                         value: (totalExpected - totalScreened).toString(),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-
-                // Stat Cards Row 3 - Total Events and Participation Rate
-                Row(
-                  children: [
-                    Expanded(
-                      child: _StatCard(
-                        icon: Icons.event,
-                        title: 'Total Events',
-                        value: events.length.toString(),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _StatCard(
-                        icon: Icons.trending_up,
-                        title: 'Participation Rate',
-                        value: '$participationRate%',
+                        color: Colors.orange.shade700,
                       ),
                     ),
                   ],
@@ -622,107 +630,48 @@ class _StatsReportScreenState extends State<StatsReportScreen>
                 ),
                 const SizedBox(height: 24),
 
-                // HIGH PRIORITY: Events by Status - Only show when filters are active
+                // ── Events by Status (only when filters are active) ───────
                 if (_hasActiveFilters) ...[
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.white,
-                          Colors.grey.shade50,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
+                  KenwellFormCard(
+                    title: 'Events by Status',
+                    child: Column(
+                      children: [
+                        _buildDetailRow('Scheduled', scheduledEvents,
+                            Icons.schedule, Colors.orange, theme),
+                        const Divider(height: 24),
+                        _buildDetailRow('In Progress', inProgressEvents,
+                            Icons.play_circle, Colors.blue, theme),
+                        const Divider(height: 24),
+                        _buildDetailRow('Completed', completedEvents,
+                            Icons.check_circle, Colors.deepPurple, theme),
                       ],
-                    ),
-                    child: KenwellFormCard(
-                      title: 'Events by Status',
-                      child: Column(
-                        children: [
-                          _buildDetailRow('Scheduled', scheduledEvents,
-                              Icons.schedule, Colors.orange, theme),
-                          const Divider(height: 24),
-                          _buildDetailRow('In Progress', inProgressEvents,
-                              Icons.play_circle, Colors.blue, theme),
-                          const Divider(height: 24),
-                          _buildDetailRow('Completed', completedEvents,
-                              Icons.check_circle, Colors.deepPurple, theme),
-                        ],
-                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
                 ],
 
-                // MEDIUM PRIORITY: Geographic Distribution - Only show when filters are active
+                // ── Geographic Distribution (only when filters active) ─────
                 if (_hasActiveFilters && eventsByProvince.isNotEmpty) ...[
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.white,
-                          Colors.grey.shade50,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: KenwellFormCard(
-                      title: 'Geographic Distribution',
-                      child: Column(
-                        children: eventsByProvince.entries.map((entry) {
-                          final isLast = entry == eventsByProvince.entries.last;
-                          return Column(
-                            children: [
-                              _buildDetailRow(entry.key, entry.value,
-                                  Icons.location_on, Colors.red, theme),
-                              if (!isLast) const Divider(height: 24),
-                            ],
-                          );
-                        }).toList(),
-                      ),
+                  KenwellFormCard(
+                    title: 'Geographic Distribution',
+                    child: Column(
+                      children: eventsByProvince.entries.map((entry) {
+                        final isLast = entry == eventsByProvince.entries.last;
+                        return Column(
+                          children: [
+                            _buildDetailRow(entry.key, entry.value,
+                                Icons.location_on, Colors.red, theme),
+                            if (!isLast) const Divider(height: 24),
+                          ],
+                        );
+                      }).toList(),
                     ),
                   ),
                   const SizedBox(height: 16),
                 ],
 
-                // Event Breakdown Card - Always visible, filtered by active tab
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.white,
-                        Colors.grey.shade50,
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: KenwellFormCard(
+                // ── Event Breakdown ───────────────────────────────────────
+                KenwellFormCard(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -946,12 +895,109 @@ class _StatsReportScreenState extends State<StatsReportScreen>
                       ],
                     ),
                   ),
-                ),
                 const SizedBox(height: 24),
               ],
             ),
           ),
         ));
+  }
+
+  Widget _buildHeroBanner(
+      int eventCount, String participationRate, bool isLiveTab) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [
+            KenwellColors.secondaryNavy,
+            KenwellColors.secondaryNavyLight,
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: KenwellColors.secondaryNavy.withValues(alpha: 0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isLiveTab ? 'Live Events' : 'Past Events',
+                  style: const TextStyle(
+                    color: Colors.white60,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '$eventCount Event${eventCount != 1 ? "s" : ""}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 26,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color:
+                        KenwellColors.primaryGreen.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color:
+                          KenwellColors.primaryGreen.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Text(
+                    isLiveTab ? 'In Progress' : 'Completed',
+                    style: const TextStyle(
+                      color: KenwellColors.primaryGreen,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              const Text(
+                'Participation',
+                style: TextStyle(color: Colors.white60, fontSize: 12),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                '$participationRate%',
+                style: const TextStyle(
+                  color: KenwellColors.primaryGreen,
+                  fontSize: 34,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const Text(
+                'Rate',
+                style: TextStyle(color: Colors.white60, fontSize: 12),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   void _showFilterBottomSheet(
@@ -1346,35 +1392,59 @@ class _StatCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final String value;
+  final Color color;
 
   const _StatCard({
     required this.icon,
     required this.title,
     required this.value,
+    required this.color,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return GradientContainer.purpleGreen(
+    return Container(
       padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+        border: Border.all(color: Colors.grey.shade100),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: Colors.white, size: 32),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: color, size: 22),
+          ),
           const SizedBox(height: 12),
           Text(
             value,
-            style: theme.textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w800,
+              color: KenwellColors.secondaryNavy,
+              fontSize: 26,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
             title,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: Colors.white,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey.shade600,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],

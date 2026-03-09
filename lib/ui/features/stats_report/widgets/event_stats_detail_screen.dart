@@ -1,12 +1,9 @@
-import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:intl/intl.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
-import '../../../shared/ui/containers/gradient_container.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
-import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 import 'health_screening_stats_section.dart';
 
 class EventStatsDetailScreen extends StatelessWidget {
@@ -20,140 +17,141 @@ class EventStatsDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    /*  final screeningPercentage = event.expectedParticipation > 0
-        ? (event.screenedCount / event.expectedParticipation * 100)
-            .toStringAsFixed(1)
-        : '0.0'; */
 
     return Scaffold(
       appBar: KenwellAppBar(
-        title: 'Event Statistics: ${event.title}',
-        titleColor: Colors.white,
+        title: 'Event Statistics',
+        subtitle: event.title,
         titleStyle: const TextStyle(
           color: Colors.white,
-          //fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.bold,
         ),
-        backgroundColor: const Color(0xFF201C58),
+        backgroundColor: KenwellColors.secondaryNavy,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const KenwellModernSectionHeader(
-              title: 'Event Details',
-              subtitle: 'Detailed information about the wellness event',
-              uppercase: true,
-              icon: Icons.info,
-              //color: KenwellColors.secondaryNavyDark,
-            ),
-            const SizedBox(height: 24),
-
-            /*   // Event Title Card
-            GradientContainer.purpleGreen(
-              padding: const EdgeInsets.all(16),
+            // ── Event Header Card ─────────────────────────────────────────
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [
+                    KenwellColors.secondaryNavy,
+                    KenwellColors.secondaryNavyLight,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: KenwellColors.secondaryNavy.withValues(alpha: 0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Status badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: _getStatusColor(event.status)
+                          .withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: _getStatusColor(event.status)
+                            .withValues(alpha: 0.5),
+                      ),
+                    ),
+                    child: Text(
+                      event.status,
+                      style: TextStyle(
+                        color: _getStatusColor(event.status),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // Event title
+                  Text(
+                    event.title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // Date + venue row
                   Row(
                     children: [
-                      const Icon(Icons.event, color: Colors.white, size: 32),
-                      const SizedBox(width: 12),
+                      const Icon(Icons.calendar_today,
+                          color: Colors.white60, size: 14),
+                      const SizedBox(width: 6),
+                      Text(
+                        DateFormat('MMM dd, yyyy').format(event.date),
+                        style: const TextStyle(
+                            color: Colors.white70, fontSize: 13),
+                      ),
+                      const SizedBox(width: 16),
+                      const Icon(Icons.location_on,
+                          color: Colors.white60, size: 14),
+                      const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          event.title,
-                          style: theme.textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                          event.venue,
+                          style: const TextStyle(
+                              color: Colors.white70, fontSize: 13),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  _buildInfoRow(
-                    Icons.location_on,
-                    event.venue,
-                    theme,
-                  ),
-                  const SizedBox(height: 4),
-                  _buildInfoRow(
-                    Icons.calendar_today,
-                    DateFormat('MMM dd, yyyy').format(event.date),
-                    theme,
-                  ),
-                  const SizedBox(height: 4),
-                  _buildInfoRow(
-                    Icons.access_time,
-                    '${event.startTime} - ${event.endTime}',
-                    theme,
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      const Icon(Icons.access_time,
+                          color: Colors.white60, size: 14),
+                      const SizedBox(width: 6),
+                      Text(
+                        '${event.startTime} – ${event.endTime}',
+                        style: const TextStyle(
+                            color: Colors.white70, fontSize: 13),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
-             // Event Location
-            KenwellFormCard(
-                title: 'Client Organization',
-                child: Column(children: [
-                  _buildDetailRow('Event Title', event.title, theme),
-                  //const Divider(),
-                ])),
-            const SizedBox(height: 16),
- */
-            /*   // Status Badge
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: _getStatusColor(event.status).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: _getStatusColor(event.status),
-                  width: 2,
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    _getStatusIcon(event.status),
-                    color: _getStatusColor(event.status),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Status: ${event.status}',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: _getStatusColor(event.status),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
- */
 
-            // Key Metrics
+            const SizedBox(height: 20),
+
+            // ── Key Metrics ───────────────────────────────────────────────
             Row(
               children: [
                 Expanded(
                   child: _MetricCard(
-                    icon: Icons.people,
+                    icon: Icons.flag_outlined,
                     title: 'Expected',
                     value: event.expectedParticipation.toString(),
-                    // title: 'Screened',
-                    //value: event.screenedCount.toString(),
+                    color: Colors.blue.shade600,
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: _MetricCard(
-                    icon: Icons.trending_up,
+                    icon: Icons.how_to_reg_outlined,
                     title: 'Registered',
-                    value: event.expectedParticipation
-                        .toString(), //Change this value to actual registered count when available
-                    //title: 'Expected',
-                    //value: event.expectedParticipation.toString(),
+                    value: event.expectedParticipation.toString(),
+                    color: KenwellColors.primaryGreen,
                   ),
                 ),
               ],
@@ -163,62 +161,61 @@ class EventStatsDetailScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: _MetricCard(
-                    icon: Icons.flag,
+                    icon: Icons.health_and_safety_outlined,
                     title: 'Screened',
                     value: event.screenedCount.toString(),
-                    //title: 'Expected',
-                    //value: event.expectedParticipation.toString(),
+                    color: Colors.teal.shade600,
                   ),
                 ),
-                /*   Expanded(
-                  child: _MetricCard(
-                    icon: Icons.trending_up,
-                    title: 'Completion',
-                    value: '$screeningPercentage%',
-                  ),
-                ), */
                 const SizedBox(width: 12),
                 Expanded(
                   child: _MetricCard(
-                    icon: Icons.group,
+                    icon: Icons.person_off_outlined,
                     title: 'No Show',
                     value: (event.expectedParticipation -
-                            event
-                                .screenedCount) //Fix this when actual registered count is available (Registered - Screened)
+                            event.screenedCount)
                         .toString(),
+                    color: Colors.orange.shade700,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 24),
 
-            // Event Location
+            // ── Client Organization ────────────────────────────────────────
             KenwellFormCard(
-                title: 'Client Organization',
-                child: Column(children: [
+              title: 'Client Organization',
+              child: Column(
+                children: [
                   _buildDetailRow('Event Title', event.title, theme),
-                  //const Divider(),
-                ])),
+                ],
+              ),
+            ),
             const SizedBox(height: 16),
 
-            // Event Location
+            // ── Date & Time ───────────────────────────────────────────────
             KenwellFormCard(
-                title: 'Date & Time',
-                child: Column(children: [
-                  _buildDetailRow('Date',
-                      DateFormat('MMM dd, yyyy').format(event.date), theme),
+              title: 'Date & Time',
+              child: Column(
+                children: [
+                  _buildDetailRow(
+                      'Date',
+                      DateFormat('MMM dd, yyyy').format(event.date),
+                      theme),
                   const Divider(),
                   _buildDetailRow('Start Time', event.startTime, theme),
                   const Divider(),
                   _buildDetailRow('End Time', event.endTime, theme),
-                ])),
-
+                ],
+              ),
+            ),
             const SizedBox(height: 16),
 
-            // Event Location
+            // ── Event Location ────────────────────────────────────────────
             KenwellFormCard(
-                title: 'Event Location',
-                child: Column(children: [
+              title: 'Event Location',
+              child: Column(
+                children: [
                   _buildDetailRow('Venue', event.venue, theme),
                   const Divider(),
                   _buildDetailRow('Address', event.address, theme),
@@ -226,20 +223,18 @@ class EventStatsDetailScreen extends StatelessWidget {
                   _buildDetailRow('Town/City', event.townCity, theme),
                   const Divider(),
                   _buildDetailRow('Province', event.province, theme),
-                ])),
+                ],
+              ),
+            ),
             const SizedBox(height: 16),
 
-            // Event Details
+            // ── On-site Contact ───────────────────────────────────────────
             KenwellFormCard(
-              title: 'Event Details',
+              title: 'On-site Contact',
               child: Column(
                 children: [
-                  _buildDetailRow('Town/City', event.townCity, theme),
-                  const Divider(),
-                  _buildDetailRow('Address', event.address, theme),
-                  const Divider(),
                   _buildDetailRow(
-                    'On-site Contact',
+                    'Name',
                     '${event.onsiteContactFirstName} ${event.onsiteContactLastName}',
                     theme,
                   ),
@@ -249,91 +244,14 @@ class EventStatsDetailScreen extends StatelessWidget {
                   if (event.onsiteContactEmail.isNotEmpty) ...[
                     const Divider(),
                     _buildDetailRow(
-                        'Contact Email', event.onsiteContactEmail, theme),
+                        'Email', event.onsiteContactEmail, theme),
                   ],
                 ],
               ),
             ),
             const SizedBox(height: 16),
 
-            // Services Offered
-            if (event.servicesRequested.isNotEmpty) ...[
-              // || event.additionalServicesRequested.isNotEmpty) ...[
-              KenwellFormCard(
-                title: 'Services Offered',
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (event.servicesRequested.isNotEmpty) ...[
-                      Text(
-                        'Primary Services:',
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      ...event.servicesRequested
-                          .split(',')
-                          .map((service) => Padding(
-                                padding: const EdgeInsets.only(bottom: 4),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.check_circle,
-                                      size: 16,
-                                      color: theme.primaryColor,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        service.trim(),
-                                        style: theme.textTheme.bodyMedium,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )),
-                    ],
-                    if (event.servicesRequested.isNotEmpty) //&&
-                      // event.additionalServicesRequested.isNotEmpty)
-                      const SizedBox(height: 16),
-                    //  if (event.additionalServicesRequested.isNotEmpty) ...[
-                    //   Text(
-                    //    'Additional Services:',
-                    //   style: theme.textTheme.titleSmall?.copyWith(
-                    //     fontWeight: FontWeight.bold,
-                    //  ),
-                    // ),
-                    //  const SizedBox(height: 8),
-                    // ...event.additionalServicesRequested
-                    //     .split(',')
-                    //    .map((service) => Padding(
-                    //         padding: const EdgeInsets.only(bottom: 4),
-                    //         child: Row(
-                    //           children: [
-                    //             Icon(
-                    //               Icons.check_circle_outline,
-                    //               size: 16,
-                    //               color: Colors.grey[600],
-                    //             ),
-                    //             const SizedBox(width: 8),
-                    //             Expanded(
-                    //               child: Text(
-                    //                 service.trim(),
-                    //                 style: theme.textTheme.bodyMedium,
-                    //               ),
-                    //             ),
-                    //           ],
-                    //         ),
-                    //      )),
-                    //   ],
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
-
-            // AE Facilitator Info (if available)
+            // ── AE Facilitator (if available) ─────────────────────────────
             if (event.aeContactFirstName.isNotEmpty) ...[
               KenwellFormCard(
                 title: 'AE Facilitator',
@@ -354,14 +272,49 @@ class EventStatsDetailScreen extends StatelessWidget {
                   ],
                 ),
               ),
+              const SizedBox(height: 16),
             ],
-            const SizedBox(height: 24),
+
+            // ── Services Offered ──────────────────────────────────────────
+            if (event.servicesRequested.isNotEmpty) ...[
+              KenwellFormCard(
+                title: 'Services Offered',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ...event.servicesRequested
+                        .split(',')
+                        .map((service) => Padding(
+                              padding:
+                                  const EdgeInsets.only(bottom: 6),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.check_circle,
+                                    size: 16,
+                                    color: theme.primaryColor,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      service.trim(),
+                                      style: theme.textTheme.bodyMedium,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
 
             // ── Health Screening Analytics ────────────────────────────────
             HealthScreeningStatsSection(eventIds: [event.id]),
             const SizedBox(height: 24),
 
-            // Export Button
+            // ── Export Button ─────────────────────────────────────────────
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -383,97 +336,6 @@ class EventStatsDetailScreen extends StatelessWidget {
     );
   }
 
-  /* Future<File?> _exportEventAsExcel(BuildContext context) async {
-    final excel = Excel.Excel.createExcel(); // create a new excel document
-    final sheet = excel['Event Details'];
-
-    // Helper to convert any value to String
-    String cv(dynamic value) => value?.toString() ?? '';
-
-    // Append header row
-    sheet.appendRow([cv('Field'), cv('Value')]);
-
-    final event = this.event; // assuming this is in your class
-
-    // Prepare data list
-    final List<List<dynamic>> details = [
-      ['Title', event.title],
-      ['Date', DateFormat('yyyy-MM-dd').format(event.date)],
-      ['Venue', event.venue],
-      ['Address', event.address],
-      ['Town/City', event.townCity],
-      ['Province', event.province],
-      [
-        'Onsite Contact Name',
-        '${event.onsiteContactFirstName} ${event.onsiteContactLastName}'
-      ],
-      ['Onsite Contact Number', event.onsiteContactNumber],
-      ['Onsite Contact Email', event.onsiteContactEmail],
-      [
-        'AE Contact Name',
-        '${event.aeContactFirstName} ${event.aeContactLastName}'
-      ],
-      ['AE Contact Number', event.aeContactNumber],
-      ['AE Contact Email', event.aeContactEmail],
-      [
-        'Services Requested',
-        event.servicesRequested is List
-            ? (event.servicesRequested as List).join(', ')
-            : event.servicesRequested.toString()
-      ],
-      [
-        'Additional Services',
-        event.additionalServicesRequested is List
-            ? (event.additionalServicesRequested as List).join(', ')
-            : event.additionalServicesRequested.toString()
-      ],
-      ['Expected Participation', event.expectedParticipation.toString()],
-      ['Nurses', event.nurses.toString()],
-      ['Coordinators', event.coordinators.toString()],
-      ['Set Up Time', event.setUpTime.toString()],
-      ['Start Time', event.startTime.toString()],
-      ['End Time', event.endTime.toString()],
-      ['Strike Down Time', event.strikeDownTime.toString()],
-      ['Medical Aid', event.medicalAid == true ? 'Yes' : 'No'],
-      ['Mobile Booths', event.mobileBooths == true ? 'Yes' : 'No'],
-      ['Description', event.description ?? ''],
-      ['Status', event.status],
-      [
-        'Actual Start Time',
-        event.actualStartTime != null
-            ? DateFormat('yyyy-MM-dd HH:mm').format(event.actualStartTime!)
-            : ''
-      ],
-      [
-        'Actual End Time',
-        event.actualEndTime != null
-            ? DateFormat('yyyy-MM-dd HH:mm').format(event.actualEndTime!)
-            : ''
-      ],
-      ['Screened Count', event.screenedCount.toString()],
-    ];
-
-    // Append data rows
-    for (final row in details) {
-      sheet.appendRow([
-        cv(row[0]),
-        cv(row[1]),
-      ]);
-    }
-
-    // Encode to bytes
-    final fileBytes = excel.encode();
-    if (fileBytes == null) return null;
-
-    // Save to file
-    final directory = await getApplicationDocumentsDirectory();
-    final path = '${directory.path}/event_${event.id}.xlsx';
-    final file = File(path);
-    await file.writeAsBytes(fileBytes, flush: true);
-
-    return file;
-  } */
-
   void _showExportSheet(BuildContext context) {
     final theme = Theme.of(context);
     showModalBottomSheet(
@@ -490,7 +352,8 @@ class EventStatsDetailScreen extends StatelessWidget {
             children: [
               ListTile(
                 leading: Icon(Icons.table_chart, color: theme.primaryColor),
-                title: Text('Export as CSV', style: theme.textTheme.bodyMedium),
+                title: Text('Export as CSV',
+                    style: theme.textTheme.bodyMedium),
                 subtitle: const Text('Export event data as CSV file'),
                 onTap: () {
                   Navigator.of(ctx).pop();
@@ -501,45 +364,11 @@ class EventStatsDetailScreen extends StatelessWidget {
                   );
                 },
               ),
-              /*     ListTile(
-                leading: const Icon(Icons.grid_on, color: Colors.green),
-                title: Text('Export as Excel Spreadsheet',
-                    style: theme.textTheme.bodyMedium),
-                subtitle:
-                    const Text('Export event data as an Excel (.xlsx) file'),
-                onTap: () async {
-                  Navigator.of(ctx).pop();
-                  try {
-                    final file = await _exportEventAsExcel(context);
-                    if (file != null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Excel file saved: ${file.path}'),
-                          action: SnackBarAction(
-                            label: 'Open',
-                            onPressed: () {
-                              // Optionally implement file opening
-                            },
-                          ),
-                        ),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Failed to export Excel file.'),
-                        ),
-                      );
-                    }
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error exporting Excel: $e')),
-                    );
-                  }
-                },
-              ), */
               ListTile(
-                leading: const Icon(Icons.picture_as_pdf, color: Colors.red),
-                title: Text('Export as PDF', style: theme.textTheme.bodyMedium),
+                leading:
+                    const Icon(Icons.picture_as_pdf, color: Colors.red),
+                title: Text('Export as PDF',
+                    style: theme.textTheme.bodyMedium),
                 subtitle: const Text('Export event report as PDF'),
                 onTap: () {
                   Navigator.of(ctx).pop();
@@ -557,23 +386,6 @@ class EventStatsDetailScreen extends StatelessWidget {
     );
   }
 
-  /*  Widget _buildInfoRow(IconData icon, String text, ThemeData theme) {
-    return Row(
-      children: [
-        Icon(icon, size: 16, color: Colors.white.withValues(alpha: 0.9)),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            text,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: Colors.white.withValues(alpha: 0.9),
-            ),
-          ),
-        ),
-      ],
-    );
-  } */
-
   Widget _buildDetailRow(String label, String value, ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -586,7 +398,6 @@ class EventStatsDetailScreen extends StatelessWidget {
               label,
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                //color: Colors.grey[700],
                 color: KenwellColors.secondaryNavyDark,
               ),
             ),
@@ -608,6 +419,7 @@ class EventStatsDetailScreen extends StatelessWidget {
       case 'finished':
         return Colors.deepPurple;
       case 'in progress':
+      case 'in_progress':
       case 'ongoing':
         return Colors.blue;
       case 'cancelled':
@@ -619,60 +431,66 @@ class EventStatsDetailScreen extends StatelessWidget {
         return Colors.grey;
     }
   }
-
-  IconData _getStatusIcon(String status) {
-    switch (status.toLowerCase()) {
-      case 'completed':
-      case 'finished':
-        return Icons.check_circle;
-      case 'in progress':
-      case 'ongoing':
-        return Icons.timelapse;
-      case 'cancelled':
-        return Icons.cancel;
-      case 'scheduled':
-      case 'upcoming':
-        return Icons.schedule;
-      default:
-        return Icons.info;
-    }
-  }
 }
 
 class _MetricCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final String value;
+  final Color color;
 
   const _MetricCard({
     required this.icon,
     required this.title,
     required this.value,
+    required this.color,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return GradientContainer.purpleGreen(
+    return Container(
       padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+        border: Border.all(color: Colors.grey.shade100),
+      ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: Colors.white, size: 32),
-          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: color, size: 22),
+          ),
+          const SizedBox(height: 12),
           Text(
             value,
             style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+              fontWeight: FontWeight.w800,
+              color: KenwellColors.secondaryNavy,
+              fontSize: 26,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
             title,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: Colors.white,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey.shade600,
+              fontWeight: FontWeight.w500,
             ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),
