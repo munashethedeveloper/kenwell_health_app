@@ -29,8 +29,6 @@ class EventCard extends StatelessWidget {
     final canDelete =
         RolePermissions.canAccessFeature(profileVM.role, 'delete_event');
 
-    // Event card styled to match My Events screen layout
-    final theme = Theme.of(context);
     final cardContent = Material(
       color: Colors.transparent,
       child: InkWell(
@@ -40,19 +38,43 @@ class EventCard extends StatelessWidget {
             extra: {'event': event},
           );
         },
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 0),
-          padding: const EdgeInsets.all(16),
+          margin: const EdgeInsets.symmetric(vertical: 6),
           decoration: BoxDecoration(
-            color: theme.primaryColor.withValues(alpha: 0.05),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: theme.primaryColor.withValues(alpha: 0.15),
-              width: 1.5,
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.07),
+                blurRadius: 12,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          // ClipRRect ensures the left accent bar respects rounded corners
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Left green accent bar
+                  Container(
+                    width: 5,
+                    color: KenwellColors.primaryGreen,
+                  ),
+                  // Main card body
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+                      child: _buildCardContent(context),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-          child: _buildCardContent(context),
         ),
       ),
     )
@@ -93,7 +115,7 @@ class EventCard extends StatelessWidget {
       },
       // Background shown when swiping to delete
       background: Container(
-        margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 0),
+        margin: const EdgeInsets.symmetric(vertical: 6),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -151,104 +173,78 @@ class EventCard extends StatelessWidget {
     );
   }
 
-  // Build the card content matching My Events screen layout
+  // Build the modernised card content
   Widget _buildCardContent(BuildContext context) {
     final theme = Theme.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header row with icon badge and title/date
+        // ── Header: icon badge + organization label + title + address ──────────
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // const SizedBox(width: 12),
+            // Calendar icon badge
+            Container(
+              width: 46,
+              height: 46,
+              decoration: BoxDecoration(
+                color: KenwellColors.primaryGreen.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.event_rounded,
+                color: KenwellColors.primaryGreen,
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 12),
+            // Organization label, title and address
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Event title with primary color
+                  // Eyebrow label
                   Text(
-                    'Client Organization: ${event.title}',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                      color: theme.primaryColor,
+                    'CLIENT ORGANIZATION',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: KenwellColors.primaryGreen,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.8,
+                      fontSize: 10,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  // Event title
+                  Text(
+                    event.title,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15,
+                      color: KenwellColors.secondaryNavy,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    //textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 8),
-                  // Date, time and status row
+                  const SizedBox(height: 4),
+                  // Address
                   Row(
                     children: [
-                      // Address row
-                      Expanded(
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.location_on,
-                              size: 14,
-                              color: KenwellColors.secondaryNavyDark,
-                            ),
-                            const SizedBox(width: 4),
-                            Flexible(
-                              child: Text(
-                                'Address: ${event.address}',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: KenwellColors.secondaryNavyDark,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
+                      const Icon(
+                        Icons.location_on_outlined,
+                        size: 13,
+                        color: KenwellColors.neutralGrey,
                       ),
-                      const SizedBox(width: 20),
-
-                      // Date
+                      const SizedBox(width: 3),
                       Expanded(
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.calendar_today,
-                              size: 14,
-                              color: KenwellColors.secondaryNavyDark,
-                            ),
-                            const SizedBox(width: 4),
-                            Flexible(
-                              child: Text(
-                                'Date: ${viewModel.formatDateShort(event.date)}',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: KenwellColors.secondaryNavyDark,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      //const SizedBox(width: 20),
-                      // Time
-                      Expanded(
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.access_time,
-                              size: 14,
-                              color: KenwellColors.secondaryNavyDark,
-                            ),
-                            const SizedBox(width: 4),
-                            Flexible(
-                              child: Text(
-                                'Time: ${event.startTime}${event.endTime.isNotEmpty ? ' - ${event.endTime}' : ''}',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: KenwellColors.secondaryNavyDark,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
+                        child: Text(
+                          event.address,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: KenwellColors.neutralGrey,
+                            fontSize: 12,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
                       ),
                     ],
@@ -258,75 +254,102 @@ class EventCard extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 4),
-        // const SizedBox(height: 16),
-        /*    // Services row
-        if (event.venue.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const Icon(
-                Icons.business,
-                size: 16,
-                color: KenwellColors.secondaryNavyDark,
+
+        const SizedBox(height: 12),
+        const Divider(
+            height: 1, thickness: 1, color: KenwellColors.neutralDivider),
+        const SizedBox(height: 10),
+
+        // ── Meta chips: date, time, and optional participation ─────────────────
+        Wrap(
+          spacing: 8,
+          runSpacing: 6,
+          children: [
+            _EventMetaChip(
+              icon: Icons.calendar_today_outlined,
+              label: viewModel.formatDateShort(event.date),
+            ),
+            _EventMetaChip(
+              icon: Icons.access_time_rounded,
+              label: event.endTime.isNotEmpty
+                  ? '${event.startTime} – ${event.endTime}'
+                  : event.startTime,
+            ),
+            if (event.expectedParticipation > 0)
+              _EventMetaChip(
+                icon: Icons.people_outline_rounded,
+                label: '${event.expectedParticipation} participants',
               ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  'Requested Services: ${event.servicesRequested}',
-                  style: const TextStyle(
-                    color: KenwellColors.secondaryNavyDark,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-              ),
-            ],
-          ),
-        ], */
-        // Expected participation row
-        if (event.expectedParticipation > 0) ...[
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const Icon(
-                Icons.people,
-                size: 16,
-                color: KenwellColors.secondaryNavyDark,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                'Expected Participation: ${event.expectedParticipation}',
-                //style: const TextStyle(
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: KenwellColors.secondaryNavyDark,
-                ),
-              ),
-            ],
-          ),
-        ],
-        // Down arrow with "Click for more details" hint
-        const SizedBox(height: 8),
-        const Center(
-          child: Column(
+          ],
+        ),
+
+        const SizedBox(height: 10),
+        const Divider(
+            height: 1, thickness: 1, color: KenwellColors.neutralDivider),
+
+        // ── Tap affordance ─────────────────────────────────────────────────────
+        Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Click for more details',
+                'Tap for more details',
                 style: TextStyle(
                   fontSize: 11,
-                  color: KenwellColors.secondaryNavyDark,
-                  fontStyle: FontStyle.italic,
+                  color: KenwellColors.primaryGreen,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.2,
                 ),
               ),
-              Icon(
-                Icons.keyboard_arrow_down,
-                size: 20,
-                color: KenwellColors.secondaryNavyDark,
+              const SizedBox(width: 2),
+              const Icon(
+                Icons.keyboard_arrow_down_rounded,
+                size: 16,
+                color: KenwellColors.primaryGreen,
               ),
             ],
           ),
         ),
       ],
+    );
+  }
+}
+
+// ── Small pill chip used in the meta row ──────────────────────────────────────
+class _EventMetaChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _EventMetaChip({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+      decoration: BoxDecoration(
+        color: KenwellColors.neutralBackground,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: KenwellColors.neutralDivider,
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: KenwellColors.secondaryNavy),
+          const SizedBox(width: 5),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+              color: KenwellColors.secondaryNavy,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
