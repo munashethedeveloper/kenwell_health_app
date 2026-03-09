@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 
 /// A circular badge displaying a number
 /// Used for sequential numbering in lists

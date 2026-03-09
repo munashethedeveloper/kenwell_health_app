@@ -10,7 +10,6 @@ import '../../../shared/ui/form/kenwell_form_page.dart';
 import '../../../shared/ui/form/kenwell_form_styles.dart';
 import '../../../shared/ui/form/kenwell_referral_card.dart';
 import '../../../shared/ui/form/kenwell_yes_no_list.dart';
-import '../../../shared/models/nursing_referral_option.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/cancer_view_model.dart';
 

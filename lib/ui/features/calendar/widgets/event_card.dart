@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
-import 'package:kenwell_health_app/utils/event_status_colors.dart';
 import 'package:provider/provider.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../domain/constants/role_permissions.dart';
@@ -295,8 +294,8 @@ class EventCard extends StatelessWidget {
             height: 1, thickness: 1, color: KenwellColors.neutralDivider),
 
         // ── Tap affordance ─────────────────────────────────────────────────────
-        Padding(
-          padding: const EdgeInsets.only(top: 8),
+        const Padding(
+          padding: EdgeInsets.only(top: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -309,8 +308,8 @@ class EventCard extends StatelessWidget {
                   letterSpacing: 0.2,
                 ),
               ),
-              const SizedBox(width: 2),
-              const Icon(
+              SizedBox(width: 2),
+              Icon(
                 Icons.keyboard_arrow_down_rounded,
                 size: 16,
                 color: KenwellColors.primaryGreen,

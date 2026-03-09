@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../utils/extensions.dart';
 
 class StatsReportViewModel extends ChangeNotifier {
   StatsReportViewModel() {
@@ -48,10 +49,17 @@ class StatsReportViewModel extends ChangeNotifier {
     final picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
+      builder: (context, child) => MediaQuery(
+        // Force 24-hour clock regardless of device locale
+        data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+        child: child!,
+      ),
     );
 
     if (picked != null && context.mounted) {
-      controller.text = picked.format(context);
+      // Use fixed 24-hour HH:mm format (locale-independent) for consistency
+      // with the 24-hour picker dialog configured above.
+      controller.text = picked.toHHmm();
       notifyListeners();
     }
   }

@@ -1,11 +1,14 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:kenwell_health_app/utils/event_status_colors.dart';
 import 'package:provider/provider.dart';
+import '../../../../data/repositories_dcl/event_repository.dart';
 import '../../../../data/repositories_dcl/user_event_repository.dart';
 import '../../../../data/services/auth_service.dart';
 import '../../../../domain/models/wellness_event.dart';
@@ -35,12 +38,25 @@ class MyEventScreenState extends State<MyEventScreen> {
   String? _startingEventId;
   int _selectedWeek = 0; // 0 = this week, 1 = next week
   List<WellnessEvent> _userEvents = [];
+  Timer? _clockTimer;
+  bool _isTransitioning = false;
 
   // Initialize state
   @override
   void initState() {
     super.initState();
     _fetchUserEvents();
+    // Tick every minute so button states update as the clock passes start time
+    // and scheduled events are automatically transitioned to in-progress.
+    _clockTimer = Timer.periodic(const Duration(minutes: 1), (_) {
+      _autoTransitionEvents();
+    });
+  }
+
+  @override
+  void dispose() {
+    _clockTimer?.cancel();
+    super.dispose();
   }
 
   // Call this method after returning from allocation to refresh events
@@ -64,80 +80,46 @@ class MyEventScreenState extends State<MyEventScreen> {
       debugPrint('MyEventScreen: No user logged in.');
       return;
     }
-    // Fetch user events from repository
-    final repo = UserEventRepository();
-    debugPrint('MyEventScreen: Fetching events for user ${user.id}...');
-    final userEventMaps = await repo.fetchUserEvents(user.id);
+    // Fetch assigned event IDs from user_events collection
+    final userEventRepo = UserEventRepository();
+    final eventRepo = EventRepository();
     debugPrint(
-        'MyEventScreen: Received ${userEventMaps.length} raw user events from Firestore');
-    debugPrint('MyEventScreen: Raw userEventMaps from Firestore:');
-    for (final map in userEventMaps) {
-      debugPrint('  - ${map.toString()}');
-    }
-    // Convert Firestore maps to WellnessEvent objects
-    final events = userEventMaps
-        .map((e) {
-          try {
-            // Handle eventDate - could be Timestamp or DateTime
-            DateTime eventDate;
-            final rawDate = e['eventDate'];
-            if (rawDate is Timestamp) {
-              eventDate = rawDate.toDate();
-            } else if (rawDate is DateTime) {
-              eventDate = rawDate;
-            } else {
-              debugPrint(
-                  'MyEventScreen: Invalid date type: ${rawDate.runtimeType}');
-              return null;
-            }
+        'MyEventScreen: Fetching assigned event IDs for user ${user.id}...');
+    final userEventMaps = await userEventRepo.fetchUserEvents(user.id);
+    debugPrint(
+        'MyEventScreen: Received ${userEventMaps.length} user_event records');
 
-            return WellnessEvent(
-              id: e['eventId'] ?? '',
-              title: e['eventTitle'] ?? '',
-              date: eventDate,
-              venue: e['eventVenue'] ?? '',
-              address: e['eventLocation'] ?? '',
-              townCity: '',
-              province: '',
-              onsiteContactFirstName: '',
-              onsiteContactLastName: '',
-              onsiteContactNumber: '',
-              onsiteContactEmail: '',
-              aeContactFirstName: '',
-              aeContactLastName: '',
-              aeContactNumber: '',
-              aeContactEmail: '',
-              servicesRequested: e['servicesRequested'] ?? '',
-              // additionalServicesRequested: '',
-              expectedParticipation: 0,
-              nurses: 0,
-              //  coordinators: 0,
-              setUpTime: '',
-              startTime: e['eventStartTime'] ?? '',
-              endTime: e['eventEndTime'] ?? '',
-              strikeDownTime: '',
-              mobileBooths: '',
-              description: '',
-              medicalAid: '',
-              status: 'scheduled',
-              actualStartTime: null,
-              actualEndTime: null,
-            );
-          } catch (err) {
-            debugPrint(
-                'MyEventScreen: Failed to map event: ${e.toString()} | Error: ${err.toString()}');
-            return null;
-          }
-        })
-        .whereType<WellnessEvent>()
+    // For each assigned event ID, fetch the full event from the events collection
+    final eventIds = userEventMaps
+        .map((m) => m['eventId'] as String?)
+        .where((id) => id != null && id.isNotEmpty)
+        .cast<String>()
         .toList();
+
+    final results = await Future.wait(
+      eventIds.map((eventId) async {
+        try {
+          final event = await eventRepo.fetchEventById(eventId);
+          if (event != null) {
+            debugPrint(
+                'MyEventScreen: Loaded full event "$eventId" | townCity: ${event.townCity} | province: ${event.province} | expectedParticipation: ${event.expectedParticipation} | status: ${event.status}');
+          } else {
+            debugPrint(
+                'MyEventScreen: Event "$eventId" not found in events collection');
+          }
+          return event;
+        } catch (err) {
+          debugPrint(
+              'MyEventScreen: Failed to fetch event "$eventId": ${err.toString()}');
+          return null;
+        }
+      }),
+    );
+
+    final events = results.whereType<WellnessEvent>().toList();
+
     debugPrint(
-        'MyEventScreen: Successfully mapped ${events.length} WellnessEvent objects');
-    debugPrint('MyEventScreen: Mapped WellnessEvent list:');
-    for (final event in events) {
-      debugPrint(
-          '  - id: ${event.id}, title: ${event.title}, date: ${event.date}');
-    }
+        'MyEventScreen: Successfully loaded ${events.length} full WellnessEvent objects');
     if (!mounted) return;
     setState(() {
       _userEvents = events;
@@ -170,63 +152,21 @@ class MyEventScreenState extends State<MyEventScreen> {
     final List<WellnessEvent> filteredEvents;
 
     if (_selectedWeek == 0) {
-      // TODAY TAB: Show only today's events
-      // An event is "today's event" if:
-      // 1. The event date is today
-      // 2. Current time is within the event window (between start time and strike down time)
-      //    OR if there's no strike down time, just check if it hasn't ended yet
+      // TODAY TAB: Show all events scheduled for today
       filteredEvents = allEvents.where((event) {
-        // Check if event is today
         final eventDate =
             DateTime(event.date.year, event.date.month, event.date.day);
-        if (!eventDate.isAtSameMomentAs(today)) {
-          return false; // Not today
-        }
-
-        // Event is today, now check the time window
-        final startDateTime = event.startDateTime;
-        final strikeDownDateTime = event.strikeDownDateTime;
-
-        // If we have both start and strike down times, check if we're within that window
-        if (startDateTime != null && strikeDownDateTime != null) {
-          // Show event if current time is before strike down time
-          return now.isBefore(strikeDownDateTime) ||
-              now.isAtSameMomentAs(strikeDownDateTime);
-        } else if (startDateTime != null) {
-          // If we only have start time, show the event if it's today
-          return true;
-        } else {
-          // If no times specified, show all today's events
-          return true;
-        }
+        return eventDate.isAtSameMomentAs(today);
       }).toList();
 
       debugPrint(
           'MyEventScreen: TODAY tab - Found ${filteredEvents.length} events for today');
     } else {
-      // UPCOMING TAB: Show all other events (future events + today's events that have passed)
+      // UPCOMING TAB: Show all events scheduled for a future date (after today)
       filteredEvents = allEvents.where((event) {
         final eventDate =
             DateTime(event.date.year, event.date.month, event.date.day);
-
-        // Include future events (after today)
-        if (eventDate.isAfter(today)) {
-          return true;
-        }
-
-        // For today's events, include only those that have passed strike down time
-        if (eventDate.isAtSameMomentAs(today)) {
-          final strikeDownDateTime = event.strikeDownDateTime;
-          if (strikeDownDateTime != null) {
-            // Include if current time is after strike down time
-            return now.isAfter(strikeDownDateTime);
-          }
-          // If no strike down time, exclude from upcoming (they're in TODAY)
-          return false;
-        }
-
-        // Exclude past events
-        return false;
+        return eventDate.isAfter(today);
       }).toList();
 
       debugPrint(
@@ -393,298 +333,345 @@ class MyEventScreenState extends State<MyEventScreen> {
               )
             else
               // List of events for the selected tab
-              // Using Event Breakdown Card styling inline to preserve custom action buttons
-              // (Start/Resume/Finish buttons are specific to this screen)
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.white,
-                      Colors.grey.shade50,
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: filteredEvents.map((event) {
-                    final isStarting = _startingEventId == event.id;
-                    final theme = Theme.of(context);
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: theme.primaryColor.withValues(alpha: 0.05),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: theme.primaryColor.withValues(alpha: 0.15),
-                              width: 1.5,
-                            ),
+              Column(
+                children: filteredEvents.map((event) {
+                  final isStarting = _startingEventId == event.id;
+                  final theme = Theme.of(context);
+                  return Material(
+                    color: Colors.transparent,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.07),
+                            blurRadius: 12,
+                            offset: const Offset(0, 3),
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: IntrinsicHeight(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              // Header row with icon and title
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: theme.primaryColor
-                                          .withValues(alpha: 0.1),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Icon(
-                                      Icons.event,
-                                      color: theme.primaryColor,
-                                      size: 20,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          event.title,
-                                          style: theme.textTheme.bodyMedium
-                                              ?.copyWith(
-                                            fontWeight: FontWeight.w600,
-                                            color: theme.primaryColor,
+                              // Left green accent bar
+                              Container(
+                                width: 5,
+                                color: KenwellColors.primaryGreen,
+                              ),
+                              // Main card body
+                              Expanded(
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(14, 14, 14, 12),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // Header: icon badge + org label + title + address
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          // Calendar icon badge
+                                          Container(
+                                            width: 46,
+                                            height: 46,
+                                            decoration: BoxDecoration(
+                                              color: KenwellColors.primaryGreen
+                                                  .withValues(alpha: 0.12),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                            child: const Icon(
+                                              Icons.event_rounded,
+                                              color: KenwellColors.primaryGreen,
+                                              size: 22,
+                                            ),
                                           ),
-                                        ),
-                                        const SizedBox(height: 4),
+                                          const SizedBox(width: 12),
+                                          // Organization label, title and address
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'CLIENT ORGANIZATION',
+                                                  style: theme
+                                                      .textTheme.labelSmall
+                                                      ?.copyWith(
+                                                    color: KenwellColors
+                                                        .primaryGreen,
+                                                    fontWeight: FontWeight.w700,
+                                                    letterSpacing: 0.8,
+                                                    fontSize: 10,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 2),
+                                                Text(
+                                                  event.title,
+                                                  style: theme
+                                                      .textTheme.titleSmall
+                                                      ?.copyWith(
+                                                    fontWeight: FontWeight.w700,
+                                                    fontSize: 15,
+                                                    color: KenwellColors
+                                                        .secondaryNavy,
+                                                  ),
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                                Builder(
+                                                  builder: (_) {
+                                                    final fullAddress = [
+                                                      event.venue,
+                                                      event.address,
+                                                      event.townCity,
+                                                      event.province,
+                                                    ]
+                                                        .where(
+                                                            (s) => s.isNotEmpty)
+                                                        .join(', ');
+                                                    if (fullAddress.isEmpty) {
+                                                      return const SizedBox
+                                                          .shrink();
+                                                    }
+                                                    return Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 4),
+                                                      child: Row(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          const Padding(
+                                                            padding:
+                                                                EdgeInsets.only(
+                                                                    top: 1),
+                                                            child: Icon(
+                                                              Icons
+                                                                  .location_on_outlined,
+                                                              size: 13,
+                                                              color: KenwellColors
+                                                                  .neutralGrey,
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              width: 3),
+                                                          Expanded(
+                                                            child: Text(
+                                                              fullAddress,
+                                                              style: theme
+                                                                  .textTheme
+                                                                  .bodySmall
+                                                                  ?.copyWith(
+                                                                color: KenwellColors
+                                                                    .neutralGrey,
+                                                                fontSize: 12,
+                                                              ),
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              maxLines: 2,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 12),
+                                      const Divider(
+                                          height: 1,
+                                          thickness: 1,
+                                          color: KenwellColors.neutralDivider),
+                                      const SizedBox(height: 10),
+                                      // Meta chips: date, time, and status badge
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: _MyEventMetaChip(
+                                              icon:
+                                                  Icons.calendar_today_outlined,
+                                              label:
+                                                  '${event.date.day}/${event.date.month}/${event.date.year}',
+                                            ),
+                                          ),
+                                          if (event.startTime.isNotEmpty) ...[
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: _MyEventMetaChip(
+                                                icon: Icons.access_time_rounded,
+                                                label: event.endTime.isNotEmpty
+                                                    ? '${event.startTime} – ${event.endTime}'
+                                                    : event.startTime,
+                                              ),
+                                            ),
+                                          ],
+                                          const SizedBox(width: 8),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 9, vertical: 5),
+                                            decoration: BoxDecoration(
+                                              color: EventStatusColors
+                                                      .getStatusColor(
+                                                          event.status)
+                                                  .withValues(alpha: 0.15),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              border: Border.all(
+                                                color: KenwellColors
+                                                    .neutralDivider,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            child: Text(
+                                              event.status,
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w600,
+                                                color: EventStatusColors
+                                                    .getStatusColor(
+                                                        event.status),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      if (event.expectedParticipation > 0) ...[
+                                        const SizedBox(height: 8),
                                         Row(
                                           children: [
                                             const Icon(
-                                              Icons.calendar_today,
-                                              size: 14,
-                                              //color: Colors.grey[600],
-                                              color: KenwellColors
-                                                  .secondaryNavyDark,
+                                              Icons.people_outline_rounded,
+                                              size: 13,
+                                              color: KenwellColors.neutralGrey,
                                             ),
-                                            const SizedBox(width: 4),
+                                            const SizedBox(width: 6),
                                             Text(
-                                              '${event.date.day}/${event.date.month}/${event.date.year}',
+                                              '${event.expectedParticipation} expected participant${event.expectedParticipation == 1 ? '' : 's'}',
                                               style: theme.textTheme.bodySmall
                                                   ?.copyWith(
-                                                color: KenwellColors
-                                                    .secondaryNavyDark,
-                                                //color: Colors.black,
-                                                //color: Colors.grey[600],
-                                                //color: KenwellColors
-                                                // .secondaryNavyDark,
+                                                color:
+                                                    KenwellColors.neutralGrey,
+                                                fontSize: 12,
                                               ),
                                             ),
-                                            const SizedBox(width: 12),
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 8,
-                                                vertical: 2,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color: EventStatusColors
-                                                        .getStatusColor(
-                                                            event.status)
-                                                    .withValues(alpha: 0.15),
-                                                borderRadius:
-                                                    BorderRadius.circular(4),
-                                              ),
+                                          ],
+                                        ),
+                                      ],
+                                      if (event
+                                          .servicesRequested.isNotEmpty) ...[
+                                        const SizedBox(height: 8),
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Icon(
+                                              Icons.medical_services,
+                                              size: 13,
+                                              color: KenwellColors.neutralGrey,
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Expanded(
                                               child: Text(
-                                                event.status,
-                                                style: theme
-                                                    .textTheme.labelSmall
+                                                'Services: ${event.servicesRequested}',
+                                                style: theme.textTheme.bodySmall
                                                     ?.copyWith(
-                                                  color: EventStatusColors
-                                                      .getStatusColor(
-                                                          event.status),
-                                                  fontWeight: FontWeight.w600,
+                                                  color:
+                                                      KenwellColors.neutralGrey,
+                                                  fontSize: 12,
                                                 ),
                                               ),
                                             ),
                                           ],
                                         ),
                                       ],
-                                    ),
-                                  ),
-                                  /*    // Screened count badge
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 8),
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          theme.primaryColor,
-                                          theme.primaryColor
-                                              .withValues(alpha: 0.8),
+                                      const SizedBox(height: 12),
+                                      const Divider(
+                                          height: 1,
+                                          thickness: 1,
+                                          color: KenwellColors.neutralDivider),
+                                      const SizedBox(height: 12),
+                                      // Action buttons
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Builder(
+                                              builder: (context) {
+                                                final tooltip =
+                                                    _startEventTooltip(event);
+                                                final button =
+                                                    CustomPrimaryButton(
+                                                  label: event.status ==
+                                                          WellnessEventStatus
+                                                              .inProgress
+                                                      ? 'Resume Event'
+                                                      : 'Start Event',
+                                                  onPressed: isStarting ||
+                                                          !_canStartEvent(event)
+                                                      ? null
+                                                      : () => _startEvent(
+                                                          context, event),
+                                                  isBusy: isStarting,
+                                                  fullWidth: true,
+                                                );
+                                                return tooltip != null
+                                                    ? Tooltip(
+                                                        message: tooltip,
+                                                        child: button,
+                                                      )
+                                                    : button;
+                                              },
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: CustomPrimaryButton(
+                                              label: 'Finish Event',
+                                              fullWidth: true,
+                                              onPressed: event.status ==
+                                                          WellnessEventStatus
+                                                              .inProgress &&
+                                                      event.screenedCount > 0
+                                                  ? () => _finishEvent(
+                                                      context, event)
+                                                  : null,
+                                              backgroundColor: Colors.red,
+                                            ),
+                                          ),
                                         ],
                                       ),
-                                      borderRadius: BorderRadius.circular(8),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: theme.primaryColor
-                                              .withValues(alpha: 0.3),
-                                          blurRadius: 8,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Text(
-                                      event.screenedCount.toString(),
-                                      style:
-                                          theme.textTheme.labelLarge?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ), */
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              // Additional event details
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.access_time,
-                                    size: 16,
-                                    //color: Colors.grey[700]
-                                    color: KenwellColors.secondaryNavyDark,
+                                    ],
                                   ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    '${event.startTime} - ${event.endTime}',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      color: KenwellColors.secondaryNavyDark,
-                                      // color:
-                                      //  Colors.black.withValues(alpha: 0.9),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              if (event.address.isNotEmpty) ...[
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.location_on,
-                                      size: 16,
-                                      //color: Colors.grey[700]
-                                      color: KenwellColors.secondaryNavyDark,
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Expanded(
-                                      child: Text(event.address,
-                                          style: const TextStyle(
-                                            color:
-                                                KenwellColors.secondaryNavyDark,
-                                          )),
-                                    ),
-                                  ],
                                 ),
-                              ],
-                              if (event.venue.isNotEmpty) ...[
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.business,
-                                      size: 16,
-                                      //color: Colors.grey[700]
-                                      color: KenwellColors.secondaryNavyDark,
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Expanded(
-                                      child: Text(
-                                        event.venue,
-                                        style: const TextStyle(
-                                          color:
-                                              KenwellColors.secondaryNavyDark,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                              if (event.servicesRequested.isNotEmpty) ...[
-                                const SizedBox(height: 8),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Icon(
-                                      Icons.medical_services,
-                                      size: 16,
-                                      //color: Colors.grey[700]
-                                      color: KenwellColors.secondaryNavyDark,
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Expanded(
-                                      child: Text(
-                                          'Services: ${event.servicesRequested}',
-                                          style: const TextStyle(
-                                            //color: Colors.black54),
-                                            color:
-                                                KenwellColors.secondaryNavyDark,
-                                          )),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                              const SizedBox(height: 16),
-                              // Action buttons
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: CustomPrimaryButton(
-                                      label: event.status ==
-                                              WellnessEventStatus.inProgress
-                                          ? 'Resume Event'
-                                          : 'Start Event',
-                                      onPressed: isStarting ||
-                                              !_canStartEvent(event)
-                                          ? null
-                                          : () => _startEvent(context, event),
-                                      isBusy: isStarting,
-                                      fullWidth: true,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: CustomPrimaryButton(
-                                      label: 'Finish Event',
-                                      fullWidth: true,
-                                      onPressed: event.status ==
-                                                  WellnessEventStatus
-                                                      .inProgress &&
-                                              event.screenedCount > 0
-                                          ? () => _finishEvent(context, event)
-                                          : null,
-                                      backgroundColor: Colors.red,
-                                    ),
-                                  ),
-                                ],
                               ),
                             ],
                           ),
                         ),
                       ),
-                    );
-                  }).toList(),
-                ),
+                    ),
+                  )
+                      .animate()
+                      .fadeIn(duration: 300.ms, curve: Curves.easeOut)
+                      .slideY(
+                          begin: 0.1,
+                          end: 0,
+                          duration: 300.ms,
+                          curve: Curves.easeOut);
+                }).toList(),
               ),
           ],
         ),
@@ -692,7 +679,63 @@ class MyEventScreenState extends State<MyEventScreen> {
     );
   }
 
-  // Determine if the event can be started based on the event date
+  // Auto-transition any scheduled events whose start time has elapsed.
+  // Called every minute by the clock timer so button states stay current.
+  Future<void> _autoTransitionEvents() async {
+    // Skip if a previous tick is still in flight to avoid race conditions
+    if (_isTransitioning || !mounted) return;
+    _isTransitioning = true;
+    try {
+      final now = DateTime.now();
+
+      // Snapshot the list to avoid mutation issues if _fetchUserEvents runs
+      // concurrently (e.g., from the refresh button).
+      final snapshot = List<WellnessEvent>.from(_userEvents);
+
+      // Capture ViewModel before any async gap so context is still valid.
+      final eventVM = context.read<EventViewModel>();
+
+      final eventsToTransition = snapshot.where((e) {
+        if (e.status != WellnessEventStatus.scheduled) return false;
+        final startDt = e.startDateTime;
+        return startDt != null && !now.isBefore(startDt);
+      }).toList();
+
+      if (eventsToTransition.isEmpty) {
+        // Only rebuild if there are today-scheduled events whose button state
+        // could actually change as the clock advances.
+        final today = DateTime(now.year, now.month, now.day);
+        if (mounted &&
+            snapshot.any((e) =>
+                e.status == WellnessEventStatus.scheduled &&
+                _eventDay(e).isAtSameMomentAs(today))) {
+          setState(() {});
+        }
+        return;
+      }
+
+      // Update all elapsed events concurrently; tolerate partial failures so
+      // a single bad update does not block the rest.
+      await Future.wait(
+        eventsToTransition.map((event) => eventVM
+                .updateEvent(event.copyWith(
+              status: WellnessEventStatus.inProgress,
+              actualStartTime: event.startDateTime,
+            ))
+                .catchError((Object e) {
+              debugPrint(
+                  '_autoTransitionEvents: failed to update ${event.id}: $e');
+            })),
+      );
+
+      if (!mounted) return;
+      await _fetchUserEvents();
+    } finally {
+      _isTransitioning = false;
+    }
+  }
+
+  // Determine if the event can be started based on the event date and time
   bool _canStartEvent(WellnessEvent event) {
     // Allow resuming events that are already in progress
     if (event.status == WellnessEventStatus.inProgress) {
@@ -704,12 +747,56 @@ class MyEventScreenState extends State<MyEventScreen> {
       return false;
     }
 
-    // Allow starting any event whose day has arrived (today or earlier)
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final eventDay =
-        DateTime(event.date.year, event.date.month, event.date.day);
-    return !today.isBefore(eventDay);
+    final eventDay = _eventDay(event);
+
+    // Event must be today or in the past
+    if (today.isBefore(eventDay)) {
+      return false;
+    }
+
+    // For today's events, the start time must have been reached
+    if (today.isAtSameMomentAs(eventDay) && _isTimeLocked(event, now)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /// Returns a tooltip message explaining why the Start Event button is
+  /// disabled due to the start time not yet being reached, or null otherwise.
+  String? _startEventTooltip(WellnessEvent event) {
+    // Only show a time-based tooltip for scheduled events on today's date
+    if (event.status != WellnessEventStatus.scheduled) return null;
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    if (!today.isAtSameMomentAs(_eventDay(event))) return null;
+
+    if (!_isTimeLocked(event, now)) return null;
+
+    final startDateTime = event.startDateTime;
+    return startDateTime != null
+        ? 'Available from ${DateFormat.Hm().format(startDateTime)}'
+        : 'Not yet available';
+  }
+
+  /// Returns true when a scheduled event has a non-empty [startTime] that
+  /// either could not be parsed or has not yet been reached.
+  bool _isTimeLocked(WellnessEvent event, DateTime now) {
+    final startTime = event.startTime.trim();
+    if (startTime.isEmpty) return false;
+    final startDateTime = event.startDateTime;
+    return startDateTime == null || now.isBefore(startDateTime);
+  }
+
+  /// Returns the date portion of an event's date (midnight local time, no
+  /// time of day component). Uses toLocal() to correctly handle UTC DateTimes
+  /// that Firestore's Timestamp.toDate() may return.
+  DateTime _eventDay(WellnessEvent event) {
+    final local = event.date.toLocal();
+    return DateTime(local.year, local.month, local.day);
   }
 
   // Start the event and navigate to WellnessFlowPage
@@ -771,5 +858,47 @@ class MyEventScreenState extends State<MyEventScreen> {
     } catch (e) {
       debugPrint('MyEventScreen: Error refreshing events after finish: $e');
     }
+  }
+}
+
+// ── Small pill chip used in the meta row ──────────────────────────────────────
+class _MyEventMetaChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _MyEventMetaChip({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+      decoration: BoxDecoration(
+        color: KenwellColors.neutralBackground,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: KenwellColors.neutralDivider,
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 12, color: KenwellColors.secondaryNavy),
+          const SizedBox(width: 5),
+          Flexible(
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: KenwellColors.secondaryNavy,
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

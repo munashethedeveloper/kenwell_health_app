@@ -253,13 +253,16 @@ class WellnessEvent {
     final trimmed = rawTime.trim();
     if (trimmed.isEmpty) return null;
 
+    // Always work in local time so Firestore UTC timestamps don't shift the day
+    final localDate = date.toLocal();
+
     final formats = <DateFormat>[DateFormat.Hm(), DateFormat.jm()];
 
     for (final format in formats) {
       try {
         final parsed = format.parse(trimmed);
-        return DateTime(
-            date.year, date.month, date.day, parsed.hour, parsed.minute);
+        return DateTime(localDate.year, localDate.month, localDate.day,
+            parsed.hour, parsed.minute);
       } catch (_) {
         continue;
       }
@@ -271,7 +274,8 @@ class WellnessEvent {
       final hour = int.tryParse(match.namedGroup('hour') ?? '');
       final minute = int.tryParse(match.namedGroup('minute') ?? '');
       if (hour != null && minute != null && hour < 24 && minute < 60) {
-        return DateTime(date.year, date.month, date.day, hour, minute);
+        return DateTime(
+            localDate.year, localDate.month, localDate.day, hour, minute);
       }
     }
 

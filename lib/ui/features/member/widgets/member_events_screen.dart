@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../domain/models/member.dart';
 import '../../../../data/repositories_dcl/firestore_member_repository.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
-import '../../../shared/ui/logo/app_logo.dart';
 import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 
 /// Screen to display all events a member has attended
