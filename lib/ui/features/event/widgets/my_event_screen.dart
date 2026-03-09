@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
@@ -591,19 +592,32 @@ class MyEventScreenState extends State<MyEventScreen> {
                                       Row(
                                         children: [
                                           Expanded(
-                                            child: CustomPrimaryButton(
-                                              label: event.status ==
-                                                      WellnessEventStatus
-                                                          .inProgress
-                                                  ? 'Resume Event'
-                                                  : 'Start Event',
-                                              onPressed: isStarting ||
-                                                      !_canStartEvent(event)
-                                                  ? null
-                                                  : () => _startEvent(
-                                                      context, event),
-                                              isBusy: isStarting,
-                                              fullWidth: true,
+                                            child: Builder(
+                                              builder: (context) {
+                                                final tooltip =
+                                                    _startEventTooltip(event);
+                                                final button =
+                                                    CustomPrimaryButton(
+                                                  label: event.status ==
+                                                          WellnessEventStatus
+                                                              .inProgress
+                                                      ? 'Resume Event'
+                                                      : 'Start Event',
+                                                  onPressed: isStarting ||
+                                                          !_canStartEvent(event)
+                                                      ? null
+                                                      : () => _startEvent(
+                                                          context, event),
+                                                  isBusy: isStarting,
+                                                  fullWidth: true,
+                                                );
+                                                return tooltip != null
+                                                    ? Tooltip(
+                                                        message: tooltip,
+                                                        child: button,
+                                                      )
+                                                    : button;
+                                              },
                                             ),
                                           ),
                                           const SizedBox(width: 12),
@@ -660,13 +674,47 @@ class MyEventScreenState extends State<MyEventScreen> {
       return false;
     }
 
-    // Allow starting any event whose day has arrived (today or earlier)
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final eventDay =
-        DateTime(event.date.year, event.date.month, event.date.day);
-    return !today.isBefore(eventDay);
+    final eventDay = _eventDay(event);
+
+    // Event must be today or in the past
+    if (today.isBefore(eventDay)) {
+      return false;
+    }
+
+    // For today's events, the start time must have been reached
+    if (today.isAtSameMomentAs(eventDay)) {
+      final startDateTime = event.startDateTime;
+      if (startDateTime != null && now.isBefore(startDateTime)) {
+        return false;
+      }
+    }
+
+    return true;
   }
+
+  /// Returns a tooltip message explaining why the Start Event button is
+  /// disabled due to the start time not yet being reached, or null otherwise.
+  String? _startEventTooltip(WellnessEvent event) {
+    // Only show a time-based tooltip for scheduled events on today's date
+    if (event.status != WellnessEventStatus.scheduled) return null;
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    if (!today.isAtSameMomentAs(_eventDay(event))) return null;
+
+    final startDateTime = event.startDateTime;
+    if (startDateTime != null && now.isBefore(startDateTime)) {
+      return 'Available from ${DateFormat.jm().format(startDateTime)}';
+    }
+
+    return null;
+  }
+
+  /// Returns the date portion of an event's date (midnight, no time component).
+  DateTime _eventDay(WellnessEvent event) =>
+      DateTime(event.date.year, event.date.month, event.date.day);
 
   // Start the event and navigate to WellnessFlowPage
   Future<void> _startEvent(BuildContext context, WellnessEvent event) async {
