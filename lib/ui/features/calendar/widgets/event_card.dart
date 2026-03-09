@@ -261,25 +261,32 @@ class EventCard extends StatelessWidget {
         const SizedBox(height: 10),
 
         // ── Meta chips: date, time, and optional participation ─────────────────
-        Wrap(
-          spacing: 8,
-          runSpacing: 6,
+        Row(
           children: [
-            _EventMetaChip(
-              icon: Icons.calendar_today_outlined,
-              label: viewModel.formatDateShort(event.date),
-            ),
-            _EventMetaChip(
-              icon: Icons.access_time_rounded,
-              label: event.endTime.isNotEmpty
-                  ? '${event.startTime} – ${event.endTime}'
-                  : event.startTime,
-            ),
-            if (event.expectedParticipation > 0)
-              _EventMetaChip(
-                icon: Icons.people_outline_rounded,
-                label: '${event.expectedParticipation} participants',
+            Expanded(
+              child: _EventMetaChip(
+                icon: Icons.calendar_today_outlined,
+                label: viewModel.formatDateShort(event.date),
               ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _EventMetaChip(
+                icon: Icons.access_time_rounded,
+                label: event.endTime.isNotEmpty
+                    ? '${event.startTime} – ${event.endTime}'
+                    : event.startTime,
+              ),
+            ),
+            if (event.expectedParticipation > 0) ...[
+              const SizedBox(width: 8),
+              Expanded(
+                child: _EventMetaChip(
+                  icon: Icons.people_outline_rounded,
+                  label: '${event.expectedParticipation} participants',
+                ),
+              ),
+            ],
           ],
         ),
 
@@ -336,16 +343,20 @@ class _EventMetaChip extends StatelessWidget {
         ),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon, size: 12, color: KenwellColors.secondaryNavy),
           const SizedBox(width: 5),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-              color: KenwellColors.secondaryNavy,
+          Flexible(
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: KenwellColors.secondaryNavy,
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
           ),
         ],
