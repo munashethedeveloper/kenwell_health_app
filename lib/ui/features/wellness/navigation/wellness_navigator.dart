@@ -142,9 +142,25 @@ class WellnessNavigator {
                   await memberVM.saveLocally();
                   if (context.mounted && memberVM.savedMember != null) {
                     Navigator.of(context).pop(memberVM.savedMember);
+                  } else if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Registration failed. Please try again.'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
                   }
                 } catch (e) {
                   debugPrint('Failed to save member: $e');
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                            'Failed to register member. Please try again.'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
                 }
               }
             },
@@ -171,7 +187,9 @@ class WellnessNavigator {
       Member member, WellnessFlowViewModel wellnessVM) async {
     wellnessVM.currentMember = member;
     wellnessVM.memberRegistrationCompleted = true;
-    await wellnessVM.checkConsentCompletion(member.id, event.id);
+    // Load all completion flags from Firestore so the event home screen
+    // immediately shows the correct consent, screenings and survey status.
+    await wellnessVM.loadAllCompletionFlags(member.id, event.id);
 
     // Ensure a member_events record exists for this member-event pair.
     // This covers the case where an existing member is found via search
@@ -284,7 +302,13 @@ class WellnessNavigator {
                           false); // false means completed a screening, need to reshow
 
                       if (result == true) {
-                        wellnessVM.screeningsCompleted = true;
+                        wellnessVM.markScreeningsCompleted();
+                      } else if (wellnessVM.hraCompleted ||
+                          wellnessVM.hctCompleted ||
+                          wellnessVM.tbCompleted ||
+                          wellnessVM.cancerCompleted) {
+                        // Some screenings done but not all — mark as in progress
+                        wellnessVM.markScreeningsInProgress();
                       }
                       break;
                     }
@@ -292,7 +316,7 @@ class WellnessNavigator {
                     {
                       final result = await _navigateToSurvey(member);
                       if (result == true) {
-                        wellnessVM.surveyCompleted = true;
+                        wellnessVM.markSurveyCompleted();
                       }
                       break;
                     }
@@ -371,7 +395,7 @@ class WellnessNavigator {
             final result = await _navigateToHra(member);
             if (!context.mounted) return;
             if (result == true) {
-              wellnessVM.hraCompleted = true;
+              wellnessVM.markHraCompleted();
               _memberEventRepository
                   .updateScreeningStatus(member.id, event.id,
                       hraCompleted: true)
@@ -384,7 +408,7 @@ class WellnessNavigator {
             final result = await _navigateToHctFlow(member);
             if (!context.mounted) return;
             if (result == true) {
-              wellnessVM.hctCompleted = true;
+              wellnessVM.markHctCompleted();
               _memberEventRepository
                   .updateScreeningStatus(member.id, event.id,
                       hctCompleted: true)
@@ -397,7 +421,7 @@ class WellnessNavigator {
             final result = await _navigateToTb(member);
             if (!context.mounted) return;
             if (result == true) {
-              wellnessVM.tbCompleted = true;
+              wellnessVM.markTbCompleted();
               _memberEventRepository
                   .updateScreeningStatus(member.id, event.id, tbCompleted: true)
                   .catchError((e) =>

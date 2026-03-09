@@ -40,7 +40,8 @@ class _CalendarScreenBody extends StatefulWidget {
 // State class for the calendar screen body
 class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
   // Marker colours reused by both the calendar builder and the legend
-  static const Color _dotColor = Color(0xFF90C048);
+  //static const Color _dotColor = Color(0xFF90C048);
+  static const Color _dotColor = Color(0xFF201C58);
   static const Color _badgeColor = Color(0xFF201C58);
 
   // Helper to check if user can add events using RolePermissions

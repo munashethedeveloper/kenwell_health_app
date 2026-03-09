@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_referral_card.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/health_metric_status_badge.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/nursing_referral_status_card.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
@@ -231,30 +231,13 @@ class HealthMetricsScreen extends StatelessWidget {
 
   // Build nursing referrals widget
   Widget _buildReferrals() {
-    return KenwellReferralCard<NursingReferralOption>(
+    return NursingReferralStatusCard(
       title: 'Nursing Referrals',
       selectedValue: nurseViewModel.nursingReferralSelection,
       onChanged: nurseViewModel.setNursingReferralSelection,
+      notReferredReasonController: nurseViewModel.notReferredReasonController,
       reasonValidator: (val) =>
           (val == null || val.isEmpty) ? 'Please enter a reason' : null,
-      options: [
-        // Referral options
-        KenwellReferralOption(
-          value: NursingReferralOption.patientNotReferred,
-          label: 'Patient not referred',
-          requiresReason: true,
-          reasonController: nurseViewModel.notReferredReasonController,
-          reasonLabel: 'Reason patient not referred',
-        ),
-        const KenwellReferralOption(
-          value: NursingReferralOption.referredToGP,
-          label: 'Patient referred to GP',
-        ),
-        const KenwellReferralOption(
-          value: NursingReferralOption.referredToStateClinic,
-          label: 'Patient referred to State HIV clinic',
-        ),
-      ],
     );
   }
 

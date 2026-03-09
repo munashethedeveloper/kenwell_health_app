@@ -105,7 +105,7 @@ class MemberDetailsScreen extends StatelessWidget {
           hintText: 'Enter email address',
           controller: vm.emailController,
           keyboardType: TextInputType.emailAddress,
-          validator: Validators.validateEmail,
+          validator: Validators.validateOptionalEmail,
         ),
         InternationalPhoneField(
           label: 'Cell Number',

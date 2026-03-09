@@ -100,14 +100,15 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
           padding: const EdgeInsets.all(16),
           children: [
             const SizedBox(height: 8),
-            const AppLogo(size: 150),
-            const SizedBox(height: 24),
+            //const AppLogo(size: 150),
+            // const SizedBox(height: 24),
             // Events section
             const KenwellModernSectionHeader(
               title: 'Member Details',
               subtitle:
                   'Detailed information about the member and their event history',
             ),
+            const SizedBox(height: 16),
 
             // Member information
             _buildSectionCard(

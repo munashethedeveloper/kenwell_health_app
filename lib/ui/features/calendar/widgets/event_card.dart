@@ -3,7 +3,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/utils/event_status_colors.dart';
-import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../domain/constants/role_permissions.dart';
@@ -162,19 +161,7 @@ class EventCard extends StatelessWidget {
         // Header row with icon badge and title/date
         Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: theme.primaryColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(
-                viewModel.getServiceIcon(event.servicesRequested),
-                color: theme.primaryColor,
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 12),
+            // const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,61 +170,85 @@ class EventCard extends StatelessWidget {
                   Text(
                     'Client Organization: ${event.title}',
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
                       color: theme.primaryColor,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
+                    //textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 4),
-                  // Date and status row
+                  const SizedBox(height: 8),
+                  // Date, time and status row
                   Row(
                     children: [
-                      const Icon(
-                        Icons.calendar_today,
-                        size: 14,
-                        color: KenwellColors.secondaryNavyDark,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Date: ${viewModel.formatDateShort(event.date)}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: KenwellColors.secondaryNavyDark,
+                      // Address row
+                      Expanded(
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.location_on,
+                              size: 14,
+                              color: KenwellColors.secondaryNavyDark,
+                            ),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                'Address: ${event.address}',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: KenwellColors.secondaryNavyDark,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      //Time
-                      const SizedBox(width: 200),
-                      const Icon(
-                        Icons.access_time,
-                        size: 16,
-                        color: KenwellColors.secondaryNavyDark,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Time: ${event.startTime}${event.endTime.isNotEmpty ? ' - ${event.endTime}' : ''}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: KenwellColors.secondaryNavyDark,
+                      const SizedBox(width: 20),
+
+                      // Date
+                      Expanded(
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.calendar_today,
+                              size: 14,
+                              color: KenwellColors.secondaryNavyDark,
+                            ),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                'Date: ${viewModel.formatDateShort(event.date)}',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: KenwellColors.secondaryNavyDark,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(width: 200),
-                      // Status badge
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: EventStatusColors.getStatusColor(event.status)
-                              .withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          event.status,
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color:
-                                EventStatusColors.getStatusColor(event.status),
-                            fontWeight: FontWeight.w600,
-                          ),
+                      //const SizedBox(width: 20),
+                      // Time
+                      Expanded(
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.access_time,
+                              size: 14,
+                              color: KenwellColors.secondaryNavyDark,
+                            ),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                'Time: ${event.startTime}${event.endTime.isNotEmpty ? ' - ${event.endTime}' : ''}',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: KenwellColors.secondaryNavyDark,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -247,56 +258,9 @@ class EventCard extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 16),
-        /*   // Event time row
-        Row(
-          children: [
-            const Icon(
-              Icons.access_time,
-              size: 16,
-              color: KenwellColors.secondaryNavyDark,
-            ),
-            const SizedBox(width: 6),
-            /*  Text(
-              'Time: ${event.startTime}${event.endTime.isNotEmpty ? ' - ${event.endTime}' : ''}',
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                color: KenwellColors.secondaryNavyDark,
-              ),
-            ), */
-          /*   Text(
-              'Time: ${event.startTime}${event.endTime.isNotEmpty ? ' - ${event.endTime}' : ''}',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: KenwellColors.secondaryNavyDark,
-              ),
-            ), */
-          ],
-        ), */
-        // Address row
-        if (event.address.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const Icon(
-                Icons.location_on,
-                size: 16,
-                color: KenwellColors.secondaryNavyDark,
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  'Address: ${event.address}',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: KenwellColors.secondaryNavyDark,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-              ),
-            ],
-          ),
-        ],
-        /* // Venue row
+        const SizedBox(height: 4),
+        // const SizedBox(height: 16),
+        /*    // Services row
         if (event.venue.isNotEmpty) ...[
           const SizedBox(height: 8),
           Row(
@@ -309,7 +273,7 @@ class EventCard extends StatelessWidget {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  'Venue: ${event.venue}',
+                  'Requested Services: ${event.servicesRequested}',
                   style: const TextStyle(
                     color: KenwellColors.secondaryNavyDark,
                   ),
@@ -320,7 +284,6 @@ class EventCard extends StatelessWidget {
             ],
           ),
         ], */
-
         // Expected participation row
         if (event.expectedParticipation > 0) ...[
           const SizedBox(height: 8),
@@ -333,34 +296,10 @@ class EventCard extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Text(
-                '${event.expectedParticipation} Expected Members',
+                'Expected Participation: ${event.expectedParticipation}',
+                //style: const TextStyle(
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: KenwellColors.secondaryNavyDark,
-                ),
-              ),
-            ],
-          ),
-        ],
-
-        // Requested Services row
-        if (event.servicesRequested.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const Icon(
-                Icons.medical_services,
-                size: 16,
-                color: KenwellColors.secondaryNavyDark,
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  'Services Requested: ${event.servicesRequested}',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: KenwellColors.secondaryNavyDark,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
                 ),
               ),
             ],

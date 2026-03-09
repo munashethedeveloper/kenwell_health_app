@@ -93,6 +93,7 @@ class SurveyViewModel extends ChangeNotifier {
   Map<String, dynamic> toMap() => {
         'memberId': _memberId,
         'eventId': _eventId,
+        'type': 'survey',
         'heardAbout': heardAbout,
         'province': province,
         'ratings': ratings,
