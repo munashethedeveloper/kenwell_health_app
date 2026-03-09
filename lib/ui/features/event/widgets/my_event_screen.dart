@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -37,12 +38,25 @@ class MyEventScreenState extends State<MyEventScreen> {
   String? _startingEventId;
   int _selectedWeek = 0; // 0 = this week, 1 = next week
   List<WellnessEvent> _userEvents = [];
+  Timer? _clockTimer;
+  bool _isTransitioning = false;
 
   // Initialize state
   @override
   void initState() {
     super.initState();
     _fetchUserEvents();
+    // Tick every minute so button states update as the clock passes start time
+    // and scheduled events are automatically transitioned to in-progress.
+    _clockTimer = Timer.periodic(const Duration(minutes: 1), (_) {
+      _autoTransitionEvents();
+    });
+  }
+
+  @override
+  void dispose() {
+    _clockTimer?.cancel();
+    super.dispose();
   }
 
   // Call this method after returning from allocation to refresh events
@@ -662,7 +676,62 @@ class MyEventScreenState extends State<MyEventScreen> {
     );
   }
 
-  // Determine if the event can be started based on the event date
+  // Auto-transition any scheduled events whose start time has elapsed.
+  // Called every minute by the clock timer so button states stay current.
+  Future<void> _autoTransitionEvents() async {
+    // Skip if a previous tick is still in flight to avoid race conditions
+    if (_isTransitioning || !mounted) return;
+    _isTransitioning = true;
+    try {
+      final now = DateTime.now();
+
+      // Snapshot the list to avoid mutation issues if _fetchUserEvents runs
+      // concurrently (e.g., from the refresh button).
+      final snapshot = List<WellnessEvent>.from(_userEvents);
+
+      // Capture ViewModel before any async gap so context is still valid.
+      final eventVM = context.read<EventViewModel>();
+
+      final eventsToTransition = snapshot.where((e) {
+        if (e.status != WellnessEventStatus.scheduled) return false;
+        final startDt = e.startDateTime;
+        return startDt != null && !now.isBefore(startDt);
+      }).toList();
+
+      if (eventsToTransition.isEmpty) {
+        // Only rebuild if there are today-scheduled events whose button state
+        // could actually change as the clock advances.
+        final today = DateTime(now.year, now.month, now.day);
+        if (mounted &&
+            snapshot.any((e) =>
+                e.status == WellnessEventStatus.scheduled &&
+                _eventDay(e).isAtSameMomentAs(today))) {
+          setState(() {});
+        }
+        return;
+      }
+
+      // Update all elapsed events concurrently; tolerate partial failures so
+      // a single bad update does not block the rest.
+      await Future.wait(
+        eventsToTransition.map((event) => eventVM
+            .updateEvent(event.copyWith(
+              status: WellnessEventStatus.inProgress,
+              actualStartTime: event.startDateTime,
+            ))
+            .catchError((Object e) {
+          debugPrint('_autoTransitionEvents: failed to update ${event.id}: $e');
+        })),
+      );
+
+      if (!mounted) return;
+      await _fetchUserEvents();
+    } finally {
+      _isTransitioning = false;
+    }
+  }
+
+  // Determine if the event can be started based on the event date and time
   bool _canStartEvent(WellnessEvent event) {
     // Allow resuming events that are already in progress
     if (event.status == WellnessEventStatus.inProgress) {
@@ -684,11 +753,8 @@ class MyEventScreenState extends State<MyEventScreen> {
     }
 
     // For today's events, the start time must have been reached
-    if (today.isAtSameMomentAs(eventDay)) {
-      final startDateTime = event.startDateTime;
-      if (startDateTime != null && now.isBefore(startDateTime)) {
-        return false;
-      }
+    if (today.isAtSameMomentAs(eventDay) && _isTimeLocked(event, now)) {
+      return false;
     }
 
     return true;
@@ -704,17 +770,30 @@ class MyEventScreenState extends State<MyEventScreen> {
     final today = DateTime(now.year, now.month, now.day);
     if (!today.isAtSameMomentAs(_eventDay(event))) return null;
 
-    final startDateTime = event.startDateTime;
-    if (startDateTime != null && now.isBefore(startDateTime)) {
-      return 'Available from ${DateFormat.jm().format(startDateTime)}';
-    }
+    if (!_isTimeLocked(event, now)) return null;
 
-    return null;
+    final startDateTime = event.startDateTime;
+    return startDateTime != null
+        ? 'Available from ${DateFormat.jm().format(startDateTime)}'
+        : 'Not yet available';
   }
 
-  /// Returns the date portion of an event's date (midnight, no time component).
-  DateTime _eventDay(WellnessEvent event) =>
-      DateTime(event.date.year, event.date.month, event.date.day);
+  /// Returns true when a scheduled event has a non-empty [startTime] that
+  /// either could not be parsed or has not yet been reached.
+  bool _isTimeLocked(WellnessEvent event, DateTime now) {
+    final startTime = event.startTime.trim();
+    if (startTime.isEmpty) return false;
+    final startDateTime = event.startDateTime;
+    return startDateTime == null || now.isBefore(startDateTime);
+  }
+
+  /// Returns the date portion of an event's date (midnight local time, no
+  /// time of day component). Uses toLocal() to correctly handle UTC DateTimes
+  /// that Firestore's Timestamp.toDate() may return.
+  DateTime _eventDay(WellnessEvent event) {
+    final local = event.date.toLocal();
+    return DateTime(local.year, local.month, local.day);
+  }
 
   // Start the event and navigate to WellnessFlowPage
   Future<void> _startEvent(BuildContext context, WellnessEvent event) async {
