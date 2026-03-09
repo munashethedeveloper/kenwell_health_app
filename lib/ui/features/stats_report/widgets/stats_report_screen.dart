@@ -5,7 +5,12 @@ import '../../event/view_model/event_view_model.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../../data/repositories_dcl/firestore_member_repository.dart';
+import '../../../../data/repositories_dcl/firestore_hra_repository.dart';
+import '../../../../data/repositories_dcl/firestore_cancer_screening_repository.dart';
+import '../../../../data/repositories_dcl/firestore_tb_screening_repository.dart';
+import '../../../../data/repositories_dcl/firestore_hiv_screening_repository.dart';
 import '../../../../domain/models/wellness_event.dart';
+import '../../../../domain/models/cander_screening.dart';
 import 'event_stats_detail_screen.dart';
 import 'health_screening_stats_section.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
@@ -616,6 +621,14 @@ class _StatsReportScreenState extends State<StatsReportScreen>
                   ],
                 ),
                 const SizedBox(height: 24),
+
+                // ── Live Screening Counts (live tab only) ─────────────────
+                if (isLiveTab) ...[
+                  _LiveScreeningCountsSection(
+                    eventIds: events.map((e) => e.id).toList(),
+                  ),
+                  const SizedBox(height: 24),
+                ],
 
                 // ── Health Screening Analytics (scoped to current tab) ────
                 HealthScreeningStatsSection(
@@ -1381,6 +1394,330 @@ class _StatsReportScreenState extends State<StatsReportScreen>
                 color: color,
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Displays live screening count cards for the 6 main screening types.
+/// Only shown on the Live Events tab.
+class _LiveScreeningCountsSection extends StatefulWidget {
+  final List<String> eventIds;
+
+  const _LiveScreeningCountsSection({required this.eventIds});
+
+  @override
+  State<_LiveScreeningCountsSection> createState() =>
+      _LiveScreeningCountsSectionState();
+}
+
+class _LiveScreeningCountsSectionState
+    extends State<_LiveScreeningCountsSection> {
+  final _hraRepo = FirestoreHraRepository();
+  final _cancerRepo = FirestoreCancerScreeningRepository();
+  final _tbRepo = FirestoreTbScreeningRepository();
+  final _hivRepo = FirestoreHivScreeningRepository();
+
+  bool _isLoading = true;
+  int _hraCount = 0;
+  int _hctCount = 0;
+  int _tbCount = 0;
+  int _papSmearCount = 0;
+  int _breastScreeningCount = 0;
+  int _psaCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCounts();
+  }
+
+  @override
+  void didUpdateWidget(_LiveScreeningCountsSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final oldSet = oldWidget.eventIds.toSet();
+    final newSet = widget.eventIds.toSet();
+    if (oldSet.length != newSet.length || !oldSet.containsAll(newSet)) {
+      _loadCounts();
+    }
+  }
+
+  Future<void> _loadCounts() async {
+    if (!mounted) return;
+    setState(() => _isLoading = true);
+
+    try {
+      final ids = widget.eventIds;
+      if (ids.isEmpty) {
+        if (mounted) {
+          setState(() {
+            _hraCount = 0;
+            _hctCount = 0;
+            _tbCount = 0;
+            _papSmearCount = 0;
+            _breastScreeningCount = 0;
+            _psaCount = 0;
+            _isLoading = false;
+          });
+        }
+        return;
+      }
+
+      final results = await Future.wait(<Future<dynamic>>[
+        _hraRepo.getHraScreeningsByEvents(ids),
+        _cancerRepo.getCancerScreeningsByEvents(ids),
+        _tbRepo.getTbScreeningsByEvents(ids),
+        _hivRepo.getHivScreeningsByEvents(ids),
+      ]);
+
+      final hraList = List<dynamic>.from(results[0] as List);
+      final cancerList =
+          List<CancerScreening>.from(results[1] as List);
+      final tbList = List<dynamic>.from(results[2] as List);
+      final hivList = List<dynamic>.from(results[3] as List);
+
+      // Pap Smear: cancer records where specimen was collected
+      final papCount = cancerList
+          .where((s) => s.papSmearSpecimenCollected?.toLowerCase() == 'yes')
+          .length;
+
+      // Breast Screening: cancer records where a breast light exam was performed
+      final breastCount = cancerList
+          .where((s) =>
+              s.breastLightExamFindings != null &&
+              s.breastLightExamFindings!.isNotEmpty)
+          .length;
+
+      // PSA: cancer records where PSA results were recorded
+      final psaCount = cancerList
+          .where((s) => s.psaResults != null && s.psaResults!.isNotEmpty)
+          .length;
+
+      if (mounted) {
+        setState(() {
+          _hraCount = hraList.length;
+          _hctCount = hivList.length;
+          _tbCount = tbList.length;
+          _papSmearCount = papCount;
+          _breastScreeningCount = breastCount;
+          _psaCount = psaCount;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('LiveScreeningCounts: failed to load counts: $e');
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    final screenings = [
+      _ScreeningCount(
+        label: 'HRA',
+        count: _hraCount,
+        icon: Icons.monitor_heart_outlined,
+        color: Colors.teal.shade600,
+      ),
+      _ScreeningCount(
+        label: 'HCT',
+        count: _hctCount,
+        icon: Icons.bloodtype_outlined,
+        color: Colors.red.shade600,
+      ),
+      _ScreeningCount(
+        label: 'TB',
+        count: _tbCount,
+        icon: Icons.air_outlined,
+        color: Colors.amber.shade700,
+      ),
+      _ScreeningCount(
+        label: 'Pap Smear',
+        count: _papSmearCount,
+        icon: Icons.science_outlined,
+        color: Colors.purple.shade500,
+      ),
+      _ScreeningCount(
+        label: 'Breast',
+        count: _breastScreeningCount,
+        icon: Icons.favorite_border,
+        color: Colors.pink.shade500,
+      ),
+      _ScreeningCount(
+        label: 'PSA',
+        count: _psaCount,
+        icon: Icons.biotech_outlined,
+        color: Colors.indigo.shade500,
+      ),
+    ];
+
+    return KenwellFormCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Section header
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.local_hospital_outlined,
+                  color: KenwellColors.primaryGreen,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Live Screening Counts',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: KenwellColors.secondaryNavy,
+                      ),
+                    ),
+                    Text(
+                      'People screened per service at live events',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (_isLoading)
+                SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: KenwellColors.primaryGreen,
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // 3-column grid of screening cards
+          if (widget.eventIds.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Center(
+                child: Text(
+                  'No live events to show screening data for',
+                  style: TextStyle(
+                    color: Colors.grey.shade500,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
+            )
+          else
+            GridView.count(
+              crossAxisCount: 3,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              childAspectRatio: 1.05,
+              children: screenings
+                  .map((s) => _ScreeningCountCard(
+                        label: s.label,
+                        count: _isLoading ? null : s.count,
+                        icon: s.icon,
+                        color: s.color,
+                      ))
+                  .toList(),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Simple data class for a single screening type's count metadata.
+class _ScreeningCount {
+  final String label;
+  final int count;
+  final IconData icon;
+  final Color color;
+
+  const _ScreeningCount({
+    required this.label,
+    required this.count,
+    required this.icon,
+    required this.color,
+  });
+}
+
+/// Compact card showing icon + count + label for one screening type.
+class _ScreeningCountCard extends StatelessWidget {
+  final String label;
+  final int? count; // null while loading
+  final IconData icon;
+  final Color color;
+
+  const _ScreeningCountCard({
+    required this.label,
+    required this.count,
+    required this.icon,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.07),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: color, size: 22),
+          const SizedBox(height: 6),
+          count == null
+              ? SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: color,
+                  ),
+                )
+              : Text(
+                  count.toString(),
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: KenwellColors.secondaryNavy,
+                    fontSize: 22,
+                  ),
+                ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              color: Colors.grey.shade700,
+              fontWeight: FontWeight.w600,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
