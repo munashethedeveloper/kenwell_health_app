@@ -136,63 +136,21 @@ class MyEventScreenState extends State<MyEventScreen> {
     final List<WellnessEvent> filteredEvents;
 
     if (_selectedWeek == 0) {
-      // TODAY TAB: Show only today's events
-      // An event is "today's event" if:
-      // 1. The event date is today
-      // 2. Current time is within the event window (between start time and strike down time)
-      //    OR if there's no strike down time, just check if it hasn't ended yet
+      // TODAY TAB: Show all events scheduled for today
       filteredEvents = allEvents.where((event) {
-        // Check if event is today
         final eventDate =
             DateTime(event.date.year, event.date.month, event.date.day);
-        if (!eventDate.isAtSameMomentAs(today)) {
-          return false; // Not today
-        }
-
-        // Event is today, now check the time window
-        final startDateTime = event.startDateTime;
-        final strikeDownDateTime = event.strikeDownDateTime;
-
-        // If we have both start and strike down times, check if we're within that window
-        if (startDateTime != null && strikeDownDateTime != null) {
-          // Show event if current time is before strike down time
-          return now.isBefore(strikeDownDateTime) ||
-              now.isAtSameMomentAs(strikeDownDateTime);
-        } else if (startDateTime != null) {
-          // If we only have start time, show the event if it's today
-          return true;
-        } else {
-          // If no times specified, show all today's events
-          return true;
-        }
+        return eventDate.isAtSameMomentAs(today);
       }).toList();
 
       debugPrint(
           'MyEventScreen: TODAY tab - Found ${filteredEvents.length} events for today');
     } else {
-      // UPCOMING TAB: Show all other events (future events + today's events that have passed)
+      // UPCOMING TAB: Show all events scheduled for a future date (after today)
       filteredEvents = allEvents.where((event) {
         final eventDate =
             DateTime(event.date.year, event.date.month, event.date.day);
-
-        // Include future events (after today)
-        if (eventDate.isAfter(today)) {
-          return true;
-        }
-
-        // For today's events, include only those that have passed strike down time
-        if (eventDate.isAtSameMomentAs(today)) {
-          final strikeDownDateTime = event.strikeDownDateTime;
-          if (strikeDownDateTime != null) {
-            // Include if current time is after strike down time
-            return now.isAfter(strikeDownDateTime);
-          }
-          // If no strike down time, exclude from upcoming (they're in TODAY)
-          return false;
-        }
-
-        // Exclude past events
-        return false;
+        return eventDate.isAfter(today);
       }).toList();
 
       debugPrint(
