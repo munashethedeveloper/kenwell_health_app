@@ -92,6 +92,15 @@ class HealthMetricsViewModel extends ChangeNotifier {
       bloodSugarStatus == HealthMetricStatus.red ||
       cholesterolStatus == HealthMetricStatus.red;
 
+  /// True when at least one metric is in the caution (orange) zone and none
+  /// are in the danger (red) zone.
+  bool get isCaution =>
+      !hasRedMetrics &&
+      (systolicStatus == HealthMetricStatus.orange ||
+          diastolicStatus == HealthMetricStatus.orange ||
+          bloodSugarStatus == HealthMetricStatus.orange ||
+          cholesterolStatus == HealthMetricStatus.orange);
+
   // Convert health metrics to a map
   Map<String, dynamic> toMap() {
     return {

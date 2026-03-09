@@ -236,6 +236,7 @@ class HealthMetricsScreen extends StatelessWidget {
       selectedValue: nurseViewModel.nursingReferralSelection,
       onChanged: nurseViewModel.setNursingReferralSelection,
       notReferredReasonController: nurseViewModel.notReferredReasonController,
+      isCaution: viewModel.isCaution,
       reasonValidator: (val) =>
           (val == null || val.isEmpty) ? 'Please enter a reason' : null,
     );

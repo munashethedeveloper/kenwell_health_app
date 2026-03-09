@@ -3,23 +3,26 @@ import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart
 import 'custom_text_field.dart';
 import 'kenwell_form_card.dart';
 
-/// Interactive card-based selector that replaces radio buttons for the
-/// nursing referral / clinical outcomes section.
+/// Interactive card-based selector for the nursing referral / clinical
+/// outcomes section.
 ///
-/// All three option cards are always visible. Tapping one selects it:
-/// - Selected card: fully coloured background and border
-/// - Unselected cards: white background with a light grey border
+/// Two selectable option cards are always visible:
+/// - 🟢 Healthy  → [NursingReferralOption.patientNotReferred]
+/// - 🔴 At Risk  → [NursingReferralOption.referredToStateClinic]
 ///
-/// Options:
-/// - 🟢 Healthy       → [NursingReferralOption.patientNotReferred]
-/// - 🟠 Caution       → [NursingReferralOption.referredToGP]
-/// - 🔴 At Risk       → [NursingReferralOption.referredToStateClinic]
+/// When [isCaution] is `true` a non-interactive orange caution banner is shown
+/// above the option cards, informing the nurse that they must use their
+/// clinical discretion to classify the patient as either Healthy or At Risk.
 class NursingReferralStatusCard extends StatelessWidget {
   final String title;
   final NursingReferralOption? selectedValue;
   final ValueChanged<NursingReferralOption> onChanged;
   final TextEditingController? notReferredReasonController;
   final FormFieldValidator<String>? reasonValidator;
+
+  /// When `true`, a caution status banner is displayed and the nurse is
+  /// prompted to use their discretion to select Healthy or At Risk.
+  final bool isCaution;
 
   const NursingReferralStatusCard({
     super.key,
@@ -28,6 +31,7 @@ class NursingReferralStatusCard extends StatelessWidget {
     required this.onChanged,
     this.notReferredReasonController,
     this.reasonValidator,
+    this.isCaution = false,
   });
 
   @override
@@ -37,6 +41,10 @@ class NursingReferralStatusCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (isCaution) ...[
+            const _CautionBanner(),
+            const SizedBox(height: 12),
+          ],
           _OptionCard(
             option: NursingReferralOption.patientNotReferred,
             activeColor: const Color(0xFF2E7D32),
@@ -44,17 +52,6 @@ class NursingReferralStatusCard extends StatelessWidget {
             icon: Icons.check_circle,
             title: 'Healthy',
             message: 'Patient not referred',
-            selectedValue: selectedValue,
-            onChanged: onChanged,
-          ),
-          const SizedBox(height: 8),
-          _OptionCard(
-            option: NursingReferralOption.referredToGP,
-            activeColor: const Color(0xFFF57C00),
-            activeBackground: const Color(0xFFFFF3E0),
-            icon: Icons.warning_amber,
-            title: 'Caution',
-            message: 'Patient referred to GP',
             selectedValue: selectedValue,
             onChanged: onChanged,
           ),
@@ -79,6 +76,65 @@ class NursingReferralStatusCard extends StatelessWidget {
               validator: reasonValidator,
             ),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Non-interactive banner displayed when the patient's status is caution.
+class _CautionBanner extends StatelessWidget {
+  const _CautionBanner();
+  @override
+  Widget build(BuildContext context) {
+    const cautionColor = Color(0xFFF57C00);
+    const cautionBackground = Color(0xFFFFF3E0);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: cautionBackground,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: cautionColor, width: 2),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.warning_amber, color: cautionColor, size: 24),
+          const SizedBox(width: 8),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Caution',
+                  style: TextStyle(
+                    color: cautionColor,
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  'Patient health metrics indicate caution status.',
+                  style: TextStyle(
+                    color: cautionColor,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                SizedBox(height: 6),
+                Text(
+                  'Please use your clinical discretion to determine whether the patient is Healthy or At Risk.',
+                  style: TextStyle(
+                    color: cautionColor,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

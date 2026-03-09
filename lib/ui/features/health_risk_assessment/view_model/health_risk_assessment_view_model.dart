@@ -249,6 +249,15 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
       bloodSugarController.text.isNotEmpty &&
       cholesterolController.text.isNotEmpty;
 
+  /// True when at least one metric is in the caution (orange) zone and none
+  /// are in the danger (red) zone.
+  bool get isCaution =>
+      !hasRedMetrics &&
+      (systolicStatus == HealthMetricStatus.orange ||
+          diastolicStatus == HealthMetricStatus.orange ||
+          bloodSugarStatus == HealthMetricStatus.orange ||
+          cholesterolStatus == HealthMetricStatus.orange);
+
   /// True when all metrics are entered and none are in the danger zone.
   bool get isHealthy => allMetricsEntered && !hasRedMetrics;
 

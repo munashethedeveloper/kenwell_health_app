@@ -64,6 +64,20 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                     NursingReferralOption.referredToStateClinic);
               }
             });
+          } else if (vm.isCaution) {
+            // Caution: nurse uses discretion – do not auto-set the referral.
+            // Only clear a previous red-zone auto-referral (referredToStateClinic)
+            // so the nurse can make a deliberate choice. A patientNotReferred
+            // value (from a prior healthy auto-set) is intentionally left in
+            // place; the caution banner makes it clear the nurse should review
+            // and override if appropriate. Clearing it here would also erase
+            // any manual selection made while metrics are in the caution zone.
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (nurseViewModel.nursingReferralSelection ==
+                  NursingReferralOption.referredToStateClinic) {
+                nurseViewModel.setNursingReferralSelection(null);
+              }
+            });
           } else if (vm.isHealthy) {
             // When all metrics are healthy, auto-clear the referral to "not referred"
             WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -534,6 +548,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
       selectedValue: nurseViewModel.nursingReferralSelection,
       onChanged: nurseViewModel.setNursingReferralSelection,
       notReferredReasonController: nurseViewModel.notReferredReasonController,
+      isCaution: viewModel.isCaution,
       reasonValidator: (val) =>
           (val == null || val.isEmpty) ? 'Please enter a reason' : null,
     );
