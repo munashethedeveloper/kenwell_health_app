@@ -774,7 +774,7 @@ class MyEventScreenState extends State<MyEventScreen> {
 
     final startDateTime = event.startDateTime;
     return startDateTime != null
-        ? 'Available from ${DateFormat.jm().format(startDateTime)}'
+        ? 'Available from ${DateFormat.Hm().format(startDateTime)}'
         : 'Not yet available';
   }
 

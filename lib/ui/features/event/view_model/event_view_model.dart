@@ -4,6 +4,7 @@ import '../../../../domain/models/wellness_event.dart';
 import '../../../../data/repositories_dcl/event_repository.dart';
 import '../../../../domain/enums/service_type.dart';
 import '../../../../domain/enums/additional_service_type.dart';
+import '../../../../utils/extensions.dart';
 
 /// ViewModel for managing wellness events
 class EventViewModel extends ChangeNotifier {
@@ -222,10 +223,11 @@ class EventViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Set time in controller (UI calls this)
+  // Set time in controller (UI calls this).
+  // Uses fixed 24-hour HH:mm formatting for consistency with pickTime().
   void setTime(
       TextEditingController controller, TimeOfDay time, BuildContext context) {
-    controller.text = time.format(context);
+    controller.text = time.toHHmm();
     notifyListeners();
   }
 
@@ -241,12 +243,17 @@ class EventViewModel extends ChangeNotifier {
     final picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
+      builder: (context, child) => MediaQuery(
+        // Force 24-hour clock regardless of device locale
+        data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+        child: child!,
+      ),
     );
 
     if (picked != null) {
       // Only use context if the widget is still mounted
       if (!context.mounted) return;
-      controller.text = picked.format(context);
+      controller.text = picked.toHHmm();
       notifyListeners();
     }
   }
