@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 extension StringExtensions on String {
   bool get isEmail {
     final regex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
