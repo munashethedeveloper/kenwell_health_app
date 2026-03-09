@@ -33,10 +33,14 @@ class FirestoreTbScreeningRepository {
 
   Future<List<TbScreening>> getTbScreeningsByMember(String memberId) async {
     try {
+      // NOTE: No orderBy here — .where('memberId').orderBy('createdAt')
+      // requires a Firestore composite index.  Without it Firestore throws an
+      // error that is silently caught in loadAllCompletionFlags, leaving the
+      // tbCompleted flag permanently false.  A single equality filter uses
+      // the auto-created single-field index and needs no composite index.
       final querySnapshot = await _firestore
           .collection(_collectionName)
           .where('memberId', isEqualTo: memberId)
-          .orderBy('createdAt', descending: true)
           .get();
 
       return querySnapshot.docs

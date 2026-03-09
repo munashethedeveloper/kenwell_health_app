@@ -430,7 +430,7 @@ class MyEventScreenState extends State<MyEventScreen> {
                                                 Builder(
                                                   builder: (_) {
                                                     final fullAddress = [
-                                                      event.venue,
+                                                      // event.venue,
                                                       event.address,
                                                       event.townCity,
                                                       event.province,

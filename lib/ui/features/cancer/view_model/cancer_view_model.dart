@@ -356,7 +356,6 @@ class CancerScreeningViewModel extends ChangeNotifier {
     clinicianNameController.dispose();
     clinicianSignatureController.dispose();
     clinicianNotesController.dispose();
-    notReferredReasonController.dispose();
     super.dispose();
   }
 }

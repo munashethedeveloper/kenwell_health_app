@@ -11,6 +11,7 @@ import '../../health_metrics/view_model/health_metrics_view_model.dart';
 import '../../hiv_test/view_model/hiv_test_view_model.dart';
 import '../../survey/view_model/survey_view_model.dart';
 import '../../tb_test/view_model/tb_testing_view_model.dart';
+import '../../cancer/view_model/cancer_view_model.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../domain/models/member.dart';
 import '../../../../domain/constants/enums.dart';
@@ -23,12 +24,11 @@ import '../../../../data/repositories_dcl/firestore_cancer_screening_repository.
 class WellnessFlowViewModel extends ChangeNotifier {
   // Consent flags for screenings
   bool hraEnabled = false;
-  //bool hivEnabled = false;
-  bool hctEnabled = false; // Added HCT flag
+  bool hctEnabled = false;
   bool tbEnabled = false;
   bool cancerEnabled = false;
 
-  /// Loads all completion flags (consent, HRA, HIV, TB, survey) for the given member and event from Firestore
+  /// Loads all completion flags (consent, HRA, HCT, TB, Cancer, survey) for the given member and event from Firestore
   Future<void> loadAllCompletionFlags(String? memberId, String? eventId) async {
     if (memberId == null || eventId == null) return;
 
@@ -40,8 +40,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
     tbEnabled = false;
     cancerEnabled = false;
     hraCompleted = false;
-    hctCompleted = false; // Added HCT flag
-    //hivCompleted = false;
+    hctCompleted = false;
     tbCompleted = false;
     cancerCompleted = false;
     screeningsCompleted = false;
@@ -94,22 +93,8 @@ class WellnessFlowViewModel extends ChangeNotifier {
         hctCompleted = true;
       }
     } catch (e) {
-      debugPrint('Error loading HIV completion: $e');
+      debugPrint('Error loading HCT completion: $e');
     }
-
-/*     // HIV
-    try {
-      final hivRepo = FirestoreHivScreeningRepository();
-      final hivList = await hivRepo.getHivScreeningsByMember(memberId);
-      debugPrint(
-          'Loaded HIV for $memberId: ${hivList.map((h) => h.eventId).toList()}');
-      final hasHiv = hivList.any((hiv) => hiv.eventId == eventId);
-      if (hasHiv) {
-        hivCompleted = true;
-      }
-    } catch (e) {
-      debugPrint('Error loading HIV completion: $e');
-    } */
 
     // TB
     try {
@@ -187,11 +172,10 @@ class WellnessFlowViewModel extends ChangeNotifier {
   static const String stepHealthScreeningsMenu = 'health_screenings_menu';
   static const String stepPersonalDetails = 'personal_details';
   static const String stepRiskAssessment = 'risk_assessment';
-  //static const String stepHivTest = 'hiv_test';
-  //static const String stepHivResults = 'hiv_results';
-  static const String stepHctTest = 'hct_test'; // Updated to HCT
-  static const String stepHctResults = 'hct_results'; // Updated to HCT
+  static const String stepHctTest = 'hct_test';
+  static const String stepHctResults = 'hct_results';
   static const String stepTbTest = 'tb_test';
+  static const String stepCancerScreening = 'cancer_screening';
   static const String stepSurvey = 'survey';
 
   // Section identifiers (used by UI cards to identify which section was tapped)
@@ -215,11 +199,10 @@ class WellnessFlowViewModel extends ChangeNotifier {
   final riskVM = PersonalRiskAssessmentViewModel();
   final healthMetricsVM = HealthMetricsViewModel();
   final nurseVM = NurseInterventionViewModel();
-  //final hivTestVM = HIVTestViewModel();
-  final hctTestVM = HIVTestViewModel(); // Updated to HCT
-  //final hivResultsVM = HIVTestResultViewModel();
-  final hctResultsVM = HIVTestResultViewModel(); // Updated to HCT
+  final hctTestVM = HIVTestViewModel();
+  final hctResultsVM = HIVTestResultViewModel();
   final tbTestVM = TBTestingViewModel();
+  final cancerVM = CancerScreeningViewModel();
   final surveyVM = SurveyViewModel();
 
   WellnessEvent? activeEvent;
@@ -234,8 +217,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
 
   // Track individual screening completions
   bool hraCompleted = false;
-  // bool hivCompleted = false;
-  bool hctCompleted = false; // Added HCT completion flag
+  bool hctCompleted = false;
   bool tbCompleted = false;
   bool cancerCompleted = false;
 
@@ -269,6 +251,11 @@ class WellnessFlowViewModel extends ChangeNotifier {
     // Add TB screens if selected
     if (selectedScreenings.contains('tb')) {
       _flowSteps.add(stepTbTest);
+    }
+
+    // Add Cancer screening if selected
+    if (selectedScreenings.contains('cancer')) {
+      _flowSteps.add(stepCancerScreening);
     }
 
     // Survey is always included at the end
@@ -326,16 +313,19 @@ class WellnessFlowViewModel extends ChangeNotifier {
     _currentStep = 0;
     _flowSteps = [stepMemberRegistration]; // Reset to member registration step
     currentMember = null; // Clear current member
+    // Clear enabled screening flags so stale values don't persist across members
+    hraEnabled = false;
+    hctEnabled = false;
+    tbEnabled = false;
+    cancerEnabled = false;
     notifyListeners();
   }
 
   Future<void> submitAll(BuildContext context) async {
-    // Collect all data from ViewModels
+    // Collect all data from ViewModels for debug logging
     final consentData = consentVM.toMap();
     final memberData = memberDetailsVM.toMap();
     final riskData = riskVM.toMap();
-    // final healthMetricsData = healthMetricsVM.toMap();
-    //final nurseData = nurseVM.toMap();
     final hctTestData = hctTestVM.toMap();
     final hctResultsData = await hctResultsVM.toMap();
     final tbTestData = await tbTestVM.toMap();
@@ -345,8 +335,6 @@ class WellnessFlowViewModel extends ChangeNotifier {
     debugPrint('Consent: $consentData');
     debugPrint('Member: $memberData');
     debugPrint('Risk: $riskData');
-    //debugPrint('Health Metrics: $healthMetricsData');
-    //debugPrint('Nurse Intervention: $nurseData');
     debugPrint('HCT Test: $hctTestData');
     debugPrint('HCT Results: $hctResultsData');
     debugPrint('TB Test: $tbTestData');
@@ -390,6 +378,14 @@ class WellnessFlowViewModel extends ChangeNotifier {
     screeningsCompleted = false;
     screeningsInProgress = false;
     surveyCompleted = false;
+    hraEnabled = false;
+    hctEnabled = false;
+    tbEnabled = false;
+    cancerEnabled = false;
+    hraCompleted = false;
+    hctCompleted = false;
+    tbCompleted = false;
+    cancerCompleted = false;
     notifyListeners();
   }
 
@@ -473,7 +469,8 @@ class WellnessFlowViewModel extends ChangeNotifier {
         break;
       case sectionHealthScreenings:
         // Navigate to health screenings menu if consent is completed
-        if (consentCompleted && consentVM.selectedScreenings.isNotEmpty) {
+        if (consentCompleted &&
+            (hraEnabled || hctEnabled || tbEnabled || cancerEnabled)) {
           _flowSteps = [
             stepMemberRegistration,
             stepCurrentEventDetails,
@@ -535,7 +532,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Navigate to HIV screening from health screenings menu
+  /// Navigate to HCT screening from health screenings menu
   void navigateToHctScreening() {
     _flowSteps = [
       stepMemberRegistration,
@@ -544,7 +541,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
       stepHctTest,
       stepHctResults,
     ];
-    _currentStep = 3; // Go directly to HIV test
+    _currentStep = 3; // Go directly to HCT test
     notifyListeners();
   }
 
@@ -560,10 +557,23 @@ class WellnessFlowViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Navigate to Cancer screening from health screenings menu
+  void navigateToCancerScreening() {
+    _flowSteps = [
+      stepMemberRegistration,
+      stepCurrentEventDetails,
+      stepHealthScreeningsMenu,
+      stepCancerScreening,
+    ];
+    _currentStep = 3; // Go directly to cancer screening
+    notifyListeners();
+  }
+
   /// Check if the current survey is standalone (accessed directly) or part of a screening flow
   /// A survey is standalone if:
   /// 1. The flow only has member_registration, current_event_details and survey (direct access)
-  /// 2. The flow doesn't contain screening steps (consent, risk_assessment, hiv_test, tb_test)
+  /// 2. The flow doesn't contain any screening steps: stepRiskAssessment, stepHctTest,
+  ///    stepHctResults, stepTbTest, or stepCancerScreening
   bool get isStandaloneSurvey {
     // Check for direct access: only member_registration, current_event_details and survey
     if (_flowSteps.length == 3 &&

@@ -273,16 +273,24 @@ class WellnessNavigator {
                     {
                       final selectedScreenings =
                           await _navigateToConsent(member, wellnessVM);
-                      wellnessVM.markConsentCompleted();
-                      // Store selected screenings in wellnessVM for later use
-                      wellnessVM.hraEnabled =
-                          selectedScreenings?.contains('hra') ?? false;
-                      wellnessVM.hctEnabled =
-                          selectedScreenings?.contains('hct') ?? false;
-                      wellnessVM.tbEnabled =
-                          selectedScreenings?.contains('tb') ?? false;
-                      wellnessVM.cancerEnabled =
-                          selectedScreenings?.contains('cancer') ?? false;
+                      // Only mark consent and update enabled flags when the user
+                      // actually submitted (selectedScreenings is non-null and
+                      // non-empty). If the user backs out, selectedScreenings is
+                      // null and no state should change.
+                      if (selectedScreenings != null) {
+                        // Set enabled flags before markConsentCompleted() so
+                        // the single notifyListeners() call inside it sends the
+                        // full updated state to the hub screen at once.
+                        wellnessVM.hraEnabled =
+                            selectedScreenings.contains('hra');
+                        wellnessVM.hctEnabled =
+                            selectedScreenings.contains('hct');
+                        wellnessVM.tbEnabled =
+                            selectedScreenings.contains('tb');
+                        wellnessVM.cancerEnabled =
+                            selectedScreenings.contains('cancer');
+                        wellnessVM.markConsentCompleted();
+                      }
                       break;
                     }
                   case 'health_screenings':
@@ -340,8 +348,16 @@ class WellnessNavigator {
     return await Navigator.push<List<String>>(
       context,
       MaterialPageRoute(
-        builder: (context) => ChangeNotifierProvider.value(
-          value: consentVM,
+        // Provide BOTH consentVM and wellnessVM so that ConsentScreen can
+        // read wellnessVM.currentMember?.id for the memberId. Without this,
+        // the new route's BuildContext does not inherit the hub route's scoped
+        // providers and the memberId lookup silently returns null, causing
+        // consent records to be saved with a null memberId.
+        builder: (context) => MultiProvider(
+          providers: [
+            ChangeNotifierProvider.value(value: consentVM),
+            ChangeNotifierProvider.value(value: wellnessVM),
+          ],
           child: ConsentScreen(
             event: event,
             onNext: () {
