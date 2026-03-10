@@ -535,23 +535,23 @@ class _MyEventsHeroBanner extends StatelessWidget {
                 const KenwellSectionLabel(label: 'MY EVENTS'),
                 const SizedBox(height: 10),
                 Text(
-                  isToday ? "Today's Events" : 'Upcoming Events',
+                  isToday ? "Today's\nEvents" : 'Upcoming\nEvents',
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 22,
+                    fontSize: 28,
                     fontWeight: FontWeight.w800,
                     height: 1.2,
-                    letterSpacing: -0.4,
+                    letterSpacing: -0.5,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
                 Text(
                   isToday
                       ? 'Manage your wellness events for today.'
                       : 'Your scheduled events for the coming days.',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.65),
-                    fontSize: 12,
+                    color: Colors.white.withValues(alpha: 0.7),
+                    fontSize: 14,
                     height: 1.4,
                   ),
                 ),

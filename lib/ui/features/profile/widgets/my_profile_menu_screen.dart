@@ -147,6 +147,25 @@ class _ProfileHeader extends StatelessWidget {
             children: [
               // Section label
               const KenwellSectionLabel(label: 'PROFILE'),
+              const SizedBox(height: 10),
+              const Text(
+                'My\nProfile',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                  height: 1.2,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Manage your personal details and preferences.',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.7),
+                  fontSize: 14,
+                ),
+              ),
               const SizedBox(height: 20),
               // Avatar row
               Row(
