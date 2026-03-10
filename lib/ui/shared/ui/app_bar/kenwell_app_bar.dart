@@ -3,9 +3,9 @@ import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 
 /// AppBar with Kenwell default styling and sensible customization hooks.
 ///
-/// Uses a branded gradient background (navy → purple → dark-green) by default,
-/// matching the Registration Management screen header. Pass [useGradient: false]
-/// to opt out of the gradient and fall back to [backgroundColor].
+/// Shows a solid [KenwellColors.primaryGreen] background by default.
+/// Pass [useGradient: true] to switch to the branded navy→purple→dark-green
+/// gradient, or supply a custom [backgroundColor] when [useGradient] is false.
 class KenwellAppBar extends StatelessWidget implements PreferredSizeWidget {
   const KenwellAppBar({
     super.key,
@@ -18,7 +18,7 @@ class KenwellAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.titleStyle,
     this.actions,
     this.bottom,
-    this.useGradient = true,
+    this.useGradient = false,
   });
 
   final String title;
@@ -31,7 +31,8 @@ class KenwellAppBar extends StatelessWidget implements PreferredSizeWidget {
   final List<Widget>? actions;
   final PreferredSizeWidget? bottom;
 
-  /// When true (default) the app bar shows the branded gradient.
+  /// When false (default) the app bar shows a solid [KenwellColors.primaryGreen]
+  /// background. Set to true to use the branded navy→purple→dark-green gradient.
   final bool useGradient;
 
   // Brand gradient shared by every KenwellAppBar
