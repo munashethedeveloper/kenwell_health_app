@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/cards/kenwell_action_card.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
-import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
+import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:provider/provider.dart';
-import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/help_screen_view_model.dart';
 
 // HelpScreen provides help and support information to users
@@ -18,66 +17,78 @@ class HelpScreen extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => HelpScreenViewModel(),
       child: Scaffold(
-        // App bar
         appBar: const KenwellAppBar(
           title: 'KenWell365',
-          //titleColor: Color(0xFF201C58),
-          titleColor: Colors.white,
-          titleStyle: TextStyle(
-            //color: Color(0xFF201C58),
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
           automaticallyImplyLeading: true,
         ),
         // Body of the screen
         body: Consumer<HelpScreenViewModel>(
           builder: (context, viewModel, _) {
-            // Main content
-            return ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                const SizedBox(height: 16),
-                const AppLogo(size: 150),
-                const SizedBox(height: 16),
-                const KenwellModernSectionHeader(
-                  title: 'Help & Support',
-                  subtitle: 'Get assistance and FAQs about the app',
+            return CustomScrollView(
+              slivers: [
+                // ── Gradient section header ───────────────────────────────
+                SliverToBoxAdapter(child: _HelpHeader()),
+                // ── Help action cards ─────────────────────────────────────
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+                  sliver: SliverList(
+                    delegate: SliverChildListDelegate([
+                      KenwellActionCard(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF201C58), Color(0xFF3B3F86)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        icon: Icons.info_outline_rounded,
+                        title: 'About the App',
+                        subtitle:
+                            'Version: ${viewModel.appVersion} · Developer: ${viewModel.developer}',
+                        badgeLabel: 'Info',
+                        onTap: () {},
+                      ),
+                      const SizedBox(height: 16),
+                      KenwellActionCard(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF90C048), Color(0xFF5E8C1F)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        icon: Icons.email_outlined,
+                        title: 'Contact Support',
+                        subtitle: 'mapiyem@kenwellhealthcare.co.za',
+                        badgeLabel: 'Email',
+                        onTap: viewModel.contactSupport,
+                      ),
+                      const SizedBox(height: 16),
+                      KenwellActionCard(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF5B8DEF), Color(0xFF2563EB)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        icon: Icons.help_outline_rounded,
+                        title: 'FAQs / Help Center',
+                        subtitle:
+                            'Find answers to common questions and get help',
+                        badgeLabel: 'FAQs',
+                        onTap: viewModel.openFAQs,
+                      ),
+                      const SizedBox(height: 16),
+                      KenwellActionCard(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF059669), Color(0xFF065F46)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        icon: Icons.description_outlined,
+                        title: 'Terms & Privacy Policy',
+                        subtitle: 'Read our terms and privacy policy',
+                        badgeLabel: 'Legal',
+                        onTap: viewModel.openTermsAndPrivacy,
+                      ),
+                    ]),
+                  ),
                 ),
-                const SizedBox(height: 16),
-                // Menu items
-                _ProfileMenuItem(
-                  icon: Icons.info_outline,
-                  title: 'About the App',
-                  subtitle:
-                      'Version: ${viewModel.appVersion}\nDeveloper: ${viewModel.developer}',
-                  onTap: () {},
-                ),
-                const SizedBox(height: 12),
-                //Contact support menu item
-                _ProfileMenuItem(
-                  icon: Icons.email_outlined,
-                  title: 'Contact Support',
-                  subtitle: 'mapiyem@kenwellhealthcare.co.za',
-                  onTap: viewModel.contactSupport,
-                ),
-                const SizedBox(height: 8),
-                // Menu items
-                _ProfileMenuItem(
-                  icon: Icons.help_outline,
-                  title: 'FAQs / Help Center',
-                  subtitle: 'Find answers to common questions and get help',
-                  onTap: viewModel.openFAQs,
-                ),
-                const SizedBox(height: 12),
-                // Menu items
-                _ProfileMenuItem(
-                  icon: Icons.description_outlined,
-                  title: 'Terms & Conditions / Privacy Policy',
-                  subtitle: 'Read our terms and privacy policy',
-                  onTap: viewModel.openTermsAndPrivacy,
-                ),
-                const SizedBox(height: 24),
               ],
             );
           },
@@ -87,103 +98,77 @@ class HelpScreen extends StatelessWidget {
   }
 }
 
-class _ProfileMenuItem extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-  final bool isDestructive;
+// ── Gradient header ──────────────────────────────────────────────────────────
 
-  const _ProfileMenuItem({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-    this.isDestructive = false,
-  });
-
+class _HelpHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isDestructive
-              ? Colors.red.withValues(alpha: 0.3)
-              : Colors.grey.shade200,
-          width: 1,
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            KenwellColors.secondaryNavy,
+            Color(0xFF2E2880),
+            KenwellColors.primaryGreenDark,
+          ],
+          stops: [0.0, 0.55, 1.0],
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
+        ),
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: isDestructive
-                        ? Colors.red.withValues(alpha: 0.1)
-                        : const Color(0xFF90C048).withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    icon,
-                    color:
-                        isDestructive ? Colors.red : KenwellColors.primaryGreen,
-                    size: 24,
-                  ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 20, 24, 36),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Section label
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+              decoration: BoxDecoration(
+                color: KenwellColors.primaryGreen.withValues(alpha: 0.25),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: KenwellColors.primaryGreen.withValues(alpha: 0.5),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: isDestructive
-                              ? Colors.red
-                              : const Color(0xFF201C58),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        subtitle,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          //color: Colors.grey.shade600,
-                          color: KenwellColors.secondaryNavyDark,
-                        ),
-                      ),
-                    ],
-                  ),
+              ),
+              child: const Text(
+                'SUPPORT',
+                style: TextStyle(
+                  color: KenwellColors.primaryGreenLight,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 1.0,
                 ),
-                const Icon(
-                  Icons.chevron_right,
-                  color: KenwellColors.primaryGreen,
-                  size: 24,
-                ),
-              ],
+              ),
             ),
-          ),
+            const SizedBox(height: 10),
+            const Text(
+              'Help &\nSupport',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 28,
+                fontWeight: FontWeight.w800,
+                height: 1.2,
+                letterSpacing: -0.5,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Get assistance, read FAQs, or contact our team.',
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.7),
+                fontSize: 14,
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
+
