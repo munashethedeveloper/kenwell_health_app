@@ -369,6 +369,7 @@ class _HealthScreeningStatsSectionState
     final theme = Theme.of(context);
     return KenwellFormCard(
       title: 'HRA — Health Risk Assessment  (${s.total})',
+      borderColor: const Color(0xFF6A1B9A).withValues(alpha: 0.35),
       child: s.total == 0
           ? _noData(theme)
           : Column(
@@ -386,33 +387,17 @@ class _HealthScreeningStatsSectionState
                 ),
                 const Divider(height: 24),
                 // Key health risks
-                _statRow(
-                    Icons.favorite,
-                    'Hypertension',
-                    '${s.hypertension} (${_pct(s.hypertension, s.total)})',
-                    Colors.red,
-                    theme),
+                _statRow(Icons.favorite, 'Hypertension', s.hypertension,
+                    s.total, Colors.red, theme),
                 const Divider(),
-                _statRow(
-                    Icons.bloodtype,
-                    'Elevated Blood Sugar',
-                    '${s.highBloodSugar} (${_pct(s.highBloodSugar, s.total)})',
-                    Colors.orange,
-                    theme),
+                _statRow(Icons.bloodtype, 'Elevated Blood Sugar',
+                    s.highBloodSugar, s.total, Colors.orange, theme),
                 const Divider(),
-                _statRow(
-                    Icons.monitor_heart,
-                    'High Cholesterol',
-                    '${s.highCholesterol} (${_pct(s.highCholesterol, s.total)})',
-                    Colors.deepOrange,
-                    theme),
+                _statRow(Icons.monitor_heart, 'High Cholesterol',
+                    s.highCholesterol, s.total, Colors.deepOrange, theme),
                 const Divider(),
-                _statRow(
-                    Icons.smoking_rooms,
-                    'Smokers',
-                    '${s.smokers} (${_pct(s.smokers, s.total)})',
-                    Colors.brown,
-                    theme),
+                _statRow(Icons.smoking_rooms, 'Smokers', s.smokers, s.total,
+                    Colors.brown, theme),
                 if (s.topConditions.isNotEmpty) ...[
                   const Divider(height: 24),
                   _sectionLabel('Top Chronic Conditions', theme),
@@ -431,51 +416,33 @@ class _HealthScreeningStatsSectionState
     final theme = Theme.of(context);
     return KenwellFormCard(
       title: 'Cancer Screening  (${s.total})',
+      borderColor: const Color(0xFF6A1B9A).withValues(alpha: 0.35),
       child: s.total == 0
           ? _noData(theme)
           : Column(
               children: [
-                _statRow(
-                    Icons.science,
-                    'PAP Smear Collected',
-                    '${s.papCollected} (${_pct(s.papCollected, s.total)})',
-                    Colors.purple,
-                    theme),
+                _statRow(Icons.science, 'PAP Smear Collected', s.papCollected,
+                    s.total, Colors.purple, theme),
                 const Divider(),
                 _statRow(
                     Icons.warning_amber,
                     'PAP Smear Positive',
-                    '${s.papPositive} (${_pct(s.papPositive, _den(s.papCollected, s.total))})',
+                    s.papPositive,
+                    _den(s.papCollected, s.total),
                     Colors.deepPurple,
                     theme),
                 const Divider(),
-                _statRow(
-                    Icons.biotech,
-                    'PSA Test Done',
-                    '${s.psaDone} (${_pct(s.psaDone, s.total)})',
-                    Colors.indigo,
-                    theme),
+                _statRow(Icons.biotech, 'PSA Test Done', s.psaDone, s.total,
+                    Colors.indigo, theme),
                 const Divider(),
-                _statRow(
-                    Icons.error_outline,
-                    'PSA Abnormal',
-                    '${s.psaAbnormal} (${_pct(s.psaAbnormal, _den(s.psaDone, s.total))})',
-                    Colors.red,
-                    theme),
+                _statRow(Icons.error_outline, 'PSA Abnormal', s.psaAbnormal,
+                    _den(s.psaDone, s.total), Colors.red, theme),
                 const Divider(),
-                _statRow(
-                    Icons.report_problem_outlined,
-                    'Symptomatic',
-                    '${s.symptomatic} (${_pct(s.symptomatic, s.total)})',
-                    Colors.orange,
-                    theme),
+                _statRow(Icons.report_problem_outlined, 'Symptomatic',
+                    s.symptomatic, s.total, Colors.orange, theme),
                 const Divider(),
-                _statRow(
-                    Icons.local_hospital,
-                    'Referred',
-                    '${s.referred} (${_pct(s.referred, s.total)})',
-                    Colors.teal,
-                    theme),
+                _statRow(Icons.local_hospital, 'Referred', s.referred, s.total,
+                    Colors.teal, theme),
               ],
             ),
     );
@@ -487,67 +454,36 @@ class _HealthScreeningStatsSectionState
     final theme = Theme.of(context);
     return KenwellFormCard(
       title: 'TB Screening  (${s.total})',
+      borderColor: const Color(0xFF6A1B9A).withValues(alpha: 0.35),
       child: s.total == 0
           ? _noData(theme)
           : Column(
               children: [
-                _statRow(
-                    Icons.coronavirus,
-                    'Symptomatic (≥1 symptom)',
-                    '${s.symptomatic} (${_pct(s.symptomatic, s.total)})',
-                    Colors.red,
-                    theme),
+                _statRow(Icons.coronavirus, 'Symptomatic (≥1 symptom)',
+                    s.symptomatic, s.total, Colors.red, theme),
                 const Divider(height: 24),
                 _sectionLabel('Symptom Breakdown', theme),
                 const SizedBox(height: 8),
-                _statRow(
-                    Icons.air,
-                    'Cough ≥2 weeks',
-                    '${s.cough} (${_pct(s.cough, s.total)})',
-                    Colors.orange,
-                    theme),
+                _statRow(Icons.air, 'Cough ≥2 weeks', s.cough, s.total,
+                    Colors.orange, theme),
                 const Divider(),
-                _statRow(
-                    Icons.water_drop,
-                    'Blood in Sputum',
-                    '${s.bloodInSputum} (${_pct(s.bloodInSputum, s.total)})',
-                    Colors.red,
-                    theme),
+                _statRow(Icons.water_drop, 'Blood in Sputum', s.bloodInSputum,
+                    s.total, Colors.red, theme),
                 const Divider(),
-                _statRow(
-                    Icons.trending_down,
-                    'Unexplained Weight Loss',
-                    '${s.weightLoss} (${_pct(s.weightLoss, s.total)})',
-                    Colors.deepOrange,
-                    theme),
+                _statRow(Icons.trending_down, 'Unexplained Weight Loss',
+                    s.weightLoss, s.total, Colors.deepOrange, theme),
                 const Divider(),
-                _statRow(
-                    Icons.nightlight,
-                    'Night Sweats',
-                    '${s.nightSweats} (${_pct(s.nightSweats, s.total)})',
-                    Colors.purple,
-                    theme),
+                _statRow(Icons.nightlight, 'Night Sweats', s.nightSweats,
+                    s.total, Colors.purple, theme),
                 const Divider(height: 24),
-                _statRow(
-                    Icons.history,
-                    'Previous TB Treatment',
-                    '${s.treatedBefore} (${_pct(s.treatedBefore, s.total)})',
-                    Colors.blue,
-                    theme),
+                _statRow(Icons.history, 'Previous TB Treatment',
+                    s.treatedBefore, s.total, Colors.blue, theme),
                 const Divider(),
-                _statRow(
-                    Icons.people_alt,
-                    'Known TB Contact',
-                    '${s.contactWithTB} (${_pct(s.contactWithTB, s.total)})',
-                    Colors.teal,
-                    theme),
+                _statRow(Icons.people_alt, 'Known TB Contact', s.contactWithTB,
+                    s.total, Colors.teal, theme),
                 const Divider(),
-                _statRow(
-                    Icons.local_hospital,
-                    'Referred',
-                    '${s.referred} (${_pct(s.referred, s.total)})',
-                    Colors.green,
-                    theme),
+                _statRow(Icons.local_hospital, 'Referred', s.referred, s.total,
+                    Colors.green, theme),
               ],
             ),
     );
@@ -559,30 +495,19 @@ class _HealthScreeningStatsSectionState
     final theme = Theme.of(context);
     return KenwellFormCard(
       title: 'HCT — HIV Counselling & Testing  (${s.total})',
+      borderColor: const Color(0xFF6A1B9A).withValues(alpha: 0.35),
       child: s.total == 0
           ? _noData(theme)
           : Column(
               children: [
-                _statRow(
-                    Icons.person_add_alt_1,
-                    'First-Time Testers',
-                    '${s.firstTimeTesters} (${_pct(s.firstTimeTesters, s.total)})',
-                    Colors.blue,
-                    theme),
+                _statRow(Icons.person_add_alt_1, 'First-Time Testers',
+                    s.firstTimeTesters, s.total, Colors.blue, theme),
                 const Divider(),
-                _statRow(
-                    Icons.warning,
-                    'High-Risk Individuals',
-                    '${s.highRisk} (${_pct(s.highRisk, s.total)})',
-                    Colors.orange,
-                    theme),
+                _statRow(Icons.warning, 'High-Risk Individuals', s.highRisk,
+                    s.total, Colors.orange, theme),
                 const Divider(),
-                _statRow(
-                    Icons.medical_information,
-                    'Known Positive History',
-                    '${s.knownPositive} (${_pct(s.knownPositive, s.total)})',
-                    Colors.red,
-                    theme),
+                _statRow(Icons.medical_information, 'Known Positive History',
+                    s.knownPositive, s.total, Colors.red, theme),
               ],
             ),
     );
@@ -621,45 +546,76 @@ class _HealthScreeningStatsSectionState
         ),
       );
 
-  Widget _sectionLabel(String label, ThemeData theme) => Align(
-        alignment: Alignment.centerLeft,
-        child: Text(
-          label,
-          style: theme.textTheme.labelLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: KenwellColors.secondaryNavyDark,
+  Widget _sectionLabel(String label, ThemeData theme) => Padding(
+        padding: const EdgeInsets.only(bottom: 4),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            label,
+            style: theme.textTheme.labelLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF6A1B9A),
+            ),
           ),
         ),
       );
 
-  Widget _statRow(
-      IconData icon, String label, String value, Color color, ThemeData theme) {
+  Widget _statRow(IconData icon, String label, int count, int total,
+      Color color, ThemeData theme) {
+    const purple = Color(0xFF6A1B9A);
+    final ratio = total > 0 ? (count / total).clamp(0.0, 1.0) : 0.0;
+    final pctString = _pct(count, total);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(icon, color: color, size: 18),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              label,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: KenwellColors.secondaryNavyDark,
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, color: color, size: 18),
               ),
-            ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  label,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: KenwellColors.secondaryNavyDark,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                count.toString(),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: KenwellColors.secondaryNavy,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '($pctString)',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: Colors.grey.shade600,
+                ),
+              ),
+            ],
           ),
-          Text(
-            value,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: color,
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: ratio,
+              minHeight: 4,
+              backgroundColor: purple.withValues(alpha: 0.08),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                purple.withValues(alpha: 0.45),
+              ),
             ),
           ),
         ],
@@ -668,14 +624,15 @@ class _HealthScreeningStatsSectionState
   }
 
   Widget _pillStat(String label, int count, Color color, ThemeData theme) {
+    const purple = Color(0xFF6A1B9A);
     return Expanded(
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 3),
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.12),
+          color: purple.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: color.withValues(alpha: 0.3)),
+          border: Border.all(color: purple.withValues(alpha: 0.3)),
         ),
         child: Column(
           children: [
@@ -683,12 +640,15 @@ class _HealthScreeningStatsSectionState
               count.toString(),
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: color,
+                color: KenwellColors.secondaryNavy,
               ),
             ),
+            const SizedBox(height: 2),
             Text(
               label,
-              style: theme.textTheme.labelSmall?.copyWith(color: color),
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: Colors.grey.shade600,
+              ),
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -701,19 +661,29 @@ class _HealthScreeningStatsSectionState
 
   Widget _conditionRow(
       String condition, int count, int total, ThemeData theme) {
+    const purple = Color(0xFF6A1B9A);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          const Icon(Icons.circle, size: 8, color: Colors.grey),
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              color: purple.withValues(alpha: 0.5),
+              shape: BoxShape.circle,
+            ),
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(condition, style: theme.textTheme.bodyMedium),
           ),
           Text(
             '$count (${_pct(count, total)})',
-            style: theme.textTheme.bodyMedium
-                ?.copyWith(fontWeight: FontWeight.bold),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: KenwellColors.secondaryNavy,
+            ),
           ),
         ],
       ),
