@@ -9,60 +9,60 @@ import '../../../../shared/ui/badges/number_badge.dart';
 _RoleStyle _roleStyle(String role) {
   switch (role.toUpperCase()) {
     case 'ADMIN':
-      return _RoleStyle(
+      return const _RoleStyle(
         icon: Icons.admin_panel_settings_rounded,
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           colors: [Color(0xFF7C3AED), Color(0xFF201C58)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        accentColor: const Color(0xFF7C3AED),
+        accentColor: Color(0xFF7C3AED),
       );
     case 'TOP MANAGEMENT':
-      return _RoleStyle(
+      return const _RoleStyle(
         icon: Icons.business_center_rounded,
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           colors: [Color(0xFF1D4ED8), Color(0xFF1E3A8A)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        accentColor: const Color(0xFF1D4ED8),
+        accentColor: Color(0xFF1D4ED8),
       );
     case 'PROJECT MANAGER':
-      return _RoleStyle(
+      return const _RoleStyle(
         icon: Icons.manage_accounts_rounded,
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           colors: [Color(0xFF0891B2), Color(0xFF164E63)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        accentColor: const Color(0xFF0891B2),
+        accentColor: Color(0xFF0891B2),
       );
     case 'PROJECT COORDINATOR':
-      return _RoleStyle(
+      return const _RoleStyle(
         icon: Icons.event_rounded,
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           colors: [Color(0xFF059669), Color(0xFF064E3B)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        accentColor: const Color(0xFF059669),
+        accentColor: Color(0xFF059669),
       );
     case 'HEALTH PRACTITIONER':
     case 'NURSE':
-      return _RoleStyle(
+      return const _RoleStyle(
         icon: Icons.medical_services_rounded,
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           colors: [Color(0xFFD97706), Color(0xFF92400E)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        accentColor: const Color(0xFFD97706),
+        accentColor: Color(0xFFD97706),
       );
     case 'CLIENT':
-      return _RoleStyle(
+      return const _RoleStyle(
         icon: Icons.person_rounded,
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           colors: [KenwellColors.primaryGreen, KenwellColors.primaryGreenDark],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -70,14 +70,14 @@ _RoleStyle _roleStyle(String role) {
         accentColor: KenwellColors.primaryGreen,
       );
     default:
-      return _RoleStyle(
+      return const _RoleStyle(
         icon: Icons.person_outline_rounded,
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           colors: [Color(0xFF6B7280), Color(0xFF374151)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        accentColor: const Color(0xFF6B7280),
+        accentColor: Color(0xFF6B7280),
       );
   }
 }
@@ -204,14 +204,25 @@ class UserCardWidget extends StatelessWidget {
                               width: 48,
                               height: 48,
                               decoration: BoxDecoration(
-                                gradient: rs.gradient,
+                                gradient: LinearGradient(
+                                  colors: [
+                                    KenwellColors.primaryGreen
+                                        .withOpacity(0.15),
+                                    KenwellColors.primaryGreenDark
+                                        .withOpacity(0.15),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                // rs.gradient,
                                 borderRadius: BorderRadius.circular(13),
-                                boxShadow: [
+                                boxShadow: const [
                                   BoxShadow(
-                                    color:
-                                        rs.accentColor.withValues(alpha: 0.25),
+                                    color: KenwellColors.primaryGreen,
+
+                                    //rs.accentColor.withValues(alpha: 0.25),
                                     blurRadius: 8,
-                                    offset: const Offset(0, 3),
+                                    offset: Offset(0, 3),
                                   ),
                                 ],
                               ),
