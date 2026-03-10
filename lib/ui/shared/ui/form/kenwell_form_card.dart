@@ -10,6 +10,7 @@ class KenwellFormCard extends StatelessWidget {
     required this.child,
     this.margin = EdgeInsets.zero,
     this.padding = const EdgeInsets.all(16),
+    this.borderColor,
   });
 
   final String? title;
@@ -18,6 +19,10 @@ class KenwellFormCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry margin;
   final EdgeInsetsGeometry padding;
+
+  /// Optional border color. When provided a 1.5 px solid border is drawn
+  /// around the card using this color.
+  final Color? borderColor;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +37,12 @@ class KenwellFormCard extends StatelessWidget {
       color: Colors.white,
       elevation: 3,
       shadowColor: Colors.grey.shade300,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: borderColor != null
+            ? BorderSide(color: borderColor!, width: 1.5)
+            : BorderSide.none,
+      ),
       child: Padding(
         padding: padding,
         child: Column(

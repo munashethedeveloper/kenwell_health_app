@@ -778,8 +778,8 @@ class _StatsReportScreenState extends State<StatsReportScreen>
                                             .withValues(alpha: 0.05),
                                         borderRadius: BorderRadius.circular(12),
                                         border: Border.all(
-                                          color: theme.primaryColor
-                                              .withValues(alpha: 0.15),
+                                          color: const Color(0xFF6A1B9A)
+                                              .withValues(alpha: 0.45),
                                           width: 1.5,
                                         ),
                                       ),
@@ -1724,7 +1724,7 @@ class _ScreeningCountCard extends StatelessWidget {
         color: theme.primaryColor.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: theme.primaryColor.withValues(alpha: 0.15),
+          color: const Color(0xFF6A1B9A).withValues(alpha: 0.45),
           width: 1.5,
         ),
       ),
@@ -1800,7 +1800,7 @@ class _StatCard extends StatelessWidget {
         color: theme.primaryColor.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: theme.primaryColor.withValues(alpha: 0.15),
+          color: const Color(0xFF6A1B9A).withValues(alpha: 0.45),
           width: 1.5,
         ),
       ),
