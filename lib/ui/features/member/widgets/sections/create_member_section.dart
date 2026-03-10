@@ -69,6 +69,7 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
                 children: [
                   const SizedBox(height: 20),
                   const KenwellModernSectionHeader(
+                    label: 'MEMBERS',
                     title: 'New Member Registration',
                     subtitle: 'Complete the form to register a new user',
                   ),

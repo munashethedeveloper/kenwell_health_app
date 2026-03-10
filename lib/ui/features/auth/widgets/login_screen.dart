@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/labels/kenwell_section_label.dart';
 import 'package:provider/provider.dart';
 import '../../../../data/repositories_dcl/auth_repository_dcl.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
@@ -114,7 +115,6 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
         body: SafeArea(
           child: Column(
             children: [
-              // Hero section — logo + branding on navy background
               Padding(
                 padding: const EdgeInsets.fromLTRB(24, 28, 24, 32),
                 child: Column(
@@ -145,16 +145,19 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
                       ),
                     ),
                     const SizedBox(height: 20),
+                    const KenwellSectionLabel(label: 'WELCOME'),
+                    const SizedBox(height: 10),
                     const Text(
                       'KenWell365',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
+                        fontWeight: FontWeight.w800,
+                        height: 1.2,
+                        letterSpacing: -0.5,
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 8),
                     const Text(
                       'Supporting wellbeing, 365 days a year.',
                       style: TextStyle(

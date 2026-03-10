@@ -65,6 +65,7 @@ class ConsentScreen extends StatelessWidget {
     return KenwellFormPage(
       title: 'Consent Form',
       sectionTitle: 'Section B: Informed Consent',
+      sectionLabel: 'CONSENT',
       subtitle:
           'Please complete the form below to provide your informed consent.',
       formKey: vm.formKey,

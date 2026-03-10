@@ -208,13 +208,11 @@ class _EventScreenState extends State<EventScreen> {
               const SizedBox(height: 16),
               // Section header using consistent KenwellModernSectionHeader
               KenwellModernSectionHeader(
+                label: isEditMode ? 'EDIT EVENT' : 'EVENT',
                 title: isEditMode ? 'Edit Event' : 'Add New Event',
                 subtitle: isEditMode
                     ? 'Update the event details below'
                     : 'Complete the form to add a new event',
-                icon: isEditMode
-                    ? Icons.edit_rounded
-                    : Icons.add_circle_outline_rounded,
                 padding: const EdgeInsets.symmetric(horizontal: 4),
               ),
               const SizedBox(height: 20),

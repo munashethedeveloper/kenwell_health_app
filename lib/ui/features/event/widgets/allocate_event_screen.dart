@@ -850,6 +850,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                       ),
                       const SizedBox(height: 32),
                       KenwellModernSectionHeader(
+                        label: 'ALLOCATE',
                         title: 'Allocate Event: ${widget.event.title}',
                         subtitle:
                             'Swipe on a user to assign or unassign them from this event',

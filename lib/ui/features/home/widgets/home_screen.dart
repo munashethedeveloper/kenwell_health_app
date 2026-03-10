@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:kenwell_health_app/ui/features/calendar/view_model/calendar_view_model.dart';
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/labels/kenwell_section_label.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -127,6 +128,9 @@ class _HeroHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Section label
+              const KenwellSectionLabel(label: 'HOME'),
+              const SizedBox(height: 16),
               // Top bar: app name + date
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

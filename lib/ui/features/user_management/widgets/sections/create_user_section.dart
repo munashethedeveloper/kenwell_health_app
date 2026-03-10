@@ -156,6 +156,7 @@ class _CreateUserSectionState extends State<CreateUserSection> {
                   const SizedBox(height: 20),
 
                   const KenwellModernSectionHeader(
+                    label: 'CREATE USER',
                     title: 'New User Registration',
                     subtitle: 'Complete the form to register a new user',
                   ),

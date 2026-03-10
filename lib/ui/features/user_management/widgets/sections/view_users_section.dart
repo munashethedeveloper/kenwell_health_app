@@ -567,6 +567,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
 
                     // ── Section title ─────────────────────────────────────
                     const KenwellModernSectionHeader(
+                      label: 'USERS',
                       title: 'View Registered Users',
                       subtitle: 'Swipe on a user for options',
                     ),

@@ -239,6 +239,7 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const KenwellModernSectionHeader(
+                                  label: 'PROFILE',
                                   title: 'Edit Profile',
                                   subtitle: 'Update your profile information',
                                 ),

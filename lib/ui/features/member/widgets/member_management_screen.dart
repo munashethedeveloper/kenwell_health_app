@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../domain/constants/role_permissions.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/colours/kenwell_colours.dart';
+import '../../../shared/ui/labels/kenwell_section_label.dart';
 import '../../profile/view_model/profile_view_model.dart';
 import '../view_model/member_registration_view_model.dart';
 import 'sections/create_member_section.dart';
@@ -206,8 +208,60 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
                     dynamicTabViews.add(const ViewMembersSection());
                   }
 
-                  return TabBarView(
-                    children: dynamicTabViews,
+                  return Column(
+                    children: [
+                      // ── Gradient section header ────────────────────────
+                      Container(
+                        width: double.infinity,
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              KenwellColors.secondaryNavy,
+                              Color(0xFF2E2880),
+                              KenwellColors.primaryGreenDark,
+                            ],
+                            stops: [0.0, 0.55, 1.0],
+                          ),
+                        ),
+                        child: Padding(
+                          padding:
+                              const EdgeInsets.fromLTRB(24, 16, 24, 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const KenwellSectionLabel(label: 'MEMBERS'),
+                              const SizedBox(height: 10),
+                              const Text(
+                                'Member\nManagement',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.2,
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Create and view registered members.',
+                                style: TextStyle(
+                                  color:
+                                      Colors.white.withValues(alpha: 0.7),
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: TabBarView(
+                          children: dynamicTabViews,
+                        ),
+                      ),
+                    ],
                   );
                 },
               ),

@@ -69,6 +69,7 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
                     sliver: SliverList(
                       delegate: SliverChildListDelegate([
                         const KenwellModernSectionHeader(
+                          label: 'PROFILE',
                           title: 'My Profile',
                           subtitle: 'Manage your account settings',
                           padding: EdgeInsets.zero,

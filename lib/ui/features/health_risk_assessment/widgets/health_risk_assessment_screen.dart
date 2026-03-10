@@ -107,11 +107,11 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                   children: [
                     // ===== Section C: Health Screening =====
                     const KenwellModernSectionHeader(
+                      label: 'ASSESSMENT',
                       title: 'Section C: Health Screening',
                       subtitle:
                           'Please complete the form below to provide your health information.',
                       uppercase: true,
-                      icon: Icons.medical_information,
                     ),
                     const SizedBox(height: 16),
 

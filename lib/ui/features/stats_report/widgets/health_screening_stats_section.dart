@@ -342,10 +342,10 @@ class _HealthScreeningStatsSectionState
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         KenwellModernSectionHeader(
+          label: 'ANALYTICS',
           title: 'Health Screening Analytics',
           subtitle: widget.sectionSubtitle ??
               'Statistics derived from HRA, Cancer, TB and HCT screenings',
-          icon: Icons.health_and_safety,
         ),
         const SizedBox(height: 16),
         if (!hasAnyData) ...[

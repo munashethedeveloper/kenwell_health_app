@@ -56,9 +56,9 @@ class HealthScreeningsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const KenwellModernSectionHeader(
+              label: 'SCREENINGS',
               title: 'Section C: Health Screenings',
               subtitle: 'Complete the health screenings you have consented to.',
-              icon: Icons.medical_services,
             ),
             const SizedBox(height: 24),
             Text(

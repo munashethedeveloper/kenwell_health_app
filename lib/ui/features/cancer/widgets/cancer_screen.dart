@@ -39,6 +39,7 @@ class CancerScreen extends StatelessWidget {
     return KenwellFormPage(
       title: 'Cancer Screening Form',
       sectionTitle: 'Section C: Cancer Screening',
+      sectionLabel: 'CANCER',
       subtitle:
           'Please complete the form below to provide your cancer screening information.',
       formKey: viewModel.formKey,

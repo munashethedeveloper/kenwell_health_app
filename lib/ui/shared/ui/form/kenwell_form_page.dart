@@ -12,6 +12,7 @@ class KenwellFormPage extends StatelessWidget {
   final PreferredSizeWidget? appBar;
   final EdgeInsetsGeometry padding;
   final String? sectionTitle;
+  final String? sectionLabel;
   final String? subtitle;
   final bool uppercaseSectionTitle;
   final double sectionSpacing;
@@ -25,6 +26,7 @@ class KenwellFormPage extends StatelessWidget {
     this.appBar,
     this.padding = const EdgeInsets.all(16),
     this.sectionTitle,
+    this.sectionLabel,
     this.subtitle,
     this.uppercaseSectionTitle = true,
     this.sectionSpacing = 16,
@@ -37,6 +39,7 @@ class KenwellFormPage extends StatelessWidget {
       if (sectionTitle != null) ...[
         KenwellModernSectionHeader(
           title: sectionTitle!,
+          label: sectionLabel,
           uppercase: uppercaseSectionTitle,
           subtitle: subtitle,
         ),

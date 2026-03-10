@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:intl/intl.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/labels/kenwell_section_label.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import 'health_screening_stats_section.dart';
@@ -57,6 +58,9 @@ class EventStatsDetailScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Section label
+                  const KenwellSectionLabel(label: 'STATISTICS'),
+                  const SizedBox(height: 10),
                   // Status badge
                   Container(
                     padding:

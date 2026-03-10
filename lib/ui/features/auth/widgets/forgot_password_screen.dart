@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
+import 'package:kenwell_health_app/ui/shared/ui/labels/kenwell_section_label.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
 import '../../../../data/services/auth_service.dart';
 import '../../../shared/ui/colours/kenwell_colours.dart';
@@ -131,12 +132,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
+                  const KenwellSectionLabel(label: 'ACCOUNT'),
+                  const SizedBox(height: 10),
                   const Text(
                     'Forgot Password?',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 28,
+                      fontWeight: FontWeight.w800,
+                      height: 1.2,
+                      letterSpacing: -0.5,
                     ),
                   ),
                   const SizedBox(height: 8),

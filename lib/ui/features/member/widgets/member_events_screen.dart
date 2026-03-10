@@ -103,6 +103,7 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
             // const SizedBox(height: 24),
             // Events section
             const KenwellModernSectionHeader(
+              label: 'MEMBER',
               title: 'Member Details',
               subtitle:
                   'Detailed information about the member and their event history',

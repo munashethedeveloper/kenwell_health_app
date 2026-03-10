@@ -164,10 +164,10 @@ class CurrentEventHomeScreen extends StatelessWidget {
             ],
             const SizedBox(height: 24),
             const KenwellModernSectionHeader(
+              label: 'EVENT',
               title: 'Event Process',
               subtitle:
                   'Complete the steps below to finish the wellness event process.',
-              icon: Icons.checklist,
             ),
             const SizedBox(height: 24),
             _ProcessStepCard(

@@ -74,6 +74,7 @@ class EventDetailsScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: [
           KenwellModernSectionHeader(
+            label: 'DETAILS',
             title: '$eventTitleCapitalized Event Details',
             subtitle: 'Detailed information about the $eventTitle event',
           ), //const SizedBox(height: 16),
