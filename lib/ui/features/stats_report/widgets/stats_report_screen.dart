@@ -584,8 +584,7 @@ class _StatsReportScreenState extends State<StatsReportScreen>
                         icon: Icons.flag_outlined,
                         title: 'Expected',
                         value: totalExpected.toString(),
-                        gradientStart: KenwellColors.secondaryNavy,
-                        gradientEnd: KenwellColors.secondaryNavyLight,
+                        color: KenwellColors.secondaryNavy,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -596,8 +595,7 @@ class _StatsReportScreenState extends State<StatsReportScreen>
                         value: _isLoadingMembers
                             ? '...'
                             : _totalMembers.toString(),
-                        gradientStart: const Color(0xFF6A1B9A),
-                        gradientEnd: KenwellColors.primaryGreen,
+                        color: const Color(0xFF6A1B9A),
                       ),
                     ),
                   ],
@@ -610,8 +608,7 @@ class _StatsReportScreenState extends State<StatsReportScreen>
                         icon: Icons.health_and_safety_outlined,
                         title: 'Screened',
                         value: totalScreened.toString(),
-                        gradientStart: KenwellColors.primaryGreenDark,
-                        gradientEnd: KenwellColors.primaryGreen,
+                        color: KenwellColors.primaryGreenDark,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -620,8 +617,7 @@ class _StatsReportScreenState extends State<StatsReportScreen>
                         icon: Icons.person_off_outlined,
                         title: 'No Show',
                         value: (totalExpected - totalScreened).toString(),
-                        gradientStart: const Color(0xFFBF360C),
-                        gradientEnd: const Color(0xFFFF8F00),
+                        color: const Color(0xFFBF360C),
                       ),
                     ),
                   ],
@@ -1705,6 +1701,9 @@ class _ScreeningCountCard extends StatelessWidget {
   final String label;
   final int? count; // null while loading
   final IconData icon;
+
+  /// Accent colour used for the icon only. Card background matches the
+  /// breakdown cards for a unified look.
   final Color color;
 
   const _ScreeningCountCard({
@@ -1720,14 +1719,24 @@ class _ScreeningCountCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.07),
+        color: theme.primaryColor.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.2)),
+        border: Border.all(
+          color: theme.primaryColor.withValues(alpha: 0.15),
+          width: 1.5,
+        ),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: color, size: 22),
+          Container(
+            padding: const EdgeInsets.all(7),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: color, size: 20),
+          ),
           const SizedBox(height: 6),
           count == null
               ? SizedBox(
@@ -1768,15 +1777,16 @@ class _StatCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final String value;
-  final Color gradientStart;
-  final Color gradientEnd;
+
+  /// Accent colour used for the icon badge. The card background itself always
+  /// uses the same subtle primary-colour tint as the breakdown cards.
+  final Color color;
 
   const _StatCard({
     required this.icon,
     required this.title,
     required this.value,
-    required this.gradientStart,
-    required this.gradientEnd,
+    required this.color,
   });
 
   @override
@@ -1785,19 +1795,12 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [gradientStart, gradientEnd],
+        color: theme.primaryColor.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.primaryColor.withValues(alpha: 0.15),
+          width: 1.5,
         ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: gradientStart.withValues(alpha: 0.35),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1805,17 +1808,17 @@ class _StatCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(9),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.20),
+              color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, color: Colors.white, size: 20),
+            child: Icon(icon, color: color, size: 20),
           ),
           const SizedBox(height: 12),
           Text(
             value,
             style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.w800,
-              color: Colors.white,
+              color: KenwellColors.secondaryNavy,
               fontSize: 26,
             ),
           ),
@@ -1824,7 +1827,7 @@ class _StatCard extends StatelessWidget {
             title,
             style: TextStyle(
               fontSize: 12,
-              color: Colors.white.withValues(alpha: 0.85),
+              color: Colors.grey.shade600,
               fontWeight: FontWeight.w500,
             ),
           ),
