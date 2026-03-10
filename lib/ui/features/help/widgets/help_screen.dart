@@ -27,7 +27,7 @@ class HelpScreen extends StatelessWidget {
             return CustomScrollView(
               slivers: [
                 // ── Gradient section header ───────────────────────────────
-                SliverToBoxAdapter(child: _HelpHeader()),
+                SliverToBoxAdapter(child: const _HelpHeader()),
                 // ── Help action cards ─────────────────────────────────────
                 SliverPadding(
                   padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
@@ -101,6 +101,7 @@ class HelpScreen extends StatelessWidget {
 // ── Gradient header ──────────────────────────────────────────────────────────
 
 class _HelpHeader extends StatelessWidget {
+  const _HelpHeader();
   @override
   Widget build(BuildContext context) {
     return Container(

@@ -19,7 +19,7 @@ class StatsReportScreen extends StatelessWidget {
       body: CustomScrollView(
         slivers: [
           // ── Gradient header ───────────────────────────────────────────
-          SliverToBoxAdapter(child: _StatsHeader()),
+          SliverToBoxAdapter(child: const _StatsHeader()),
           // ── Dashboard cards ───────────────────────────────────────────
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
@@ -70,6 +70,7 @@ class StatsReportScreen extends StatelessWidget {
 // ── Gradient header ──────────────────────────────────────────────────────────
 
 class _StatsHeader extends StatelessWidget {
+  const _StatsHeader();
   @override
   Widget build(BuildContext context) {
     return Container(

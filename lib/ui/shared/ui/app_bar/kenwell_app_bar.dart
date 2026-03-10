@@ -61,7 +61,7 @@ class KenwellAppBar extends StatelessWidget implements PreferredSizeWidget {
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.normal,
-                  color: Colors.white70,
+                  color: Colors.white,
                 ),
               ),
             ],
