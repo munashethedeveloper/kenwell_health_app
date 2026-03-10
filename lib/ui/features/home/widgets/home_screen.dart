@@ -454,7 +454,7 @@ class _NotificationsSection extends StatelessWidget {
     if (items.isEmpty) {
       items.add(const _NotifItem(
         icon: Icons.check_circle_outline_rounded,
-        title: 'You\'re all set!',
+        title: "You're all set!",
         body:
             'No pending actions at the moment. Everything is up to date. Keep up the great work!',
         type: _NotifType.success,

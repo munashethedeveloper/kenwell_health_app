@@ -1085,6 +1085,8 @@ class _MetaPill extends StatelessWidget {
               fontWeight: FontWeight.w500,
               color: KenwellColors.secondaryNavy,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
