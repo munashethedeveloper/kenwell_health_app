@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 
 /// Consistent card wrapper for grouped form content.
 ///
-/// Supply [accentBorderGradient] (and optionally [titleIcon]) to get a premium
-/// gradient-bordered card.  All existing callers without these parameters
-/// retain the original Card appearance.
+/// By default, cards with a [title] automatically receive the brand purple
+/// gradient border so every form card looks uniform across the app.
+/// Pass [useGradient: false] to opt out and render a plain white card instead.
 class KenwellFormCard extends StatelessWidget {
   const KenwellFormCard({
     super.key,
@@ -18,6 +19,7 @@ class KenwellFormCard extends StatelessWidget {
     this.accentBorderGradient,
     this.titleIcon,
     this.borderColor,
+    this.useGradient = true,
   });
 
   final String? title;
@@ -28,21 +30,33 @@ class KenwellFormCard extends StatelessWidget {
   final EdgeInsetsGeometry padding;
 
   /// When provided the card gets a 2-px gradient border and a subtle glow.
-  /// Use brand-purple gradient for form cards, e.g.:
-  /// ```dart
-  /// accentBorderGradient: const LinearGradient(
-  ///   colors: [Color(0xFF7C3AED), Color(0xFF201C58)],
-  /// )
-  /// ```
+  /// Defaults to the brand purple–navy gradient when [useGradient] is true.
   final Gradient? accentBorderGradient;
 
   /// Optional icon shown next to the title in the card header.
   final IconData? titleIcon;
   final Color? borderColor;
 
+  /// Set to false to suppress the gradient border even when [title] is set.
+  final bool useGradient;
+
+  // Default brand gradient used for all titled form cards.
+  static const _defaultGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [KenwellColors.secondaryNavyLight, KenwellColors.secondaryNavy],
+  );
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
+    // Resolve the effective accent gradient:
+    //  1. Caller-supplied gradient takes highest priority.
+    //  2. When useGradient == true and a title is present, use the default brand gradient.
+    //  3. Otherwise no gradient (plain card).
+    final Gradient? effectiveGradient = accentBorderGradient ??
+        (useGradient && title != null ? _defaultGradient : null);
 
     final titleStyle = theme.textTheme.titleMedium?.copyWith(
       fontSize: 16,
@@ -54,7 +68,7 @@ class KenwellFormCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(
-          accentBorderGradient != null ? 13 : 12,
+          effectiveGradient != null ? 13 : 12,
         ),
       ),
       child: Padding(
@@ -68,11 +82,11 @@ class KenwellFormCard extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (titleIcon != null && accentBorderGradient != null) ...[
+                    if (titleIcon != null && effectiveGradient != null) ...[
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          gradient: accentBorderGradient,
+                          gradient: effectiveGradient,
                           borderRadius: BorderRadius.circular(9),
                         ),
                         child: Icon(titleIcon, color: Colors.white, size: 16),
@@ -107,16 +121,16 @@ class KenwellFormCard extends StatelessWidget {
     );
 
     // ── Premium gradient-border card ─────────────────────────────────────
-    if (accentBorderGradient != null) {
+    if (effectiveGradient != null) {
       return Padding(
         padding: margin,
         child: Container(
           decoration: BoxDecoration(
-            gradient: accentBorderGradient,
+            gradient: effectiveGradient,
             borderRadius: BorderRadius.circular(15),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF7C3AED).withValues(alpha: 0.18),
+                color: KenwellColors.secondaryNavy.withValues(alpha: 0.14),
                 blurRadius: 16,
                 offset: const Offset(0, 4),
               ),
@@ -128,12 +142,12 @@ class KenwellFormCard extends StatelessWidget {
       );
     }
 
-    // ── Default Card (unchanged appearance) ──────────────────────────────
+    // ── Plain card (no title, or useGradient == false) ────────────────────
     return Card(
       margin: margin,
       color: Colors.white,
-      elevation: 3,
-      shadowColor: Colors.grey.shade300,
+      elevation: 2,
+      shadowColor: Colors.black.withValues(alpha: 0.08),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: padding,
