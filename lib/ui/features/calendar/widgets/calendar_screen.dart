@@ -298,7 +298,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
       child: Column(
         children: [
           const SizedBox(height: 16),
-          // Centered welcome header
+          /*  // Centered welcome header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
@@ -333,7 +333,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 20), */
           // Stats strip: events this month and upcoming events
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -342,7 +342,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                 _buildStatChip(
                   context,
                   icon: Icons.calendar_month_rounded,
-                  label: 'This Month',
+                  label: 'Events This Month',
                   value: '$eventsThisMonth',
                   color: const Color(0xFF201C58),
                   //color: const Color(0xFF90C048),
@@ -351,7 +351,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                 _buildStatChip(
                   context,
                   icon: Icons.upcoming_rounded,
-                  label: 'Upcoming Month\'s',
+                  label: 'Upcoming Events',
                   value: '$upcomingEventsCount',
                   color: const Color(0xFF201C58),
                 ),
