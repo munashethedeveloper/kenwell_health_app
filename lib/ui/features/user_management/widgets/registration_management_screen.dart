@@ -67,8 +67,7 @@ class RegistrationManagementScreenBody extends StatelessWidget {
                     const SizedBox(height: 16),
                     // Menu items
                     _ProfileMenuItem(
-                      icon: Icons.person,
-                      //color: const Color(0xFF90C048),
+                      icon: Icons.manage_accounts,
                       title: 'User Registration',
                       subtitle:
                           'Register individuals who will manage and operate wellness events.',
@@ -76,11 +75,18 @@ class RegistrationManagementScreenBody extends StatelessWidget {
                           context.pushNamed('userManagementVersionTwo'),
                     ),
                     _ProfileMenuItem(
-                      icon: Icons.help_outline,
+                      icon: Icons.person_add_alt_1,
                       title: 'Member Registration',
                       subtitle:
                           'Register individuals who will participate in wellness events.',
                       onTap: () => context.pushNamed('memberManagement'),
+                    ),
+                    _ProfileMenuItem(
+                      icon: Icons.event_available,
+                      title: 'Event Registration',
+                      subtitle:
+                          'View and register for upcoming wellness events on the calendar.',
+                      onTap: () => context.pushNamed('calendar'),
                     ),
                   ],
                 ),

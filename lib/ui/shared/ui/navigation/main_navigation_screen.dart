@@ -7,7 +7,7 @@ import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_m
 import 'package:provider/provider.dart';
 
 // Feature imports
-import '../../../features/calendar/widgets/calendar_screen.dart';
+import '../../../features/home/widgets/home_screen.dart';
 import '../../../features/stats_report/widgets/stats_report_screen.dart';
 import '../../../features/event/widgets/my_event_screen.dart';
 
@@ -53,18 +53,17 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       //const UserManagementScreenVersionTwo(),
       const RegistrationManagementScreen(),
       const StatsReportScreen(),
-      const CalendarScreen(),
+      const HomeScreen(),
       const MyProfileMenuScreen(),
       const MyEventScreen(),
     ];
     final List<Widget> clientTabs = [
       const StatsReportScreen(),
-      //client should also be able to see the calendar but without the events displaying
-      const CalendarScreen(),
+      const HomeScreen(),
       const MyProfileMenuScreen(),
     ];
     final List<Widget> restrictedTabs = [
-      const CalendarScreen(),
+      const HomeScreen(),
       const MyProfileMenuScreen(),
       const MyEventScreen(),
     ];
@@ -80,9 +79,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         label: Text('Statistics'),
       ),
       const NavigationRailDestination(
-        icon: Icon(Icons.calendar_today_outlined),
-        selectedIcon: Icon(Icons.calendar_today),
-        label: Text('Planner'),
+        icon: Icon(Icons.home_outlined),
+        selectedIcon: Icon(Icons.home),
+        label: Text('Home'),
       ),
       const NavigationRailDestination(
         icon: Icon(Icons.person_outline),
@@ -102,9 +101,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         label: Text('Statistics'),
       ),
       const NavigationRailDestination(
-        icon: Icon(Icons.calendar_today_outlined),
-        selectedIcon: Icon(Icons.calendar_today),
-        label: Text('Planner'),
+        icon: Icon(Icons.home_outlined),
+        selectedIcon: Icon(Icons.home),
+        label: Text('Home'),
       ),
       const NavigationRailDestination(
         icon: Icon(Icons.person_outline),
@@ -114,9 +113,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     ];
     final List<NavigationRailDestination> restrictedRailDestinations = [
       const NavigationRailDestination(
-        icon: Icon(Icons.calendar_today_outlined),
-        selectedIcon: Icon(Icons.calendar_today),
-        label: Text('Planner'),
+        icon: Icon(Icons.home_outlined),
+        selectedIcon: Icon(Icons.home),
+        label: Text('Home'),
       ),
       const NavigationRailDestination(
         icon: Icon(Icons.person_outline),
@@ -141,9 +140,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         label: 'Statistics',
       ),
       const NavigationDestination(
-        icon: Icon(Icons.calendar_today_outlined),
-        selectedIcon: Icon(Icons.calendar_today),
-        label: 'Planner',
+        icon: Icon(Icons.home_outlined),
+        selectedIcon: Icon(Icons.home),
+        label: 'Home',
       ),
       const NavigationDestination(
         icon: Icon(Icons.person_outline),
@@ -163,9 +162,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         label: 'Statistics',
       ),
       const NavigationDestination(
-        icon: Icon(Icons.calendar_today_outlined),
-        selectedIcon: Icon(Icons.calendar_today),
-        label: 'Planner',
+        icon: Icon(Icons.home_outlined),
+        selectedIcon: Icon(Icons.home),
+        label: 'Home',
       ),
       const NavigationDestination(
         icon: Icon(Icons.person_outline),
@@ -175,9 +174,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     ];
     final List<NavigationDestination> restrictedNavDestinations = [
       const NavigationDestination(
-        icon: Icon(Icons.calendar_today_outlined),
-        selectedIcon: Icon(Icons.calendar_today),
-        label: 'Planner',
+        icon: Icon(Icons.home_outlined),
+        selectedIcon: Icon(Icons.home),
+        label: 'Home',
       ),
       const NavigationDestination(
         icon: Icon(Icons.person_outline),
