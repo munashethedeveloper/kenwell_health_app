@@ -11,6 +11,7 @@ import '../../../../data/repositories_dcl/firestore_tb_screening_repository.dart
 import '../../../../data/repositories_dcl/firestore_hiv_screening_repository.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../domain/models/cander_screening.dart';
+import '../../../../domain/enums/service_type.dart';
 import 'event_stats_detail_screen.dart';
 import 'health_screening_stats_section.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
@@ -582,7 +583,8 @@ class _StatsReportScreenState extends State<StatsReportScreen>
                         icon: Icons.flag_outlined,
                         title: 'Expected',
                         value: totalExpected.toString(),
-                        color: Colors.blue.shade600,
+                        gradientStart: KenwellColors.secondaryNavy,
+                        gradientEnd: KenwellColors.secondaryNavyLight,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -593,7 +595,8 @@ class _StatsReportScreenState extends State<StatsReportScreen>
                         value: _isLoadingMembers
                             ? '...'
                             : _totalMembers.toString(),
-                        color: KenwellColors.primaryGreen,
+                        gradientStart: const Color(0xFF6A1B9A),
+                        gradientEnd: KenwellColors.primaryGreen,
                       ),
                     ),
                   ],
@@ -606,7 +609,8 @@ class _StatsReportScreenState extends State<StatsReportScreen>
                         icon: Icons.health_and_safety_outlined,
                         title: 'Screened',
                         value: totalScreened.toString(),
-                        color: Colors.teal.shade600,
+                        gradientStart: KenwellColors.primaryGreenDark,
+                        gradientEnd: KenwellColors.primaryGreen,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -615,7 +619,8 @@ class _StatsReportScreenState extends State<StatsReportScreen>
                         icon: Icons.person_off_outlined,
                         title: 'No Show',
                         value: (totalExpected - totalScreened).toString(),
-                        color: Colors.orange.shade700,
+                        gradientStart: const Color(0xFFBF360C),
+                        gradientEnd: const Color(0xFFFF8F00),
                       ),
                     ),
                   ],
@@ -626,6 +631,7 @@ class _StatsReportScreenState extends State<StatsReportScreen>
                 if (isLiveTab) ...[
                   _LiveScreeningCountsSection(
                     eventIds: events.map((e) => e.id).toList(),
+                    events: events,
                   ),
                   const SizedBox(height: 24),
                 ],
@@ -1401,12 +1407,19 @@ class _StatsReportScreenState extends State<StatsReportScreen>
   }
 }
 
-/// Displays live screening count cards for the 6 main screening types.
-/// Only shown on the Live Events tab.
+/// Displays live screening count cards for the requested service types.
+/// Only shown on the Live Events tab. Cards are filtered to only show
+/// the services actually requested across the active live events.
 class _LiveScreeningCountsSection extends StatefulWidget {
   final List<String> eventIds;
 
-  const _LiveScreeningCountsSection({required this.eventIds});
+  /// The live events whose requested services determine which cards are shown.
+  final List<WellnessEvent> events;
+
+  const _LiveScreeningCountsSection({
+    required this.eventIds,
+    required this.events,
+  });
 
   @override
   State<_LiveScreeningCountsSection> createState() =>
@@ -1427,6 +1440,17 @@ class _LiveScreeningCountsSectionState
   int _papSmearCount = 0;
   int _breastScreeningCount = 0;
   int _psaCount = 0;
+
+  /// Returns the union of all service types across every live event.
+  /// An empty set means no service info — show all cards as fallback.
+  Set<ServiceType> get _activeServices {
+    final services = <ServiceType>{};
+    for (final event in widget.events) {
+      services.addAll(
+          ServiceTypeConverter.fromStorageString(event.servicesRequested));
+    }
+    return services;
+  }
 
   @override
   void initState() {
@@ -1473,8 +1497,7 @@ class _LiveScreeningCountsSectionState
       ]);
 
       final hraList = List<dynamic>.from(results[0] as List);
-      final cancerList =
-          List<CancerScreening>.from(results[1] as List);
+      final cancerList = List<CancerScreening>.from(results[1] as List);
       final tbList = List<dynamic>.from(results[2] as List);
       final hivList = List<dynamic>.from(results[3] as List);
 
@@ -1516,44 +1539,60 @@ class _LiveScreeningCountsSectionState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final screenings = [
+    // Full set of possible screening cards, each tagged with its ServiceType.
+    final allScreenings = [
       _ScreeningCount(
+        serviceType: ServiceType.hra,
         label: 'HRA',
         count: _hraCount,
         icon: Icons.monitor_heart_outlined,
         color: Colors.teal.shade600,
       ),
       _ScreeningCount(
+        serviceType: ServiceType.hct,
         label: 'HCT',
         count: _hctCount,
         icon: Icons.bloodtype_outlined,
         color: Colors.red.shade600,
       ),
       _ScreeningCount(
+        serviceType: ServiceType.tbTest,
         label: 'TB',
         count: _tbCount,
         icon: Icons.air_outlined,
         color: Colors.amber.shade700,
       ),
       _ScreeningCount(
+        serviceType: ServiceType.papSmear,
         label: 'Pap Smear',
         count: _papSmearCount,
         icon: Icons.science_outlined,
         color: Colors.purple.shade500,
       ),
       _ScreeningCount(
+        serviceType: ServiceType.breastScreening,
         label: 'Breast',
         count: _breastScreeningCount,
         icon: Icons.favorite_border,
         color: Colors.pink.shade500,
       ),
       _ScreeningCount(
+        serviceType: ServiceType.psa,
         label: 'PSA',
         count: _psaCount,
         icon: Icons.biotech_outlined,
         color: Colors.indigo.shade500,
       ),
     ];
+
+    // Filter to only the services requested across live events.
+    // If we have no service info (empty set) fall back to showing all cards.
+    final activeServices = _activeServices;
+    final screenings = activeServices.isEmpty
+        ? allScreenings
+        : allScreenings
+            .where((s) => activeServices.contains(s.serviceType))
+            .toList();
 
     return KenwellFormCard(
       child: Column(
@@ -1587,7 +1626,7 @@ class _LiveScreeningCountsSectionState
                       ),
                     ),
                     Text(
-                      'People screened per service at live events',
+                      'People screened for each requested service',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey.shade600,
@@ -1609,7 +1648,7 @@ class _LiveScreeningCountsSectionState
           ),
           const SizedBox(height: 16),
 
-          // 3-column grid of screening cards
+          // Grid of screening cards — only the services relevant to live events
           if (widget.eventIds.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
@@ -1648,12 +1687,14 @@ class _LiveScreeningCountsSectionState
 
 /// Simple data class for a single screening type's count metadata.
 class _ScreeningCount {
+  final ServiceType serviceType;
   final String label;
   final int count;
   final IconData icon;
   final Color color;
 
   const _ScreeningCount({
+    required this.serviceType,
     required this.label,
     required this.count,
     required this.icon,
@@ -1729,13 +1770,15 @@ class _StatCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final String value;
-  final Color color;
+  final Color gradientStart;
+  final Color gradientEnd;
 
   const _StatCard({
     required this.icon,
     required this.title,
     required this.value,
-    required this.color,
+    required this.gradientStart,
+    required this.gradientEnd,
   });
 
   @override
@@ -1744,34 +1787,37 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [gradientStart, gradientEnd],
+        ),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: gradientStart.withValues(alpha: 0.35),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
-        border: Border.all(color: Colors.grey.shade100),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(9),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
+              color: Colors.white.withValues(alpha: 0.20),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, color: color, size: 22),
+            child: Icon(icon, color: Colors.white, size: 20),
           ),
           const SizedBox(height: 12),
           Text(
             value,
             style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.w800,
-              color: KenwellColors.secondaryNavy,
+              color: Colors.white,
               fontSize: 26,
             ),
           ),
@@ -1780,7 +1826,7 @@ class _StatCard extends StatelessWidget {
             title,
             style: TextStyle(
               fontSize: 12,
-              color: Colors.grey.shade600,
+              color: Colors.white.withValues(alpha: 0.85),
               fontWeight: FontWeight.w500,
             ),
           ),
