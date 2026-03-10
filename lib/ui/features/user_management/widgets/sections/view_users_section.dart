@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
 import 'package:provider/provider.dart';
 import '../../../../../domain/models/user_model.dart';
 import '../../../../../domain/constants/role_permissions.dart';
-import '../../../../shared/ui/containers/gradient_container.dart';
 import '../../../profile/view_model/profile_view_model.dart';
 import '../../viewmodel/user_management_view_model.dart';
 import 'user_card_widget.dart';
@@ -372,24 +370,45 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                   children: [
                     const SizedBox(height: 16),
 
-                    // Stats header
+                    // ── Premium Stats Header ──────────────────────────────
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: GradientContainer.purpleGreen(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Color(0xFF7C3AED),
+                              Color(0xFF201C58),
+                              Color(0xFF90C048),
+                            ],
+                            stops: [0.0, 0.55, 1.0],
+                          ),
+                          borderRadius: BorderRadius.circular(18),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF7C3AED)
+                                  .withValues(alpha: 0.30),
+                              blurRadius: 16,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 14),
+                            horizontal: 18, vertical: 16),
                         child: Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(10),
+                              padding: const EdgeInsets.all(11),
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.white.withValues(alpha: 0.18),
+                                borderRadius: BorderRadius.circular(12),
                               ),
                               child: const Icon(
                                 Icons.people_rounded,
                                 color: Colors.white,
-                                size: 20,
+                                size: 22,
                               ),
                             ),
                             const SizedBox(width: 14),
@@ -403,138 +422,112 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                                         : '$totalUsers Total Users',
                                     style: const TextStyle(
                                       color: Colors.white,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: -0.2,
                                     ),
                                   ),
-                                  const SizedBox(height: 3),
+                                  const SizedBox(height: 5),
                                   Row(
                                     children: [
-                                      Icon(
-                                        Icons.verified_rounded,
-                                        color:
-                                            Colors.white.withValues(alpha: 0.9),
-                                        size: 13,
+                                      _StatPill(
+                                        icon: Icons.verified_rounded,
+                                        label: '$verifiedCount verified',
+                                        color: const Color(0xFF10B981),
                                       ),
-                                      const SizedBox(width: 3),
-                                      Text(
-                                        '$verifiedCount verified',
-                                        style: TextStyle(
-                                          color: Colors.white
-                                              .withValues(alpha: 0.9),
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 10),
-                                      Icon(
-                                        Icons.error_outline_rounded,
-                                        color:
-                                            Colors.white.withValues(alpha: 0.9),
-                                        size: 13,
-                                      ),
-                                      const SizedBox(width: 3),
-                                      Text(
-                                        '$unverifiedCount unverified',
-                                        style: TextStyle(
-                                          color: Colors.white
-                                              .withValues(alpha: 0.9),
-                                          fontSize: 12,
-                                        ),
+                                      const SizedBox(width: 8),
+                                      _StatPill(
+                                        icon: Icons.error_outline_rounded,
+                                        label: '$unverifiedCount unverified',
+                                        color: Colors.white70,
                                       ),
                                     ],
                                   ),
                                 ],
                               ),
                             ),
-                            /*   Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
+                            // Swipe hint
+                            Column(
                               children: [
-                                const Icon(
-                                  Icons.swipe_left_rounded,
-                                  color: Colors.white70,
-                                  size: 16,
-                                ),
+                                const Icon(Icons.swipe_left_rounded,
+                                    color: Colors.white70, size: 18),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'Swipe for options',
+                                  'Swipe',
                                   style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.7),
+                                    color:
+                                        Colors.white.withValues(alpha: 0.65),
                                     fontSize: 10,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
                               ],
-                            ), */
+                            ),
                           ],
                         ),
                       ),
                     ),
                     const SizedBox(height: 16),
 
-                    // Section title
-                    /*    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: theme.primaryColor.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            /*  child: Icon(
-                              Icons.group_rounded,
-                              color: theme.primaryColor,
-                              size: 18,
-                            ), */
-                          ),
-                          const SizedBox(width: 10),
-                          const Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                KenwellModernSectionHeader(
-                                  title: 'Registered Users',
-                                  subtitle: 'Swipe or long-press for options',
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ), */
-                    //const SizedBox(height: 12),
-
-                    // Search and filter card
+                    // ── Premium Search & Filter Card ──────────────────────
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 16),
-                      padding: const EdgeInsets.all(14),
+                      padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(18),
                         border: Border.all(
-                          color: KenwellColors.secondaryNavy
-                              .withValues(alpha: 0.08),
-                          width: 2.5,
+                          color:
+                              const Color(0xFF7C3AED).withValues(alpha: 0.20),
+                          width: 1.5,
                         ),
                         boxShadow: [
                           BoxShadow(
+                            color: const Color(0xFF7C3AED)
+                                .withValues(alpha: 0.08),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                          BoxShadow(
                             color: Colors.black.withValues(alpha: 0.04),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
+                            blurRadius: 6,
+                            offset: const Offset(0, 1),
                           ),
                         ],
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Search users:',
-                            style: theme.textTheme.labelMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: const Color(0xFF201C58),
-                            ),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(7),
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xFF7C3AED),
+                                      Color(0xFF201C58),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(9),
+                                ),
+                                child: const Icon(Icons.search_rounded,
+                                    color: Colors.white, size: 15),
+                              ),
+                              const SizedBox(width: 10),
+                              const Text(
+                                'Search & Filter Users',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF201C58),
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 12),
                           UserSearchBar(
                             controller: _searchController,
                             searchQuery: viewModel.searchQuery,
@@ -550,8 +543,8 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                             children: [
                               const Icon(
                                 Icons.tune_rounded,
-                                size: 15,
-                                color: KenwellColors.primaryGreen,
+                                size: 14,
+                                color: Color(0xFF7C3AED),
                               ),
                               const SizedBox(width: 6),
                               Text(
@@ -571,41 +564,9 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                       ),
                     ),
 
-                    /*             // Section title
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: theme.primaryColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        Icons.group_rounded,
-                        color: theme.primaryColor,
-                        size: 18,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          KenwellModernSectionHeader(
-                            title: 'Registered Users',
-                            subtitle: 'Swipe or long-press for options',
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),*/
-
                     const SizedBox(height: 24),
 
+                    // ── Section title ─────────────────────────────────────
                     const KenwellModernSectionHeader(
                       title: 'View Registered Users',
                       subtitle: 'Swipe on a user for options',
@@ -660,6 +621,39 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
           ),
         );
       },
+    );
+  }
+}
+
+// ── Helper widget ─────────────────────────────────────────────────────────────
+
+class _StatPill extends StatelessWidget {
+  const _StatPill({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, color: color, size: 12),
+        const SizedBox(width: 3),
+        Text(
+          label,
+          style: TextStyle(
+            color: color,
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
     );
   }
 }
