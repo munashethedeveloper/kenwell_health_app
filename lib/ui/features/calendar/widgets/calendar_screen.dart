@@ -87,7 +87,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
             // App bar with title and actions
             appBar: KenwellAppBar(
               title: 'KenWell365',
-              automaticallyImplyLeading: false,
+              automaticallyImplyLeading: true,
               //titleColor: const Color(0xFF201C58),
               titleStyle: const TextStyle(
                 //color: Color(0xFF201C58),

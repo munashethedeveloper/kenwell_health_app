@@ -4,6 +4,7 @@ import '../../../../domain/models/wellness_event.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/buttons/form_action_buttons.dart';
 import '../../../shared/ui/dialogs/confirmation_dialog.dart';
+import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 import '../utils/event_form_validator.dart';
 import '../view_model/event_view_model.dart';
 import 'sections/event_basic_info_section.dart';
@@ -184,7 +185,6 @@ class _EventScreenState extends State<EventScreen> {
   Widget build(BuildContext context) {
     final WellnessEvent? eventToEdit = widget.existingEvent;
     final bool isEditMode = eventToEdit != null;
-    final theme = Theme.of(context);
 
     // Build the Scaffold
     return Scaffold(
@@ -206,54 +206,16 @@ class _EventScreenState extends State<EventScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 16),
-              // Compact section header
-              Padding(
+              // Section header using consistent KenwellModernSectionHeader
+              KenwellModernSectionHeader(
+                title: isEditMode ? 'Edit Event' : 'Add New Event',
+                subtitle: isEditMode
+                    ? 'Update the event details below'
+                    : 'Complete the form to add a new event',
+                icon: isEditMode
+                    ? Icons.edit_rounded
+                    : Icons.add_circle_outline_rounded,
                 padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: theme.primaryColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(
-                        isEditMode
-                            ? Icons.edit_rounded
-                            : Icons.add_circle_outline_rounded,
-                        color: theme.primaryColor,
-                        size: 22,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            isEditMode ? 'Edit Event' : 'Add New Event',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              color: Color(0xFF201C58),
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            isEditMode
-                                ? 'Update the event details below'
-                                : 'Complete the form to add a new event',
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xFF6B7280),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
               ),
               const SizedBox(height: 20),
               // Event Basic Info Section

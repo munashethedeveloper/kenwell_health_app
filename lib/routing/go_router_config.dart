@@ -25,6 +25,8 @@ import '../ui/features/hiv_test_results/view_model/hiv_test_result_view_model.da
 import '../ui/features/hiv_test_results/widgets/hiv_test_result_screen.dart';
 import '../ui/features/stats_report/view_model/stats_report_view_model.dart';
 import '../ui/features/stats_report/widgets/stats_report_screen.dart';
+import '../ui/features/stats_report/widgets/live_events_screen.dart';
+import '../ui/features/stats_report/widgets/past_events_screen.dart';
 
 // HIV & TB Tests
 import '../ui/features/hiv_test/view_model/hiv_test_view_model.dart';
@@ -273,6 +275,20 @@ class AppRouterConfig {
             create: (_) => StatsReportViewModel(),
             child: const StatsReportScreen(),
           ),
+        ),
+
+        // Live Events Route
+        GoRoute(
+          path: '/live-events',
+          name: 'liveEvents',
+          builder: (context, state) => const LiveEventsScreen(),
+        ),
+
+        // Past Events Route
+        GoRoute(
+          path: '/past-events',
+          name: 'pastEvents',
+          builder: (context, state) => const PastEventsScreen(),
         ),
 
         // HIV Testing Routes
