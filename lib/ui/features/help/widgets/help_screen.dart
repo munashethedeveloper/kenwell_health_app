@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/cards/kenwell_action_card.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/labels/kenwell_section_label.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:provider/provider.dart';
 import '../view_model/help_screen_view_model.dart';
@@ -128,25 +129,7 @@ class _HelpHeader extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Section label
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-              decoration: BoxDecoration(
-                color: KenwellColors.primaryGreen.withValues(alpha: 0.25),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: KenwellColors.primaryGreen.withValues(alpha: 0.5),
-                ),
-              ),
-              child: const Text(
-                'SUPPORT',
-                style: TextStyle(
-                  color: KenwellColors.primaryGreenLight,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 1.0,
-                ),
-              ),
-            ),
+            const KenwellSectionLabel(label: 'SUPPORT'),
             const SizedBox(height: 10),
             const Text(
               'Help &\nSupport',

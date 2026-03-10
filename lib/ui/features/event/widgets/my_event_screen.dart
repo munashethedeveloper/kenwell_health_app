@@ -5,7 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
-import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
+import 'package:kenwell_health_app/ui/shared/ui/labels/kenwell_section_label.dart';
 import 'package:kenwell_health_app/utils/event_status_colors.dart';
 import 'package:provider/provider.dart';
 import '../../../../data/repositories_dcl/event_repository.dart';
@@ -13,7 +13,6 @@ import '../../../../data/repositories_dcl/user_event_repository.dart';
 import '../../../../data/services/auth_service.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../shared/ui/buttons/custom_primary_button.dart';
-import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 import '../view_model/event_view_model.dart';
 import '../../wellness/widgets/wellness_flow_page.dart';
 
@@ -183,11 +182,10 @@ class MyEventScreenState extends State<MyEventScreen> {
     }
 
     // Build the Scaffold
-    //  final eventVM = context.read<EventViewModel>();
     return Scaffold(
+      backgroundColor: KenwellColors.neutralBackground,
       appBar: KenwellAppBar(
-        title: 'KenWell365',
-        titleColor: Colors.white,
+        title: 'My Events',
         titleStyle: const TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.bold,
@@ -198,480 +196,107 @@ class MyEventScreenState extends State<MyEventScreen> {
             tooltip: 'Refresh',
             icon: const Icon(Icons.refresh, color: Colors.white),
             onPressed: () async {
-              // Refresh user events from Firestore
               await _fetchUserEvents();
               if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Events refreshed'),
-                  duration: Duration(seconds: 1),
+                SnackBar(
+                  content: const Row(
+                    children: [
+                      Icon(Icons.check_circle_outline,
+                          color: Colors.white, size: 18),
+                      SizedBox(width: 8),
+                      Text('Events refreshed'),
+                    ],
+                  ),
+                  backgroundColor: KenwellColors.primaryGreen,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  duration: const Duration(seconds: 2),
                 ),
               );
             },
           ),
-          TextButton.icon(
-            onPressed: () {
-              if (mounted) {
-                context.pushNamed('help');
-              }
-            },
+          IconButton(
+            tooltip: 'Help',
             icon: const Icon(Icons.help_outline, color: Colors.white),
-            label: const Text(
-              'Help',
-              style: TextStyle(color: Colors.white),
-            ),
+            onPressed: () {
+              if (mounted) context.pushNamed('help');
+            },
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            //const SizedBox(height: 16),
-            //const AppLogo(size: 150),
-            const SizedBox(height: 16),
-            const KenwellModernSectionHeader(
-              title: 'My Events Screen',
-              subtitle:
-                  'Switch between the \'Today\' and \'Upcoming\' tabs to view and manage your wellness events.',
-              icon: Icons.event_available,
-              //textAlign: TextAlign.center,
+      body: RefreshIndicator(
+        onRefresh: _fetchUserEvents,
+        color: KenwellColors.primaryGreen,
+        child: CustomScrollView(
+          slivers: [
+            // ── Hero intro banner ──────────────────────────────────────
+            SliverToBoxAdapter(
+              child: _MyEventsHeroBanner(
+                totalEvents: allEvents.length,
+                todayCount: filteredEvents.length,
+                isToday: _selectedWeek == 0,
+              ),
             ),
-            const SizedBox(height: 32),
 
-            // Row with left toggle, centered label, and right toggle
-            Row(
-              children: [
-                // Left single-button Toggle for "Today"
-                ToggleButtons(
-                  isSelected: [_selectedWeek == 0],
-                  onPressed: (index) {
-                    if (mounted) {
-                      setState(() {
-                        _selectedWeek = 0;
-                      });
-                    }
-                  },
-                  borderRadius: BorderRadius.circular(6),
-                  selectedColor: Colors.white,
-                  color: const Color(0xFF201C58),
-                  fillColor: const Color(0xFF201C58),
-                  constraints: const BoxConstraints(minWidth: 96),
-                  children: const [
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      child: Text('Today'),
-                    ),
-                  ],
-                ),
-
-                // Centered label
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      _selectedWeek == 0
-                          ? 'Today\'s Events'
-                          : 'Upcoming Events',
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                ),
-
-                // Right single-button Toggle for "Upcoming"
-                ToggleButtons(
-                  isSelected: [_selectedWeek == 1],
-                  onPressed: (index) {
-                    if (mounted) {
-                      setState(() {
-                        _selectedWeek = 1;
-                      });
-                    }
-                  },
-                  borderRadius: BorderRadius.circular(6),
-                  selectedColor: Colors.white,
-                  color: const Color(0xFF201C58),
-                  fillColor: const Color(0xFF201C58),
-                  constraints: const BoxConstraints(minWidth: 96),
-                  children: const [
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      child: Text('Upcoming'),
-                    ),
-                  ],
-                ),
-              ],
+            // ── Segmented Tab bar ──────────────────────────────────────
+            SliverToBoxAdapter(
+              child: _MyEventsTabBar(
+                selectedIndex: _selectedWeek,
+                onChanged: (i) {
+                  if (mounted) setState(() => _selectedWeek = i);
+                },
+                todayCount: allEvents.where((e) {
+                  final d = e.date.toLocal();
+                  return DateTime(d.year, d.month, d.day)
+                      .isAtSameMomentAs(today);
+                }).length,
+                upcomingCount: allEvents.where((e) {
+                  final d = e.date.toLocal();
+                  return DateTime(d.year, d.month, d.day).isAfter(today);
+                }).length,
+              ),
             ),
-            const SizedBox(height: 12),
 
-            // If no events for selected tab, show friendly empty state
+            // ── Event list ─────────────────────────────────────────────
             if (filteredEvents.isEmpty)
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.event_available,
-                          size: 64, color: Color(0xFF90C048)),
-                      const SizedBox(height: 16),
-                      Text(
-                        _selectedWeek == 0
-                            ? 'No events scheduled for today.\nCheck the "Upcoming" tab for future events.'
-                            : allEvents.isEmpty
-                                ? 'No upcoming events.\nCreate an event to get started!'
-                                : 'No upcoming events.\nAll your events are scheduled for today.',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ],
-                  ),
+              SliverFillRemaining(
+                child: Center(
+                  child: _MyEventsEmptyState(isToday: _selectedWeek == 0),
                 ),
               )
             else
-              // List of events for the selected tab
-              Column(
-                children: filteredEvents.map((event) {
-                  final isStarting = _startingEventId == event.id;
-                  final theme = Theme.of(context);
-                  return Material(
-                    color: Colors.transparent,
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.07),
-                            blurRadius: 12,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: IntrinsicHeight(
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              // Left green accent bar
-                              Container(
-                                width: 5,
-                                color: KenwellColors.primaryGreen,
-                              ),
-                              // Main card body
-                              Expanded(
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(14, 14, 14, 12),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      // Header: icon badge + org label + title + address
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          // Calendar icon badge
-                                          Container(
-                                            width: 46,
-                                            height: 46,
-                                            decoration: BoxDecoration(
-                                              color: KenwellColors.primaryGreen
-                                                  .withValues(alpha: 0.12),
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                            ),
-                                            child: const Icon(
-                                              Icons.event_rounded,
-                                              color: KenwellColors.primaryGreen,
-                                              size: 22,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          // Organization label, title and address
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  'CLIENT ORGANIZATION',
-                                                  style: theme
-                                                      .textTheme.labelSmall
-                                                      ?.copyWith(
-                                                    color: KenwellColors
-                                                        .primaryGreen,
-                                                    fontWeight: FontWeight.w700,
-                                                    letterSpacing: 0.8,
-                                                    fontSize: 10,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 2),
-                                                Text(
-                                                  event.title,
-                                                  style: theme
-                                                      .textTheme.titleSmall
-                                                      ?.copyWith(
-                                                    fontWeight: FontWeight.w700,
-                                                    fontSize: 15,
-                                                    color: KenwellColors
-                                                        .secondaryNavy,
-                                                  ),
-                                                  maxLines: 2,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                                Builder(
-                                                  builder: (_) {
-                                                    final fullAddress = [
-                                                      // event.venue,
-                                                      event.address,
-                                                      event.townCity,
-                                                      event.province,
-                                                    ]
-                                                        .where(
-                                                            (s) => s.isNotEmpty)
-                                                        .join(', ');
-                                                    if (fullAddress.isEmpty) {
-                                                      return const SizedBox
-                                                          .shrink();
-                                                    }
-                                                    return Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              top: 4),
-                                                      child: Row(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          const Padding(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                                    top: 1),
-                                                            child: Icon(
-                                                              Icons
-                                                                  .location_on_outlined,
-                                                              size: 13,
-                                                              color: KenwellColors
-                                                                  .neutralGrey,
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                              width: 3),
-                                                          Expanded(
-                                                            child: Text(
-                                                              fullAddress,
-                                                              style: theme
-                                                                  .textTheme
-                                                                  .bodySmall
-                                                                  ?.copyWith(
-                                                                color: KenwellColors
-                                                                    .neutralGrey,
-                                                                fontSize: 12,
-                                                              ),
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
-                                                              maxLines: 2,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 12),
-                                      const Divider(
-                                          height: 1,
-                                          thickness: 1,
-                                          color: KenwellColors.neutralDivider),
-                                      const SizedBox(height: 10),
-                                      // Meta chips: date, time, and status badge
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: _MyEventMetaChip(
-                                              icon:
-                                                  Icons.calendar_today_outlined,
-                                              label:
-                                                  '${event.date.day}/${event.date.month}/${event.date.year}',
-                                            ),
-                                          ),
-                                          if (event.startTime.isNotEmpty) ...[
-                                            const SizedBox(width: 8),
-                                            Expanded(
-                                              child: _MyEventMetaChip(
-                                                icon: Icons.access_time_rounded,
-                                                label: event.endTime.isNotEmpty
-                                                    ? '${event.startTime} – ${event.endTime}'
-                                                    : event.startTime,
-                                              ),
-                                            ),
-                                          ],
-                                          const SizedBox(width: 8),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 9, vertical: 5),
-                                            decoration: BoxDecoration(
-                                              color: EventStatusColors
-                                                      .getStatusColor(
-                                                          event.status)
-                                                  .withValues(alpha: 0.15),
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              border: Border.all(
-                                                color: KenwellColors
-                                                    .neutralDivider,
-                                                width: 1,
-                                              ),
-                                            ),
-                                            child: Text(
-                                              event.status,
-                                              style: TextStyle(
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.w600,
-                                                color: EventStatusColors
-                                                    .getStatusColor(
-                                                        event.status),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      if (event.expectedParticipation > 0) ...[
-                                        const SizedBox(height: 8),
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.people_outline_rounded,
-                                              size: 13,
-                                              color: KenwellColors.neutralGrey,
-                                            ),
-                                            const SizedBox(width: 6),
-                                            Text(
-                                              '${event.expectedParticipation} expected participant${event.expectedParticipation == 1 ? '' : 's'}',
-                                              style: theme.textTheme.bodySmall
-                                                  ?.copyWith(
-                                                color:
-                                                    KenwellColors.neutralGrey,
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                      if (event
-                                          .servicesRequested.isNotEmpty) ...[
-                                        const SizedBox(height: 8),
-                                        Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            const Icon(
-                                              Icons.medical_services,
-                                              size: 13,
-                                              color: KenwellColors.neutralGrey,
-                                            ),
-                                            const SizedBox(width: 6),
-                                            Expanded(
-                                              child: Text(
-                                                'Services: ${event.servicesRequested}',
-                                                style: theme.textTheme.bodySmall
-                                                    ?.copyWith(
-                                                  color:
-                                                      KenwellColors.neutralGrey,
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                      const SizedBox(height: 12),
-                                      const Divider(
-                                          height: 1,
-                                          thickness: 1,
-                                          color: KenwellColors.neutralDivider),
-                                      const SizedBox(height: 12),
-                                      // Action buttons
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: Builder(
-                                              builder: (context) {
-                                                final tooltip =
-                                                    _startEventTooltip(event);
-                                                final button =
-                                                    CustomPrimaryButton(
-                                                  label: event.status ==
-                                                          WellnessEventStatus
-                                                              .inProgress
-                                                      ? 'Resume Event'
-                                                      : 'Start Event',
-                                                  onPressed: isStarting ||
-                                                          !_canStartEvent(event)
-                                                      ? null
-                                                      : () => _startEvent(
-                                                          context, event),
-                                                  isBusy: isStarting,
-                                                  fullWidth: true,
-                                                );
-                                                return tooltip != null
-                                                    ? Tooltip(
-                                                        message: tooltip,
-                                                        child: button,
-                                                      )
-                                                    : button;
-                                              },
-                                            ),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          Expanded(
-                                            child: CustomPrimaryButton(
-                                              label: 'Finish Event',
-                                              fullWidth: true,
-                                              onPressed: event.status ==
-                                                          WellnessEventStatus
-                                                              .inProgress &&
-                                                      event.screenedCount > 0
-                                                  ? () => _finishEvent(
-                                                      context, event)
-                                                  : null,
-                                              backgroundColor: Colors.red,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                      .animate()
-                      .fadeIn(duration: 300.ms, curve: Curves.easeOut)
-                      .slideY(
-                          begin: 0.1,
-                          end: 0,
-                          duration: 300.ms,
-                          curve: Curves.easeOut);
-                }).toList(),
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final event = filteredEvents[index];
+                      final isStarting = _startingEventId == event.id;
+                      return _PremiumEventCard(
+                        event: event,
+                        isStarting: isStarting,
+                        canStart: _canStartEvent(event),
+                        startTooltip: _startEventTooltip(event),
+                        onStart: () => _startEvent(context, event),
+                        onFinish: () => _finishEvent(context, event),
+                      )
+                          .animate()
+                          .fadeIn(
+                              duration: 300.ms,
+                              delay: (index * 60).ms,
+                              curve: Curves.easeOut)
+                          .slideY(
+                              begin: 0.08,
+                              end: 0,
+                              duration: 300.ms,
+                              delay: (index * 60).ms,
+                              curve: Curves.easeOut);
+                    },
+                    childCount: filteredEvents.length,
+                  ),
+                ),
               ),
           ],
         ),
@@ -861,12 +486,583 @@ class MyEventScreenState extends State<MyEventScreen> {
   }
 }
 
-// ── Small pill chip used in the meta row ──────────────────────────────────────
-class _MyEventMetaChip extends StatelessWidget {
+// ── Premium My-Events widgets ─────────────────────────────────────────────────
+
+/// Gradient hero banner at the top of the My Events scroll view.
+class _MyEventsHeroBanner extends StatelessWidget {
+  const _MyEventsHeroBanner({
+    required this.totalEvents,
+    required this.todayCount,
+    required this.isToday,
+  });
+
+  final int totalEvents;
+  final int todayCount;
+  final bool isToday;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [
+            KenwellColors.secondaryNavy,
+            Color(0xFF2E2880),
+            KenwellColors.primaryGreenDark,
+          ],
+          stops: [0.0, 0.6, 1.0],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: KenwellColors.secondaryNavy.withValues(alpha: 0.35),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Left – text
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const KenwellSectionLabel(label: 'MY EVENTS'),
+                const SizedBox(height: 10),
+                Text(
+                  isToday ? "Today's Events" : 'Upcoming Events',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    height: 1.2,
+                    letterSpacing: -0.4,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  isToday
+                      ? 'Manage your wellness events for today.'
+                      : 'Your scheduled events for the coming days.',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.65),
+                    fontSize: 12,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 16),
+          // Right – count badge
+          Column(
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: KenwellColors.primaryGreen.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: KenwellColors.primaryGreen.withValues(alpha: 0.4),
+                  ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '$todayCount',
+                      style: const TextStyle(
+                        color: KenwellColors.primaryGreenLight,
+                        fontSize: 26,
+                        fontWeight: FontWeight.w900,
+                        height: 1,
+                      ),
+                    ),
+                    Text(
+                      isToday ? 'today' : 'upcoming',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.6),
+                        fontSize: 9,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Segmented tab bar for switching between Today / Upcoming.
+class _MyEventsTabBar extends StatelessWidget {
+  const _MyEventsTabBar({
+    required this.selectedIndex,
+    required this.onChanged,
+    required this.todayCount,
+    required this.upcomingCount,
+  });
+
+  final int selectedIndex;
+  final ValueChanged<int> onChanged;
+  final int todayCount;
+  final int upcomingCount;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      child: Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            _TabItem(
+              label: 'Today',
+              count: todayCount,
+              isSelected: selectedIndex == 0,
+              onTap: () => onChanged(0),
+            ),
+            _TabItem(
+              label: 'Upcoming',
+              count: upcomingCount,
+              isSelected: selectedIndex == 1,
+              onTap: () => onChanged(1),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TabItem extends StatelessWidget {
+  const _TabItem({
+    required this.label,
+    required this.count,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final String label;
+  final int count;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 11),
+          decoration: BoxDecoration(
+            gradient: isSelected
+                ? const LinearGradient(
+                    colors: [KenwellColors.secondaryNavy, Color(0xFF3B3F86)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                : null,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: isSelected
+                      ? Colors.white
+                      : KenwellColors.secondaryNavy.withValues(alpha: 0.6),
+                ),
+              ),
+              const SizedBox(width: 6),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? Colors.white.withValues(alpha: 0.2)
+                      : Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '$count',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: isSelected ? Colors.white : Colors.grey.shade500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Empty-state widget shown when no events match the selected tab.
+class _MyEventsEmptyState extends StatelessWidget {
+  const _MyEventsEmptyState({required this.isToday});
+
+  final bool isToday;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(40),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(28),
+            decoration: BoxDecoration(
+              color: KenwellColors.primaryGreen.withValues(alpha: 0.08),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              isToday ? Icons.today_rounded : Icons.date_range_rounded,
+              size: 56,
+              color: KenwellColors.primaryGreen,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            isToday ? 'No Events Today' : 'No Upcoming Events',
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: KenwellColors.secondaryNavy,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            isToday
+                ? 'You have no events scheduled for today.\nCheck the Upcoming tab for future events.'
+                : 'No events have been allocated to you yet.\nContact your administrator to be assigned.',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 13,
+              color: Color(0xFF6B7280),
+              height: 1.6,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Premium event card with gradient accent bar and modern layout.
+class _PremiumEventCard extends StatelessWidget {
+  const _PremiumEventCard({
+    required this.event,
+    required this.isStarting,
+    required this.canStart,
+    required this.startTooltip,
+    required this.onStart,
+    required this.onFinish,
+  });
+
+  final WellnessEvent event;
+  final bool isStarting;
+  final bool canStart;
+  final String? startTooltip;
+  final VoidCallback onStart;
+  final VoidCallback onFinish;
+
+  @override
+  Widget build(BuildContext context) {
+    final statusColor = EventStatusColors.getStatusColor(event.status);
+    final fullAddress = [event.address, event.townCity, event.province]
+        .where((s) => s.isNotEmpty)
+        .join(', ');
+
+    return Container(
+      margin: const EdgeInsets.only(top: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.07),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Column(
+          children: [
+            // ── Gradient top accent bar ──────────────────────────────────
+            Container(
+              height: 4,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [KenwellColors.primaryGreen, Color(0xFF3B3F86)],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+              ),
+            ),
+            // ── Card body ────────────────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header row: icon + title + status badge
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Icon badge
+                      Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [
+                              KenwellColors.secondaryNavy,
+                              Color(0xFF3B3F86)
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: const Icon(
+                          Icons.event_rounded,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Section micro-label
+                            const Text(
+                              'CLIENT ORGANIZATION',
+                              style: TextStyle(
+                                color: KenwellColors.primaryGreen,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.8,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              event.title,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                                color: KenwellColors.secondaryNavy,
+                                height: 1.25,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      // Status badge
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 9, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: statusColor.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                              color: statusColor.withValues(alpha: 0.3),
+                              width: 1),
+                        ),
+                        child: Text(
+                          event.status,
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: statusColor,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  // Address
+                  if (fullAddress.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(top: 1.5),
+                          child: Icon(Icons.location_on_outlined,
+                              size: 13, color: KenwellColors.neutralGrey),
+                        ),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            fullAddress,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: KenwellColors.neutralGrey,
+                              height: 1.4,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+
+                  const SizedBox(height: 14),
+                  const Divider(
+                      height: 1,
+                      thickness: 1,
+                      color: KenwellColors.neutralDivider),
+                  const SizedBox(height: 12),
+
+                  // Meta row: date, time, participants
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 6,
+                    children: [
+                      _MetaPill(
+                        icon: Icons.calendar_today_outlined,
+                        label:
+                            '${event.date.day}/${event.date.month}/${event.date.year}',
+                      ),
+                      if (event.startTime.isNotEmpty)
+                        _MetaPill(
+                          icon: Icons.access_time_rounded,
+                          label: event.endTime.isNotEmpty
+                              ? '${event.startTime} – ${event.endTime}'
+                              : event.startTime,
+                        ),
+                      if (event.expectedParticipation > 0)
+                        _MetaPill(
+                          icon: Icons.people_outline_rounded,
+                          label:
+                              '${event.expectedParticipation} participant${event.expectedParticipation == 1 ? '' : 's'}',
+                        ),
+                    ],
+                  ),
+
+                  if (event.servicesRequested.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(top: 1.5),
+                          child: Icon(Icons.medical_services_outlined,
+                              size: 13, color: KenwellColors.neutralGrey),
+                        ),
+                        const SizedBox(width: 5),
+                        Expanded(
+                          child: Text(
+                            'Services: ${event.servicesRequested}',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: KenwellColors.neutralGrey,
+                              height: 1.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+
+                  const SizedBox(height: 14),
+                  const Divider(
+                      height: 1,
+                      thickness: 1,
+                      color: KenwellColors.neutralDivider),
+                  const SizedBox(height: 12),
+
+                  // Action buttons
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Builder(
+                          builder: (context) {
+                            final btn = CustomPrimaryButton(
+                              label: event.status ==
+                                      WellnessEventStatus.inProgress
+                                  ? 'Resume Event'
+                                  : 'Start Event',
+                              onPressed:
+                                  isStarting || !canStart ? null : onStart,
+                              isBusy: isStarting,
+                              fullWidth: true,
+                            );
+                            return startTooltip != null
+                                ? Tooltip(message: startTooltip!, child: btn)
+                                : btn;
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: CustomPrimaryButton(
+                          label: 'Finish Event',
+                          fullWidth: true,
+                          onPressed: event.status ==
+                                      WellnessEventStatus.inProgress &&
+                                  event.screenedCount > 0
+                              ? onFinish
+                              : null,
+                          backgroundColor: Colors.red.shade700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Small pill chip for event metadata (date, time, etc.)
+class _MetaPill extends StatelessWidget {
+  const _MetaPill({required this.icon, required this.label});
+
   final IconData icon;
   final String label;
-
-  const _MyEventMetaChip({required this.icon, required this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -875,26 +1071,19 @@ class _MyEventMetaChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: KenwellColors.neutralBackground,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: KenwellColors.neutralDivider,
-          width: 1,
-        ),
+        border: Border.all(color: KenwellColors.neutralDivider, width: 1),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 12, color: KenwellColors.secondaryNavy),
           const SizedBox(width: 5),
-          Flexible(
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-                color: KenwellColors.secondaryNavy,
-              ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+              color: KenwellColors.secondaryNavy,
             ),
           ),
         ],
@@ -902,3 +1091,5 @@ class _MyEventMetaChip extends StatelessWidget {
     );
   }
 }
+
+

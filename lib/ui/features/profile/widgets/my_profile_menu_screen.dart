@@ -6,6 +6,7 @@ import 'package:kenwell_health_app/ui/shared/ui/cards/kenwell_action_card.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/dialogs/confirmation_dialog.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
+import 'package:kenwell_health_app/ui/shared/ui/labels/kenwell_section_label.dart';
 import 'package:provider/provider.dart';
 
 class MyProfileMenuScreen extends StatelessWidget {
@@ -145,26 +146,7 @@ class _ProfileHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Section label
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                decoration: BoxDecoration(
-                  color: KenwellColors.primaryGreen.withValues(alpha: 0.25),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: KenwellColors.primaryGreen.withValues(alpha: 0.5),
-                  ),
-                ),
-                child: const Text(
-                  'PROFILE',
-                  style: TextStyle(
-                    color: KenwellColors.primaryGreenLight,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 1.0,
-                  ),
-                ),
-              ),
+              const KenwellSectionLabel(label: 'PROFILE'),
               const SizedBox(height: 20),
               // Avatar row
               Row(

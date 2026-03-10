@@ -13,6 +13,7 @@ import '../../../../domain/enums/service_type.dart';
 import 'event_stats_detail_screen.dart';
 import 'health_screening_stats_section.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/labels/kenwell_section_label.dart';
 
 /// Reusable event-statistics body.
 ///
@@ -505,31 +506,57 @@ class _EventStatsContentState extends State<EventStatsContent> {
             ],
 
             // ── Event breakdown list ──────────────────────────────────────
-            KenwellFormCard(
-              useGradient: false,
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.06),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.all(18),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Breakdown header
                   Row(
                     children: [
-                      Icon(
-                        isLiveTab
-                            ? Icons.play_circle_outline
-                            : Icons.history,
-                        color: theme.primaryColor,
-                        size: 24,
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: isLiveTab
+                                ? [const Color(0xFF059669), const Color(0xFF065F46)]
+                                : [KenwellColors.secondaryNavy, const Color(0xFF3B3F86)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          isLiveTab ? Icons.play_circle_outline : Icons.history,
+                          color: Colors.white,
+                          size: 18,
+                        ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 10),
                       Text(
-                        isLiveTab
-                            ? 'Live Event Breakdown'
-                            : 'Past Event Breakdown',
-                        style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold),
+                        isLiveTab ? 'Live Event Breakdown' : 'Past Event Breakdown',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: KenwellColors.secondaryNavy,
+                        ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
+                  const Divider(height: 1, color: KenwellColors.neutralDivider),
+                  const SizedBox(height: 12),
                   if (events.isEmpty)
                     Center(
                       child: Padding(
@@ -537,27 +564,33 @@ class _EventStatsContentState extends State<EventStatsContent> {
                         child: Column(
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(24),
+                              padding: const EdgeInsets.all(22),
                               decoration: BoxDecoration(
-                                  color: Colors.grey.shade100,
-                                  shape: BoxShape.circle),
+                                color: KenwellColors.neutralBackground,
+                                shape: BoxShape.circle,
+                              ),
                               child: Icon(Icons.event_busy,
-                                  size: 48, color: Colors.grey[400]),
+                                  size: 44,
+                                  color: Colors.grey[400]),
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 14),
                             Text(
                               isLiveTab ? 'No live events' : 'No past events',
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                  color: Colors.grey[600],
-                                  fontWeight: FontWeight.w500),
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: KenwellColors.secondaryNavy,
+                              ),
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 6),
                             Text(
                               isLiveTab
                                   ? 'Events currently in progress will appear here'
                                   : 'Completed events will appear here',
-                              style: theme.textTheme.bodySmall
-                                  ?.copyWith(color: Colors.grey[500]),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Color(0xFF6B7280),
+                              ),
                               textAlign: TextAlign.center,
                             ),
                           ],
@@ -566,7 +599,7 @@ class _EventStatsContentState extends State<EventStatsContent> {
                     )
                   else
                     ...events.map((event) => Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
+                          padding: const EdgeInsets.only(bottom: 10),
                           child: Material(
                             color: Colors.transparent,
                             child: InkWell(
@@ -577,32 +610,34 @@ class _EventStatsContentState extends State<EventStatsContent> {
                                       EventStatsDetailScreen(event: event),
                                 ),
                               ),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(14),
                               child: Container(
-                                padding: const EdgeInsets.all(16),
+                                padding: const EdgeInsets.all(14),
                                 decoration: BoxDecoration(
-                                  color: theme.primaryColor
-                                      .withValues(alpha: 0.05),
-                                  borderRadius: BorderRadius.circular(12),
+                                  color: KenwellColors.neutralBackground,
+                                  borderRadius: BorderRadius.circular(14),
                                   border: Border.all(
-                                    color: const Color(0xFF6A1B9A)
-                                        .withValues(alpha: 0.45),
-                                    width: 1.5,
+                                    color: KenwellColors.neutralDivider,
+                                    width: 1,
                                   ),
                                 ),
                                 child: Row(
                                   children: [
+                                    // Gradient icon
                                     Container(
                                       padding: const EdgeInsets.all(10),
                                       decoration: BoxDecoration(
-                                        color: theme.primaryColor
-                                            .withValues(alpha: 0.1),
-                                        borderRadius:
-                                            BorderRadius.circular(10),
+                                        gradient: LinearGradient(
+                                          colors: isLiveTab
+                                              ? [const Color(0xFF059669), const Color(0xFF065F46)]
+                                              : [KenwellColors.secondaryNavy, const Color(0xFF3B3F86)],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        ),
+                                        borderRadius: BorderRadius.circular(10),
                                       ),
-                                      child: Icon(Icons.event,
-                                          color: theme.primaryColor,
-                                          size: 20),
+                                      child: const Icon(Icons.event,
+                                          color: Colors.white, size: 18),
                                     ),
                                     const SizedBox(width: 12),
                                     Expanded(
@@ -612,50 +647,47 @@ class _EventStatsContentState extends State<EventStatsContent> {
                                         children: [
                                           Text(
                                             event.title,
-                                            style: theme.textTheme.bodyMedium
-                                                ?.copyWith(
-                                                    fontWeight:
-                                                        FontWeight.w600,
-                                                    color:
-                                                        theme.primaryColor),
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w600,
+                                              color: KenwellColors.secondaryNavy,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                           const SizedBox(height: 4),
                                           Row(
                                             children: [
                                               Icon(Icons.calendar_today,
-                                                  size: 14,
-                                                  color: Colors.grey[600]),
-                                              const SizedBox(width: 4),
+                                                  size: 12,
+                                                  color: Colors.grey[500]),
+                                              const SizedBox(width: 3),
                                               Text(
                                                 '${event.date.day}/${event.date.month}/${event.date.year}',
-                                                style: theme
-                                                    .textTheme.bodySmall
-                                                    ?.copyWith(
-                                                        color:
-                                                            Colors.grey[600]),
+                                                style: TextStyle(
+                                                  fontSize: 11,
+                                                  color: Colors.grey[500],
+                                                ),
                                               ),
-                                              const SizedBox(width: 12),
+                                              const SizedBox(width: 10),
                                               Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 8,
-                                                        vertical: 2),
+                                                padding: const EdgeInsets
+                                                    .symmetric(
+                                                    horizontal: 7, vertical: 2),
                                                 decoration: BoxDecoration(
                                                   color: _getStatusColor(
                                                           event.status)
-                                                      .withValues(alpha: 0.15),
+                                                      .withValues(alpha: 0.12),
                                                   borderRadius:
-                                                      BorderRadius.circular(4),
+                                                      BorderRadius.circular(6),
                                                 ),
                                                 child: Text(
                                                   event.status,
-                                                  style: theme
-                                                      .textTheme.labelSmall
-                                                      ?.copyWith(
+                                                  style: TextStyle(
+                                                    fontSize: 9,
                                                     color: _getStatusColor(
                                                         event.status),
-                                                    fontWeight:
-                                                        FontWeight.w600,
+                                                    fontWeight: FontWeight.w700,
                                                   ),
                                                 ),
                                               ),
@@ -664,37 +696,32 @@ class _EventStatsContentState extends State<EventStatsContent> {
                                         ],
                                       ),
                                     ),
+                                    // Screened count badge
                                     Container(
                                       padding: const EdgeInsets.symmetric(
-                                          horizontal: 16, vertical: 8),
+                                          horizontal: 14, vertical: 8),
                                       decoration: BoxDecoration(
-                                        gradient: LinearGradient(colors: [
-                                          theme.primaryColor,
-                                          theme.primaryColor
-                                              .withValues(alpha: 0.8),
-                                        ]),
-                                        borderRadius:
-                                            BorderRadius.circular(8),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: theme.primaryColor
-                                                .withValues(alpha: 0.3),
-                                            blurRadius: 8,
-                                            offset: const Offset(0, 2),
-                                          ),
-                                        ],
+                                        gradient: LinearGradient(
+                                          colors: isLiveTab
+                                              ? [const Color(0xFF059669), const Color(0xFF065F46)]
+                                              : [KenwellColors.secondaryNavy, const Color(0xFF3B3F86)],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        ),
+                                        borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: Text(
-                                        event.screenedCount.toString(),
-                                        style: theme.textTheme.labelLarge
-                                            ?.copyWith(
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white),
+                                        '${event.screenedCount}',
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w800,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     ),
-                                    const SizedBox(width: 8),
+                                    const SizedBox(width: 6),
                                     Icon(Icons.chevron_right,
-                                        color: theme.primaryColor),
+                                        color: Colors.grey.shade400),
                                   ],
                                 ),
                               ),
@@ -714,85 +741,130 @@ class _EventStatsContentState extends State<EventStatsContent> {
   Widget _buildHeroBanner(
       int eventCount, String participationRate, bool isLiveTab) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            KenwellColors.secondaryNavy,
-            KenwellColors.secondaryNavyLight,
-          ],
+        gradient: LinearGradient(
+          colors: isLiveTab
+              ? [
+                  const Color(0xFF065F46),
+                  const Color(0xFF059669),
+                  const Color(0xFF3B3F86),
+                ]
+              : [
+                  KenwellColors.secondaryNavy,
+                  const Color(0xFF2E2880),
+                  KenwellColors.primaryGreenDark,
+                ],
+          stops: const [0.0, 0.55, 1.0],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: KenwellColors.secondaryNavy.withValues(alpha: 0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: (isLiveTab
+                    ? const Color(0xFF059669)
+                    : KenwellColors.secondaryNavy)
+                .withValues(alpha: 0.35),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  isLiveTab ? 'Live Events' : 'Past Events',
-                  style: const TextStyle(
-                      color: Colors.white60,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500),
+          // Section label + icon row
+          Row(
+            children: [
+              KenwellSectionLabel(
+                  label: isLiveTab ? 'LIVE EVENTS' : 'PAST EVENTS'),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  '$eventCount Event${eventCount != 1 ? "s" : ""}',
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 26,
-                      fontWeight: FontWeight.w800),
+                child: Icon(
+                  isLiveTab
+                      ? Icons.play_circle_outline_rounded
+                      : Icons.history_rounded,
+                  color: Colors.white,
+                  size: 20,
                 ),
-                const SizedBox(height: 10),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: KenwellColors.primaryGreen.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                        color:
-                            KenwellColors.primaryGreen.withValues(alpha: 0.5)),
-                  ),
-                  child: Text(
-                    isLiveTab ? 'In Progress' : 'Completed',
-                    style: const TextStyle(
-                        color: KenwellColors.primaryGreen,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-          Column(
+          const SizedBox(height: 14),
+          // Main stats row
+          Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              const Text('Participation',
-                  style:
-                      TextStyle(color: Colors.white60, fontSize: 12)),
-              const SizedBox(height: 2),
-              Text(
-                '$participationRate%',
-                style: const TextStyle(
-                    color: KenwellColors.primaryGreen,
-                    fontSize: 34,
-                    fontWeight: FontWeight.w900),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '$eventCount',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 44,
+                        fontWeight: FontWeight.w900,
+                        height: 1,
+                        letterSpacing: -1,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Event${eventCount != 1 ? "s" : ""} ${isLiveTab ? "in progress" : "completed"}',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.75),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const Text('Rate',
-                  style: TextStyle(color: Colors.white60, fontSize: 12)),
+              // Participation rate badge
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.25)),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          '$participationRate%',
+                          style: const TextStyle(
+                            color: KenwellColors.primaryGreenLight,
+                            fontSize: 28,
+                            fontWeight: FontWeight.w900,
+                            height: 1,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'participation',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.65),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ],
@@ -1466,41 +1538,64 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.primaryColor.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(12),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
         border: Border.all(
-            color: const Color(0xFF6A1B9A).withValues(alpha: 0.45),
-            width: 1.5),
+            color: color.withValues(alpha: 0.2), width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Gradient icon container
           Container(
             padding: const EdgeInsets.all(9),
             decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(10)),
-            child: Icon(icon, color: color, size: 20),
+              gradient: LinearGradient(
+                colors: [color, color.withValues(alpha: 0.7)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withValues(alpha: 0.3),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Icon(icon, color: Colors.white, size: 20),
           ),
           const SizedBox(height: 12),
           Text(
             value,
-            style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: KenwellColors.secondaryNavy,
-                fontSize: 26),
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w900,
+              color: KenwellColors.secondaryNavy,
+              height: 1,
+              letterSpacing: -0.5,
+            ),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 3),
           Text(
             title,
-            style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey.shade600,
-                fontWeight: FontWeight.w500),
+            style: const TextStyle(
+              fontSize: 11,
+              color: Color(0xFF6B7280),
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.3,
+            ),
           ),
         ],
       ),
