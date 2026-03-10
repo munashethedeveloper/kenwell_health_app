@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/international_form_field.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
 import 'package:provider/provider.dart';
@@ -130,14 +131,15 @@ class _CreateUserSectionState extends State<CreateUserSection> {
   }
 
   // Purple gradient used for the accent border on both form cards
-  static const _purpleBorderGradient = LinearGradient(
+  static final _purpleBorderGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [_purple, Color(0xFF201C58)],
+    colors: [_purple, const Color(0xFF201C58)],
   );
 
   // Shared purple accent colour
-  static const _purple = Color(0xFF7C3AED);
+  static final Color _purple =
+      KenwellColors.secondaryNavy.withValues(alpha: 0.08);
 
   @override
   Widget build(BuildContext context) {
