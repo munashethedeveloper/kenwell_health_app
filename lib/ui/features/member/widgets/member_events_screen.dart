@@ -146,12 +146,13 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
             const SizedBox(height: 24),
 
             // Events section
-            KenwellModernSectionHeader(
-              title: 'Events History',
-              subtitle: _isLoading
-                  ? 'Loading events...'
-                  : '${_events.length} event${_events.length == 1 ? '' : 's'} attended',
-              icon: Icons.history,
+            Text(
+              'Events History  (${_events.length})',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF201C58),
+              ),
             ),
 
             const SizedBox(height: 16),

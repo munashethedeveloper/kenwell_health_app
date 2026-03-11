@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
+import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/profile_view_model.dart';
@@ -118,15 +118,9 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
   Widget build(BuildContext context) {
     return Consumer<ProfileViewModel>(
       builder: (context, vm, _) => Scaffold(
-        backgroundColor: KenwellColors.primaryGreen,
+        backgroundColor: KenwellColors.neutralBackground,
         appBar: KenwellAppBar(
           title: 'KenWell365',
-          titleColor: Colors.white,
-          titleStyle: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-          backgroundColor: KenwellColors.primaryGreen,
           automaticallyImplyLeading: true,
           actions: [
             IconButton(
@@ -159,123 +153,56 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
         ),
         body: Column(
           children: [
-            // Profile summary on navy background
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-              child: Row(
-                children: [
-                  Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF90C048),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.3), width: 2),
-                    ),
-                    child: Center(
-                      child: Text(
-                        vm.firstName.isNotEmpty
-                            ? vm.firstName[0].toUpperCase()
-                            : '?',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${vm.firstName} ${vm.lastName}'.trim().isEmpty
-                              ? 'Your Profile'
-                              : '${vm.firstName} ${vm.lastName}'.trim(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        if (vm.email.isNotEmpty)
-                          Text(
-                            vm.email,
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 13,
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+            // ── Gradient section header ─────────────────────────────
+            const KenwellGradientHeader(
+              label: 'PROFILE',
+              title: 'Edit\nProfile',
+              subtitle: 'Update your personal information',
             ),
 
-            // Form section — white panel with rounded top corners
+            // ── Scrollable form ─────────────────────────────────────
             Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(32),
-                  ),
-                ),
-                child: SafeArea(
-                  top: false,
-                  child: Stack(
-                    children: [
-                      AbsorbPointer(
-                        absorbing: vm.isLoading,
-                        child: SingleChildScrollView(
-                          padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
-                          child: Form(
-                            key: _formKey,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const KenwellModernSectionHeader(
-                                  label: 'PROFILE',
-                                  title: 'Edit Profile',
-                                  subtitle: 'Update your profile information',
-                                ),
-                                const SizedBox(height: 20),
-                                ProfileFormSection(
-                                  firstNameController: _firstNameController,
-                                  lastNameController: _lastNameController,
-                                  phoneController: _phoneController,
-                                  emailController: _emailController,
-                                  selectedRole: _selectedRole,
-                                  onRoleChanged: (value) =>
-                                      setState(() => _selectedRole = value),
-                                ),
-                                CustomPrimaryButton(
-                                  label: "Save Profile",
-                                  onPressed: vm.isLoading ? null : _saveProfile,
-                                  isBusy: vm.isLoading,
-                                ),
-                                const SizedBox(height: 16),
-                              ],
+              child: Stack(
+                children: [
+                  AbsorbPointer(
+                    absorbing: vm.isLoading,
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ProfileFormSection(
+                              firstNameController: _firstNameController,
+                              lastNameController: _lastNameController,
+                              phoneController: _phoneController,
+                              emailController: _emailController,
+                              selectedRole: _selectedRole,
+                              onRoleChanged: (value) =>
+                                  setState(() => _selectedRole = value),
                             ),
-                          ),
+                            CustomPrimaryButton(
+                              label: "Save Profile",
+                              onPressed: vm.isLoading ? null : _saveProfile,
+                              isBusy: vm.isLoading,
+                            ),
+                            const SizedBox(height: 16),
+                          ],
                         ),
                       ),
-                      if (vm.isLoading)
-                        const Positioned.fill(
-                          child: IgnorePointer(
-                            child: ColoredBox(
-                              color: Color(0x66FFFFFF),
-                              child: Center(child: CircularProgressIndicator()),
-                            ),
-                          ),
-                        ),
-                    ],
+                    ),
                   ),
-                ),
+                  if (vm.isLoading)
+                    const Positioned.fill(
+                      child: IgnorePointer(
+                        child: ColoredBox(
+                          color: Color(0x66FFFFFF),
+                          child: Center(child: CircularProgressIndicator()),
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
           ],

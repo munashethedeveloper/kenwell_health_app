@@ -9,7 +9,7 @@ import '../../../shared/ui/form/kenwell_date_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_styles.dart';
 import '../../../shared/ui/form/kenwell_referral_card.dart';
-import '../../../shared/ui/form/kenwell_modern_section_header.dart';
+import '../../../shared/ui/headers/kenwell_gradient_header.dart';
 import '../../../shared/ui/form/kenwell_signature_actions.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../../../shared/models/nursing_referral_option.dart';
@@ -51,28 +51,28 @@ class HIVTestResultScreen extends StatelessWidget {
       // App bar
       appBar: appBar ??
           const KenwellAppBar(
-            title: 'HIV Test Results Form',
+            title: 'KenWell365',
             automaticallyImplyLeading: false,
-            backgroundColor: KenwellColors.primaryGreen,
           ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        // Form
-        child: Form(
-          key: viewModel.formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              //  Section Header
-              const KenwellModernSectionHeader(
-                label: 'HIV RESULTS',
-                title: 'Section C: HIV Test Results',
-                subtitle:
-                    'Please complete the form below to provide your HIV testing history and risk behaviors.',
-                uppercase: true,
-              ),
-              // Spacing
-              const SizedBox(height: 16),
+      body: Column(
+        children: [
+          // ── Gradient section header ─────────────────────────────
+          const KenwellGradientHeader(
+            label: 'HIV RESULTS',
+            title: 'HIV Test\nResults',
+            subtitle: 'Section C: Record HIV testing history and risk behaviors',
+          ),
+          // ── Scrollable form ─────────────────────────────────────
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              // Form
+              child: Form(
+                key: viewModel.formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 8),
               // Screening Test Card
               KenwellFormCard(
                 title: 'Screening Test',
@@ -153,6 +153,8 @@ class HIVTestResultScreen extends StatelessWidget {
             ],
           ),
         ),
+          ),
+        ],
       ),
     );
   }

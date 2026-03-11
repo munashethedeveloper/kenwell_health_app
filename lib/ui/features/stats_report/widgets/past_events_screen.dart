@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/headers/kenwell_gradient_header.dart';
 import 'event_stats_content.dart';
 
 /// Displays statistics and a breakdown of events that have been completed.
@@ -11,7 +12,7 @@ class PastEventsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: KenwellAppBar(
-        title: 'Past Events',
+        title: 'KenWell365',
         automaticallyImplyLeading: true,
         actions: [
           IconButton(
@@ -21,7 +22,18 @@ class PastEventsScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: const EventStatsContent(isLiveTab: false),
+      body: const Column(
+        children: [
+          // ── Gradient section header ─────────────────────────────
+          KenwellGradientHeader(
+            label: 'PAST EVENTS',
+            title: 'Past Event\nStatistics',
+            subtitle: 'Outcomes from completed wellness events.',
+          ),
+          // ── Stats content ───────────────────────────────────────
+          Expanded(child: EventStatsContent(isLiveTab: false)),
+        ],
+      ),
     );
   }
 }

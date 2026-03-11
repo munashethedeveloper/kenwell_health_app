@@ -5,6 +5,7 @@ import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart
 import 'package:kenwell_health_app/ui/shared/ui/form/health_metric_status_badge.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/nursing_referral_status_card.dart';
 import 'package:kenwell_health_app/ui/features/nurse_interventions/view_model/nurse_intervention_view_model.dart';
+import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
@@ -12,7 +13,6 @@ import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/custom_yes_no_question.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_styles.dart';
-import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/health_risk_assessment_view_model.dart';
 
@@ -93,27 +93,28 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
             // App bar
             appBar: appBar ??
                 const KenwellAppBar(
-                  title: 'Health Risk Assessment Form',
-                  backgroundColor: KenwellColors.primaryGreen,
+                  title: 'KenWell365',
                   automaticallyImplyLeading: false,
                 ),
-            body: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              // Form
-              child: Form(
-                key: vm.formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // ===== Section C: Health Screening =====
-                    const KenwellModernSectionHeader(
-                      label: 'ASSESSMENT',
-                      title: 'Section C: Health Screening',
-                      subtitle:
-                          'Please complete the form below to provide your health information.',
-                      uppercase: true,
-                    ),
-                    const SizedBox(height: 16),
+            body: Column(
+              children: [
+                // ── Gradient section header ─────────────────────────
+                const KenwellGradientHeader(
+                  label: 'ASSESSMENT',
+                  title: 'Health Risk\nAssessment',
+                  subtitle: 'Section C: Complete the health screening form',
+                ),
+                // ── Scrollable form ─────────────────────────────────
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    // Form
+                    child: Form(
+                      key: vm.formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 8),
 
                     // ===== Section 1: Chronic Conditions =====
                     KenwellFormCard(
@@ -357,12 +358,13 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                     const SizedBox(height: 32),
 
                     // ===== Section D: Health Metrics =====
-                    const KenwellModernSectionHeader(
-                      title: 'Health Metrics',
-                      subtitle:
-                          'Please complete the form below to provide your health information.',
-                      uppercase: true,
-                      icon: Icons.health_and_safety,
+                    const Text(
+                      'Section D: Health Metrics',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF201C58),
+                      ),
                     ),
                     const SizedBox(height: 16),
 
@@ -512,6 +514,9 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                 ),
               ),
             ),
+              ),
+            ],
+          ),
           );
         },
       ),

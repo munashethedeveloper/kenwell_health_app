@@ -4,9 +4,9 @@ import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.da
 import 'package:kenwell_health_app/ui/features/wellness/view_model/wellness_flow_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/containers/gradient_container.dart';
+import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
+import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 import 'package:provider/provider.dart';
-
-import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 
 class CurrentEventHomeScreen extends StatelessWidget {
   final WellnessEvent event;
@@ -22,85 +22,30 @@ class CurrentEventHomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final viewModel = context.watch<WellnessFlowViewModel>();
 
     return Scaffold(
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            GradientContainer.purple(
-              padding: const EdgeInsets.all(20),
-              borderRadius: 16,
+      appBar: const KenwellAppBar(
+        title: 'KenWell365',
+        automaticallyImplyLeading: false,
+      ),
+      body: Column(
+        children: [
+          // ── Gradient section header ─────────────────────────────
+          KenwellGradientHeader(
+            label: 'EVENT',
+            title: event.title,
+            subtitle:
+                '${event.date.day}/${event.date.month}/${event.date.year}${event.venue.isNotEmpty ? ' · ${event.venue}' : ''}',
+          ),
+          // ── Scrollable content ──────────────────────────────────
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Icon centered at top
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(
-                      Icons.event,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  // Title centered
-                  Text(
-                    'Client Organization: ${event.title}',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                      fontSize: 18,
-                    ),
-                  ),
                   const SizedBox(height: 8),
-                  // Date row centered
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.calendar_today,
-                        size: 16,
-                        color: Colors.white70,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Date: ${event.date.day}/${event.date.month}/${event.date.year}',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: Colors.white70,
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (event.venue.isNotEmpty) ...[
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.business,
-                            size: 16, color: Colors.white70),
-                        const SizedBox(width: 6),
-                        Text(
-                          'Venue: ${event.venue}',
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: Colors.white70,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ],
-              ),
-            ),
             if (viewModel.currentMember != null) ...[
               const SizedBox(height: 16),
               Container(
@@ -163,13 +108,7 @@ class CurrentEventHomeScreen extends StatelessWidget {
               ),
             ],
             const SizedBox(height: 24),
-            const KenwellModernSectionHeader(
-              label: 'EVENT',
-              title: 'Event Process',
-              subtitle:
-                  'Complete the steps below to finish the wellness event process.',
-            ),
-            const SizedBox(height: 24),
+                  const SizedBox(height: 8),
             _ProcessStepCard(
               icon: Icons.person_add,
               title: 'Section A: Member Registration',
@@ -214,8 +153,11 @@ class CurrentEventHomeScreen extends StatelessWidget {
               onPressed: onBackToSearch,
             ),
             const SizedBox(height: 16),
-          ],
-        ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

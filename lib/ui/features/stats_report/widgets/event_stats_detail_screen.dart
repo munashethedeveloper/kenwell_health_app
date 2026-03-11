@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:intl/intl.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
-import 'package:kenwell_health_app/ui/shared/ui/labels/kenwell_section_label.dart';
+import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import 'health_screening_stats_section.dart';
@@ -20,123 +20,26 @@ class EventStatsDetailScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: KenwellAppBar(
-        title: 'Event Statistics',
-        subtitle: event.title,
-        titleStyle: const TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-        ),
-        backgroundColor: KenwellColors.secondaryNavy,
+      appBar: const KenwellAppBar(
+        title: 'KenWell365',
+        automaticallyImplyLeading: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // ── Event Header Card ─────────────────────────────────────────
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [
-                    KenwellColors.secondaryNavy,
-                    KenwellColors.secondaryNavyLight,
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: KenwellColors.secondaryNavy.withValues(alpha: 0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
+      body: Column(
+        children: [
+          // ── Gradient section header ─────────────────────────────
+          KenwellGradientHeader(
+            label: 'STATISTICS',
+            title: '${event.title}\nStatistics',
+            subtitle:
+                '${DateFormat('MMM dd, yyyy').format(event.date)} · ${event.venue}',
+          ),
+          // ── Scrollable content ──────────────────────────────────
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Section label
-                  const KenwellSectionLabel(label: 'STATISTICS'),
-                  const SizedBox(height: 10),
-                  // Status badge
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color:
-                          _getStatusColor(event.status).withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: _getStatusColor(event.status)
-                            .withValues(alpha: 0.5),
-                      ),
-                    ),
-                    child: Text(
-                      event.status,
-                      style: TextStyle(
-                        color: _getStatusColor(event.status),
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  // Event title
-                  Text(
-                    event.title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  // Date + venue row
-                  Row(
-                    children: [
-                      const Icon(Icons.calendar_today,
-                          color: Colors.white60, size: 14),
-                      const SizedBox(width: 6),
-                      Text(
-                        DateFormat('MMM dd, yyyy').format(event.date),
-                        style: const TextStyle(
-                            color: Colors.white70, fontSize: 13),
-                      ),
-                      const SizedBox(width: 16),
-                      const Icon(Icons.location_on,
-                          color: Colors.white60, size: 14),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          event.venue,
-                          style: const TextStyle(
-                              color: Colors.white70, fontSize: 13),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      const Icon(Icons.access_time,
-                          color: Colors.white60, size: 14),
-                      const SizedBox(width: 6),
-                      Text(
-                        '${event.startTime} – ${event.endTime}',
-                        style: const TextStyle(
-                            color: Colors.white70, fontSize: 13),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 20),
 
             // ── Key Metrics ───────────────────────────────────────────────
             Row(
@@ -329,8 +232,11 @@ class EventStatsDetailScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-          ],
-        ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

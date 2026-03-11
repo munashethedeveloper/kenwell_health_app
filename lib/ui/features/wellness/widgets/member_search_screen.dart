@@ -3,12 +3,13 @@ import 'package:kenwell_health_app/data/repositories_dcl/firestore_member_reposi
 import 'package:kenwell_health_app/data/repositories_dcl/member_repository.dart';
 import 'package:kenwell_health_app/data/local/app_database.dart';
 import 'package:kenwell_health_app/domain/models/member.dart';
+import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_secondary_button.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_form_card.dart';
-import 'package:kenwell_health_app/ui/shared/ui/containers/gradient_container.dart';
 
 class MemberSearchScreen extends StatefulWidget {
   final Function(String searchQuery) onGoToMemberDetails;
@@ -143,63 +144,26 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            GradientContainer.purple(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
-              borderRadius: 16,
+      appBar: const KenwellAppBar(
+        title: 'KenWell365',
+        automaticallyImplyLeading: false,
+      ),
+      body: Column(
+        children: [
+          // ── Gradient section header ─────────────────────────────
+          const KenwellGradientHeader(
+            label: 'MEMBER',
+            title: 'Member\nSearch',
+            subtitle: 'Enter the member\'s ID or Passport number to search.',
+          ),
+          // ── Scrollable content ──────────────────────────────────
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Container(
-                    width: 88,
-                    height: 88,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: ClipOval(
-                      child: Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Image.asset(
-                          'assets/app_logo.jpg',
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Member Search Form',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.2,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  const Text(
-                    'Enter the member\'s ID or Passport number to search our records.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
+                  const SizedBox(height: 8),
 
             // Search section with background
             Container(
@@ -458,9 +422,12 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-            ],
-          ],
+                ],
+              ],
+            ),
+          ),
         ),
+        ],
       ),
     );
   }

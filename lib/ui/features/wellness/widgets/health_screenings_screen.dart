@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
-
-import '../../../shared/ui/form/kenwell_modern_section_header.dart';
+import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 
 class HealthScreeningsScreen extends StatelessWidget {
   final bool hraEnabled;
@@ -48,19 +47,24 @@ class HealthScreeningsScreen extends StatelessWidget {
     return Scaffold(
       appBar: appBar ??
           const KenwellAppBar(
-            title: 'Health Screenings',
+            title: 'KenWell365',
           ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const KenwellModernSectionHeader(
-              label: 'SCREENINGS',
-              title: 'Section C: Health Screenings',
-              subtitle: 'Complete the health screenings you have consented to.',
-            ),
-            const SizedBox(height: 24),
+      body: Column(
+        children: [
+          // ── Gradient section header ─────────────────────────────
+          const KenwellGradientHeader(
+            label: 'SCREENINGS',
+            title: 'Health\nScreenings',
+            subtitle: 'Section C: Complete the health screenings you have consented to.',
+          ),
+          // ── Scrollable content ──────────────────────────────────
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 8),
             Text(
               'Select a screening to continue:',
               style: theme.textTheme.titleMedium?.copyWith(
@@ -106,8 +110,11 @@ class HealthScreeningsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
             ],
-          ],
-        ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

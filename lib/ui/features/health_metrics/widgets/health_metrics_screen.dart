@@ -3,12 +3,12 @@ import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/health_metric_status_badge.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/nursing_referral_status_card.dart';
+import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
-import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/health_metrics_view_model.dart';
 
@@ -53,25 +53,28 @@ class HealthMetricsScreen extends StatelessWidget {
           return Scaffold(
             // App bar
             appBar: const KenwellAppBar(
-              title: 'Health Metrics Form',
+              title: 'KenWell365',
               automaticallyImplyLeading: false,
-              backgroundColor: KenwellColors.primaryGreen,
             ),
-            body: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              // Form for health metrics
-              child: Form(
-                key: vm.formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Section header
-                    const KenwellModernSectionHeader(
-                      label: 'HEALTH',
-                      title: 'Section D: Health Metrics',
-                      uppercase: true,
-                    ),
-                    const SizedBox(height: 16),
+            body: Column(
+              children: [
+                // ── Gradient section header ─────────────────────────
+                const KenwellGradientHeader(
+                  label: 'HEALTH',
+                  title: 'Health\nMetrics',
+                  subtitle: 'Section D: Record health measurements',
+                ),
+                // ── Scrollable form ─────────────────────────────────
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    // Form for health metrics
+                    child: Form(
+                      key: vm.formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 8),
                     // Measurements form card
                     KenwellFormCard(
                       title: 'Measurements',
@@ -223,6 +226,9 @@ class HealthMetricsScreen extends StatelessWidget {
                 ),
               ),
             ),
+              ),
+            ],
+          ),
           );
         },
       ),

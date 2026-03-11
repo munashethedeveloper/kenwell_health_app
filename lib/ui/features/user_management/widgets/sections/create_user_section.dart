@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/international_form_field.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
 import 'package:provider/provider.dart';
 import '../../../../../domain/constants/user_roles.dart';
 import '../../../../../utils/input_formatters.dart';
@@ -155,10 +154,13 @@ class _CreateUserSectionState extends State<CreateUserSection> {
                 children: [
                   const SizedBox(height: 20),
 
-                  const KenwellModernSectionHeader(
-                    label: 'CREATE USER',
-                    title: 'New User Registration',
-                    subtitle: 'Complete the form to register a new user',
+                  const Text(
+                    'New User Registration',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF201C58),
+                    ),
                   ),
                   const SizedBox(height: 24),
 
