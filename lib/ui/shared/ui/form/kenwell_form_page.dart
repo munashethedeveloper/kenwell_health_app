@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 
 import '../app_bar/kenwell_app_bar.dart';
-import 'kenwell_modern_section_header.dart';
 
 /// Reusable page shell that standardizes Kenwell form layouts.
+///
+/// Renders a solid-green [KenwellAppBar] followed by a [KenwellGradientHeader]
+/// (when [sectionTitle] is provided) that is fixed at the top of the viewport.
+/// The form children scroll beneath the header inside an [Expanded] view.
 class KenwellFormPage extends StatelessWidget {
   final String title;
   final List<Widget> children;
@@ -35,35 +39,6 @@ class KenwellFormPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final contentChildren = <Widget>[
-      if (sectionTitle != null) ...[
-        KenwellModernSectionHeader(
-          title: sectionTitle!,
-          label: sectionLabel,
-          uppercase: uppercaseSectionTitle,
-          subtitle: subtitle,
-        ),
-        SizedBox(height: sectionSpacing),
-      ],
-      ...children,
-    ];
-
-    final body = SingleChildScrollView(
-      padding: padding,
-      child: formKey != null
-          ? Form(
-              key: formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: contentChildren,
-              ),
-            )
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: contentChildren,
-            ),
-    );
-
     final preferredAppBar = appBar ??
         KenwellAppBar(
           title: title,
@@ -71,9 +46,39 @@ class KenwellFormPage extends StatelessWidget {
           automaticallyImplyLeading: automaticallyImplyLeading,
         );
 
+    final scrollChild = formKey != null
+        ? Form(
+            key: formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: children,
+            ),
+          )
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: children,
+          );
+
     return Scaffold(
       appBar: preferredAppBar,
-      body: body,
+      body: Column(
+        children: [
+          // ── Gradient section header ──────────────────────────────────
+          if (sectionTitle != null)
+            KenwellGradientHeader(
+              label: sectionLabel ?? title.toUpperCase(),
+              title: sectionTitle!,
+              subtitle: subtitle ?? '',
+            ),
+          // ── Scrollable form content ──────────────────────────────────
+          Expanded(
+            child: SingleChildScrollView(
+              padding: padding,
+              child: scrollChild,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

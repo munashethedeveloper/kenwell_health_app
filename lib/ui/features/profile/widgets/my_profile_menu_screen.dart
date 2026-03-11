@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/features/auth/view_models/auth_view_model.dart';
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
+import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/cards/kenwell_action_card.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/dialogs/confirmation_dialog.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
 import 'package:kenwell_health_app/ui/shared/ui/labels/kenwell_section_label.dart';
 import 'package:provider/provider.dart';
 
@@ -55,6 +55,10 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
     return Consumer<ProfileViewModel>(
       builder: (context, vm, _) => Scaffold(
         backgroundColor: KenwellColors.neutralBackground,
+        appBar: const KenwellAppBar(
+          title: 'KenWell365',
+          automaticallyImplyLeading: false,
+        ),
         body: vm.isLoadingProfile
             ? const Center(child: CircularProgressIndicator())
             : CustomScrollView(
@@ -68,13 +72,7 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
                     padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
                     sliver: SliverList(
                       delegate: SliverChildListDelegate([
-                        const KenwellModernSectionHeader(
-                          label: 'PROFILE',
-                          title: 'My Profile',
-                          subtitle: 'Manage your account settings',
-                          padding: EdgeInsets.zero,
-                        ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 4),
                         KenwellActionCard(
                           gradient: const LinearGradient(
                             colors: [Color(0xFF201C58), Color(0xFF3B3F86)],
@@ -139,10 +137,8 @@ class _ProfileHeader extends StatelessWidget {
           bottomRight: Radius.circular(32),
         ),
       ),
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 20, 24, 36),
+      child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

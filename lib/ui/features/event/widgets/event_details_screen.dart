@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
+import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 import 'package:provider/provider.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../domain/constants/role_permissions.dart';
@@ -70,15 +70,19 @@ class EventDetailsScreen extends StatelessWidget {
         ],
       ),
       // Body of the screen
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      body: Column(
         children: [
-          KenwellModernSectionHeader(
+          // ── Gradient section header ─────────────────────────────
+          KenwellGradientHeader(
             label: 'DETAILS',
-            title: '$eventTitleCapitalized Event Details',
+            title: '$eventTitleCapitalized\nEvent Details',
             subtitle: 'Detailed information about the $eventTitle event',
-          ), //const SizedBox(height: 16),
-          /*  // Event title header card
+          ),
+          // ── Scrollable content ──────────────────────────────────
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -311,6 +315,9 @@ class EventDetailsScreen extends StatelessWidget {
               ),
             ),
           const SizedBox(height: 24),
+          ],
+        ),
+          ),
         ],
       ),
     );

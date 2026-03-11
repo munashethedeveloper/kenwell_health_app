@@ -4,7 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../domain/models/member.dart';
 import '../../../../data/repositories_dcl/firestore_member_repository.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
-import '../../../shared/ui/form/kenwell_modern_section_header.dart';
+import '../../../shared/ui/colours/kenwell_colours.dart';
+import '../../../shared/ui/headers/kenwell_gradient_header.dart';
 
 /// Screen to display all events a member has attended
 class MemberEventsScreen extends StatefulWidget {
@@ -84,33 +85,33 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
     return Scaffold(
       appBar: const KenwellAppBar(
         title: 'KenWell365',
-        titleColor: Colors.white,
         titleStyle: TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.bold,
         ),
         automaticallyImplyLeading: true,
-        backgroundColor: Color(0xFF201C58),
-        centerTitle: true,
       ),
       body: RefreshIndicator(
         onRefresh: _loadMemberEvents,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            const SizedBox(height: 8),
-            //const AppLogo(size: 150),
-            // const SizedBox(height: 24),
-            // Events section
-            const KenwellModernSectionHeader(
-              label: 'MEMBER',
-              title: 'Member Details',
-              subtitle:
-                  'Detailed information about the member and their event history',
+        child: CustomScrollView(
+          slivers: [
+            // ── Gradient section header ─────────────────────────
+            const SliverToBoxAdapter(
+              child: KenwellGradientHeader(
+                label: 'MEMBER',
+                title: 'Member\nDetails',
+                subtitle:
+                    'Detailed information about the member and their event history',
+              ),
             ),
-            const SizedBox(height: 16),
-
-            // Member information
+            // ── Content ─────────────────────────────────────────
+            SliverList(
+              delegate: SliverChildListDelegate([
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
             _buildSectionCard(
               'Personal Information',
               Icons.person,
@@ -219,9 +220,14 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
                   ),
                 ),
               )
-            else
-              // Events list
-              ..._events.map((event) => _buildEventCard(event)).toList(),
+              else
+                // Events list
+                ..._events.map((event) => _buildEventCard(event)).toList(),
+            ],
+          ),
+                ),
+              ]),
+            ),
           ],
         ),
       ),

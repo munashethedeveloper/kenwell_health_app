@@ -5,7 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
-import 'package:kenwell_health_app/ui/shared/ui/labels/kenwell_section_label.dart';
+import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 import 'package:kenwell_health_app/utils/event_status_colors.dart';
 import 'package:provider/provider.dart';
 import '../../../../data/repositories_dcl/event_repository.dart';
@@ -231,12 +231,16 @@ class MyEventScreenState extends State<MyEventScreen> {
         color: KenwellColors.primaryGreen,
         child: CustomScrollView(
           slivers: [
-            // ── Hero intro banner ──────────────────────────────────────
+            // ── Gradient section header ────────────────────────────────
             SliverToBoxAdapter(
-              child: _MyEventsHeroBanner(
-                totalEvents: allEvents.length,
-                todayCount: filteredEvents.length,
-                isToday: _selectedWeek == 0,
+              child: KenwellGradientHeader(
+                label: 'MY EVENTS',
+                title: _selectedWeek == 0
+                    ? "Today's\nEvents"
+                    : 'Upcoming\nEvents',
+                subtitle: _selectedWeek == 0
+                    ? 'Manage your wellness events for today.'
+                    : 'Your scheduled events for the coming days.',
               ),
             ),
 
@@ -487,121 +491,6 @@ class MyEventScreenState extends State<MyEventScreen> {
 }
 
 // ── Premium My-Events widgets ─────────────────────────────────────────────────
-
-/// Gradient hero banner at the top of the My Events scroll view.
-class _MyEventsHeroBanner extends StatelessWidget {
-  const _MyEventsHeroBanner({
-    required this.totalEvents,
-    required this.todayCount,
-    required this.isToday,
-  });
-
-  final int totalEvents;
-  final int todayCount;
-  final bool isToday;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            KenwellColors.secondaryNavy,
-            Color(0xFF2E2880),
-            KenwellColors.primaryGreenDark,
-          ],
-          stops: [0.0, 0.6, 1.0],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: KenwellColors.secondaryNavy.withValues(alpha: 0.35),
-            blurRadius: 18,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Left – text
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const KenwellSectionLabel(label: 'MY EVENTS'),
-                const SizedBox(height: 10),
-                Text(
-                  isToday ? "Today's\nEvents" : 'Upcoming\nEvents',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 28,
-                    fontWeight: FontWeight.w800,
-                    height: 1.2,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  isToday
-                      ? 'Manage your wellness events for today.'
-                      : 'Your scheduled events for the coming days.',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.7),
-                    fontSize: 14,
-                    height: 1.4,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 16),
-          // Right – count badge
-          Column(
-            children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: KenwellColors.primaryGreen.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(
-                    color: KenwellColors.primaryGreen.withValues(alpha: 0.4),
-                  ),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '$todayCount',
-                      style: const TextStyle(
-                        color: KenwellColors.primaryGreenLight,
-                        fontSize: 26,
-                        fontWeight: FontWeight.w900,
-                        height: 1,
-                      ),
-                    ),
-                    Text(
-                      isToday ? 'today' : 'upcoming',
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.6),
-                        fontSize: 9,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 /// Segmented tab bar for switching between Today / Upcoming.
 class _MyEventsTabBar extends StatelessWidget {

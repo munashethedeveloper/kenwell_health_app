@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/cards/kenwell_action_card.dart';
 import 'package:kenwell_health_app/ui/shared/ui/labels/kenwell_section_label.dart';
@@ -16,6 +17,10 @@ class StatsReportScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: KenwellColors.neutralBackground,
+      appBar: const KenwellAppBar(
+        title: 'KenWell365',
+        automaticallyImplyLeading: false,
+      ),
       body: CustomScrollView(
         slivers: [
           // ── Gradient header ───────────────────────────────────────────
@@ -90,10 +95,8 @@ class _StatsHeader extends StatelessWidget {
           bottomRight: Radius.circular(32),
         ),
       ),
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 20, 24, 36),
+      child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -121,7 +124,6 @@ class _StatsHeader extends StatelessWidget {
             ],
           ),
         ),
-      ),
     );
   }
 }
