@@ -85,10 +85,6 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
     return Scaffold(
       appBar: const KenwellAppBar(
         title: 'KenWell365',
-        titleStyle: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-        ),
         automaticallyImplyLeading: true,
       ),
       body: RefreshIndicator(
