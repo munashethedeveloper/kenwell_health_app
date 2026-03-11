@@ -4,9 +4,8 @@ import 'package:kenwell_health_app/ui/shared/ui/labels/kenwell_section_label.dar
 
 /// Standard gradient section header used on every screen in the app.
 ///
-/// Placed directly in the body Column, immediately below the [KenwellAppBar].
-/// The gradient fills edge-to-edge with no rounded corners so it butts flush
-/// against the app bar.
+/// Rendered as a rounded card with a navy drop-shadow, placed directly in the
+/// body Column immediately below the [KenwellAppBar].
 ///
 /// Usage:
 /// ```dart
@@ -45,41 +44,49 @@ class KenwellGradientHeader extends StatelessWidget {
       Color(0xFF2E2880),
       KenwellColors.primaryGreenDark,
     ],
-    stops: [0.0, 0.55, 1.0],
+    stops: [0.0, 0.6, 1.0],
   );
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(gradient: _gradient),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            KenwellSectionLabel(label: label),
-            const SizedBox(height: 10),
-            Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 28,
-                fontWeight: FontWeight.w800,
-                height: 1.2,
-                letterSpacing: -0.5,
-              ),
+      margin: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: _gradient,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: KenwellColors.secondaryNavy.withValues(alpha: 0.35),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          KenwellSectionLabel(label: label),
+          const SizedBox(height: 10),
+          Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 28,
+              fontWeight: FontWeight.w800,
+              height: 1.2,
+              letterSpacing: -0.5,
             ),
-            const SizedBox(height: 8),
-            Text(
-              subtitle,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.7),
-                fontSize: 14,
-              ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            subtitle,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.7),
+              fontSize: 14,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
