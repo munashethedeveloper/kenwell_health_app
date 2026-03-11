@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kenwell_health_app/ui/features/calendar/view_model/calendar_view_model.dart';
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
+import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/labels/kenwell_section_label.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -41,6 +43,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
         return Scaffold(
           backgroundColor: KenwellColors.neutralBackground,
+          appBar: const KenwellAppBar(
+            title: 'KenWell365',
+            automaticallyImplyLeading: false,
+          ),
           body: RefreshIndicator(
             onRefresh: () async {
               await calendarVM.loadEvents();
@@ -103,9 +109,11 @@ class _HeroHeader extends StatelessWidget {
     final formattedDate = DateFormat('EEEE, d MMMM yyyy').format(date);
 
     return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
+      margin: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+      padding: const EdgeInsets.all(10),
+      // width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
@@ -113,129 +121,95 @@ class _HeroHeader extends StatelessWidget {
             Color(0xFF2E2880),
             KenwellColors.primaryGreenDark,
           ],
-          stops: [0.0, 0.55, 1.0],
+          stops: [0.0, 0.6, 1.0],
+          //stops: [0.0, 0.55, 1.0],
         ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(32),
-          bottomRight: Radius.circular(32),
-        ),
+        borderRadius: BorderRadius.circular(20),
       ),
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 20, 24, 36),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Top bar: app name + date
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: KenwellColors.primaryGreen,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(
-                          Icons.health_and_safety_rounded,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      const Text(
-                        'KenWell365',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.3,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.2),
-                      ),
-                    ),
-                    child: Text(
-                      formattedDate,
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 28),
-
-              // Greeting
-              Text(
-                greeting,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.75),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Section label
+            // const KenwellSectionLabel(label: 'HOME'),
+            // const SizedBox(height: 10),
+            // Date chip
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.2),
                 ),
               ),
-              const SizedBox(height: 4),
-              Text(
-                firstName,
+              child: Text(
+                formattedDate,
                 style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 30,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.5,
+                  color: Colors.white70,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-              if (role.isNotEmpty) ...[
-                const SizedBox(height: 10),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: KenwellColors.primaryGreen.withValues(alpha: 0.25),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: KenwellColors.primaryGreen.withValues(alpha: 0.5),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.verified_rounded,
-                        color: KenwellColors.primaryGreen,
-                        size: 13,
-                      ),
-                      const SizedBox(width: 5),
-                      Text(
-                        role.toUpperCase(),
-                        style: const TextStyle(
-                          color: KenwellColors.primaryGreenLight,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.8,
-                        ),
-                      ),
-                    ],
+            ),
+            const SizedBox(height: 14),
+
+            // Greeting
+            Text(
+              greeting,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.75),
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              firstName,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 28,
+                fontWeight: FontWeight.w800,
+                height: 1.2,
+                letterSpacing: -0.5,
+              ),
+            ),
+            if (role.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+                decoration: BoxDecoration(
+                  color: KenwellColors.primaryGreen.withValues(alpha: 0.25),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: KenwellColors.primaryGreen.withValues(alpha: 0.5),
                   ),
                 ),
-              ],
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.verified_rounded,
+                      color: KenwellColors.primaryGreen,
+                      size: 13,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      role.toUpperCase(),
+                      style: const TextStyle(
+                        color: KenwellColors.primaryGreenLight,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
-          ),
+          ],
         ),
       ),
     );

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
 import 'package:provider/provider.dart';
 import '../../../../../domain/models/user_model.dart';
 import '../../../../../domain/constants/role_permissions.dart';
@@ -566,9 +565,13 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                     const SizedBox(height: 24),
 
                     // ── Section title ─────────────────────────────────────
-                    const KenwellModernSectionHeader(
-                      title: 'View Registered Users',
-                      subtitle: 'Swipe on a user for options',
+                    const Text(
+                      'View Registered Users',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF201C58),
+                      ),
                     ),
 
                     const SizedBox(height: 16),

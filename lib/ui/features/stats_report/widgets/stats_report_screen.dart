@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/cards/kenwell_action_card.dart';
 import 'package:kenwell_health_app/ui/shared/ui/labels/kenwell_section_label.dart';
@@ -16,6 +17,10 @@ class StatsReportScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: KenwellColors.neutralBackground,
+      appBar: const KenwellAppBar(
+        title: 'KenWell365',
+        automaticallyImplyLeading: false,
+      ),
       body: CustomScrollView(
         slivers: [
           // ── Gradient header ───────────────────────────────────────────
@@ -73,9 +78,11 @@ class _StatsHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
+      margin: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+      padding: const EdgeInsets.all(10),
+      // width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
@@ -83,43 +90,44 @@ class _StatsHeader extends StatelessWidget {
             Color(0xFF2E2880),
             KenwellColors.primaryGreenDark,
           ],
-          stops: [0.0, 0.55, 1.0],
+          stops: [0.0, 0.6, 1.0],
+
+          // stops: [0.0, 0.55, 1.0],
         ),
-        borderRadius: BorderRadius.only(
+        borderRadius: BorderRadius.circular(20),
+
+        /*  borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(32),
           bottomRight: Radius.circular(32),
-        ),
+        ), */
       ),
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 20, 24, 36),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Section label
-              const KenwellSectionLabel(label: 'ANALYTICS'),
-              const SizedBox(height: 10),
-              const Text(
-                'Stats &\nReports',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w800,
-                  height: 1.2,
-                  letterSpacing: -0.5,
-                ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Section label
+            //const KenwellSectionLabel(label: 'ANALYTICS'),
+            //const SizedBox(height: 10),
+            const Text(
+              'Stats &\nReports',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 28,
+                fontWeight: FontWeight.w800,
+                height: 1.2,
+                letterSpacing: -0.5,
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Select a category to explore wellness event data.',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.7),
-                  fontSize: 14,
-                ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Select a category to explore wellness event data.',
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.7),
+                fontSize: 14,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

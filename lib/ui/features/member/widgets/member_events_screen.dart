@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../domain/models/member.dart';
 import '../../../../data/repositories_dcl/firestore_member_repository.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
-import '../../../shared/ui/form/kenwell_modern_section_header.dart';
+import '../../../shared/ui/headers/kenwell_gradient_header.dart';
 
 /// Screen to display all events a member has attended
 class MemberEventsScreen extends StatefulWidget {
@@ -84,143 +84,152 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
     return Scaffold(
       appBar: const KenwellAppBar(
         title: 'KenWell365',
-        titleColor: Colors.white,
-        titleStyle: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-        ),
         automaticallyImplyLeading: true,
-        backgroundColor: Color(0xFF201C58),
-        centerTitle: true,
       ),
       body: RefreshIndicator(
         onRefresh: _loadMemberEvents,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            const SizedBox(height: 8),
-            //const AppLogo(size: 150),
-            // const SizedBox(height: 24),
-            // Events section
-            const KenwellModernSectionHeader(
-              title: 'Member Details',
-              subtitle:
-                  'Detailed information about the member and their event history',
+        child: CustomScrollView(
+          slivers: [
+            // ── Gradient section header ─────────────────────────
+            const SliverToBoxAdapter(
+              child: KenwellGradientHeader(
+                label: 'MEMBER',
+                title: 'Member\nDetails',
+                subtitle:
+                    'Detailed information about the member and their event history',
+              ),
             ),
-            const SizedBox(height: 16),
-
-            // Member information
-            _buildSectionCard(
-              'Personal Information',
-              Icons.person,
-              [
-                _buildDetailRow('Name and Surname',
-                    '${widget.member.name} ${widget.member.surname}', theme),
-                const Divider(height: 1),
-                _buildDetailRow('Gender', widget.member.gender ?? '', theme),
-                const Divider(height: 1),
-                _buildDetailRow('Email', widget.member.email ?? '', theme),
-                const Divider(height: 1),
-                _buildDetailRow(
-                    'Phone Number', widget.member.cellNumber ?? '', theme),
-                const Divider(height: 1),
-                _buildDetailRow('Citizenship Status',
-                    widget.member.citizenshipStatus ?? '', theme),
-                const Divider(height: 1),
-                _buildDetailRow(
-                    'Nationality', widget.member.nationality ?? '', theme),
-                const Divider(height: 1),
-                _buildDetailRow(
-                    'ID Number', widget.member.idNumber ?? '', theme),
-                const Divider(height: 1),
-                _buildDetailRow('Passport Number',
-                    widget.member.passportNumber ?? '', theme),
-                const Divider(height: 1),
-                _buildDetailRow(
-                    'Medical Aid', widget.member.medicalAidName ?? '', theme),
-              ],
-            ),
-
-            const SizedBox(height: 24),
-
-            // Events section
-            KenwellModernSectionHeader(
-              title: 'Events History',
-              subtitle: _isLoading
-                  ? 'Loading events...'
-                  : '${_events.length} event${_events.length == 1 ? '' : 's'} attended',
-              icon: Icons.history,
-            ),
-
-            const SizedBox(height: 16),
-
-            // Loading, error, or events list
-            if (_isLoading)
-              const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(32.0),
-                  child: CircularProgressIndicator(),
-                ),
-              )
-            else if (_errorMessage != null)
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(32.0),
+            // ── Content ─────────────────────────────────────────
+            SliverList(
+              delegate: SliverChildListDelegate([
+                Padding(
+                  padding: const EdgeInsets.all(16),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        Icons.error_outline,
-                        size: 64,
-                        color: theme.colorScheme.error,
+                      _buildSectionCard(
+                        'Personal Information',
+                        Icons.person,
+                        [
+                          _buildDetailRow(
+                              'Name and Surname',
+                              '${widget.member.name} ${widget.member.surname}',
+                              theme),
+                          const Divider(height: 1),
+                          _buildDetailRow(
+                              'Gender', widget.member.gender ?? '', theme),
+                          const Divider(height: 1),
+                          _buildDetailRow(
+                              'Email', widget.member.email ?? '', theme),
+                          const Divider(height: 1),
+                          _buildDetailRow('Phone Number',
+                              widget.member.cellNumber ?? '', theme),
+                          const Divider(height: 1),
+                          _buildDetailRow('Citizenship Status',
+                              widget.member.citizenshipStatus ?? '', theme),
+                          const Divider(height: 1),
+                          _buildDetailRow('Nationality',
+                              widget.member.nationality ?? '', theme),
+                          const Divider(height: 1),
+                          _buildDetailRow(
+                              'ID Number', widget.member.idNumber ?? '', theme),
+                          const Divider(height: 1),
+                          _buildDetailRow('Passport Number',
+                              widget.member.passportNumber ?? '', theme),
+                          const Divider(height: 1),
+                          _buildDetailRow('Medical Aid',
+                              widget.member.medicalAidName ?? '', theme),
+                        ],
                       ),
-                      const SizedBox(height: 16),
+
+                      const SizedBox(height: 24),
+
+                      // Events section
                       Text(
-                        _errorMessage!,
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.bodyMedium,
+                        'Events History  (${_events.length})',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF201C58),
+                        ),
                       ),
+
                       const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _loadMemberEvents,
-                        child: const Text('Retry'),
-                      ),
+
+                      // Loading, error, or events list
+                      if (_isLoading)
+                        const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(32.0),
+                            child: CircularProgressIndicator(),
+                          ),
+                        )
+                      else if (_errorMessage != null)
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(32.0),
+                            child: Column(
+                              children: [
+                                Icon(
+                                  Icons.error_outline,
+                                  size: 64,
+                                  color: theme.colorScheme.error,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  _errorMessage!,
+                                  textAlign: TextAlign.center,
+                                  style: theme.textTheme.bodyMedium,
+                                ),
+                                const SizedBox(height: 16),
+                                ElevatedButton(
+                                  onPressed: _loadMemberEvents,
+                                  child: const Text('Retry'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      else if (_events.isEmpty)
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(32.0),
+                            child: Column(
+                              children: [
+                                Icon(
+                                  Icons.event_busy,
+                                  size: 64,
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'No Events Found',
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'This member has not attended any events yet.',
+                                  textAlign: TextAlign.center,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      else
+                        // Events list
+                        ..._events
+                            .map((event) => _buildEventCard(event))
+                            .toList(),
                     ],
                   ),
                 ),
-              )
-            else if (_events.isEmpty)
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(32.0),
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.event_busy,
-                        size: 64,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No Events Found',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'This member has not attended any events yet.',
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            else
-              // Events list
-              ..._events.map((event) => _buildEventCard(event)).toList(),
+              ]),
+            ),
           ],
         ),
       ),

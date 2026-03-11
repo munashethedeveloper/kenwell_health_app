@@ -98,12 +98,12 @@ class _CautionBanner extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: cautionColor, width: 2),
       ),
-      child: Row(
+      child: const Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.warning_amber, color: cautionColor, size: 24),
-          const SizedBox(width: 8),
-          const Expanded(
+          Icon(Icons.warning_amber, color: cautionColor, size: 24),
+          SizedBox(width: 8),
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

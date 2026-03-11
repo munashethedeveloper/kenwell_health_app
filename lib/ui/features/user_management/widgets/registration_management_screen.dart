@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
+import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/labels/kenwell_section_label.dart';
 import 'package:provider/provider.dart';
@@ -22,6 +23,10 @@ class RegistrationManagementScreenBody extends StatelessWidget {
     return Consumer<ProfileViewModel>(
       builder: (context, vm, _) => Scaffold(
         backgroundColor: KenwellColors.neutralBackground,
+        appBar: const KenwellAppBar(
+          title: 'KenWell365',
+          automaticallyImplyLeading: false,
+        ),
         body: vm.isLoadingProfile
             ? const Center(child: CircularProgressIndicator())
             : CustomScrollView(
@@ -114,9 +119,12 @@ class _RegistrationHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
+      margin: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+      padding: const EdgeInsets.all(10),
+
+      /// width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
@@ -124,77 +132,39 @@ class _RegistrationHeader extends StatelessWidget {
             Color(0xFF2E2880),
             KenwellColors.primaryGreenDark,
           ],
-          stops: [0.0, 0.55, 1.0],
+          stops: [0.0, 0.6, 1.0],
+
+          //stops: [0.0, 0.55, 1.0],
         ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(32),
-          bottomRight: Radius.circular(32),
-        ),
+        borderRadius: BorderRadius.circular(20),
       ),
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 20, 24, 36),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Back + title row
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.of(context).maybePop(),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                        color: Colors.white,
-                        size: 18,
-                      ),
-                    ),
-                  ),
-                  const Spacer(),
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: KenwellColors.primaryGreen,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(
-                      Icons.health_and_safety_rounded,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                ],
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Section label
+            // const KenwellSectionLabel(label: 'MANAGEMENT'),
+            //  const SizedBox(height: 10),
+            const Text(
+              'Registration\nManagement',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 28,
+                fontWeight: FontWeight.w800,
+                height: 1.2,
+                letterSpacing: -0.5,
               ),
-              const SizedBox(height: 24),
-              // Section label
-              const KenwellSectionLabel(label: 'MANAGEMENT'),
-              const SizedBox(height: 10),
-              const Text(
-                'Registration\nManagement',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w800,
-                  height: 1.2,
-                  letterSpacing: -0.5,
-                ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Select a registration type to get started.',
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.7),
+                fontSize: 14,
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Select a registration type to get started.',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.7),
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

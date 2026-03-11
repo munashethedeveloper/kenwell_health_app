@@ -4,7 +4,7 @@ import '../../../../domain/models/wellness_event.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/buttons/form_action_buttons.dart';
 import '../../../shared/ui/dialogs/confirmation_dialog.dart';
-import '../../../shared/ui/form/kenwell_modern_section_header.dart';
+import '../../../shared/ui/headers/kenwell_gradient_header.dart';
 import '../utils/event_form_validator.dart';
 import '../view_model/event_view_model.dart';
 import 'sections/event_basic_info_section.dart';
@@ -197,82 +197,85 @@ class _EventScreenState extends State<EventScreen> {
           fontWeight: FontWeight.bold,
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        // Form for event details
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-              // Section header using consistent KenwellModernSectionHeader
-              KenwellModernSectionHeader(
-                title: isEditMode ? 'Edit Event' : 'Add New Event',
-                subtitle: isEditMode
-                    ? 'Update the event details below'
-                    : 'Complete the form to add a new event',
-                icon: isEditMode
-                    ? Icons.edit_rounded
-                    : Icons.add_circle_outline_rounded,
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-              ),
-              const SizedBox(height: 20),
-              // Event Basic Info Section
-              EventBasicInfoSection(
-                viewModel: widget.viewModel,
-                date: widget.date,
-                requiredField: _requiredField,
-              ),
-              // Contact Person Sections
-              ContactPersonSection(
-                viewModel: widget.viewModel,
-                title: 'Onsite Contact Person',
-                isOnsite: true,
-                requiredField: _requiredField,
-              ),
-              // AE Contact Person Section
-              ContactPersonSection(
-                viewModel: widget.viewModel,
-                title: 'AE Contact Person',
-                isOnsite: false,
-                requiredField: _requiredField,
-              ),
-              // Medical Aid Section
-              MedicalAidSection(
-                viewModel: widget.viewModel,
-                requiredSelection: _requiredSelection,
-              ),
-              // Participation Section
-              ParticipationSection(
-                viewModel: widget.viewModel,
-              ),
-              // Event Options Section
-              EventOptionsSection(
-                viewModel: widget.viewModel,
-                requiredSelection: _requiredSelection,
-              ),
-              // Services Selection Section
-              ServicesSelectionSection(
-                viewModel: widget.viewModel,
-                isAdditionalServices: false,
-              ),
-              // Event Time Section
-              EventTimeSection(
-                viewModel: widget.viewModel,
-                requiredField: _requiredField,
-              ),
-              const SizedBox(height: 20),
-              // Form action buttons
-              FormActionButtons(
-                onCancel: _handleCancel,
-                onSave: _validateAndSave,
-                saveLabel: 'Save Event',
-              ),
-              const SizedBox(height: 30),
-            ],
+      body: Column(
+        children: [
+          // ── Gradient section header ───────────────────────────────
+          KenwellGradientHeader(
+            label: isEditMode ? 'EDIT EVENT' : 'EVENT',
+            title: isEditMode ? 'Edit\nEvent' : 'Add New\nEvent',
+            subtitle: isEditMode
+                ? 'Update the event details below'
+                : 'Complete the form to add a new event',
           ),
-        ),
+          // ── Scrollable form ───────────────────────────────────────
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              // Form for event details
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 8),
+                    // Event Basic Info Section
+                    EventBasicInfoSection(
+                      viewModel: widget.viewModel,
+                      date: widget.date,
+                      requiredField: _requiredField,
+                    ),
+                    // Contact Person Sections
+                    ContactPersonSection(
+                      viewModel: widget.viewModel,
+                      title: 'Onsite Contact Person',
+                      isOnsite: true,
+                      requiredField: _requiredField,
+                    ),
+                    // AE Contact Person Section
+                    ContactPersonSection(
+                      viewModel: widget.viewModel,
+                      title: 'AE Contact Person',
+                      isOnsite: false,
+                      requiredField: _requiredField,
+                    ),
+                    // Medical Aid Section
+                    MedicalAidSection(
+                      viewModel: widget.viewModel,
+                      requiredSelection: _requiredSelection,
+                    ),
+                    // Participation Section
+                    ParticipationSection(
+                      viewModel: widget.viewModel,
+                    ),
+                    // Event Options Section
+                    EventOptionsSection(
+                      viewModel: widget.viewModel,
+                      requiredSelection: _requiredSelection,
+                    ),
+                    // Services Selection Section
+                    ServicesSelectionSection(
+                      viewModel: widget.viewModel,
+                      isAdditionalServices: false,
+                    ),
+                    // Event Time Section
+                    EventTimeSection(
+                      viewModel: widget.viewModel,
+                      requiredField: _requiredField,
+                    ),
+                    const SizedBox(height: 20),
+                    // Form action buttons
+                    FormActionButtons(
+                      onCancel: _handleCancel,
+                      onSave: _validateAndSave,
+                      saveLabel: 'Save Event',
+                    ),
+                    const SizedBox(height: 30),
+                  ],
+                ),
+              ),
+            ),
+          )
+        ],
       ),
     );
   }

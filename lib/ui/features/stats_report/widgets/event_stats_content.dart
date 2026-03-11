@@ -566,7 +566,7 @@ class _EventStatsContentState extends State<EventStatsContent> {
                           children: [
                             Container(
                               padding: const EdgeInsets.all(22),
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 color: KenwellColors.neutralBackground,
                                 shape: BoxShape.circle,
                               ),
@@ -1407,7 +1407,7 @@ class _LiveScreeningCountsSectionState
                 ),
               ),
               if (_isLoading)
-                SizedBox(
+                const SizedBox(
                   width: 16,
                   height: 16,
                   child: CircularProgressIndicator(
@@ -1575,7 +1575,7 @@ class _StatCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             value,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.w900,
               color: KenwellColors.secondaryNavy,

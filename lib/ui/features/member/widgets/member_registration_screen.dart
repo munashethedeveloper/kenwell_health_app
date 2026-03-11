@@ -34,6 +34,7 @@ class MemberDetailsScreen extends StatelessWidget {
           return KenwellFormPage(
             title: 'Member Registration Form',
             sectionTitle: 'Section A: Member Registration',
+            sectionLabel: 'REGISTRATION',
             subtitle:
                 'Please complete the form below to register a new member.',
             formKey: vm.formKey,

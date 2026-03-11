@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/features/auth/view_models/auth_view_model.dart';
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
+import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/cards/kenwell_action_card.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/dialogs/confirmation_dialog.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
 import 'package:kenwell_health_app/ui/shared/ui/labels/kenwell_section_label.dart';
 import 'package:provider/provider.dart';
 
@@ -55,6 +55,10 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
     return Consumer<ProfileViewModel>(
       builder: (context, vm, _) => Scaffold(
         backgroundColor: KenwellColors.neutralBackground,
+        appBar: const KenwellAppBar(
+          title: 'KenWell365',
+          automaticallyImplyLeading: false,
+        ),
         body: vm.isLoadingProfile
             ? const Center(child: CircularProgressIndicator())
             : CustomScrollView(
@@ -68,12 +72,7 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
                     padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
                     sliver: SliverList(
                       delegate: SliverChildListDelegate([
-                        const KenwellModernSectionHeader(
-                          title: 'My Profile',
-                          subtitle: 'Manage your account settings',
-                          padding: EdgeInsets.zero,
-                        ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 4),
                         KenwellActionCard(
                           gradient: const LinearGradient(
                             colors: [Color(0xFF201C58), Color(0xFF3B3F86)],
@@ -121,9 +120,11 @@ class _ProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
+      margin: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+      padding: const EdgeInsets.all(10),
+      //width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
@@ -131,106 +132,107 @@ class _ProfileHeader extends StatelessWidget {
             Color(0xFF2E2880),
             KenwellColors.primaryGreenDark,
           ],
-          stops: [0.0, 0.55, 1.0],
+          stops: [0.0, 0.6, 1.0],
+
+          //stops: [0.0, 0.55, 1.0],
         ),
-        borderRadius: BorderRadius.only(
+        borderRadius: BorderRadius.circular(20),
+
+        /* borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(32),
           bottomRight: Radius.circular(32),
-        ),
+        ), */
       ),
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 20, 24, 36),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Section label
-              const KenwellSectionLabel(label: 'PROFILE'),
-              const SizedBox(height: 10),
-              const Text(
-                'My\nProfile',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w800,
-                  height: 1.2,
-                  letterSpacing: -0.5,
-                ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Section label
+            //  const KenwellSectionLabel(label: 'PROFILE'),
+            //  const SizedBox(height: 10),
+            const Text(
+              'My\nProfile',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 28,
+                fontWeight: FontWeight.w800,
+                height: 1.2,
+                letterSpacing: -0.5,
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Manage your personal details and preferences.',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.7),
-                  fontSize: 14,
-                ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Manage your personal details and preferences.',
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.7),
+                fontSize: 14,
               ),
-              const SizedBox(height: 20),
-              // Avatar row
-              Row(
-                children: [
-                  Container(
-                    width: 72,
-                    height: 72,
-                    decoration: BoxDecoration(
-                      color: KenwellColors.primaryGreen.withValues(alpha: 0.3),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.6), width: 2),
-                    ),
-                    child: Center(
-                      child: Text(
-                        vm.firstName.isNotEmpty
-                            ? vm.firstName[0].toUpperCase()
-                            : '?',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                        ),
+            ),
+            // const SizedBox(height: 20),
+            /*    // Avatar row
+            Row(
+              children: [
+                Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    color: KenwellColors.primaryGreen.withValues(alpha: 0.3),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.6), width: 2),
+                  ),
+                  child: Center(
+                    child: Text(
+                      vm.firstName.isNotEmpty
+                          ? vm.firstName[0].toUpperCase()
+                          : '?',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${vm.firstName} ${vm.lastName}'.trim(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${vm.firstName} ${vm.lastName}'.trim(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      if (vm.role.isNotEmpty) ...[
+                        const SizedBox(height: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            vm.role,
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
-                        if (vm.role.isNotEmpty) ...[
-                          const SizedBox(height: 6),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              vm.role,
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
                       ],
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ), */
+          ],
         ),
       ),
     );

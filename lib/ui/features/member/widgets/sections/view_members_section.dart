@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
 import 'package:provider/provider.dart';
 import '../../../../../domain/models/member.dart';
 import '../../../../../domain/constants/role_permissions.dart';
@@ -484,9 +483,13 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                     ),
                     const SizedBox(height: 32),
 
-                    const KenwellModernSectionHeader(
-                      title: 'View Registered Members',
-                      subtitle: 'Swipe on a member for options',
+                    const Text(
+                      'View Registered Members',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF201C58),
+                      ),
                     ),
 
                     const SizedBox(height: 16),

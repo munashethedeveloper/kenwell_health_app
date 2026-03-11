@@ -9,7 +9,7 @@ import '../../../shared/ui/form/kenwell_date_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_styles.dart';
 import '../../../shared/ui/form/kenwell_referral_card.dart';
-import '../../../shared/ui/form/kenwell_modern_section_header.dart';
+import '../../../shared/ui/headers/kenwell_gradient_header.dart';
 import '../../../shared/ui/form/kenwell_signature_actions.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../../../shared/models/nursing_referral_option.dart';
@@ -51,108 +51,113 @@ class HIVTestResultScreen extends StatelessWidget {
       // App bar
       appBar: appBar ??
           const KenwellAppBar(
-            title: 'HIV Test Results Form',
+            title: 'KenWell365',
             automaticallyImplyLeading: false,
-            backgroundColor: KenwellColors.primaryGreen,
           ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        // Form
-        child: Form(
-          key: viewModel.formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              //  Section Header
-              const KenwellModernSectionHeader(
-                title: 'Section C: HIV Test Results',
-                subtitle:
-                    'Please complete the form below to provide your HIV testing history and risk behaviors.',
-                uppercase: true,
-                icon: Icons.vaccines,
-              ),
-              // Spacing
-              const SizedBox(height: 16),
-              // Screening Test Card
-              KenwellFormCard(
-                title: 'Screening Test',
+      body: Column(
+        children: [
+          // ── Gradient section header ─────────────────────────────
+          const KenwellGradientHeader(
+            label: 'HIV RESULTS',
+            title: 'HIV Test\nResults',
+            subtitle:
+                'Section C: Record HIV testing history and risk behaviors',
+          ),
+          // ── Scrollable form ─────────────────────────────────────
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              // Form
+              child: Form(
+                key: viewModel.formKey,
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildTextField(
-                      label: 'Name of Test',
-                      controller: viewModel.screeningTestNameController,
-                      hint: 'Enter test name',
+                    const SizedBox(height: 8),
+                    // Screening Test Card
+                    KenwellFormCard(
+                      title: 'Screening Test',
+                      child: Column(
+                        children: [
+                          _buildTextField(
+                            label: 'Name of Test',
+                            controller: viewModel.screeningTestNameController,
+                            hint: 'Enter test name',
+                          ),
+                          const SizedBox(height: 12),
+                          _buildTextField(
+                            label: 'Batch No',
+                            controller: viewModel.screeningBatchNoController,
+                            hint: 'Enter batch number',
+                          ),
+                          const SizedBox(height: 12),
+                          _buildTextField(
+                            label: 'Expiry Date',
+                            controller: viewModel.screeningExpiryDateController,
+                            readOnly: true,
+                            hint: 'Select expiry date',
+                            suffixIcon: const Icon(Icons.calendar_today,
+                                color: KenwellColors.primaryGreenDark),
+                            onTap: () => viewModel.pickExpiryDate(context,
+                                isScreening: true),
+                          ),
+                          const SizedBox(height: 12),
+                          _buildDropdown(
+                            'Test Result',
+                            ['Negative', 'Positive'],
+                            viewModel.screeningResult,
+                            viewModel.setScreeningResult,
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 12),
-                    _buildTextField(
-                      label: 'Batch No',
-                      controller: viewModel.screeningBatchNoController,
-                      hint: 'Enter batch number',
-                    ),
-                    const SizedBox(height: 12),
-                    _buildTextField(
-                      label: 'Expiry Date',
-                      controller: viewModel.screeningExpiryDateController,
-                      readOnly: true,
-                      hint: 'Select expiry date',
-                      suffixIcon: const Icon(Icons.calendar_today,
-                          color: KenwellColors.primaryGreenDark),
-                      onTap: () =>
-                          viewModel.pickExpiryDate(context, isScreening: true),
-                    ),
-                    const SizedBox(height: 12),
-                    _buildDropdown(
-                      'Test Result',
-                      ['Negative', 'Positive'],
-                      viewModel.screeningResult,
-                      viewModel.setScreeningResult,
+                    const SizedBox(height: 24),
+                    // Confirmatory Test Card
+                    _buildInitialAssessment(viewModel),
+                    const SizedBox(height: 24),
+                    // Show referral card only for positive (at-risk) results;
+                    // hide it for negative results and show a healthy status banner
+                    if (viewModel.isAtRisk) ...[
+                      _buildReferrals(viewModel),
+                      const SizedBox(height: 24),
+                    ] else ...[
+                      _buildNegativeBanner(),
+                      const SizedBox(height: 24),
+                    ],
+                    // Nurse Details Card
+                    _buildNurseDetails(viewModel),
+                    const SizedBox(height: 24),
+                    // Signature Actions
+                    KenwellSignatureActions(
+                      title: 'Signature',
+                      controller: viewModel.signatureController,
+                      onClear: viewModel.clearSignature,
+                      navigation: KenwellFormNavigation(
+                        onPrevious: onPrevious,
+                        onNext: () {
+                          if (!viewModel.isFormValid) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content:
+                                    Text('Please complete all required fields'),
+                                duration: Duration(seconds: 3),
+                              ),
+                            );
+                            return;
+                          }
+                          viewModel.submitTestResult(context, onNext: onNext);
+                        },
+                        isNextBusy: viewModel.isSubmitting,
+                        isNextEnabled: !viewModel.isSubmitting,
+                        nextLabel: 'Submit',
+                      ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
-              // Confirmatory Test Card
-              _buildInitialAssessment(viewModel),
-              const SizedBox(height: 24),
-              // Show referral card only for positive (at-risk) results;
-              // hide it for negative results and show a healthy status banner
-              if (viewModel.isAtRisk) ...[
-                _buildReferrals(viewModel),
-                const SizedBox(height: 24),
-              ] else ...[
-                _buildNegativeBanner(),
-                const SizedBox(height: 24),
-              ],
-              // Nurse Details Card
-              _buildNurseDetails(viewModel),
-              const SizedBox(height: 24),
-              // Signature Actions
-              KenwellSignatureActions(
-                title: 'Signature',
-                controller: viewModel.signatureController,
-                onClear: viewModel.clearSignature,
-                navigation: KenwellFormNavigation(
-                  onPrevious: onPrevious,
-                  onNext: () {
-                    if (!viewModel.isFormValid) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Please complete all required fields'),
-                          duration: Duration(seconds: 3),
-                        ),
-                      );
-                      return;
-                    }
-                    viewModel.submitTestResult(context, onNext: onNext);
-                  },
-                  isNextBusy: viewModel.isSubmitting,
-                  isNextEnabled: !viewModel.isSubmitting,
-                  nextLabel: 'Submit',
-                ),
-              ),
-            ],
-          ),
-        ),
+            ),
+          )
+        ],
       ),
     );
   }

@@ -28,7 +28,7 @@ class HelpScreen extends StatelessWidget {
             return CustomScrollView(
               slivers: [
                 // ── Gradient section header ───────────────────────────────
-                SliverToBoxAdapter(child: const _HelpHeader()),
+                const SliverToBoxAdapter(child: _HelpHeader()),
                 // ── Help action cards ─────────────────────────────────────
                 SliverPadding(
                   padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
@@ -106,9 +106,11 @@ class _HelpHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
+      margin: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+      padding: const EdgeInsets.all(10),
+      //width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
@@ -116,21 +118,20 @@ class _HelpHeader extends StatelessWidget {
             Color(0xFF2E2880),
             KenwellColors.primaryGreenDark,
           ],
-          stops: [0.0, 0.55, 1.0],
+          stops: [0.0, 0.6, 1.0],
+
+          //stops: [0.0, 0.55, 1.0],
         ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(32),
-          bottomRight: Radius.circular(32),
-        ),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 20, 24, 36),
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Section label
-            const KenwellSectionLabel(label: 'SUPPORT'),
-            const SizedBox(height: 10),
+            // const KenwellSectionLabel(label: 'SUPPORT'),
+            // const SizedBox(height: 10),
             const Text(
               'Help &\nSupport',
               style: TextStyle(

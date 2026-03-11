@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
-
-import '../../../shared/ui/form/kenwell_modern_section_header.dart';
+import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 
 class HealthScreeningsScreen extends StatelessWidget {
   final bool hraEnabled;
@@ -48,66 +47,75 @@ class HealthScreeningsScreen extends StatelessWidget {
     return Scaffold(
       appBar: appBar ??
           const KenwellAppBar(
-            title: 'Health Screenings',
+            title: 'KenWell365',
           ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const KenwellModernSectionHeader(
-              title: 'Section C: Health Screenings',
-              subtitle: 'Complete the health screenings you have consented to.',
-              icon: Icons.medical_services,
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Select a screening to continue:',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
+      body: Column(
+        children: [
+          // ── Gradient section header ─────────────────────────────
+          const KenwellGradientHeader(
+            label: 'SCREENINGS',
+            title: 'Health\nScreenings',
+            subtitle:
+                'Section C: Complete the health screenings you have consented to.',
+          ),
+          // ── Scrollable content ──────────────────────────────────
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 8),
+                  Text(
+                    'Select a screening to continue:',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  if (hraEnabled) ...[
+                    _ScreeningCard(
+                      icon: Icons.psychology,
+                      title: 'Health Risk Assessment',
+                      isEnabled: hraEnabled,
+                      isCompleted: hraCompleted,
+                      onTap: onHraTap,
+                    ),
+                  ],
+                  if (hctEnabled) ...[
+                    _ScreeningCard(
+                      icon: Icons.vaccines,
+                      title: 'HCT Screening',
+                      isEnabled: hctEnabled,
+                      isCompleted: hctCompleted,
+                      onTap: onHctTap,
+                    ),
+                  ],
+                  if (tbEnabled) ...[
+                    _ScreeningCard(
+                      icon: Icons.healing,
+                      title: 'TB Screening',
+                      isEnabled: tbEnabled,
+                      isCompleted: tbCompleted,
+                      onTap: onTbTap,
+                    ),
+                    if (!cancerEnabled) const SizedBox(height: 24),
+                  ],
+                  if (cancerEnabled) ...[
+                    _ScreeningCard(
+                      icon: Icons.biotech,
+                      title: 'Cancer Screening',
+                      isEnabled: cancerEnabled,
+                      isCompleted: cancerCompleted,
+                      onTap: onCancerTap,
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+                ],
               ),
             ),
-            const SizedBox(height: 16),
-            if (hraEnabled) ...[
-              _ScreeningCard(
-                icon: Icons.psychology,
-                title: 'Health Risk Assessment',
-                isEnabled: hraEnabled,
-                isCompleted: hraCompleted,
-                onTap: onHraTap,
-              ),
-            ],
-            if (hctEnabled) ...[
-              _ScreeningCard(
-                icon: Icons.vaccines,
-                title: 'HCT Screening',
-                isEnabled: hctEnabled,
-                isCompleted: hctCompleted,
-                onTap: onHctTap,
-              ),
-            ],
-            if (tbEnabled) ...[
-              _ScreeningCard(
-                icon: Icons.healing,
-                title: 'TB Screening',
-                isEnabled: tbEnabled,
-                isCompleted: tbCompleted,
-                onTap: onTbTap,
-              ),
-              if (!cancerEnabled) const SizedBox(height: 24),
-            ],
-            if (cancerEnabled) ...[
-              _ScreeningCard(
-                icon: Icons.biotech,
-                title: 'Cancer Screening',
-                isEnabled: cancerEnabled,
-                isCompleted: cancerCompleted,
-                onTap: onCancerTap,
-              ),
-              const SizedBox(height: 24),
-            ],
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

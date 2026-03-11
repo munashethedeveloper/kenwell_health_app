@@ -10,7 +10,6 @@ import 'package:kenwell_health_app/domain/models/tb_screening.dart';
 import 'package:kenwell_health_app/domain/models/hiv_screening.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
-import '../../../shared/ui/form/kenwell_modern_section_header.dart';
 
 /// Displays health-screening-specific statistics for HRA, Cancer, TB and HCT.
 ///
@@ -341,11 +340,13 @@ class _HealthScreeningStatsSectionState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        KenwellModernSectionHeader(
-          title: 'Health Screening Analytics',
-          subtitle: widget.sectionSubtitle ??
-              'Statistics derived from HRA, Cancer, TB and HCT screenings',
-          icon: Icons.health_and_safety,
+        const Text(
+          'Health Screening Analytics',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF201C58),
+          ),
         ),
         const SizedBox(height: 16),
         if (!hasAnyData) ...[
