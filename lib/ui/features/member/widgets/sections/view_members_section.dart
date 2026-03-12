@@ -287,7 +287,7 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                   children: [
                     const SizedBox(height: 16),
 
-                    // Stats header
+                    /*  // Stats header
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: GradientContainer.purpleGreen(
@@ -325,71 +325,11 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                                 ],
                               ),
                             ),
-                            /*    Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                const Icon(
-                                  Icons.swipe_left_rounded,
-                                  color: Colors.white70,
-                                  size: 16,
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  'Swipe for options',
-                                  style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.7),
-                                    fontSize: 10,
-                                  ),
-                                ),
-                              ],
-                            ), */
                           ],
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    /*   // Section title
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: theme.primaryColor.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Icon(
-                              Icons.group_rounded,
-                              color: theme.primaryColor,
-                              size: 18,
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Registered Members',
-                                style: theme.textTheme.titleSmall?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                  color: const Color(0xFF201C58),
-                                ),
-                              ),
-                              Text(
-                                'Swipe or long-press for options',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: const Color(0xFF6B7280),
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
                     ), */
-                    // const SizedBox(height: 12),
+                    //const SizedBox(height: 16),
 
                     // Search and filter card
                     Container(
@@ -414,24 +354,6 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          /*       Row(
-                            children: [
-                              Icon(
-                                Icons.search_rounded,
-                                size: 18,
-                                color: theme.primaryColor,
-                              ),
-                              const SizedBox(width: 6),
-                              /*  Text(
-                                'Search Members',
-                                style: theme.textTheme.labelMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: const Color(0xFF201C58),
-                                ),
-                              ), */
-                            ],
-                          ), */
-                          //const SizedBox(height: 8),
                           Text(
                             'Search members:',
                             style: theme.textTheme.labelMedium?.copyWith(
@@ -483,7 +405,7 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                     ),
                     const SizedBox(height: 32),
 
-                    const Text(
+                    /* const Text(
                       'View Registered Members',
                       style: TextStyle(
                         fontSize: 16,
@@ -492,7 +414,7 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                       ),
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 16), */
                   ],
                 ),
               ),

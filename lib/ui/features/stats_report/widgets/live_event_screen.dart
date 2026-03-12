@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/headers/kenwell_gradient_header.dart';
 import 'event_stats_content.dart';
@@ -13,6 +14,12 @@ class LiveEventsScreen extends StatelessWidget {
     return Scaffold(
       appBar: KenwellAppBar(
         title: 'KenWell365',
+        backgroundColor: KenwellColors.primaryGreenDark,
+        titleStyle: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
         automaticallyImplyLeading: true,
         actions: [
           IconButton(

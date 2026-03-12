@@ -25,6 +25,11 @@ class RegistrationManagementScreenBody extends StatelessWidget {
         backgroundColor: KenwellColors.neutralBackground,
         appBar: const KenwellAppBar(
           title: 'KenWell365',
+          titleStyle: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
           automaticallyImplyLeading: false,
         ),
         body: vm.isLoadingProfile
@@ -48,18 +53,26 @@ class RegistrationManagementScreenBody extends StatelessWidget {
                               Expanded(
                                 child: _RegistrationGridCard(
                                   gradient: const LinearGradient(
+                                    /*  colors: [
+                                      Color(0xFF90C048),
+                                      Color(0xFF5E8C1F),
+                                    ], */
                                     colors: [
                                       Color(0xFF201C58),
                                       Color(0xFF3B3F86)
                                     ],
+                                    /* colors: [
+                                      Color(0xFF201C58),
+                                      Color(0xFF3B3F86)
+                                    ], */
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
                                   ),
                                   icon: Icons.manage_accounts_rounded,
-                                  title: 'User\nRegistration',
+                                  title: 'User\nManagement',
                                   subtitle:
-                                      'Register staff who manage wellness events.',
-                                  badgeLabel: 'Staff',
+                                      'Manage staff who oversee wellness events.',
+                                  //badgeLabel: 'Staff',
                                   onTap: () => context
                                       .pushNamed('userManagementVersionTwo'),
                                 ),
@@ -68,18 +81,22 @@ class RegistrationManagementScreenBody extends StatelessWidget {
                               Expanded(
                                 child: _RegistrationGridCard(
                                   gradient: const LinearGradient(
-                                    colors: [
+                                    /*   colors: [
                                       Color(0xFF90C048),
                                       Color(0xFF5E8C1F),
+                                    ], */
+                                    colors: [
+                                      Color(0xFF201C58),
+                                      Color(0xFF3B3F86)
                                     ],
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
                                   ),
                                   icon: Icons.group_add_rounded,
-                                  title: 'Member\nRegistration',
+                                  title: 'Member\nManagement',
                                   subtitle:
-                                      'Register participants in wellness events.',
-                                  badgeLabel: 'Members',
+                                      'Manage individuals who participate in wellness events.',
+                                  // badgeLabel: 'Members',
                                   onTap: () =>
                                       context.pushNamed('memberManagement'),
                                 ),
@@ -90,18 +107,23 @@ class RegistrationManagementScreenBody extends StatelessWidget {
                           // Row 2: Event Registration (full-width)
                           _RegistrationCard(
                             gradient: const LinearGradient(
-                              colors: [
+                              /*  colors: [
+                                Color(0xFF90C048),
+                                Color(0xFF5E8C1F),
+                              ], */
+                              colors: [Color(0xFF201C58), Color(0xFF3B3F86)],
+                              /*   colors: [
                                 Color(0xFF5B8DEF),
                                 Color(0xFF2563EB),
-                              ],
+                              ], */
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
                             icon: Icons.event_available_rounded,
-                            title: 'Event Registration',
+                            title: 'Event Management',
                             subtitle:
-                                'Browse upcoming wellness events and manage event schedules.',
-                            badgeLabel: 'Events',
+                                'Manage wellness event schedules and allocations.',
+                            // badgeLabel: 'Events',
                             onTap: () => context.pushNamed('calendar'),
                           ),
                         ],
@@ -138,16 +160,17 @@ class _RegistrationHeader extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
+      child: const Padding(
+        padding: EdgeInsets.fromLTRB(24, 16, 24, 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Section label
             // const KenwellSectionLabel(label: 'MANAGEMENT'),
             //  const SizedBox(height: 10),
-            const Text(
-              'Registration\nManagement',
+            Text(
+              // 'Wellness \nManagement',
+              'Wellness Management',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 28,
@@ -156,14 +179,14 @@ class _RegistrationHeader extends StatelessWidget {
                 letterSpacing: -0.5,
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Select a registration type to get started.',
+            // SizedBox(height: 8),
+            /*   Text(
+              'Manage and setup.',
               style: TextStyle(
                 color: Colors.white.withValues(alpha: 0.7),
                 fontSize: 14,
               ),
-            ),
+            ), */
           ],
         ),
       ),
@@ -177,7 +200,7 @@ class _RegistrationCard extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.subtitle,
-    required this.badgeLabel,
+    //required this.badgeLabel,
     required this.onTap,
   });
 
@@ -185,7 +208,7 @@ class _RegistrationCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
-  final String badgeLabel;
+  //final String badgeLabel;
   final VoidCallback onTap;
 
   @override
@@ -254,14 +277,14 @@ class _RegistrationCard extends StatelessWidget {
                                   .withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: Text(
+                            /*  child: Text(
                               badgeLabel,
                               style: const TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
                                 color: KenwellColors.primaryGreenDark,
                               ),
-                            ),
+                            ), */
                           ),
                         ],
                       ),
@@ -300,7 +323,7 @@ class _RegistrationGridCard extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.subtitle,
-    required this.badgeLabel,
+    // required this.badgeLabel,
     required this.onTap,
   });
 
@@ -308,7 +331,7 @@ class _RegistrationGridCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
-  final String badgeLabel;
+  //final String badgeLabel;
   final VoidCallback onTap;
 
   @override
@@ -362,7 +385,7 @@ class _RegistrationGridCard extends StatelessWidget {
                     color: KenwellColors.primaryGreen.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Text(
+                  /* child: Text(
                     badgeLabel,
                     style: const TextStyle(
                       fontSize: 9,
@@ -370,7 +393,7 @@ class _RegistrationGridCard extends StatelessWidget {
                       color: KenwellColors.primaryGreenDark,
                       letterSpacing: 0.5,
                     ),
-                  ),
+                  ), */
                 ),
                 const SizedBox(height: 8),
                 Text(

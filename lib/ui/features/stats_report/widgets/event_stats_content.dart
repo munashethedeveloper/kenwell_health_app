@@ -208,8 +208,8 @@ class _EventStatsContentState extends State<EventStatsContent> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // ── Hero banner ───────────────────────────────────────────────
-            _buildHeroBanner(events.length, participationRate, isLiveTab),
-            const SizedBox(height: 20),
+            // _buildHeroBanner(events.length, participationRate, isLiveTab),
+            // const SizedBox(height: 20),
 
             // ── Search + filter ───────────────────────────────────────────
             Row(
@@ -405,7 +405,7 @@ class _EventStatsContentState extends State<EventStatsContent> {
                   icon: Icons.flag_outlined,
                   title: 'Expected',
                   value: totalExpected.toString(),
-                  color: KenwellColors.secondaryNavy,
+                  color: KenwellColors.primaryGreen,
                 ),
               ),
               const SizedBox(width: 12),
@@ -414,7 +414,8 @@ class _EventStatsContentState extends State<EventStatsContent> {
                   icon: Icons.how_to_reg_outlined,
                   title: 'Registered',
                   value: _isLoadingMembers ? '...' : _totalMembers.toString(),
-                  color: const Color(0xFF6A1B9A),
+                  //color: const Color(0xFF6A1B9A),
+                  color: KenwellColors.primaryGreen,
                 ),
               ),
             ]),
@@ -425,7 +426,7 @@ class _EventStatsContentState extends State<EventStatsContent> {
                   icon: Icons.health_and_safety_outlined,
                   title: 'Screened',
                   value: totalScreened.toString(),
-                  color: KenwellColors.primaryGreenDark,
+                  color: KenwellColors.primaryGreen,
                 ),
               ),
               const SizedBox(width: 12),
@@ -524,7 +525,7 @@ class _EventStatsContentState extends State<EventStatsContent> {
                           gradient: LinearGradient(
                             colors: isLiveTab
                                 ? [
-                                    const Color(0xFF059669),
+                                    KenwellColors.primaryGreen,
                                     const Color(0xFF065F46)
                                   ]
                                 : [
@@ -630,7 +631,7 @@ class _EventStatsContentState extends State<EventStatsContent> {
                                         gradient: LinearGradient(
                                           colors: isLiveTab
                                               ? [
-                                                  const Color(0xFF059669),
+                                                  KenwellColors.primaryGreen,
                                                   const Color(0xFF065F46)
                                                 ]
                                               : [
@@ -712,7 +713,7 @@ class _EventStatsContentState extends State<EventStatsContent> {
                                         gradient: LinearGradient(
                                           colors: isLiveTab
                                               ? [
-                                                  const Color(0xFF059669),
+                                                  KenwellColors.primaryGreen,
                                                   const Color(0xFF065F46)
                                                 ]
                                               : [
@@ -752,7 +753,7 @@ class _EventStatsContentState extends State<EventStatsContent> {
     );
   }
 
-  Widget _buildHeroBanner(
+  /*  Widget _buildHeroBanner(
       int eventCount, String participationRate, bool isLiveTab) {
     return Container(
       padding: const EdgeInsets.all(22),
@@ -760,9 +761,9 @@ class _EventStatsContentState extends State<EventStatsContent> {
         gradient: LinearGradient(
           colors: isLiveTab
               ? [
+                  KenwellColors.primaryGreenDark,
                   const Color(0xFF065F46),
-                  const Color(0xFF059669),
-                  const Color(0xFF3B3F86),
+                  const Color(0xFF064E3B)
                 ]
               : [
                   KenwellColors.secondaryNavy,
@@ -884,7 +885,7 @@ class _EventStatsContentState extends State<EventStatsContent> {
         ],
       ),
     );
-  }
+  } */
 
   void _showFilterBottomSheet(
       BuildContext context, ThemeData theme, List<WellnessEvent> allEvents) {
@@ -1479,7 +1480,9 @@ class _ScreeningCountCard extends StatelessWidget {
         color: theme.primaryColor.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-            color: const Color(0xFF6A1B9A).withValues(alpha: 0.45), width: 1.5),
+            // color: const Color(0xFF6A1B9A).withValues(alpha: 0.45), width: 1.5),
+            color: KenwellColors.primaryGreen.withValues(alpha: 0.45),
+            width: 1.5),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

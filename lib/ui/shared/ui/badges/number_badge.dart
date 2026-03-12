@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 
 /// A circular badge displaying a number
 /// Used for sequential numbering in lists
@@ -22,7 +23,9 @@ class NumberBadge extends StatelessWidget {
       decoration: BoxDecoration(
         //color: KenwellColors.secondaryNavy.withValues(alpha: 0.15),
 
-        color: theme.primaryColor.withValues(alpha: 0.15),
+        //   color: theme.primaryColor.withValues(alpha: 0.15),
+        color: KenwellColors.secondaryNavyDark.withValues(alpha: 0.15),
+
         shape: BoxShape.circle,
       ),
       alignment: Alignment.center,
@@ -30,8 +33,8 @@ class NumberBadge extends StatelessWidget {
         '$number',
         style: theme.textTheme.labelSmall?.copyWith(
           fontWeight: FontWeight.bold,
-          color: theme.primaryColor,
-          //color: KenwellColors.secondaryNavy,
+          //color: theme.primaryColor,
+          color: KenwellColors.secondaryNavyDark,
         ),
       ),
     );

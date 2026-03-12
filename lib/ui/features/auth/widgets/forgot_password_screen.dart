@@ -3,7 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
 import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
+import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
 import '../../../../data/services/auth_service.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
@@ -102,17 +104,24 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return Scaffold(
       appBar: const KenwellAppBar(
         title: 'KenWell365',
+        titleStyle: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
         automaticallyImplyLeading: true,
       ),
       backgroundColor: KenwellColors.neutralBackground,
       body: Column(
         children: [
-          // ── Gradient section header ───────────────────────────────
+          const SizedBox(height: 10),
+          const AppLogo(size: 200),
+          /*  // ── Gradient section header ───────────────────────────────
           const KenwellGradientHeader(
             label: 'ACCOUNT RECOVERY',
             title: 'Forgot\nPassword?',
             subtitle: 'Enter your email and we\'ll send you a reset link.',
-          ),
+          ), */
 
           // ── Form section ──────────────────────────────────────────
           Expanded(
@@ -123,14 +132,24 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    /*  const Text(
                       'Enter the email associated with your account.',
                       style: TextStyle(
                         fontSize: 14,
                         color: Color(0xFF6B7280),
                       ),
                     ),
-                    const SizedBox(height: 28),
+                    const SizedBox(height: 28), */
+
+                    // Section header
+                    const KenwellModernSectionHeader(
+                      title: 'Forgot Password',
+                      subtitle:
+                          'Enter your email and we\'ll send you a reset link.',
+                      icon: Icons.lock_reset,
+                    ),
+                    const SizedBox(height: 40),
+
                     // Email field
                     KenwellTextField(
                       label: 'Email',

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 import 'package:provider/provider.dart';
 import '../../../../domain/constants/role_permissions.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
@@ -142,7 +143,7 @@ class _UserManagementScreenVersionTwoState
             length: tabs.length,
             child: Scaffold(
               appBar: KenwellAppBar(
-                title: 'User Management',
+                title: 'KenWell365',
                 //titleColor: const Color(0xFF201C58),
                 titleColor: Colors.white,
                 titleStyle: const TextStyle(
@@ -223,54 +224,9 @@ class _UserManagementScreenVersionTwoState
 
                   return Column(
                     children: [
-                      // ── Gradient section header ────────────────────────
-                      Container(
-                        margin: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-                        padding: const EdgeInsets.all(10),
-                        //width: double.infinity,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              KenwellColors.secondaryNavy,
-                              Color(0xFF2E2880),
-                              KenwellColors.primaryGreenDark,
-                            ],
-                            stops: [0.0, 0.6, 1.0],
-
-                            //stops: [0.0, 0.55, 1.0],
-                          ),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              //const KenwellSectionLabel(label: 'USERS'),
-                              // const SizedBox(height: 10),
-                              const Text(
-                                'User\nManagement',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.w800,
-                                  height: 1.2,
-                                  letterSpacing: -0.5,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Create and view registered users.',
-                                style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.7),
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                      const KenwellGradientHeader(
+                        title: 'User Management',
+                        subtitle: 'Create and view registered users',
                       ),
                       Expanded(
                         child: TabBarView(

@@ -13,6 +13,11 @@ class PastEventsScreen extends StatelessWidget {
     return Scaffold(
       appBar: KenwellAppBar(
         title: 'KenWell365',
+        titleStyle: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
         automaticallyImplyLeading: true,
         actions: [
           IconButton(

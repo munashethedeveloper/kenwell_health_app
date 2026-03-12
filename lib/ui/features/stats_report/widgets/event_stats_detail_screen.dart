@@ -22,6 +22,11 @@ class EventStatsDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: const KenwellAppBar(
         title: 'KenWell365',
+        titleStyle: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
         automaticallyImplyLeading: true,
       ),
       body: Column(

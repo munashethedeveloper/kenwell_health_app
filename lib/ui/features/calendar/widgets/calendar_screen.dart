@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../../../domain/models/wellness_event.dart';
@@ -162,54 +163,9 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                 ? const Center(child: CircularProgressIndicator())
                 : Column(
                     children: [
-                      // ── Gradient section header ──────────────────────────
-                      Container(
-                        margin: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-                        padding: const EdgeInsets.all(10),
-                        //width: double.infinity,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              KenwellColors.secondaryNavy,
-                              Color(0xFF2E2880),
-                              KenwellColors.primaryGreenDark,
-                            ],
-                            stops: [0.0, 0.6, 1.0],
-
-                            // stops: [0.0, 0.55, 1.0],
-                          ),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const KenwellSectionLabel(label: 'CALENDAR'),
-                              const SizedBox(height: 10),
-                              const Text(
-                                'Events\nCalendar',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.w800,
-                                  height: 1.2,
-                                  letterSpacing: -0.5,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'View and manage your wellness events.',
-                                style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.7),
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                      const KenwellGradientHeader(
+                        title: 'Event Management',
+                        subtitle: 'View and manage your wellness events',
                       ),
                       // Show error banner if there's an error, but still show calendar
                       if (viewModel.error != null)
@@ -347,42 +303,6 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          /*   const SizedBox(height: 16),
-          // Centered welcome header
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: KenwellColors.primaryGreen.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Icon(Icons.calendar_month_rounded,
-                      color: KenwellColors.primaryGreen, size: 28),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  _getWelcomeTitle(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF201C58),
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'View and manage your wellness events.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
-                ),
-              ],
-            ),
-          ), */
           const SizedBox(height: 20),
           // Stats strip: events this month and upcoming events
           Padding(
@@ -398,13 +318,12 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                   //color: const Color(0xFF90C048),
                 ),
                 const SizedBox(width: 10),
-                _buildStatChip(
-                  context,
-                  icon: Icons.upcoming_rounded,
-                  label: 'Upcoming Month\'s',
-                  value: '$upcomingEventsCount',
-                  color: const Color(0xFF201C58),
-                ),
+                _buildStatChip(context,
+                    icon: Icons.upcoming_rounded,
+                    label: 'Upcoming Month\'s',
+                    value: '$upcomingEventsCount',
+                    //color: const Color(0xFF201C58),
+                    color: KenwellColors.secondaryNavy),
               ],
             ),
           ),
@@ -637,10 +556,12 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
+            gradient: const LinearGradient(
               colors: [
-                KenwellColors.secondaryNavy.withValues(alpha: 0.08),
-                KenwellColors.secondaryNavy.withValues(alpha: 0.02),
+                KenwellColors.secondaryNavy,
+                Color(0xFF2E2880),
+                /*  KenwellColors.secondaryNavy.withValues(alpha: 0.08),
+                KenwellColors.secondaryNavy.withValues(alpha: 0.02), */
                 //theme.primaryColor.withValues(alpha: 0.08),
                 //theme.primaryColor.withValues(alpha: 0.02),
               ],
@@ -675,7 +596,8 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF201C58),
+                  // color: Color(0xFF201C58),
+                  color: Colors.white,
                   letterSpacing: -0.5,
                 ),
               ),

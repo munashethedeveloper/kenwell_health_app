@@ -19,6 +19,11 @@ class StatsReportScreen extends StatelessWidget {
       backgroundColor: KenwellColors.neutralBackground,
       appBar: const KenwellAppBar(
         title: 'KenWell365',
+        titleStyle: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
         automaticallyImplyLeading: false,
       ),
       body: CustomScrollView(
@@ -35,12 +40,13 @@ class StatsReportScreen extends StatelessWidget {
                   Expanded(
                     child: _StatsGridCard(
                       gradient: const LinearGradient(
-                        colors: [Color(0xFF059669), Color(0xFF065F46)],
+                        //colors: [Color(0xFF059669), Color(0xFF065F46)],
+                        colors: [Color(0xFF201C58), Color(0xFF3B3F86)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                       icon: Icons.play_circle_outline_rounded,
-                      title: 'Live Stats',
+                      title: 'Live Wellness Stats',
                       subtitle: 'Real-time stats for in-progress events.',
                       badgeLabel: 'Live',
                       onTap: () => context.pushNamed('liveEvents'),
@@ -55,7 +61,7 @@ class StatsReportScreen extends StatelessWidget {
                         end: Alignment.bottomRight,
                       ),
                       icon: Icons.history_rounded,
-                      title: 'Past Events',
+                      title: 'Past Wellness Stats',
                       subtitle: 'Outcomes from completed events.',
                       badgeLabel: 'History',
                       onTap: () => context.pushNamed('pastEvents'),
@@ -101,16 +107,17 @@ class _StatsHeader extends StatelessWidget {
           bottomRight: Radius.circular(32),
         ), */
       ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
+      child: const Padding(
+        padding: EdgeInsets.fromLTRB(24, 16, 24, 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Section label
             //const KenwellSectionLabel(label: 'ANALYTICS'),
             //const SizedBox(height: 10),
-            const Text(
-              'Stats &\nReports',
+            Text(
+              // 'Wellness \nStatistics',
+              'Wellness Statistics',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 28,
@@ -119,14 +126,14 @@ class _StatsHeader extends StatelessWidget {
                 letterSpacing: -0.5,
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
+            //SizedBox(height: 8),
+            /*   Text(
               'Select a category to explore wellness event data.',
               style: TextStyle(
                 color: Colors.white.withValues(alpha: 0.7),
                 fontSize: 14,
               ),
-            ),
+            ), */
           ],
         ),
       ),

@@ -9,11 +9,15 @@ class CustomPrimaryButton extends StatelessWidget {
     this.backgroundColor,
     this.foregroundColor,
     this.minHeight = 50,
-    this.padding = const EdgeInsets.symmetric(vertical: 14),
+    this.padding = const EdgeInsets.symmetric(vertical: 24),
     this.leading,
     this.labelStyle,
     this.iconGap = 8,
-    this.fullWidth = true,
+    this.fullWidth = false,
+    this.margin,
+    this.minWidth = 600,
+    this.maxWidthFactor = 0.8,
+    //this.maxWidthFactor = 2.0,
   });
 
   final String label;
@@ -27,6 +31,9 @@ class CustomPrimaryButton extends StatelessWidget {
   final TextStyle? labelStyle;
   final double iconGap;
   final bool fullWidth;
+  final EdgeInsetsGeometry? margin;
+  final double minWidth;
+  final double maxWidthFactor;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +45,7 @@ class CustomPrimaryButton extends StatelessWidget {
 
     final bool isDisabled = onPressed == null || isBusy;
 
-    return FilledButton(
+    final button = FilledButton(
       onPressed: isDisabled ? null : onPressed,
       style: FilledButton.styleFrom(
         backgroundColor: resolvedBackground,
@@ -46,7 +53,7 @@ class CustomPrimaryButton extends StatelessWidget {
         minimumSize: Size(fullWidth ? double.infinity : 0, minHeight),
         padding: padding,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12), // M3 standard radius
+          borderRadius: BorderRadius.circular(12),
         ),
       ),
       child: isBusy
@@ -60,6 +67,26 @@ class CustomPrimaryButton extends StatelessWidget {
             )
           : _buildLabel(resolvedForeground),
     );
+
+    final constrained = fullWidth
+        ? button
+        : Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minWidth: minWidth,
+                maxWidth: MediaQuery.of(context).size.width * maxWidthFactor,
+              ),
+              child: button,
+            ),
+          );
+
+    if (margin != null) {
+      return Padding(
+        padding: margin!,
+        child: constrained,
+      );
+    }
+    return constrained;
   }
 
   Widget _buildLabel(Color resolvedForeground) {

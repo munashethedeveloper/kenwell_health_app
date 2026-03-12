@@ -67,7 +67,7 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 20),
-                  const Text(
+                  /* const Text(
                     'New Member Registration',
                     style: TextStyle(
                       fontSize: 18,
@@ -75,7 +75,7 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
                       color: Color(0xFF201C58),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 24), */
                   KenwellFormCard(
                     title: 'Basic Information',
                     margin: const EdgeInsets.only(bottom: 16),

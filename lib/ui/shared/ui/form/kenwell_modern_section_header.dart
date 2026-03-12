@@ -14,7 +14,7 @@ class KenwellModernSectionHeader extends StatelessWidget {
     this.subtitle,
     this.label,
     this.icon = Icons.list_alt_rounded,
-    this.padding = const EdgeInsets.symmetric(horizontal: 16),
+    this.padding = const EdgeInsets.symmetric(horizontal: 8),
     this.textAlign = TextAlign.start,
     this.uppercase = false,
     this.color,

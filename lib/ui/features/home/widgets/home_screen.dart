@@ -4,7 +4,9 @@ import 'package:kenwell_health_app/ui/features/calendar/view_model/calendar_view
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 import 'package:kenwell_health_app/ui/shared/ui/labels/kenwell_section_label.dart';
+import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -45,6 +47,11 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: KenwellColors.neutralBackground,
           appBar: const KenwellAppBar(
             title: 'KenWell365',
+            titleStyle: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
             automaticallyImplyLeading: false,
           ),
           body: RefreshIndicator(
@@ -54,7 +61,32 @@ class _HomeScreenState extends State<HomeScreen> {
             color: KenwellColors.primaryGreen,
             child: CustomScrollView(
               slivers: [
-                // ── Hero Header ──────────────────────────────────────────
+                // ── Welcome Banner ───────────────────────────────────────
+                const SliverToBoxAdapter(
+                  // child: Padding(
+                  //padding: EdgeInsets.only(top: 10),
+                  //child: AppLogo(size: 200),
+                  child: KenwellGradientHeader(
+                    title: 'Home Dashboard',
+                    subtitle: 'Wellness 365 days a year',
+                    // ),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.only(top: 10, bottom: 20, left: 20),
+                    child: Text(
+                      '${_greeting()}, ${firstName.isNotEmpty ? firstName : 'there'}',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: KenwellColors.secondaryNavy,
+                      ),
+                    ),
+                  ),
+                ),
+                /*   // ── Hero Header ──────────────────────────────────────────
                 SliverToBoxAdapter(
                   child: _HeroHeader(
                     greeting: _greeting(),
@@ -62,12 +94,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     role: role,
                     date: now,
                   ),
-                ),
+                ), */
 
-                // ── Welcome Banner ───────────────────────────────────────
+                /*        // ── Welcome Banner ───────────────────────────────────────
                 SliverToBoxAdapter(
                   child: _WelcomeBanner(role: role),
-                ),
+                ), */
 
                 // ── Notifications Section ────────────────────────────────
                 SliverToBoxAdapter(
@@ -493,7 +525,7 @@ class _NotificationsSection extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Notifications',
+                    'Pending Notifications',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,

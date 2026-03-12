@@ -154,7 +154,7 @@ class _CreateUserSectionState extends State<CreateUserSection> {
                 children: [
                   const SizedBox(height: 20),
 
-                  const Text(
+                  /*   const Text(
                     'New User Registration',
                     style: TextStyle(
                       fontSize: 18,
@@ -162,12 +162,12 @@ class _CreateUserSectionState extends State<CreateUserSection> {
                       color: Color(0xFF201C58),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 24), */
 
                   // ── Personal Information card with purple gradient border ──
                   KenwellFormCard(
                     title: 'Personal Information',
-                    titleIcon: Icons.person_outline_rounded,
+                    //titleIcon: Icons.person_outline_rounded,
                     accentBorderGradient: _purpleBorderGradient,
                     margin: const EdgeInsets.only(bottom: 20),
                     child: Column(
@@ -215,7 +215,7 @@ class _CreateUserSectionState extends State<CreateUserSection> {
                   // ── Account Credentials card with purple gradient border ──
                   KenwellFormCard(
                     title: 'Account Credentials',
-                    titleIcon: Icons.lock_outline_rounded,
+                    //titleIcon: Icons.lock_outline_rounded,
                     accentBorderGradient: _purpleBorderGradient,
                     margin: const EdgeInsets.only(bottom: 24),
                     child: Column(

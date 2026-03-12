@@ -74,7 +74,7 @@ class EventDetailsScreen extends StatelessWidget {
         children: [
           // ── Gradient section header ─────────────────────────────
           KenwellGradientHeader(
-            label: 'DETAILS',
+            //   label: 'EVENT DETAILS',
             title: '$eventTitleCapitalized\nEvent Details',
             subtitle: 'Detailed information about the $eventTitle event',
           ),
@@ -83,7 +83,7 @@ class EventDetailsScreen extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                Container(
+                /*  Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -118,7 +118,7 @@ class EventDetailsScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 14),
-                      Expanded(
+                      /*    Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -140,11 +140,11 @@ class EventDetailsScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                      ),
+                      ), */
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 20), */
                 // Event detail sections
                 _buildSectionCard(
                   'Client Organization',

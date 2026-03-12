@@ -331,7 +331,9 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: KenwellColors.primaryGreen.withValues(alpha: 0.4),
+                color: KenwellColors.secondaryNavyDark.withValues(alpha: 0.4),
+                //color: KenwellColors.primaryGreen.withValues(alpha: 0.4),
+
                 width: 1.5,
               ),
               boxShadow: [
@@ -351,7 +353,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                     const SizedBox(width: 10),
                   ],
 
-                  // Avatar
+                  /*  // Avatar
                   Container(
                     width: 46,
                     height: 46,
@@ -365,7 +367,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                       size: 22,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 12), */
 
                   // User Info
                   Expanded(
@@ -376,7 +378,8 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                           '${user.firstName} ${user.lastName}',
                           style: theme.textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.w700,
-                            color: const Color(0xFF201C58),
+                            //color: const Color(0xFF201C58),
+                            color: KenwellColors.secondaryNavyDark,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -394,7 +397,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                               child: Text(
                                 user.email,
                                 style: theme.textTheme.bodySmall?.copyWith(
-                                  color: const Color(0xFF6B7280),
+                                  color: KenwellColors.secondaryNavyDark,
                                   fontSize: 12,
                                 ),
                                 maxLines: 1,
@@ -633,9 +636,10 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                 // ── Gradient section header ───────────────────────────
                 SliverToBoxAdapter(
                   child: KenwellGradientHeader(
-                    label: 'ALLOCATE',
+                    // label: 'ALLOCATE',
                     title: 'Allocate\nEvent',
-                    subtitle: widget.event.title,
+                    subtitle:
+                        'Allocate users to the ${widget.event.title} event',
                   ),
                 ),
                 SliverToBoxAdapter(
@@ -644,7 +648,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                     children: [
                       const SizedBox(height: 16),
 
-                      // Stats header
+                      /*  // Stats header
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: GradientContainer.purpleGreen(
@@ -718,30 +722,12 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                                   ],
                                 ),
                               ),
-                              /*  Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  const Icon(
-                                    Icons.swipe_left_rounded,
-                                    color: Colors.white70,
-                                    size: 16,
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    'Swipe for options',
-                                    style: TextStyle(
-                                      color:
-                                          Colors.white.withValues(alpha: 0.7),
-                                      fontSize: 10,
-                                    ),
-                                  ),
-                                ],
-                              ), */
+                      
                             ],
                           ),
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 16), */
 
                       /*             // Section title
                       Padding(

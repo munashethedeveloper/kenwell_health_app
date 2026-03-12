@@ -3,7 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
 import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
+import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
 import '../../../../data/repositories_dcl/auth_repository_dcl.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
@@ -114,17 +116,26 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
       return Scaffold(
         appBar: const KenwellAppBar(
           title: 'KenWell365',
+          titleStyle: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+          // titleColor: Colors.white,
           automaticallyImplyLeading: false,
         ),
         backgroundColor: KenwellColors.neutralBackground,
         body: Column(
           children: [
-            // ── Gradient section header ─────────────────────────────
+            const SizedBox(height: 10),
+            const AppLogo(size: 200),
+            /*   // ── Gradient section header ─────────────────────────────
             const KenwellGradientHeader(
               label: 'LOGIN',
               title: 'Welcome\nBack',
+             // title: 'Login',
               subtitle: 'Supporting wellbeing, 365 days a year.',
-            ),
+            ), */
 
             // ── Form section — white scrollable panel ───────────────
             Expanded(
@@ -135,14 +146,21 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      // Section header
+                      const KenwellModernSectionHeader(
+                        title: 'Sign in',
+                        subtitle:
+                            'Access your account and manage your wellbeing.',
+                        icon: Icons.waving_hand,
+                      ),
+                      /*  const Text(
                         'Sign in to your account',
                         style: TextStyle(
                           fontSize: 14,
                           color: Color(0xFF6B7280),
                         ),
-                      ),
-                      const SizedBox(height: 28),
+                      ), */
+                      const SizedBox(height: 40),
                       // Email field
                       KenwellTextField(
                         label: "Email",
@@ -188,6 +206,8 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
                       // Login button
                       CustomPrimaryButton(
                         label: "Login",
+                        // minimumSize: 20,
+                        minHeight: 20,
                         labelStyle: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

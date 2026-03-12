@@ -201,8 +201,8 @@ class _EventScreenState extends State<EventScreen> {
         children: [
           // ── Gradient section header ───────────────────────────────
           KenwellGradientHeader(
-            label: isEditMode ? 'EDIT EVENT' : 'EVENT',
-            title: isEditMode ? 'Edit\nEvent' : 'Add New\nEvent',
+            // label: isEditMode ? 'EDIT EVENT' : 'EVENT',
+            title: isEditMode ? 'Edit Event' : 'Add New Event',
             subtitle: isEditMode
                 ? 'Update the event details below'
                 : 'Complete the form to add a new event',

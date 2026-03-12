@@ -20,6 +20,10 @@ class HelpScreen extends StatelessWidget {
       child: Scaffold(
         appBar: const KenwellAppBar(
           title: 'KenWell365',
+          titleStyle: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
           automaticallyImplyLeading: true,
         ),
         // Body of the screen
@@ -34,7 +38,7 @@ class HelpScreen extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
-                      KenwellActionCard(
+                      /*  KenwellActionCard(
                         gradient: const LinearGradient(
                           colors: [Color(0xFF201C58), Color(0xFF3B3F86)],
                           begin: Alignment.topLeft,
@@ -47,10 +51,14 @@ class HelpScreen extends StatelessWidget {
                         badgeLabel: 'Info',
                         onTap: () {},
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 16), */
                       KenwellActionCard(
                         gradient: const LinearGradient(
-                          colors: [Color(0xFF90C048), Color(0xFF5E8C1F)],
+                          colors: [
+                            KenwellColors.secondaryNavy,
+                            Color(0xFF2E2880),
+                          ],
+                          //colors: [Color(0xFF90C048), Color(0xFF5E8C1F)],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -63,7 +71,11 @@ class HelpScreen extends StatelessWidget {
                       const SizedBox(height: 16),
                       KenwellActionCard(
                         gradient: const LinearGradient(
-                          colors: [Color(0xFF5B8DEF), Color(0xFF2563EB)],
+                          colors: [
+                            KenwellColors.secondaryNavy,
+                            Color(0xFF2E2880),
+                          ],
+                          //colors: [Color(0xFF5B8DEF), Color(0xFF2563EB)],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -77,7 +89,11 @@ class HelpScreen extends StatelessWidget {
                       const SizedBox(height: 16),
                       KenwellActionCard(
                         gradient: const LinearGradient(
-                          colors: [Color(0xFF059669), Color(0xFF065F46)],
+                          colors: [
+                            KenwellColors.secondaryNavy,
+                            Color(0xFF2E2880),
+                          ],
+                          //colors: [Color(0xFF059669), Color(0xFF065F46)],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -87,6 +103,8 @@ class HelpScreen extends StatelessWidget {
                         badgeLabel: 'Legal',
                         onTap: viewModel.openTermsAndPrivacy,
                       ),
+                      const SizedBox(height: 16),
+                      const _WelcomeBanner(),
                     ]),
                   ),
                 ),
@@ -153,6 +171,109 @@ class _HelpHeader extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _WelcomeBanner extends StatelessWidget {
+  const _WelcomeBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<HelpScreenViewModel>(
+      builder: (context, viewModel, _) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  KenwellColors.secondaryNavy,
+                  Color(0xFF2E2880),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: KenwellColors.secondaryNavy.withValues(alpha: 0.3),
+                  blurRadius: 16,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'About KenWell365:',
+                        style: TextStyle(
+                          color: KenwellColors.primaryGreenLight,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.0,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        'Corporate Wellness Management Platform',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          height: 1.25,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Empowering organisations to deliver world-class wellness programmes.',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.65),
+                          fontSize: 12,
+                          height: 1.5,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        'Version: '
+                        '${viewModel.appVersion.isNotEmpty ? viewModel.appVersion : 'Loading...'}'
+                        ' · Developer: ${viewModel.developer}',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.65),
+                          fontSize: 12,
+                          height: 1.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                /*   const SizedBox(width: 16),
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: KenwellColors.primaryGreen.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: KenwellColors.primaryGreen.withValues(alpha: 0.4),
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.health_and_safety_rounded,
+                    color: KenwellColors.primaryGreenLight,
+                    size: 34,
+                  ),
+                ), */
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

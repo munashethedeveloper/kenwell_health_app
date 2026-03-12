@@ -78,7 +78,7 @@ class KenwellAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: useGradient
           ? Colors.transparent
           : (backgroundColor ?? KenwellColors.primaryGreen),
-      foregroundColor: titleColor ?? Colors.white,
+      foregroundColor: Colors.white,
       elevation: 0,
       actions: actions,
       bottom: bottom,

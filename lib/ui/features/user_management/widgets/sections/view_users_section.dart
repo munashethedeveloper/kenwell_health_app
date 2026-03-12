@@ -369,7 +369,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                   children: [
                     const SizedBox(height: 16),
 
-                    // ── Premium Stats Header ──────────────────────────────
+                    /*     // ── Premium Stats Header ──────────────────────────────
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Container(
@@ -465,7 +465,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 16), */
 
                     // ── Premium Search & Filter Card ──────────────────────
                     Container(
@@ -564,7 +564,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
 
                     const SizedBox(height: 24),
 
-                    // ── Section title ─────────────────────────────────────
+                    /*     // ── Section title ─────────────────────────────────────
                     const Text(
                       'View Registered Users',
                       style: TextStyle(
@@ -574,7 +574,7 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                       ),
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 16), */
                   ],
                 ),
               ),

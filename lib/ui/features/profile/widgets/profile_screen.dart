@@ -121,6 +121,11 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
         backgroundColor: KenwellColors.neutralBackground,
         appBar: KenwellAppBar(
           title: 'KenWell365',
+          titleStyle: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
           automaticallyImplyLeading: true,
           actions: [
             IconButton(
@@ -155,7 +160,7 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
           children: [
             // ── Gradient section header ─────────────────────────────
             const KenwellGradientHeader(
-              label: 'PROFILE',
+              //label: 'MY PROFILE',
               title: 'Edit\nProfile',
               subtitle: 'Update your personal information',
             ),

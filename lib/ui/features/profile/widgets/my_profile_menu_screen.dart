@@ -57,6 +57,11 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
         backgroundColor: KenwellColors.neutralBackground,
         appBar: const KenwellAppBar(
           title: 'KenWell365',
+          titleStyle: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
           automaticallyImplyLeading: false,
         ),
         body: vm.isLoadingProfile
@@ -82,20 +87,21 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
                           icon: Icons.person_outline_rounded,
                           title: 'Edit Profile',
                           subtitle: 'Update your personal information',
-                          badgeLabel: 'Account',
+                          // badgeLabel: 'Account',
                           onTap: () => context.pushNamed('profile'),
                         ),
                         const SizedBox(height: 16),
                         KenwellActionCard(
                           gradient: const LinearGradient(
-                            colors: [Color(0xFF90C048), Color(0xFF5E8C1F)],
+                            colors: [Color(0xFF201C58), Color(0xFF3B3F86)],
+                            // colors: [Color(0xFF90C048), Color(0xFF5E8C1F)],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           icon: Icons.help_outline_rounded,
                           title: 'Help & Support',
                           subtitle: 'Get assistance and FAQs',
-                          badgeLabel: 'Support',
+                          //badgeLabel: 'Support',
                           onTap: () => context.pushNamed('help'),
                         ),
                         const SizedBox(height: 16),
@@ -143,16 +149,16 @@ class _ProfileHeader extends StatelessWidget {
           bottomRight: Radius.circular(32),
         ), */
       ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
+      child: const Padding(
+        padding: EdgeInsets.fromLTRB(24, 16, 24, 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Section label
             //  const KenwellSectionLabel(label: 'PROFILE'),
             //  const SizedBox(height: 10),
-            const Text(
-              'My\nProfile',
+            Text(
+              'My Profile',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 28,
@@ -161,14 +167,14 @@ class _ProfileHeader extends StatelessWidget {
                 letterSpacing: -0.5,
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
+            // SizedBox(height: 8),
+            /*  Text(
               'Manage your personal details and preferences.',
               style: TextStyle(
                 color: Colors.white.withValues(alpha: 0.7),
                 fontSize: 14,
               ),
-            ),
+            ), */
             // const SizedBox(height: 20),
             /*    // Avatar row
             Row(

@@ -26,12 +26,12 @@ import 'package:kenwell_health_app/ui/shared/ui/labels/kenwell_section_label.dar
 class KenwellGradientHeader extends StatelessWidget {
   const KenwellGradientHeader({
     super.key,
-    required this.label,
+    this.label,
     required this.title,
     required this.subtitle,
   });
 
-  final String label;
+  final String? label;
   final String title;
   final String subtitle;
 
@@ -69,8 +69,10 @@ class KenwellGradientHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                KenwellSectionLabel(label: label),
-                const SizedBox(height: 10),
+                if (label != null) ...[
+                  KenwellSectionLabel(label: label!),
+                  const SizedBox(height: 10),
+                ],
                 Text(
                   title,
                   style: const TextStyle(
