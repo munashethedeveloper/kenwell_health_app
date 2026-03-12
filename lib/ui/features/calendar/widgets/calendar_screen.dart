@@ -764,7 +764,9 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                             // Event cards for the day
                             ...dayEvents
                                 .map((event) => EventCard(
-                                    event: event, viewModel: viewModel))
+                                    event: event,
+                                    viewModel: viewModel,
+                                    showBorder: true))
                                 .toList(),
                             const SizedBox(height: 8),
                           ],

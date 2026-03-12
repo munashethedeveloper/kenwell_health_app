@@ -19,6 +19,7 @@ class KenwellAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.actions,
     this.bottom,
     this.useGradient = false,
+    this.leading,
   });
 
   final String title;
@@ -30,6 +31,8 @@ class KenwellAppBar extends StatelessWidget implements PreferredSizeWidget {
   final TextStyle? titleStyle;
   final List<Widget>? actions;
   final PreferredSizeWidget? bottom;
+  /// Optional override for the leading widget.
+  final Widget? leading;
 
   /// When false (default) the app bar shows a solid [KenwellColors.primaryGreen]
   /// background. Set to true to use the branded navy→purple→dark-green gradient.
@@ -73,6 +76,25 @@ class KenwellAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: titleWidget,
       centerTitle: centerTitle,
       automaticallyImplyLeading: automaticallyImplyLeading,
+      // Chevron back arrow replaces the default back arrow
+      leading: leading ??
+          (automaticallyImplyLeading
+              ? Builder(
+                  builder: (ctx) {
+                    final canPop = Navigator.of(ctx).canPop();
+                    if (!canPop) return const SizedBox.shrink();
+                    return IconButton(
+                      icon: const Icon(
+                        Icons.chevron_left,
+                        size: 30,
+                        color: Colors.white,
+                      ),
+                      tooltip: MaterialLocalizations.of(ctx).backButtonTooltip,
+                      onPressed: () => Navigator.of(ctx).pop(),
+                    );
+                  },
+                )
+              : null),
       // When gradient is active the background must be transparent so the
       // flexibleSpace gradient shows through.
       backgroundColor: useGradient

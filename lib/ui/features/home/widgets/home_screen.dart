@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:kenwell_health_app/ui/features/calendar/view_model/calendar_view_model.dart';
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
@@ -45,14 +46,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
         return Scaffold(
           backgroundColor: KenwellColors.neutralBackground,
-          appBar: const KenwellAppBar(
+          appBar: KenwellAppBar(
             title: 'KenWell365',
-            titleStyle: TextStyle(
+            titleStyle: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
             automaticallyImplyLeading: false,
+            actions: [
+              IconButton(
+                tooltip: 'Help',
+                icon: const Icon(Icons.help_outline, color: Colors.white),
+                onPressed: () => context.pushNamed('help'),
+              ),
+            ],
           ),
           body: RefreshIndicator(
             onRefresh: () async {

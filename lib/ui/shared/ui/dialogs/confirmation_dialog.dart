@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import '../buttons/custom_primary_button.dart';
-import '../buttons/custom_secondary_button.dart';
 
 /// A reusable confirmation dialog for important actions
 class ConfirmationDialog extends StatelessWidget {
@@ -26,6 +24,7 @@ class ConfirmationDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Row(
         children: [
           if (icon != null) ...[
@@ -36,25 +35,28 @@ class ConfirmationDialog extends StatelessWidget {
         ],
       ),
       content: Text(message),
+      actionsAlignment: MainAxisAlignment.end,
+      actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       actions: [
-        CustomSecondaryButton(
-          label: cancelText,
-          minHeight: 40,
-          fullWidth: false,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        TextButton(
           onPressed: () => Navigator.of(context).pop(false),
+          child: Text(cancelText),
         ),
-        CustomPrimaryButton(
-          label: confirmText,
-          backgroundColor: confirmColor ?? Colors.red,
-          foregroundColor: Colors.white,
-          minHeight: 40,
-          fullWidth: false,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        ElevatedButton(
           onPressed: () {
             Navigator.of(context).pop(true);
             onConfirm();
           },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: confirmColor ?? Colors.red,
+            foregroundColor: Colors.white,
+            padding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: Text(confirmText),
         ),
       ],
     );
@@ -74,6 +76,8 @@ class ConfirmationDialog extends StatelessWidget {
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16)),
           title: Row(
             children: [
               if (icon != null) ...[
@@ -84,22 +88,25 @@ class ConfirmationDialog extends StatelessWidget {
             ],
           ),
           content: Text(message),
+          actionsAlignment: MainAxisAlignment.end,
+          actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           actions: [
-            CustomSecondaryButton(
-              label: cancelText,
-              minHeight: 40,
-              fullWidth: false,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(cancelText),
             ),
-            CustomPrimaryButton(
-              label: confirmText,
-              backgroundColor: confirmColor ?? Colors.red,
-              foregroundColor: Colors.white,
-              minHeight: 40,
-              fullWidth: false,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            ElevatedButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: confirmColor ?? Colors.red,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 20, vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(confirmText),
             ),
           ],
         );

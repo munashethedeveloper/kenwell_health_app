@@ -211,9 +211,43 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
 
                   return Column(
                     children: [
-                      const KenwellGradientHeader(
-                        title: 'Member Management',
-                        subtitle: 'Create and view registered members',
+                      Builder(
+                        builder: (ctx) {
+                          final tabController =
+                              DefaultTabController.of(ctx);
+                          return AnimatedBuilder(
+                            animation: tabController,
+                            builder: (_, __) {
+                              final idx = tabController.index;
+                              // Determine title based on active tab
+                              String title = 'Member Management';
+                              String subtitle =
+                                  'Create and view registered members';
+                              if (canCreateMember && canViewMembers) {
+                                if (idx == 0) {
+                                  title = 'New Member\nRegistration';
+                                  subtitle =
+                                      'Register a new wellness participant';
+                                } else {
+                                  title = 'Registered Members';
+                                  subtitle =
+                                      'Search and manage your members';
+                                }
+                              } else if (canCreateMember) {
+                                title = 'New Member\nRegistration';
+                                subtitle =
+                                    'Register a new wellness participant';
+                              } else if (canViewMembers) {
+                                title = 'Registered Members';
+                                subtitle = 'Search and manage your members';
+                              }
+                              return KenwellGradientHeader(
+                                title: title,
+                                subtitle: subtitle,
+                              );
+                            },
+                          );
+                        },
                       ),
                       Expanded(
                         child: TabBarView(

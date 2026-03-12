@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:intl/intl.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
@@ -20,14 +21,21 @@ class EventStatsDetailScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: const KenwellAppBar(
+      appBar: KenwellAppBar(
         title: 'KenWell365',
-        titleStyle: TextStyle(
+        titleStyle: const TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
         automaticallyImplyLeading: true,
+        actions: [
+          IconButton(
+            tooltip: 'Help',
+            icon: const Icon(Icons.help_outline, color: Colors.white),
+            onPressed: () => context.pushNamed('help'),
+          ),
+        ],
       ),
       body: Column(
         children: [

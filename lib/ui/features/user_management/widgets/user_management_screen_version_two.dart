@@ -224,9 +224,42 @@ class _UserManagementScreenVersionTwoState
 
                   return Column(
                     children: [
-                      const KenwellGradientHeader(
-                        title: 'User Management',
-                        subtitle: 'Create and view registered users',
+                      Builder(
+                        builder: (ctx) {
+                          final tabController =
+                              DefaultTabController.of(ctx);
+                          return AnimatedBuilder(
+                            animation: tabController,
+                            builder: (_, __) {
+                              final idx = tabController.index;
+                              // Determine title based on active tab
+                              String title = 'User Management';
+                              String subtitle =
+                                  'Create and view registered users';
+                              if (canCreateUser && canViewUsers) {
+                                if (idx == 0) {
+                                  title = 'New User\nRegistration';
+                                  subtitle =
+                                      'Register a new system user';
+                                } else {
+                                  title = 'Registered Users';
+                                  subtitle =
+                                      'Search and manage your users';
+                                }
+                              } else if (canCreateUser) {
+                                title = 'New User\nRegistration';
+                                subtitle = 'Register a new system user';
+                              } else if (canViewUsers) {
+                                title = 'Registered Users';
+                                subtitle = 'Search and manage your users';
+                              }
+                              return KenwellGradientHeader(
+                                title: title,
+                                subtitle: subtitle,
+                              );
+                            },
+                          );
+                        },
                       ),
                       Expanded(
                         child: TabBarView(

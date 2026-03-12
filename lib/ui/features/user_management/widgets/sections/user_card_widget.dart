@@ -159,41 +159,27 @@ class UserCardWidget extends StatelessWidget {
             }
           },
           child: Container(
-            margin: const EdgeInsets.only(bottom: 12),
+            margin: const EdgeInsets.only(bottom: 10),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: KenwellColors.secondaryNavyDark.withValues(alpha: 0.4),
+                width: 1.5,
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: rs.accentColor.withValues(alpha: 0.10),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
-                  blurRadius: 6,
-                  offset: const Offset(0, 1),
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: IntrinsicHeight(
-                child: Row(
-                  children: [
-                    // ── Left accent stripe ─────────────────────────────
-                    Container(
-                      width: 5,
-                      decoration: BoxDecoration(gradient: rs.gradient),
-                    ),
-
-                    // ── Card body ──────────────────────────────────────
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 13),
-                        child: Row(
-                          children: [
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              child: Row(
+                children: [
                             if (number != null) ...[
                               NumberBadge(number: number!),
                               const SizedBox(width: 10),
@@ -363,13 +349,8 @@ class UserCardWidget extends StatelessWidget {
                         ),
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+              );
   }
 }
