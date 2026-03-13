@@ -14,6 +14,7 @@ import 'package:kenwell_health_app/data/services/user_event_service.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/user_event_repository.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../domain/models/user_model.dart';
+import 'sections/allocate_user_card.dart';
 
 // AllocateEventScreen allows assigning a wellness event to multiple users
 class AllocateEventScreen extends StatefulWidget {
@@ -274,210 +275,6 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
 
     // Refresh assigned users list immediately
     await _fetchAssignedUsers();
-  }
-
-  Widget _buildUserCard(UserModel user, ThemeData theme, {int? number}) {
-    final isAssigned = _assignedUserIds.contains(user.id);
-
-    final roleIcons = {
-      'ADMIN': Icons.admin_panel_settings_rounded,
-      'TOP MANAGEMENT': Icons.business_center_rounded,
-      'PROJECT MANAGER': Icons.manage_accounts_rounded,
-      'PROJECT COORDINATOR': Icons.event_rounded,
-      'HEALTH PRACTITIONER': Icons.medical_services_rounded,
-      'CLIENT': Icons.person_rounded,
-    };
-
-    return Slidable(
-      key: ValueKey(user.id),
-      endActionPane: ActionPane(
-        motion: const ScrollMotion(),
-        children: [
-          if (!isAssigned)
-            SlidableAction(
-              onPressed: (_) => _assignUser(user),
-              backgroundColor: theme.colorScheme.primary,
-              foregroundColor: theme.colorScheme.onPrimary,
-              icon: Icons.person_add_rounded,
-              label: 'Assign',
-              borderRadius: BorderRadius.circular(12),
-            ),
-          if (isAssigned)
-            SlidableAction(
-              onPressed: (_) => _unassignUser(user),
-              backgroundColor: theme.colorScheme.error,
-              foregroundColor: theme.colorScheme.onError,
-              icon: Icons.person_remove_rounded,
-              label: 'Unassign',
-              borderRadius: BorderRadius.circular(12),
-            ),
-        ],
-      ),
-      child: Builder(
-        builder: (context) => GestureDetector(
-          onTap: () {
-            final slidable = Slidable.of(context);
-            final isOpen =
-                slidable?.actionPaneType.value != ActionPaneType.none;
-            if (isOpen) {
-              slidable?.close();
-            } else {
-              slidable?.openEndActionPane();
-            }
-          },
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: KenwellColors.secondaryNavyDark.withValues(alpha: 0.4),
-                //color: KenwellColors.primaryGreen.withValues(alpha: 0.4),
-
-                width: 1.5,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              child: Row(
-                children: [
-                  if (number != null) ...[
-                    NumberBadge(number: number),
-                    const SizedBox(width: 10),
-                  ],
-
-                  /*  // Avatar
-                  Container(
-                    width: 46,
-                    height: 46,
-                    decoration: BoxDecoration(
-                      color: theme.primaryColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      roleIcons[user.role] ?? Icons.person_rounded,
-                      color: theme.primaryColor,
-                      size: 22,
-                    ),
-                  ),
-                  const SizedBox(width: 12), */
-
-                  // User Info
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${user.firstName} ${user.lastName}',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            //color: const Color(0xFF201C58),
-                            color: KenwellColors.secondaryNavyDark,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 3),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.email_outlined,
-                              size: 12,
-                              color: Colors.grey.shade500,
-                            ),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                user.email,
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: KenwellColors.secondaryNavyDark,
-                                  fontSize: 12,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 5),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 7, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: isAssigned
-                                ? const Color(0xFF10B981).withValues(alpha: 0.1)
-                                : const Color(0xFFEF4444)
-                                    .withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                isAssigned
-                                    ? Icons.check_circle_rounded
-                                    : Icons.radio_button_unchecked_rounded,
-                                color: isAssigned
-                                    ? const Color(0xFF10B981)
-                                    : const Color(0xFFEF4444),
-                                size: 12,
-                              ),
-                              const SizedBox(width: 3),
-                              Text(
-                                isAssigned ? 'Assigned' : 'Unassigned',
-                                style: TextStyle(
-                                  color: isAssigned
-                                      ? const Color(0xFF10B981)
-                                      : const Color(0xFFEF4444),
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 10,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(width: 10),
-
-                  // Role badge
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: theme.primaryColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: theme.primaryColor.withValues(alpha: 0.2),
-                        width: 1,
-                      ),
-                    ),
-                    child: Text(
-                      user.role,
-                      style: TextStyle(
-                        color: theme.primaryColor,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 10,
-                        letterSpacing: 0.3,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
   }
 
   Widget _buildEmptyState(ThemeData theme) {
@@ -860,7 +657,13 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
                           final user = filteredUsers[index];
-                          return _buildUserCard(user, theme, number: index + 1);
+                          return AllocateUserCard(
+                          user: user,
+                          number: index + 1,
+                          isAssigned: _assignedUserIds.contains(user.id),
+                          onAssign: () => _assignUser(user),
+                          onUnassign: () => _unassignUser(user),
+                        );
                         },
                         childCount: filteredUsers.length,
                       ),

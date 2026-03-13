@@ -1,31 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/custom_dropdown_field.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/health_metric_status_badge.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/nursing_referral_status_card.dart';
 import 'package:kenwell_health_app/ui/features/nurse_interventions/view_model/nurse_intervention_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 import 'package:provider/provider.dart';
-import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
-import '../../../shared/ui/form/custom_text_field.dart';
-import '../../../shared/ui/form/custom_yes_no_question.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
-import '../../../shared/ui/form/kenwell_form_styles.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/health_risk_assessment_view_model.dart';
+import 'sections/hra_lifestyle_section.dart';
+import 'sections/hra_gender_questions_section.dart';
+import 'sections/hra_health_metrics_section.dart';
 
-// PersonalRiskAssessmentScreen displays the personal risk assessment form
+/// Health Risk Assessment (HRA) form screen — Section C of the wellness flow.
+///
+/// This screen is a StatelessWidget that hosts a [Consumer] on
+/// [PersonalRiskAssessmentViewModel].  Complex build-level callbacks
+/// (auto-referral logic, see below) are deferred with
+/// [WidgetsBinding.addPostFrameCallback] so they never mutate ViewModel
+/// state synchronously during a build pass.
+///
+/// ## Auto-referral logic (important — do not simplify without reading this)
+///
+/// When the nurse enters health metrics the ViewModel computes colour-coded
+/// zones (Red / Caution / Healthy).  Based on the zone, the nursing-referral
+/// selection is automatically pre-populated:
+///
+/// | Zone    | Auto-set                         | Conditions                                   |
+/// |---------|----------------------------------|----------------------------------------------|
+/// | Red     | referredToStateClinic            | Only if no prior selection OR "not referred" |
+/// | Caution | *(no change to selection)*       | Clears a red-auto-set; nurse decides         |
+/// | Healthy | patientNotReferred               | Only if no selection OR not already that     |
+///
+/// This prevents nurses from accidentally triggering (or missing) referrals
+/// as they update one metric at a time.
 class PersonalRiskAssessmentScreen extends StatelessWidget {
-  final PersonalRiskAssessmentViewModel viewModel;
-  final NurseInterventionViewModel nurseViewModel;
-  final VoidCallback? onNext;
-  final VoidCallback? onPrevious;
-  final bool isFemale;
-  final int age;
-  final PreferredSizeWidget? appBar;
-
-  //  Constructor
   const PersonalRiskAssessmentScreen({
     super.key,
     required this.viewModel,
@@ -37,10 +47,27 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
     this.appBar,
   });
 
-  // Build method
+  final PersonalRiskAssessmentViewModel viewModel;
+  final NurseInterventionViewModel nurseViewModel;
+  final VoidCallback? onNext;
+  final VoidCallback? onPrevious;
+
+  /// True when the patient is female; controls which gender-specific sections
+  /// are shown (pap smear, breast exam, mammogram vs. prostate questions).
+  final bool isFemale;
+
+  /// Patient age — used to show the mammogram / prostate-check questions only
+  /// for patients older than 40.
+  final int age;
+
+  /// Optional custom app bar injected by the caller (e.g. from the wellness
+  /// flow).  Falls back to a plain KenwellAppBar.
+  final PreferredSizeWidget? appBar;
+
   @override
   Widget build(BuildContext context) {
-    // Initialize the view model with gender and age data
+    // Initialise gender + age once after the first frame so ViewModel state is
+    // correct before the form renders conditional sections.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       viewModel.setPersonalDetails(
         gender: isFemale ? 'Female' : 'Male',
@@ -48,29 +75,31 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
       );
     });
 
-    // Provide the view model to the widget tree
     return ChangeNotifierProvider.value(
       value: viewModel,
       child: Consumer<PersonalRiskAssessmentViewModel>(
         builder: (context, vm, _) {
-          // Auto-refer when any metric is in the danger zone
+          // ── Auto-referral logic ───────────────────────────────────────
+          // All three branches use addPostFrameCallback to avoid calling
+          // notifyListeners() inside build(), which would schedule a second
+          // frame and could cause an assertion error.
           if (vm.hasRedMetrics) {
+            // RED ZONE: auto-refer unless the nurse already made a manual
+            // selection other than "not referred".
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (nurseViewModel.nursingReferralSelection == null ||
                   nurseViewModel.nursingReferralSelection ==
                       NursingReferralOption.patientNotReferred) {
                 nurseViewModel.setNursingReferralSelection(
-                    NursingReferralOption.referredToStateClinic);
+                  NursingReferralOption.referredToStateClinic,
+                );
               }
             });
           } else if (vm.isCaution) {
-            // Caution: nurse uses discretion – do not auto-set the referral.
-            // Only clear a previous red-zone auto-referral (referredToStateClinic)
-            // so the nurse can make a deliberate choice. A patientNotReferred
-            // value (from a prior healthy auto-set) is intentionally left in
-            // place; the caution banner makes it clear the nurse should review
-            // and override if appropriate. Clearing it here would also erase
-            // any manual selection made while metrics are in the caution zone.
+            // CAUTION ZONE: clear a previous red-zone auto-set only.
+            // Do NOT force a value here — the nurse must use their discretion.
+            // Intentionally leave "not referred" selections so we don't erase
+            // a deliberate nurse choice made while in the caution zone.
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (nurseViewModel.nursingReferralSelection ==
                   NursingReferralOption.referredToStateClinic) {
@@ -78,18 +107,19 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
               }
             });
           } else if (vm.isHealthy) {
-            // When all metrics are healthy, auto-clear the referral to "not referred"
+            // HEALTHY ZONE: auto-clear to "not referred".
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (nurseViewModel.nursingReferralSelection == null ||
                   nurseViewModel.nursingReferralSelection !=
                       NursingReferralOption.patientNotReferred) {
                 nurseViewModel.setNursingReferralSelection(
-                    NursingReferralOption.patientNotReferred);
+                  NursingReferralOption.patientNotReferred,
+                );
               }
             });
           }
+
           return Scaffold(
-            // App bar
             appBar: appBar ??
                 const KenwellAppBar(
                   title: 'KenWell365',
@@ -97,17 +127,16 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                 ),
             body: Column(
               children: [
-                // ── Gradient section header ─────────────────────────
+                // Gradient header
                 const KenwellGradientHeader(
                   label: 'ASSESSMENT',
                   title: 'Health Risk\nAssessment',
                   subtitle: 'Section C: Complete the health screening form',
                 ),
-                // ── Scrollable form ─────────────────────────────────
+                // Scrollable form
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(16),
-                    // Form
                     child: Form(
                       key: vm.formKey,
                       child: Column(
@@ -115,7 +144,7 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                         children: [
                           const SizedBox(height: 8),
 
-                          // ===== Section 1: Chronic Conditions =====
+                          // Section 1: Chronic Conditions (inline — small enough)
                           KenwellFormCard(
                             title:
                                 '1. Do you suffer or take medication for any of the following conditions?',
@@ -128,405 +157,63 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                                     onChanged: (val) =>
                                         vm.toggleCondition(condition, val),
                                   );
-                                }).toList(),
+                                }),
                                 if (vm.chronicConditions['Other'] == true)
-                                  KenwellTextField(
-                                    label:
-                                        'If Other, please specify condition and treatment',
-                                    controller: vm.otherConditionController,
-                                    hintText: 'Specify other condition...',
-                                    decoration: KenwellFormStyles.decoration(
-                                      label:
-                                          'If Other, please specify condition and treatment',
-                                      hint: 'Specify other condition...',
-                                    ),
-                                    validator: (val) =>
-                                        val == null || val.isEmpty
-                                            ? 'Please specify other condition'
-                                            : null,
-                                  ),
+                                  _buildOtherConditionField(vm),
                               ],
                             ),
                           ),
 
                           const SizedBox(height: 24),
 
-                          // ===== Section 2: Exercise =====
-                          KenwellFormCard(
-                            title: '2. Do you have any exercising habits?',
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                KenwellDropdownField(
-                                  label: 'Do you Exercise?',
-                                  value: vm.exerciseStatus,
-                                  items: vm.exerciseStatusOptions,
-                                  onChanged: vm.setExerciseStatus,
-                                  validator: (val) =>
-                                      (val == null || val.isEmpty)
-                                          ? 'Select Exercise Status'
-                                          : null,
-                                ),
-                                if (vm.showExerciseFields) ...[
-                                  const Text(
-                                      '2.1 Over the past month, how many days per week have you exercised for 30 minutes or longer?',
-                                      style: TextStyle(fontSize: 16)),
-                                  _buildStringRadioGroup(
-                                    selected: vm.exerciseFrequency.isEmpty
-                                        ? null
-                                        : vm.exerciseFrequency,
-                                    options: const [
-                                      'Once/week',
-                                      'Twice/week',
-                                      'Three times/week or more',
-                                    ],
-                                    onChanged: vm.setExerciseFrequency,
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
+                          // Sections 2–4: Lifestyle (Exercise, Smoking, Alcohol)
+                          HraLifestyleSection(vm: vm),
 
                           const SizedBox(height: 24),
 
-                          // ===== Section 3: Smoking =====
-                          KenwellFormCard(
-                            title: '3. Do You Have Any Smoking Habits?',
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                KenwellDropdownField(
-                                  label: 'Do you smoke?',
-                                  value: vm.smokingStatus,
-                                  items: vm.smokingStatusOptions,
-                                  onChanged: vm.setSmokingStatus,
-                                  validator: (val) =>
-                                      (val == null || val.isEmpty)
-                                          ? 'Select Smoking Status'
-                                          : null,
-                                ),
-                                if (vm.showSmokingFields) ...[
-                                  const Text('3.1 What do you smoke?',
-                                      style: TextStyle(fontSize: 16)),
-                                  _buildStringRadioGroup(
-                                    selected: vm.smokeType.isEmpty
-                                        ? null
-                                        : vm.smokeType,
-                                    options: const [
-                                      'Cigarette',
-                                      'Pipe',
-                                      'Dagga',
-                                      'Vape'
-                                    ],
-                                    onChanged: vm.setSmokeType,
-                                  ),
-                                  const SizedBox(
-                                    height: 16,
-                                  ),
-                                  const Text(
-                                      '3.2 How much do you smoke per day?'),
-                                  const SizedBox(
-                                    height: 8,
-                                  ),
-                                  KenwellTextField(
-                                    label: '3. How much do you smoke per day?',
-                                    controller: vm.dailySmokeController,
-                                    hintText:
-                                        'Please Enter Amount of Times You Smoke',
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters:
-                                        AppTextInputFormatters.numbersOnly(),
-                                    decoration: KenwellFormStyles.decoration(
-                                      label: 'Number per day',
-                                      hint:
-                                          'Please Enter Amount of Times You Smoke',
-                                    ),
-                                    validator: (val) => val == null ||
-                                            val.isEmpty
-                                        ? 'Please enter daily smoking amount'
-                                        : null,
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
+                          // Sections 5–7: Female-only questions
+                          HraFemaleQuestionsSection(vm: vm),
 
-                          const SizedBox(height: 24),
-
-                          // ===== Section 4: Alcohol =====
-                          KenwellFormCard(
-                            title: '4. Do you have any drinking habits?',
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                KenwellDropdownField(
-                                  label: 'Do you drink?',
-                                  value: vm.drinkingStatus,
-                                  items: vm.drinkingStatusOptions,
-                                  onChanged: vm.setDrinkingStatus,
-                                  validator: (val) =>
-                                      (val == null || val.isEmpty)
-                                          ? 'Select Drinking Status'
-                                          : null,
-                                ),
-                                if (vm.showDrinkingFields) ...[
-                                  const SizedBox(height: 8),
-                                  const Text(
-                                      '4.1 How often do you use alcoholic beverages?',
-                                      style: TextStyle(fontSize: 16)),
-                                  _buildStringRadioGroup(
-                                    selected: vm.alcoholFrequency.isEmpty
-                                        ? null
-                                        : vm.alcoholFrequency,
-                                    options: const [
-                                      'On occasion',
-                                      'Two-three drinks per day',
-                                      'More than 3 drinks per day',
-                                      'I often drink too much',
-                                    ],
-                                    onChanged: vm.setAlcoholFrequency,
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(height: 24),
-
-                          // ===== Section 5-7: Female Only =====
-                          if (vm.showFemaleQuestions)
-                            KenwellFormCard(
-                              title: 'Female Only Questions',
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  KenwellYesNoQuestion<bool>(
-                                    question:
-                                        '5. Have you had a pap smear in the last 24 months?',
-                                    value: vm.papSmear,
-                                    onChanged: vm.setPapSmear,
-                                    yesValue: true,
-                                    noValue: false,
-                                    textStyle: const TextStyle(fontSize: 16),
-                                  ),
-                                  KenwellYesNoQuestion<bool>(
-                                    question:
-                                        '6. Do you examine your breasts regularly?',
-                                    value: vm.breastExam,
-                                    onChanged: vm.setBreastExam,
-                                    yesValue: true,
-                                    noValue: false,
-                                    textStyle: const TextStyle(fontSize: 16),
-                                  ),
-                                  if (vm.showMammogramQuestion)
-                                    KenwellYesNoQuestion<bool>(
-                                      question:
-                                          '7. If older than 40, have you had a mammogram done?',
-                                      value: vm.mammogram,
-                                      onChanged: vm.setMammogram,
-                                      yesValue: true,
-                                      noValue: false,
-                                      textStyle: const TextStyle(fontSize: 16),
-                                    ),
-                                ],
-                              ),
-                            ),
-
-                          // ===== Section 8-9: Male Only =====
-                          if (vm.showMaleQuestions)
-                            KenwellFormCard(
-                              title: 'Male Only Questions',
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  if (vm.showProstateCheckQuestion)
-                                    KenwellYesNoQuestion<bool>(
-                                      question:
-                                          '8. If > than 40, have you had your prostate checked?',
-                                      value: vm.prostateCheck,
-                                      onChanged: vm.setProstateCheck,
-                                      yesValue: true,
-                                      noValue: false,
-                                      textStyle: const TextStyle(fontSize: 16),
-                                    ),
-                                  KenwellYesNoQuestion<bool>(
-                                    question:
-                                        '9. Have you been tested for prostate cancer?',
-                                    value: vm.prostateTested,
-                                    onChanged: vm.setProstateTested,
-                                    yesValue: true,
-                                    noValue: false,
-                                    textStyle: const TextStyle(fontSize: 16),
-                                  ),
-                                ],
-                              ),
-                            ),
+                          // Sections 8–9: Male-only questions
+                          HraMaleQuestionsSection(vm: vm),
 
                           const SizedBox(height: 32),
 
-                          // ===== Section D: Health Metrics =====
-                          const Text(
-                            'Section D: Health Metrics',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF201C58),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
+                          // Section D: Health Metrics
+                          HraHealthMetricsSection(vm: vm),
 
-                          KenwellFormCard(
-                            title: 'Measurements',
-                            child: Column(
-                              children: [
-                                KenwellTextField(
-                                  label: 'Waist Circumference (cm)',
-                                  hintText: 'e.g., 80',
-                                  controller: vm.waistController,
-                                  keyboardType: TextInputType.number,
-                                  inputFormatters:
-                                      AppTextInputFormatters.numbersOnly(),
-                                  validator: (val) => _validateRequired(
-                                      val, 'Waist Circumference (cm)'),
-                                ),
-                                const SizedBox(height: 12),
-                                KenwellTextField(
-                                  label: 'Height (cm)',
-                                  hintText: 'Enter your height in centimeters',
-                                  controller: vm.heightController,
-                                  keyboardType: TextInputType.number,
-                                  inputFormatters:
-                                      AppTextInputFormatters.numbersOnly(
-                                          allowDecimal: true),
-                                  validator: (val) =>
-                                      _validateRequired(val, 'Height (cm)'),
-                                ),
-                                const SizedBox(height: 12),
-                                KenwellTextField(
-                                  label: 'Weight (kg)',
-                                  hintText: 'Enter your weight',
-                                  controller: vm.weightController,
-                                  keyboardType: TextInputType.number,
-                                  inputFormatters:
-                                      AppTextInputFormatters.numbersOnly(
-                                          allowDecimal: true),
-                                  validator: (val) =>
-                                      _validateRequired(val, 'Weight (kg)'),
-                                ),
-                                const SizedBox(height: 12),
-                                KenwellTextField(
-                                  label: 'BMI',
-                                  hintText: 'Automatically calculated',
-                                  controller: vm.bmiController,
-                                  readOnly: true,
-                                ),
-                                const SizedBox(height: 12),
-                                const Text(
-                                  'Blood Pressure (mmHg)',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          KenwellTextField(
-                                            label: 'Systolic (mmHg)',
-                                            hintText: 'e.g., 120',
-                                            controller: vm.systolicBpController,
-                                            keyboardType: TextInputType.number,
-                                            inputFormatters:
-                                                AppTextInputFormatters
-                                                    .numbersOnly(),
-                                            validator: (val) =>
-                                                _validateRequired(
-                                                    val, 'Systolic (mmHg)'),
-                                          ),
-                                          HealthMetricStatusBadge(
-                                              status: vm.systolicStatus),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          KenwellTextField(
-                                            label: 'Diastolic (mmHg)',
-                                            hintText: 'e.g., 80',
-                                            controller:
-                                                vm.diastolicBpController,
-                                            keyboardType: TextInputType.number,
-                                            inputFormatters:
-                                                AppTextInputFormatters
-                                                    .numbersOnly(),
-                                            validator: (val) =>
-                                                _validateRequired(
-                                                    val, 'Diastolic (mmHg)'),
-                                          ),
-                                          HealthMetricStatusBadge(
-                                              status: vm.diastolicStatus),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                KenwellTextField(
-                                  label: 'Cholesterol (mmol/L)',
-                                  hintText: 'e.g., 5.2',
-                                  controller: vm.cholesterolController,
-                                  keyboardType: TextInputType.number,
-                                  inputFormatters:
-                                      AppTextInputFormatters.numbersOnly(
-                                          allowDecimal: true),
-                                  validator: (val) => _validateRequired(
-                                      val, 'Cholesterol (mmol/L)'),
-                                ),
-                                HealthMetricStatusBadge(
-                                    status: vm.cholesterolStatus),
-                                const SizedBox(height: 12),
-                                KenwellTextField(
-                                  label: 'Blood Sugar (mmol/L)',
-                                  hintText: 'e.g., 6.1',
-                                  controller: vm.bloodSugarController,
-                                  keyboardType: TextInputType.number,
-                                  inputFormatters:
-                                      AppTextInputFormatters.numbersOnly(
-                                          allowDecimal: true),
-                                  validator: (val) => _validateRequired(
-                                      val, 'Blood Sugar (mmol/L)'),
-                                ),
-                                HealthMetricStatusBadge(
-                                    status: vm.bloodSugarStatus),
-                              ],
-                            ),
-                          ),
-
-                          // Auto-referral alert shown when any metric is in the red zone
+                          // Red-zone alert banner
                           if (vm.hasRedMetrics) ...[
                             const SizedBox(height: 12),
                             const HealthMetricRedAlert(),
                           ],
 
                           const SizedBox(height: 24),
-                          _buildReferrals(),
+
+                          // Nursing referral section
+                          NursingReferralStatusCard(
+                            title: 'Nursing Referrals',
+                            selectedValue:
+                                nurseViewModel.nursingReferralSelection,
+                            onChanged:
+                                nurseViewModel.setNursingReferralSelection,
+                            notReferredReasonController:
+                                nurseViewModel.notReferredReasonController,
+                            isCaution: vm.isCaution,
+                            reasonValidator: (val) =>
+                                (val == null || val.isEmpty)
+                                    ? 'Please enter a reason'
+                                    : null,
+                          ),
+
                           const SizedBox(height: 24),
 
-                          // ===== Navigation Buttons =====
+                          // Navigation (Previous + Submit)
                           KenwellFormNavigation(
                             nextLabel: 'Submit',
                             onPrevious: vm.isSubmitting ? null : onPrevious,
-                            onNext: () => vm.submitResults(context,
-                                onNext: onNext ?? () {}),
+                            onNext: () =>
+                                vm.submitResults(context, onNext: onNext ?? () {}),
                             isNextBusy: vm.isSubmitting,
                             isNextEnabled: !vm.isSubmitting,
                           ),
@@ -543,47 +230,21 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
     );
   }
 
-  // Build radio group widget
-  Widget _buildStringRadioGroup({
-    required String? selected,
-    required List<String> options,
-    required ValueChanged<String> onChanged,
-  }) {
-    return Column(
-      children: options
-          .map(
-            (option) => RadioListTile<String>(
-              title: Text(option),
-              value: option,
-              groupValue: selected,
-              onChanged: (value) {
-                if (value != null) onChanged(value);
-              },
-              toggleable: false,
-            ),
-          )
-          .toList(),
+  /// Free-text field shown when the patient selects "Other" as a chronic
+  /// condition.
+  Widget _buildOtherConditionField(PersonalRiskAssessmentViewModel vm) {
+    return KenwellFormCard(
+      useGradient: false,
+      child: TextFormField(
+        controller: vm.otherConditionController,
+        decoration: const InputDecoration(
+          labelText: 'If Other, please specify condition and treatment',
+          hintText: 'Specify other condition...',
+        ),
+        validator: (val) => val == null || val.isEmpty
+            ? 'Please specify other condition'
+            : null,
+      ),
     );
-  }
-
-  // Build referrals widget
-  Widget _buildReferrals() {
-    return NursingReferralStatusCard(
-      title: 'Nursing Referrals',
-      selectedValue: nurseViewModel.nursingReferralSelection,
-      onChanged: nurseViewModel.setNursingReferralSelection,
-      notReferredReasonController: nurseViewModel.notReferredReasonController,
-      isCaution: viewModel.isCaution,
-      reasonValidator: (val) =>
-          (val == null || val.isEmpty) ? 'Please enter a reason' : null,
-    );
-  }
-
-  // Validate required field
-  String? _validateRequired(String? value, String label) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter $label';
-    }
-    return null;
   }
 }

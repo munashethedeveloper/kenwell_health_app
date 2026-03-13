@@ -28,7 +28,23 @@ class WellnessFlowViewModel extends ChangeNotifier {
   bool tbEnabled = false;
   bool cancerEnabled = false;
 
-  /// Loads all completion flags (consent, HRA, HCT, TB, Cancer, survey) for the given member and event from Firestore
+  /// Loads all completion flags (consent, HRA, HCT, TB, Cancer, survey) for
+  /// the given member and event from Firestore.
+  ///
+  /// ## Sequencing
+  /// 1. **Consent** — determines which screenings were enabled (HRA/HCT/TB/Cancer).
+  ///    The enabled flags are restored from the persisted consent record so that
+  ///    a screen refresh and a first load both show the same state.
+  /// 2. **Individual screenings** — each queried independently; a failure in
+  ///    one does not prevent the others from loading.
+  /// 3. **screeningsCompleted/screeningsInProgress** — derived from whether
+  ///    *all consented* screenings have data.  Screenings not covered by
+  ///    consent are ignored.
+  /// 4. **Survey** — loaded last; independent of screening status.
+  ///
+  /// All flags are reset at the start of every call so stale values from a
+  /// previous member never leak when the same [WellnessFlowViewModel] is
+  /// reused across members.
   Future<void> loadAllCompletionFlags(String? memberId, String? eventId) async {
     if (memberId == null || eventId == null) return;
 
@@ -303,23 +319,22 @@ class WellnessFlowViewModel extends ChangeNotifier {
   String get currentStepName =>
       _isValidCurrentStep ? _flowSteps[_currentStep] : 'unknown';
 
+  /// Cancels the current flow and returns to the member registration step.
+  ///
+  /// This is a lightweight cancel that does not clear completion flags.
+  /// For a full reset (e.g. when moving to a new member), use [resetFlow].
   void cancelFlow() {
     _currentStep = 0;
-    _flowSteps = [stepMemberRegistration]; // Reset flow to initial state
+    _flowSteps = [stepMemberRegistration];
     notifyListeners();
   }
 
-  void resetToMemberSearch() {
-    _currentStep = 0;
-    _flowSteps = [stepMemberRegistration]; // Reset to member registration step
-    currentMember = null; // Clear current member
-    // Clear enabled screening flags so stale values don't persist across members
-    hraEnabled = false;
-    hctEnabled = false;
-    tbEnabled = false;
-    cancerEnabled = false;
-    notifyListeners();
-  }
+  /// Resets the flow to member search and clears the current member.
+  ///
+  /// Also clears the enabled-screening flags so a stale consent from a
+  /// previous member does not leak to the next one.  Delegates full state
+  /// reset to [resetFlow].
+  void resetToMemberSearch() => resetFlow();
 
   Future<void> submitAll(BuildContext context) async {
     // Collect all data from ViewModels for debug logging
@@ -452,7 +467,18 @@ class WellnessFlowViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Navigate to a specific section from the current event details screen
+  /// Navigate to a specific section from the current event details screen.
+  ///
+  /// The flow steps are rebuilt from scratch each time so the "back" button
+  /// always returns to the correct previous screen.
+  ///
+  /// | section                  | Navigates to                                     |
+  /// |--------------------------|--------------------------------------------------|
+  /// | sectionConsent           | Consent screen                                   |
+  /// | sectionMemberRegistration| Back to member search (step 0)                   |
+  /// | sectionHealthScreenings  | Health screenings menu *if* consent done, else   |
+  /// |                          | consent screen (to complete consent first)        |
+  /// | sectionSurvey            | Survey screen                                    |
   void navigateToSection(String section) {
     switch (section) {
       case sectionConsent:
