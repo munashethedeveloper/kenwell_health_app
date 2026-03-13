@@ -299,47 +299,6 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
     }
   }
 
-  Widget _buildEmptyState(ThemeData theme, String title, String message) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: theme.primaryColor.withValues(alpha: 0.08),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.people_outline_rounded,
-                color: theme.primaryColor,
-                size: 48,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              title,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF201C58),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              message,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: const Color(0xFF6B7280),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Consumer<UserManagementViewModel>(
@@ -582,19 +541,19 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
               // User list or empty states
               if (viewModel.users.isEmpty)
                 SliverToBoxAdapter(
-                  child: _buildEmptyState(
-                    theme,
-                    'No users yet',
-                    'Create your first user to get started',
-                  ),
+                  child: KenwellEmptyState(
+                      icon: Icons.people_outline_rounded,
+                      title: 'No users yet',
+                      message: 'Create your first user to get started',
+                    ),
                 )
               else if (filteredUsers.isEmpty)
                 SliverToBoxAdapter(
-                  child: _buildEmptyState(
-                    theme,
-                    'No users found',
-                    'Try adjusting your search or filter',
-                  ),
+                  child: KenwellEmptyState(
+                      icon: Icons.people_outline_rounded,
+                      title: 'No users found',
+                      message: 'Try adjusting your search or filter',
+                    ),
                 )
               else
                 SliverPadding(

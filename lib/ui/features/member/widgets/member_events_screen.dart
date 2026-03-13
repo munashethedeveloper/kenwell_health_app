@@ -5,6 +5,8 @@ import '../../../../domain/models/member.dart';
 import '../../../../data/repositories_dcl/firestore_member_repository.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/headers/kenwell_gradient_header.dart';
+import '../../../shared/ui/cards/kenwell_detail_row.dart';
+import '../../../shared/ui/cards/kenwell_section_card.dart';
 
 /// Screen to display all events a member has attended
 class MemberEventsScreen extends StatefulWidget {
@@ -107,9 +109,9 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildSectionCard(
-                        'Personal Information',
-                        Icons.person,
+                      KenwellSectionCard(
+                      title: 'Personal Information',
+                      Icons.person,
                         [
                           _buildDetailRow(
                               'Name and Surname',
@@ -122,23 +124,18 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
                           _buildDetailRow(
                               'Email', widget.member.email ?? '', theme),
                           const Divider(height: 1),
-                          _buildDetailRow('Phone Number',
-                              widget.member.cellNumber ?? '', theme),
+                          KenwellDetailRow(label: 'Phone Number', value: widget.member.cellNumber ?? ''),
                           const Divider(height: 1),
-                          _buildDetailRow('Citizenship Status',
-                              widget.member.citizenshipStatus ?? '', theme),
+                          KenwellDetailRow(label: 'Citizenship Status', value: widget.member.citizenshipStatus ?? ''),
                           const Divider(height: 1),
-                          _buildDetailRow('Nationality',
-                              widget.member.nationality ?? '', theme),
+                          KenwellDetailRow(label: 'Nationality', value: widget.member.nationality ?? ''),
                           const Divider(height: 1),
                           _buildDetailRow(
                               'ID Number', widget.member.idNumber ?? '', theme),
                           const Divider(height: 1),
-                          _buildDetailRow('Passport Number',
-                              widget.member.passportNumber ?? '', theme),
+                          KenwellDetailRow(label: 'Passport Number', value: widget.member.passportNumber ?? ''),
                           const Divider(height: 1),
-                          _buildDetailRow('Medical Aid',
-                              widget.member.medicalAidName ?? '', theme),
+                          KenwellDetailRow(label: 'Medical Aid', value: widget.member.medicalAidName ?? ''),
                         ],
                       ),
 
@@ -421,101 +418,5 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
     );
   }
 
-  Widget _buildDetailRow(String label, String value, ThemeData theme) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 130,
-            child: Text(
-              label,
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF6B7280),
-                fontSize: 12,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: const Color(0xFF201C58),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  // Build a section card widget with an icon
-  Widget _buildSectionCard(String title, IconData icon, List<Widget> children) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color(0xFF201C58).withValues(alpha: 0.08),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Section header row
-          Padding(
-            padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(7),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF201C58).withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(icon, color: const Color(0xFF201C58), size: 16),
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF201C58),
-                    letterSpacing: 0.2,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Divider(
-            height: 1,
-            thickness: 1,
-            color: const Color(0xFF201C58).withValues(alpha: 0.06),
-          ),
-          // Content
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: children,
-            ),
-          ),
-          const SizedBox(height: 4),
-        ],
-      ),
-    );
-  }
 }

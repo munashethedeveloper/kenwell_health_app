@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/cards/kenwell_empty_state.dart';
 import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/containers/gradient_container.dart';
@@ -275,47 +276,6 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
 
     // Refresh assigned users list immediately
     await _fetchAssignedUsers();
-  }
-
-  Widget _buildEmptyState(ThemeData theme) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: theme.primaryColor.withValues(alpha: 0.08),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.people_outline_rounded,
-                color: theme.primaryColor,
-                size: 48,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'No users found',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF201C58),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Try adjusting your search or filter',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: const Color(0xFF6B7280),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   void _showHelpDialog() {
@@ -648,7 +608,11 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                 if (filteredUsers.isEmpty)
                   SliverFillRemaining(
                     hasScrollBody: false,
-                    child: _buildEmptyState(theme),
+                    child: const KenwellEmptyState(
+                      icon: Icons.people_outline_rounded,
+                      title: 'No users found',
+                      message: 'Try adjusting your search or filter',
+                    ),
                   )
                 else
                   SliverPadding(

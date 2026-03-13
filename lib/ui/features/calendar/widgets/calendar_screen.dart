@@ -2,103 +2,69 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 import 'package:provider/provider.dart';
-import 'package:table_calendar/table_calendar.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../domain/constants/role_permissions.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../event/widgets/event_screen.dart';
 import '../../profile/view_model/profile_view_model.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
-import '../../../shared/ui/form/kenwell_form_card.dart';
-import '../../../shared/ui/colours/kenwell_colours.dart';
-import '../../../shared/ui/labels/kenwell_section_label.dart';
 import '../view_model/calendar_view_model.dart';
-import 'day_events_dialog.dart';
-import 'event_card.dart';
+import 'sections/calendar_tab_view.dart';
+import 'sections/events_list_tab_view.dart';
 
-/// The main calendar screen displaying events in calendar and list views.
+/// The main calendar screen.
+///
+/// Hosts two tabs:
+/// - **Events Calendar** — full [TableCalendar] with event markers
+///   (see [CalendarTabView]).
+/// - **Events List** — month-grouped list of events with navigation
+///   (see [EventsListTabView]).
+///
+/// A FAB is shown only when the user has permission to create events.
 class CalendarScreen extends StatelessWidget {
-  // Constructor
   const CalendarScreen({super.key});
 
-  // Build method to create the widget tree
   @override
-  Widget build(BuildContext context) {
-    // Return the body of the calendar screen
-    return const _CalendarScreenBody();
-  }
+  Widget build(BuildContext context) => const _CalendarScreenBody();
 }
 
-// The stateful body of the calendar screen
 class _CalendarScreenBody extends StatefulWidget {
-  // Constructor
   const _CalendarScreenBody();
 
-  // Create state for the widget
   @override
   State<_CalendarScreenBody> createState() => _CalendarScreenBodyState();
 }
 
-// State class for the calendar screen body
 class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
-  // Marker colours reused by both the calendar builder and the legend
-  //static const Color _dotColor = Color(0xFF90C048);
-  static const Color _dotColor = Color(0xFF201C58);
-  static const Color _badgeColor = Color(0xFF201C58);
-
-  // Helper to check if user can add events using RolePermissions
+  /// Checks whether the current user role has the create_event permission.
   bool _canAddEvent(BuildContext context) {
     final profileVM = context.read<ProfileViewModel>();
     return RolePermissions.canAccessFeature(profileVM.role, 'create_event');
   }
 
-/*   // Helper to generate personalized welcome title
-  String _getWelcomeTitle() {
-    final profileVM = context.read<ProfileViewModel>();
-    final firstName = profileVM.firstName;
-    if (firstName.isEmpty) {
-      return 'Welcome to KenWell365';
-    }
-    // Capitalize the first character of the firstName
-    final capitalizedFirstName = firstName[0].toUpperCase() +
-        (firstName.length > 1 ? firstName.substring(1) : '');
-    return 'Welcome to KenWell365, $capitalizedFirstName';
-  } */
-
-  // Initialize state
   @override
   void initState() {
     super.initState();
-    // Load events when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<CalendarViewModel>().loadEvents();
     });
   }
 
-  // Build method to create the widget tree
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    // Use Consumer to listen to CalendarViewModel changes
     return Consumer<CalendarViewModel>(
       builder: (context, viewModel, _) {
-        // Main scaffold with tab controller
         return DefaultTabController(
           length: 2,
           child: Scaffold(
-            // App bar with title and actions
             appBar: KenwellAppBar(
               title: 'KenWell365',
               automaticallyImplyLeading: true,
-              //titleColor: const Color(0xFF201C58),
               titleStyle: const TextStyle(
-                //color: Color(0xFF201C58),
                 color: Colors.white,
-                //color: KenwellColors.secondaryNavyDark,
                 fontWeight: FontWeight.bold,
               ),
               actions: [
-                // Refresh events button
                 IconButton(
                   onPressed: () {
                     if (mounted) {
@@ -114,60 +80,56 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                   icon: const Icon(Icons.refresh, color: Colors.white),
                   tooltip: 'Refresh events',
                 ),
-                // Help button
                 TextButton.icon(
                   onPressed: () {
-                    if (mounted) {
-                      context.pushNamed('help');
-                    }
+                    if (mounted) context.pushNamed('help');
                   },
                   icon: const Icon(Icons.help_outline, color: Colors.white),
-                  label: const Text(
-                    'Help',
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  label: const Text('Help',
+                      style: TextStyle(color: Colors.white)),
                 ),
               ],
-              // Tab bar for switching views
+              // Tab bar switching between Calendar and List views
               bottom: TabBar(
                 indicatorSize: TabBarIndicatorSize.label,
                 indicator: UnderlineTabIndicator(
                   borderSide: BorderSide(
                     width: 3.0,
-                    color: theme.colorScheme.onPrimary,
+                    color: Theme.of(context).colorScheme.onPrimary,
                   ),
                   insets: const EdgeInsets.symmetric(horizontal: 16.0),
                 ),
-                labelColor: theme.colorScheme.onPrimary,
-                unselectedLabelColor:
-                    theme.colorScheme.onPrimary.withValues(alpha: 0.7),
+                labelColor: Theme.of(context).colorScheme.onPrimary,
+                unselectedLabelColor: Theme.of(context)
+                    .colorScheme
+                    .onPrimary
+                    .withValues(alpha: 0.7),
                 labelStyle: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
+                    fontWeight: FontWeight.bold, fontSize: 14),
                 unselectedLabelStyle: const TextStyle(
-                  fontWeight: FontWeight.normal,
-                  fontSize: 14,
-                ),
-                // Tabs for calendar and list views
+                    fontWeight: FontWeight.normal, fontSize: 14),
                 tabs: const [
                   Tab(
-                      icon: Icon(Icons.calendar_today),
-                      text: 'Events Calendar'),
-                  Tab(icon: Icon(Icons.list), text: 'Events List'),
+                    icon: Icon(Icons.calendar_today_rounded),
+                    text: 'Events Calendar',
+                  ),
+                  Tab(
+                    icon: Icon(Icons.list_rounded),
+                    text: 'Events List',
+                  ),
                 ],
               ),
             ),
-            // Body with loading indicator, error banner, and tab views
             body: viewModel.isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : Column(
                     children: [
                       const KenwellGradientHeader(
                         title: 'Event Management',
-                        subtitle: 'View and manage your wellness events',
+                        subtitle:
+                            'View and manage your wellness events',
                       ),
-                      // Show error banner if there's an error, but still show calendar
+                      // Error banner (non-blocking — calendar still shows)
                       if (viewModel.error != null)
                         Container(
                           width: double.infinity,
@@ -175,23 +137,20 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                           color: Colors.orange.shade100,
                           child: Row(
                             children: [
-                              // Warning icon and error message
                               Icon(Icons.warning,
                                   color: Colors.orange.shade900),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
                                   viewModel.error!,
-                                  style:
-                                      TextStyle(color: Colors.orange.shade900),
+                                  style: TextStyle(
+                                      color: Colors.orange.shade900),
                                 ),
                               ),
-                              // Retry button
                               TextButton(
                                 onPressed: () => viewModel.loadEvents(),
                                 child: const Text('Retry'),
                               ),
-                              // Dismiss button
                               IconButton(
                                 icon: const Icon(Icons.close),
                                 onPressed: () => viewModel.clearError(),
@@ -201,24 +160,37 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                             ],
                           ),
                         ),
-                      // Always show the calendar and events list
                       Expanded(
                         child: TabBarView(
-                          // Two tabs: Calendar view and Events list view
                           children: [
-                            _buildCalendarTab(viewModel),
-                            _buildEventsListTab(viewModel),
+                            // Tab 1: full calendar widget
+                            CalendarTabView(
+                              viewModel: viewModel,
+                              onOpenEventForm: (date,
+                                      {existingEvent}) =>
+                                  _openEventForm(
+                                context,
+                                viewModel,
+                                date,
+                                existingEvent: existingEvent,
+                              ),
+                            ),
+                            // Tab 2: month grouped event list
+                            EventsListTabView(
+                              viewModel: viewModel,
+                              canAddEvent: _canAddEvent(context),
+                            ),
                           ],
                         ),
                       ),
                     ],
                   ),
-
-            // Floating action button to add new events
+            // FAB: only for users with create_event permission
             floatingActionButton: _canAddEvent(context)
                 ? FloatingActionButton.extended(
                     backgroundColor: const Color(0xFF90C048),
-                    icon: const Icon(Icons.add, color: Colors.white),
+                    icon:
+                        const Icon(Icons.add, color: Colors.white),
                     label: const Text('Add Event',
                         style: TextStyle(color: Colors.white)),
                     onPressed: () {
@@ -234,567 +206,22 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
     );
   }
 
-  // Build a stat chip for the stats strip
-  Widget _buildStatChip(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required String value,
-    required Color color,
-  }) {
-    final theme = Theme.of(context);
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color.withValues(alpha: 0.18), width: 1),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(icon, size: 18, color: color),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    value,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                      color: color,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                  Text(
-                    label,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      //color: theme.colorScheme.onSurfaceVariant,
-                      color: KenwellColors.secondaryNavyDark,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // ── Navigation ───────────────────────────────────────────────────────────
 
-  // Build the calendar tab view
-  Widget _buildCalendarTab(CalendarViewModel viewModel) {
-    final theme = Theme.of(context);
-    final eventsThisMonth =
-        viewModel.getTotalEventsThisMonth(viewModel.focusedDay);
-    final upcomingEventsCount = viewModel.getUpcomingEvents();
-
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          const SizedBox(height: 20),
-          // Stats strip: events this month and upcoming events
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                _buildStatChip(
-                  context,
-                  icon: Icons.calendar_month_rounded,
-                  label: 'This Month',
-                  value: '$eventsThisMonth',
-                  color: const Color(0xFF201C58),
-                  //color: const Color(0xFF90C048),
-                ),
-                const SizedBox(width: 10),
-                _buildStatChip(context,
-                    icon: Icons.upcoming_rounded,
-                    label: 'Upcoming Month\'s',
-                    value: '$upcomingEventsCount',
-                    //color: const Color(0xFF201C58),
-                    color: KenwellColors.secondaryNavy),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            // Green border wrapper makes the calendar pop
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  // color: KenwellColors.primaryGreen,
-                  //color: KenwellColors.secondaryNavy,
-                  color: KenwellColors.secondaryNavy.withValues(alpha: 0.08),
-                  width: 2.5,
-                ),
-              ),
-              child: KenwellFormCard(
-                child: TableCalendar(
-                  // Calendar configuration
-                  firstDay: DateTime.utc(2020, 1, 1),
-                  lastDay: DateTime.utc(3000, 12, 31),
-                  focusedDay: viewModel.focusedDay,
-                  selectedDayPredicate: (day) =>
-                      isSameDay(viewModel.selectedDay, day),
-                  eventLoader: (day) => viewModel.getEventsForDay(day),
-                  calendarFormat: CalendarFormat.month,
-                  startingDayOfWeek: StartingDayOfWeek.monday,
-                  // Calendar styles
-                  headerStyle: const HeaderStyle(
-                    formatButtonVisible: false,
-                    titleCentered: true,
-                    titleTextStyle: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF201C58),
-                    ),
-                  ),
-                  // Days of week styles
-                  daysOfWeekStyle: const DaysOfWeekStyle(
-                    weekdayStyle: TextStyle(fontWeight: FontWeight.bold),
-                    weekendStyle: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red,
-                    ),
-                  ),
-                  // Calendar day styles (markersMaxCount 0 – custom builder used)
-                  calendarStyle: CalendarStyle(
-                    markersMaxCount: 0,
-                    weekendTextStyle: const TextStyle(color: Colors.red),
-                    todayDecoration: BoxDecoration(
-                      color: Colors.deepPurple.withValues(alpha: 0.3),
-                      shape: BoxShape.circle,
-                    ),
-                    selectedDecoration: const BoxDecoration(
-                      color: Color(0xFF90C048),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  // Custom marker builder:
-                  //  • 1–2 events → coloured dots below the day number
-                  //  • 3+ events  → count badge (navy circle with number)
-                  calendarBuilders: CalendarBuilders(
-                    markerBuilder: (context, day, events) {
-                      if (events.isEmpty) return const SizedBox.shrink();
-                      if (events.length <= 2) {
-                        // Show one dot per event, centred below the day cell
-                        return Positioned(
-                          bottom: 4,
-                          left: 0,
-                          right: 0,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: List.generate(
-                              events.length,
-                              (_) => Container(
-                                width: 6,
-                                height: 6,
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 1.5),
-                                decoration: const BoxDecoration(
-                                  color: _dotColor,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      }
-                      // 3+ events: show count badge
-                      return Positioned(
-                        right: 2,
-                        bottom: 2,
-                        child: Container(
-                          width: 18,
-                          height: 18,
-                          decoration: BoxDecoration(
-                            color: _badgeColor,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 1.5),
-                          ),
-                          child: Center(
-                            child: Text(
-                              '${events.length}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  // Handle day selection and page changes
-                  onDaySelected: (selectedDay, focusedDay) async {
-                    viewModel.setSelectedDay(selectedDay);
-                    viewModel.setFocusedDay(focusedDay);
-                    // Show dialog with events for the selected day
-                    final eventsForDay = viewModel.getEventsForDay(selectedDay);
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      builder: (ctx) => DayEventsDialog(
-                        selectedDay: selectedDay,
-                        events: eventsForDay,
-                        viewModel: viewModel,
-                        // Callback to open the event form
-                        onOpenEventForm: (date,
-                                {WellnessEvent? existingEvent}) =>
-                            _openEventForm(context, viewModel, date,
-                                existingEvent: existingEvent),
-                      ),
-                    );
-                  },
-                  // Handle month navigation
-                  onPageChanged: (focusedDay) {
-                    viewModel.setFocusedDay(focusedDay);
-                  },
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          // Legend: dots for 1–2 events, number badge for 3+
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Wrap(
-              alignment: WrapAlignment.center,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 16,
-              children: [
-                // Dot legend
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: _dotColor,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      '1–2 events',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: KenwellColors.secondaryNavyDark,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ],
-                ),
-                // Badge legend
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 16,
-                      height: 16,
-                      decoration: BoxDecoration(
-                        color: _badgeColor,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 1.5),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          '3',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 8,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      '3+ events — tap a date to view details',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: KenwellColors.secondaryNavyDark,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-        ],
-      ),
-    );
-  }
-
-  // Build the events list tab view
-  Widget _buildEventsListTab(CalendarViewModel viewModel) {
-    // Get events for the focused month
-    final eventsThisMonth = viewModel.getEventsForMonth(viewModel.focusedDay);
-    final theme = Theme.of(context);
-
-    return Column(
-      children: [
-        const SizedBox(height: 16),
-        // Month navigation header
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [
-                KenwellColors.secondaryNavy,
-                Color(0xFF2E2880),
-                /*  KenwellColors.secondaryNavy.withValues(alpha: 0.08),
-                KenwellColors.secondaryNavy.withValues(alpha: 0.02), */
-                //theme.primaryColor.withValues(alpha: 0.08),
-                //theme.primaryColor.withValues(alpha: 0.02),
-              ],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: theme.primaryColor.withValues(alpha: 0.15),
-              width: 1,
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Previous month button with enhanced styling
-              IconButton(
-                icon: const Icon(Icons.chevron_left_rounded),
-                onPressed: () => viewModel.goToPreviousMonth(),
-                style: IconButton.styleFrom(
-                  backgroundColor: theme.colorScheme.surface,
-                  foregroundColor: const Color(0xFF201C58),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              // Month and year title with enhanced typography
-              Text(
-                viewModel.getMonthYearTitle(),
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  // color: Color(0xFF201C58),
-                  color: Colors.white,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              const SizedBox(width: 16),
-              // Next month button with enhanced styling
-              IconButton(
-                icon: const Icon(Icons.chevron_right_rounded),
-                onPressed: () => viewModel.goToNextMonth(),
-                style: IconButton.styleFrom(
-                  backgroundColor: theme.colorScheme.surface,
-                  foregroundColor: const Color(0xFF201C58),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        // Events list
-        Expanded(
-          child: eventsThisMonth.isEmpty
-              ? SingleChildScrollView(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: MediaQuery.of(context).size.height * 0.5,
-                    ),
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(32),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            // Enhanced no events illustration
-                            Container(
-                              padding: const EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color:
-                                    theme.primaryColor.withValues(alpha: 0.08),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.event_busy_rounded,
-                                size: 80,
-                                color:
-                                    theme.primaryColor.withValues(alpha: 0.6),
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                            // Informative message with enhanced typography
-                            Text(
-                              'No events this month',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.onSurface,
-                                letterSpacing: -0.5,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            // Suggestion to create events
-                            if (_canAddEvent(context))
-                              Text(
-                                'Create an event to get started',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            const SizedBox(height: 32),
-                            // Enhanced button to create a new event
-                            //  if (_canAddEvent(context))
-                            //  CustomPrimaryButton(
-                            //  label: 'Create Event',
-                            //  onPressed: () => _openEventForm(
-                            //     context, viewModel, viewModel.focusedDay),
-                            //  leading: const Icon(Icons.add_rounded),
-                            //  ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-              // List of events for the month
-              : Builder(
-                  builder: (_) {
-                    // Sort events
-                    final sortedEvents = [...eventsThisMonth];
-                    sortedEvents.sort(viewModel.compareEvents);
-
-                    // Group events by day
-                    final Map<DateTime, List<WellnessEvent>> groupedEvents = {};
-                    for (var event in sortedEvents) {
-                      final dayKey = viewModel.normalizeDate(event.date);
-                      groupedEvents.putIfAbsent(dayKey, () => []).add(event);
-                    }
-
-                    final sortedDates = groupedEvents.keys.toList()
-                      ..sort((a, b) => a.compareTo(b));
-
-                    return ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: sortedDates.length,
-                      itemBuilder: (context, index) {
-                        final day = sortedDates[index];
-                        final dayEvents = groupedEvents[day]!;
-
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Enhanced day header with better styling
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 16, bottom: 12, left: 4),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 4,
-                                    height: 24,
-                                    decoration: BoxDecoration(
-                                      color: theme.primaryColor,
-                                      borderRadius: BorderRadius.circular(2),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Text(
-                                      viewModel.formatDateLong(day),
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: KenwellColors.secondaryNavy,
-                                        //color: KenwellColors.secondaryNavyDark,
-                                        //color: theme.colorScheme.onSurface,
-                                        letterSpacing: -0.3,
-                                      ),
-                                    ),
-                                  ),
-                                  // Event count badge
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: theme.primaryColor
-                                          .withValues(alpha: 0.15),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Text(
-                                      '${dayEvents.length}',
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.bold,
-                                        color: theme.primaryColor,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            // Event cards for the day
-                            ...dayEvents
-                                .map((event) => EventCard(
-                                    event: event,
-                                    viewModel: viewModel,
-                                    showBorder: true))
-                                .toList(),
-                            const SizedBox(height: 8),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                ),
-        ),
-      ],
-    );
-  }
-
-  // Open the event form for adding or editing events
+  /// Opens the event creation/editing form and reloads the calendar on return.
   Future<void> _openEventForm(
-      BuildContext context, CalendarViewModel viewModel, DateTime date,
-      {WellnessEvent? existingEvent}) async {
-    // Use global EventViewModel from provider
+    BuildContext context,
+    CalendarViewModel viewModel,
+    DateTime date, {
+    WellnessEvent? existingEvent,
+  }) async {
     final eventViewModel = context.read<EventViewModel>();
     await eventViewModel.initialized;
 
-    // Navigate to the EventScreen
     if (!context.mounted) return;
 
-    // Push EventScreen and wait for it to close
     await Navigator.push(
       context,
-      // Navigate to EventScreen
       MaterialPageRoute(
         builder: (_) => EventScreen(
           date: date,
@@ -811,7 +238,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
       ),
     );
 
-    // Reload calendar events to reflect any changes
+    // Reload to reflect any changes made in the form
     if (context.mounted) {
       try {
         await viewModel.loadEvents();
