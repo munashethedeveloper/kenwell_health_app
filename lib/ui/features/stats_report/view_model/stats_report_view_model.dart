@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../utils/extensions.dart';
 
 class StatsReportViewModel extends ChangeNotifier {
   StatsReportViewModel() {
@@ -44,24 +43,13 @@ class StatsReportViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> pickTime(
-      BuildContext context, TextEditingController controller) async {
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-      builder: (context, child) => MediaQuery(
-        // Force 24-hour clock regardless of device locale
-        data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-        child: child!,
-      ),
-    );
-
-    if (picked != null && context.mounted) {
-      // Use fixed 24-hour HH:mm format (locale-independent) for consistency
-      // with the 24-hour picker dialog configured above.
-      controller.text = picked.toHHmm();
-      notifyListeners();
-    }
+  /// Stores a time string (HH:mm) in [controller] and notifies listeners.
+  /// Call this from the UI after showing a [showTimePicker] dialog.
+  void setTimeFromPicked(TimeOfDay picked, TextEditingController controller) {
+    final hh = picked.hour.toString().padLeft(2, '0');
+    final mm = picked.minute.toString().padLeft(2, '0');
+    controller.text = '$hh:$mm';
+    notifyListeners();
   }
 
   Future<bool> generateReport() async {
@@ -71,7 +59,6 @@ class StatsReportViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // In a real app: Save to Firestore or generate downloadable report here.
       await Future.delayed(const Duration(seconds: 1));
       debugPrint(
         'Stats report generated for ${eventTitleController.text} on $eventDate',
