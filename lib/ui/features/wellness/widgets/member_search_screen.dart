@@ -7,7 +7,6 @@ import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_form_card.dart';
-import 'package:provider/provider.dart';
 import '../view_model/member_search_view_model.dart';
 
 /// Search screen used at the start of the wellness flow.
@@ -89,9 +88,7 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<MemberSearchViewModel>.value(
-      value: _viewModel,
-      child: Scaffold(
+    return Scaffold(
         appBar: const KenwellAppBar(
           title: 'KenWell365',
           automaticallyImplyLeading: false,
@@ -107,14 +104,15 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
-                child: Consumer<MemberSearchViewModel>(
-                  builder: (context, vm, _) => Column(
+                child: ListenableBuilder(
+                  listenable: _viewModel,
+                  builder: (context, _) => Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       const SizedBox(height: 8),
                       _SearchInputCard(
                         controller: _idController,
-                        isSearching: vm.isSearching,
+                        isSearching: _viewModel.isSearching,
                         onSearch: _handleSearch,
                       ),
                       const SizedBox(height: 8),
@@ -128,17 +126,17 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
                       const SizedBox(height: 16),
 
                       // Not found card
-                      if (vm.memberFound == false) ...[
+                      if (_viewModel.memberFound == false) ...[
                         _MemberNotFoundCard(
                             onRegister: _proceedToRegistration),
                         const SizedBox(height: 16),
                       ],
 
                       // Found card
-                      if (vm.memberFound == true &&
-                          vm.foundMemberName != null) ...[
+                      if (_viewModel.memberFound == true &&
+                          _viewModel.foundMemberName != null) ...[
                         _MemberFoundCard(
-                          memberName: vm.foundMemberName!,
+                          memberName: _viewModel.foundMemberName!,
                           onContinue: _proceedWithFoundMember,
                         ),
                         const SizedBox(height: 16),
@@ -149,7 +147,6 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
               ),
             ),
           ],
-        ),
       ),
     );
   }

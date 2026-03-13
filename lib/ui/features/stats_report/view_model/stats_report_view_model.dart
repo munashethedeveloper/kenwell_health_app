@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import '../../../../data/repositories_dcl/firestore_member_repository.dart';
 
 class StatsReportViewModel extends ChangeNotifier {
-  StatsReportViewModel() {
+  StatsReportViewModel({FirestoreMemberRepository? memberRepository})
+      : _memberRepository =
+            memberRepository ?? FirestoreMemberRepository() {
     for (final controller in _allControllers) {
       controller.addListener(_onFieldChanged);
     }
   }
+
+  final FirestoreMemberRepository _memberRepository;
 
   final formKey = GlobalKey<FormState>();
 
@@ -20,6 +25,29 @@ class StatsReportViewModel extends ChangeNotifier {
 
   DateTime? eventDate;
   bool isLoading = false;
+
+  // ── Member count ──────────────────────────────────────────────────────────
+
+  int _memberCount = 0;
+  bool _isLoadingMemberCount = false;
+
+  int get memberCount => _memberCount;
+  bool get isLoadingMemberCount => _isLoadingMemberCount;
+
+  /// Fetches the total number of registered members and notifies listeners.
+  Future<void> loadMemberCount() async {
+    _isLoadingMemberCount = true;
+    notifyListeners();
+    try {
+      final members = await _memberRepository.fetchAllMembers();
+      _memberCount = members.length;
+    } catch (_) {
+      // Non-fatal — keep previous count.
+    } finally {
+      _isLoadingMemberCount = false;
+      notifyListeners();
+    }
+  }
 
   List<TextEditingController> get _allControllers => [
         eventTitleController,

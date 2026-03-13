@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
-import '../../../../data/repositories_dcl/firestore_member_repository.dart';
 import '../../../../domain/models/wellness_event.dart';
 import 'health_screening_stats_section.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
@@ -10,6 +9,7 @@ import 'sections/event_stats_list_section.dart';
 import 'sections/live_screening_counts_section.dart';
 import 'sections/stats_filter_sheet.dart';
 import 'sections/stats_stat_card.dart';
+import '../view_model/stats_report_view_model.dart';
 
 /// Reusable event-statistics body.
 ///
@@ -27,9 +27,6 @@ class EventStatsContent extends StatefulWidget {
 
 class _EventStatsContentState extends State<EventStatsContent> {
   final _searchController = TextEditingController();
-  final _memberRepository = FirestoreMemberRepository();
-  int _totalMembers = 0;
-  bool _isLoadingMembers = true;
 
   // Filter states
   String? _selectedStatus;
@@ -40,27 +37,16 @@ class _EventStatsContentState extends State<EventStatsContent> {
   @override
   void initState() {
     super.initState();
-    _loadMemberCount();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<StatsReportViewModel>().loadMemberCount();
+    });
     _searchController.addListener(() => setState(() {}));
   }
 
-  Future<void> _loadMemberCount() async {
-    try {
-      setState(() => _isLoadingMembers = true);
-      final members = await _memberRepository.fetchAllMembers();
-      if (mounted) {
-        setState(() {
-          _totalMembers = members.length;
-          _isLoadingMembers = false;
-        });
-      }
-    } catch (_) {
-      if (mounted) setState(() => _isLoadingMembers = false);
-    }
-  }
+
 
   Future<void> _refreshData() async {
-    await _loadMemberCount();
+    context.read<StatsReportViewModel>().loadMemberCount();
     if (mounted) {
       setState(() {});
       ScaffoldMessenger.of(context).showSnackBar(
@@ -433,7 +419,7 @@ class _EventStatsContentState extends State<EventStatsContent> {
                   icon: Icons.how_to_reg_outlined,
                   title: 'Registered',
                   value:
-                      _isLoadingMembers ? '...' : _totalMembers.toString(),
+                      context.watch<StatsReportViewModel>().isLoadingMemberCount ? '...' : context.watch<StatsReportViewModel>().memberCount.toString(),
                   color: KenwellColors.primaryGreen,
                 ),
               ),

@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../domain/models/member.dart';
-import '../../../../data/repositories_dcl/firestore_member_repository.dart';
+import '../view_model/member_events_view_model.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/headers/kenwell_gradient_header.dart';
 import '../../../shared/ui/cards/kenwell_detail_row.dart';
 import '../../../shared/ui/cards/kenwell_section_card.dart';
 
-/// Screen to display all events a member has attended
+/// Displays a member's personal details and their event-attendance history.
+///
+/// All data loading is handled by [MemberEventsViewModel]; this widget is
+/// pure UI.
 class MemberEventsScreen extends StatefulWidget {
   final Member member;
 
@@ -22,62 +23,29 @@ class MemberEventsScreen extends StatefulWidget {
 }
 
 class _MemberEventsScreenState extends State<MemberEventsScreen> {
-  final FirestoreMemberRepository _repository = FirestoreMemberRepository();
-  List<Map<String, dynamic>> _events = [];
-  bool _isLoading = true;
-  String? _errorMessage;
+  late final MemberEventsViewModel _vm;
 
   @override
   void initState() {
     super.initState();
-    _loadMemberEvents();
+    _vm = MemberEventsViewModel(member: widget.member);
+    _vm.addListener(_onVmChanged);
+    _vm.loadMemberEvents();
   }
 
   @override
   void dispose() {
+    _vm
+      ..removeListener(_onVmChanged)
+      ..dispose();
     super.dispose();
   }
 
-  Future<void> _loadMemberEvents() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    try {
-      final events = await _repository.fetchMemberEvents(widget.member);
-      setState(() {
-        _events = events;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Failed to load events: $e';
-        _isLoading = false;
-      });
-    }
+  void _onVmChanged() {
+    if (mounted) setState(() {});
   }
 
-  String _formatDate(dynamic date) {
-    if (date == null) return 'Date not available';
-
-    try {
-      DateTime dateTime;
-      if (date is Timestamp) {
-        dateTime = date.toDate();
-      } else if (date is String) {
-        dateTime = DateTime.parse(date);
-      } else if (date is DateTime) {
-        dateTime = date;
-      } else {
-        return 'Invalid date';
-      }
-
-      return DateFormat('dd MMM yyyy').format(dateTime);
-    } catch (e) {
-      return 'Date format error';
-    }
-  }
+  // ── Build ─────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +57,7 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
         automaticallyImplyLeading: true,
       ),
       body: RefreshIndicator(
-        onRefresh: _loadMemberEvents,
+        onRefresh: _vm.loadMemberEvents,
         child: CustomScrollView(
           slivers: [
             // ── Gradient section header ─────────────────────────
@@ -110,34 +78,52 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       KenwellSectionCard(
-                      title: 'Personal Information',
-                      Icons.person,
+                        title: 'Personal Information',
+                        Icons.person,
                         [
-                          KenwellDetailRow(label: 'Name and Surname', value: '${widget.member.name} ${widget.member.surname}'),
+                          KenwellDetailRow(
+                              label: 'Name and Surname',
+                              value:
+                                  '${widget.member.name} ${widget.member.surname}'),
                           const Divider(height: 1),
-                          KenwellDetailRow(label: 'Gender', value: widget.member.gender ?? ''),
+                          KenwellDetailRow(
+                              label: 'Gender',
+                              value: widget.member.gender ?? ''),
                           const Divider(height: 1),
-                          KenwellDetailRow(label: 'Email', value: widget.member.email ?? ''),
+                          KenwellDetailRow(
+                              label: 'Email',
+                              value: widget.member.email ?? ''),
                           const Divider(height: 1),
-                          KenwellDetailRow(label: 'Phone Number', value: widget.member.cellNumber ?? ''),
+                          KenwellDetailRow(
+                              label: 'Phone Number',
+                              value: widget.member.cellNumber ?? ''),
                           const Divider(height: 1),
-                          KenwellDetailRow(label: 'Citizenship Status', value: widget.member.citizenshipStatus ?? ''),
+                          KenwellDetailRow(
+                              label: 'Citizenship Status',
+                              value: widget.member.citizenshipStatus ?? ''),
                           const Divider(height: 1),
-                          KenwellDetailRow(label: 'Nationality', value: widget.member.nationality ?? ''),
+                          KenwellDetailRow(
+                              label: 'Nationality',
+                              value: widget.member.nationality ?? ''),
                           const Divider(height: 1),
-                          KenwellDetailRow(label: 'ID Number', value: widget.member.idNumber ?? ''),
+                          KenwellDetailRow(
+                              label: 'ID Number',
+                              value: widget.member.idNumber ?? ''),
                           const Divider(height: 1),
-                          KenwellDetailRow(label: 'Passport Number', value: widget.member.passportNumber ?? ''),
+                          KenwellDetailRow(
+                              label: 'Passport Number',
+                              value: widget.member.passportNumber ?? ''),
                           const Divider(height: 1),
-                          KenwellDetailRow(label: 'Medical Aid', value: widget.member.medicalAidName ?? ''),
+                          KenwellDetailRow(
+                              label: 'Medical Aid',
+                              value: widget.member.medicalAidName ?? ''),
                         ],
                       ),
 
                       const SizedBox(height: 24),
 
-                      // Events section
                       Text(
-                        'Events History  (${_events.length})',
+                        'Events History  (${_vm.events.length})',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
@@ -147,58 +133,48 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
 
                       const SizedBox(height: 16),
 
-                      // Loading, error, or events list
-                      if (_isLoading)
+                      if (_vm.isLoading)
                         const Center(
                           child: Padding(
                             padding: EdgeInsets.all(32.0),
                             child: CircularProgressIndicator(),
                           ),
                         )
-                      else if (_errorMessage != null)
+                      else if (_vm.errorMessage != null)
                         Center(
                           child: Padding(
                             padding: const EdgeInsets.all(32.0),
                             child: Column(
                               children: [
-                                Icon(
-                                  Icons.error_outline,
-                                  size: 64,
-                                  color: theme.colorScheme.error,
-                                ),
+                                Icon(Icons.error_outline,
+                                    size: 64, color: theme.colorScheme.error),
                                 const SizedBox(height: 16),
-                                Text(
-                                  _errorMessage!,
-                                  textAlign: TextAlign.center,
-                                  style: theme.textTheme.bodyMedium,
-                                ),
+                                Text(_vm.errorMessage!,
+                                    textAlign: TextAlign.center,
+                                    style: theme.textTheme.bodyMedium),
                                 const SizedBox(height: 16),
                                 ElevatedButton(
-                                  onPressed: _loadMemberEvents,
-                                  child: const Text('Retry'),
-                                ),
+                                    onPressed: _vm.loadMemberEvents,
+                                    child: const Text('Retry')),
                               ],
                             ),
                           ),
                         )
-                      else if (_events.isEmpty)
+                      else if (_vm.events.isEmpty)
                         Center(
                           child: Padding(
                             padding: const EdgeInsets.all(32.0),
                             child: Column(
                               children: [
-                                Icon(
-                                  Icons.event_busy,
-                                  size: 64,
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
+                                Icon(Icons.event_busy,
+                                    size: 64,
+                                    color: theme.colorScheme.onSurfaceVariant),
                                 const SizedBox(height: 16),
-                                Text(
-                                  'No Events Found',
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
+                                Text('No Events Found',
+                                    style:
+                                        theme.textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    )),
                                 const SizedBox(height: 8),
                                 Text(
                                   'This member has not attended any events yet.',
@@ -212,9 +188,11 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
                           ),
                         )
                       else
-                        // Events list
-                        ..._events
-                            .map((event) => _buildEventCard(event))
+                        ..._vm.events
+                            .map((event) => _EventCard(
+                                  event: event,
+                                  formatDate: _vm.formatDate,
+                                ))
                             .toList(),
                     ],
                   ),
@@ -226,29 +204,25 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
       ),
     );
   }
+}
 
-  Widget _buildEventCard(Map<String, dynamic> event) {
+// ─────────────────────────────────────────────────────────────────────────────
+// Private section widgets
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _EventCard extends StatelessWidget {
+  const _EventCard({required this.event, required this.formatDate});
+
+  final Map<String, dynamic> event;
+  final String Function(dynamic) formatDate;
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final location = (event['eventLocation'] != null &&
-            event['eventLocation'].toString().isNotEmpty)
-        ? event['eventLocation'] as String
-        : (event['eventVenue'] != null &&
-                event['eventVenue'].toString().isNotEmpty)
-            ? event['eventVenue'] as String
-            : null;
 
+    final location = _resolveLocation();
     final isScreened = event['isScreened'] as bool? ?? false;
-    final hraCompleted = event['hraCompleted'] as bool? ?? false;
-    final hctCompleted = event['hctCompleted'] as bool? ?? false;
-    final tbCompleted = event['tbCompleted'] as bool? ?? false;
-    final cancerCompleted = event['cancerCompleted'] as bool? ?? false;
-
-    final completedScreenings = <String>[
-      if (hraCompleted) 'HRA',
-      if (hctCompleted) 'HCT',
-      if (tbCompleted) 'TB',
-      if (cancerCompleted) 'Cancer',
-    ];
+    final completedScreenings = _completedScreenings();
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
@@ -270,11 +244,7 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
               color: theme.primaryColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(
-              Icons.event,
-              color: theme.primaryColor,
-              size: 20,
-            ),
+            child: Icon(Icons.event, color: theme.primaryColor, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -296,23 +266,19 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    _buildScreeningBadge(isScreened, theme),
+                    _ScreeningBadge(isScreened: isScreened),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Icon(
-                      Icons.calendar_today,
-                      size: 14,
-                      color: Colors.grey[600],
-                    ),
+                    Icon(Icons.calendar_today,
+                        size: 14, color: Colors.grey[600]),
                     const SizedBox(width: 4),
                     Text(
-                      _formatDate(event['eventDate']),
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: Colors.grey[600],
-                      ),
+                      formatDate(event['eventDate']),
+                      style: theme.textTheme.bodySmall
+                          ?.copyWith(color: Colors.grey[600]),
                     ),
                   ],
                 ),
@@ -320,18 +286,14 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      Icon(
-                        Icons.location_on,
-                        size: 14,
-                        color: Colors.grey[600],
-                      ),
+                      Icon(Icons.location_on,
+                          size: 14, color: Colors.grey[600]),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
                           location,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: Colors.grey[600],
-                          ),
+                          style: theme.textTheme.bodySmall
+                              ?.copyWith(color: Colors.grey[600]),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                         ),
@@ -345,7 +307,7 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
                     spacing: 4,
                     runSpacing: 4,
                     children: completedScreenings
-                        .map((s) => _buildScreeningChip(s, theme))
+                        .map((s) => _ScreeningChip(label: s))
                         .toList(),
                   ),
                 ],
@@ -357,19 +319,36 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
     );
   }
 
-  Widget _buildScreeningBadge(bool isScreened, ThemeData theme) {
+  String? _resolveLocation() {
+    final loc = event['eventLocation'];
+    if (loc != null && loc.toString().isNotEmpty) return loc as String;
+    final venue = event['eventVenue'];
+    if (venue != null && venue.toString().isNotEmpty) return venue as String;
+    return null;
+  }
+
+  List<String> _completedScreenings() => [
+        if (event['hraCompleted'] as bool? ?? false) 'HRA',
+        if (event['hctCompleted'] as bool? ?? false) 'HCT',
+        if (event['tbCompleted'] as bool? ?? false) 'TB',
+        if (event['cancerCompleted'] as bool? ?? false) 'Cancer',
+      ];
+}
+
+class _ScreeningBadge extends StatelessWidget {
+  const _ScreeningBadge({required this.isScreened});
+  final bool isScreened;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = isScreened ? Colors.green : Colors.orange;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: isScreened
-            ? Colors.green.withValues(alpha: 0.12)
-            : Colors.orange.withValues(alpha: 0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isScreened
-              ? Colors.green.withValues(alpha: 0.4)
-              : Colors.orange.withValues(alpha: 0.4),
-        ),
+        border: Border.all(color: color.withValues(alpha: 0.4)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -377,13 +356,13 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
           Icon(
             isScreened ? Icons.check_circle_outline : Icons.app_registration,
             size: 12,
-            color: isScreened ? Colors.green[700] : Colors.orange[700],
+            color: isScreened ? Colors.green.shade700 : Colors.orange.shade700,
           ),
           const SizedBox(width: 3),
           Text(
             isScreened ? 'Screened' : 'Registered',
             style: theme.textTheme.labelSmall?.copyWith(
-              color: isScreened ? Colors.green[700] : Colors.orange[700],
+              color: isScreened ? Colors.green.shade700 : Colors.orange.shade700,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -391,16 +370,21 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
       ),
     );
   }
+}
 
-  Widget _buildScreeningChip(String label, ThemeData theme) {
+class _ScreeningChip extends StatelessWidget {
+  const _ScreeningChip({required this.label});
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: theme.primaryColor.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: theme.primaryColor.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: theme.primaryColor.withValues(alpha: 0.2)),
       ),
       child: Text(
         label,
@@ -411,6 +395,4 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
       ),
     );
   }
-
-
 }

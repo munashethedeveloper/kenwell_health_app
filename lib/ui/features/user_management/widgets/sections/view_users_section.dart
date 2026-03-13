@@ -8,6 +8,7 @@ import '../../viewmodel/user_management_view_model.dart';
 import 'user_card_widget.dart';
 import 'user_filter_chips.dart';
 import 'user_search_bar.dart';
+import '../../../../shared/ui/badges/stat_pill.dart';
 
 /// View users section with search, filter, and user list
 class ViewUsersSection extends StatefulWidget {
@@ -388,13 +389,13 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                                   const SizedBox(height: 5),
                                   Row(
                                     children: [
-                                      _StatPill(
+                                      StatPill(
                                         icon: Icons.verified_rounded,
                                         label: '$verifiedCount verified',
                                         color: const Color(0xFF10B981),
                                       ),
                                       const SizedBox(width: 8),
-                                      _StatPill(
+                                      StatPill(
                                         icon: Icons.error_outline_rounded,
                                         label: '$unverifiedCount unverified',
                                         color: Colors.white70,
@@ -588,33 +589,3 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
 
 // ── Helper widget ─────────────────────────────────────────────────────────────
 
-class _StatPill extends StatelessWidget {
-  const _StatPill({
-    required this.icon,
-    required this.label,
-    required this.color,
-  });
-
-  final IconData icon;
-  final String label;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: color, size: 12),
-        const SizedBox(width: 3),
-        Text(
-          label,
-          style: TextStyle(
-            color: color,
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    );
-  }
-}
