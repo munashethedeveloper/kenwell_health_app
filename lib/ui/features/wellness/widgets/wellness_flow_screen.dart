@@ -287,7 +287,11 @@ class WellnessFlowScreen extends StatelessWidget {
               // 1) submit all flow data (existing behavior) — protect with try/catch
               try {
                 debugPrint('WellnessFlow: calling flowVM.submitAll');
-                await flowVM.submitAll(context);
+                await flowVM.submitAll(
+                  onSuccess: (msg) {
+                    if (context.mounted) AppSnackbar.showSuccess(context, msg);
+                  },
+                );
                 // Mark survey as completed and update UI immediately
                 flowVM.markSurveyCompleted();
                 debugPrint('WellnessFlow: submitAll completed');

@@ -247,28 +247,6 @@ class EventViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Pick time using TimePicker.
-  //
-  // NOTE: Showing a time-picker dialog is a UI concern.  New code should call
-  // [showTimePicker] in the widget layer and pass the result to [setTime].
-  // This method is retained for backward compatibility with callers that have
-  // not been migrated yet.
-  Future<void> pickTime(
-      BuildContext context, TextEditingController controller) async {
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-      builder: (context, child) => MediaQuery(
-        // Force 24-hour clock regardless of device locale
-        data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-        child: child!,
-      ),
-    );
-
-    if (picked != null && context.mounted) {
-      setTime(controller, picked);
-    }
-  }
 
   /// Constructs a [WellnessEvent] from the current form controller values.
   ///
