@@ -8,6 +8,7 @@ import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import 'sections/stats_metric_card.dart';
 import 'health_screening_stats_section.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 class EventStatsDetailScreen extends StatelessWidget {
   final WellnessEvent event;
@@ -279,11 +280,7 @@ class EventStatsDetailScreen extends StatelessWidget {
                 subtitle: const Text('Export event data as CSV file'),
                 onTap: () {
                   Navigator.of(ctx).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('CSV export coming soon'),
-                    ),
-                  );
+                  AppSnackbar.showInfo(context, 'CSV export coming soon');
                 },
               ),
               ListTile(
@@ -292,11 +289,7 @@ class EventStatsDetailScreen extends StatelessWidget {
                 subtitle: const Text('Export event report as PDF'),
                 onTap: () {
                   Navigator.of(ctx).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('PDF export coming soon'),
-                    ),
-                  );
+                  AppSnackbar.showInfo(context, 'PDF export coming soon');
                 },
               ),
             ],

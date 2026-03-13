@@ -11,6 +11,7 @@ import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/calendar_view_model.dart';
 import 'sections/calendar_tab_view.dart';
 import 'sections/events_list_tab_view.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 /// The main calendar screen.
 ///
@@ -69,12 +70,8 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                   onPressed: () {
                     if (mounted) {
                       viewModel.loadEvents();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Events refreshed'),
-                          duration: Duration(seconds: 1),
-                        ),
-                      );
+                      AppSnackbar.showSuccess(context, 'Events refreshed',
+                          duration: const Duration(seconds: 1));
                     }
                   },
                   icon: const Icon(Icons.refresh, color: Colors.white),

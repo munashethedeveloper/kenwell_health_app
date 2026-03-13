@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 /// Utility class for handling logout functionality across the app
 class LogoutHelper {
@@ -39,12 +40,8 @@ class LogoutHelper {
 
     if (!context.mounted) return true;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Successfully logged out'),
-        duration: Duration(seconds: 2),
-      ),
-    );
+    AppSnackbar.showSuccess(context, 'Successfully logged out',
+        duration: const Duration(seconds: 2));
 
     onComplete();
     return true;

@@ -14,6 +14,7 @@ import '../../consent_form/widgets/consent_screen.dart';
 import '../../health_risk_assessment/widgets/health_risk_assessment_screen.dart';
 import '../../hiv_test/widgets/hiv_test_screen.dart';
 import '../../tb_test/widgets/tb_testing_screen.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 class WellnessFlowScreen extends StatelessWidget {
   final VoidCallback onExitFlow;
@@ -295,9 +296,8 @@ class WellnessFlowScreen extends StatelessWidget {
                 if (context.mounted) {
                   // Close progress dialog if open
                   Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Failed to submit data: $e')),
-                  );
+                  AppSnackbar.showError(
+                      context, 'Failed to submit data: $e');
                 }
                 return;
               }

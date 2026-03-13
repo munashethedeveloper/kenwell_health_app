@@ -13,6 +13,7 @@ import '../../wellness/widgets/wellness_flow_page.dart';
 import 'sections/my_event_tab_bar.dart';
 import 'sections/my_event_empty_state.dart';
 import 'sections/premium_event_card.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 /// Screen that lists the wellness events assigned to the currently logged-in
 /// user.  Events are split into two tabs:
@@ -113,9 +114,7 @@ class MyEventScreenState extends State<MyEventScreen> {
   Future<void> _finishEvent(WellnessEvent event) async {
     await _vm.finishEvent(event);
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Event finished successfully')),
-    );
+    AppSnackbar.showSuccess(context, 'Event finished successfully');
   }
 
   // ── Build ───────────────────────────────────────────────────────────────
@@ -158,23 +157,8 @@ class MyEventScreenState extends State<MyEventScreen> {
             onPressed: () async {
               await _vm.loadUserEvents();
               if (!context.mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Row(
-                    children: [
-                      Icon(Icons.check_circle_outline,
-                          color: Colors.white, size: 18),
-                      SizedBox(width: 8),
-                      Text('Events refreshed'),
-                    ],
-                  ),
-                  backgroundColor: KenwellColors.primaryGreen,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
-                  duration: const Duration(seconds: 2),
-                ),
-              );
+              AppSnackbar.showSuccess(context, 'Events refreshed',
+                  duration: const Duration(seconds: 2));
             },
           ),
           IconButton(

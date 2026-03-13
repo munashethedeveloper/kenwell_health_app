@@ -20,6 +20,7 @@ import '../../../../data/repositories_dcl/firestore_hra_repository.dart';
 import '../../../../data/repositories_dcl/firestore_hiv_screening_repository.dart';
 import '../../../../data/repositories_dcl/firestore_tb_screening_repository.dart';
 import '../../../../data/repositories_dcl/firestore_cancer_screening_repository.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 class WellnessFlowViewModel extends ChangeNotifier {
   // Consent flags for screenings
@@ -359,9 +360,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
 
     if (!context.mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('All data submitted successfully!')),
-    );
+    AppSnackbar.showSuccess(context, 'All data submitted successfully!');
 
     _currentStep = 0;
     _flowSteps = [stepCurrentEventDetails]; // Reset flow after submission

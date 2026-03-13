@@ -13,6 +13,7 @@ import 'package:kenwell_health_app/utils/validators.dart';
 import '../../profile/view_model/profile_view_model.dart';
 import '../view_models/auth_view_model.dart';
 import '../view_models/login_view_model.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 // Login Screen Widget
 class LoginScreen extends StatelessWidget {
@@ -105,9 +106,7 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
       if (viewModel.errorMessage != null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(viewModel.errorMessage!)),
-          );
+          AppSnackbar.showError(context, viewModel.errorMessage!);
           viewModel.clearError();
         });
       }

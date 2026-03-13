@@ -9,6 +9,7 @@ import 'user_card_widget.dart';
 import 'user_filter_chips.dart';
 import 'user_search_bar.dart';
 import '../../../../shared/ui/badges/stat_pill.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 /// View users section with search, filter, and user list
 class ViewUsersSection extends StatefulWidget {
@@ -208,20 +209,11 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
         user.id, '${user.firstName} ${user.lastName}');
 
     if (mounted && success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content:
-              Text(viewModel.successMessage ?? 'User deleted successfully'),
-          backgroundColor: theme.colorScheme.error,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-      );
+      AppSnackbar.showSuccess(
+          context, viewModel.successMessage ?? 'User deleted successfully');
     } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(viewModel.errorMessage ?? 'Failed to delete user')),
-      );
+      AppSnackbar.showError(
+          context, viewModel.errorMessage ?? 'Failed to delete user');
     }
   }
 
@@ -271,32 +263,19 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
         user.email, '${user.firstName} ${user.lastName}');
 
     if (mounted && success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            viewModel.successMessage ??
-                'Password reset email sent successfully',
-            maxLines: 5,
-          ),
-          duration: const Duration(seconds: 6),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          action: SnackBarAction(
-            label: 'OK',
-            onPressed: () {},
-          ),
+      AppSnackbar.showSuccess(
+        context,
+        viewModel.successMessage ?? 'Password reset email sent successfully',
+        duration: const Duration(seconds: 6),
+        action: SnackBarAction(
+          label: 'OK',
+          onPressed: () {},
         ),
       );
     } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            viewModel.errorMessage ?? 'Failed to send reset email',
-            maxLines: 3,
-          ),
-          duration: const Duration(seconds: 4),
-        ),
-      );
+      AppSnackbar.showError(
+          context, viewModel.errorMessage ?? 'Failed to send reset email',
+          duration: const Duration(seconds: 4));
     }
   }
 

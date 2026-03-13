@@ -14,6 +14,7 @@ import 'sections/event_options_section.dart';
 import 'sections/services_selection_section.dart';
 import 'sections/medical_aid_section.dart';
 import 'sections/participation_section.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 // EventScreen allows adding or editing a wellness event
 class EventScreen extends StatefulWidget {
@@ -105,17 +106,8 @@ class _EventScreenState extends State<EventScreen> {
 
     if (invalidFields.isNotEmpty) {
       final message = invalidFields.join(', ');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Please complete: $message"),
-          duration: const Duration(seconds: 4),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.orange.shade700,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          margin: const EdgeInsets.all(16),
-        ),
-      );
+      AppSnackbar.showWarning(context, "Please complete: $message",
+          duration: const Duration(seconds: 4));
       return;
     }
 
@@ -144,17 +136,8 @@ class _EventScreenState extends State<EventScreen> {
       debugPrintStack(stackTrace: stackTrace);
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Error saving event: $e"),
-          duration: const Duration(seconds: 5),
-          backgroundColor: Colors.red.shade700,
-          behavior: SnackBarBehavior.floating,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          margin: const EdgeInsets.all(16),
-        ),
-      );
+      AppSnackbar.showError(context, "Error saving event: $e",
+          duration: const Duration(seconds: 5));
       return;
     }
 
@@ -163,18 +146,8 @@ class _EventScreenState extends State<EventScreen> {
     widget.viewModel.clearControllers();
 
     // Show success SnackBar
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(isEditMode
-            ? "Event updated successfully"
-            : "Event created successfully"),
-        duration: const Duration(seconds: 3),
-        backgroundColor: Colors.green.shade600,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        margin: const EdgeInsets.all(16),
-      ),
-    );
+    AppSnackbar.showSuccess(context,
+        isEditMode ? "Event updated successfully" : "Event created successfully");
 
     // Close the screen
     context.pop();

@@ -16,6 +16,7 @@ import '../../consent_form/widgets/consent_screen.dart';
 import '../../member/widgets/member_registration_screen.dart';
 import '../../member/view_model/member_registration_view_model.dart';
 import 'screening_navigators/screening_navigator.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 /// Central navigation coordinator for the wellness flow
 /// Manages screen-to-screen navigation with proper data passing
@@ -134,23 +135,14 @@ class WellnessNavigator {
                   if (context.mounted && memberVM.savedMember != null) {
                     Navigator.of(context).pop(memberVM.savedMember);
                   } else if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Registration failed. Please try again.'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
+                    AppSnackbar.showError(
+                        context, 'Registration failed. Please try again.');
                   }
                 } catch (e) {
                   debugPrint('Failed to save member: $e');
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                            'Failed to register member. Please try again.'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
+                    AppSnackbar.showError(
+                        context, 'Failed to register member. Please try again.');
                   }
                 }
               }
@@ -226,9 +218,7 @@ class WellnessNavigator {
                     if (memberId != null) {
                       await wellnessVM.loadAllCompletionFlags(
                           memberId, eventId);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Status refreshed.')),
-                      );
+                      AppSnackbar.showInfo(context, 'Status refreshed.');
                     }
                   },
                 ),

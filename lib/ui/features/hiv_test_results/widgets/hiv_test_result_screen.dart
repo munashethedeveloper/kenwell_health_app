@@ -14,6 +14,7 @@ import '../../../shared/ui/form/kenwell_signature_actions.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../../../shared/models/nursing_referral_option.dart';
 import '../view_model/hiv_test_result_view_model.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 // HIVTestResultScreen displays the HIV test results form
 class HIVTestResultScreen extends StatelessWidget {
@@ -136,13 +137,8 @@ class HIVTestResultScreen extends StatelessWidget {
                         onPrevious: onPrevious,
                         onNext: () {
                           if (!viewModel.isFormValid) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content:
-                                    Text('Please complete all required fields'),
-                                duration: Duration(seconds: 3),
-                              ),
-                            );
+                            AppSnackbar.showWarning(context,
+                                'Please complete all required fields');
                             return;
                           }
                           viewModel.submitTestResult(context, onNext: onNext);

@@ -6,6 +6,7 @@ import 'package:kenwell_health_app/utils/logger.dart';
 import 'package:kenwell_health_app/domain/constants/enums.dart';
 import 'package:kenwell_health_app/utils/health_metric_classification.dart';
 import 'package:uuid/uuid.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 // ViewModel for Personal Risk Assessment
 class PersonalRiskAssessmentViewModel extends ChangeNotifier {
@@ -338,9 +339,7 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
   }) async {
     debugPrint('Saving HRA for memberId=$_memberId, eventId=$_eventId');
     if (!isFormValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please complete all required fields.')),
-      );
+      AppSnackbar.showWarning(context, 'Please complete all required fields.');
       return;
     }
 

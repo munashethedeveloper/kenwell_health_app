@@ -10,6 +10,7 @@ import 'sections/live_screening_counts_section.dart';
 import 'sections/stats_filter_sheet.dart';
 import 'sections/stats_stat_card.dart';
 import '../view_model/stats_report_view_model.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 /// Reusable event-statistics body.
 ///
@@ -49,22 +50,8 @@ class _EventStatsContentState extends State<EventStatsContent> {
     context.read<StatsReportViewModel>().loadMemberCount();
     if (mounted) {
       setState(() {});
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Row(
-            children: [
-              Icon(Icons.refresh, color: Colors.white, size: 20),
-              SizedBox(width: 8),
-              Text('Statistics refreshed'),
-            ],
-          ),
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 2),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-      );
+      AppSnackbar.showSuccess(context, 'Statistics refreshed',
+          duration: const Duration(seconds: 2));
     }
   }
 

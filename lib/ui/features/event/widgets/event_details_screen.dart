@@ -14,6 +14,7 @@ import '../../../shared/ui/cards/kenwell_section_card.dart';
 import '../view_model/event_view_model.dart';
 import 'allocate_event_screen.dart';
 import 'my_event_screen.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 // EventDetailsScreen displays detailed information about a wellness event
 class EventDetailsScreen extends StatelessWidget {
@@ -263,18 +264,8 @@ class EventDetailsScreen extends StatelessWidget {
                                 event: event,
                                 onAllocate: (assignedUserIds) {
                                   if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                            'Assigned to ${assignedUserIds.length} user(s)'),
-                                        backgroundColor: Colors.green.shade600,
-                                        behavior: SnackBarBehavior.floating,
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
-                                        margin: const EdgeInsets.all(16),
-                                      ),
-                                    );
+                                    AppSnackbar.showSuccess(context,
+                                        'Assigned to \${assignedUserIds.length} user(s)');
                                   }
                                 },
                               ),
@@ -387,9 +378,7 @@ class EventDetailsScreen extends StatelessWidget {
     await viewModel!.deleteEvent(event.id); // implement deleteEvent in VM
     if (!context.mounted) return;
     context.pop();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Event deleted')),
-    );
+    AppSnackbar.showSuccess(context, 'Event deleted');
   }
 
   // Build a detail row widget

@@ -8,6 +8,7 @@ import '../../../../domain/constants/role_permissions.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../profile/view_model/profile_view_model.dart';
 import '../view_model/calendar_view_model.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 // Widget representing a single event card in the calendar
 class EventCard extends StatelessWidget {
@@ -170,20 +171,17 @@ class EventCard extends StatelessWidget {
 
         // Show snackbar with UNDO option
         if (context.mounted) {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: const Text('Event deleted successfully'),
-                action: SnackBarAction(
-                  label: 'UNDO',
-                  onPressed: () async {
-                    await eventViewModel.addEvent(event);
-                    viewModel.loadEvents();
-                  },
-                ),
-              ),
-            );
+          AppSnackbar.showSuccess(
+            context,
+            'Event deleted successfully',
+            action: SnackBarAction(
+              label: 'UNDO',
+              onPressed: () async {
+                await eventViewModel.addEvent(event);
+                viewModel.loadEvents();
+              },
+            ),
+          );
         }
       },
       // Event card content

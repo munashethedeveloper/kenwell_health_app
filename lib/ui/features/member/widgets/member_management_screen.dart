@@ -10,6 +10,7 @@ import '../../profile/view_model/profile_view_model.dart';
 import '../view_model/member_registration_view_model.dart';
 import 'sections/create_member_section.dart';
 import 'sections/view_members_section.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 /// Member registration screen with create and view members functionality
 ///
@@ -166,12 +167,8 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
                     onPressed: () {
                       if (mounted) {
                         context.read<MemberDetailsViewModel>().loadMembers();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Members refreshed'),
-                            duration: Duration(seconds: 1),
-                          ),
-                        );
+                        AppSnackbar.showSuccess(context, 'Members refreshed',
+                            duration: const Duration(seconds: 1));
                       }
                     },
                     icon: const Icon(Icons.refresh, color: Colors.white),

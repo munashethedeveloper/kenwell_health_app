@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'package:kenwell_health_app/utils/logger.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 class SurveyViewModel extends ChangeNotifier {
   String? _memberId;
@@ -53,9 +54,7 @@ class SurveyViewModel extends ChangeNotifier {
   Future<void> submitSurvey(BuildContext context,
       {required VoidCallback onNext}) async {
     if (!isFormValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please complete all fields')),
-      );
+      AppSnackbar.showWarning(context, 'Please complete all fields');
       return;
     }
 
@@ -72,19 +71,14 @@ class SurveyViewModel extends ChangeNotifier {
     } catch (e) {
       AppLogger.error('Failed to save survey', e);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Failed to save survey. Please try again.')),
-        );
+        AppSnackbar.showError(context, 'Failed to save survey. Please try again.');
       }
       return;
     }
 
     if (!context.mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Survey submitted successfully!')),
-    );
+    AppSnackbar.showSuccess(context, 'Survey submitted successfully!');
 
     await Future.delayed(const Duration(milliseconds: 800));
     onNext();

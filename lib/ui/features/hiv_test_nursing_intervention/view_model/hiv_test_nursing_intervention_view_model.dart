@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
 import 'package:kenwell_health_app/domain/constants/enums.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 class HIVTestNursingInterventionViewModel extends ChangeNotifier {
   /// Controls whether the Initial Assessment card (and related validations) show.
@@ -156,9 +157,7 @@ class HIVTestNursingInterventionViewModel extends ChangeNotifier {
   Future<void> submitIntervention(
       BuildContext context, VoidCallback? onNext) async {
     if (!isFormValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all required fields')),
-      );
+      AppSnackbar.showWarning(context, 'Please fill in all required fields');
       return;
     }
 
@@ -171,15 +170,11 @@ class HIVTestNursingInterventionViewModel extends ChangeNotifier {
 
       if (!context.mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Intervention saved successfully!')),
-      );
+      AppSnackbar.showSuccess(context, 'Intervention saved successfully!');
       onNext?.call();
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving interventions: $e')),
-        );
+        AppSnackbar.showError(context, 'Error saving interventions: \$e');
       }
     } finally {
       _isSubmitting = false;

@@ -12,6 +12,7 @@ import '../member_events_screen.dart';
 import 'member_card_widget.dart';
 import 'member_filter_chips.dart';
 import 'member_search_bar.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 /// View members section with search, filter, and member list
 class ViewMembersSection extends StatefulWidget {
@@ -204,20 +205,11 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
         member.id, '${member.name} ${member.surname}');
 
     if (mounted && success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content:
-              Text(viewModel.successMessage ?? 'Member deleted successfully'),
-          backgroundColor: theme.colorScheme.error,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-      );
+      AppSnackbar.showSuccess(
+          context, viewModel.successMessage ?? 'Member deleted successfully');
     } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(viewModel.errorMessage ?? 'Failed to delete member')),
-      );
+      AppSnackbar.showError(
+          context, viewModel.errorMessage ?? 'Failed to delete member');
     }
   }
 

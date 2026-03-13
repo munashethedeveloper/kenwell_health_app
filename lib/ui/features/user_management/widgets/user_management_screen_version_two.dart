@@ -10,6 +10,7 @@ import '../../profile/view_model/profile_view_model.dart';
 import '../viewmodel/user_management_view_model.dart';
 import 'sections/create_user_section.dart';
 import 'sections/view_users_section.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 /// User management screen with create and view users functionality
 class UserManagementScreenVersionTwo extends StatefulWidget {
@@ -179,12 +180,8 @@ class _UserManagementScreenVersionTwoState
                     onPressed: () {
                       if (mounted) {
                         context.read<UserManagementViewModel>().loadUsers();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Users refreshed'),
-                            duration: Duration(seconds: 1),
-                          ),
-                        );
+                        AppSnackbar.showSuccess(context, 'Users refreshed',
+                            duration: const Duration(seconds: 1));
                       }
                     },
                     icon: const Icon(Icons.refresh, color: Colors.white),
