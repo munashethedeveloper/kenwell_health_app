@@ -99,7 +99,7 @@ class EventTimeSection extends StatelessWidget {
     );
 
     if (picked != null && context.mounted) {
-      viewModel.setTime(controller, picked, context);
+      viewModel.setTime(controller, picked);
     }
   }
 }

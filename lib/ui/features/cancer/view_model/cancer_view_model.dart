@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_cancer_screening_repository.dart';
 import 'package:kenwell_health_app/domain/models/cander_screening.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
-import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 import 'package:uuid/uuid.dart';
 
 class CancerScreeningViewModel extends ChangeNotifier {
@@ -253,23 +252,19 @@ class CancerScreeningViewModel extends ChangeNotifier {
     return true;
   }
 
-  Future<void> submitCancerScreening(
-    BuildContext context, {
+  Future<void> submitCancerScreening({
     VoidCallback? onNext,
+    void Function(String)? onValidationFailed,
+    void Function(String)? onSuccess,
+    void Function(String)? onError,
   }) async {
     if (!isFormValid) {
-      AppSnackbar.showWarning(
-        context,
-        'Please complete all required fields',
-      );
+      onValidationFailed?.call('Please complete all required fields');
       return;
     }
 
     if (_memberId == null || _eventId == null) {
-      AppSnackbar.showError(
-        context,
-        'Missing member or event information',
-      );
+      onError?.call('Missing member or event information');
       return;
     }
 
@@ -325,21 +320,10 @@ class CancerScreeningViewModel extends ChangeNotifier {
 
       await _repository.addCancerScreening(screening);
 
-      if (!context.mounted) return;
-
-      AppSnackbar.showSuccess(
-        context,
-        'Cancer screening saved successfully',
-      );
-
+      onSuccess?.call('Cancer screening saved successfully');
       onNext?.call();
     } catch (e) {
-      if (context.mounted) {
-        AppSnackbar.showError(
-          context,
-          'Error saving cancer screening: $e',
-        );
-      }
+      onError?.call('Error saving cancer screening: $e');
     } finally {
       _isSubmitting = false;
       notifyListeners();

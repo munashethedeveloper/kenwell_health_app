@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'package:kenwell_health_app/utils/logger.dart';
-import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 class SurveyViewModel extends ChangeNotifier {
   String? _memberId;
@@ -51,10 +50,14 @@ class SurveyViewModel extends ChangeNotifier {
   }
 
   /// Submits the survey and triggers workflow continuation
-  Future<void> submitSurvey(BuildContext context,
-      {required VoidCallback onNext}) async {
+  Future<void> submitSurvey({
+    required VoidCallback onNext,
+    void Function(String)? onValidationFailed,
+    void Function(String)? onSuccess,
+    void Function(String)? onError,
+  }) async {
     if (!isFormValid) {
-      AppSnackbar.showWarning(context, 'Please complete all fields');
+      onValidationFailed?.call('Please complete all fields');
       return;
     }
 
@@ -70,15 +73,11 @@ class SurveyViewModel extends ChangeNotifier {
       AppLogger.info('Survey saved successfully');
     } catch (e) {
       AppLogger.error('Failed to save survey', e);
-      if (context.mounted) {
-        AppSnackbar.showError(context, 'Failed to save survey. Please try again.');
-      }
+      onError?.call('Failed to save survey. Please try again.');
       return;
     }
 
-    if (!context.mounted) return;
-
-    AppSnackbar.showSuccess(context, 'Survey submitted successfully!');
+    onSuccess?.call('Survey submitted successfully!');
 
     await Future.delayed(const Duration(milliseconds: 800));
     onNext();

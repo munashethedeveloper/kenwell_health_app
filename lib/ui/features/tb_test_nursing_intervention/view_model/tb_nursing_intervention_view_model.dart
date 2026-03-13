@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
 import 'package:kenwell_health_app/domain/constants/enums.dart';
-import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 class TBNursingInterventionViewModel extends ChangeNotifier {
   /// Controls whether the Initial Assessment card (and related validations) show.
@@ -154,10 +153,14 @@ class TBNursingInterventionViewModel extends ChangeNotifier {
     };
   }
 
-  Future<void> submitIntervention(
-      BuildContext context, VoidCallback? onNext) async {
+  Future<void> submitIntervention({
+    VoidCallback? onNext,
+    void Function(String)? onValidationFailed,
+    void Function(String)? onSuccess,
+    void Function(String)? onError,
+  }) async {
     if (!isFormValid) {
-      AppSnackbar.showWarning(context, 'Please fill in all required fields');
+      onValidationFailed?.call('Please fill in all required fields');
       return;
     }
 
@@ -168,14 +171,10 @@ class TBNursingInterventionViewModel extends ChangeNotifier {
       await toMap();
       await Future.delayed(const Duration(seconds: 1));
 
-      if (!context.mounted) return;
-
-      AppSnackbar.showSuccess(context, 'Intervention saved successfully!');
+      onSuccess?.call('Intervention saved successfully!');
       onNext?.call();
     } catch (e) {
-      if (context.mounted) {
-        AppSnackbar.showError(context, 'Error saving interventions: \$e');
-      }
+      onError?.call('Error saving interventions: $e');
     } finally {
       _isSubmitting = false;
       notifyListeners();

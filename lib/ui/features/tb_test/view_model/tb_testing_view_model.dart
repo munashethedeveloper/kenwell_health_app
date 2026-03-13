@@ -5,7 +5,6 @@ import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_tb_screening_repository.dart';
 import 'package:kenwell_health_app/domain/models/tb_screening.dart';
-import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:convert';
 import 'package:kenwell_health_app/domain/constants/enums.dart';
@@ -328,21 +327,19 @@ class TBTestingViewModel extends ChangeNotifier {
   }
 
   // --- Submit & continue ---
-  Future<void> submitTBTest(BuildContext context,
-      {VoidCallback? onNext}) async {
+  Future<void> submitTBTest({
+    VoidCallback? onNext,
+    void Function(String)? onValidationFailed,
+    void Function(String)? onSuccess,
+    void Function(String)? onError,
+  }) async {
     if (!isFormValid) {
-      AppSnackbar.showWarning(
-        context,
-        'Please complete all required fields',
-      );
+      onValidationFailed?.call('Please complete all required fields');
       return;
     }
 
     if (_memberId == null || _eventId == null) {
-      AppSnackbar.showError(
-        context,
-        'Missing member or event information',
-      );
+      onError?.call('Missing member or event information');
       return;
     }
 
@@ -398,21 +395,10 @@ class TBTestingViewModel extends ChangeNotifier {
 
       await _repository.addTbScreening(screening);
 
-      if (!context.mounted) return;
-
-      AppSnackbar.showSuccess(
-        context,
-        'TB screening saved successfully',
-      );
-
+      onSuccess?.call('TB screening saved successfully');
       onNext?.call();
     } catch (e) {
-      if (context.mounted) {
-        AppSnackbar.showError(
-          context,
-          'Error saving TB screening: $e',
-        );
-      }
+      onError?.call('Error saving TB screening: $e');
     } finally {
       _isSubmitting = false;
       notifyListeners();

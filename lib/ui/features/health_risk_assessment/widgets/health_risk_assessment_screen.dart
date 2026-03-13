@@ -4,6 +4,7 @@ import 'package:kenwell_health_app/ui/shared/ui/form/health_metric_status_badge.
 import 'package:kenwell_health_app/ui/shared/ui/form/nursing_referral_status_card.dart';
 import 'package:kenwell_health_app/ui/features/nurse_interventions/view_model/nurse_intervention_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
@@ -212,8 +213,15 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                           KenwellFormNavigation(
                             nextLabel: 'Submit',
                             onPrevious: vm.isSubmitting ? null : onPrevious,
-                            onNext: () =>
-                                vm.submitResults(context, onNext: onNext ?? () {}),
+                            onNext: () => vm.submitResults(
+                              onNext: onNext ?? () {},
+                              onValidationFailed: (msg) =>
+                                  AppSnackbar.showWarning(context, msg),
+                              onSuccess: (msg) =>
+                                  AppSnackbar.showSuccess(context, msg),
+                              onError: (msg) =>
+                                  AppSnackbar.showError(context, msg),
+                            ),
                             isNextBusy: vm.isSubmitting,
                             isNextEnabled: !vm.isSubmitting,
                           ),

@@ -236,7 +236,6 @@ class EventViewModel extends ChangeNotifier {
   void setTime(
     TextEditingController controller,
     TimeOfDay time,
-    BuildContext context,
   ) {
     controller.text = time.toHHmm();
     notifyListeners();
@@ -267,7 +266,7 @@ class EventViewModel extends ChangeNotifier {
     );
 
     if (picked != null && context.mounted) {
-      setTime(controller, picked, context);
+      setTime(controller, picked);
     }
   }
 

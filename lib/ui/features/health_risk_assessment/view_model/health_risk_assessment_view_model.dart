@@ -6,7 +6,6 @@ import 'package:kenwell_health_app/utils/logger.dart';
 import 'package:kenwell_health_app/domain/constants/enums.dart';
 import 'package:kenwell_health_app/utils/health_metric_classification.dart';
 import 'package:uuid/uuid.dart';
-import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 // ViewModel for Personal Risk Assessment
 class PersonalRiskAssessmentViewModel extends ChangeNotifier {
@@ -333,13 +332,15 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
   }
 
   // Submit results
-  Future<void> submitResults(
-    BuildContext context, {
+  Future<void> submitResults({
     required VoidCallback onNext,
+    void Function(String)? onValidationFailed,
+    void Function(String)? onSuccess,
+    void Function(String)? onError,
   }) async {
     debugPrint('Saving HRA for memberId=$_memberId, eventId=$_eventId');
     if (!isFormValid) {
-      AppSnackbar.showWarning(context, 'Please complete all required fields.');
+      onValidationFailed?.call('Please complete all required fields.');
       return;
     }
 
@@ -393,6 +394,7 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
       onNext();
     } catch (e) {
       AppLogger.error('Failed to save HRA screening', e);
+      onError?.call('Failed to save HRA screening. Please try again.');
     } finally {
       _isSubmitting = false;
       notifyListeners();

@@ -3,6 +3,7 @@ import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart
 import 'package:kenwell_health_app/ui/shared/ui/form/health_metric_status_badge.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/nursing_referral_status_card.dart';
 import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
@@ -230,8 +231,15 @@ class HealthMetricsScreen extends StatelessWidget {
                           // Navigation buttons
                           KenwellFormNavigation(
                             onPrevious: vm.isSubmitting ? null : onPrevious,
-                            onNext: () =>
-                                vm.submitResults(context, onNext: onNext),
+                            onNext: () => vm.submitResults(
+                              onNext: onNext,
+                              onValidationFailed: (msg) =>
+                                  AppSnackbar.showWarning(context, msg),
+                              onSuccess: (msg) =>
+                                  AppSnackbar.showSuccess(context, msg),
+                              onError: (msg) =>
+                                  AppSnackbar.showError(context, msg),
+                            ),
                             isNextBusy: vm.isSubmitting,
                             isNextEnabled: !vm.isSubmitting,
                           ),

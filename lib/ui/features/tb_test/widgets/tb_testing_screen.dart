@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_referral_card.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_page.dart';
@@ -179,7 +180,13 @@ class TBTestingScreen extends StatelessWidget {
           onClear: viewModel.clearSignature,
           navigation: KenwellFormNavigation(
             onPrevious: onPrevious,
-            onNext: () => viewModel.submitTBTest(context, onNext: onNext),
+            onNext: () => viewModel.submitTBTest(
+              onNext: onNext,
+              onValidationFailed: (msg) =>
+                  AppSnackbar.showWarning(context, msg),
+              onSuccess: (msg) => AppSnackbar.showSuccess(context, msg),
+              onError: (msg) => AppSnackbar.showError(context, msg),
+            ),
             isNextEnabled: viewModel.isFormValid && !viewModel.isSubmitting,
             isNextBusy: viewModel.isSubmitting,
           ),

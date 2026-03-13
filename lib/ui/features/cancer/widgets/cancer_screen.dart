@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 import '../../../shared/models/nursing_referral_option.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
@@ -330,8 +331,12 @@ class CancerScreen extends StatelessWidget {
         // Navigation
         KenwellFormNavigation(
           onPrevious: onPrevious,
-          onNext: () =>
-              viewModel.submitCancerScreening(context, onNext: onNext),
+          onNext: () => viewModel.submitCancerScreening(
+            onNext: onNext,
+            onValidationFailed: (msg) => AppSnackbar.showWarning(context, msg),
+            onSuccess: (msg) => AppSnackbar.showSuccess(context, msg),
+            onError: (msg) => AppSnackbar.showError(context, msg),
+          ),
           isNextEnabled: !viewModel.isSubmitting,
           isNextBusy: viewModel.isSubmitting,
         ),
