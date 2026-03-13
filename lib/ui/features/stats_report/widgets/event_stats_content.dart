@@ -41,7 +41,9 @@ class _EventStatsContentState extends State<EventStatsContent> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<StatsReportViewModel>().loadMemberCount();
     });
-    _searchController.addListener(() => setState(() {}));
+    _searchController.addListener(() {
+      if (mounted) setState(() {});
+    });
   }
 
 
