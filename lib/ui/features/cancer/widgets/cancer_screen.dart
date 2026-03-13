@@ -9,7 +9,7 @@ import '../../../shared/ui/form/kenwell_date_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_page.dart';
 import '../../../shared/ui/form/kenwell_form_styles.dart';
-import '../../../shared/ui/form/kenwell_referral_card.dart';
+import '../../../shared/ui/form/nursing_referral_status_card.dart';
 import '../../../shared/ui/form/kenwell_yes_no_list.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/cancer_view_model.dart';
@@ -295,38 +295,16 @@ class CancerScreen extends StatelessWidget {
         ),
         const SizedBox(height: 24),
 
-        // 8. Nursing Referral — show only when at risk or undetermined;
-        //    hide when all findings are healthy
-        if (viewModel.isAtRisk || !viewModel.isHealthy) ...[
-          KenwellReferralCard<NursingReferralOption>(
-            title: 'Nursing Referrals',
-            selectedValue: viewModel.nursingReferralSelection,
-            onChanged: viewModel.setNursingReferralSelection,
-            reasonValidator: (val) =>
-                (val == null || val.isEmpty) ? 'Please enter a reason' : null,
-            options: [
-              KenwellReferralOption(
-                value: NursingReferralOption.patientNotReferred,
-                label: 'Patient not referred',
-                requiresReason: true,
-                reasonController: viewModel.notReferredReasonController,
-                reasonLabel: 'Reason patient not referred',
-              ),
-              const KenwellReferralOption(
-                value: NursingReferralOption.referredToGP,
-                label: 'Patient referred to GP',
-              ),
-              const KenwellReferralOption(
-                value: NursingReferralOption.referredToStateClinic,
-                label: 'Patient referred to State Clinic',
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-        ] else ...[
-          _buildCancerHealthyBanner(),
-          const SizedBox(height: 24),
-        ],
+        // 8. Nursing Referral — always shown, identical to HRA / HCT
+        NursingReferralStatusCard(
+          title: 'Nursing Referrals',
+          selectedValue: viewModel.nursingReferralSelection,
+          onChanged: viewModel.setNursingReferralSelection,
+          notReferredReasonController: viewModel.notReferredReasonController,
+          reasonValidator: (val) =>
+              (val == null || val.isEmpty) ? 'Please enter a reason' : null,
+        ),
+        const SizedBox(height: 24),
 
         // Navigation
         KenwellFormNavigation(
@@ -343,34 +321,5 @@ class CancerScreen extends StatelessWidget {
       ],
     );
   }
-
-  Widget _buildCancerHealthyBanner() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE8F5E9),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFF2E7D32), width: 1),
-      ),
-      child: const Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.check_circle, color: Color(0xFF2E7D32), size: 20),
-          SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'All cancer screening findings are normal. '
-              'No nursing referral is required.',
-              style: TextStyle(
-                color: Color(0xFF2E7D32),
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
+
