@@ -6,6 +6,7 @@ import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
+import 'sections/stats_metric_card.dart';
 import 'health_screening_stats_section.dart';
 
 class EventStatsDetailScreen extends StatelessWidget {
@@ -57,7 +58,7 @@ class EventStatsDetailScreen extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: _MetricCard(
+                        child: StatsMetricCard(
                           icon: Icons.flag_outlined,
                           title: 'Expected',
                           value: event.expectedParticipation.toString(),
@@ -66,7 +67,7 @@ class EventStatsDetailScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: _MetricCard(
+                        child: StatsMetricCard(
                           icon: Icons.how_to_reg_outlined,
                           title: 'Registered',
                           value: event.expectedParticipation.toString(),
@@ -79,7 +80,7 @@ class EventStatsDetailScreen extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: _MetricCard(
+                        child: StatsMetricCard(
                           icon: Icons.health_and_safety_outlined,
                           title: 'Screened',
                           value: event.screenedCount.toString(),
@@ -88,7 +89,7 @@ class EventStatsDetailScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: _MetricCard(
+                        child: StatsMetricCard(
                           icon: Icons.person_off_outlined,
                           title: 'No Show',
                           value: (event.expectedParticipation -
@@ -352,63 +353,3 @@ class EventStatsDetailScreen extends StatelessWidget {
   }
 }
 
-class _MetricCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String value;
-  final Color color;
-
-  const _MetricCard({
-    required this.icon,
-    required this.title,
-    required this.value,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.primaryColor.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFF6A1B9A).withValues(alpha: 0.45),
-          width: 1.5,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: color, size: 22),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            value,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w800,
-              color: KenwellColors.secondaryNavy,
-              fontSize: 26,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey.shade600,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}

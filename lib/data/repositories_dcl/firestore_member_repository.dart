@@ -1,51 +1,92 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import '../services/firestore_service.dart';
+import '../local/app_database.dart';
 import '../../domain/models/member.dart';
 import 'firestore_member_event_repository.dart';
+import 'member_repository.dart';
 
-/// Repository for managing members in Firestore
+/// Repository for managing members in Firestore.
+///
+/// ## Offline strategy
+///
+/// | Operation              | Online                                  | Offline                          |
+/// |------------------------|-----------------------------------------|----------------------------------|
+/// | `fetchAllMembers`      | Fetches Firestore, caches to local DB   | Returns cached local rows        |
+/// | `fetchMemberByIdNumber`| Firestore first, falls back to local    | Returns cached row               |
+/// | `fetchMemberByPassport`| Firestore first, falls back to local    | Returns cached row               |
+/// | `fetchMemberById`      | Firestore first, falls back to local    | Returns cached row               |
+/// | `addMember`            | Writes to Firestore, mirrors to local   | Throws                           |
+/// | `updateMember`         | Writes to Firestore, mirrors to local   | Throws                           |
 class FirestoreMemberRepository {
   final FirestoreService _firestore;
+  final MemberRepository _localRepo;
   static const String membersCollection = 'members';
   final _memberEventRepository = FirestoreMemberEventRepository();
 
-  FirestoreMemberRepository({FirestoreService? firestoreService})
-      : _firestore = firestoreService ?? FirestoreService();
+  FirestoreMemberRepository({
+    FirestoreService? firestoreService,
+    MemberRepository? localRepo,
+  })  : _firestore = firestoreService ?? FirestoreService(),
+        _localRepo = localRepo ?? MemberRepository(AppDatabase.instance);
 
-  /// Fetch all members from Firestore
+  /// Fetch all members from Firestore and cache them locally.
+  ///
+  /// Falls back to the local Drift DB when Firestore is unreachable.
   Future<List<Member>> fetchAllMembers() async {
     try {
       final docs = await _firestore.getCollection(
         collection: membersCollection,
       );
-
-      return docs.map(_mapToMember).toList();
+      final members = docs.map(_mapToMember).toList();
+      // Cache each member locally for offline access.
+      for (final m in members) {
+        try {
+          await _localRepo.updateMember(m);
+        } catch (_) {
+          // If the member doesn't exist locally yet, create it.
+          try {
+            await _localRepo.createMember(m);
+          } catch (cacheErr) {
+            debugPrint('FirestoreMemberRepository: cache write failed: $cacheErr');
+          }
+        }
+      }
+      return members;
     } catch (e, stackTrace) {
       debugPrint('Error fetching members from Firestore: $e');
       debugPrintStack(stackTrace: stackTrace);
+      // Offline fallback — serve cached rows.
+      try {
+        final cached = await AppDatabase.instance.getAllMembers();
+        if (cached.isNotEmpty) {
+          debugPrint('FirestoreMemberRepository: serving ${cached.length} cached members');
+          return cached.map(_localRepo.entityToModelPublic).toList();
+        }
+      } catch (_) {}
       rethrow;
     }
   }
 
-  /// Fetch member by ID
+  /// Fetch member by Firestore document ID, with local fallback.
   Future<Member?> fetchMemberById(String id) async {
     try {
       final data = await _firestore.getDocument(
         collection: membersCollection,
         documentId: id,
       );
-
       if (data == null) return null;
-
       return _mapToMember(data);
     } catch (e) {
       debugPrint('Error fetching member $id: $e');
-      return null;
+      // Offline fallback.
+      return _localRepo.getMemberById(id);
     }
   }
 
-  /// Fetch member by ID number
+  /// Fetch member by SA ID number.
+  ///
+  /// Tries Firestore first; falls back to the local Drift cache if offline.
   Future<Member?> fetchMemberByIdNumber(String idNumber) async {
     try {
       final docs = await _firestore.queryDocuments(
@@ -53,17 +94,17 @@ class FirestoreMemberRepository {
         field: 'idNumber',
         isEqualTo: idNumber,
       );
-
       if (docs.isEmpty) return null;
-
       return _mapToMember(docs.first);
     } catch (e) {
-      debugPrint('Error fetching member by ID number: $e');
-      return null;
+      debugPrint('FirestoreMemberRepository: Firestore ID-number search failed ($e) — using local cache');
+      return _localRepo.getMemberByIdNumber(idNumber);
     }
   }
 
-  /// Fetch member by passport number
+  /// Fetch member by passport number.
+  ///
+  /// Tries Firestore first; falls back to the local Drift cache if offline.
   Future<Member?> fetchMemberByPassportNumber(String passportNumber) async {
     try {
       final docs = await _firestore.queryDocuments(
@@ -71,48 +112,56 @@ class FirestoreMemberRepository {
         field: 'passportNumber',
         isEqualTo: passportNumber,
       );
-
       if (docs.isEmpty) return null;
-
       return _mapToMember(docs.first);
     } catch (e) {
-      debugPrint('Error fetching member by passport number: $e');
-      return null;
+      debugPrint('FirestoreMemberRepository: Firestore passport search failed ($e) — using local cache');
+      return _localRepo.getMemberByPassportNumber(passportNumber);
     }
   }
 
-  /// Search members by name or surname
+  /// Search members by name or surname (Firestore, with local fallback).
   Future<List<Member>> searchMembers(String query) async {
     try {
       final allMembers = await fetchAllMembers();
       final lowerQuery = query.toLowerCase();
-
       return allMembers.where((member) {
         final fullName = '${member.name} ${member.surname}'.toLowerCase();
         return fullName.contains(lowerQuery);
       }).toList();
     } catch (e) {
       debugPrint('Error searching members: $e');
-      return [];
+      // Fallback to local search.
+      return _localRepo.searchMembers(query);
     }
   }
 
-  /// Add new member to Firestore
+  /// Add new member to Firestore and mirror to local cache.
   Future<void> addMember(Member member) async {
     await _firestore.createDocument(
       collection: membersCollection,
       documentId: member.id,
       data: _mapToFirestore(member),
     );
+    try {
+      await _localRepo.createMember(member);
+    } catch (_) {
+      // Non-fatal — Firestore write succeeded.
+    }
   }
 
-  /// Update existing member in Firestore
+  /// Update existing member in Firestore and mirror to local cache.
   Future<void> updateMember(Member member) async {
     await _firestore.updateDocument(
       collection: membersCollection,
       documentId: member.id,
       data: _mapToFirestore(member),
     );
+    try {
+      await _localRepo.updateMember(member);
+    } catch (_) {
+      // Non-fatal — Firestore write succeeded.
+    }
   }
 
   /// Delete member from Firestore

@@ -100,4 +100,8 @@ class MemberRepository {
       updatedAt: entity.updatedAt,
     );
   }
+
+  /// Public alias used by [FirestoreMemberRepository] when building [Member]
+  /// objects from the local Drift cache during offline fallback.
+  Member entityToModelPublic(MemberEntity entity) => _entityToModel(entity);
 }

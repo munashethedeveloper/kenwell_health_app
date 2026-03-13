@@ -1,28 +1,20 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/cards/kenwell_empty_state.dart';
 import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 import 'package:provider/provider.dart';
-import '../../../shared/ui/containers/gradient_container.dart';
-import '../../../shared/ui/badges/number_badge.dart';
 import '../../user_management/viewmodel/user_management_view_model.dart';
 import '../../user_management/widgets/sections/user_filter_chips.dart';
 import '../../user_management/widgets/sections/user_search_bar.dart';
-import 'package:kenwell_health_app/data/services/user_event_service.dart';
-import 'package:kenwell_health_app/data/repositories_dcl/user_event_repository.dart';
+import '../view_model/allocate_event_view_model.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../domain/models/user_model.dart';
 import 'sections/allocate_user_card.dart';
-
-// AllocateEventScreen allows assigning a wellness event to multiple users
 class AllocateEventScreen extends StatefulWidget {
   final void Function(List<String> assignedUserIds) onAllocate;
   final WellnessEvent event;
-
-  // Constructor
   const AllocateEventScreen({
     super.key,
     required this.onAllocate,
@@ -33,55 +25,30 @@ class AllocateEventScreen extends StatefulWidget {
   State<AllocateEventScreen> createState() => _AllocateEventScreenState();
 }
 
-// State class for AllocateEventScreen
 class _AllocateEventScreenState extends State<AllocateEventScreen> {
   final TextEditingController _searchController = TextEditingController();
-  final Set<String> _assignedUserIds = {};
-  bool _isLoadingAssignedUsers = true;
+  late final AllocateEventViewModel _allocVM;
 
-  // Initialize state
   @override
   void initState() {
     super.initState();
-    // Load users and fetch already assigned users
+    _allocVM = AllocateEventViewModel(event: widget.event);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<UserManagementViewModel>().loadUsers();
-      _fetchAssignedUsers();
+      _allocVM.loadAssignedUsers();
     });
-  }
-
-  // Fetch users already assigned to this event
-  Future<void> _fetchAssignedUsers() async {
-    setState(() => _isLoadingAssignedUsers = true);
-    try {
-      final repo = UserEventRepository();
-      final assignedIds = await repo.fetchAssignedUserIds(widget.event.id);
-      if (mounted) {
-        setState(() {
-          _assignedUserIds.clear();
-          _assignedUserIds.addAll(assignedIds);
-          _isLoadingAssignedUsers = false;
-        });
-        debugPrint(
-            'AllocateEventScreen: Loaded ${assignedIds.length} already assigned users');
-      }
-    } catch (e) {
-      debugPrint('AllocateEventScreen: Error fetching assigned users: $e');
-      if (mounted) {
-        setState(() => _isLoadingAssignedUsers = false);
-      }
-    }
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _allocVM.dispose();
     super.dispose();
   }
 
   void _showUserOptions(UserModel user) {
     final theme = Theme.of(context);
-    final isAssigned = _assignedUserIds.contains(user.id);
+    final isAssigned = _allocVM.isAssigned(user.id);
 
     showModalBottomSheet(
       context: context,
@@ -189,29 +156,15 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
   }
 
   Future<void> _assignUser(UserModel user) async {
-    // Show loading indicator
     if (!mounted) return;
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
-      ),
+      builder: (context) => const Center(child: CircularProgressIndicator()),
     );
-
-    // Assign event to user
-    await UserEventService.addUserEvent(
-      event: widget.event,
-      user: user,
-    );
-
+    await _allocVM.assignUser(user);
     if (!mounted) return;
-
-    // Close loading dialog
     Navigator.of(context).pop();
-
-    // Refresh assigned users list
-    await _fetchAssignedUsers();
   }
 
   Future<void> _unassignUser(UserModel user) async {
@@ -221,9 +174,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
       builder: (context) => AlertDialog(
         title: Text(
           'Unassign User',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
         ),
         content: Text(
           'Are you sure you want to unassign ${user.firstName} ${user.lastName} from this event?',
@@ -232,50 +183,30 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
         actions: [
           TextButton(
             onPressed: () => context.pop(false),
-            child: Text(
-              'Cancel',
-              style: theme.textTheme.titleSmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
+            child: Text('Cancel',
+                style: theme.textTheme.titleSmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant)),
           ),
           ElevatedButton(
             onPressed: () => context.pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: theme.colorScheme.error,
-            ),
-            child: Text(
-              'Unassign',
-              style: theme.textTheme.titleSmall?.copyWith(color: Colors.white),
-            ),
+            style:
+                ElevatedButton.styleFrom(backgroundColor: theme.colorScheme.error),
+            child: Text('Unassign',
+                style: theme.textTheme.titleSmall?.copyWith(color: Colors.white)),
           ),
         ],
       ),
     );
 
     if (confirmed != true || !mounted) return;
-
-    // Show loading indicator
-    if (!mounted) return;
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
-      ),
+      builder: (context) => const Center(child: CircularProgressIndicator()),
     );
-
-    // Unassign event from user
-    final repo = UserEventRepository();
-    await repo.removeUserEvent(widget.event.id, user.id);
-
+    await _allocVM.unassignUser(user);
     if (!mounted) return;
-
-    // Close loading dialog
     Navigator.of(context).pop();
-
-    // Refresh assigned users list immediately
-    await _fetchAssignedUsers();
   }
 
   void _showHelpDialog() {
@@ -297,15 +228,12 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
       ),
     );
   }
-
-  // Build method
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return Scaffold(
       appBar: KenwellAppBar(
-        //title: 'Allocate Event: ${widget.event.title}',
         title: 'KenWell365',
         titleColor: Colors.white,
         titleStyle: const TextStyle(
@@ -320,7 +248,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
             icon: const Icon(Icons.refresh,
                 color: Colors.white, semanticLabel: 'Refresh'),
             tooltip: 'Refresh',
-            onPressed: _fetchAssignedUsers,
+            onPressed: _allocVM.loadAssignedUsers,
           ),
           IconButton(
             icon: const Icon(Icons.help_outline,
@@ -330,12 +258,13 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
           ),
         ],
       ),
-      // Body of the screen
-      body: Consumer<UserManagementViewModel>(
-        builder: (context, viewModel, _) {
+      body: ListenableBuilder(
+        listenable: _allocVM,
+        builder: (context, _) => Consumer<UserManagementViewModel>(
+          builder: (context, viewModel, _) {
           final filteredUsers = viewModel.filteredUsers;
           final totalUsers = viewModel.users.length;
-          final assignedCount = _assignedUserIds.length;
+          final assignedCount = _allocVM.assignedUserIds.length;
           final notAssignedCount = totalUsers - assignedCount;
           final filterActive = viewModel.selectedFilter != 'all' ||
               viewModel.searchQuery.isNotEmpty;
@@ -390,10 +319,8 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
             onRefresh: viewModel.loadUsers,
             child: CustomScrollView(
               slivers: [
-                // ── Gradient section header ───────────────────────────
                 SliverToBoxAdapter(
                   child: KenwellGradientHeader(
-                    // label: 'ALLOCATE',
                     title: 'Allocate\nEvent',
                     subtitle:
                         'Allocate users to the ${widget.event.title} event',
@@ -404,136 +331,6 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 16),
-
-                      /*  // Stats header
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: GradientContainer.purpleGreen(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 14),
-                          child: Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: const Icon(
-                                  Icons.people_rounded,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
-                              ),
-                              const SizedBox(width: 14),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      filterActive
-                                          ? 'Showing ${filteredUsers.length} of $totalUsers Users'
-                                          : '$totalUsers Total Users',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 3),
-                                    Row(
-                                      children: [
-                                        Icon(
-                                          Icons.check_circle_rounded,
-                                          color: Colors.white
-                                              .withValues(alpha: 0.9),
-                                          size: 13,
-                                        ),
-                                        const SizedBox(width: 3),
-                                        Text(
-                                          '$assignedCount assigned',
-                                          style: TextStyle(
-                                            color: Colors.white
-                                                .withValues(alpha: 0.9),
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 10),
-                                        Icon(
-                                          Icons.radio_button_unchecked_rounded,
-                                          color: Colors.white
-                                              .withValues(alpha: 0.9),
-                                          size: 13,
-                                        ),
-                                        const SizedBox(width: 3),
-                                        Text(
-                                          '$notAssignedCount unassigned',
-                                          style: TextStyle(
-                                            color: Colors.white
-                                                .withValues(alpha: 0.9),
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                      
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16), */
-
-                      /*             // Section title
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color:
-                                    theme.primaryColor.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Icon(
-                                Icons.event_rounded,
-                                color: theme.primaryColor,
-                                size: 18,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Allocate Event',
-                                    style: theme.textTheme.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.w700,
-                                      color: const Color(0xFF201C58),
-                                    ),
-                                  ),
-                                  Text(
-                                    widget.event.title,
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: const Color(0xFF6B7280),
-                                      fontSize: 11,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 12), */
-
-                      // Search and filter card
                       Container(
                         margin: const EdgeInsets.symmetric(horizontal: 16),
                         padding: const EdgeInsets.all(14),
@@ -604,7 +401,6 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                     ],
                   ),
                 ),
-                // User list
                 if (filteredUsers.isEmpty)
                   SliverFillRemaining(
                     hasScrollBody: false,
@@ -624,7 +420,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                           return AllocateUserCard(
                           user: user,
                           number: index + 1,
-                          isAssigned: _assignedUserIds.contains(user.id),
+                          isAssigned: _allocVM.isAssigned(user.id),
                           onAssign: () => _assignUser(user),
                           onUnassign: () => _unassignUser(user),
                         );
@@ -641,6 +437,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
           );
         },
       ),
+    ),
     );
   }
 }

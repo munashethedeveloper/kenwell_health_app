@@ -113,16 +113,11 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
                       title: 'Personal Information',
                       Icons.person,
                         [
-                          _buildDetailRow(
-                              'Name and Surname',
-                              '${widget.member.name} ${widget.member.surname}',
-                              theme),
+                          KenwellDetailRow(label: 'Name and Surname', value: '${widget.member.name} ${widget.member.surname}'),
                           const Divider(height: 1),
-                          _buildDetailRow(
-                              'Gender', widget.member.gender ?? '', theme),
+                          KenwellDetailRow(label: 'Gender', value: widget.member.gender ?? ''),
                           const Divider(height: 1),
-                          _buildDetailRow(
-                              'Email', widget.member.email ?? '', theme),
+                          KenwellDetailRow(label: 'Email', value: widget.member.email ?? ''),
                           const Divider(height: 1),
                           KenwellDetailRow(label: 'Phone Number', value: widget.member.cellNumber ?? ''),
                           const Divider(height: 1),
@@ -130,8 +125,7 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
                           const Divider(height: 1),
                           KenwellDetailRow(label: 'Nationality', value: widget.member.nationality ?? ''),
                           const Divider(height: 1),
-                          _buildDetailRow(
-                              'ID Number', widget.member.idNumber ?? '', theme),
+                          KenwellDetailRow(label: 'ID Number', value: widget.member.idNumber ?? ''),
                           const Divider(height: 1),
                           KenwellDetailRow(label: 'Passport Number', value: widget.member.passportNumber ?? ''),
                           const Divider(height: 1),
