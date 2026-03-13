@@ -9,6 +9,7 @@ import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'sections/event_stats_list_section.dart';
 import 'sections/live_screening_counts_section.dart';
 import 'sections/stats_filter_sheet.dart';
+import 'sections/stats_stat_card.dart';
 
 /// Reusable event-statistics body.
 ///
@@ -419,7 +420,7 @@ class _EventStatsContentState extends State<EventStatsContent> {
             // ── Stat cards ────────────────────────────────────────────────
             Row(children: [
               Expanded(
-                child: _StatCard(
+                child: StatsStatCard(
                   icon: Icons.flag_outlined,
                   title: 'Expected',
                   value: totalExpected.toString(),
@@ -428,7 +429,7 @@ class _EventStatsContentState extends State<EventStatsContent> {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _StatCard(
+                child: StatsStatCard(
                   icon: Icons.how_to_reg_outlined,
                   title: 'Registered',
                   value:
@@ -440,7 +441,7 @@ class _EventStatsContentState extends State<EventStatsContent> {
             const SizedBox(height: 12),
             Row(children: [
               Expanded(
-                child: _StatCard(
+                child: StatsStatCard(
                   icon: Icons.health_and_safety_outlined,
                   title: 'Screened',
                   value: totalScreened.toString(),
@@ -449,7 +450,7 @@ class _EventStatsContentState extends State<EventStatsContent> {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _StatCard(
+                child: StatsStatCard(
                   icon: Icons.person_off_outlined,
                   title: 'No Show',
                   value: (totalExpected - totalScreened).toString(),
@@ -595,82 +596,3 @@ class _EventStatsContentState extends State<EventStatsContent> {
   }
 }
 
-// ── Private stat card widget ─────────────────────────────────────────────────
-
-class _StatCard extends StatelessWidget {
-  const _StatCard({
-    required this.icon,
-    required this.title,
-    required this.value,
-    required this.color,
-  });
-
-  final IconData icon;
-  final String title;
-  final String value;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        border: Border.all(color: color.withValues(alpha: 0.2), width: 1.5),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(9),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [color, color.withValues(alpha: 0.7)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: color.withValues(alpha: 0.3),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Icon(icon, color: Colors.white, size: 20),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.w900,
-              color: KenwellColors.secondaryNavy,
-              height: 1,
-              letterSpacing: -0.5,
-            ),
-          ),
-          const SizedBox(height: 3),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 11,
-              color: Color(0xFF6B7280),
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.3,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}

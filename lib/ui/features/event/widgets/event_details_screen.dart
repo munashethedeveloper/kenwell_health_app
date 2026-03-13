@@ -31,7 +31,6 @@ class EventDetailsScreen extends StatelessWidget {
   // Build method
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final profileVM = context.watch<ProfileViewModel>();
     final canEdit =
         RolePermissions.canAccessFeature(profileVM.role, 'edit_event');
@@ -164,8 +163,7 @@ class EventDetailsScreen extends StatelessWidget {
                   title: 'Date & Time',
                   Icons.schedule_rounded,
                   [
-                    _buildDetailRow(
-                        'Date', DateFormat.yMMMMd().format(event.date), theme),
+                    KenwellDetailRow(label: 'Date', value: DateFormat.yMMMMd().format(event.date)),
                     const Divider(height: 1),
                     KenwellDetailRow(label: 'Set Up Time', value: event.setUpTime),
                     const Divider(height: 1),
@@ -173,8 +171,7 @@ class EventDetailsScreen extends StatelessWidget {
                     const Divider(height: 1),
                     KenwellDetailRow(label: 'End Time', value: event.endTime),
                     const Divider(height: 1),
-                    _buildDetailRow(
-                        'Strike Down Time', event.strikeDownTime, theme),
+                    KenwellDetailRow(label: 'Strike Down Time', value: event.strikeDownTime),
                   ],
                 ),
                 KenwellSectionCard(
@@ -194,14 +191,9 @@ class EventDetailsScreen extends StatelessWidget {
                   title: 'Onsite Contact',
                   Icons.person_pin_rounded,
                   [
-                    _buildDetailRow(
-                        'Contact Person',
-                        fullName(event.onsiteContactFirstName,
-                            event.onsiteContactLastName),
-                        theme),
+                    KenwellDetailRow(label: 'Contact Person', value: fullName(event.onsiteContactFirstName, event.onsiteContactLastName)),
                     const Divider(height: 1),
-                    _buildDetailRow(
-                        'Contact Number', event.onsiteContactNumber, theme),
+                    KenwellDetailRow(label: 'Contact Number', value: event.onsiteContactNumber),
                     const Divider(height: 1),
                     KenwellDetailRow(label: 'Email', value: event.onsiteContactEmail),
                   ],
@@ -210,14 +202,9 @@ class EventDetailsScreen extends StatelessWidget {
                   title: 'AE Contact',
                   Icons.support_agent_rounded,
                   [
-                    _buildDetailRow(
-                        'Contact Person',
-                        fullName(
-                            event.aeContactFirstName, event.aeContactLastName),
-                        theme),
+                    KenwellDetailRow(label: 'Contact Person', value: fullName(event.aeContactFirstName, event.aeContactLastName)),
                     const Divider(height: 1),
-                    _buildDetailRow(
-                        'Contact Number', event.aeContactNumber, theme),
+                    KenwellDetailRow(label: 'Contact Number', value: event.aeContactNumber),
                     const Divider(height: 1),
                     KenwellDetailRow(label: 'Email', value: event.aeContactEmail),
                   ],
@@ -232,8 +219,7 @@ class EventDetailsScreen extends StatelessWidget {
                     const Divider(height: 1),
                     KenwellDetailRow(label: 'Mobile Booths', value: event.mobileBooths),
                     const Divider(height: 1),
-                    _buildDetailRow(
-                        'Medical Aid Option', event.medicalAid, theme),
+                    KenwellDetailRow(label: 'Medical Aid Option', value: event.medicalAid),
                     if (event.description != null &&
                         event.description!.isNotEmpty) ...[
                       const Divider(height: 1),
@@ -245,13 +231,9 @@ class EventDetailsScreen extends StatelessWidget {
                   title: 'Requested Services',
                   Icons.medical_services_rounded,
                   [
-                    _buildDetailRow(
-                      'Services',
-                      event.servicesRequested.isNotEmpty
+                    KenwellDetailRow(label: 'Services', value: event.servicesRequested.isNotEmpty
                           ? event.servicesRequested
-                          : 'None',
-                      theme,
-                    ),
+                          : 'None'),
                   ],
                 ),
                 const SizedBox(height: 20),
