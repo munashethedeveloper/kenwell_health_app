@@ -251,8 +251,7 @@ class _EventStatsDetailScreenState extends State<EventStatsDetailScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
-                      onPressed:
-                          _isExporting ? null : () => _exportToExcel(context),
+                      onPressed: _isExporting ? null : _exportToExcel,
                       icon: _isExporting
                           ? const SizedBox(
                               width: 18,
@@ -283,13 +282,13 @@ class _EventStatsDetailScreenState extends State<EventStatsDetailScreen> {
     );
   }
 
-  Future<void> _exportToExcel(BuildContext context) async {
+  Future<void> _exportToExcel() async {
     setState(() => _isExporting = true);
     try {
       final exporter = EventReportExporter();
       final filePath = await exporter.export(event);
       if (!mounted) return;
-      _showExportSuccessSheet(context, filePath);
+      _showExportSuccessSheet(filePath);
     } catch (e) {
       if (!mounted) return;
       AppSnackbar.showError(context, 'Export failed: $e');
@@ -298,7 +297,7 @@ class _EventStatsDetailScreenState extends State<EventStatsDetailScreen> {
     }
   }
 
-  void _showExportSuccessSheet(BuildContext context, String filePath) {
+  void _showExportSuccessSheet(String filePath) {
     final theme = Theme.of(context);
     final fileName = filePath.split('/').last;
 
@@ -321,7 +320,7 @@ class _EventStatsDetailScreenState extends State<EventStatsDetailScreen> {
                   color: KenwellColors.primaryGreen.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.check_circle_outline,
                   size: 40,
                   color: KenwellColors.primaryGreen,
@@ -352,7 +351,7 @@ class _EventStatsDetailScreenState extends State<EventStatsDetailScreen> {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.table_chart,
+                    const Icon(Icons.table_chart,
                         size: 18, color: KenwellColors.primaryGreen),
                     const SizedBox(width: 8),
                     Expanded(
@@ -445,24 +444,5 @@ class _EventStatsDetailScreenState extends State<EventStatsDetailScreen> {
         ],
       ),
     );
-  }
-
-  Color _getStatusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'completed':
-      case 'finished':
-        return Colors.deepPurple;
-      case 'in progress':
-      case 'in_progress':
-      case 'ongoing':
-        return Colors.blue;
-      case 'cancelled':
-        return Colors.red;
-      case 'scheduled':
-      case 'upcoming':
-        return Colors.orange;
-      default:
-        return Colors.grey;
-    }
   }
 }
