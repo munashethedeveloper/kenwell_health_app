@@ -6,13 +6,21 @@ import 'kenwell_form_card.dart';
 /// Interactive card-based selector for the nursing referral / clinical
 /// outcomes section.
 ///
-/// Two selectable option cards are always visible:
+/// Two option cards are always visible:
 /// - 🟢 Healthy  → [NursingReferralOption.patientNotReferred]
 /// - 🔴 At Risk  → [NursingReferralOption.referredToStateClinic]
 ///
-/// When [isCaution] is `true` a non-interactive orange caution banner is shown
-/// above the option cards, informing the nurse that they must use their
-/// clinical discretion to classify the patient as either Healthy or At Risk.
+/// ## Interaction modes
+///
+/// | [readOnly] | [isCaution] | Behaviour                                              |
+/// |-----------|------------|--------------------------------------------------------|
+/// | `false`   | `false`    | Normal interactive mode — nurse selects manually       |
+/// | `false`   | `true`     | Caution banner shown — nurse must use their discretion |
+/// | `true`    | *any*      | Cards are locked; outcome was auto-determined by the   |
+/// |           |            | screening data.  An info label is shown below the cards|
+///
+/// When [readOnly] is `true` the [onChanged] callback is never invoked and
+/// the "reason not referred" text field is hidden (no manual override needed).
 class NursingReferralStatusCard extends StatelessWidget {
   final String title;
   final NursingReferralOption? selectedValue;
@@ -24,6 +32,11 @@ class NursingReferralStatusCard extends StatelessWidget {
   /// prompted to use their discretion to select Healthy or At Risk.
   final bool isCaution;
 
+  /// When `true` the outcome has been automatically determined from the
+  /// screening data.  Both option cards are non-interactive and a small
+  /// "Automatically determined" label is shown below them.
+  final bool readOnly;
+
   const NursingReferralStatusCard({
     super.key,
     required this.title,
@@ -32,6 +45,7 @@ class NursingReferralStatusCard extends StatelessWidget {
     this.notReferredReasonController,
     this.reasonValidator,
     this.isCaution = false,
+    this.readOnly = false,
   });
 
   @override
@@ -41,7 +55,8 @@ class NursingReferralStatusCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (isCaution) ...[
+          // Caution banner — only shown when in manual caution mode.
+          if (isCaution && !readOnly) ...[
             const _CautionBanner(),
             const SizedBox(height: 12),
           ],
@@ -54,6 +69,7 @@ class NursingReferralStatusCard extends StatelessWidget {
             message: 'Patient not referred',
             selectedValue: selectedValue,
             onChanged: onChanged,
+            readOnly: readOnly,
           ),
           const SizedBox(height: 8),
           _OptionCard(
@@ -65,8 +81,31 @@ class NursingReferralStatusCard extends StatelessWidget {
             message: 'Patient referred to State clinic',
             selectedValue: selectedValue,
             onChanged: onChanged,
+            readOnly: readOnly,
           ),
-          if (selectedValue == NursingReferralOption.patientNotReferred &&
+          // Auto-determined label — only shown when the card is locked.
+          if (readOnly) ...[
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Icon(Icons.lock_outline,
+                    size: 13, color: Colors.grey.shade500),
+                const SizedBox(width: 4),
+                Text(
+                  'Automatically determined based on screening data',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey.shade500,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ),
+          ],
+          // Reason field — only shown in manual (non-readOnly) mode when
+          // the nurse has selected "Healthy" and a controller is provided.
+          if (!readOnly &&
+              selectedValue == NursingReferralOption.patientNotReferred &&
               notReferredReasonController != null) ...[
             const SizedBox(height: 12),
             KenwellTextField(
@@ -150,6 +189,7 @@ class _OptionCard extends StatelessWidget {
   final String message;
   final NursingReferralOption? selectedValue;
   final ValueChanged<NursingReferralOption> onChanged;
+  final bool readOnly;
 
   const _OptionCard({
     required this.option,
@@ -160,23 +200,34 @@ class _OptionCard extends StatelessWidget {
     required this.message,
     required this.selectedValue,
     required this.onChanged,
+    this.readOnly = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final isSelected = selectedValue == option;
+    // In readOnly mode, the unselected card is visually dimmed.
+    final bool isDisabledUnselected = readOnly && !isSelected;
 
     return GestureDetector(
-      onTap: () => onChanged(option),
+      onTap: readOnly ? null : () => onChanged(option),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         width: double.infinity,
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isSelected ? activeBackground : Colors.white,
+          color: isSelected
+              ? activeBackground
+              : isDisabledUnselected
+                  ? Colors.grey.shade100
+                  : Colors.white,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected ? activeColor : Colors.grey.shade300,
+            color: isSelected
+                ? activeColor
+                : isDisabledUnselected
+                    ? Colors.grey.shade200
+                    : Colors.grey.shade300,
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -185,7 +236,11 @@ class _OptionCard extends StatelessWidget {
           children: [
             Icon(
               isSelected ? icon : Icons.radio_button_unchecked,
-              color: isSelected ? activeColor : Colors.grey.shade400,
+              color: isSelected
+                  ? activeColor
+                  : isDisabledUnselected
+                      ? Colors.grey.shade300
+                      : Colors.grey.shade400,
               size: 24,
             ),
             const SizedBox(width: 8),
@@ -196,7 +251,11 @@ class _OptionCard extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(
-                      color: isSelected ? activeColor : Colors.grey.shade600,
+                      color: isSelected
+                          ? activeColor
+                          : isDisabledUnselected
+                              ? Colors.grey.shade400
+                              : Colors.grey.shade600,
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
                     ),
@@ -205,7 +264,11 @@ class _OptionCard extends StatelessWidget {
                   Text(
                     message,
                     style: TextStyle(
-                      color: isSelected ? activeColor : Colors.grey.shade500,
+                      color: isSelected
+                          ? activeColor
+                          : isDisabledUnselected
+                              ? Colors.grey.shade400
+                              : Colors.grey.shade500,
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                     ),

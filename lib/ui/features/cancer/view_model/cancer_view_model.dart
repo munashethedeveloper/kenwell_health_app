@@ -62,12 +62,14 @@ class CancerScreeningViewModel extends ChangeNotifier {
   void setPreviousCancerDiagnosis(String? value) {
     if (previousCancerDiagnosis == value) return;
     previousCancerDiagnosis = value;
+    _autoApplyReferral();
     notifyListeners();
   }
 
   void setFamilyHistoryOfCancer(String? value) {
     if (familyHistoryOfCancer == value) return;
     familyHistoryOfCancer = value;
+    _autoApplyReferral();
     notifyListeners();
   }
 
@@ -86,30 +88,35 @@ class CancerScreeningViewModel extends ChangeNotifier {
   void setBreastLump(String? value) {
     if (breastLump == value) return;
     breastLump = value;
+    _autoApplyReferral();
     notifyListeners();
   }
 
   void setAbnormalBleeding(String? value) {
     if (abnormalBleeding == value) return;
     abnormalBleeding = value;
+    _autoApplyReferral();
     notifyListeners();
   }
 
   void setUrinaryDifficulty(String? value) {
     if (urinaryDifficulty == value) return;
     urinaryDifficulty = value;
+    _autoApplyReferral();
     notifyListeners();
   }
 
   void setWeightLoss(String? value) {
     if (weightLoss == value) return;
     weightLoss = value;
+    _autoApplyReferral();
     notifyListeners();
   }
 
   void setPersistentPain(String? value) {
     if (persistentPain == value) return;
     persistentPain = value;
+    _autoApplyReferral();
     notifyListeners();
   }
 

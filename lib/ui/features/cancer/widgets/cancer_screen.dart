@@ -25,7 +25,7 @@ class CancerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<CancerScreeningViewModel>();
 
-    // Auto-refer when any at-risk indicator is present
+    // Auto-refer when any at-risk indicator is present — locked to At Risk.
     if (viewModel.isAtRisk) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (viewModel.nursingReferralSelection == null ||
@@ -33,6 +33,15 @@ class CancerScreen extends StatelessWidget {
                 NursingReferralOption.patientNotReferred) {
           viewModel.setNursingReferralSelection(
               NursingReferralOption.referredToStateClinic);
+        }
+      });
+    } else if (viewModel.isHealthy) {
+      // All relevant exams entered and none abnormal — lock to Healthy.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (viewModel.nursingReferralSelection !=
+            NursingReferralOption.patientNotReferred) {
+          viewModel.setNursingReferralSelection(
+              NursingReferralOption.patientNotReferred);
         }
       });
     }
@@ -295,12 +304,16 @@ class CancerScreen extends StatelessWidget {
         ),
         const SizedBox(height: 24),
 
-        // 8. Nursing Referral — always shown, identical to HRA / HCT
+        // 8. Nursing Referral — always shown.
+        // Locked to At Risk when any symptom/finding is abnormal,
+        // locked to Healthy when all relevant exams are normal,
+        // and interactive only when some exams are still pending.
         NursingReferralStatusCard(
           title: 'Nursing Referrals',
           selectedValue: viewModel.nursingReferralSelection,
           onChanged: viewModel.setNursingReferralSelection,
           notReferredReasonController: viewModel.notReferredReasonController,
+          readOnly: viewModel.isAtRisk || viewModel.isHealthy,
           reasonValidator: (val) =>
               (val == null || val.isEmpty) ? 'Please enter a reason' : null,
         ),

@@ -8,7 +8,7 @@ import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_date_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_styles.dart';
-import '../../../shared/ui/form/kenwell_referral_card.dart';
+import '../../../shared/ui/form/nursing_referral_status_card.dart';
 import '../../../shared/ui/headers/kenwell_gradient_header.dart';
 import '../../../shared/ui/form/kenwell_signature_actions.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
@@ -35,7 +35,9 @@ class HIVTestResultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<HIVTestResultViewModel>();
 
-    // Auto-refer when the screening result is Positive (at risk)
+    // Auto-refer based on the screening result.
+    // This mirrors the logic in setScreeningResult() for the case where
+    // the screen is first built after the VM already has a result selected.
     if (viewModel.isAtRisk) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (viewModel.nursingReferralSelection == null ||
@@ -43,6 +45,14 @@ class HIVTestResultScreen extends StatelessWidget {
                 NursingReferralOption.patientNotReferred) {
           viewModel.setNursingReferralSelection(
               NursingReferralOption.referredToStateClinic);
+        }
+      });
+    } else if (viewModel.isHealthy) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (viewModel.nursingReferralSelection !=
+            NursingReferralOption.patientNotReferred) {
+          viewModel.setNursingReferralSelection(
+              NursingReferralOption.patientNotReferred);
         }
       });
     }
@@ -120,18 +130,20 @@ class HIVTestResultScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    // Confirmatory Test Card
+                    // Initial Assessment
                     _buildInitialAssessment(viewModel),
                     const SizedBox(height: 24),
-                    // Show referral card only for positive (at-risk) results;
-                    // hide it for negative results and show a healthy status banner
-                    if (viewModel.isAtRisk) ...[
-                      _buildReferrals(viewModel),
-                      const SizedBox(height: 24),
-                    ] else ...[
-                      _buildNegativeBanner(),
-                      const SizedBox(height: 24),
-                    ],
+                    // Nursing Referral — always shown, automatically locked
+                    // to Healthy (Negative result) or At Risk (Positive result).
+                    NursingReferralStatusCard(
+                      title: 'Nursing Referrals',
+                      selectedValue: viewModel.nursingReferralSelection,
+                      onChanged: viewModel.setNursingReferralSelection,
+                      // HCT has no caution state — outcome is always
+                      // automatically determined from the test result.
+                      readOnly: true,
+                    ),
+                    const SizedBox(height: 24),
                     // Nurse Details Card
                     _buildNurseDetails(viewModel),
                     const SizedBox(height: 24),
@@ -253,64 +265,6 @@ class HIVTestResultScreen extends StatelessWidget {
             validator: (val) => (val == null || val.isEmpty)
                 ? 'Please select Committed to change behavior?'
                 : null,
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Build Referrals section
-  Widget _buildReferrals(HIVTestResultViewModel viewModel) {
-    return KenwellReferralCard<NursingReferralOption>(
-      title: 'Nursing Referrals',
-      selectedValue: viewModel.nursingReferralSelection,
-      onChanged: viewModel.setNursingReferralSelection,
-      reasonValidator: (val) =>
-          (val == null || val.isEmpty) ? 'Please enter a reason' : null,
-      options: [
-        KenwellReferralOption(
-          value: NursingReferralOption.patientNotReferred,
-          label: 'Patient not referred',
-          requiresReason: true,
-          reasonController: viewModel.notReferredReasonController,
-          reasonLabel: 'Reason patient not referred',
-        ),
-        const KenwellReferralOption(
-          value: NursingReferralOption.referredToGP,
-          label: 'Patient referred to GP',
-        ),
-        const KenwellReferralOption(
-          value: NursingReferralOption.referredToStateClinic,
-          label: 'Patient referred to State Clinic',
-        ),
-      ],
-    );
-  }
-
-  // Green banner shown when the HIV test result is negative (healthy)
-  Widget _buildNegativeBanner() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE8F5E9),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFF2E7D32), width: 1),
-      ),
-      child: const Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.check_circle, color: Color(0xFF2E7D32), size: 20),
-          SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'HIV test result is Negative. No nursing referral is required.',
-              style: TextStyle(
-                color: Color(0xFF2E7D32),
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
           ),
         ],
       ),

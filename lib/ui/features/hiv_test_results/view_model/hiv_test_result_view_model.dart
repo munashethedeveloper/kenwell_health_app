@@ -13,6 +13,10 @@ import 'package:kenwell_health_app/domain/constants/enums.dart';
 class HIVTestResultViewModel extends ChangeNotifier {
   HIVTestResultViewModel() {
     _loadCurrentUserProfile();
+    // Initialize referral to Healthy since the default screening result is
+    // Negative.  setScreeningResult() updates this whenever the nurse changes
+    // the result dropdown.
+    nursingReferralSelection = NursingReferralOption.patientNotReferred;
   }
 
   final AuthService _authService = AuthService();

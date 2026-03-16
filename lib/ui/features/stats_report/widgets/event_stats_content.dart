@@ -476,7 +476,7 @@ class _EventStatsContentState extends State<EventStatsContent> {
                             child: Row(
                               children: [
                                 Text(
-                                  '${_selectedScreeningType!.toUpperCase()} Analytics',
+                                  '${_screeningTypeLabel(_selectedScreeningType!)} Analytics',
                                   style: const TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w700,
@@ -584,6 +584,17 @@ class _EventStatsContentState extends State<EventStatsContent> {
         visualDensity: VisualDensity.compact,
       ),
     );
+  }
+
+  /// Maps internal service type keys to display labels for the analytics panel.
+  String _screeningTypeLabel(String key) {
+    const labels = {
+      'hra': 'HRA (Health Risk)',
+      'hct': 'HCT (HIV Testing)',
+      'tb': 'TB Screening',
+      'cancer': 'Cancer Screening',
+    };
+    return labels[key.toLowerCase()] ?? key.toUpperCase();
   }
 
   Widget _buildDetailRow(

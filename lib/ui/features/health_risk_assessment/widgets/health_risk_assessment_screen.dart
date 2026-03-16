@@ -191,7 +191,11 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
 
                           const SizedBox(height: 24),
 
-                          // Nursing referral section
+                          // Nursing referral section.
+                          // readOnly when the system has made an automatic
+                          // determination: locked to Healthy when all metrics
+                          // are green, locked to At Risk when any metric is red.
+                          // Interactive (nurse chooses) only in the caution zone.
                           NursingReferralStatusCard(
                             title: 'Nursing Referrals',
                             selectedValue:
@@ -201,6 +205,8 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                             notReferredReasonController:
                                 nurseViewModel.notReferredReasonController,
                             isCaution: vm.isCaution,
+                            readOnly: !vm.isCaution &&
+                                (vm.hasRedMetrics || vm.isHealthy),
                             reasonValidator: (val) =>
                                 (val == null || val.isEmpty)
                                     ? 'Please enter a reason'
