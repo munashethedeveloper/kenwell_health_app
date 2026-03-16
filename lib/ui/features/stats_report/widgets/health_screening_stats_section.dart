@@ -21,6 +21,10 @@ import 'sections/hct_stats_card.dart';
 /// respective Firestore collections.
 /// When [eventIds] is an empty list no data is fetched and the section shows
 /// an empty-state message.
+///
+/// When [selectedType] is provided, only the analytics card for that screening
+/// type is shown.  Pass `null` to show all cards (legacy behaviour).
+/// Accepted values: `'hra'`, `'hct'`, `'tb'`, `'cancer'`.
 class HealthScreeningStatsSection extends StatefulWidget {
   /// The wellness event IDs to scope stats to, or null for an aggregate view.
   final List<String>? eventIds;
@@ -28,10 +32,15 @@ class HealthScreeningStatsSection extends StatefulWidget {
   /// Optional subtitle override for the section header.
   final String? sectionSubtitle;
 
+  /// When non-null, restricts the displayed analytics card to the matching
+  /// screening type.  Accepted values: `'hra'`, `'hct'`, `'tb'`, `'cancer'`.
+  final String? selectedType;
+
   const HealthScreeningStatsSection({
     super.key,
     this.eventIds,
     this.sectionSubtitle,
+    this.selectedType,
   });
 
   @override
@@ -311,28 +320,30 @@ class _HealthScreeningStatsSectionState
 
     final hasAnyData = hra.total + cancer.total + tb.total + hct.total > 0;
 
+    // Determine which cards to show based on the selectedType filter.
+    final selected = widget.selectedType;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Text(
-          'Health Screening Analytics',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF201C58),
-          ),
-        ),
-        const SizedBox(height: 16),
         if (!hasAnyData) ...[
           buildScreeningEmptyState(context),
         ] else ...[
-          HraStatsCard(stats: hra),
-          const SizedBox(height: 16),
-          CancerStatsCard(stats: cancer),
-          const SizedBox(height: 16),
-          TbStatsCard(stats: tb),
-          const SizedBox(height: 16),
-          HctStatsCard(stats: hct),
+          if (selected == null || selected == 'hra') ...[
+            HraStatsCard(stats: hra),
+            const SizedBox(height: 16),
+          ],
+          if (selected == null || selected == 'cancer') ...[
+            CancerStatsCard(stats: cancer),
+            const SizedBox(height: 16),
+          ],
+          if (selected == null || selected == 'tb') ...[
+            TbStatsCard(stats: tb),
+            const SizedBox(height: 16),
+          ],
+          if (selected == null || selected == 'hct') ...[
+            HctStatsCard(stats: hct),
+          ],
         ],
       ],
     );

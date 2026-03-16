@@ -14,12 +14,18 @@ import '../../../../../domain/models/wellness_event.dart';
 /// Used on both the Live Events view (title: "Live Screening Counts") and the
 /// Past Events view (title: "Health Screening Analytics").  Pass [isLiveTab]
 /// to control the label and empty-state copy.
+///
+/// When [onCardTapped] is provided, each card becomes interactive. The parent
+/// can track which service type was selected and show the detailed analytics
+/// section accordingly.
 class LiveScreeningCountsSection extends StatefulWidget {
   const LiveScreeningCountsSection({
     super.key,
     required this.eventIds,
     required this.events,
     this.isLiveTab = true,
+    this.onCardTapped,
+    this.selectedServiceType,
   });
 
   final List<String> eventIds;
@@ -28,6 +34,14 @@ class LiveScreeningCountsSection extends StatefulWidget {
   /// When false the section uses "Health Screening Analytics" as its title and
   /// adjusts empty-state copy to refer to past events.
   final bool isLiveTab;
+
+  /// Called with the [ServiceType] label (e.g. `'hra'`, `'hct'`, `'tb'`) when
+  /// a screening card is tapped. Tap the same card again to deselect.
+  final void Function(String? serviceKey)? onCardTapped;
+
+  /// The currently selected service key — the corresponding card is
+  /// highlighted to indicate it is active.
+  final String? selectedServiceType;
 
   @override
   State<LiveScreeningCountsSection> createState() =>
@@ -134,17 +148,17 @@ class _LiveScreeningCountsSectionState
     final theme = Theme.of(context);
 
     final allScreenings = [
-      _ScreeningCount(ServiceType.hra, 'HRA', _hraCount,
+      _ScreeningCount(ServiceType.hra, 'hra', 'HRA', _hraCount,
           Icons.monitor_heart_outlined, Colors.teal.shade600),
-      _ScreeningCount(ServiceType.hct, 'HCT', _hctCount,
+      _ScreeningCount(ServiceType.hct, 'hct', 'HCT', _hctCount,
           Icons.bloodtype_outlined, Colors.red.shade600),
-      _ScreeningCount(ServiceType.tbTest, 'TB', _tbCount, Icons.air_outlined,
+      _ScreeningCount(ServiceType.tbTest, 'tb', 'TB', _tbCount, Icons.air_outlined,
           Colors.amber.shade700),
-      _ScreeningCount(ServiceType.papSmear, 'Pap Smear', _papSmearCount,
+      _ScreeningCount(ServiceType.papSmear, 'cancer', 'Pap Smear', _papSmearCount,
           Icons.science_outlined, Colors.purple.shade500),
-      _ScreeningCount(ServiceType.breastScreening, 'Breast',
+      _ScreeningCount(ServiceType.breastScreening, 'cancer', 'Breast',
           _breastScreeningCount, Icons.favorite_border, Colors.pink.shade500),
-      _ScreeningCount(ServiceType.psa, 'PSA', _psaCount, Icons.biotech_outlined,
+      _ScreeningCount(ServiceType.psa, 'cancer', 'PSA', _psaCount, Icons.biotech_outlined,
           Colors.indigo.shade500),
     ];
 
@@ -237,6 +251,18 @@ class _LiveScreeningCountsSectionState
                         count: _isLoading ? null : s.count,
                         icon: s.icon,
                         color: s.color,
+                        isSelected:
+                            widget.selectedServiceType == s.serviceKey,
+                        onTap: widget.onCardTapped != null
+                            ? () {
+                                // Toggle: tap selected card again to deselect.
+                                final next =
+                                    widget.selectedServiceType == s.serviceKey
+                                        ? null
+                                        : s.serviceKey;
+                                widget.onCardTapped!(next);
+                              }
+                            : null,
                       ))
                   .toList(),
             ),
@@ -250,9 +276,12 @@ class _LiveScreeningCountsSectionState
 
 class _ScreeningCount {
   const _ScreeningCount(
-      this.serviceType, this.label, this.count, this.icon, this.color);
+      this.serviceType, this.serviceKey, this.label, this.count, this.icon, this.color);
 
   final ServiceType serviceType;
+  /// Short key used to group cards for the detail panel (e.g. 'hra', 'hct',
+  /// 'tb', 'cancer').
+  final String serviceKey;
   final String label;
   final int count;
   final IconData icon;
@@ -265,66 +294,101 @@ class _ScreeningCountCard extends StatelessWidget {
     required this.count,
     required this.icon,
     required this.color,
+    this.isSelected = false,
+    this.onTap,
   });
 
   final String label;
   final int? count;
   final IconData icon;
   final Color color;
+  final bool isSelected;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: theme.primaryColor.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: KenwellColors.primaryGreen.withValues(alpha: 0.45),
-          width: 1.5,
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? color.withValues(alpha: 0.18)
+              : theme.primaryColor.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected
+                ? color
+                : KenwellColors.primaryGreen.withValues(alpha: 0.45),
+            width: isSelected ? 2 : 1.5,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: color.withValues(alpha: 0.25),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  )
+                ]
+              : null,
         ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(7),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(8),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(7),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, color: color, size: 20),
             ),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          const SizedBox(height: 6),
-          count == null
-              ? SizedBox(
-                  width: 18,
-                  height: 18,
-                  child:
-                      CircularProgressIndicator(strokeWidth: 2, color: color),
-                )
-              : Text(
-                  count.toString(),
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: KenwellColors.secondaryNavy,
-                    fontSize: 22,
+            const SizedBox(height: 6),
+            count == null
+                ? SizedBox(
+                    width: 18,
+                    height: 18,
+                    child:
+                        CircularProgressIndicator(strokeWidth: 2, color: color),
+                  )
+                : Text(
+                    count.toString(),
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: KenwellColors.secondaryNavy,
+                      fontSize: 22,
+                    ),
                   ),
-                ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              color: Colors.grey.shade700,
-              fontWeight: FontWeight.w600,
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                color: Colors.grey.shade700,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+            if (onTap != null) ...[
+              const SizedBox(height: 2),
+              Text(
+                isSelected ? 'Tap to hide' : 'Tap for details',
+                style: TextStyle(
+                  fontSize: 9,
+                  color: color.withValues(alpha: 0.7),
+                  fontStyle: FontStyle.italic,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }

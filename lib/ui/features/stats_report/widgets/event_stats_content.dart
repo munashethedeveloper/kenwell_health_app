@@ -35,6 +35,10 @@ class _EventStatsContentState extends State<EventStatsContent> {
   DateTime? _startDate;
   DateTime? _endDate;
 
+  // Selected screening type for the analytics detail panel.
+  // Null means no card is selected (detail panel is hidden).
+  String? _selectedScreeningType;
+
   @override
   void initState() {
     super.initState();
@@ -438,15 +442,73 @@ class _EventStatsContentState extends State<EventStatsContent> {
               eventIds: events.map((e) => e.id).toList(),
               events: events,
               isLiveTab: isLiveTab,
+              selectedServiceType: _selectedScreeningType,
+              onCardTapped: (key) {
+                setState(() => _selectedScreeningType = key);
+              },
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
 
-            // ── Per-service analytics (deep stats) ───────────────────────
-            HealthScreeningStatsSection(
-              eventIds: events.map((e) => e.id).toList(),
-              sectionSubtitle: isLiveTab
-                  ? 'Live screening data from ${events.length} currently running event${events.length != 1 ? "s" : ""}'
-                  : 'Screening data from ${events.length} past event${events.length != 1 ? "s" : ""}',
+            // ── Per-service analytics (shown only when a card is selected) ─
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              transitionBuilder: (child, animation) => FadeTransition(
+                opacity: animation,
+                child: SizeTransition(
+                  sizeFactor: animation,
+                  axisAlignment: -1,
+                  child: child,
+                ),
+              ),
+              child: _selectedScreeningType != null
+                  ? Padding(
+                      // Use a stable key so the HealthScreeningStatsSection
+                      // widget persists across type changes (avoids re-fetching
+                      // Firestore data on each card tap).
+                      key: const ValueKey('analytics_panel'),
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(left: 4, bottom: 12),
+                            child: Row(
+                              children: [
+                                Text(
+                                  '${_selectedScreeningType!.toUpperCase()} Analytics',
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF201C58),
+                                  ),
+                                ),
+                                const Spacer(),
+                                TextButton.icon(
+                                  onPressed: () => setState(
+                                      () => _selectedScreeningType = null),
+                                  icon: const Icon(Icons.close, size: 16),
+                                  label: const Text('Close'),
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: Colors.grey.shade600,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          HealthScreeningStatsSection(
+                            eventIds: events.map((e) => e.id).toList(),
+                            selectedType: _selectedScreeningType,
+                            sectionSubtitle: isLiveTab
+                                ? 'Live screening data from ${events.length} running event${events.length != 1 ? "s" : ""}'
+                                : 'Screening data from ${events.length} past event${events.length != 1 ? "s" : ""}',
+                          ),
+                        ],
+                      ),
+                    )
+                  : const SizedBox.shrink(key: ValueKey('empty')),
             ),
             const SizedBox(height: 24),
 

@@ -140,6 +140,53 @@ class FirestoreMemberEventRepository {
     }
   }
 
+  /// Mark the survey as completed for a member-event record.
+  ///
+  /// Sets `surveyCompleted = true`, `isScreened = true`, and records
+  /// `screenedAt` (if not already set) so that live statistics immediately
+  /// reflect the newly screened member.
+  Future<void> markSurveyCompleted(String memberId, String eventId) async {
+    try {
+      final docId = _docId(memberId, eventId);
+      final ref = FirebaseFirestore.instance
+          .collection(memberEventsCollection)
+          .doc(docId);
+
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        final snapshot = await transaction.get(ref);
+        final existing =
+            snapshot.exists ? snapshot.data() as Map<String, dynamic> : {};
+        final alreadyScreened = existing['isScreened'] as bool? ?? false;
+
+        final updates = <String, dynamic>{
+          'surveyCompleted': true,
+          'isScreened': true,
+        };
+        if (!alreadyScreened) {
+          updates['screenedAt'] = Timestamp.now();
+        }
+
+        if (snapshot.exists) {
+          transaction.update(ref, updates);
+        } else {
+          transaction.set(ref, {
+            'id': docId,
+            'memberId': memberId,
+            'eventId': eventId,
+            'eventTitle': 'Unknown Event',
+            'registeredAt': Timestamp.now(),
+            ...updates,
+          });
+        }
+      });
+      debugPrint('markSurveyCompleted: updated $docId');
+    } catch (e, stackTrace) {
+      debugPrint('Error marking survey completed for $memberId/$eventId: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
   /// Ensure a member-event record exists, creating one with full event details
   /// if it does not already exist. Used when an existing member is found via
   /// search and enters the wellness flow without going through registration.

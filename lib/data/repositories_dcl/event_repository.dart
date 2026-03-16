@@ -89,6 +89,40 @@ class EventRepository {
 
   // ── Write operations ───────────────────────────────────────────────────────
 
+  /// Atomically increments the [screenedCount] for an event by 1.
+  ///
+  /// Uses Firestore's [FieldValue.increment] to avoid read-modify-write races
+  /// when multiple devices are processing members simultaneously.
+  /// Also updates the local cache with the latest value.
+  Future<void> incrementScreenedCount(String eventId) async {
+    try {
+      await _firestore
+          .collection(_collectionName)
+          .doc(eventId)
+          .update({'screenedCount': FieldValue.increment(1)});
+      debugPrint(
+          'EventRepository: incremented screenedCount for event $eventId');
+
+      // Refresh local cache so the stats widget immediately reflects the new
+      // count without requiring a full re-fetch.
+      try {
+        final doc =
+            await _firestore.collection(_collectionName).doc(eventId).get();
+        if (doc.exists) {
+          final updated = _mapFirestoreToDomain(doc.id, doc.data()!);
+          await _localDb.upsertEvent(_mapDomainToEntity(updated));
+        }
+      } catch (_) {
+        // Non-fatal: local cache refresh is best-effort.
+      }
+    } catch (e, stackTrace) {
+      debugPrint(
+          'EventRepository: ERROR incrementing screenedCount for $eventId – $e');
+      debugPrintStack(stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
   Future<void> addEvent(WellnessEvent event) => upsertEvent(event);
 
   Future<void> updateEvent(WellnessEvent updatedEvent) =>

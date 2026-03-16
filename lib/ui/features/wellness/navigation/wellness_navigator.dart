@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../../../../domain/models/member.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../data/repositories_dcl/firestore_member_event_repository.dart';
+import '../../../../data/repositories_dcl/event_repository.dart';
 import '../widgets/member_search_screen.dart';
 import '../widgets/current_event_home_screen.dart';
 import '../widgets/health_screenings_screen.dart';
@@ -24,6 +25,7 @@ class WellnessNavigator {
   final BuildContext context;
   final WellnessEvent event;
   final _memberEventRepository = FirestoreMemberEventRepository();
+  final _eventRepository = EventRepository();
 
   /// Delegates individual screening screen pushes to [ScreeningNavigator].
   late final ScreeningNavigator _screeningNavigator =
@@ -307,6 +309,20 @@ class WellnessNavigator {
                           await _screeningNavigator.navigateToSurvey(member);
                       if (result == true) {
                         wellnessVM.markSurveyCompleted();
+                        // Mark the member as screened in the member_events
+                        // record and increment the event's screened counter so
+                        // live statistics update immediately.  Both writes are
+                        // fire-and-forget; a failure in either is non-fatal
+                        // (the member_events record is the source of truth for
+                        // individual screening status; the event counter is a
+                        // denormalised aggregate that self-heals on the next
+                        // stats refresh).
+                        _memberEventRepository
+                            .markSurveyCompleted(member.id, event.id)
+                            .then((_) =>
+                                _eventRepository.incrementScreenedCount(event.id))
+                            .catchError((e) => debugPrint(
+                                'Failed to record survey completion: $e'));
                       }
                       break;
                     }

@@ -224,6 +224,11 @@ class _ProcessStepCard extends StatelessWidget {
     Color iconColor;
     Color statusTextColor;
 
+    // A completed section is locked — tapping is disabled.
+    // An in-progress section (health screenings only) remains tappable.
+    final bool isLocked = isCompleted;
+    final VoidCallback? effectiveTap = isLocked ? null : onTap;
+
     if (isCompleted) {
       iconContainerColor = const Color(0xFF90C048).withValues(alpha: 0.15);
       iconColor = const Color(0xFF90C048);
@@ -238,75 +243,90 @@ class _ProcessStepCard extends StatelessWidget {
       statusTextColor = Colors.grey.shade600;
     }
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.grey.shade200,
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
+    return Tooltip(
+      message: isLocked ? 'This section has already been completed' : '',
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          // Slightly muted background for completed (locked) cards.
+          color: isLocked ? Colors.grey.shade50 : Colors.white,
           borderRadius: BorderRadius.circular(12),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: iconContainerColor,
-                    borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isLocked
+                ? const Color(0xFF90C048).withValues(alpha: 0.35)
+                : Colors.grey.shade200,
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: effectiveTap,
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: iconContainerColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      icon,
+                      color: iconColor,
+                      size: 24,
+                    ),
                   ),
-                  child: Icon(
-                    icon,
-                    color: iconColor,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF201C58),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: isLocked
+                                ? const Color(0xFF201C58).withValues(alpha: 0.6)
+                                : const Color(0xFF201C58),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        status,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: statusTextColor,
+                        const SizedBox(height: 2),
+                        Text(
+                          status,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: statusTextColor,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                if (onTap != null)
-                  Icon(
-                    Icons.chevron_right,
-                    color: Colors.grey.shade400,
-                    size: 24,
-                  ),
-              ],
+                  // Show lock icon for completed sections, chevron for active ones.
+                  if (isLocked)
+                    Icon(
+                      Icons.lock_outline,
+                      color: const Color(0xFF90C048).withValues(alpha: 0.7),
+                      size: 22,
+                    )
+                  else if (effectiveTap != null)
+                    Icon(
+                      Icons.chevron_right,
+                      color: Colors.grey.shade400,
+                      size: 24,
+                    ),
+                ],
+              ),
             ),
           ),
         ),
