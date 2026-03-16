@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'dart:math';
 import 'package:kenwell_health_app/domain/models/hra_screening.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_hra_repository.dart';
 import 'package:kenwell_health_app/utils/logger.dart';
 import 'package:kenwell_health_app/domain/constants/enums.dart';
 import 'package:kenwell_health_app/utils/health_metric_classification.dart';
+import 'package:kenwell_health_app/ui/features/nurse_interventions/view_model/nurse_intervention_view_model.dart';
 import 'package:uuid/uuid.dart';
 
 // ViewModel for Personal Risk Assessment
@@ -334,6 +336,7 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
   // Submit results
   Future<void> submitResults({
     required VoidCallback onNext,
+    NurseInterventionViewModel? nurseVM,
     void Function(String)? onValidationFailed,
     void Function(String)? onSuccess,
     void Function(String)? onError,
@@ -344,10 +347,33 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
       return;
     }
 
+    // Validate nurse fields when a nurseVM is provided.
+    if (nurseVM != null) {
+      if (nurseVM.nurseFirstNameController.text.isEmpty ||
+          nurseVM.nurseLastNameController.text.isEmpty ||
+          nurseVM.rankController.text.isEmpty ||
+          nurseVM.sancNumberController.text.isEmpty) {
+        onValidationFailed?.call(
+            'Please complete all nurse details (name, rank, SANC No).');
+        return;
+      }
+      if (nurseVM.signatureController.isEmpty) {
+        onValidationFailed?.call('Please add the nurse signature.');
+        return;
+      }
+    }
+
     _isSubmitting = true;
     notifyListeners();
 
     try {
+      // Encode the signature if provided.
+      String? signatureBase64;
+      if (nurseVM != null) {
+        final bytes = await nurseVM.signatureController.toPngBytes();
+        if (bytes != null) signatureBase64 = base64Encode(bytes);
+      }
+
       // Create HRA screening object
       final hraScreening = HraScreening(
         id: const Uuid().v4(),
@@ -385,6 +411,17 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
             ? bloodSugarController.text
             : null,
         waist: waistController.text.isNotEmpty ? waistController.text : null,
+        nursingReferral: nurseVM?.nursingReferralSelection?.name,
+        notReferredReason: nurseVM?.notReferredReasonController.text.isEmpty ==
+                true
+            ? null
+            : nurseVM?.notReferredReasonController.text,
+        nurseFirstName: nurseVM?.nurseFirstNameController.text,
+        nurseLastName: nurseVM?.nurseLastNameController.text,
+        rank: nurseVM?.rankController.text,
+        sancNumber: nurseVM?.sancNumberController.text,
+        nurseDate: nurseVM?.nurseDateController.text,
+        signatureData: signatureBase64,
         createdAt: DateTime.now(),
       );
 

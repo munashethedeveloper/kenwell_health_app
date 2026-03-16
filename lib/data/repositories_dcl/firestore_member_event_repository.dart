@@ -73,6 +73,11 @@ class FirestoreMemberEventRepository {
 
   /// Update the screening completion status for a member-event record.
   /// Marks the member as screened if at least one screening is completed.
+  ///
+  /// When [isScreened] transitions from `false → true` for the first time the
+  /// event's `screenedCount` field is atomically incremented by 1 via
+  /// [FieldValue.increment], so the stats page stays consistent without
+  /// requiring a separate call.
   Future<void> updateScreeningStatus(
     String memberId,
     String eventId, {
@@ -110,11 +115,20 @@ class FirestoreMemberEventRepository {
               cancerCompleted ?? existing['cancerCompleted'] as bool? ?? false;
 
           final nowScreened = newHra || newHct || newTb || newCancer;
+          final wasScreened = existing['isScreened'] as bool? ?? false;
           updates['isScreened'] = nowScreened;
 
-          if (nowScreened &&
-              (existing['isScreened'] as bool? ?? false) == false) {
+          if (nowScreened && !wasScreened) {
             updates['screenedAt'] = Timestamp.now();
+            // Atomically increment the event's screened counter so that the
+            // stats page immediately reflects the new member.  This is the
+            // single source of truth for that transition – see also
+            // [markSurveyCompleted] which applies the same guard.
+            final eventRef = FirebaseFirestore.instance
+                .collection('events')
+                .doc(eventId);
+            transaction.update(
+                eventRef, {'screenedCount': FieldValue.increment(1)});
           }
 
           if (snapshot.exists) {
@@ -142,9 +156,13 @@ class FirestoreMemberEventRepository {
 
   /// Mark the survey as completed for a member-event record.
   ///
-  /// Sets `surveyCompleted = true`, `isScreened = true`, and records
-  /// `screenedAt` (if not already set) so that live statistics immediately
-  /// reflect the newly screened member.
+  /// Sets `surveyCompleted = true` and `isScreened = true`.  Records
+  /// `screenedAt` and atomically increments the event's `screenedCount` only
+  /// when the member was **not** previously marked as screened (i.e. this is the
+  /// first "screened" transition for this member/event pair).  This prevents
+  /// double-counting for members who complete individual screenings (which
+  /// already increment the counter via [updateScreeningStatus]) before the
+  /// survey.
   Future<void> markSurveyCompleted(String memberId, String eventId) async {
     try {
       final docId = _docId(memberId, eventId);
@@ -164,6 +182,13 @@ class FirestoreMemberEventRepository {
         };
         if (!alreadyScreened) {
           updates['screenedAt'] = Timestamp.now();
+          // First time this member is marked screened — increment the event
+          // counter.  Members who completed individual screenings earlier will
+          // have already triggered this increment via [updateScreeningStatus].
+          final eventRef =
+              FirebaseFirestore.instance.collection('events').doc(eventId);
+          transaction.update(
+              eventRef, {'screenedCount': FieldValue.increment(1)});
         }
 
         if (snapshot.exists) {

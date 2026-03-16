@@ -5,9 +5,14 @@ import 'package:kenwell_health_app/ui/shared/ui/form/nursing_referral_status_car
 import 'package:kenwell_health_app/ui/features/nurse_interventions/view_model/nurse_intervention_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
+import 'package:kenwell_health_app/utils/input_formatters.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
+import '../../../shared/ui/form/custom_text_field.dart';
+import '../../../shared/ui/form/kenwell_date_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
+import '../../../shared/ui/form/kenwell_form_styles.dart';
+import '../../../shared/ui/form/kenwell_signature_actions.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/health_risk_assessment_view_model.dart';
 import 'sections/hra_lifestyle_section.dart';
@@ -215,21 +220,114 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
 
                           const SizedBox(height: 24),
 
-                          // Navigation (Previous + Submit)
-                          KenwellFormNavigation(
-                            nextLabel: 'Submit',
-                            onPrevious: vm.isSubmitting ? null : onPrevious,
-                            onNext: () => vm.submitResults(
-                              onNext: onNext ?? () {},
-                              onValidationFailed: (msg) =>
-                                  AppSnackbar.showWarning(context, msg),
-                              onSuccess: (msg) =>
-                                  AppSnackbar.showSuccess(context, msg),
-                              onError: (msg) =>
-                                  AppSnackbar.showError(context, msg),
+                          // Healthcare-practitioner details
+                          KenwellFormCard(
+                            title: 'Nurse Details',
+                            child: Column(
+                              children: [
+                                KenwellTextField(
+                                  label: 'Nurse First Name',
+                                  hintText: 'Auto-filled from profile',
+                                  enabled: false,
+                                  readOnly: true,
+                                  controller:
+                                      nurseViewModel.nurseFirstNameController,
+                                  decoration: KenwellFormStyles.decoration(
+                                    label: 'Nurse First Name',
+                                    hint: 'Auto-filled from profile',
+                                  ),
+                                  inputFormatters:
+                                      AppTextInputFormatters.lettersOnly(
+                                          allowHyphen: true),
+                                  validator: (val) =>
+                                      (val == null || val.isEmpty)
+                                          ? 'Please enter Nurse First Name'
+                                          : null,
+                                ),
+                                KenwellTextField(
+                                  label: 'Nurse Last Name',
+                                  hintText: 'Auto-filled from profile',
+                                  enabled: false,
+                                  readOnly: true,
+                                  controller:
+                                      nurseViewModel.nurseLastNameController,
+                                  decoration: KenwellFormStyles.decoration(
+                                    label: 'Nurse Last Name',
+                                    hint: 'Auto-filled from profile',
+                                  ),
+                                  inputFormatters:
+                                      AppTextInputFormatters.lettersOnly(
+                                          allowHyphen: true),
+                                  validator: (val) =>
+                                      (val == null || val.isEmpty)
+                                          ? 'Please enter Nurse Last Name'
+                                          : null,
+                                ),
+                                KenwellTextField(
+                                  label: 'Rank',
+                                  hintText: 'Enter nurse rank',
+                                  controller: nurseViewModel.rankController,
+                                  decoration: KenwellFormStyles.decoration(
+                                    label: 'Rank',
+                                    hint: 'Enter nurse rank',
+                                  ),
+                                  validator: (val) =>
+                                      (val == null || val.isEmpty)
+                                          ? 'Please enter Rank'
+                                          : null,
+                                ),
+                                KenwellTextField(
+                                  label: 'SANC No',
+                                  hintText: 'Enter SANC number',
+                                  controller: nurseViewModel.sancNumberController,
+                                  decoration: KenwellFormStyles.decoration(
+                                    label: 'SANC No',
+                                    hint: 'Enter SANC number',
+                                  ),
+                                  inputFormatters:
+                                      AppTextInputFormatters.numbersOnly(),
+                                  validator: (val) =>
+                                      (val == null || val.isEmpty)
+                                          ? 'Please enter SANC No'
+                                          : null,
+                                ),
+                                KenwellDateField(
+                                  label: 'Date',
+                                  controller: nurseViewModel.nurseDateController,
+                                  readOnly: true,
+                                  enabled: false,
+                                  validator: (val) =>
+                                      (val == null || val.isEmpty)
+                                          ? 'Please select Date'
+                                          : null,
+                                ),
+                              ],
                             ),
-                            isNextBusy: vm.isSubmitting,
-                            isNextEnabled: !vm.isSubmitting,
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          // Signature
+                          KenwellSignatureActions(
+                            title: 'Signature',
+                            controller: nurseViewModel.signatureController,
+                            onClear: nurseViewModel.clearSignature,
+                            navigation: KenwellFormNavigation(
+                              nextLabel: 'Submit',
+                              onPrevious: vm.isSubmitting ? null : onPrevious,
+                              onNext: () => vm.submitResults(
+                                onNext: onNext ?? () {},
+                                nurseVM: nurseViewModel,
+                                onValidationFailed: (msg) =>
+                                    AppSnackbar.showWarning(context, msg),
+                                onSuccess: (msg) =>
+                                    AppSnackbar.showSuccess(context, msg),
+                                onError: (msg) =>
+                                    AppSnackbar.showError(context, msg),
+                              ),
+                              isNextBusy: vm.isSubmitting,
+                              isNextEnabled: !vm.isSubmitting,
+                            ),
                           ),
                         ],
                       ),

@@ -38,6 +38,14 @@ class CancerScreening {
   final String? nursingReferral;
   final String? notReferredReason;
 
+  // Nurse / healthcare-practitioner details
+  final String? nurseFirstName;
+  final String? nurseLastName;
+  final String? rank;
+  final String? sancNumber;
+  final String? nurseDate;
+  final String? signatureData; // Base64-encoded PNG
+
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -66,6 +74,12 @@ class CancerScreening {
     this.clinicianNotes,
     this.nursingReferral,
     this.notReferredReason,
+    this.nurseFirstName,
+    this.nurseLastName,
+    this.rank,
+    this.sancNumber,
+    this.nurseDate,
+    this.signatureData,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -96,6 +110,12 @@ class CancerScreening {
       'clinicianNotes': clinicianNotes,
       'nursingReferral': nursingReferral,
       'notReferredReason': notReferredReason,
+      'nurseFirstName': nurseFirstName,
+      'nurseLastName': nurseLastName,
+      'rank': rank,
+      'sancNumber': sancNumber,
+      'nurseDate': nurseDate,
+      'signatureData': signatureData,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };
@@ -129,6 +149,12 @@ class CancerScreening {
       clinicianNotes: map['clinicianNotes'] as String?,
       nursingReferral: map['nursingReferral'] as String?,
       notReferredReason: map['notReferredReason'] as String?,
+      nurseFirstName: map['nurseFirstName'] as String?,
+      nurseLastName: map['nurseLastName'] as String?,
+      rank: map['rank'] as String?,
+      sancNumber: map['sancNumber'] as String?,
+      nurseDate: map['nurseDate'] as String?,
+      signatureData: map['signatureData'] as String?,
       createdAt: DateTime.parse(map['createdAt'] as String),
       updatedAt: DateTime.parse(map['updatedAt'] as String),
     );

@@ -4,11 +4,32 @@ import 'package:intl/intl.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
 import 'package:kenwell_health_app/domain/constants/enums.dart';
+import 'package:kenwell_health_app/data/services/auth_service.dart';
 
 class NurseInterventionViewModel extends ChangeNotifier {
+  final AuthService _authService = AuthService();
+
   /// Controls whether the Initial Assessment card (and related validations) show.
   bool get showInitialAssessment => false;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+  NurseInterventionViewModel() {
+    _loadCurrentUserProfile();
+  }
+
+  /// Load the current nurse's profile to pre-populate name fields.
+  Future<void> _loadCurrentUserProfile() async {
+    try {
+      final user = await _authService.getCurrentUser();
+      if (user != null) {
+        nurseFirstNameController.text = user.firstName;
+        nurseLastNameController.text = user.lastName;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('NurseInterventionViewModel: failed to load profile: $e');
+    }
+  }
 
   // --- Initial Assessment ---
   String? windowPeriod; // 'N/A', 'Yes', 'No'

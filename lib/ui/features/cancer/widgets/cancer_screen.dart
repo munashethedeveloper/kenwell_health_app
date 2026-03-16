@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
+import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/models/nursing_referral_option.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
@@ -9,6 +10,7 @@ import '../../../shared/ui/form/kenwell_date_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_page.dart';
 import '../../../shared/ui/form/kenwell_form_styles.dart';
+import '../../../shared/ui/form/kenwell_signature_actions.dart';
 import '../../../shared/ui/form/nursing_referral_status_card.dart';
 import '../../../shared/ui/form/kenwell_yes_no_list.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
@@ -319,17 +321,98 @@ class CancerScreen extends StatelessWidget {
         ),
         const SizedBox(height: 24),
 
-        // Navigation
-        KenwellFormNavigation(
-          onPrevious: onPrevious,
-          onNext: () => viewModel.submitCancerScreening(
-            onNext: onNext,
-            onValidationFailed: (msg) => AppSnackbar.showWarning(context, msg),
-            onSuccess: (msg) => AppSnackbar.showSuccess(context, msg),
-            onError: (msg) => AppSnackbar.showError(context, msg),
+        // 9. Nurse / healthcare-practitioner details
+        KenwellFormCard(
+          title: 'Nurse Details',
+          child: Column(
+            children: [
+              KenwellTextField(
+                label: 'Nurse First Name',
+                hintText: 'Auto-filled from profile',
+                enabled: false,
+                readOnly: true,
+                controller: viewModel.nurseFirstNameController,
+                decoration: KenwellFormStyles.decoration(
+                  label: 'Nurse First Name',
+                  hint: 'Auto-filled from profile',
+                ),
+                inputFormatters:
+                    AppTextInputFormatters.lettersOnly(allowHyphen: true),
+                validator: (val) => (val == null || val.isEmpty)
+                    ? 'Please enter Nurse First Name'
+                    : null,
+              ),
+              KenwellTextField(
+                label: 'Nurse Last Name',
+                hintText: 'Auto-filled from profile',
+                enabled: false,
+                readOnly: true,
+                controller: viewModel.nurseLastNameController,
+                decoration: KenwellFormStyles.decoration(
+                  label: 'Nurse Last Name',
+                  hint: 'Auto-filled from profile',
+                ),
+                inputFormatters:
+                    AppTextInputFormatters.lettersOnly(allowHyphen: true),
+                validator: (val) => (val == null || val.isEmpty)
+                    ? 'Please enter Nurse Last Name'
+                    : null,
+              ),
+              KenwellTextField(
+                label: 'Rank',
+                hintText: 'Enter nurse rank',
+                controller: viewModel.rankController,
+                decoration: KenwellFormStyles.decoration(
+                  label: 'Rank',
+                  hint: 'Enter nurse rank',
+                ),
+                validator: (val) => (val == null || val.isEmpty)
+                    ? 'Please enter Rank'
+                    : null,
+              ),
+              KenwellTextField(
+                label: 'SANC No',
+                hintText: 'Enter SANC number',
+                controller: viewModel.sancNumberController,
+                decoration: KenwellFormStyles.decoration(
+                  label: 'SANC No',
+                  hint: 'Enter SANC number',
+                ),
+                inputFormatters: AppTextInputFormatters.numbersOnly(),
+                validator: (val) => (val == null || val.isEmpty)
+                    ? 'Please enter SANC No'
+                    : null,
+              ),
+              KenwellDateField(
+                label: 'Date',
+                controller: viewModel.nurseDateController,
+                readOnly: true,
+                enabled: false,
+                validator: (val) =>
+                    (val == null || val.isEmpty) ? 'Please select Date' : null,
+              ),
+            ],
           ),
-          isNextEnabled: !viewModel.isSubmitting,
-          isNextBusy: viewModel.isSubmitting,
+        ),
+        const SizedBox(height: 24),
+
+        // 10. Signature + navigation
+        KenwellSignatureActions(
+          title: 'Signature',
+          controller: viewModel.signatureController,
+          onClear: viewModel.clearSignature,
+          navigation: KenwellFormNavigation(
+            onPrevious: onPrevious,
+            onNext: () => viewModel.submitCancerScreening(
+              onNext: onNext,
+              onValidationFailed: (msg) =>
+                  AppSnackbar.showWarning(context, msg),
+              onSuccess: (msg) => AppSnackbar.showSuccess(context, msg),
+              onError: (msg) => AppSnackbar.showError(context, msg),
+            ),
+            isNextEnabled: !viewModel.isSubmitting,
+            isNextBusy: viewModel.isSubmitting,
+          ),
         ),
       ],
     );

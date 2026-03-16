@@ -39,6 +39,7 @@ class ScreeningNavigator {
     final riskVM = PersonalRiskAssessmentViewModel();
     final nurseVM = NurseInterventionViewModel();
     riskVM.setMemberAndEventId(member.id, event.id);
+    nurseVM.initialiseWithEvent(event);
 
     final age = _calculateAge(member.dateOfBirth);
 
@@ -137,6 +138,7 @@ class ScreeningNavigator {
   Future<bool?> navigateToCancer(Member member) async {
     final cancerVM = CancerScreeningViewModel();
     cancerVM.setMemberAndEventId(member.id, event.id);
+    cancerVM.initialiseWithEvent(event);
 
     // Determine which cancer sub-types were requested for this event.
     final allServices =

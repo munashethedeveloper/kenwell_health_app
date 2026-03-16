@@ -1,20 +1,55 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_cancer_screening_repository.dart';
+import 'package:kenwell_health_app/data/services/auth_service.dart';
 import 'package:kenwell_health_app/domain/models/cander_screening.dart';
+import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
+import 'package:signature/signature.dart';
 import 'package:uuid/uuid.dart';
 
 class CancerScreeningViewModel extends ChangeNotifier {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final FirestoreCancerScreeningRepository _repository =
       FirestoreCancerScreeningRepository();
+  final AuthService _authService = AuthService();
 
   String? _memberId;
   String? _eventId;
 
+  CancerScreeningViewModel() {
+    _loadCurrentUserProfile();
+  }
+
+  /// Pre-populate nurse first/last name from the authenticated user profile.
+  Future<void> _loadCurrentUserProfile() async {
+    try {
+      final user = await _authService.getCurrentUser();
+      if (user != null) {
+        nurseFirstNameController.text = user.firstName;
+        nurseLastNameController.text = user.lastName;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('CancerScreeningViewModel: failed to load profile: $e');
+    }
+  }
+
   void setMemberAndEventId(String memberId, String eventId) {
     _memberId = memberId;
     _eventId = eventId;
+  }
+
+  // --- Nurse / event initialisation ---
+  WellnessEvent? _event;
+  void initialiseWithEvent(WellnessEvent e) {
+    if (_event != null) return;
+    _event = e;
+    if (nurseDateController.text.isEmpty) {
+      nurseDateController.text = DateFormat('yyyy-MM-dd').format(e.date);
+      notifyListeners();
+    }
   }
 
   // --- Cancer sub-types from event services ---
@@ -216,19 +251,24 @@ class CancerScreeningViewModel extends ChangeNotifier {
   final TextEditingController clinicianNotesController =
       TextEditingController();
 
-  /* // --- Nursing Referral ---
-  NursingReferralOption? nursingReferralSelection;
-  final TextEditingController notReferredReasonController =
+  // --- Nurse / healthcare-practitioner details ---
+  final TextEditingController nurseFirstNameController =
       TextEditingController();
+  final TextEditingController nurseLastNameController = TextEditingController();
+  final TextEditingController rankController = TextEditingController();
+  final TextEditingController sancNumberController = TextEditingController();
+  final TextEditingController nurseDateController = TextEditingController();
+  final SignatureController signatureController = SignatureController(
+    penStrokeWidth: 2,
+    penColor: Colors.black,
+    exportBackgroundColor: Colors.white,
+  );
 
-  void setNursingReferralSelection(NursingReferralOption? value) {
-    if (nursingReferralSelection == value) return;
-    nursingReferralSelection = value;
-    if (value != NursingReferralOption.patientNotReferred) {
-      notReferredReasonController.clear();
-    }
+  void clearSignature() {
+    signatureController.clear();
     notifyListeners();
-  } */
+  }
+
 
   /// True when any symptom, exam finding, or medical history flag indicates
   /// that the patient requires follow-up (at risk).
@@ -258,6 +298,14 @@ class CancerScreeningViewModel extends ChangeNotifier {
         return false;
       }
     }
+    // Nurse details are always required.
+    if (nurseFirstNameController.text.isEmpty ||
+        nurseLastNameController.text.isEmpty ||
+        rankController.text.isEmpty ||
+        sancNumberController.text.isEmpty) {
+      return false;
+    }
+    if (signatureController.isEmpty) return false;
     return true;
   }
 
@@ -281,6 +329,10 @@ class CancerScreeningViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
+      final signatureBytes = await signatureController.toPngBytes();
+      final signatureBase64 =
+          signatureBytes != null ? base64Encode(signatureBytes) : null;
+
       final screening = CancerScreening(
         id: const Uuid().v4(),
         memberId: _memberId!,
@@ -318,11 +370,23 @@ class CancerScreeningViewModel extends ChangeNotifier {
         clinicianNotes: clinicianNotesController.text.isEmpty
             ? null
             : clinicianNotesController.text,
-        nursingReferral: isAtRisk ? nursingReferralSelection?.name : null,
-        notReferredReason:
-            isAtRisk && notReferredReasonController.text.isNotEmpty
-                ? notReferredReasonController.text
-                : null,
+        nursingReferral: nursingReferralSelection?.name,
+        notReferredReason: notReferredReasonController.text.isEmpty
+            ? null
+            : notReferredReasonController.text,
+        nurseFirstName: nurseFirstNameController.text.isEmpty
+            ? null
+            : nurseFirstNameController.text,
+        nurseLastName: nurseLastNameController.text.isEmpty
+            ? null
+            : nurseLastNameController.text,
+        rank: rankController.text.isEmpty ? null : rankController.text,
+        sancNumber:
+            sancNumberController.text.isEmpty ? null : sancNumberController.text,
+        nurseDate: nurseDateController.text.isEmpty
+            ? null
+            : nurseDateController.text,
+        signatureData: signatureBase64,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
@@ -349,6 +413,12 @@ class CancerScreeningViewModel extends ChangeNotifier {
     clinicianNameController.dispose();
     clinicianSignatureController.dispose();
     clinicianNotesController.dispose();
+    nurseFirstNameController.dispose();
+    nurseLastNameController.dispose();
+    rankController.dispose();
+    sancNumberController.dispose();
+    nurseDateController.dispose();
+    signatureController.dispose();
     super.dispose();
   }
 }
