@@ -4,6 +4,7 @@ import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:intl/intl.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import 'sections/stats_metric_card.dart';
@@ -288,16 +289,135 @@ class _EventStatsDetailScreenState extends State<EventStatsDetailScreen> {
       final exporter = EventReportExporter();
       final filePath = await exporter.export(event);
       if (!mounted) return;
-      AppSnackbar.showSuccess(
-        context,
-        'Report saved: ${filePath.split('/').last}',
-      );
+      _showExportSuccessSheet(context, filePath);
     } catch (e) {
       if (!mounted) return;
       AppSnackbar.showError(context, 'Export failed: $e');
     } finally {
       if (mounted) setState(() => _isExporting = false);
     }
+  }
+
+  void _showExportSuccessSheet(BuildContext context, String filePath) {
+    final theme = Theme.of(context);
+    final fileName = filePath.split('/').last;
+
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // ── Success icon ──────────────────────────────────────────────
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: KenwellColors.primaryGreen.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.check_circle_outline,
+                  size: 40,
+                  color: KenwellColors.primaryGreen,
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // ── Title ─────────────────────────────────────────────────────
+              Text(
+                'Report Exported!',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: KenwellColors.secondaryNavyDark,
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              // ── Filename ──────────────────────────────────────────────────
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: KenwellColors.neutralBackground,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: KenwellColors.secondaryNavy.withValues(alpha: 0.2),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.table_chart,
+                        size: 18, color: KenwellColors.primaryGreen),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        fileName,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontFamily: 'monospace',
+                          color: KenwellColors.secondaryNavyDark,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              // ── Location hint ─────────────────────────────────────────────
+              Text(
+                'Tap "Share File" to open the report in Excel, Google Sheets, '
+                'email it, or save it to cloud storage.',
+                style: theme.textTheme.bodySmall
+                    ?.copyWith(color: Colors.grey.shade600),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+
+              // ── Share button ──────────────────────────────────────────────
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () async {
+                    Navigator.of(ctx).pop();
+                    await SharePlus.instance.share(
+                      ShareParams(
+                        files: [XFile(filePath)],
+                        subject: '${event.title} – Event Report',
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.share),
+                  label: const Text('Share File'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.all(14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              // ── Dismiss button ────────────────────────────────────────────
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: const Text('Dismiss'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildDetailRow(String label, String value, ThemeData theme) {

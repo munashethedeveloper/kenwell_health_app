@@ -3,7 +3,7 @@ description: A wellness calendar app
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.2.0 <4.0.0"
+  sdk: ">=3.3.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -35,6 +35,7 @@ dependencies:
   flutter_slidable: ^3.1.1
   sizer: ^2.0.15
   excel: ^4.0.6
+  share_plus: ^10.1.3
   go_router: ^14.6.2
   geocoding: ^3.0.0
   flutter_typeahead: ^5.2.0
