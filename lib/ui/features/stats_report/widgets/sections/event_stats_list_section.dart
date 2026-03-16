@@ -27,7 +27,7 @@ class EventStatsListSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<Color> _gradientColors = isLiveTab
+    final List<Color> gradientColors = isLiveTab
         ? [KenwellColors.primaryGreen, const Color(0xFF065F46)]
         : [KenwellColors.secondaryNavy, const Color(0xFF3B3F86)];
 
@@ -54,7 +54,7 @@ class EventStatsListSection extends StatelessWidget {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: _gradientColors,
+                    colors: gradientColors,
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -153,7 +153,7 @@ class EventStatsListSection extends StatelessWidget {
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                colors: _gradientColors,
+                                colors: gradientColors,
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
@@ -220,7 +220,7 @@ class EventStatsListSection extends StatelessWidget {
                                 horizontal: 14, vertical: 8),
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                colors: _gradientColors,
+                                colors: gradientColors,
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),

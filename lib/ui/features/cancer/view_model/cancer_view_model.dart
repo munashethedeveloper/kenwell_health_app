@@ -247,7 +247,9 @@ class CancerScreeningViewModel extends ChangeNotifier {
       if (nursingReferralSelection == null) return false;
       if (nursingReferralSelection ==
               NursingReferralOption.patientNotReferred &&
-          notReferredReasonController.text.isEmpty) return false;
+          notReferredReasonController.text.isEmpty) {
+        return false;
+      }
     }
     return true;
   }
