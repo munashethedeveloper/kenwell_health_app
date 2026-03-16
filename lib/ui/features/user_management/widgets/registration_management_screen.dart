@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
-import 'package:kenwell_health_app/ui/shared/ui/labels/kenwell_section_label.dart';
 import 'package:provider/provider.dart';
 
 class RegistrationManagementScreen extends StatelessWidget {
@@ -23,14 +22,21 @@ class RegistrationManagementScreenBody extends StatelessWidget {
     return Consumer<ProfileViewModel>(
       builder: (context, vm, _) => Scaffold(
         backgroundColor: KenwellColors.neutralBackground,
-        appBar: const KenwellAppBar(
+        appBar: KenwellAppBar(
           title: 'KenWell365',
-          titleStyle: TextStyle(
+          titleStyle: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
           automaticallyImplyLeading: false,
+          actions: [
+            IconButton(
+              tooltip: 'Help',
+              icon: const Icon(Icons.help_outline, color: Colors.white),
+              onPressed: () => context.pushNamed('help'),
+            ),
+          ],
         ),
         body: vm.isLoadingProfile
             ? const Center(child: CircularProgressIndicator())

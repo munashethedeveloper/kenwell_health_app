@@ -11,6 +11,7 @@ import '../../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../../shared/ui/form/kenwell_date_field.dart';
 import '../../../../shared/ui/form/kenwell_form_styles.dart';
 import '../../view_model/member_registration_view_model.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 /// Create member form section
 class CreateMemberSection extends StatefulWidget {
@@ -33,23 +34,13 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
     if (!mounted) return;
 
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Member registered successfully!'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      AppSnackbar.showSuccess(context, 'Member registered successfully!');
       // Reset form
       viewModel.formKey.currentState?.reset();
       viewModel.resetForm();
       widget.onMemberCreated?.call();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to register member'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      AppSnackbar.showError(context, 'Failed to register member');
     }
   }
 

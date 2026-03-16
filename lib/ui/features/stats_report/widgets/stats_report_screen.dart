@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
-import 'package:kenwell_health_app/ui/shared/ui/cards/kenwell_action_card.dart';
-import 'package:kenwell_health_app/ui/shared/ui/labels/kenwell_section_label.dart';
 
 /// Statistics dashboard screen.
 ///
@@ -17,14 +15,21 @@ class StatsReportScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: KenwellColors.neutralBackground,
-      appBar: const KenwellAppBar(
+      appBar: KenwellAppBar(
         title: 'KenWell365',
-        titleStyle: TextStyle(
+        titleStyle: const TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
         automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            tooltip: 'Help',
+            icon: const Icon(Icons.help_outline, color: Colors.white),
+            onPressed: () => context.pushNamed('help'),
+          ),
+        ],
       ),
       body: CustomScrollView(
         slivers: [

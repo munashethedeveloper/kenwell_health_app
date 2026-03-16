@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/profile_view_model.dart';
 import 'sections/profile_form_section.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -55,9 +56,7 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
 
     // Show error if load failed
     if (vm.errorMessage != null && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(vm.errorMessage!)),
-      );
+      AppSnackbar.showError(context, vm.errorMessage!);
     }
   }
 
@@ -103,14 +102,10 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
     if (success) {
       // No original values to update after successful save
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(vm.successMessage ?? 'Profile updated successfully')),
-      );
+      AppSnackbar.showSuccess(
+          context, vm.successMessage ?? 'Profile updated successfully');
     } else if (vm.errorMessage != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(vm.errorMessage!)),
-      );
+      AppSnackbar.showError(context, vm.errorMessage!);
     }
   }
 
@@ -134,12 +129,8 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
               onPressed: () async {
                 await _loadAndPopulateProfile();
                 if (!context.mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Profile refreshed'),
-                    duration: Duration(seconds: 1),
-                  ),
-                );
+                AppSnackbar.showSuccess(context, 'Profile refreshed',
+                    duration: const Duration(seconds: 1));
               },
             ),
             TextButton.icon(

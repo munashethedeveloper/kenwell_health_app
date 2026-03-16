@@ -10,6 +10,7 @@ import '../../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../../shared/ui/form/custom_text_field.dart';
 import '../../../../shared/ui/form/kenwell_form_card.dart';
 import '../../viewmodel/user_management_view_model.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 /// Create user form section
 class CreateUserSection extends StatefulWidget {
@@ -36,23 +37,17 @@ class _CreateUserSectionState extends State<CreateUserSection> {
     if (verified) {
       await viewModel.syncCurrentUserVerificationStatus();
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Email verified! Status synced to database.')),
-      );
+      AppSnackbar.showSuccess(
+          context, 'Email verified! Status synced to database.');
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Email not yet verified.')),
-      );
+      AppSnackbar.showWarning(context, 'Email not yet verified.');
     }
   }
 
   Future<void> _resendVerification() async {
     final viewModel = context.read<UserManagementViewModel>();
     await viewModel.sendEmailVerification();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Verification email resent.')),
-    );
+    AppSnackbar.showSuccess(context, 'Verification email resent.');
   }
 
   final _formKey = GlobalKey<FormState>();
@@ -71,9 +66,7 @@ class _CreateUserSectionState extends State<CreateUserSection> {
     if (!_formKey.currentState!.validate()) return;
 
     if (_selectedRole == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a role')),
-      );
+      AppSnackbar.showWarning(context, 'Please select a role');
       return;
     }
 
@@ -96,11 +89,10 @@ class _CreateUserSectionState extends State<CreateUserSection> {
         _verificationSent = true;
         _isVerified = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(viewModel.successMessage ??
-                'User registered successfully! Password reset email sent.')),
-      );
+      AppSnackbar.showSuccess(
+          context,
+          viewModel.successMessage ??
+              'User registered successfully! Password reset email sent.');
       // Clear the form
       _emailController.clear();
       _passwordController.clear();
@@ -111,10 +103,8 @@ class _CreateUserSectionState extends State<CreateUserSection> {
       setState(() => _selectedRole = null);
       widget.onUserCreated?.call();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(viewModel.errorMessage ?? 'Registration failed')),
-      );
+      AppSnackbar.showError(
+          context, viewModel.errorMessage ?? 'Registration failed');
     }
   }
 

@@ -14,6 +14,7 @@ import '../../consent_form/widgets/consent_screen.dart';
 import '../../health_risk_assessment/widgets/health_risk_assessment_screen.dart';
 import '../../hiv_test/widgets/hiv_test_screen.dart';
 import '../../tb_test/widgets/tb_testing_screen.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 class WellnessFlowScreen extends StatelessWidget {
   final VoidCallback onExitFlow;
@@ -286,7 +287,11 @@ class WellnessFlowScreen extends StatelessWidget {
               // 1) submit all flow data (existing behavior) — protect with try/catch
               try {
                 debugPrint('WellnessFlow: calling flowVM.submitAll');
-                await flowVM.submitAll(context);
+                await flowVM.submitAll(
+                  onSuccess: (msg) {
+                    if (context.mounted) AppSnackbar.showSuccess(context, msg);
+                  },
+                );
                 // Mark survey as completed and update UI immediately
                 flowVM.markSurveyCompleted();
                 debugPrint('WellnessFlow: submitAll completed');
@@ -295,9 +300,7 @@ class WellnessFlowScreen extends StatelessWidget {
                 if (context.mounted) {
                   // Close progress dialog if open
                   Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Failed to submit data: $e')),
-                  );
+                  AppSnackbar.showError(context, 'Failed to submit data: $e');
                 }
                 return;
               }

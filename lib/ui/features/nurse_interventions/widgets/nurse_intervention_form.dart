@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
@@ -56,7 +57,13 @@ class NurseInterventionForm extends StatelessWidget {
           onClear: viewModel.clearSignature,
           navigation: KenwellFormNavigation(
             onPrevious: onPrevious,
-            onNext: () => viewModel.submitIntervention(context, onNext),
+            onNext: () => viewModel.submitIntervention(
+              onNext: onNext,
+              onValidationFailed: (msg) =>
+                  AppSnackbar.showWarning(context, msg),
+              onSuccess: (msg) => AppSnackbar.showSuccess(context, msg),
+              onError: (msg) => AppSnackbar.showError(context, msg),
+            ),
             isNextBusy: viewModel.isSubmitting,
             isNextEnabled: !viewModel.isSubmitting,
           ),

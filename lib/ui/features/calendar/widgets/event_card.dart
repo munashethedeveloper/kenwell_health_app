@@ -8,17 +8,22 @@ import '../../../../domain/constants/role_permissions.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../profile/view_model/profile_view_model.dart';
 import '../view_model/calendar_view_model.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 // Widget representing a single event card in the calendar
 class EventCard extends StatelessWidget {
   final WellnessEvent event;
   final CalendarViewModel viewModel;
 
+  /// When true, adds the same navy border used on the calendar widget.
+  final bool showBorder;
+
   // Constructor
   const EventCard({
     super.key,
     required this.event,
     required this.viewModel,
+    this.showBorder = false,
   });
 
   // Build method to render the event card
@@ -43,6 +48,12 @@ class EventCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
+            border: showBorder
+                ? Border.all(
+                    color: KenwellColors.secondaryNavy.withValues(alpha: 0.08),
+                    width: 2.5,
+                  )
+                : null,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.07),
@@ -93,9 +104,13 @@ class EventCard extends StatelessWidget {
         return await showDialog<bool>(
           context: context,
           builder: (dialogContext) => AlertDialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             title: const Text('Delete Event'),
             content: const Text('Are you sure you want to delete this event?'),
             // Actions for confirming or canceling the deletion
+            actionsAlignment: MainAxisAlignment.end,
+            actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             actions: [
               // Cancel button
               TextButton(
@@ -103,10 +118,15 @@ class EventCard extends StatelessWidget {
                 child: const Text('Cancel'),
               ),
               // Delete button
-              TextButton(
+              ElevatedButton(
                 onPressed: () => Navigator.of(dialogContext).pop(true),
-                child:
-                    const Text('Delete', style: TextStyle(color: Colors.red)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                ),
+                child: const Text('Delete'),
               ),
             ],
           ),
@@ -151,20 +171,17 @@ class EventCard extends StatelessWidget {
 
         // Show snackbar with UNDO option
         if (context.mounted) {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: const Text('Event deleted successfully'),
-                action: SnackBarAction(
-                  label: 'UNDO',
-                  onPressed: () async {
-                    await eventViewModel.addEvent(event);
-                    viewModel.loadEvents();
-                  },
-                ),
-              ),
-            );
+          AppSnackbar.showSuccess(
+            context,
+            'Event deleted successfully',
+            action: SnackBarAction(
+              label: 'UNDO',
+              onPressed: () async {
+                await eventViewModel.addEvent(event);
+                viewModel.loadEvents();
+              },
+            ),
+          );
         }
       },
       // Event card content

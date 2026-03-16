@@ -11,6 +11,7 @@ import 'routing/go_router_config.dart';
 import 'ui/features/auth/view_models/auth_view_model.dart';
 import 'ui/features/calendar/view_model/calendar_view_model.dart';
 import 'ui/features/event/view_model/event_view_model.dart';
+import 'ui/features/stats_report/view_model/stats_report_view_model.dart';
 import 'ui/shared/themes/app_theme.dart';
 
 void main() async {
@@ -48,6 +49,9 @@ class MyApp extends StatelessWidget {
             create: (_) => CalendarViewModel()),
         ChangeNotifierProvider<EventViewModel>(
           create: (_) => EventViewModel(),
+        ),
+        ChangeNotifierProvider<StatsReportViewModel>(
+          create: (_) => StatsReportViewModel(),
         ),
         ChangeNotifierProvider<ThemeProvider>(
           create: (_) => ThemeProvider(),

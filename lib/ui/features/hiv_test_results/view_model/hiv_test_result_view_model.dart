@@ -6,7 +6,6 @@ import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart
 import 'package:kenwell_health_app/data/services/auth_service.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_hiv_result_repository.dart';
 import 'package:kenwell_health_app/domain/models/hiv_result.dart';
-import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:convert';
 import 'package:kenwell_health_app/domain/constants/enums.dart';
@@ -139,15 +138,10 @@ class HIVTestResultViewModel extends ChangeNotifier {
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
 
-  // --- Pick expiry date ---
-  Future<void> pickExpiryDate(BuildContext context,
-      {required bool isScreening}) async {
-    DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2030),
-    );
+  Future<void> pickExpiryDate(
+      {required bool isScreening,
+      Future<DateTime?> Function()? showPicker}) async {
+    DateTime? picked = await showPicker?.call();
     if (picked != null) {
       String formattedDate = DateFormat('yyyy-MM-dd').format(picked);
       if (isScreening) {
@@ -264,21 +258,19 @@ class HIVTestResultViewModel extends ChangeNotifier {
   }
 
   // --- Save & continue ---
-  Future<void> submitTestResult(BuildContext context,
-      {VoidCallback? onNext}) async {
+  Future<void> submitTestResult({
+    VoidCallback? onNext,
+    void Function(String)? onValidationFailed,
+    void Function(String)? onSuccess,
+    void Function(String)? onError,
+  }) async {
     if (!isFormValid) {
-      AppSnackbar.showWarning(
-        context,
-        'Please complete all required fields',
-      );
+      onValidationFailed?.call('Please complete all required fields');
       return;
     }
 
     if (_memberId == null || _eventId == null) {
-      AppSnackbar.showError(
-        context,
-        'Missing member or event information',
-      );
+      onError?.call('Missing member or event information');
       return;
     }
 
@@ -327,21 +319,10 @@ class HIVTestResultViewModel extends ChangeNotifier {
 
       await _repository.addHivResult(result);
 
-      if (!context.mounted) return;
-
-      AppSnackbar.showSuccess(
-        context,
-        'HIV test result saved successfully',
-      );
-
+      onSuccess?.call('HIV test result saved successfully');
       onNext?.call();
     } catch (e) {
-      if (context.mounted) {
-        AppSnackbar.showError(
-          context,
-          'Error saving HIV test result: $e',
-        );
-      }
+      onError?.call('Error saving HIV test result: $e');
     } finally {
       _isSubmitting = false;
       notifyListeners();

@@ -4,7 +4,6 @@ import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
-import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
 import '../../../../data/repositories_dcl/auth_repository_dcl.dart';
@@ -13,6 +12,7 @@ import 'package:kenwell_health_app/utils/validators.dart';
 import '../../profile/view_model/profile_view_model.dart';
 import '../view_models/auth_view_model.dart';
 import '../view_models/login_view_model.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 // Login Screen Widget
 class LoginScreen extends StatelessWidget {
@@ -105,9 +105,7 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
       if (viewModel.errorMessage != null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(viewModel.errorMessage!)),
-          );
+          AppSnackbar.showError(context, viewModel.errorMessage!);
           viewModel.clearError();
         });
       }

@@ -90,7 +90,7 @@ class MemberCardWidget extends StatelessWidget {
               color: Colors.white,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: KenwellColors.primaryGreen.withValues(alpha: 0.4),
+                color: KenwellColors.secondaryNavyDark.withValues(alpha: 0.4),
                 width: 1.5,
               ),
               boxShadow: [

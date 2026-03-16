@@ -3,7 +3,6 @@ import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/ui/features/wellness/view_model/wellness_flow_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
-import 'package:kenwell_health_app/ui/shared/ui/containers/gradient_container.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 import 'package:provider/provider.dart';
@@ -46,113 +45,124 @@ class CurrentEventHomeScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 8),
-            if (viewModel.currentMember != null) ...[
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: KenwellColors.primaryGreen.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: KenwellColors.primaryGreen,
-                    width: 1.5,
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: KenwellColors.primaryGreen
-                                .withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(
-                            Icons.person,
-                            color: KenwellColors.primaryGreen,
-                            size: 20,
-                          ),
+                  if (viewModel.currentMember != null) ...[
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color:
+                            KenwellColors.primaryGreen.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: KenwellColors.primaryGreen,
+                          width: 1.5,
                         ),
-                        const SizedBox(width: 12),
-                        Text(
-                          'Current Member',
-                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: KenwellColors.secondaryNavy,
-                            fontSize: 16,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: KenwellColors.primaryGreen
+                                      .withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(
+                                  Icons.person,
+                                  color: KenwellColors.primaryGreen,
+                                  size: 20,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                'Current Member',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleSmall
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: KenwellColors.secondaryNavy,
+                                      fontSize: 16,
+                                    ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    const Divider(color: KenwellColors.primaryGreen, height: 1),
-                    const SizedBox(height: 12),
-                    _buildMemberInfoRow(
-                      'Name',
-                      '${viewModel.currentMember!.name} ${viewModel.currentMember!.surname}',
-                    ),
-                    const SizedBox(height: 8),
-                    _buildMemberInfoRow(
-                      viewModel.currentMember!.idDocumentType == 'ID'
-                          ? 'ID Number'
-                          : 'Passport Number',
-                      viewModel.currentMember!.idDocumentType == 'ID'
-                          ? (viewModel.currentMember!.idNumber ?? 'N/A')
-                          : (viewModel.currentMember!.passportNumber ?? 'N/A'),
+                          const SizedBox(height: 12),
+                          const Divider(
+                              color: KenwellColors.primaryGreen, height: 1),
+                          const SizedBox(height: 12),
+                          _buildMemberInfoRow(
+                            'Name',
+                            '${viewModel.currentMember!.name} ${viewModel.currentMember!.surname}',
+                          ),
+                          const SizedBox(height: 8),
+                          _buildMemberInfoRow(
+                            viewModel.currentMember!.idDocumentType == 'ID'
+                                ? 'ID Number'
+                                : 'Passport Number',
+                            viewModel.currentMember!.idDocumentType == 'ID'
+                                ? (viewModel.currentMember!.idNumber ?? 'N/A')
+                                : (viewModel.currentMember!.passportNumber ??
+                                    'N/A'),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
-                ),
-              ),
-            ],
-            const SizedBox(height: 24),
+                  const SizedBox(height: 24),
                   const SizedBox(height: 8),
-            _ProcessStepCard(
-              icon: Icons.person_add,
-              title: 'Section A: Member Registration',
-              status: viewModel.memberRegistrationCompleted
-                  ? 'Completed'
-                  : 'Not Completed',
-              isCompleted: viewModel.memberRegistrationCompleted,
-              onTap: () =>
-                  onSectionTap(WellnessFlowViewModel.sectionMemberRegistration),
-            ),
-            _ProcessStepCard(
-              icon: Icons.assignment,
-              title: 'Section B: Informed Consent',
-              status:
-                  viewModel.consentCompleted ? 'Completed' : 'Not Completed',
-              isCompleted: viewModel.consentCompleted,
-              onTap: () => onSectionTap(WellnessFlowViewModel.sectionConsent),
-            ),
-            _ProcessStepCard(
-              icon: Icons.health_and_safety,
-              title: 'Section C: Health Screenings',
-              status: viewModel.screeningsCompleted
-                  ? 'Completed'
-                  : viewModel.screeningsInProgress
-                      ? 'In Progress'
-                      : 'Not Completed',
-              isCompleted: viewModel.screeningsCompleted,
-              isInProgress: viewModel.screeningsInProgress,
-              onTap: () =>
-                  onSectionTap(WellnessFlowViewModel.sectionHealthScreenings),
-            ),
-            _ProcessStepCard(
-              icon: Icons.poll,
-              title: 'Section D: Survey',
-              status: viewModel.surveyCompleted ? 'Completed' : 'Not Completed',
-              isCompleted: viewModel.surveyCompleted,
-              onTap: () => onSectionTap(WellnessFlowViewModel.sectionSurvey),
-            ),
-            const SizedBox(height: 24),
-            CustomPrimaryButton(
-              label: 'Back to Search',
-              onPressed: onBackToSearch,
-            ),
-            const SizedBox(height: 16),
+                  _ProcessStepCard(
+                    icon: Icons.person_add,
+                    title: 'Section A: Member Registration',
+                    status: viewModel.memberRegistrationCompleted
+                        ? 'Completed'
+                        : 'Not Completed',
+                    isCompleted: viewModel.memberRegistrationCompleted,
+                    onTap: () => onSectionTap(
+                        WellnessFlowViewModel.sectionMemberRegistration),
+                  ),
+                  _ProcessStepCard(
+                    icon: Icons.assignment,
+                    title: 'Section B: Informed Consent',
+                    status: viewModel.consentCompleted
+                        ? 'Completed'
+                        : 'Not Completed',
+                    isCompleted: viewModel.consentCompleted,
+                    onTap: () =>
+                        onSectionTap(WellnessFlowViewModel.sectionConsent),
+                  ),
+                  _ProcessStepCard(
+                    icon: Icons.health_and_safety,
+                    title: 'Section C: Health Screenings',
+                    status: viewModel.screeningsCompleted
+                        ? 'Completed'
+                        : viewModel.screeningsInProgress
+                            ? 'In Progress'
+                            : 'Not Completed',
+                    isCompleted: viewModel.screeningsCompleted,
+                    isInProgress: viewModel.screeningsInProgress,
+                    onTap: () => onSectionTap(
+                        WellnessFlowViewModel.sectionHealthScreenings),
+                  ),
+                  _ProcessStepCard(
+                    icon: Icons.poll,
+                    title: 'Section D: Survey',
+                    status: viewModel.surveyCompleted
+                        ? 'Completed'
+                        : 'Not Completed',
+                    isCompleted: viewModel.surveyCompleted,
+                    onTap: () =>
+                        onSectionTap(WellnessFlowViewModel.sectionSurvey),
+                  ),
+                  const SizedBox(height: 24),
+                  CustomPrimaryButton(
+                    label: 'Back to Search',
+                    onPressed: onBackToSearch,
+                  ),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),

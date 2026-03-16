@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_referral_card.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_page.dart';
 import '../../../shared/ui/form/kenwell_date_field.dart';
 import '../../../shared/ui/form/kenwell_signature_actions.dart';
 import '../../../shared/ui/form/kenwell_yes_no_list.dart';
+import '../../../shared/ui/form/nursing_referral_status_card.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../view_model/tb_testing_view_model.dart';
 
@@ -164,22 +165,28 @@ class TBTestingScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
-        // Show referral card only when at-risk (any 'Yes' symptom) or undetermined;
-        // show a healthy banner when all symptoms are answered and none are 'Yes'
-        if (viewModel.isHealthy) ...[
-          _buildTbHealthyBanner(),
-          const SizedBox(height: 24),
-        ] else ...[
-          _buildReferrals(viewModel),
-          const SizedBox(height: 24),
-        ],
+        NursingReferralStatusCard(
+          title: 'Nursing Referrals',
+          selectedValue: viewModel.nursingReferralSelection,
+          onChanged: viewModel.setNursingReferralSelection,
+          notReferredReasonController: viewModel.notReferredReasonController,
+          reasonValidator: (val) =>
+              (val == null || val.isEmpty) ? 'Please enter a reason' : null,
+        ),
+        const SizedBox(height: 24),
         KenwellSignatureActions(
           title: 'Signature',
           controller: viewModel.signatureController,
           onClear: viewModel.clearSignature,
           navigation: KenwellFormNavigation(
             onPrevious: onPrevious,
-            onNext: () => viewModel.submitTBTest(context, onNext: onNext),
+            onNext: () => viewModel.submitTBTest(
+              onNext: onNext,
+              onValidationFailed: (msg) =>
+                  AppSnackbar.showWarning(context, msg),
+              onSuccess: (msg) => AppSnackbar.showSuccess(context, msg),
+              onError: (msg) => AppSnackbar.showError(context, msg),
+            ),
             isNextEnabled: viewModel.isFormValid && !viewModel.isSubmitting,
             isNextBusy: viewModel.isSubmitting,
           ),
@@ -187,112 +194,4 @@ class TBTestingScreen extends StatelessWidget {
       ],
     );
   }
-
-  Widget _buildTbHealthyBanner() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE8F5E9),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFF2E7D32), width: 1),
-      ),
-      child: const Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.check_circle, color: Color(0xFF2E7D32), size: 20),
-          SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'No TB symptoms detected. No nursing referral is required.',
-              style: TextStyle(
-                color: Color(0xFF2E7D32),
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildReferrals(TBTestingViewModel viewModel) {
-    return KenwellReferralCard<NursingReferralOption>(
-      title: 'Nursing Referrals',
-      selectedValue: viewModel.nursingReferralSelection,
-      onChanged: viewModel.setNursingReferralSelection,
-      reasonValidator: (val) =>
-          (val == null || val.isEmpty) ? 'Please enter a reason' : null,
-      options: [
-        KenwellReferralOption(
-          value: NursingReferralOption.patientNotReferred,
-          label: 'Patient not referred',
-          requiresReason: true,
-          reasonController: viewModel.notReferredReasonController,
-          reasonLabel: 'Reason patient not referred',
-        ),
-        const KenwellReferralOption(
-          value: NursingReferralOption.referredToGP,
-          label: 'Patient referred to GP',
-        ),
-        const KenwellReferralOption(
-          value: NursingReferralOption.referredToStateClinic,
-          label: 'Patient referred to State HIV clinic',
-        ),
-      ],
-    );
-  }
-
-  //Widget _buildNurseDetails(TBTestingViewModel viewModel) {
-  //   return KenwellFormCard(
-  //    title: 'Nurse Details',
-  //   child: Column(
-  //     children: [
-  //      KenwellTextField(
-  //   label: 'Nurse First Name',
-  //    hintText: 'Enter nurse first name',
-  //    controller: viewModel.nurseFirstNameController,
-  //    inputFormatters:
-  //        AppTextInputFormatters.lettersOnly(allowHyphen: true),
-  //     validator: (val) => (val == null || val.isEmpty)
-  //         ? 'Please enter Nurse First Name'
-  //         : null,
-  //   ),
-  //    KenwellTextField(
-  //      label: 'Nurse Last Name',
-  //      hintText: 'Enter nurse last name',
-  //      controller: viewModel.nurseLastNameController,
-  //      inputFormatters:
-  //          AppTextInputFormatters.lettersOnly(allowHyphen: true),
-  //      validator: (val) => (val == null || val.isEmpty)
-  //          ? 'Please enter Nurse Last Name'
-  //          : null,
-  //    ),
-  //     KenwellTextField(
-  //       label: 'Rank',
-  //      hintText: 'Enter nurse rank',
-  //       controller: viewModel.rankController,
-  //       validator: (val) =>
-  //           (val == null || val.isEmpty) ? 'Please enter Rank' : null,
-  //     ),
-  //    KenwellTextField(
-  //      label: 'SANC No',
-  //      hintText: 'Enter SANC number',
-  //      controller: viewModel.sancNumberController,
-  //      inputFormatters: AppTextInputFormatters.numbersOnly(),
-  //      validator: (val) =>
-  //          (val == null || val.isEmpty) ? 'Please enter SANC No' : null,
-  //    ),
-  //    KenwellDateField(
-  //      label: 'Date',
-  //      controller: viewModel.nurseDateController,
-  //      readOnly: true, // <-- pre-filled from WellnessEvent
-  //      validator: (val) =>
-  //          (val == null || val.isEmpty) ? 'Please select Date' : null,
-  //    ),
-  //  ],
-  // ),
-  // );
-  //}
 }

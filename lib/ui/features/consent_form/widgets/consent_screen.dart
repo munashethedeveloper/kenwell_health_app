@@ -15,6 +15,7 @@ import '../../../shared/ui/form/kenwell_signature_actions.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../../profile/view_model/profile_view_model.dart';
 import '../../wellness/view_model/wellness_flow_view_model.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 // ConsentScreen displays the consent form for a wellness event
 class ConsentScreen extends StatelessWidget {
@@ -94,13 +95,8 @@ class ConsentScreen extends StatelessWidget {
       onNext: () async {
         if (!vm.hasAtLeastOneScreening) {
           if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                  'Please select at least one screening option.',
-                ),
-              ),
-            );
+            AppSnackbar.showWarning(
+                context, 'Please select at least one screening option.');
           }
           return;
         }
@@ -111,11 +107,7 @@ class ConsentScreen extends StatelessWidget {
             await vm.submitConsent();
           } catch (e) {
             if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Failed to save consent: $e'),
-                ),
-              );
+              AppSnackbar.showError(context, 'Failed to save consent: \$e');
             }
             return;
           }
@@ -134,13 +126,8 @@ class ConsentScreen extends StatelessWidget {
           }
         } else {
           if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                  'Please complete all fields and sign before proceeding.',
-                ),
-              ),
-            );
+            AppSnackbar.showWarning(context,
+                'Please complete all fields and sign before proceeding.');
           }
         }
       },

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/cards/kenwell_action_card.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
-import 'package:kenwell_health_app/ui/shared/ui/labels/kenwell_section_label.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:provider/provider.dart';
 import '../view_model/help_screen_view_model.dart';

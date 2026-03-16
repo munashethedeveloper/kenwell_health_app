@@ -9,9 +9,12 @@ import '../../../../domain/constants/role_permissions.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../user_management/viewmodel/user_management_view_model.dart';
 import '../../profile/view_model/profile_view_model.dart';
+import '../../../shared/ui/cards/kenwell_detail_row.dart';
+import '../../../shared/ui/cards/kenwell_section_card.dart';
 import '../view_model/event_view_model.dart';
 import 'allocate_event_screen.dart';
 import 'my_event_screen.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 // EventDetailsScreen displays detailed information about a wellness event
 class EventDetailsScreen extends StatelessWidget {
@@ -29,7 +32,6 @@ class EventDetailsScreen extends StatelessWidget {
   // Build method
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final profileVM = context.watch<ProfileViewModel>();
     final canEdit =
         RolePermissions.canAccessFeature(profileVM.role, 'edit_event');
@@ -67,6 +69,11 @@ class EventDetailsScreen extends StatelessWidget {
               tooltip: 'Delete Event',
               onPressed: () => _showDeleteConfirmation(context),
             ),
+          IconButton(
+            icon: const Icon(Icons.help_outline, color: Colors.white),
+            tooltip: 'Help',
+            onPressed: () => context.pushNamed('help'),
+          ),
         ],
       ),
       // Body of the screen
@@ -146,106 +153,112 @@ class EventDetailsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 20), */
                 // Event detail sections
-                _buildSectionCard(
-                  'Client Organization',
-                  Icons.business_rounded,
-                  [
-                    _buildDetailRow('Event Title', event.title, theme),
+                KenwellSectionCard(
+                  title: 'Client Organization',
+                  icon: Icons.business_rounded,
+                  children: [
+                    KenwellDetailRow(label: 'Event Title', value: event.title),
                   ],
                 ),
-                _buildSectionCard(
-                  'Date & Time',
-                  Icons.schedule_rounded,
-                  [
-                    _buildDetailRow(
-                        'Date', DateFormat.yMMMMd().format(event.date), theme),
+                KenwellSectionCard(
+                  title: 'Date & Time',
+                  icon: Icons.schedule_rounded,
+                  children: [
+                    KenwellDetailRow(
+                        label: 'Date',
+                        value: DateFormat.yMMMMd().format(event.date)),
                     const Divider(height: 1),
-                    _buildDetailRow('Set Up Time', event.setUpTime, theme),
+                    KenwellDetailRow(
+                        label: 'Set Up Time', value: event.setUpTime),
                     const Divider(height: 1),
-                    _buildDetailRow('Start Time', event.startTime, theme),
+                    KenwellDetailRow(
+                        label: 'Start Time', value: event.startTime),
                     const Divider(height: 1),
-                    _buildDetailRow('End Time', event.endTime, theme),
+                    KenwellDetailRow(label: 'End Time', value: event.endTime),
                     const Divider(height: 1),
-                    _buildDetailRow(
-                        'Strike Down Time', event.strikeDownTime, theme),
+                    KenwellDetailRow(
+                        label: 'Strike Down Time', value: event.strikeDownTime),
                   ],
                 ),
-                _buildSectionCard(
-                  'Event Location',
-                  Icons.location_on_rounded,
-                  [
-                    _buildDetailRow('Venue', event.venue, theme),
+                KenwellSectionCard(
+                  title: 'Event Location',
+                  icon: Icons.location_on_rounded,
+                  children: [
+                    KenwellDetailRow(label: 'Venue', value: event.venue),
                     const Divider(height: 1),
-                    _buildDetailRow('Address', event.address, theme),
+                    KenwellDetailRow(label: 'Address', value: event.address),
                     const Divider(height: 1),
-                    _buildDetailRow('Town/City', event.townCity, theme),
+                    KenwellDetailRow(label: 'Town/City', value: event.townCity),
                     const Divider(height: 1),
-                    _buildDetailRow('Province', event.province, theme),
+                    KenwellDetailRow(label: 'Province', value: event.province),
                   ],
                 ),
-                _buildSectionCard(
-                  'Onsite Contact',
-                  Icons.person_pin_rounded,
-                  [
-                    _buildDetailRow(
-                        'Contact Person',
-                        fullName(event.onsiteContactFirstName,
-                            event.onsiteContactLastName),
-                        theme),
+                KenwellSectionCard(
+                  title: 'Onsite Contact',
+                  icon: Icons.person_pin_rounded,
+                  children: [
+                    KenwellDetailRow(
+                        label: 'Contact Person',
+                        value: fullName(event.onsiteContactFirstName,
+                            event.onsiteContactLastName)),
                     const Divider(height: 1),
-                    _buildDetailRow(
-                        'Contact Number', event.onsiteContactNumber, theme),
+                    KenwellDetailRow(
+                        label: 'Contact Number',
+                        value: event.onsiteContactNumber),
                     const Divider(height: 1),
-                    _buildDetailRow('Email', event.onsiteContactEmail, theme),
+                    KenwellDetailRow(
+                        label: 'Email', value: event.onsiteContactEmail),
                   ],
                 ),
-                _buildSectionCard(
-                  'AE Contact',
-                  Icons.support_agent_rounded,
-                  [
-                    _buildDetailRow(
-                        'Contact Person',
-                        fullName(
-                            event.aeContactFirstName, event.aeContactLastName),
-                        theme),
+                KenwellSectionCard(
+                  title: 'AE Contact',
+                  icon: Icons.support_agent_rounded,
+                  children: [
+                    KenwellDetailRow(
+                        label: 'Contact Person',
+                        value: fullName(
+                            event.aeContactFirstName, event.aeContactLastName)),
                     const Divider(height: 1),
-                    _buildDetailRow(
-                        'Contact Number', event.aeContactNumber, theme),
+                    KenwellDetailRow(
+                        label: 'Contact Number', value: event.aeContactNumber),
                     const Divider(height: 1),
-                    _buildDetailRow('Email', event.aeContactEmail, theme),
+                    KenwellDetailRow(
+                        label: 'Email', value: event.aeContactEmail),
                   ],
                 ),
-                _buildSectionCard(
-                  'Participation & Options',
-                  Icons.people_rounded,
-                  [
-                    _buildDetailRow('Expected Participation',
-                        event.expectedParticipation.toString(), theme),
+                KenwellSectionCard(
+                  title: 'Participation & Options',
+                  icon: Icons.people_rounded,
+                  children: [
+                    KenwellDetailRow(
+                        label: 'Expected Participation',
+                        value: event.expectedParticipation.toString()),
                     const Divider(height: 1),
-                    _buildDetailRow('Nurses', event.nurses.toString(), theme),
+                    KenwellDetailRow(
+                        label: 'Nurses', value: event.nurses.toString()),
                     const Divider(height: 1),
-                    _buildDetailRow('Mobile Booths', event.mobileBooths, theme),
+                    KenwellDetailRow(
+                        label: 'Mobile Booths', value: event.mobileBooths),
                     const Divider(height: 1),
-                    _buildDetailRow(
-                        'Medical Aid Option', event.medicalAid, theme),
+                    KenwellDetailRow(
+                        label: 'Medical Aid Option', value: event.medicalAid),
                     if (event.description != null &&
                         event.description!.isNotEmpty) ...[
                       const Divider(height: 1),
-                      _buildDetailRow('Description', event.description!, theme),
+                      KenwellDetailRow(
+                          label: 'Description', value: event.description!),
                     ],
                   ],
                 ),
-                _buildSectionCard(
-                  'Requested Services',
-                  Icons.medical_services_rounded,
-                  [
-                    _buildDetailRow(
-                      'Services',
-                      event.servicesRequested.isNotEmpty
-                          ? event.servicesRequested
-                          : 'None',
-                      theme,
-                    ),
+                KenwellSectionCard(
+                  title: 'Requested Services',
+                  icon: Icons.medical_services_rounded,
+                  children: [
+                    KenwellDetailRow(
+                        label: 'Services',
+                        value: event.servicesRequested.isNotEmpty
+                            ? event.servicesRequested
+                            : 'None'),
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -275,18 +288,8 @@ class EventDetailsScreen extends StatelessWidget {
                                 event: event,
                                 onAllocate: (assignedUserIds) {
                                   if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                            'Assigned to ${assignedUserIds.length} user(s)'),
-                                        backgroundColor: Colors.green.shade600,
-                                        behavior: SnackBarBehavior.floating,
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
-                                        margin: const EdgeInsets.all(16),
-                                      ),
-                                    );
+                                    AppSnackbar.showSuccess(context,
+                                        'Assigned to \${assignedUserIds.length} user(s)');
                                   }
                                 },
                               ),
@@ -399,107 +402,8 @@ class EventDetailsScreen extends StatelessWidget {
     await viewModel!.deleteEvent(event.id); // implement deleteEvent in VM
     if (!context.mounted) return;
     context.pop();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Event deleted')),
-    );
+    AppSnackbar.showSuccess(context, 'Event deleted');
   }
 
   // Build a detail row widget
-  Widget _buildDetailRow(String label, String value, ThemeData theme) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 130,
-            child: Text(
-              label,
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF6B7280),
-                fontSize: 12,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: const Color(0xFF201C58),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Build a section card widget with an icon
-  Widget _buildSectionCard(String title, IconData icon, List<Widget> children) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color(0xFF201C58).withValues(alpha: 0.08),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Section header row
-          Padding(
-            padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(7),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF201C58).withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(icon, color: const Color(0xFF201C58), size: 16),
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF201C58),
-                    letterSpacing: 0.2,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Divider(
-            height: 1,
-            thickness: 1,
-            color: const Color(0xFF201C58).withValues(alpha: 0.06),
-          ),
-          // Content
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: children,
-            ),
-          ),
-          const SizedBox(height: 4),
-        ],
-      ),
-    );
-  }
 }

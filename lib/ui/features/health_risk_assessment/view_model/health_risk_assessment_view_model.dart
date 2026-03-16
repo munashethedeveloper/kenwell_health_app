@@ -332,15 +332,15 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
   }
 
   // Submit results
-  Future<void> submitResults(
-    BuildContext context, {
+  Future<void> submitResults({
     required VoidCallback onNext,
+    void Function(String)? onValidationFailed,
+    void Function(String)? onSuccess,
+    void Function(String)? onError,
   }) async {
     debugPrint('Saving HRA for memberId=$_memberId, eventId=$_eventId');
     if (!isFormValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please complete all required fields.')),
-      );
+      onValidationFailed?.call('Please complete all required fields.');
       return;
     }
 
@@ -394,6 +394,7 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
       onNext();
     } catch (e) {
       AppLogger.error('Failed to save HRA screening', e);
+      onError?.call('Failed to save HRA screening. Please try again.');
     } finally {
       _isSubmitting = false;
       notifyListeners();

@@ -4,12 +4,11 @@ import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.
 import 'package:provider/provider.dart';
 import '../../../../domain/constants/role_permissions.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
-import '../../../shared/ui/colours/kenwell_colours.dart';
-import '../../../shared/ui/labels/kenwell_section_label.dart';
 import '../../profile/view_model/profile_view_model.dart';
 import '../view_model/member_registration_view_model.dart';
 import 'sections/create_member_section.dart';
 import 'sections/view_members_section.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 /// Member registration screen with create and view members functionality
 ///
@@ -166,12 +165,8 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
                     onPressed: () {
                       if (mounted) {
                         context.read<MemberDetailsViewModel>().loadMembers();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Members refreshed'),
-                            duration: Duration(seconds: 1),
-                          ),
-                        );
+                        AppSnackbar.showSuccess(context, 'Members refreshed',
+                            duration: const Duration(seconds: 1));
                       }
                     },
                     icon: const Icon(Icons.refresh, color: Colors.white),
@@ -211,9 +206,41 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
 
                   return Column(
                     children: [
-                      const KenwellGradientHeader(
-                        title: 'Member Management',
-                        subtitle: 'Create and view registered members',
+                      Builder(
+                        builder: (ctx) {
+                          final tabController = DefaultTabController.of(ctx);
+                          return AnimatedBuilder(
+                            animation: tabController,
+                            builder: (_, __) {
+                              final idx = tabController.index;
+                              // Determine title based on active tab
+                              String title = 'Member Management';
+                              String subtitle =
+                                  'Create and view registered members';
+                              if (canCreateMember && canViewMembers) {
+                                if (idx == 0) {
+                                  title = 'New Member\nRegistration';
+                                  subtitle =
+                                      'Register a new wellness participant';
+                                } else {
+                                  title = 'Registered Members';
+                                  subtitle = 'Search and manage your members';
+                                }
+                              } else if (canCreateMember) {
+                                title = 'New Member\nRegistration';
+                                subtitle =
+                                    'Register a new wellness participant';
+                              } else if (canViewMembers) {
+                                title = 'Registered Members';
+                                subtitle = 'Search and manage your members';
+                              }
+                              return KenwellGradientHeader(
+                                title: title,
+                                subtitle: subtitle,
+                              );
+                            },
+                          );
+                        },
                       ),
                       Expanded(
                         child: TabBarView(

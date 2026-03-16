@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 class UserEventRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<List<Map<String, dynamic>>> fetchUserEvents(String userId) async {
-    print('UserEventRepository: Fetching events for userId: $userId');
+    debugPrint('UserEventRepository: Fetching events for userId: $userId');
 
     try {
       final snapshot = await _firestore
@@ -12,28 +13,30 @@ class UserEventRepository {
           .where('userId', isEqualTo: userId)
           .get();
 
-      print('UserEventRepository: Query completed');
-      print('UserEventRepository: - Found ${snapshot.docs.length} documents');
+      debugPrint('UserEventRepository: Query completed');
+      debugPrint(
+          'UserEventRepository: - Found ${snapshot.docs.length} documents');
 
       if (snapshot.docs.isEmpty) {
-        print('UserEventRepository: ⚠️ No documents found for userId: $userId');
-        print('UserEventRepository: - This could mean:');
-        print(
+        debugPrint(
+            'UserEventRepository: ⚠️ No documents found for userId: $userId');
+        debugPrint('UserEventRepository: - This could mean:');
+        debugPrint(
             'UserEventRepository:   1. No events have been assigned to this user');
-        print(
+        debugPrint(
             'UserEventRepository:   2. userId mismatch between allocation and query');
-        print('UserEventRepository:   3. Firestore permission issue');
+        debugPrint('UserEventRepository:   3. Firestore permission issue');
       } else {
-        print('UserEventRepository: ✅ Found documents:');
+        debugPrint('UserEventRepository: ✅ Found documents:');
         for (var doc in snapshot.docs) {
-          print('UserEventRepository: - Doc ID: ${doc.id}');
-          print('UserEventRepository:   Data: ${doc.data()}');
+          debugPrint('UserEventRepository: - Doc ID: ${doc.id}');
+          debugPrint('UserEventRepository:   Data: ${doc.data()}');
         }
       }
 
       return snapshot.docs.map((doc) => doc.data()).toList();
     } catch (e) {
-      print('UserEventRepository: ❌ ERROR fetching events: $e');
+      debugPrint('UserEventRepository: ❌ ERROR fetching events: $e');
       rethrow;
     }
   }

@@ -6,7 +6,6 @@ import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/cards/kenwell_action_card.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/dialogs/confirmation_dialog.dart';
-import 'package:kenwell_health_app/ui/shared/ui/labels/kenwell_section_label.dart';
 import 'package:provider/provider.dart';
 
 class MyProfileMenuScreen extends StatelessWidget {

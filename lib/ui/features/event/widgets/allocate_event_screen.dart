@@ -1,26 +1,21 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/cards/kenwell_empty_state.dart';
 import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 import 'package:provider/provider.dart';
-import '../../../shared/ui/containers/gradient_container.dart';
-import '../../../shared/ui/badges/number_badge.dart';
 import '../../user_management/viewmodel/user_management_view_model.dart';
 import '../../user_management/widgets/sections/user_filter_chips.dart';
 import '../../user_management/widgets/sections/user_search_bar.dart';
-import 'package:kenwell_health_app/data/services/user_event_service.dart';
-import 'package:kenwell_health_app/data/repositories_dcl/user_event_repository.dart';
+import '../view_model/allocate_event_view_model.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../domain/models/user_model.dart';
+import 'sections/allocate_user_card.dart';
 
-// AllocateEventScreen allows assigning a wellness event to multiple users
 class AllocateEventScreen extends StatefulWidget {
   final void Function(List<String> assignedUserIds) onAllocate;
   final WellnessEvent event;
-
-  // Constructor
   const AllocateEventScreen({
     super.key,
     required this.onAllocate,
@@ -31,55 +26,30 @@ class AllocateEventScreen extends StatefulWidget {
   State<AllocateEventScreen> createState() => _AllocateEventScreenState();
 }
 
-// State class for AllocateEventScreen
 class _AllocateEventScreenState extends State<AllocateEventScreen> {
   final TextEditingController _searchController = TextEditingController();
-  final Set<String> _assignedUserIds = {};
-  bool _isLoadingAssignedUsers = true;
+  late final AllocateEventViewModel _allocVM;
 
-  // Initialize state
   @override
   void initState() {
     super.initState();
-    // Load users and fetch already assigned users
+    _allocVM = AllocateEventViewModel(event: widget.event);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<UserManagementViewModel>().loadUsers();
-      _fetchAssignedUsers();
+      _allocVM.loadAssignedUsers();
     });
-  }
-
-  // Fetch users already assigned to this event
-  Future<void> _fetchAssignedUsers() async {
-    setState(() => _isLoadingAssignedUsers = true);
-    try {
-      final repo = UserEventRepository();
-      final assignedIds = await repo.fetchAssignedUserIds(widget.event.id);
-      if (mounted) {
-        setState(() {
-          _assignedUserIds.clear();
-          _assignedUserIds.addAll(assignedIds);
-          _isLoadingAssignedUsers = false;
-        });
-        debugPrint(
-            'AllocateEventScreen: Loaded ${assignedIds.length} already assigned users');
-      }
-    } catch (e) {
-      debugPrint('AllocateEventScreen: Error fetching assigned users: $e');
-      if (mounted) {
-        setState(() => _isLoadingAssignedUsers = false);
-      }
-    }
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _allocVM.dispose();
     super.dispose();
   }
 
   void _showUserOptions(UserModel user) {
     final theme = Theme.of(context);
-    final isAssigned = _assignedUserIds.contains(user.id);
+    final isAssigned = _allocVM.isAssigned(user.id);
 
     showModalBottomSheet(
       context: context,
@@ -187,29 +157,15 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
   }
 
   Future<void> _assignUser(UserModel user) async {
-    // Show loading indicator
     if (!mounted) return;
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
-      ),
+      builder: (context) => const Center(child: CircularProgressIndicator()),
     );
-
-    // Assign event to user
-    await UserEventService.addUserEvent(
-      event: widget.event,
-      user: user,
-    );
-
+    await _allocVM.assignUser(user);
     if (!mounted) return;
-
-    // Close loading dialog
     Navigator.of(context).pop();
-
-    // Refresh assigned users list
-    await _fetchAssignedUsers();
   }
 
   Future<void> _unassignUser(UserModel user) async {
@@ -219,9 +175,8 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
       builder: (context) => AlertDialog(
         title: Text(
           'Unassign User',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: theme.textTheme.titleMedium
+              ?.copyWith(fontWeight: FontWeight.w600),
         ),
         content: Text(
           'Are you sure you want to unassign ${user.firstName} ${user.lastName} from this event?',
@@ -230,295 +185,31 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
         actions: [
           TextButton(
             onPressed: () => context.pop(false),
-            child: Text(
-              'Cancel',
-              style: theme.textTheme.titleSmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
+            child: Text('Cancel',
+                style: theme.textTheme.titleSmall
+                    ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
           ),
           ElevatedButton(
             onPressed: () => context.pop(true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: theme.colorScheme.error,
-            ),
-            child: Text(
-              'Unassign',
-              style: theme.textTheme.titleSmall?.copyWith(color: Colors.white),
-            ),
+                backgroundColor: theme.colorScheme.error),
+            child: Text('Unassign',
+                style:
+                    theme.textTheme.titleSmall?.copyWith(color: Colors.white)),
           ),
         ],
       ),
     );
 
     if (confirmed != true || !mounted) return;
-
-    // Show loading indicator
-    if (!mounted) return;
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
-      ),
+      builder: (context) => const Center(child: CircularProgressIndicator()),
     );
-
-    // Unassign event from user
-    final repo = UserEventRepository();
-    await repo.removeUserEvent(widget.event.id, user.id);
-
+    await _allocVM.unassignUser(user);
     if (!mounted) return;
-
-    // Close loading dialog
     Navigator.of(context).pop();
-
-    // Refresh assigned users list immediately
-    await _fetchAssignedUsers();
-  }
-
-  Widget _buildUserCard(UserModel user, ThemeData theme, {int? number}) {
-    final isAssigned = _assignedUserIds.contains(user.id);
-
-    final roleIcons = {
-      'ADMIN': Icons.admin_panel_settings_rounded,
-      'TOP MANAGEMENT': Icons.business_center_rounded,
-      'PROJECT MANAGER': Icons.manage_accounts_rounded,
-      'PROJECT COORDINATOR': Icons.event_rounded,
-      'HEALTH PRACTITIONER': Icons.medical_services_rounded,
-      'CLIENT': Icons.person_rounded,
-    };
-
-    return Slidable(
-      key: ValueKey(user.id),
-      endActionPane: ActionPane(
-        motion: const ScrollMotion(),
-        children: [
-          if (!isAssigned)
-            SlidableAction(
-              onPressed: (_) => _assignUser(user),
-              backgroundColor: theme.colorScheme.primary,
-              foregroundColor: theme.colorScheme.onPrimary,
-              icon: Icons.person_add_rounded,
-              label: 'Assign',
-              borderRadius: BorderRadius.circular(12),
-            ),
-          if (isAssigned)
-            SlidableAction(
-              onPressed: (_) => _unassignUser(user),
-              backgroundColor: theme.colorScheme.error,
-              foregroundColor: theme.colorScheme.onError,
-              icon: Icons.person_remove_rounded,
-              label: 'Unassign',
-              borderRadius: BorderRadius.circular(12),
-            ),
-        ],
-      ),
-      child: Builder(
-        builder: (context) => GestureDetector(
-          onTap: () {
-            final slidable = Slidable.of(context);
-            final isOpen =
-                slidable?.actionPaneType.value != ActionPaneType.none;
-            if (isOpen) {
-              slidable?.close();
-            } else {
-              slidable?.openEndActionPane();
-            }
-          },
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: KenwellColors.secondaryNavyDark.withValues(alpha: 0.4),
-                //color: KenwellColors.primaryGreen.withValues(alpha: 0.4),
-
-                width: 1.5,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              child: Row(
-                children: [
-                  if (number != null) ...[
-                    NumberBadge(number: number),
-                    const SizedBox(width: 10),
-                  ],
-
-                  /*  // Avatar
-                  Container(
-                    width: 46,
-                    height: 46,
-                    decoration: BoxDecoration(
-                      color: theme.primaryColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      roleIcons[user.role] ?? Icons.person_rounded,
-                      color: theme.primaryColor,
-                      size: 22,
-                    ),
-                  ),
-                  const SizedBox(width: 12), */
-
-                  // User Info
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${user.firstName} ${user.lastName}',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            //color: const Color(0xFF201C58),
-                            color: KenwellColors.secondaryNavyDark,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 3),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.email_outlined,
-                              size: 12,
-                              color: Colors.grey.shade500,
-                            ),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                user.email,
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: KenwellColors.secondaryNavyDark,
-                                  fontSize: 12,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 5),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 7, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: isAssigned
-                                ? const Color(0xFF10B981).withValues(alpha: 0.1)
-                                : const Color(0xFFEF4444)
-                                    .withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                isAssigned
-                                    ? Icons.check_circle_rounded
-                                    : Icons.radio_button_unchecked_rounded,
-                                color: isAssigned
-                                    ? const Color(0xFF10B981)
-                                    : const Color(0xFFEF4444),
-                                size: 12,
-                              ),
-                              const SizedBox(width: 3),
-                              Text(
-                                isAssigned ? 'Assigned' : 'Unassigned',
-                                style: TextStyle(
-                                  color: isAssigned
-                                      ? const Color(0xFF10B981)
-                                      : const Color(0xFFEF4444),
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 10,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(width: 10),
-
-                  // Role badge
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: theme.primaryColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: theme.primaryColor.withValues(alpha: 0.2),
-                        width: 1,
-                      ),
-                    ),
-                    child: Text(
-                      user.role,
-                      style: TextStyle(
-                        color: theme.primaryColor,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 10,
-                        letterSpacing: 0.3,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEmptyState(ThemeData theme) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: theme.primaryColor.withValues(alpha: 0.08),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.people_outline_rounded,
-                color: theme.primaryColor,
-                size: 48,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'No users found',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF201C58),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Try adjusting your search or filter',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: const Color(0xFF6B7280),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   void _showHelpDialog() {
@@ -541,14 +232,12 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
     );
   }
 
-  // Build method
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return Scaffold(
       appBar: KenwellAppBar(
-        //title: 'Allocate Event: ${widget.event.title}',
         title: 'KenWell365',
         titleColor: Colors.white,
         titleStyle: const TextStyle(
@@ -563,7 +252,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
             icon: const Icon(Icons.refresh,
                 color: Colors.white, semanticLabel: 'Refresh'),
             tooltip: 'Refresh',
-            onPressed: _fetchAssignedUsers,
+            onPressed: _allocVM.loadAssignedUsers,
           ),
           IconButton(
             icon: const Icon(Icons.help_outline,
@@ -573,306 +262,186 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
           ),
         ],
       ),
-      // Body of the screen
-      body: Consumer<UserManagementViewModel>(
-        builder: (context, viewModel, _) {
-          final filteredUsers = viewModel.filteredUsers;
-          final totalUsers = viewModel.users.length;
-          final assignedCount = _assignedUserIds.length;
-          final notAssignedCount = totalUsers - assignedCount;
-          final filterActive = viewModel.selectedFilter != 'all' ||
-              viewModel.searchQuery.isNotEmpty;
+      body: ListenableBuilder(
+        listenable: _allocVM,
+        builder: (context, _) => Consumer<UserManagementViewModel>(
+          builder: (context, viewModel, _) {
+            final filteredUsers = viewModel.filteredUsers;
+            final totalUsers = viewModel.users.length;
+            final assignedCount = _allocVM.assignedUserIds.length;
+            final notAssignedCount = totalUsers - assignedCount;
+            final filterActive = viewModel.selectedFilter != 'all' ||
+                viewModel.searchQuery.isNotEmpty;
 
-          if (viewModel.isLoading && viewModel.users.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
-          }
+            if (viewModel.isLoading && viewModel.users.isEmpty) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          if (viewModel.users.isEmpty) {
-            return Center(
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: theme.primaryColor.withValues(alpha: 0.08),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.people_outline_rounded,
-                        color: theme.primaryColor,
-                        size: 48,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'No users available',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: const Color(0xFF201C58),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Create users first to allocate events',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: const Color(0xFF6B7280),
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
-
-          return RefreshIndicator(
-            onRefresh: viewModel.loadUsers,
-            child: CustomScrollView(
-              slivers: [
-                // ── Gradient section header ───────────────────────────
-                SliverToBoxAdapter(
-                  child: KenwellGradientHeader(
-                    // label: 'ALLOCATE',
-                    title: 'Allocate\nEvent',
-                    subtitle:
-                        'Allocate users to the ${widget.event.title} event',
-                  ),
-                ),
-                SliverToBoxAdapter(
+            if (viewModel.users.isEmpty) {
+              return Center(
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      const SizedBox(height: 16),
-
-                      /*  // Stats header
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: GradientContainer.purpleGreen(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 14),
-                          child: Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: const Icon(
-                                  Icons.people_rounded,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
-                              ),
-                              const SizedBox(width: 14),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      filterActive
-                                          ? 'Showing ${filteredUsers.length} of $totalUsers Users'
-                                          : '$totalUsers Total Users',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 3),
-                                    Row(
-                                      children: [
-                                        Icon(
-                                          Icons.check_circle_rounded,
-                                          color: Colors.white
-                                              .withValues(alpha: 0.9),
-                                          size: 13,
-                                        ),
-                                        const SizedBox(width: 3),
-                                        Text(
-                                          '$assignedCount assigned',
-                                          style: TextStyle(
-                                            color: Colors.white
-                                                .withValues(alpha: 0.9),
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 10),
-                                        Icon(
-                                          Icons.radio_button_unchecked_rounded,
-                                          color: Colors.white
-                                              .withValues(alpha: 0.9),
-                                          size: 13,
-                                        ),
-                                        const SizedBox(width: 3),
-                                        Text(
-                                          '$notAssignedCount unassigned',
-                                          style: TextStyle(
-                                            color: Colors.white
-                                                .withValues(alpha: 0.9),
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                      
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16), */
-
-                      /*             // Section title
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color:
-                                    theme.primaryColor.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Icon(
-                                Icons.event_rounded,
-                                color: theme.primaryColor,
-                                size: 18,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Allocate Event',
-                                    style: theme.textTheme.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.w700,
-                                      color: const Color(0xFF201C58),
-                                    ),
-                                  ),
-                                  Text(
-                                    widget.event.title,
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: const Color(0xFF6B7280),
-                                      fontSize: 11,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 12), */
-
-                      // Search and filter card
                       Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 16),
-                        padding: const EdgeInsets.all(14),
+                        padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: KenwellColors.secondaryNavy
-                                .withValues(alpha: 0.08),
-                            width: 2.5,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.04),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
+                          color: theme.primaryColor.withValues(alpha: 0.08),
+                          shape: BoxShape.circle,
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Search users:',
-                              style: theme.textTheme.labelMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: const Color(0xFF201C58),
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            UserSearchBar(
-                              controller: _searchController,
-                              searchQuery: viewModel.searchQuery,
-                              onChanged: (value) =>
-                                  viewModel.setSearchQuery(value),
-                              onClear: () {
-                                _searchController.clear();
-                                viewModel.clearSearch();
-                              },
-                            ),
-                            const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.tune_rounded,
-                                  size: 15,
-                                  color: KenwellColors.primaryGreen,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  'Filter by role:',
-                                  style: theme.textTheme.labelMedium?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: const Color(0xFF201C58),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            UserFilterChips(
-                              selectedFilter: viewModel.selectedFilter,
-                              onFilterChanged: viewModel.setFilter,
-                            ),
-                          ],
+                        child: Icon(
+                          Icons.people_outline_rounded,
+                          color: theme.primaryColor,
+                          size: 48,
                         ),
                       ),
-                      const SizedBox(height: 32),
                       const SizedBox(height: 16),
+                      Text(
+                        'No users available',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF201C58),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Create users first to allocate events',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: const Color(0xFF6B7280),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ],
                   ),
                 ),
-                // User list
-                if (filteredUsers.isEmpty)
-                  SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: _buildEmptyState(theme),
-                  )
-                else
-                  SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final user = filteredUsers[index];
-                          return _buildUserCard(user, theme, number: index + 1);
-                        },
-                        childCount: filteredUsers.length,
-                      ),
+              );
+            }
+
+            return RefreshIndicator(
+              onRefresh: viewModel.loadUsers,
+              child: CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: KenwellGradientHeader(
+                      title: 'Allocate\nEvent',
+                      subtitle:
+                          'Allocate users to the ${widget.event.title} event',
                     ),
                   ),
-                const SliverToBoxAdapter(
-                  child: SizedBox(height: 24),
-                ),
-              ],
-            ),
-          );
-        },
+                  SliverToBoxAdapter(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 16),
+                        Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: KenwellColors.secondaryNavy
+                                  .withValues(alpha: 0.08),
+                              width: 2.5,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.04),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Search users:',
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xFF201C58),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              UserSearchBar(
+                                controller: _searchController,
+                                searchQuery: viewModel.searchQuery,
+                                onChanged: (value) =>
+                                    viewModel.setSearchQuery(value),
+                                onClear: () {
+                                  _searchController.clear();
+                                  viewModel.clearSearch();
+                                },
+                              ),
+                              const SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.tune_rounded,
+                                    size: 15,
+                                    color: KenwellColors.primaryGreen,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Filter by role:',
+                                    style:
+                                        theme.textTheme.labelMedium?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFF201C58),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              UserFilterChips(
+                                selectedFilter: viewModel.selectedFilter,
+                                onFilterChanged: viewModel.setFilter,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
+                  ),
+                  if (filteredUsers.isEmpty)
+                    const SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: KenwellEmptyState(
+                        icon: Icons.people_outline_rounded,
+                        title: 'No users found',
+                        message: 'Try adjusting your search or filter',
+                      ),
+                    )
+                  else
+                    SliverPadding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            final user = filteredUsers[index];
+                            return AllocateUserCard(
+                              user: user,
+                              number: index + 1,
+                              isAssigned: _allocVM.isAssigned(user.id),
+                              onAssign: () => _assignUser(user),
+                              onUnassign: () => _unassignUser(user),
+                            );
+                          },
+                          childCount: filteredUsers.length,
+                        ),
+                      ),
+                    ),
+                  const SliverToBoxAdapter(
+                    child: SizedBox(height: 24),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

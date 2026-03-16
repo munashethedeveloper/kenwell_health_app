@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/cards/kenwell_empty_state.dart';
 import 'package:provider/provider.dart';
 import '../../../../../domain/models/member.dart';
 import '../../../../../domain/constants/role_permissions.dart';
-import '../../../../shared/ui/containers/gradient_container.dart';
 import '../../../profile/view_model/profile_view_model.dart';
 import '../../view_model/member_registration_view_model.dart';
 import '../member_events_screen.dart';
 import 'member_card_widget.dart';
 import 'member_filter_chips.dart';
 import 'member_search_bar.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 /// View members section with search, filter, and member list
 class ViewMembersSection extends StatefulWidget {
@@ -203,62 +204,12 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
         member.id, '${member.name} ${member.surname}');
 
     if (mounted && success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content:
-              Text(viewModel.successMessage ?? 'Member deleted successfully'),
-          backgroundColor: theme.colorScheme.error,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-      );
+      AppSnackbar.showSuccess(
+          context, viewModel.successMessage ?? 'Member deleted successfully');
     } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(viewModel.errorMessage ?? 'Failed to delete member')),
-      );
+      AppSnackbar.showError(
+          context, viewModel.errorMessage ?? 'Failed to delete member');
     }
-  }
-
-  Widget _buildEmptyState(ThemeData theme, String title, String message) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: theme.primaryColor.withValues(alpha: 0.08),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.people_outline_rounded,
-                color: theme.primaryColor,
-                size: 48,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              title,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF201C58),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              message,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: const Color(0xFF6B7280),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   @override
@@ -421,19 +372,19 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
 
               // Member list or empty states
               if (viewModel.members.isEmpty)
-                SliverToBoxAdapter(
-                  child: _buildEmptyState(
-                    theme,
-                    'No members yet',
-                    'Create your first member to get started',
+                const SliverToBoxAdapter(
+                  child: KenwellEmptyState(
+                    icon: Icons.people_outline_rounded,
+                    title: 'No members yet',
+                    message: 'Create your first member to get started',
                   ),
                 )
               else if (filteredMembers.isEmpty)
-                SliverToBoxAdapter(
-                  child: _buildEmptyState(
-                    theme,
-                    'No members found',
-                    'Try adjusting your search or filter',
+                const SliverToBoxAdapter(
+                  child: KenwellEmptyState(
+                    icon: Icons.people_outline_rounded,
+                    title: 'No members found',
+                    message: 'Try adjusting your search or filter',
                   ),
                 )
               else

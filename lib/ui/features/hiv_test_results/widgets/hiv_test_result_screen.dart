@@ -14,6 +14,7 @@ import '../../../shared/ui/form/kenwell_signature_actions.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../../../shared/models/nursing_referral_option.dart';
 import '../view_model/hiv_test_result_view_model.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 // HIVTestResultScreen displays the HIV test results form
 class HIVTestResultScreen extends StatelessWidget {
@@ -98,8 +99,15 @@ class HIVTestResultScreen extends StatelessWidget {
                             hint: 'Select expiry date',
                             suffixIcon: const Icon(Icons.calendar_today,
                                 color: KenwellColors.primaryGreenDark),
-                            onTap: () => viewModel.pickExpiryDate(context,
-                                isScreening: true),
+                            onTap: () => viewModel.pickExpiryDate(
+                              isScreening: true,
+                              showPicker: () => showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(2020),
+                                lastDate: DateTime(2030),
+                              ),
+                            ),
                           ),
                           const SizedBox(height: 12),
                           _buildDropdown(
@@ -134,19 +142,14 @@ class HIVTestResultScreen extends StatelessWidget {
                       onClear: viewModel.clearSignature,
                       navigation: KenwellFormNavigation(
                         onPrevious: onPrevious,
-                        onNext: () {
-                          if (!viewModel.isFormValid) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content:
-                                    Text('Please complete all required fields'),
-                                duration: Duration(seconds: 3),
-                              ),
-                            );
-                            return;
-                          }
-                          viewModel.submitTestResult(context, onNext: onNext);
-                        },
+                        onNext: () => viewModel.submitTestResult(
+                          onNext: onNext,
+                          onValidationFailed: (msg) =>
+                              AppSnackbar.showWarning(context, msg),
+                          onSuccess: (msg) =>
+                              AppSnackbar.showSuccess(context, msg),
+                          onError: (msg) => AppSnackbar.showError(context, msg),
+                        ),
                         isNextBusy: viewModel.isSubmitting,
                         isNextEnabled: !viewModel.isSubmitting,
                         nextLabel: 'Submit',

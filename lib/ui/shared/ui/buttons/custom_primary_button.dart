@@ -74,7 +74,8 @@ class CustomPrimaryButton extends StatelessWidget {
             child: ConstrainedBox(
               constraints: BoxConstraints(
                 minWidth: minWidth,
-                maxWidth: MediaQuery.of(context).size.width * maxWidthFactor,
+                maxWidth: (MediaQuery.of(context).size.width * maxWidthFactor)
+                    .clamp(minWidth, double.infinity),
               ),
               child: button,
             ),
