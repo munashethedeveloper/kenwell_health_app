@@ -9,6 +9,7 @@ import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
 import '../../../../data/services/auth_service.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -41,22 +42,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
       // Show success or error message
       if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(
-              'If an account exists with this email, a password reset link has been sent. '
-              'Please check your email and follow the instructions to reset your password.',
-            ),
-            duration: const Duration(seconds: 6),
-            action: SnackBarAction(
-              label: 'OK',
-              onPressed: () {
-                // Check if context is still valid before using it
-                if (mounted) {
-                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                }
-              },
-            ),
+        AppSnackbar.showSuccess(
+          context,
+          'If an account exists with this email, a password reset link has been sent. '
+          'Please check your email and follow the instructions to reset your password.',
+          duration: const Duration(seconds: 6),
+          action: SnackBarAction(
+            label: 'OK',
+            onPressed: () {
+              if (mounted) ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            },
           ),
         );
 
@@ -67,25 +62,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       } else {
         // Show error if something went wrong - check mounted first
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Unable to send password reset email. Please try again later.',
-              ),
-              duration: Duration(seconds: 4),
-            ),
-          );
+          AppSnackbar.showError(
+              context,
+              'Unable to send password reset email. Please try again later.',
+              duration: const Duration(seconds: 4));
         }
       }
     } catch (e) {
       // Show generic error message
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('An error occurred: ${e.toString()}'),
-          duration: const Duration(seconds: 5),
-        ),
-      );
+      AppSnackbar.showError(context, 'An error occurred: \${e.toString()}',
+          duration: const Duration(seconds: 5));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

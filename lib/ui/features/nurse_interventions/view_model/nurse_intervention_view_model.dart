@@ -153,12 +153,14 @@ class NurseInterventionViewModel extends ChangeNotifier {
     };
   }
 
-  Future<void> submitIntervention(
-      BuildContext context, VoidCallback? onNext) async {
+  Future<void> submitIntervention({
+    VoidCallback? onNext,
+    void Function(String)? onValidationFailed,
+    void Function(String)? onSuccess,
+    void Function(String)? onError,
+  }) async {
     if (!isFormValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all required fields')),
-      );
+      onValidationFailed?.call('Please fill in all required fields');
       return;
     }
 
@@ -169,18 +171,10 @@ class NurseInterventionViewModel extends ChangeNotifier {
       await toMap();
       await Future.delayed(const Duration(seconds: 1));
 
-      if (!context.mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Intervention saved successfully!')),
-      );
+      onSuccess?.call('Intervention saved successfully!');
       onNext?.call();
     } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving interventions: $e')),
-        );
-      }
+      onError?.call('Error saving interventions: $e');
     } finally {
       _isSubmitting = false;
       notifyListeners();

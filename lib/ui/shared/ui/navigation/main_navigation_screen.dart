@@ -70,13 +70,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     ];
     final List<NavigationRailDestination> allRailDestinations = [
       const NavigationRailDestination(
-        icon: Icon(Icons.people_outline),
-        selectedIcon: Icon(Icons.people),
+        icon: Icon(Icons.people_outline_rounded),
+        selectedIcon: Icon(Icons.people_rounded),
         label: Text('Users'),
       ),
       const NavigationRailDestination(
-        icon: Icon(Icons.bar_chart_outlined),
-        selectedIcon: Icon(Icons.bar_chart),
+        icon: Icon(Icons.bar_chart_rounded),
+        selectedIcon: Icon(Icons.bar_chart_rounded),
         label: Text('Statistics'),
       ),
       const NavigationRailDestination(
@@ -85,20 +85,20 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         label: Text('Home'),
       ),
       const NavigationRailDestination(
-        icon: Icon(Icons.person_outline),
-        selectedIcon: Icon(Icons.person),
+        icon: Icon(Icons.person_outline_rounded),
+        selectedIcon: Icon(Icons.person_rounded),
         label: Text('Profile'),
       ),
       const NavigationRailDestination(
         icon: Icon(Icons.event_note_outlined),
-        selectedIcon: Icon(Icons.event_note),
+        selectedIcon: Icon(Icons.event_note_rounded),
         label: Text('Events'),
       ),
     ];
     final List<NavigationRailDestination> clientRailDestinations = [
       const NavigationRailDestination(
-        icon: Icon(Icons.bar_chart_outlined),
-        selectedIcon: Icon(Icons.bar_chart),
+        icon: Icon(Icons.bar_chart_rounded),
+        selectedIcon: Icon(Icons.bar_chart_rounded),
         label: Text('Statistics'),
       ),
       const NavigationRailDestination(
@@ -107,8 +107,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         label: Text('Home'),
       ),
       const NavigationRailDestination(
-        icon: Icon(Icons.person_outline),
-        selectedIcon: Icon(Icons.person),
+        icon: Icon(Icons.person_outline_rounded),
+        selectedIcon: Icon(Icons.person_rounded),
         label: Text('Profile'),
       ),
     ];
@@ -119,25 +119,25 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         label: Text('Home'),
       ),
       const NavigationRailDestination(
-        icon: Icon(Icons.person_outline),
-        selectedIcon: Icon(Icons.person),
+        icon: Icon(Icons.person_outline_rounded),
+        selectedIcon: Icon(Icons.person_rounded),
         label: Text('Profile'),
       ),
       const NavigationRailDestination(
         icon: Icon(Icons.event_note_outlined),
-        selectedIcon: Icon(Icons.event_note),
+        selectedIcon: Icon(Icons.event_note_rounded),
         label: Text('Events'),
       ),
     ];
     final List<NavigationDestination> allNavDestinations = [
       const NavigationDestination(
-        icon: Icon(Icons.people_outline),
-        selectedIcon: Icon(Icons.people),
+        icon: Icon(Icons.people_outline_rounded),
+        selectedIcon: Icon(Icons.people_rounded),
         label: 'Users',
       ),
       const NavigationDestination(
-        icon: Icon(Icons.bar_chart_outlined),
-        selectedIcon: Icon(Icons.bar_chart),
+        icon: Icon(Icons.bar_chart_rounded),
+        selectedIcon: Icon(Icons.bar_chart_rounded),
         label: 'Statistics',
       ),
       const NavigationDestination(
@@ -146,20 +146,20 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         label: 'Home',
       ),
       const NavigationDestination(
-        icon: Icon(Icons.person_outline),
-        selectedIcon: Icon(Icons.person),
+        icon: Icon(Icons.person_outline_rounded),
+        selectedIcon: Icon(Icons.person_rounded),
         label: 'Profile',
       ),
       const NavigationDestination(
         icon: Icon(Icons.event_note_outlined),
-        selectedIcon: Icon(Icons.event_note),
+        selectedIcon: Icon(Icons.event_note_rounded),
         label: 'Events',
       ),
     ];
     final List<NavigationDestination> clientNavDestinations = [
       const NavigationDestination(
-        icon: Icon(Icons.bar_chart_outlined),
-        selectedIcon: Icon(Icons.bar_chart),
+        icon: Icon(Icons.bar_chart_rounded),
+        selectedIcon: Icon(Icons.bar_chart_rounded),
         label: 'Statistics',
       ),
       const NavigationDestination(
@@ -168,8 +168,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         label: 'Home',
       ),
       const NavigationDestination(
-        icon: Icon(Icons.person_outline),
-        selectedIcon: Icon(Icons.person),
+        icon: Icon(Icons.person_outline_rounded),
+        selectedIcon: Icon(Icons.person_rounded),
         label: 'Profile',
       ),
     ];
@@ -180,13 +180,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         label: 'Home',
       ),
       const NavigationDestination(
-        icon: Icon(Icons.person_outline),
-        selectedIcon: Icon(Icons.person),
+        icon: Icon(Icons.person_outline_rounded),
+        selectedIcon: Icon(Icons.person_rounded),
         label: 'Profile',
       ),
       const NavigationDestination(
         icon: Icon(Icons.event_note_outlined),
-        selectedIcon: Icon(Icons.event_note),
+        selectedIcon: Icon(Icons.event_note_rounded),
         label: 'Events',
       ),
     ];

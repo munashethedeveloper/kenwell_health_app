@@ -17,14 +17,21 @@ class StatsReportScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: KenwellColors.neutralBackground,
-      appBar: const KenwellAppBar(
+      appBar: KenwellAppBar(
         title: 'KenWell365',
-        titleStyle: TextStyle(
+        titleStyle: const TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
         automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            tooltip: 'Help',
+            icon: const Icon(Icons.help_outline, color: Colors.white),
+            onPressed: () => context.pushNamed('help'),
+          ),
+        ],
       ),
       body: CustomScrollView(
         slivers: [

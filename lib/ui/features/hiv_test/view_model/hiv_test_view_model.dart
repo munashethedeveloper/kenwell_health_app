@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_hiv_screening_repository.dart';
 import 'package:kenwell_health_app/domain/models/hiv_screening.dart';
 import 'package:uuid/uuid.dart';
@@ -112,23 +111,19 @@ class HIVTestViewModel extends ChangeNotifier {
   }
 
   // Submit HIV Test form
-  Future<void> submitHIVTest(
-    BuildContext context, {
+  Future<void> submitHIVTest({
     VoidCallback? onNext,
+    void Function(String)? onValidationFailed,
+    void Function(String)? onSuccess,
+    void Function(String)? onError,
   }) async {
     if (!isFormValid) {
-      AppSnackbar.showWarning(
-        context,
-        'Please complete all required fields',
-      );
+      onValidationFailed?.call('Please complete all required fields');
       return;
     }
 
     if (_memberId == null || _eventId == null) {
-      AppSnackbar.showError(
-        context,
-        'Missing member or event information',
-      );
+      onError?.call('Missing member or event information');
       return;
     }
 
@@ -158,21 +153,10 @@ class HIVTestViewModel extends ChangeNotifier {
 
       await _repository.addHivScreening(screening);
 
-      if (!context.mounted) return;
-
-      AppSnackbar.showSuccess(
-        context,
-        'HIV screening saved successfully',
-      );
-
+      onSuccess?.call('HIV screening saved successfully');
       onNext?.call();
     } catch (e) {
-      if (context.mounted) {
-        AppSnackbar.showError(
-          context,
-          'Error saving HIV screening: $e',
-        );
-      }
+      onError?.call('Error saving HIV screening: $e');
     } finally {
       _isSubmitting = false;
       notifyListeners();

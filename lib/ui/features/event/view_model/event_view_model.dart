@@ -186,7 +186,12 @@ class EventViewModel extends ChangeNotifier {
       AdditionalServiceTypeConverter.toStorageString(
           _selectedAdditionalServices);
 
-  // Load existing event for editing
+  /// Populates all form controllers and state fields from an existing
+  /// [WellnessEvent] for editing.
+  ///
+  /// **Commented-out fields** (coordinators, additionalServices) are legacy
+  /// fields retained for reference.  Do not delete them — they may be
+  /// reinstated in a future release.
   void loadExistingEvent(WellnessEvent? e) {
     if (e == null) return;
 
@@ -223,10 +228,15 @@ class EventViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Set time in controller (UI calls this).
-  // Uses fixed 24-hour HH:mm formatting for consistency with pickTime().
+    /// Formats [time] as `HH:mm` (24-hour) and writes it into [controller],
+  /// then notifies listeners.
+  ///
+  /// This is the ViewModel-layer counterpart of the picker: the UI calls
+  /// [showTimePicker] and passes the selected [TimeOfDay] here.
   void setTime(
-      TextEditingController controller, TimeOfDay time, BuildContext context) {
+    TextEditingController controller,
+    TimeOfDay time,
+  ) {
     controller.text = time.toHHmm();
     notifyListeners();
   }
@@ -237,28 +247,14 @@ class EventViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Pick time using TimePicker
-  Future<void> pickTime(
-      BuildContext context, TextEditingController controller) async {
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-      builder: (context, child) => MediaQuery(
-        // Force 24-hour clock regardless of device locale
-        data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-        child: child!,
-      ),
-    );
 
-    if (picked != null) {
-      // Only use context if the widget is still mounted
-      if (!context.mounted) return;
-      controller.text = picked.toHHmm();
-      notifyListeners();
-    }
-  }
-
-  // Build event model
+  /// Constructs a [WellnessEvent] from the current form controller values.
+  ///
+  /// All string inputs are sanitised with [_sanitizeString] (trims whitespace).
+  /// Integer fields default to `0` when unparseable via [_sanitizeInt].
+  ///
+  /// **Commented-out fields** (coordinators, additionalServices) are legacy
+  /// fields.  Do not delete — see [loadExistingEvent].
   WellnessEvent buildEvent(DateTime date) {
     return WellnessEvent(
       title: _sanitizeString(titleController.text),

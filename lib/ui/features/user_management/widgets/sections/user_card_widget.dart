@@ -11,72 +11,37 @@ _RoleStyle _roleStyle(String role) {
     case 'ADMIN':
       return const _RoleStyle(
         icon: Icons.admin_panel_settings_rounded,
-        gradient: LinearGradient(
-          colors: [Color(0xFF7C3AED), Color(0xFF201C58)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
         accentColor: Color(0xFF7C3AED),
       );
     case 'TOP MANAGEMENT':
       return const _RoleStyle(
         icon: Icons.business_center_rounded,
-        gradient: LinearGradient(
-          colors: [Color(0xFF1D4ED8), Color(0xFF1E3A8A)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
         accentColor: Color(0xFF1D4ED8),
       );
     case 'PROJECT MANAGER':
       return const _RoleStyle(
         icon: Icons.manage_accounts_rounded,
-        gradient: LinearGradient(
-          colors: [Color(0xFF0891B2), Color(0xFF164E63)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
         accentColor: Color(0xFF0891B2),
       );
     case 'PROJECT COORDINATOR':
       return const _RoleStyle(
         icon: Icons.event_rounded,
-        gradient: LinearGradient(
-          colors: [Color(0xFF059669), Color(0xFF064E3B)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
         accentColor: Color(0xFF059669),
       );
     case 'HEALTH PRACTITIONER':
     case 'NURSE':
       return const _RoleStyle(
         icon: Icons.medical_services_rounded,
-        gradient: LinearGradient(
-          colors: [Color(0xFFD97706), Color(0xFF92400E)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
         accentColor: Color(0xFFD97706),
       );
     case 'CLIENT':
       return const _RoleStyle(
         icon: Icons.person_rounded,
-        gradient: LinearGradient(
-          colors: [KenwellColors.primaryGreen, KenwellColors.primaryGreenDark],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
         accentColor: KenwellColors.primaryGreen,
       );
     default:
       return const _RoleStyle(
         icon: Icons.person_outline_rounded,
-        gradient: LinearGradient(
-          colors: [Color(0xFF6B7280), Color(0xFF374151)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
         accentColor: Color(0xFF6B7280),
       );
   }
@@ -85,11 +50,9 @@ _RoleStyle _roleStyle(String role) {
 class _RoleStyle {
   const _RoleStyle({
     required this.icon,
-    required this.gradient,
     required this.accentColor,
   });
   final IconData icon;
-  final Gradient gradient;
   final Color accentColor;
 }
 
@@ -159,41 +122,27 @@ class UserCardWidget extends StatelessWidget {
             }
           },
           child: Container(
-            margin: const EdgeInsets.only(bottom: 12),
+            margin: const EdgeInsets.only(bottom: 10),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: KenwellColors.secondaryNavyDark.withValues(alpha: 0.4),
+                width: 1.5,
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: rs.accentColor.withValues(alpha: 0.10),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
-                  blurRadius: 6,
-                  offset: const Offset(0, 1),
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: IntrinsicHeight(
-                child: Row(
-                  children: [
-                    // ── Left accent stripe ─────────────────────────────
-                    Container(
-                      width: 5,
-                      decoration: BoxDecoration(gradient: rs.gradient),
-                    ),
-
-                    // ── Card body ──────────────────────────────────────
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 13),
-                        child: Row(
-                          children: [
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              child: Row(
+                children: [
                             if (number != null) ...[
                               NumberBadge(number: number!),
                               const SizedBox(width: 10),
@@ -363,13 +312,8 @@ class UserCardWidget extends StatelessWidget {
                         ),
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+              );
   }
 }

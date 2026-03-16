@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 import 'package:kenwell_health_app/utils/health_metric_classification.dart';
 import 'dart:math';
 
@@ -116,17 +115,15 @@ class HealthMetricsViewModel extends ChangeNotifier {
   }
 
   // Submit health metrics results
-  Future<void> submitResults(
-    BuildContext context, {
+  Future<void> submitResults({
     required VoidCallback onNext,
-    // required VoidCallback onError,
+    void Function(String)? onValidationFailed,
+    void Function(String)? onSuccess,
+    void Function(String)? onError,
   }) async {
     // Validate form before submission
     if (!isFormValid) {
-      AppSnackbar.showWarning(
-        context,
-        'Please complete all required fields',
-      );
+      onValidationFailed?.call('Please complete all required fields');
       return;
     }
 
@@ -138,23 +135,12 @@ class HealthMetricsViewModel extends ChangeNotifier {
     try {
       await Future.delayed(const Duration(seconds: 1));
 
-      if (!context.mounted) return;
-
-      AppSnackbar.showSuccess(
-        context,
-        'Health metrics saved successfully',
-      );
+      onSuccess?.call('Health metrics saved successfully');
 
       // Call onNext callback after successful submission
       onNext();
     } catch (e) {
-      // Handle submission error
-      if (context.mounted) {
-        AppSnackbar.showError(
-          context,
-          'Error saving health metrics: $e',
-        );
-      }
+      onError?.call('Error saving health metrics: $e');
     } finally {
       _isSubmitting = false;
       notifyListeners();

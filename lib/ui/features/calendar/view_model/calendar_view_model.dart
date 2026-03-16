@@ -25,6 +25,7 @@ class CalendarViewModel extends ChangeNotifier {
   List<WellnessEvent> _events = [];
   bool _isLoading = false;
   String? _error;
+  bool _isOffline = false;
   final _role = '';
 
   // Public getters
@@ -33,6 +34,10 @@ class CalendarViewModel extends ChangeNotifier {
   List<WellnessEvent> get events => _events;
   bool get isLoading => _isLoading;
   String? get error => _error;
+
+  /// True when the last load fell back to (or failed to reach) local cache,
+  /// meaning the app may be showing stale data.
+  bool get isOffline => _isOffline;
   String get role => _role;
 
   /// Load events from the repository
@@ -40,19 +45,22 @@ class CalendarViewModel extends ChangeNotifier {
     // Set loading state
     _isLoading = true;
     _error = null;
+    _isOffline = false;
     // Notify listeners about state changes
     notifyListeners();
 
-    // Fetch events
+    // Fetch events – EventRepository handles the Firestore→local-cache fallback.
     try {
       final fetchedEvents = await _repository.fetchAllEvents();
       _events = fetchedEvents;
       // Don't set error if list is empty - that's a valid state
     } catch (e) {
-      // Only set error for actual failures (network, database errors, etc.)
-      _error = 'Failed to load events: $e';
-      _events = []; // Ensure events list is always initialized
-      debugPrint(_error);
+      // The repository already tried the local cache; this error means both
+      // Firestore AND the local cache failed (e.g. first launch with no data).
+      _error = 'Failed to load events. Check your connection and try again.';
+      _isOffline = true;
+      _events = [];
+      debugPrint('CalendarViewModel: $e');
     } finally {
       _isLoading = false;
       notifyListeners();

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 import '../../../../domain/constants/provinces.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_yes_no_question.dart';
@@ -116,7 +117,12 @@ class SurveyScreen extends StatelessWidget {
         const SizedBox(height: 24),
         KenwellFormNavigation(
           onPrevious: onPrevious,
-          onNext: () => vm.submitSurvey(context, onNext: onSubmit),
+          onNext: () => vm.submitSurvey(
+            onNext: onSubmit,
+            onValidationFailed: (msg) => AppSnackbar.showWarning(context, msg),
+            onSuccess: (msg) => AppSnackbar.showSuccess(context, msg),
+            onError: (msg) => AppSnackbar.showError(context, msg),
+          ),
           isNextEnabled: vm.isFormValid,
           nextLabel: 'Submit Survey',
         ),

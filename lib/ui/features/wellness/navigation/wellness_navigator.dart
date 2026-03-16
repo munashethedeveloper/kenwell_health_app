@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/features/consent_form/view_model/consent_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:provider/provider.dart';
-import '../../../../domain/enums/service_type.dart';
 import '../../../../domain/models/member.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../data/repositories_dcl/firestore_member_event_repository.dart';
@@ -16,19 +15,8 @@ import '../view_model/wellness_flow_view_model.dart';
 import '../../consent_form/widgets/consent_screen.dart';
 import '../../member/widgets/member_registration_screen.dart';
 import '../../member/view_model/member_registration_view_model.dart';
-import '../../health_risk_assessment/widgets/health_risk_assessment_screen.dart';
-import '../../health_risk_assessment/view_model/health_risk_assessment_view_model.dart';
-import '../../nurse_interventions/view_model/nurse_intervention_view_model.dart';
-import '../../hiv_test/widgets/hiv_test_screen.dart';
-import '../../hiv_test/view_model/hiv_test_view_model.dart';
-import '../../hiv_test_results/widgets/hiv_test_result_screen.dart';
-import '../../hiv_test_results/view_model/hiv_test_result_view_model.dart';
-import '../../tb_test/widgets/tb_testing_screen.dart';
-import '../../tb_test/view_model/tb_testing_view_model.dart';
-import '../../cancer/widgets/cancer_screen.dart';
-import '../../cancer/view_model/cancer_view_model.dart';
-import '../../survey/widgets/survey_screen.dart';
-import '../../survey/view_model/survey_view_model.dart';
+import 'screening_navigators/screening_navigator.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 /// Central navigation coordinator for the wellness flow
 /// Manages screen-to-screen navigation with proper data passing
@@ -36,6 +24,10 @@ class WellnessNavigator {
   final BuildContext context;
   final WellnessEvent event;
   final _memberEventRepository = FirestoreMemberEventRepository();
+
+  /// Delegates individual screening screen pushes to [ScreeningNavigator].
+  late final ScreeningNavigator _screeningNavigator =
+      ScreeningNavigator(context: context, event: event);
 
   WellnessNavigator({
     required this.context,
@@ -143,23 +135,14 @@ class WellnessNavigator {
                   if (context.mounted && memberVM.savedMember != null) {
                     Navigator.of(context).pop(memberVM.savedMember);
                   } else if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Registration failed. Please try again.'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
+                    AppSnackbar.showError(
+                        context, 'Registration failed. Please try again.');
                   }
                 } catch (e) {
                   debugPrint('Failed to save member: $e');
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                            'Failed to register member. Please try again.'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
+                    AppSnackbar.showError(
+                        context, 'Failed to register member. Please try again.');
                   }
                 }
               }
@@ -235,9 +218,7 @@ class WellnessNavigator {
                     if (memberId != null) {
                       await wellnessVM.loadAllCompletionFlags(
                           memberId, eventId);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Status refreshed.')),
-                      );
+                      AppSnackbar.showInfo(context, 'Status refreshed.');
                     }
                   },
                 ),
@@ -322,7 +303,7 @@ class WellnessNavigator {
                     }
                   case 'survey':
                     {
-                      final result = await _navigateToSurvey(member);
+                      final result = await _screeningNavigator.navigateToSurvey(member);
                       if (result == true) {
                         wellnessVM.markSurveyCompleted();
                       }
@@ -408,7 +389,7 @@ class WellnessNavigator {
           tbCompleted: wellnessVM.tbCompleted,
           cancerCompleted: wellnessVM.cancerCompleted,
           onHraTap: () async {
-            final result = await _navigateToHra(member);
+            final result = await _screeningNavigator.navigateToHra(member);
             if (!context.mounted) return;
             if (result == true) {
               wellnessVM.markHraCompleted();
@@ -421,7 +402,7 @@ class WellnessNavigator {
             }
           },
           onHctTap: () async {
-            final result = await _navigateToHctFlow(member);
+            final result = await _screeningNavigator.navigateToHctFlow(member);
             if (!context.mounted) return;
             if (result == true) {
               wellnessVM.markHctCompleted();
@@ -434,7 +415,7 @@ class WellnessNavigator {
             }
           },
           onTbTap: () async {
-            final result = await _navigateToTb(member);
+            final result = await _screeningNavigator.navigateToTb(member);
             if (!context.mounted) return;
             if (result == true) {
               wellnessVM.markTbCompleted();
@@ -446,7 +427,7 @@ class WellnessNavigator {
             }
           },
           onCancerTap: () async {
-            final result = await _navigateToCancer(member);
+            final result = await _screeningNavigator.navigateToCancer(member);
             if (!context.mounted) return;
             if (result == true) {
               wellnessVM.markCancerCompleted();
@@ -468,250 +449,6 @@ class WellnessNavigator {
               fontSize: 18,
             ),
             backgroundColor: const Color(0xFF201C58),
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// Navigate to HRA screening
-  Future<bool?> _navigateToHra(Member member) async {
-    final riskVM = PersonalRiskAssessmentViewModel();
-    final nurseVM = NurseInterventionViewModel();
-    riskVM.setMemberAndEventId(member.id, event.id);
-
-    // Calculate age from member DOB
-    int age = 0;
-    if (member.dateOfBirth != null) {
-      final dob = DateTime.tryParse(member.dateOfBirth!);
-      if (dob != null) {
-        final now = DateTime.now();
-        age = now.year - dob.year;
-        if (now.month < dob.month ||
-            (now.month == dob.month && now.day < dob.day)) {
-          age--;
-        }
-      }
-    }
-
-    return await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => MultiProvider(
-          providers: [
-            ChangeNotifierProvider.value(value: riskVM),
-            ChangeNotifierProvider.value(value: nurseVM),
-          ],
-          child: PersonalRiskAssessmentScreen(
-            onNext: () {
-              Navigator.of(context).pop(true);
-            },
-            onPrevious: () {
-              Navigator.of(context).pop();
-            },
-            viewModel: riskVM,
-            nurseViewModel: nurseVM,
-            isFemale: member.gender?.toLowerCase() == 'female',
-            age: age,
-            appBar: KenwellAppBar(
-              title: event.title,
-              subtitle: 'Health Risk Assessment Form',
-              titleColor: Colors.white,
-              titleStyle: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-              backgroundColor: const Color(0xFF201C58),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// Navigate to HIV test flow (test + results)
-  Future<bool?> _navigateToHctFlow(Member member) async {
-    final hivTestVM = HIVTestViewModel();
-    hivTestVM.setMemberAndEventId(member.id, event.id);
-
-    // First HIV test
-    final testCompleted = await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ChangeNotifierProvider.value(
-          value: hivTestVM,
-          child: HIVTestScreen(
-            onNext: () {
-              Navigator.of(context).pop(true);
-            },
-            onPrevious: () {
-              Navigator.of(context).pop();
-            },
-            appBar: KenwellAppBar(
-              title: event.title,
-              subtitle: 'HCT Form',
-              titleColor: Colors.white,
-              titleStyle: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-              backgroundColor: const Color(0xFF201C58),
-            ),
-          ),
-        ),
-      ),
-    );
-
-    // Then HIV results if test completed
-    if (testCompleted == true && context.mounted) {
-      final hivResultsVM = HIVTestResultViewModel();
-      hivResultsVM.initialiseWithEvent(event);
-      hivResultsVM.setMemberAndEventId(member.id, event.id);
-
-      await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ChangeNotifierProvider.value(
-            value: hivResultsVM,
-            child: HIVTestResultScreen(
-              onNext: () {
-                Navigator.of(context).pop(true);
-              },
-              onPrevious: () {
-                Navigator.of(context).pop();
-              },
-              appBar: KenwellAppBar(
-                title: event.title,
-                subtitle: 'HCT Results Form',
-                titleColor: Colors.white,
-                titleStyle: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-                backgroundColor: const Color(0xFF201C58),
-              ),
-            ),
-          ),
-        ),
-      );
-      return true;
-    }
-    return testCompleted;
-  }
-
-  /// Navigate to TB screening
-  Future<bool?> _navigateToTb(Member member) async {
-    final tbTestVM = TBTestingViewModel();
-    tbTestVM.initialiseWithEvent(event);
-    tbTestVM.setMemberAndEventId(member.id, event.id);
-
-    return await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ChangeNotifierProvider.value(
-          value: tbTestVM,
-          child: TBTestingScreen(
-            onNext: () {
-              Navigator.of(context).pop(true);
-            },
-            onPrevious: () {
-              Navigator.of(context).pop();
-            },
-            appBar: KenwellAppBar(
-              title: event.title,
-              subtitle: 'TB Form',
-              titleColor: Colors.white,
-              titleStyle: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-              backgroundColor: const Color(0xFF201C58),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// Navigate to Cancer screening
-  Future<bool?> _navigateToCancer(Member member) async {
-    final cancerVM = CancerScreeningViewModel();
-    cancerVM.setMemberAndEventId(member.id, event.id);
-
-    // Determine which cancer sub-types were requested for this event so the
-    // screen can show only the relevant fields.
-    final allServices =
-        ServiceTypeConverter.fromStorageString(event.servicesRequested);
-    final cancerSubTypes = allServices
-        .where((s) =>
-            s == ServiceType.breastScreening ||
-            s == ServiceType.papSmear ||
-            s == ServiceType.psa)
-        .map((s) => s.displayName)
-        .toSet();
-    cancerVM.setCancerSubTypes(cancerSubTypes);
-
-    return await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ChangeNotifierProvider.value(
-          value: cancerVM,
-          child: CancerScreen(
-            onNext: () {
-              Navigator.of(context).pop(true);
-            },
-            onPrevious: () {
-              Navigator.of(context).pop();
-            },
-            appBar: KenwellAppBar(
-              title: event.title,
-              subtitle: 'Cancer Screening Form',
-              titleColor: Colors.white,
-              titleStyle: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-              backgroundColor: const Color(0xFF201C58),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// Navigate to survey
-  Future<bool?> _navigateToSurvey(Member member) async {
-    final surveyVM = SurveyViewModel();
-    surveyVM.setMemberAndEventId(member.id, event.id);
-
-    return await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ChangeNotifierProvider.value(
-          value: surveyVM,
-          child: SurveyScreen(
-            onSubmit: () {
-              Navigator.of(context).pop(true);
-            },
-            onPrevious: () {
-              Navigator.of(context).pop();
-            },
-            appBar: KenwellAppBar(
-              title: event.title,
-              subtitle: 'Survey Form',
-              titleColor: Colors.white,
-              titleStyle: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-              backgroundColor: const Color(0xFF201C58),
-            ),
           ),
         ),
       ),

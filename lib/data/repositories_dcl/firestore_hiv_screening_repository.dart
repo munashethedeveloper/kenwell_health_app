@@ -85,18 +85,26 @@ class FirestoreHivScreeningRepository {
     }
   }
 
-  /// Get HIV screenings for a specific set of events (up to 30 IDs).
+  /// Get HIV screenings for a specific set of events.
+  /// Splits the event ID list into chunks of 30 to satisfy the Firestore
+  /// `whereIn` limit of 30 elements.
   Future<List<HivScreening>> getHivScreeningsByEvents(
       List<String> eventIds) async {
     if (eventIds.isEmpty) return [];
     try {
-      final querySnapshot = await _firestore
-          .collection(_collectionName)
-          .where('eventId', whereIn: eventIds)
-          .get();
-      return querySnapshot.docs
-          .map((doc) => HivScreening.fromMap(doc.data()))
-          .toList();
+      const chunkSize = 30;
+      final results = <HivScreening>[];
+      for (var i = 0; i < eventIds.length; i += chunkSize) {
+        final chunk = eventIds.sublist(
+            i, (i + chunkSize).clamp(0, eventIds.length));
+        final querySnapshot = await _firestore
+            .collection(_collectionName)
+            .where('eventId', whereIn: chunk)
+            .get();
+        results.addAll(
+            querySnapshot.docs.map((doc) => HivScreening.fromMap(doc.data())));
+      }
+      return results;
     } catch (e) {
       AppLogger.error('Failed to get HIV screenings by events', e);
       rethrow;

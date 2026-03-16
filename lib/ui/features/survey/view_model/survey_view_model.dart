@@ -50,12 +50,14 @@ class SurveyViewModel extends ChangeNotifier {
   }
 
   /// Submits the survey and triggers workflow continuation
-  Future<void> submitSurvey(BuildContext context,
-      {required VoidCallback onNext}) async {
+  Future<void> submitSurvey({
+    required VoidCallback onNext,
+    void Function(String)? onValidationFailed,
+    void Function(String)? onSuccess,
+    void Function(String)? onError,
+  }) async {
     if (!isFormValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please complete all fields')),
-      );
+      onValidationFailed?.call('Please complete all fields');
       return;
     }
 
@@ -71,20 +73,11 @@ class SurveyViewModel extends ChangeNotifier {
       AppLogger.info('Survey saved successfully');
     } catch (e) {
       AppLogger.error('Failed to save survey', e);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Failed to save survey. Please try again.')),
-        );
-      }
+      onError?.call('Failed to save survey. Please try again.');
       return;
     }
 
-    if (!context.mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Survey submitted successfully!')),
-    );
+    onSuccess?.call('Survey submitted successfully!');
 
     await Future.delayed(const Duration(milliseconds: 800));
     onNext();

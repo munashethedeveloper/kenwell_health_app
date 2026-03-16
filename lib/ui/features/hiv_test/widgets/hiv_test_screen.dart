@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/custom_yes_no_question.dart';
@@ -150,7 +151,12 @@ class HIVTestScreen extends StatelessWidget {
         // Navigation Buttons
         KenwellFormNavigation(
           onPrevious: onPrevious,
-          onNext: () => viewModel.submitHIVTest(context, onNext: onNext),
+          onNext: () => viewModel.submitHIVTest(
+            onNext: onNext,
+            onValidationFailed: (msg) => AppSnackbar.showWarning(context, msg),
+            onSuccess: (msg) => AppSnackbar.showSuccess(context, msg),
+            onError: (msg) => AppSnackbar.showError(context, msg),
+          ),
           isNextEnabled: viewModel.isFormValid && !viewModel.isSubmitting,
           isNextBusy: viewModel.isSubmitting,
         ),
