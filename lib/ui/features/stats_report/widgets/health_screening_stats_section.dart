@@ -191,7 +191,7 @@ class _HealthScreeningStatsSectionState
     int symptomatic = 0, referred = 0;
 
     for (final s in list) {
-      final papResult = s.papSmearResult?.toLowerCase();
+      final papResult = s.papSmearResults?.toLowerCase();
       if (s.papSmearSpecimenCollected?.toLowerCase() == 'yes') papCollected++;
       if (papResult != null &&
           (papResult.contains('positive') || papResult.contains('abnormal'))) {
@@ -204,10 +204,9 @@ class _HealthScreeningStatsSectionState
       }
       final symptoms = [
         s.breastLightExamFindings,
-        s.breastLightExamLymph,
       ].where((f) => f != null && f.isNotEmpty);
       if (symptoms.isNotEmpty) symptomatic++;
-      if (s.referred?.toLowerCase() == 'yes') referred++;
+      if (s.nursingReferral != null && s.nursingReferral!.isNotEmpty) referred++;
     }
 
     return CancerStats(
@@ -265,9 +264,10 @@ class _HealthScreeningStatsSectionState
     int firstTimeTesters = 0, highRisk = 0, knownPositive = 0;
 
     for (final s in list) {
-      if (s.testedBefore?.toLowerCase() == 'no') firstTimeTesters++;
-      if (s.riskLevel?.toLowerCase() == 'high') highRisk++;
-      if (s.knownStatus?.toLowerCase() == 'positive') knownPositive++;
+      if (s.firstHivTest?.toLowerCase() == 'yes') firstTimeTesters++;
+      if (s.sharedNeedles?.toLowerCase() == 'yes' ||
+          s.unprotectedSex?.toLowerCase() == 'yes') highRisk++;
+      if (s.lastTestResult?.toLowerCase() == 'positive') knownPositive++;
     }
 
     return HctStats(
