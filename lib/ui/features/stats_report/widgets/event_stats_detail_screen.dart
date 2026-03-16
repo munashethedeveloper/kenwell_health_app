@@ -9,14 +9,25 @@ import '../../../shared/ui/form/kenwell_form_card.dart';
 import 'sections/stats_metric_card.dart';
 import 'health_screening_stats_section.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
+import '../services/event_report_exporter.dart';
 
-class EventStatsDetailScreen extends StatelessWidget {
+class EventStatsDetailScreen extends StatefulWidget {
   final WellnessEvent event;
 
   const EventStatsDetailScreen({
     super.key,
     required this.event,
   });
+
+  @override
+  State<EventStatsDetailScreen> createState() =>
+      _EventStatsDetailScreenState();
+}
+
+class _EventStatsDetailScreenState extends State<EventStatsDetailScreen> {
+  bool _isExporting = false;
+
+  WellnessEvent get event => widget.event;
 
   @override
   Widget build(BuildContext context) {
@@ -239,9 +250,20 @@ class EventStatsDetailScreen extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
-                      onPressed: () => _showExportSheet(context),
-                      icon: const Icon(Icons.download),
-                      label: const Text('Export Event Report'),
+                      onPressed:
+                          _isExporting ? null : () => _exportToExcel(context),
+                      icon: _isExporting
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Icon(Icons.download),
+                      label: Text(
+                          _isExporting ? 'Exporting…' : 'Export Event Report'),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.all(16),
                         shape: RoundedRectangleBorder(
@@ -260,43 +282,22 @@ class EventStatsDetailScreen extends StatelessWidget {
     );
   }
 
-  void _showExportSheet(BuildContext context) {
-    final theme = Theme.of(context);
-    showModalBottomSheet(
-      context: context,
-      showDragHandle: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (ctx) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: Icon(Icons.table_chart, color: theme.primaryColor),
-                title: Text('Export as CSV', style: theme.textTheme.bodyMedium),
-                subtitle: const Text('Export event data as CSV file'),
-                onTap: () {
-                  Navigator.of(ctx).pop();
-                  AppSnackbar.showInfo(context, 'CSV export coming soon');
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.picture_as_pdf, color: Colors.red),
-                title: Text('Export as PDF', style: theme.textTheme.bodyMedium),
-                subtitle: const Text('Export event report as PDF'),
-                onTap: () {
-                  Navigator.of(ctx).pop();
-                  AppSnackbar.showInfo(context, 'PDF export coming soon');
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+  Future<void> _exportToExcel(BuildContext context) async {
+    setState(() => _isExporting = true);
+    try {
+      final exporter = EventReportExporter();
+      final filePath = await exporter.export(event);
+      if (!mounted) return;
+      AppSnackbar.showSuccess(
+        context,
+        'Report saved: ${filePath.split('/').last}',
+      );
+    } catch (e) {
+      if (!mounted) return;
+      AppSnackbar.showError(context, 'Export failed: $e');
+    } finally {
+      if (mounted) setState(() => _isExporting = false);
+    }
   }
 
   Widget _buildDetailRow(String label, String value, ThemeData theme) {
