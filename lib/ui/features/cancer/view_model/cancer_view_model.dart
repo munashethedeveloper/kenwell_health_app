@@ -208,6 +208,40 @@ class CancerScreeningViewModel extends ChangeNotifier {
 
   // --- Risk classification ---
 
+  /// Number of symptom questions answered 'Yes'.
+  int get _symptomYesCount =>
+      [breastLump, abnormalBleeding, urinaryDifficulty, weightLoss, persistentPain]
+          .where((v) => v == 'Yes')
+          .length;
+
+  /// True when any medical history flag is set.
+  bool get _hasMedicalHistory =>
+      previousCancerDiagnosis == 'Yes' || familyHistoryOfCancer == 'Yes';
+
+  /// True when any chronic condition (excluding 'None') is selected.
+  bool get _hasChronicConditions =>
+      chronicConditions.entries.any((e) => e.key != 'None' && e.value);
+
+  /// True when exam findings indicate an abnormal result.
+  bool get _hasAbnormalExam =>
+      breastLightExamFindings == 'Abnormal' ||
+      papSmearResults == 'Abnormal' ||
+      psaResults == 'Abnormal';
+
+  /// True when the patient is at high risk and should be auto-referred:
+  /// - More than 3 symptom yeses, OR
+  /// - Any exam finding is abnormal.
+  bool get isHighRisk => _symptomYesCount > 3 || _hasAbnormalExam;
+
+  /// True when any at-risk indicator is present (kept for submit logic).
+  bool get isAtRisk => isHighRisk || isCaution;
+
+  /// True when caution flags are present but the patient is not high risk.
+  /// Nurse uses clinical discretion to classify as Healthy or At Risk.
+  bool get isCaution =>
+      !isHighRisk &&
+      (_hasMedicalHistory || _hasChronicConditions || _symptomYesCount >= 1);
+
   /// True when all relevant exam findings are entered and none are abnormal.
   bool get isHealthy {
     // Determine which finding fields are relevant based on the consented sub-types
@@ -226,8 +260,11 @@ class CancerScreeningViewModel extends ChangeNotifier {
   }
 
   /// Automatically set the nursing referral based on current finding state.
+  /// - High risk (4+ symptom yeses or abnormal exam): auto-referred.
+  /// - Healthy (all normal): auto-set to not referred.
+  /// - Caution: leave selection unchanged so nurse can decide.
   void _autoApplyReferral() {
-    if (isAtRisk) {
+    if (isHighRisk) {
       if (nursingReferralSelection == null ||
           nursingReferralSelection ==
               NursingReferralOption.patientNotReferred) {
@@ -237,6 +274,7 @@ class CancerScreeningViewModel extends ChangeNotifier {
     } else if (isHealthy) {
       nursingReferralSelection = NursingReferralOption.patientNotReferred;
     }
+    // isCaution: no auto-change, nurse decides.
   }
 
   // --- Nurse / healthcare-practitioner details ---

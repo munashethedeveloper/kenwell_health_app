@@ -35,9 +35,8 @@ class HIVTestResultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<HIVTestResultViewModel>();
 
-    // Auto-refer based on the screening result.
-    // This mirrors the logic in setScreeningResult() for the case where
-    // the screen is first built after the VM already has a result selected.
+    // Auto-refer based on the screening result and initial-assessment risk flags.
+    // isAtRisk covers: positive result, window period + urgent follow-up, not committed.
     if (viewModel.isAtRisk) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (viewModel.nursingReferralSelection == null ||
@@ -56,6 +55,7 @@ class HIVTestResultScreen extends StatelessWidget {
         }
       });
     }
+    // isCaution: no auto-change, nurse applies clinical discretion.
 
     // Build the scaffold
     return Scaffold(
@@ -133,15 +133,18 @@ class HIVTestResultScreen extends StatelessWidget {
                     // Initial Assessment
                     _buildInitialAssessment(viewModel),
                     const SizedBox(height: 24),
-                    // Nursing Referral — always shown, automatically locked
-                    // to Healthy (Negative result) or At Risk (Positive result).
+                    // Nursing Referral — outcome is determined from the test
+                    // result and initial assessment:
+                    // - Positive result or urgent follow-up or not committed to
+                    //   change → locked At Risk.
+                    // - Committed to change (caution) → nurse uses discretion.
+                    // - Healthy (negative, no flags) → locked Healthy.
                     NursingReferralStatusCard(
                       title: 'Nursing Referrals',
                       selectedValue: viewModel.nursingReferralSelection,
                       onChanged: viewModel.setNursingReferralSelection,
-                      // HCT has no caution state — outcome is always
-                      // automatically determined from the test result.
-                      readOnly: true,
+                      isCaution: viewModel.isCaution,
+                      readOnly: viewModel.isAtRisk || viewModel.isHealthy,
                     ),
                     const SizedBox(height: 24),
                     // Nurse Details Card
