@@ -87,7 +87,75 @@ class EventRepository {
     }
   }
 
+  /// Returns a real-time stream of all events from Firestore.
+  ///
+  /// Each emission replaces the previous list. The stream never completes
+  /// until the caller cancels. Errors are swallowed and yield an empty list.
+  Stream<List<WellnessEvent>> watchAllEvents() {
+    return _firestore
+        .collection(_collectionName)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => _mapFirestoreToDomain(doc.id, doc.data()))
+            .toList())
+        .handleError((Object err) {
+      debugPrint('EventRepository.watchAllEvents: error – $err');
+      return <WellnessEvent>[];
+    });
+  }
+
+  /// Returns a real-time stream for a single event document.
+  ///
+  /// Emits `null` when the document is deleted. Errors are logged and the
+  /// stream continues (yielding `null`).
+  Stream<WellnessEvent?> watchEventById(String id) {
+    return _firestore
+        .collection(_collectionName)
+        .doc(id)
+        .snapshots()
+        .map((doc) =>
+            doc.exists ? _mapFirestoreToDomain(doc.id, doc.data()!) : null)
+        .handleError((Object err) {
+      debugPrint('EventRepository.watchEventById($id): error – $err');
+      return null;
+    });
+  }
+
   // ── Write operations ───────────────────────────────────────────────────────
+
+  /// Atomically increments the [screenedCount] for an event by 1.
+  ///
+  /// Uses Firestore's [FieldValue.increment] to avoid read-modify-write races
+  /// when multiple devices are processing members simultaneously.
+  /// Also updates the local cache with the latest value.
+  Future<void> incrementScreenedCount(String eventId) async {
+    try {
+      await _firestore
+          .collection(_collectionName)
+          .doc(eventId)
+          .update({'screenedCount': FieldValue.increment(1)});
+      debugPrint(
+          'EventRepository: incremented screenedCount for event $eventId');
+
+      // Refresh local cache so the stats widget immediately reflects the new
+      // count without requiring a full re-fetch.
+      try {
+        final doc =
+            await _firestore.collection(_collectionName).doc(eventId).get();
+        if (doc.exists) {
+          final updated = _mapFirestoreToDomain(doc.id, doc.data()!);
+          await _localDb.upsertEvent(_mapDomainToEntity(updated));
+        }
+      } catch (_) {
+        // Non-fatal: local cache refresh is best-effort.
+      }
+    } catch (e, stackTrace) {
+      debugPrint(
+          'EventRepository: ERROR incrementing screenedCount for $eventId – $e');
+      debugPrintStack(stackTrace: stackTrace);
+      rethrow;
+    }
+  }
 
   Future<void> addEvent(WellnessEvent event) => upsertEvent(event);
 

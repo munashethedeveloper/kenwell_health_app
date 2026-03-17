@@ -3,6 +3,7 @@ import 'package:kenwell_health_app/domain/enums/service_type.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/features/consent_form/view_model/consent_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_checkbox_group.dart';
+import 'package:kenwell_health_app/utils/input_formatters.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_bullet_list.dart';
@@ -11,6 +12,7 @@ import '../../../shared/ui/form/kenwell_date_field.dart';
 import '../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../shared/ui/form/kenwell_form_page.dart';
 import '../../../shared/ui/form/kenwell_form_step.dart';
+import '../../../shared/ui/form/kenwell_form_styles.dart';
 import '../../../shared/ui/form/kenwell_signature_actions.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../../profile/view_model/profile_view_model.dart';
@@ -77,12 +79,19 @@ class ConsentScreen extends StatelessWidget {
           step.builder(context),
           SizedBox(height: step.spacingAfter),
         ],
-        // Signature actions
+        // Patient signature
         KenwellSignatureActions(
           controller: vm.signatureController,
           onClear: vm.clearSignature,
-          navigation: _buildActionButtons(context, vm),
           title: 'Patient Signature',
+        ),
+        const SizedBox(height: 24),
+        // Healthcare practitioner signature + Submit button
+        KenwellSignatureActions(
+          controller: vm.hpSignatureController,
+          onClear: vm.clearHpSignature,
+          navigation: _buildActionButtons(context, vm),
+          title: 'Healthcare Practitioner Signature',
         ),
       ],
     );
@@ -163,7 +172,7 @@ class ConsentScreen extends StatelessWidget {
                 readOnly: true, // <-- make read-only
               ),
               const SizedBox(height: 16),
-              // Healthcare practitioner field
+              // Healthcare practitioner name field
               KenwellTextField(
                 label: 'Name of Healthcare Practitioner',
                 enabled: false,
@@ -172,6 +181,34 @@ class ConsentScreen extends StatelessWidget {
                 validator: (val) => (val == null || val.isEmpty)
                     ? 'Please enter Name of Healthcare Practitioner'
                     : null,
+              ),
+              const SizedBox(height: 16),
+              // SANC Number
+              KenwellTextField(
+                label: 'SANC No',
+                hintText: 'Enter SANC number',
+                controller: vm.sancNumberController,
+                decoration: KenwellFormStyles.decoration(
+                  label: 'SANC No',
+                  hint: 'Enter SANC number',
+                ),
+                inputFormatters: AppTextInputFormatters.numbersOnly(),
+                validator: (val) => (val == null || val.isEmpty)
+                    ? 'Please enter SANC No'
+                    : null,
+              ),
+              const SizedBox(height: 16),
+              // Rank
+              KenwellTextField(
+                label: 'Rank',
+                hintText: 'Enter rank',
+                controller: vm.rankController,
+                decoration: KenwellFormStyles.decoration(
+                  label: 'Rank',
+                  hint: 'Enter rank',
+                ),
+                validator: (val) =>
+                    (val == null || val.isEmpty) ? 'Please enter Rank' : null,
               ),
             ],
           ),

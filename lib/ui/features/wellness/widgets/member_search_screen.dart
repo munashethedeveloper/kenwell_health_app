@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/domain/models/member.dart';
-import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_secondary_button.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
@@ -88,64 +87,60 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const KenwellAppBar(
-        title: 'KenWell365',
-        automaticallyImplyLeading: false,
-      ),
-      body: Column(
-        children: [
-          const KenwellGradientHeader(
-            label: 'MEMBER',
-            title: 'Member\nSearch',
-            subtitle: "Enter the member's ID or Passport number to search.",
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: ListenableBuilder(
-                listenable: _viewModel,
-                builder: (context, _) => Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const SizedBox(height: 8),
-                    _SearchInputCard(
-                      controller: _idController,
-                      isSearching: _viewModel.isSearching,
-                      onSearch: _handleSearch,
-                    ),
-                    const SizedBox(height: 8),
-                    const Divider(
-                      color: KenwellColors.primaryGreen,
-                      height: 24,
-                      thickness: 1,
-                      indent: 16,
-                      endIndent: 16,
+    // The outer Scaffold (in WellnessNavigator) already provides the app bar.
+    // Return only body content to avoid a duplicate KenWell365 app bar.
+    return Column(
+      children: [
+        const KenwellGradientHeader(
+          label: 'MEMBER',
+          title: 'Member\nSearch',
+          subtitle: "Enter the member's ID or Passport number to search.",
+        ),
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: ListenableBuilder(
+              listenable: _viewModel,
+              builder: (context, _) => Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 8),
+                  _SearchInputCard(
+                    controller: _idController,
+                    isSearching: _viewModel.isSearching,
+                    onSearch: _handleSearch,
+                  ),
+                  const SizedBox(height: 8),
+                  const Divider(
+                    color: KenwellColors.primaryGreen,
+                    height: 24,
+                    thickness: 1,
+                    indent: 16,
+                    endIndent: 16,
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Not found card
+                  if (_viewModel.memberFound == false) ...[
+                    _MemberNotFoundCard(onRegister: _proceedToRegistration),
+                    const SizedBox(height: 16),
+                  ],
+
+                  // Found card
+                  if (_viewModel.memberFound == true &&
+                      _viewModel.foundMemberName != null) ...[
+                    _MemberFoundCard(
+                      memberName: _viewModel.foundMemberName!,
+                      onContinue: _proceedWithFoundMember,
                     ),
                     const SizedBox(height: 16),
-
-                    // Not found card
-                    if (_viewModel.memberFound == false) ...[
-                      _MemberNotFoundCard(onRegister: _proceedToRegistration),
-                      const SizedBox(height: 16),
-                    ],
-
-                    // Found card
-                    if (_viewModel.memberFound == true &&
-                        _viewModel.foundMemberName != null) ...[
-                      _MemberFoundCard(
-                        memberName: _viewModel.foundMemberName!,
-                        onContinue: _proceedWithFoundMember,
-                      ),
-                      const SizedBox(height: 16),
-                    ],
                   ],
-                ),
+                ],
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

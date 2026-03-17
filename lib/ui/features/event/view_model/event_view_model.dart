@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../domain/models/wellness_event.dart';
@@ -12,12 +13,28 @@ class EventViewModel extends ChangeNotifier {
   EventViewModel({EventRepository? repository})
       : _repository = repository ?? EventRepository() {
     _initializationFuture = _loadPersistedEvents();
+    // Subscribe to Firestore real-time updates so that changes made from other
+    // devices (e.g. incremented screenedCount) are reflected without requiring
+    // a manual refresh.
+    _eventsSubscription = _repository.watchAllEvents().listen(
+      (updatedEvents) {
+        _events
+          ..clear()
+          ..addAll(updatedEvents);
+        notifyListeners();
+      },
+      onError: (Object err) {
+        debugPrint('EventViewModel: watchAllEvents stream error – $err');
+      },
+    );
   }
 
   // Repository
   final EventRepository _repository;
   // Initialization Future
   late final Future<void> _initializationFuture;
+  // Real-time subscription to the events collection.
+  StreamSubscription<List<WellnessEvent>>? _eventsSubscription;
 
   // Controllers
   final titleController = TextEditingController();
@@ -488,6 +505,7 @@ class EventViewModel extends ChangeNotifier {
     endTimeController.dispose();
     strikeDownTimeController.dispose();
     dateController.dispose();
+    _eventsSubscription?.cancel();
     super.dispose();
   }
 

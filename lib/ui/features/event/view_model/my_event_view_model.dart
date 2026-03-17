@@ -41,6 +41,10 @@ class MyEventViewModel extends ChangeNotifier {
   String? _startingEventId;
   bool _isTransitioning = false;
 
+  /// Stream subscription that watches the current user's `user_events`
+  /// documents in Firestore and reloads the event list on any change.
+  StreamSubscription<List<Map<String, dynamic>>>? _userEventsSubscription;
+
   // ── Getters ───────────────────────────────────────────────────────────────
 
   List<WellnessEvent> get userEvents => List.unmodifiable(_userEvents);
@@ -48,12 +52,10 @@ class MyEventViewModel extends ChangeNotifier {
 
   // ── Data loading ──────────────────────────────────────────────────────────
 
-  /// Fetches the events assigned to the current user.
+  /// Fetches the events assigned to the current user and then subscribes to
+  /// real-time Firestore updates so the list stays up-to-date automatically.
   ///
-  /// Two-step:
-  ///   1. Load `user_events` mapping documents to obtain event IDs.
-  ///   2. Fetch each [WellnessEvent] in parallel (failed individual fetches
-  ///      are silently dropped).
+  /// Safe to call multiple times — only the most recent subscription is kept.
   Future<void> loadUserEvents() async {
     final user = await _authService.getCurrentUser();
     if (user == null) {
@@ -62,7 +64,25 @@ class MyEventViewModel extends ChangeNotifier {
       return;
     }
 
-    final userEventMaps = await _userEventRepo.fetchUserEvents(user.id);
+    // Perform an initial fetch so the UI populates without waiting for the
+    // first stream emission.
+    await _fetchAndUpdateEvents(user.id);
+
+    // Cancel any existing subscription before setting up a new one.
+    await _userEventsSubscription?.cancel();
+    _userEventsSubscription =
+        _userEventRepo.watchUserEvents(user.id).listen((maps) async {
+      // Re-fetch the WellnessEvent details whenever assignments change.
+      await _fetchAndUpdateEvents(user.id);
+    }, onError: (Object err) {
+      debugPrint('MyEventViewModel.watchUserEvents: stream error – $err');
+    });
+  }
+
+  /// Resolves event IDs from [userId]'s `user_events` mapping documents and
+  /// fetches the full [WellnessEvent] for each, then notifies listeners.
+  Future<void> _fetchAndUpdateEvents(String userId) async {
+    final userEventMaps = await _userEventRepo.fetchUserEvents(userId);
 
     final eventIds = userEventMaps
         .map((m) => m['eventId'] as String?)
@@ -83,6 +103,12 @@ class MyEventViewModel extends ChangeNotifier {
 
     _userEvents = results.whereType<WellnessEvent>().toList();
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _userEventsSubscription?.cancel();
+    super.dispose();
   }
 
   // ── Auto-transition ───────────────────────────────────────────────────────

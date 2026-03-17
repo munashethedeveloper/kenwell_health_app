@@ -10,7 +10,13 @@ class Consent {
   final bool hct; // HCT screening
   final bool tb; // TB screening
   final bool cancer; // Cancer screening
-  final String? signatureData; // Base64 encoded signature image
+  final String? signatureData; // Base64 encoded patient signature image
+
+  // Healthcare practitioner details
+  final String? sancNumber;
+  final String? rank;
+  final String? hpSignatureData; // Base64 encoded HP signature image
+
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -27,6 +33,9 @@ class Consent {
     required this.tb,
     this.cancer = false,
     this.signatureData,
+    this.sancNumber,
+    this.rank,
+    this.hpSignatureData,
     required this.createdAt,
     this.updatedAt,
   });
@@ -46,6 +55,9 @@ class Consent {
       'tb': tb,
       'cancer': cancer,
       'signatureData': signatureData,
+      'sancNumber': sancNumber,
+      'rank': rank,
+      'hpSignatureData': hpSignatureData,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
     };
@@ -66,6 +78,9 @@ class Consent {
       tb: map['tb'] as bool,
       cancer: (map['cancer'] as bool?) ?? false,
       signatureData: map['signatureData'] as String?,
+      sancNumber: map['sancNumber'] as String?,
+      rank: map['rank'] as String?,
+      hpSignatureData: map['hpSignatureData'] as String?,
       createdAt: DateTime.parse(map['createdAt'] as String),
       updatedAt: map['updatedAt'] != null
           ? DateTime.parse(map['updatedAt'] as String)
@@ -87,6 +102,9 @@ class Consent {
     bool? tb,
     bool? cancer,
     String? signatureData,
+    String? sancNumber,
+    String? rank,
+    String? hpSignatureData,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -103,6 +121,9 @@ class Consent {
       tb: tb ?? this.tb,
       cancer: cancer ?? this.cancer,
       signatureData: signatureData ?? this.signatureData,
+      sancNumber: sancNumber ?? this.sancNumber,
+      rank: rank ?? this.rank,
+      hpSignatureData: hpSignatureData ?? this.hpSignatureData,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

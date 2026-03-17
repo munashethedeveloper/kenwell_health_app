@@ -28,6 +28,13 @@ class WellnessFlowViewModel extends ChangeNotifier {
   bool tbEnabled = false;
   bool cancerEnabled = false;
 
+  // Healthcare-practitioner details from the consent form.
+  // These are stored here after consent submission so that health-screening
+  // navigators can pre-fill SANC, rank, and the HP signature automatically.
+  String? consentSancNumber;
+  String? consentRank;
+  String? consentHpSignatureBase64;
+
   /// Loads all completion flags (consent, HRA, HCT, TB, Cancer, survey) for
   /// the given member and event from Firestore.
   ///
@@ -62,6 +69,9 @@ class WellnessFlowViewModel extends ChangeNotifier {
     screeningsCompleted = false;
     screeningsInProgress = false;
     surveyCompleted = false;
+    consentSancNumber = null;
+    consentRank = null;
+    consentHpSignatureBase64 = null;
 
     // Consent — also restore which screenings were enabled from the saved record
     try {
@@ -79,6 +89,10 @@ class WellnessFlowViewModel extends ChangeNotifier {
         hctEnabled = consent.hct;
         tbEnabled = consent.tb;
         cancerEnabled = consent.cancer;
+        // Restore HP practitioner details for auto-filling health screenings.
+        consentSancNumber = consent.sancNumber;
+        consentRank = consent.rank;
+        consentHpSignatureBase64 = consent.hpSignatureData;
       }
     } catch (e) {
       debugPrint('Error loading consent completion: $e');
@@ -144,6 +158,8 @@ class WellnessFlowViewModel extends ChangeNotifier {
     // Determine screeningsCompleted / screeningsInProgress based on which
     // screenings were consented to (now correctly loaded from Firestore above).
     final anyEnabled = hraEnabled || hctEnabled || tbEnabled || cancerEnabled;
+    final anyCompleted =
+        hraCompleted || hctCompleted || tbCompleted || cancerCompleted;
     if (anyEnabled) {
       final allConsentedScreeningsCompleted = (!hraEnabled || hraCompleted) &&
           (!hctEnabled || hctCompleted) &&
@@ -152,9 +168,14 @@ class WellnessFlowViewModel extends ChangeNotifier {
       if (allConsentedScreeningsCompleted) {
         screeningsCompleted = true;
         screeningsInProgress = false;
-      } else {
+      } else if (anyCompleted) {
+        // At least one screening done but not all — show as "In Progress"
         screeningsCompleted = false;
         screeningsInProgress = true;
+      } else {
+        // Consent done, screenings enabled, but none started yet
+        screeningsCompleted = false;
+        screeningsInProgress = false;
       }
     } else {
       // No consent found (or no screenings selected): leave as Not Completed.

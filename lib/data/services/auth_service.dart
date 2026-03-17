@@ -44,11 +44,16 @@ class AuthService {
     );
     if (firebaseUser == null) return null;
 
-    // Store user in local DB with Firebase UID
+    // Store user in local DB with Firebase UID.
+    // NOTE: We deliberately do NOT store the plain-text password locally.
+    // Firebase Auth is the sole source of truth for authentication.  The local
+    // Drift DB is used only as an offline profile cache (role, name, etc.).
+    // Storing a non-empty placeholder prevents schema constraint failures while
+    // ensuring the raw password never resides in the on-device SQLite file.
     final newUser = await _database.createUser(
       id: firebaseUser.id, // Firebase UID
       email: sanitizedEmail,
-      password: sanitizedPassword,
+      password: '***', // placeholder — never used for auth
       role: sanitizedRole,
       phoneNumber: sanitizedPhone,
       firstName: sanitizedFirstName,
@@ -71,23 +76,26 @@ class AuthService {
     var user = await _database.getUserById(firebaseUser.id);
 
     if (user == null) {
-      // User doesn't exist in local DB, create them
+      // User doesn't exist in local DB, create them.
+      // Do NOT store the plain-text password; Firebase Auth is the source of
+      // truth.  A placeholder is stored to satisfy the NOT-NULL schema
+      // constraint on the password column.
       user = await _database.createUser(
         id: firebaseUser.id,
         email: firebaseUser.email,
-        password: sanitizedPassword, // Store the password that worked
+        password: '***', // placeholder — never used for auth
         role: firebaseUser.role,
         phoneNumber: firebaseUser.phoneNumber,
         firstName: firebaseUser.firstName,
         lastName: firebaseUser.lastName,
       );
     } else {
-      // User exists in local DB - sync their password with what they just used
-      // This ensures local DB password stays in sync with Firebase Auth
+      // User already exists locally — keep their profile data up to date but
+      // never update the password field from the incoming plaintext value.
       await _database.updateUser(
         id: user.id,
         email: user.email,
-        password: sanitizedPassword, // Update to the password that worked
+        password: user.password, // keep existing placeholder unchanged
         role: user.role,
         phoneNumber: user.phoneNumber,
         firstName: user.firstName,
@@ -146,10 +154,10 @@ class AuthService {
     required String lastName,
   }) async {
     final sanitizedEmail = email.trim().toLowerCase();
-    final sanitizedPassword = password.trim();
+    // Never store the incoming plain-text password locally; keep any
+    // existing placeholder (or write a new one if this is a first save).
     final sanitizedRole = role.trim();
     final sanitizedPhone = phoneNumber.trim();
-    // final sanitizedUsername = username.trim();
     final sanitizedFirstName = firstName.trim();
     final sanitizedLastName = lastName.trim();
 
@@ -158,13 +166,17 @@ class AuthService {
       throw StateError('Email already registered');
     }
 
+    // Preserve the existing password placeholder (if any) so we never
+    // overwrite it with a plain-text value.
+    final existingUser = await _database.getUserById(id);
+    final storedPassword = existingUser?.password ?? '***';
+
     final updated = await _database.updateUser(
       id: id,
       email: sanitizedEmail,
-      password: sanitizedPassword,
+      password: storedPassword,
       role: sanitizedRole,
       phoneNumber: sanitizedPhone,
-      // username: sanitizedUsername,
       firstName: sanitizedFirstName,
       lastName: sanitizedLastName,
     );
@@ -173,10 +185,9 @@ class AuthService {
         await _database.createUser(
           id: id,
           email: sanitizedEmail,
-          password: sanitizedPassword,
+          password: storedPassword,
           role: sanitizedRole,
           phoneNumber: sanitizedPhone,
-          //    username: sanitizedUsername,
           firstName: sanitizedFirstName,
           lastName: sanitizedLastName,
         );
@@ -225,21 +236,19 @@ class AuthService {
     }
   }
 
-  Future<bool> resetPassword(String userId, String newPassword) async {
+  /// Admin function: Reset user password by sending them a reset email.
+  ///
+  /// This does NOT set a specific password in the local database.
+  /// It delegates entirely to Firebase Auth (password reset email).
+  Future<bool> resetPassword(String userId) async {
+    // Plain-text passwords are never stored locally.  Delegate to Firebase
+    // Auth to handle the actual password change securely.
     try {
       final user = await _database.getUserById(userId);
       if (user == null) return false;
-
-      await _database.updateUser(
-        id: userId,
-        email: user.email,
-        password: newPassword,
-        role: user.role,
-        phoneNumber: user.phoneNumber,
-        firstName: user.firstName,
-        lastName: user.lastName,
-      );
-      return true;
+      // Send a password-reset email via Firebase Auth so the user can set
+      // their new password securely through the Firebase-hosted flow.
+      return await resetUserPassword(user.email);
     } catch (e) {
       return false;
     }

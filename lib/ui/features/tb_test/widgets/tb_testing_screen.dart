@@ -27,14 +27,24 @@ class TBTestingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<TBTestingViewModel>();
 
-    // Auto-refer when any TB symptom is present (at risk)
-    if (viewModel.isAtRisk) {
+    // Auto-refer when 3+ TB symptoms are present (high risk) — locked to At Risk.
+    // For 1–2 symptoms (caution) the nurse uses clinical discretion.
+    if (viewModel.isHighRisk) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (viewModel.nursingReferralSelection == null ||
             viewModel.nursingReferralSelection ==
                 NursingReferralOption.patientNotReferred) {
           viewModel.setNursingReferralSelection(
               NursingReferralOption.referredToStateClinic);
+        }
+      });
+    } else if (viewModel.isHealthy) {
+      // All 4 questions answered No — lock to Healthy.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (viewModel.nursingReferralSelection !=
+            NursingReferralOption.patientNotReferred) {
+          viewModel.setNursingReferralSelection(
+              NursingReferralOption.patientNotReferred);
         }
       });
     }
@@ -170,6 +180,11 @@ class TBTestingScreen extends StatelessWidget {
           selectedValue: viewModel.nursingReferralSelection,
           onChanged: viewModel.setNursingReferralSelection,
           notReferredReasonController: viewModel.notReferredReasonController,
+          // Locked when the system has auto-determined the outcome:
+          // High Risk (3+ yeses) or Healthy (all No). Caution (1–2 yeses) is
+          // interactive so the nurse can apply clinical discretion.
+          isCaution: viewModel.isCaution,
+          readOnly: viewModel.isHighRisk || viewModel.isHealthy,
           reasonValidator: (val) =>
               (val == null || val.isEmpty) ? 'Please enter a reason' : null,
         ),

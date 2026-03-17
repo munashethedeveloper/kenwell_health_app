@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -28,7 +29,6 @@ class WellnessNavigator {
   /// Delegates individual screening screen pushes to [ScreeningNavigator].
   late final ScreeningNavigator _screeningNavigator =
       ScreeningNavigator(context: context, event: event);
-
   WellnessNavigator({
     required this.context,
     required this.event,
@@ -306,7 +306,17 @@ class WellnessNavigator {
                       final result =
                           await _screeningNavigator.navigateToSurvey(member);
                       if (result == true) {
+                        // Update in-memory VM state.
                         wellnessVM.markSurveyCompleted();
+                        // Persist to Firestore: _memberEventRepository
+                        // .markSurveyCompleted() atomically sets
+                        // surveyCompleted=true AND increments the event's
+                        // screenedCount — but only if the member wasn't already
+                        // counted via a prior individual screening completion.
+                        _memberEventRepository
+                            .markSurveyCompleted(member.id, event.id)
+                            .catchError((e) => debugPrint(
+                                'Failed to record survey completion: $e'));
                       }
                       break;
                     }
@@ -327,7 +337,7 @@ class WellnessNavigator {
       Member member, WellnessFlowViewModel wellnessVM) async {
     final consentVM = ConsentScreenViewModel();
 
-    return await Navigator.push<List<String>>(
+    final result = await Navigator.push<List<String>>(
       context,
       MaterialPageRoute(
         // Provide BOTH consentVM and wellnessVM so that ConsentScreen can
@@ -361,6 +371,30 @@ class WellnessNavigator {
         ),
       ),
     );
+
+    // After consent is submitted, carry HP details forward into wellnessVM so
+    // that health-screening navigators can pre-fill SANC, rank and signature.
+    if (result != null && result.isNotEmpty) {
+      wellnessVM.consentSancNumber =
+          consentVM.sancNumberController.text.isEmpty
+              ? null
+              : consentVM.sancNumberController.text;
+      wellnessVM.consentRank = consentVM.rankController.text.isEmpty
+          ? null
+          : consentVM.rankController.text;
+      if (consentVM.hpSignatureController.isNotEmpty) {
+        try {
+          final bytes = await consentVM.hpSignatureController.toPngBytes();
+          if (bytes != null) {
+            wellnessVM.consentHpSignatureBase64 = base64Encode(bytes);
+          }
+        } catch (e) {
+          debugPrint('Failed to encode HP signature from consent: $e');
+        }
+      }
+    }
+
+    return result;
   }
 
   /// Navigate to health screenings menu
@@ -370,6 +404,9 @@ class WellnessNavigator {
       required bool hctEnabled,
       required bool tbEnabled,
       bool cancerEnabled = false}) async {
+    // Wire up consent HP details so screening navigators can pre-fill forms.
+    _screeningNavigator.wellnessVM = wellnessVM;
+
     // Helper: check if all enabled screenings are now complete.
     bool allDone() =>
         (!hraEnabled || wellnessVM.hraCompleted) &&

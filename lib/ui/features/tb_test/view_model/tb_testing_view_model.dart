@@ -72,12 +72,19 @@ class TBTestingViewModel extends ChangeNotifier {
 
   // --- Risk classification helpers ---
 
+  /// Number of TB symptom questions answered 'Yes'.
+  int get _yesCount => [coughTwoWeeks, bloodInSputum, weightLoss, nightSweats]
+      .where((v) => v == 'Yes')
+      .length;
+
   /// True when any active TB symptom is answered 'Yes'.
-  bool get isAtRisk =>
-      coughTwoWeeks == 'Yes' ||
-      bloodInSputum == 'Yes' ||
-      weightLoss == 'Yes' ||
-      nightSweats == 'Yes';
+  bool get isAtRisk => _yesCount >= 1;
+
+  /// True when 1 or 2 symptoms are 'Yes' — nurse uses clinical discretion.
+  bool get isCaution => _yesCount >= 1 && _yesCount < 3;
+
+  /// True when 3 or more symptoms are 'Yes' — high risk, auto-referred.
+  bool get isHighRisk => _yesCount >= 3;
 
   /// True when all required TB symptom questions are answered and none are 'Yes'.
   bool get isHealthy =>
@@ -88,8 +95,11 @@ class TBTestingViewModel extends ChangeNotifier {
       !isAtRisk;
 
   /// Automatically set the nursing referral based on the current symptom state.
+  /// - 3+ yeses (high risk): auto-set to referred.
+  /// - 0 yeses (healthy):    auto-set to not referred.
+  /// - 1–2 yeses (caution):  leave selection unchanged so nurse can decide.
   void _autoApplyReferral() {
-    if (isAtRisk) {
+    if (isHighRisk) {
       if (nursingReferralSelection == null ||
           nursingReferralSelection ==
               NursingReferralOption.patientNotReferred) {
@@ -99,6 +109,7 @@ class TBTestingViewModel extends ChangeNotifier {
     } else if (isHealthy) {
       nursingReferralSelection = NursingReferralOption.patientNotReferred;
     }
+    // isCaution (1–2 yeses): no auto-change, nurse decides.
   }
 
   //void setFeverChills(String? value) {
@@ -232,6 +243,9 @@ class TBTestingViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Base64-encoded HP signature carried over from the consent form.
+  String? prefilledHpSignatureBase64;
+
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
 
@@ -279,7 +293,7 @@ class TBTestingViewModel extends ChangeNotifier {
             nursingReferralSelection !=
                 NursingReferralOption.patientNotReferred ||
             notReferredReasonController.text.isNotEmpty) &&
-        signatureController.isNotEmpty;
+        (signatureController.isNotEmpty || prefilledHpSignatureBase64 != null);
 
     return baseTBValid && nurseInterventionValid;
   }
@@ -347,10 +361,13 @@ class TBTestingViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Convert signature to base64
-      final signatureBytes = await signatureController.toPngBytes();
-      final signatureBase64 =
-          signatureBytes != null ? base64Encode(signatureBytes) : null;
+      // Use drawn signature; fall back to consent HP signature if pad is empty.
+      String? signatureBase64;
+      if (signatureController.isNotEmpty) {
+        final signatureBytes = await signatureController.toPngBytes();
+        if (signatureBytes != null) signatureBase64 = base64Encode(signatureBytes);
+      }
+      signatureBase64 ??= prefilledHpSignatureBase64;
 
       final screening = TbScreening(
         id: const Uuid().v4(),

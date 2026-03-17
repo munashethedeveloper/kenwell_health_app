@@ -13,6 +13,10 @@ import 'package:kenwell_health_app/domain/constants/enums.dart';
 class HIVTestResultViewModel extends ChangeNotifier {
   HIVTestResultViewModel() {
     _loadCurrentUserProfile();
+    // Initialize referral to Healthy since the default screening result is
+    // Negative.  setScreeningResult() updates this whenever the nurse changes
+    // the result dropdown.
+    nursingReferralSelection = NursingReferralOption.patientNotReferred;
   }
 
   final AuthService _authService = AuthService();
@@ -55,15 +59,41 @@ class HIVTestResultViewModel extends ChangeNotifier {
   String? committedToChange; // 'N/A', 'Yes', 'No'
   final List<String> committedOptions = YesNoNA.values.labels;
 
-  void setWindowPeriod(String? value) => _setValue(() => windowPeriod = value);
+  void setWindowPeriod(String? value) {
+    _setValue(() => windowPeriod = value);
+    _autoApplyReferral();
+  }
+
   void setExpectedResult(String? value) =>
       _setValue(() => expectedResult = value);
   void setDifficultyDealingResult(String? value) =>
       _setValue(() => difficultyDealingResult = value);
-  void setUrgentPsychosocial(String? value) =>
-      _setValue(() => urgentPsychosocial = value);
-  void setCommittedToChange(String? value) =>
-      _setValue(() => committedToChange = value);
+
+  void setUrgentPsychosocial(String? value) {
+    _setValue(() => urgentPsychosocial = value);
+    _autoApplyReferral();
+  }
+
+  void setCommittedToChange(String? value) {
+    _setValue(() => committedToChange = value);
+    _autoApplyReferral();
+  }
+
+  /// Automatically adjust the nursing referral based on the current risk level.
+  void _autoApplyReferral() {
+    if (isAtRisk) {
+      if (nursingReferralSelection == null ||
+          nursingReferralSelection ==
+              NursingReferralOption.patientNotReferred) {
+        nursingReferralSelection = NursingReferralOption.referredToStateClinic;
+        notReferredReasonController.clear();
+      }
+    } else if (isHealthy) {
+      nursingReferralSelection = NursingReferralOption.patientNotReferred;
+    }
+    // isCaution: no auto-change, nurse decides.
+    notifyListeners();
+  }
 
   // --- Follow-up ---
   String? followUpLocation; // 'State clinic', 'Private doctor', 'Other'
@@ -135,6 +165,9 @@ class HIVTestResultViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Base64-encoded HP signature carried over from the consent form.
+  String? prefilledHpSignatureBase64;
+
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
 
@@ -151,11 +184,21 @@ class HIVTestResultViewModel extends ChangeNotifier {
     }
   }
 
-  /// True when the screening result indicates the patient is at risk (Positive).
-  bool get isAtRisk => screeningResult == 'Positive';
+  /// True when the screening result indicates the patient is at risk (Positive),
+  /// OR when the initial assessment flags high-risk conditions:
+  /// - window period concern AND urgent follow-up needed, OR
+  /// - not committed to behaviour change.
+  bool get isAtRisk =>
+      screeningResult == 'Positive' ||
+      (windowPeriod == 'Yes' && urgentPsychosocial == 'Yes') ||
+      committedToChange == 'No';
+
+  /// True when the patient has committed to behaviour change — caution state
+  /// where nurse uses clinical discretion.
+  bool get isCaution => !isAtRisk && committedToChange == 'Yes';
 
   /// True when the screening result indicates a healthy/negative status.
-  bool get isHealthy => screeningResult == 'Negative';
+  bool get isHealthy => !isAtRisk && !isCaution;
 
   // --- Setters ---
   void setScreeningResult(String value) {
@@ -219,7 +262,7 @@ class HIVTestResultViewModel extends ChangeNotifier {
     }
 
     // Validate signature
-    if (signatureController.isEmpty) {
+    if (signatureController.isEmpty && prefilledHpSignatureBase64 == null) {
       return false;
     }
 
@@ -278,10 +321,13 @@ class HIVTestResultViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Convert signature to base64
-      final signatureBytes = await signatureController.toPngBytes();
-      final signatureBase64 =
-          signatureBytes != null ? base64Encode(signatureBytes) : null;
+      // Use drawn signature; fall back to consent HP signature if pad is empty.
+      String? signatureBase64;
+      if (signatureController.isNotEmpty) {
+        final signatureBytes = await signatureController.toPngBytes();
+        if (signatureBytes != null) signatureBase64 = base64Encode(signatureBytes);
+      }
+      signatureBase64 ??= prefilledHpSignatureBase64;
 
       final result = HivResult(
         id: const Uuid().v4(),
