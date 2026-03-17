@@ -113,6 +113,9 @@ class NurseInterventionViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Base64-encoded HP signature carried over from the consent form.
+  String? prefilledHpSignatureBase64;
+
   // --- Submission ---
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
@@ -145,7 +148,7 @@ class NurseInterventionViewModel extends ChangeNotifier {
         rankController.text.isNotEmpty &&
         sancNumberController.text.isNotEmpty &&
         nurseDateController.text.isNotEmpty &&
-        signatureController.isNotEmpty;
+        (signatureController.isNotEmpty || prefilledHpSignatureBase64 != null);
   }
 
   /// Converts all fields to a Map

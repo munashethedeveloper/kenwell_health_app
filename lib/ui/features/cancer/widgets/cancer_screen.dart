@@ -264,49 +264,7 @@ class CancerScreen extends StatelessWidget {
           const SizedBox(height: 24),
         ],
 
-        // 7. Outcome & Referral
-        KenwellFormCard(
-          title: 'Outcome & Referral',
-          child: Column(
-            children: [
-              KenwellTextField(
-                label: 'Referred Facility',
-                hintText: 'Enter referred facility',
-                controller: viewModel.referredFacilityController,
-              ),
-              KenwellDateField(
-                label: 'Follow-up Date',
-                controller: viewModel.followUpDateController,
-                hint: 'Select follow-up date',
-                validator: (_) => null,
-              ),
-              KenwellTextField(
-                label: 'Consent Obtained',
-                hintText: 'Enter consent details',
-                controller: viewModel.consentObtainedController,
-              ),
-              KenwellTextField(
-                label: 'Clinician Name',
-                hintText: 'Enter clinician name',
-                controller: viewModel.clinicianNameController,
-              ),
-              KenwellTextField(
-                label: 'Clinician Signature',
-                hintText: 'Enter clinician signature',
-                controller: viewModel.clinicianSignatureController,
-              ),
-              KenwellTextField(
-                label: 'Clinician Notes',
-                hintText: 'Enter clinician notes',
-                controller: viewModel.clinicianNotesController,
-                maxLines: 3,
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 24),
-
-        // 8. Nursing Referral — always shown.
+        // 7. Nursing Referral — always shown.
         // Locked to At Risk when any symptom/finding is abnormal,
         // locked to Healthy when all relevant exams are normal,
         // and interactive only when some exams are still pending.

@@ -17,6 +17,7 @@ import '../../../cancer/widgets/cancer_screen.dart';
 import '../../../cancer/view_model/cancer_view_model.dart';
 import '../../../survey/widgets/survey_screen.dart';
 import '../../../survey/view_model/survey_view_model.dart';
+import '../../view_model/wellness_flow_view_model.dart';
 
 /// Contains the individual screening navigation methods extracted from
 /// [WellnessNavigator] to keep that class focused on high-level flow control.
@@ -24,13 +25,38 @@ import '../../../survey/view_model/survey_view_model.dart';
 /// Each method pushes a single screening screen and returns [true] when the
 /// user completes and submits the form, or [null]/[false] when they go back.
 class ScreeningNavigator {
-  const ScreeningNavigator({
+  ScreeningNavigator({
     required this.context,
     required this.event,
+    this.wellnessVM,
   });
 
   final BuildContext context;
   final WellnessEvent event;
+
+  /// Optional reference to the wellness-flow VM.  When set, SANC number, rank,
+  /// and the HP signature from consent are automatically pre-filled into each
+  /// health-screening nurse-details section.
+  WellnessFlowViewModel? wellnessVM;
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+
+  /// Pre-fills nurse controller fields and signature from consent HP data.
+  void _applyConsentHpDetails({
+    required TextEditingController sancController,
+    required TextEditingController rankController,
+    required void Function(String?) setPrefilledSignature,
+  }) {
+    final vm = wellnessVM;
+    if (vm == null) return;
+    if (vm.consentSancNumber != null && sancController.text.isEmpty) {
+      sancController.text = vm.consentSancNumber!;
+    }
+    if (vm.consentRank != null && rankController.text.isEmpty) {
+      rankController.text = vm.consentRank!;
+    }
+    setPrefilledSignature(vm.consentHpSignatureBase64);
+  }
 
   // ── HRA ───────────────────────────────────────────────────────────────────
 
@@ -40,6 +66,11 @@ class ScreeningNavigator {
     final nurseVM = NurseInterventionViewModel();
     riskVM.setMemberAndEventId(member.id, event.id);
     nurseVM.initialiseWithEvent(event);
+    _applyConsentHpDetails(
+      sancController: nurseVM.sancNumberController,
+      rankController: nurseVM.rankController,
+      setPrefilledSignature: (v) => nurseVM.prefilledHpSignatureBase64 = v,
+    );
 
     final age = _calculateAge(member.dateOfBirth);
 
@@ -90,6 +121,12 @@ class ScreeningNavigator {
       final hivResultsVM = HIVTestResultViewModel();
       hivResultsVM.initialiseWithEvent(event);
       hivResultsVM.setMemberAndEventId(member.id, event.id);
+      _applyConsentHpDetails(
+        sancController: hivResultsVM.sancNumberController,
+        rankController: hivResultsVM.rankController,
+        setPrefilledSignature: (v) =>
+            hivResultsVM.prefilledHpSignatureBase64 = v,
+      );
 
       await Navigator.push(
         context,
@@ -116,6 +153,11 @@ class ScreeningNavigator {
     final tbTestVM = TBTestingViewModel();
     tbTestVM.initialiseWithEvent(event);
     tbTestVM.setMemberAndEventId(member.id, event.id);
+    _applyConsentHpDetails(
+      sancController: tbTestVM.sancNumberController,
+      rankController: tbTestVM.rankController,
+      setPrefilledSignature: (v) => tbTestVM.prefilledHpSignatureBase64 = v,
+    );
 
     return Navigator.push<bool>(
       context,
@@ -139,6 +181,11 @@ class ScreeningNavigator {
     final cancerVM = CancerScreeningViewModel();
     cancerVM.setMemberAndEventId(member.id, event.id);
     cancerVM.initialiseWithEvent(event);
+    _applyConsentHpDetails(
+      sancController: cancerVM.sancNumberController,
+      rankController: cancerVM.rankController,
+      setPrefilledSignature: (v) => cancerVM.prefilledHpSignatureBase64 = v,
+    );
 
     // Determine which cancer sub-types were requested for this event.
     final allServices =
@@ -188,8 +235,6 @@ class ScreeningNavigator {
       ),
     );
   }
-
-  // ── Helpers ───────────────────────────────────────────────────────────────
 
   KenwellAppBar _buildAppBar(String subtitle) {
     return KenwellAppBar(

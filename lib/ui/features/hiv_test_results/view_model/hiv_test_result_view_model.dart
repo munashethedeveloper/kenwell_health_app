@@ -139,6 +139,9 @@ class HIVTestResultViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Base64-encoded HP signature carried over from the consent form.
+  String? prefilledHpSignatureBase64;
+
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
 
@@ -223,7 +226,7 @@ class HIVTestResultViewModel extends ChangeNotifier {
     }
 
     // Validate signature
-    if (signatureController.isEmpty) {
+    if (signatureController.isEmpty && prefilledHpSignatureBase64 == null) {
       return false;
     }
 
@@ -282,10 +285,13 @@ class HIVTestResultViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Convert signature to base64
-      final signatureBytes = await signatureController.toPngBytes();
-      final signatureBase64 =
-          signatureBytes != null ? base64Encode(signatureBytes) : null;
+      // Use drawn signature; fall back to consent HP signature if pad is empty.
+      String? signatureBase64;
+      if (signatureController.isNotEmpty) {
+        final signatureBytes = await signatureController.toPngBytes();
+        if (signatureBytes != null) signatureBase64 = base64Encode(signatureBytes);
+      }
+      signatureBase64 ??= prefilledHpSignatureBase64;
 
       final result = HivResult(
         id: const Uuid().v4(),

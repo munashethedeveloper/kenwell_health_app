@@ -19,11 +19,21 @@ class ConsentScreenViewModel extends ChangeNotifier {
   // Form key
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  // Controllers
+  // Patient signature controller
   final SignatureController signatureController = SignatureController(
     penStrokeWidth: 2,
     penColor: Colors.black,
   );
+
+  // Healthcare practitioner (HP) signature + details
+  final SignatureController hpSignatureController = SignatureController(
+    penStrokeWidth: 2,
+    penColor: Colors.black,
+    exportBackgroundColor: Colors.white,
+  );
+  final TextEditingController sancNumberController = TextEditingController();
+  final TextEditingController rankController = TextEditingController();
+
   final TextEditingController venueController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
   final TextEditingController practitionerController = TextEditingController();
@@ -53,7 +63,10 @@ class ConsentScreenViewModel extends ChangeNotifier {
       venueController.text.isNotEmpty &&
       dateController.text.isNotEmpty &&
       practitionerController.text.isNotEmpty &&
-      signatureController.isNotEmpty;
+      signatureController.isNotEmpty &&
+      hpSignatureController.isNotEmpty &&
+      sancNumberController.text.isNotEmpty &&
+      rankController.text.isNotEmpty;
 
   // Helper to check if at least one screening is selected
   bool get hasAtLeastOneScreening => hra || hct || tb || cancer;
@@ -111,6 +124,9 @@ class ConsentScreenViewModel extends ChangeNotifier {
     tb = false;
     cancer = false;
     signatureController.clear();
+    hpSignatureController.clear();
+    sancNumberController.clear();
+    rankController.clear();
     venueController.clear();
     dateController.clear();
     practitionerController.clear();
@@ -136,9 +152,15 @@ class ConsentScreenViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Clear signature
+  // Clear patient signature
   void clearSignature() {
     signatureController.clear();
+    notifyListeners();
+  }
+
+  // Clear HP signature
+  void clearHpSignature() {
+    hpSignatureController.clear();
     notifyListeners();
   }
 
@@ -149,13 +171,22 @@ class ConsentScreenViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Convert signature to base64 if available
+      // Convert patient signature to base64
       String? signatureBase64;
       if (signatureController.isNotEmpty) {
         final Uint8List? signatureBytes =
             await signatureController.toPngBytes();
         if (signatureBytes != null) {
           signatureBase64 = base64Encode(signatureBytes);
+        }
+      }
+
+      // Convert HP signature to base64
+      String? hpSignatureBase64;
+      if (hpSignatureController.isNotEmpty) {
+        final Uint8List? hpBytes = await hpSignatureController.toPngBytes();
+        if (hpBytes != null) {
+          hpSignatureBase64 = base64Encode(hpBytes);
         }
       }
 
@@ -172,6 +203,11 @@ class ConsentScreenViewModel extends ChangeNotifier {
         tb: tb,
         cancer: cancer,
         signatureData: signatureBase64,
+        sancNumber: sancNumberController.text.isEmpty
+            ? null
+            : sancNumberController.text,
+        rank: rankController.text.isEmpty ? null : rankController.text,
+        hpSignatureData: hpSignatureBase64,
         createdAt: DateTime.now(),
       );
 
@@ -239,6 +275,9 @@ class ConsentScreenViewModel extends ChangeNotifier {
   @override
   void dispose() {
     signatureController.dispose();
+    hpSignatureController.dispose();
+    sancNumberController.dispose();
+    rankController.dispose();
     venueController.dispose();
     dateController.dispose();
     practitionerController.dispose();

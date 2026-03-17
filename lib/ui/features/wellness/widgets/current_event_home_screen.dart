@@ -3,7 +3,6 @@ import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/ui/features/wellness/view_model/wellness_flow_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
-import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 import 'package:provider/provider.dart';
 
@@ -23,15 +22,12 @@ class CurrentEventHomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<WellnessFlowViewModel>();
 
-    return Scaffold(
-      appBar: const KenwellAppBar(
-        title: 'KenWell365',
-        automaticallyImplyLeading: false,
-      ),
-      body: Column(
-        children: [
-          // ── Gradient section header ─────────────────────────────
-          KenwellGradientHeader(
+    // The outer Scaffold (in WellnessNavigator) already provides the app bar.
+    // We return only the body content to avoid a duplicate app bar.
+    return Column(
+      children: [
+        // ── Gradient section header ─────────────────────────────
+        KenwellGradientHeader(
             label: 'EVENT',
             title: event.title,
             subtitle:
@@ -168,8 +164,7 @@ class CurrentEventHomeScreen extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
+      );
   }
 
   Widget _buildMemberInfoRow(String label, String value) {

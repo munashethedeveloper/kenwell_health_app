@@ -232,6 +232,9 @@ class TBTestingViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Base64-encoded HP signature carried over from the consent form.
+  String? prefilledHpSignatureBase64;
+
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
 
@@ -279,7 +282,7 @@ class TBTestingViewModel extends ChangeNotifier {
             nursingReferralSelection !=
                 NursingReferralOption.patientNotReferred ||
             notReferredReasonController.text.isNotEmpty) &&
-        signatureController.isNotEmpty;
+        (signatureController.isNotEmpty || prefilledHpSignatureBase64 != null);
 
     return baseTBValid && nurseInterventionValid;
   }
@@ -347,10 +350,13 @@ class TBTestingViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Convert signature to base64
-      final signatureBytes = await signatureController.toPngBytes();
-      final signatureBase64 =
-          signatureBytes != null ? base64Encode(signatureBytes) : null;
+      // Use drawn signature; fall back to consent HP signature if pad is empty.
+      String? signatureBase64;
+      if (signatureController.isNotEmpty) {
+        final signatureBytes = await signatureController.toPngBytes();
+        if (signatureBytes != null) signatureBase64 = base64Encode(signatureBytes);
+      }
+      signatureBase64 ??= prefilledHpSignatureBase64;
 
       final screening = TbScreening(
         id: const Uuid().v4(),

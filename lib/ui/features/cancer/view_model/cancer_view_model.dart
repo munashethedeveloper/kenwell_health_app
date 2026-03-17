@@ -239,18 +239,6 @@ class CancerScreeningViewModel extends ChangeNotifier {
     }
   }
 
-  // --- Outcome & Referral ---
-  final TextEditingController referredFacilityController =
-      TextEditingController();
-  final TextEditingController followUpDateController = TextEditingController();
-  final TextEditingController consentObtainedController =
-      TextEditingController();
-  final TextEditingController clinicianNameController = TextEditingController();
-  final TextEditingController clinicianSignatureController =
-      TextEditingController();
-  final TextEditingController clinicianNotesController =
-      TextEditingController();
-
   // --- Nurse / healthcare-practitioner details ---
   final TextEditingController nurseFirstNameController =
       TextEditingController();
@@ -264,11 +252,14 @@ class CancerScreeningViewModel extends ChangeNotifier {
     exportBackgroundColor: Colors.white,
   );
 
+  /// Base64-encoded HP signature carried over from the consent form.
+  /// When set, the signature pad is replaced by a read-only image.
+  String? prefilledHpSignatureBase64;
+
   void clearSignature() {
     signatureController.clear();
     notifyListeners();
   }
-
 
   /// True when any symptom, exam finding, or medical history flag indicates
   /// that the patient requires follow-up (at risk).
@@ -305,7 +296,10 @@ class CancerScreeningViewModel extends ChangeNotifier {
         sancNumberController.text.isEmpty) {
       return false;
     }
-    if (signatureController.isEmpty) return false;
+    // Signature required — either drawn or pre-filled from consent.
+    if (signatureController.isEmpty && prefilledHpSignatureBase64 == null) {
+      return false;
+    }
     return true;
   }
 
@@ -329,9 +323,13 @@ class CancerScreeningViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final signatureBytes = await signatureController.toPngBytes();
-      final signatureBase64 =
-          signatureBytes != null ? base64Encode(signatureBytes) : null;
+      // Use drawn signature; fall back to consent HP signature if pad is empty.
+      String? signatureBase64;
+      if (signatureController.isNotEmpty) {
+        final signatureBytes = await signatureController.toPngBytes();
+        if (signatureBytes != null) signatureBase64 = base64Encode(signatureBytes);
+      }
+      signatureBase64 ??= prefilledHpSignatureBase64;
 
       final screening = CancerScreening(
         id: const Uuid().v4(),
@@ -352,24 +350,12 @@ class CancerScreeningViewModel extends ChangeNotifier {
         papSmearSpecimenCollected: papSmearSpecimenCollected,
         papSmearResults: papSmearResults,
         psaResults: psaResults,
-        referredFacility: referredFacilityController.text.isEmpty
-            ? null
-            : referredFacilityController.text,
-        followUpDate: followUpDateController.text.isEmpty
-            ? null
-            : followUpDateController.text,
-        consentObtained: consentObtainedController.text.isEmpty
-            ? null
-            : consentObtainedController.text,
-        clinicianName: clinicianNameController.text.isEmpty
-            ? null
-            : clinicianNameController.text,
-        clinicianSignature: clinicianSignatureController.text.isEmpty
-            ? null
-            : clinicianSignatureController.text,
-        clinicianNotes: clinicianNotesController.text.isEmpty
-            ? null
-            : clinicianNotesController.text,
+        referredFacility: null,
+        followUpDate: null,
+        consentObtained: null,
+        clinicianName: null,
+        clinicianSignature: null,
+        clinicianNotes: null,
         nursingReferral: nursingReferralSelection?.name,
         notReferredReason: notReferredReasonController.text.isEmpty
             ? null
@@ -407,12 +393,6 @@ class CancerScreeningViewModel extends ChangeNotifier {
   void dispose() {
     otherConditionController.dispose();
     notReferredReasonController.dispose();
-    referredFacilityController.dispose();
-    followUpDateController.dispose();
-    consentObtainedController.dispose();
-    clinicianNameController.dispose();
-    clinicianSignatureController.dispose();
-    clinicianNotesController.dispose();
     nurseFirstNameController.dispose();
     nurseLastNameController.dispose();
     rankController.dispose();

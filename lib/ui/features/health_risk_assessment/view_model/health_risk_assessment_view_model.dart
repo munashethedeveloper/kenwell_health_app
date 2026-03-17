@@ -357,7 +357,8 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
             'Please complete all nurse details (name, rank, SANC No).');
         return;
       }
-      if (nurseVM.signatureController.isEmpty) {
+      if (nurseVM.signatureController.isEmpty &&
+          nurseVM.prefilledHpSignatureBase64 == null) {
         onValidationFailed?.call('Please add the nurse signature.');
         return;
       }
@@ -367,11 +368,14 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Encode the signature if provided.
+      // Encode the signature if provided; fall back to consent HP signature.
       String? signatureBase64;
       if (nurseVM != null) {
-        final bytes = await nurseVM.signatureController.toPngBytes();
-        if (bytes != null) signatureBase64 = base64Encode(bytes);
+        if (nurseVM.signatureController.isNotEmpty) {
+          final bytes = await nurseVM.signatureController.toPngBytes();
+          if (bytes != null) signatureBase64 = base64Encode(bytes);
+        }
+        signatureBase64 ??= nurseVM.prefilledHpSignatureBase64;
       }
 
       // Create HRA screening object
