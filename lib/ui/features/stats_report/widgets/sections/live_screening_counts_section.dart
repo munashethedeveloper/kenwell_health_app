@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_form_card.dart';
@@ -55,13 +56,19 @@ class _LiveScreeningCountsSectionState
   final _tbRepo = FirestoreTbScreeningRepository();
   final _hivRepo = FirestoreHivScreeningRepository();
 
+  // Holds the latest list from each Firestore stream.
+  List<dynamic> _hraList = [];
+  List<CancerScreening> _cancerList = [];
+  List<dynamic> _tbList = [];
+  List<dynamic> _hivList = [];
+
   bool _isLoading = true;
-  int _hraCount = 0;
-  int _hctCount = 0;
-  int _tbCount = 0;
-  int _papSmearCount = 0;
-  int _breastScreeningCount = 0;
-  int _psaCount = 0;
+
+  // Active Firestore stream subscriptions.
+  StreamSubscription<dynamic>? _hraSub;
+  StreamSubscription<dynamic>? _cancerSub;
+  StreamSubscription<dynamic>? _tbSub;
+  StreamSubscription<dynamic>? _hivSub;
 
   Set<ServiceType> get _activeServices {
     final services = <ServiceType>{};
@@ -72,10 +79,26 @@ class _LiveScreeningCountsSectionState
     return services;
   }
 
+  // Derived counts from the current list snapshots.
+  int get _hraCount => _hraList.length;
+  int get _hctCount => _hivList.length;
+  int get _tbCount => _tbList.length;
+  int get _papSmearCount => _cancerList
+      .where((s) => s.papSmearSpecimenCollected?.toLowerCase() == 'yes')
+      .length;
+  int get _breastScreeningCount => _cancerList
+      .where((s) =>
+          s.breastLightExamFindings != null &&
+          s.breastLightExamFindings!.isNotEmpty)
+      .length;
+  int get _psaCount => _cancerList
+      .where((s) => s.psaResults != null && s.psaResults!.isNotEmpty)
+      .length;
+
   @override
   void initState() {
     super.initState();
-    _loadCounts();
+    _subscribeToStreams(widget.eventIds);
   }
 
   @override
@@ -84,63 +107,97 @@ class _LiveScreeningCountsSectionState
     final oldSet = oldWidget.eventIds.toSet();
     final newSet = widget.eventIds.toSet();
     if (oldSet.length != newSet.length || !oldSet.containsAll(newSet)) {
-      _loadCounts();
+      _cancelSubscriptions();
+      _subscribeToStreams(widget.eventIds);
     }
   }
 
-  Future<void> _loadCounts() async {
+  @override
+  void dispose() {
+    _cancelSubscriptions();
+    super.dispose();
+  }
+
+  void _cancelSubscriptions() {
+    _hraSub?.cancel();
+    _cancerSub?.cancel();
+    _tbSub?.cancel();
+    _hivSub?.cancel();
+    _hraSub = _cancerSub = _tbSub = _hivSub = null;
+  }
+
+  void _subscribeToStreams(List<String> ids) {
     if (!mounted) return;
     setState(() => _isLoading = true);
-    try {
-      final ids = widget.eventIds;
-      if (ids.isEmpty) {
-        if (mounted) {
-          setState(() {
-            _hraCount = _hctCount = _tbCount = 0;
-            _papSmearCount = _breastScreeningCount = _psaCount = 0;
-            _isLoading = false;
-          });
-        }
-        return;
-      }
-      final results = await Future.wait(<Future<dynamic>>[
-        _hraRepo.getHraScreeningsByEvents(ids),
-        _cancerRepo.getCancerScreeningsByEvents(ids),
-        _tbRepo.getTbScreeningsByEvents(ids),
-        _hivRepo.getHivScreeningsByEvents(ids),
-      ]);
-      final hraList = List<dynamic>.from(results[0] as List);
-      final cancerList = List<CancerScreening>.from(results[1] as List);
-      final tbList = List<dynamic>.from(results[2] as List);
-      final hivList = List<dynamic>.from(results[3] as List);
 
-      final papCount = cancerList
-          .where((s) => s.papSmearSpecimenCollected?.toLowerCase() == 'yes')
-          .length;
-      final breastCount = cancerList
-          .where((s) =>
-              s.breastLightExamFindings != null &&
-              s.breastLightExamFindings!.isNotEmpty)
-          .length;
-      final psaCount = cancerList
-          .where((s) => s.psaResults != null && s.psaResults!.isNotEmpty)
-          .length;
-
-      if (mounted) {
-        setState(() {
-          _hraCount = hraList.length;
-          _hctCount = hivList.length;
-          _tbCount = tbList.length;
-          _papSmearCount = papCount;
-          _breastScreeningCount = breastCount;
-          _psaCount = psaCount;
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      debugPrint('LiveScreeningCounts: failed to load: $e');
-      if (mounted) setState(() => _isLoading = false);
+    if (ids.isEmpty) {
+      setState(() {
+        _hraList = [];
+        _cancerList = [];
+        _tbList = [];
+        _hivList = [];
+        _isLoading = false;
+      });
+      return;
     }
+
+    var initialised = 0;
+    const totalStreams = 4;
+
+    void markReady() {
+      initialised++;
+      if (initialised >= totalStreams && mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+
+    _hraSub = _hraRepo.watchHraScreeningsByEvents(ids).listen(
+      (list) {
+        if (!mounted) return;
+        setState(() => _hraList = list);
+        markReady();
+      },
+      onError: (Object e) {
+        debugPrint('LiveScreeningCounts HRA stream error: $e');
+        markReady();
+      },
+    );
+
+    _cancerSub = _cancerRepo.watchCancerScreeningsByEvents(ids).listen(
+      (list) {
+        if (!mounted) return;
+        setState(() => _cancerList = list);
+        markReady();
+      },
+      onError: (Object e) {
+        debugPrint('LiveScreeningCounts Cancer stream error: $e');
+        markReady();
+      },
+    );
+
+    _tbSub = _tbRepo.watchTbScreeningsByEvents(ids).listen(
+      (list) {
+        if (!mounted) return;
+        setState(() => _tbList = list);
+        markReady();
+      },
+      onError: (Object e) {
+        debugPrint('LiveScreeningCounts TB stream error: $e');
+        markReady();
+      },
+    );
+
+    _hivSub = _hivRepo.watchHivScreeningsByEvents(ids).listen(
+      (list) {
+        if (!mounted) return;
+        setState(() => _hivList = list);
+        markReady();
+      },
+      onError: (Object e) {
+        debugPrint('LiveScreeningCounts HIV stream error: $e');
+        markReady();
+      },
+    );
   }
 
   @override
