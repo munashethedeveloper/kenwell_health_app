@@ -27,6 +27,7 @@ class LiveScreeningCountsSection extends StatefulWidget {
     this.isLiveTab = true,
     this.onCardTapped,
     this.selectedServiceType,
+    this.midSectionWidget,
   });
 
   final List<String> eventIds;
@@ -43,6 +44,11 @@ class LiveScreeningCountsSection extends StatefulWidget {
   /// The currently selected service key — the corresponding card is
   /// highlighted to indicate it is active.
   final String? selectedServiceType;
+
+  /// Optional widget injected between the HRA/HCT/TB row and the cancer
+  /// (Pap Smear/Breast/PSA) row.  Used to place HRA/HCT/TB analytics
+  /// immediately below the first row of screening count cards.
+  final Widget? midSectionWidget;
 
   @override
   State<LiveScreeningCountsSection> createState() =>
@@ -294,37 +300,69 @@ class _LiveScreeningCountsSectionState
                 ),
               ),
             )
-          else
-            GridView.count(
-              crossAxisCount: 3,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              childAspectRatio: 1.05,
-              children: screenings
-                  .map((s) => _ScreeningCountCard(
-                        label: s.label,
-                        count: _isLoading ? null : s.count,
-                        icon: s.icon,
-                        color: s.color,
-                        isSelected:
-                            widget.selectedServiceType == s.serviceKey,
-                        onTap: widget.onCardTapped != null
-                            ? () {
-                                // Toggle: tap selected card again to deselect.
-                                final next =
-                                    widget.selectedServiceType == s.serviceKey
-                                        ? null
-                                        : s.serviceKey;
-                                widget.onCardTapped!(next);
-                              }
-                            : null,
-                      ))
+          else ...[
+            // Row 1: HRA / HCT / TB
+            _buildScreeningRow(
+              screenings
+                  .where((s) =>
+                      s.serviceKey == 'hra' ||
+                      s.serviceKey == 'hct' ||
+                      s.serviceKey == 'tb')
                   .toList(),
             ),
+
+            // Injected mid-section (HRA/HCT/TB analytics)
+            if (widget.midSectionWidget != null) ...[
+              const SizedBox(height: 12),
+              widget.midSectionWidget!,
+            ],
+
+            // Row 2: Cancer screenings (Pap Smear / Breast / PSA)
+            if (screenings.any((s) => s.serviceKey == 'cancer')) ...[
+              const SizedBox(height: 10),
+              _buildScreeningRow(
+                screenings.where((s) => s.serviceKey == 'cancer').toList(),
+              ),
+            ],
+          ],
         ],
       ),
+    );
+  }
+
+  /// Renders a row of up to 3 [_ScreeningCount] cards in an evenly-spaced Row.
+  Widget _buildScreeningRow(List<_ScreeningCount> items) {
+    if (items.isEmpty) return const SizedBox.shrink();
+    return Row(
+      children: [
+        for (int i = 0; i < items.length; i++) ...[
+          if (i > 0) const SizedBox(width: 10),
+          Expanded(
+            child: _ScreeningCountCard(
+              label: items[i].label,
+              count: _isLoading ? null : items[i].count,
+              icon: items[i].icon,
+              color: items[i].color,
+              isSelected: widget.selectedServiceType == items[i].serviceKey,
+              onTap: widget.onCardTapped != null
+                  ? () {
+                      final next =
+                          widget.selectedServiceType == items[i].serviceKey
+                              ? null
+                              : items[i].serviceKey;
+                      widget.onCardTapped!(next);
+                    }
+                  : null,
+            ),
+          ),
+        ],
+        // Pad with invisible spacers if the row has fewer than 3 items,
+        // so cards stay the same size as a full 3-column row.
+        for (int i = items.length; i < 3; i++) ...[
+          const SizedBox(width: 10),
+          const Expanded(child: SizedBox()),
+        ],
+      ],
     );
   }
 }

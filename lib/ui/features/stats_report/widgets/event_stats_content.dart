@@ -93,13 +93,23 @@ class _EventStatsContentState extends State<EventStatsContent> {
     final allEvents = eventVM.events;
     final isLiveTab = widget.isLiveTab;
 
-    // Filter by live/past status
+    // Filter by live/past status.
+    // For the live tab we also exclude events whose date is more than one day
+    // in the past — this prevents stale "in_progress" events (e.g. from
+    // January) from polluting the live view when they were never closed.
+    final now = DateTime.now();
+    final liveCutoff =
+        DateTime(now.year, now.month, now.day).subtract(const Duration(days: 1));
     final tabFilteredEvents = isLiveTab
         ? allEvents.where((e) {
             final s = e.status.toLowerCase();
-            return s == WellnessEventStatus.inProgress ||
+            final isActive = s == WellnessEventStatus.inProgress ||
                 s == 'in progress' ||
                 s == 'ongoing';
+            if (!isActive) return false;
+            final eventDate =
+                DateTime(e.date.year, e.date.month, e.date.day);
+            return !eventDate.isBefore(liveCutoff);
           }).toList()
         : allEvents.where((e) {
             final s = e.status.toLowerCase();
@@ -438,6 +448,10 @@ class _EventStatsContentState extends State<EventStatsContent> {
 
             // ── Screening counts (live tab = "Live Counts",
             //                     past tab  = "Health Screening Analytics") ─
+            //
+            // HRA/HCT/TB analytics are injected between row 1 (HRA/HCT/TB)
+            // and row 2 (Pap Smear/Breast/PSA) via [midSectionWidget].
+            // Cancer analytics appear below row 2.
             LiveScreeningCountsSection(
               eventIds: events.map((e) => e.id).toList(),
               events: events,
@@ -446,10 +460,16 @@ class _EventStatsContentState extends State<EventStatsContent> {
               onCardTapped: (key) {
                 setState(() => _selectedScreeningType = key);
               },
+              // HRA/HCT/TB analytics panel appears between the two card rows.
+              midSectionWidget:
+                  (_selectedScreeningType != null &&
+                          _selectedScreeningType != 'cancer')
+                      ? _buildAnalyticsPanel(events, isLiveTab)
+                      : null,
             ),
             const SizedBox(height: 16),
 
-            // ── Per-service analytics (shown only when a card is selected) ─
+            // ── Cancer analytics (shown below row 2 when a cancer card is tapped) ─
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 250),
               transitionBuilder: (child, animation) => FadeTransition(
@@ -460,53 +480,11 @@ class _EventStatsContentState extends State<EventStatsContent> {
                   child: child,
                 ),
               ),
-              child: _selectedScreeningType != null
+              child: (_selectedScreeningType == 'cancer')
                   ? Padding(
-                      // Use a stable key so the HealthScreeningStatsSection
-                      // widget persists across type changes (avoids re-fetching
-                      // Firestore data on each card tap).
-                      key: const ValueKey('analytics_panel'),
+                      key: const ValueKey('cancer_analytics_panel'),
                       padding: const EdgeInsets.only(bottom: 8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.only(left: 4, bottom: 12),
-                            child: Row(
-                              children: [
-                                Text(
-                                  '${_screeningTypeLabel(_selectedScreeningType!)} Analytics',
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFF201C58),
-                                  ),
-                                ),
-                                const Spacer(),
-                                TextButton.icon(
-                                  onPressed: () => setState(
-                                      () => _selectedScreeningType = null),
-                                  icon: const Icon(Icons.close, size: 16),
-                                  label: const Text('Close'),
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: Colors.grey.shade600,
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          HealthScreeningStatsSection(
-                            eventIds: events.map((e) => e.id).toList(),
-                            selectedType: _selectedScreeningType,
-                            sectionSubtitle: isLiveTab
-                                ? 'Live screening data from ${events.length} running event${events.length != 1 ? "s" : ""}'
-                                : 'Screening data from ${events.length} past event${events.length != 1 ? "s" : ""}',
-                          ),
-                        ],
-                      ),
+                      child: _buildAnalyticsPanel(events, isLiveTab),
                     )
                   : const SizedBox.shrink(key: ValueKey('empty')),
             ),
@@ -595,6 +573,51 @@ class _EventStatsContentState extends State<EventStatsContent> {
       'cancer': 'Cancer Screening',
     };
     return labels[key.toLowerCase()] ?? key.toUpperCase();
+  }
+
+  /// Builds the analytics panel for the currently selected screening type.
+  Widget _buildAnalyticsPanel(
+      List<WellnessEvent> events, bool isLiveTab) {
+    if (_selectedScreeningType == null) return const SizedBox.shrink();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 12),
+          child: Row(
+            children: [
+              Text(
+                '${_screeningTypeLabel(_selectedScreeningType!)} Analytics',
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF201C58),
+                ),
+              ),
+              const Spacer(),
+              TextButton.icon(
+                onPressed: () =>
+                    setState(() => _selectedScreeningType = null),
+                icon: const Icon(Icons.close, size: 16),
+                label: const Text('Close'),
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.grey.shade600,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8),
+                ),
+              ),
+            ],
+          ),
+        ),
+        HealthScreeningStatsSection(
+          eventIds: events.map((e) => e.id).toList(),
+          selectedType: _selectedScreeningType,
+          sectionSubtitle: isLiveTab
+              ? 'Live screening data from ${events.length} running event${events.length != 1 ? "s" : ""}'
+              : 'Screening data from ${events.length} past event${events.length != 1 ? "s" : ""}',
+        ),
+      ],
+    );
   }
 
   Widget _buildDetailRow(

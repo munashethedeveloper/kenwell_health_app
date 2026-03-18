@@ -34,6 +34,13 @@ class ConsentScreenViewModel extends ChangeNotifier {
   final TextEditingController sancNumberController = TextEditingController();
   final TextEditingController rankController = TextEditingController();
 
+  /// Sets the nurse rank from the dropdown and syncs to [rankController].
+  void setRank(String? value) {
+    if (rankController.text == (value ?? '')) return;
+    rankController.text = value ?? '';
+    notifyListeners();
+  }
+
   final TextEditingController venueController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
   final TextEditingController practitionerController = TextEditingController();

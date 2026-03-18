@@ -53,18 +53,20 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       //const UserManagementScreenVersionTwo(),
       const RegistrationManagementScreen(),
       const StatsReportScreen(),
-      const HomeScreen(),
+      // privileged: Users=0, Stats=1, Home=2, Profile=3, Events=4
+      HomeScreen(onTabSwitch: (i) => setState(() => _currentIndex = i)),
       const MyProfileMenuScreen(),
       const MyEventScreen(),
     ];
     final List<Widget> clientTabs = [
       const StatsReportScreen(),
       //client should also be able to see the calendar but without the events displaying
-      const HomeScreen(),
+      HomeScreen(onTabSwitch: (i) => setState(() => _currentIndex = i)),
       const MyProfileMenuScreen(),
     ];
     final List<Widget> restrictedTabs = [
-      const HomeScreen(),
+      // restricted: Home=0, Profile=1, Events=2
+      HomeScreen(onTabSwitch: (i) => setState(() => _currentIndex = i)),
       const MyProfileMenuScreen(),
       const MyEventScreen(),
     ];

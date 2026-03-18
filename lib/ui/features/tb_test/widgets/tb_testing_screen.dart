@@ -193,6 +193,7 @@ class TBTestingScreen extends StatelessWidget {
           title: 'Signature',
           controller: viewModel.signatureController,
           onClear: viewModel.clearSignature,
+          prefilledBase64: viewModel.prefilledHpSignatureBase64,
           navigation: KenwellFormNavigation(
             onPrevious: onPrevious,
             onNext: () => viewModel.submitTBTest(

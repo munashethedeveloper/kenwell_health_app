@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/domain/constants/enums.dart';
 import 'package:kenwell_health_app/domain/enums/service_type.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/features/consent_form/view_model/consent_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_checkbox_group.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import 'package:provider/provider.dart';
+import '../../../shared/ui/form/custom_dropdown_field.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
 import '../../../shared/ui/form/kenwell_bullet_list.dart';
 import '../../../shared/ui/form/kenwell_checkbox_list_card.dart';
@@ -199,16 +201,16 @@ class ConsentScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               // Rank
-              KenwellTextField(
+              KenwellDropdownField<String>(
                 label: 'Rank',
-                hintText: 'Enter rank',
-                controller: vm.rankController,
-                decoration: KenwellFormStyles.decoration(
-                  label: 'Rank',
-                  hint: 'Enter rank',
-                ),
+                value: vm.rankController.text.isEmpty
+                    ? null
+                    : vm.rankController.text,
+                items: NurseRank.values.map((e) => e.label).toList(),
+                onChanged: vm.setRank,
+                hintText: 'Select rank',
                 validator: (val) =>
-                    (val == null || val.isEmpty) ? 'Please enter Rank' : null,
+                    (val == null || val.isEmpty) ? 'Please select Rank' : null,
               ),
             ],
           ),
