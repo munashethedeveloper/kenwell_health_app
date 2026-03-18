@@ -21,6 +21,19 @@ class HraScreening {
   final String? cholesterol;
   final String? bloodSugar;
   final String? waist;
+
+  // Nursing referral
+  final String? nursingReferral;
+  final String? notReferredReason;
+
+  // Nurse / healthcare-practitioner details
+  final String? nurseFirstName;
+  final String? nurseLastName;
+  final String? rank;
+  final String? sancNumber;
+  final String? nurseDate;
+  final String? signatureData; // Base64-encoded PNG
+
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -47,6 +60,14 @@ class HraScreening {
     this.cholesterol,
     this.bloodSugar,
     this.waist,
+    this.nursingReferral,
+    this.notReferredReason,
+    this.nurseFirstName,
+    this.nurseLastName,
+    this.rank,
+    this.sancNumber,
+    this.nurseDate,
+    this.signatureData,
     required this.createdAt,
     this.updatedAt,
   });
@@ -75,6 +96,14 @@ class HraScreening {
       'cholesterol': cholesterol,
       'bloodSugar': bloodSugar,
       'waist': waist,
+      'nursingReferral': nursingReferral,
+      'notReferredReason': notReferredReason,
+      'nurseFirstName': nurseFirstName,
+      'nurseLastName': nurseLastName,
+      'rank': rank,
+      'sancNumber': sancNumber,
+      'nurseDate': nurseDate,
+      'signatureData': signatureData,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
     };
@@ -105,6 +134,14 @@ class HraScreening {
       cholesterol: map['cholesterol'] as String?,
       bloodSugar: map['bloodSugar'] as String?,
       waist: map['waist'] as String?,
+      nursingReferral: map['nursingReferral'] as String?,
+      notReferredReason: map['notReferredReason'] as String?,
+      nurseFirstName: map['nurseFirstName'] as String?,
+      nurseLastName: map['nurseLastName'] as String?,
+      rank: map['rank'] as String?,
+      sancNumber: map['sancNumber'] as String?,
+      nurseDate: map['nurseDate'] as String?,
+      signatureData: map['signatureData'] as String?,
       createdAt: DateTime.parse(map['createdAt'] as String),
       updatedAt: map['updatedAt'] != null
           ? DateTime.parse(map['updatedAt'] as String)
@@ -135,6 +172,14 @@ class HraScreening {
     String? cholesterol,
     String? bloodSugar,
     String? waist,
+    String? nursingReferral,
+    String? notReferredReason,
+    String? nurseFirstName,
+    String? nurseLastName,
+    String? rank,
+    String? sancNumber,
+    String? nurseDate,
+    String? signatureData,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -163,6 +208,14 @@ class HraScreening {
       cholesterol: cholesterol ?? this.cholesterol,
       bloodSugar: bloodSugar ?? this.bloodSugar,
       waist: waist ?? this.waist,
+      nursingReferral: nursingReferral ?? this.nursingReferral,
+      notReferredReason: notReferredReason ?? this.notReferredReason,
+      nurseFirstName: nurseFirstName ?? this.nurseFirstName,
+      nurseLastName: nurseLastName ?? this.nurseLastName,
+      rank: rank ?? this.rank,
+      sancNumber: sancNumber ?? this.sancNumber,
+      nurseDate: nurseDate ?? this.nurseDate,
+      signatureData: signatureData ?? this.signatureData,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

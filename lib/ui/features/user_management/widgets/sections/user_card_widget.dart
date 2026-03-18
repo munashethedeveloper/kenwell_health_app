@@ -132,7 +132,8 @@ class UserCardWidget extends StatelessWidget {
                               horizontal: 7, vertical: 2),
                           decoration: BoxDecoration(
                             color: user.emailVerified
-                                ? const Color(0xFF10B981)
+                                //  ? const Color(0xFF10B981)
+                                ? KenwellColors.primaryGreen
                                     .withValues(alpha: 0.12)
                                 : const Color(0xFFEF4444)
                                     .withValues(alpha: 0.10),
@@ -146,7 +147,8 @@ class UserCardWidget extends StatelessWidget {
                                     ? Icons.verified_rounded
                                     : Icons.error_outline_rounded,
                                 color: user.emailVerified
-                                    ? const Color(0xFF10B981)
+                                    // ? const Color(0xFF10B981)
+                                    ? KenwellColors.primaryGreen
                                     : const Color(0xFFEF4444),
                                 size: 12,
                               ),
@@ -155,7 +157,8 @@ class UserCardWidget extends StatelessWidget {
                                 user.emailVerified ? 'Verified' : 'Unverified',
                                 style: TextStyle(
                                   color: user.emailVerified
-                                      ? const Color(0xFF10B981)
+                                      // ? const Color(0xFF10B981)
+                                      ? KenwellColors.primaryGreen
                                       : const Color(0xFFEF4444),
                                   fontWeight: FontWeight.w600,
                                   fontSize: 10,
@@ -175,17 +178,22 @@ class UserCardWidget extends StatelessWidget {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
-                      color: theme.primaryColor.withValues(alpha: 0.1),
+                      //color: theme.primaryColor.withValues(alpha: 0.1),
+                      color: KenwellColors.secondaryNavy.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: theme.primaryColor.withValues(alpha: 0.2),
+                        //color: theme.primaryColor.withValues(alpha: 0.2),
+                        color:
+                            KenwellColors.secondaryNavy.withValues(alpha: 0.2),
+
                         width: 1,
                       ),
                     ),
                     child: Text(
                       user.role,
-                      style: TextStyle(
-                        color: theme.primaryColor,
+                      style: const TextStyle(
+                        //color: theme.primaryColor,
+                        color: KenwellColors.secondaryNavy,
                         fontWeight: FontWeight.w700,
                         fontSize: 10,
                         letterSpacing: 0.3,

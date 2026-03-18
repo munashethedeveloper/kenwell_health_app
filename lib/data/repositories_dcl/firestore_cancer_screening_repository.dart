@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kenwell_health_app/data/services/firestore_service.dart';
 import 'package:kenwell_health_app/domain/models/cander_screening.dart';
@@ -111,5 +112,63 @@ class FirestoreCancerScreeningRepository {
       AppLogger.error('Failed to get cancer screenings by events', e);
       rethrow;
     }
+  }
+
+  /// Real-time stream of cancer screenings for a specific set of events.
+  ///
+  /// When [eventIds] has more than 30 items, multiple Firestore queries are
+  /// merged.  Each Firestore query emits independently, so the combined stream
+  /// re-emits whenever *any* chunk changes.
+  Stream<List<CancerScreening>> watchCancerScreeningsByEvents(
+      List<String> eventIds) {
+    if (eventIds.isEmpty) {
+      return Stream.value([]);
+    }
+    const chunkSize = 30;
+    final chunks = <List<String>>[];
+    for (var i = 0; i < eventIds.length; i += chunkSize) {
+      chunks
+          .add(eventIds.sublist(i, (i + chunkSize).clamp(0, eventIds.length)));
+    }
+    if (chunks.length == 1) {
+      return _firestore
+          .collection(_collectionName)
+          .where('eventId', whereIn: chunks[0])
+          .snapshots()
+          .map((s) =>
+              s.docs.map((d) => CancerScreening.fromMap(d.data())).toList());
+    }
+    // Multiple chunks: merge by holding the latest snapshot from each chunk
+    // and combining them whenever any one updates.
+    return _mergeChunkStreams(chunks);
+  }
+
+  Stream<List<CancerScreening>> _mergeChunkStreams(
+      List<List<String>> chunks) async* {
+    final latest = List<List<CancerScreening>>.filled(chunks.length, []);
+    final controller = StreamController<List<CancerScreening>>();
+    var active = chunks.length;
+    for (var i = 0; i < chunks.length; i++) {
+      final idx = i;
+      _firestore
+          .collection(_collectionName)
+          .where('eventId', whereIn: chunks[idx])
+          .snapshots()
+          .listen(
+            (s) {
+              latest[idx] =
+                  s.docs.map((d) => CancerScreening.fromMap(d.data())).toList();
+              if (!controller.isClosed) {
+                controller.add(latest.expand((l) => l).toList());
+              }
+            },
+            onError: controller.addError,
+            onDone: () {
+              active--;
+              if (active == 0) controller.close();
+            },
+          );
+    }
+    yield* controller.stream;
   }
 }

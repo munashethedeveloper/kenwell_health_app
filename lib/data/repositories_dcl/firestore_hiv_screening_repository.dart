@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kenwell_health_app/domain/models/hiv_screening.dart';
 import 'package:kenwell_health_app/data/services/firestore_service.dart';
@@ -109,5 +110,54 @@ class FirestoreHivScreeningRepository {
       AppLogger.error('Failed to get HIV screenings by events', e);
       rethrow;
     }
+  }
+
+  /// Real-time stream of HIV screenings for a specific set of events.
+  Stream<List<HivScreening>> watchHivScreeningsByEvents(List<String> eventIds) {
+    if (eventIds.isEmpty) return Stream.value([]);
+    const chunkSize = 30;
+    final chunks = <List<String>>[];
+    for (var i = 0; i < eventIds.length; i += chunkSize) {
+      chunks
+          .add(eventIds.sublist(i, (i + chunkSize).clamp(0, eventIds.length)));
+    }
+    if (chunks.length == 1) {
+      return _firestore
+          .collection(_collectionName)
+          .where('eventId', whereIn: chunks[0])
+          .snapshots()
+          .map((s) =>
+              s.docs.map((d) => HivScreening.fromMap(d.data())).toList());
+    }
+    return _mergeChunkStreams(chunks);
+  }
+
+  Stream<List<HivScreening>> _mergeChunkStreams(
+      List<List<String>> chunks) async* {
+    final latest = List<List<HivScreening>>.filled(chunks.length, []);
+    final controller = StreamController<List<HivScreening>>();
+    var active = chunks.length;
+    for (var i = 0; i < chunks.length; i++) {
+      final idx = i;
+      _firestore
+          .collection(_collectionName)
+          .where('eventId', whereIn: chunks[idx])
+          .snapshots()
+          .listen(
+            (s) {
+              latest[idx] =
+                  s.docs.map((d) => HivScreening.fromMap(d.data())).toList();
+              if (!controller.isClosed) {
+                controller.add(latest.expand((l) => l).toList());
+              }
+            },
+            onError: controller.addError,
+            onDone: () {
+              active--;
+              if (active == 0) controller.close();
+            },
+          );
+    }
+    yield* controller.stream;
   }
 }

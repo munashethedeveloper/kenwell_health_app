@@ -41,15 +41,16 @@ extension HealthMetricStatusExtension on HealthMetricStatus {
 /// Classifies health metrics into green / orange / red risk levels.
 ///
 /// Thresholds:
-/// - Systolic BP : ≤129 green, 130–159 orange, ≥160 red
-/// - Diastolic BP: ≤80  green, 81–89  orange, ≥90  red
-/// - Blood glucose: <7.8 green, 7.8–<11 orange, ≥11 red
-/// - Cholesterol  : <5.2 green, 5.2–<7.2 orange, ≥7.2 red
+/// - Systolic BP : 90–129 green, <90 or 130–159 orange, ≥160 red
+/// - Diastolic BP: 60–79  green, <60 or 80–89  orange, ≥90  red
+/// - Blood glucose: 3.9–7.79 green, <3.9 or 7.8–10.9 orange, ≥11 red
+/// - Cholesterol  : 3.0–5.19 green, <3.0 or 5.2–6.9 orange, ≥7  red
 class HealthMetricClassifier {
   const HealthMetricClassifier._();
 
   /// Blood Pressure Systolic (mmHg)
   static HealthMetricStatus classifySystolic(double value) {
+    if (value < 90) return HealthMetricStatus.orange;
     if (value <= 129) return HealthMetricStatus.green;
     if (value <= 159) return HealthMetricStatus.orange;
     return HealthMetricStatus.red;
@@ -57,13 +58,15 @@ class HealthMetricClassifier {
 
   /// Blood Pressure Diastolic (mmHg)
   static HealthMetricStatus classifyDiastolic(double value) {
-    if (value <= 80) return HealthMetricStatus.green;
+    if (value < 60) return HealthMetricStatus.orange;
+    if (value <= 79) return HealthMetricStatus.green;
     if (value <= 89) return HealthMetricStatus.orange;
     return HealthMetricStatus.red;
   }
 
   /// Blood Glucose / Blood Sugar (mmol/L)
   static HealthMetricStatus classifyBloodGlucose(double value) {
+    if (value < 3.9) return HealthMetricStatus.orange;
     if (value < 7.8) return HealthMetricStatus.green;
     if (value < 11.0) return HealthMetricStatus.orange;
     return HealthMetricStatus.red;
@@ -71,8 +74,9 @@ class HealthMetricClassifier {
 
   /// Cholesterol (mmol/L)
   static HealthMetricStatus classifyCholesterol(double value) {
+    if (value < 3.0) return HealthMetricStatus.orange;
     if (value < 5.2) return HealthMetricStatus.green;
-    if (value < 7.2) return HealthMetricStatus.orange;
+    if (value < 7.0) return HealthMetricStatus.orange;
     return HealthMetricStatus.red;
   }
 

@@ -8,7 +8,7 @@ import 'kenwell_signature_field.dart';
 class KenwellSignatureActions extends StatelessWidget {
   final SignatureController controller;
   final VoidCallback onClear;
-  final Widget navigation;
+  final Widget? navigation;
   final String? title;
   final double spacing;
 
@@ -16,7 +16,7 @@ class KenwellSignatureActions extends StatelessWidget {
     super.key,
     required this.controller,
     required this.onClear,
-    required this.navigation,
+    this.navigation,
     this.title,
     this.spacing = 24,
   });
@@ -33,8 +33,10 @@ class KenwellSignatureActions extends StatelessWidget {
             onClear: onClear,
           ),
         ),
-        SizedBox(height: spacing),
-        navigation,
+        if (navigation != null) ...[
+          SizedBox(height: spacing),
+          navigation!,
+        ],
       ],
     );
   }

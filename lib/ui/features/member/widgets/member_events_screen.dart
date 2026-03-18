@@ -5,6 +5,7 @@ import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/headers/kenwell_gradient_header.dart';
 import '../../../shared/ui/cards/kenwell_detail_row.dart';
 import '../../../shared/ui/cards/kenwell_section_card.dart';
+import '../../../shared/ui/colours/kenwell_colours.dart';
 
 /// Displays a member's personal details and their event-attendance history.
 ///
@@ -187,6 +188,8 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
                             .map((event) => _EventCard(
                                   event: event,
                                   formatDate: _vm.formatDate,
+                                  referral: _vm.referralFor(
+                                      event['eventId'] as String? ?? ''),
                                 ))
                             .toList(),
                     ],
@@ -206,10 +209,15 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _EventCard extends StatelessWidget {
-  const _EventCard({required this.event, required this.formatDate});
+  const _EventCard({
+    required this.event,
+    required this.formatDate,
+    this.referral,
+  });
 
   final Map<String, dynamic> event;
   final String Function(dynamic) formatDate;
+  final EventReferralSummary? referral;
 
   @override
   Widget build(BuildContext context) {
@@ -306,6 +314,13 @@ class _EventCard extends StatelessWidget {
                         .toList(),
                   ),
                 ],
+                // ── Referral outcome ────────────────────────────────────
+                if (referral != null && referral!.status != null) ...[
+                  const SizedBox(height: 10),
+                  const Divider(height: 1),
+                  const SizedBox(height: 10),
+                  _ReferralOutcomeSection(referral: referral!),
+                ],
               ],
             ),
           ),
@@ -328,6 +343,113 @@ class _EventCard extends StatelessWidget {
         if (event['tbCompleted'] as bool? ?? false) 'TB',
         if (event['cancerCompleted'] as bool? ?? false) 'Cancer',
       ];
+}
+
+class _ReferralOutcomeSection extends StatelessWidget {
+  const _ReferralOutcomeSection({required this.referral});
+  final EventReferralSummary referral;
+
+  @override
+  Widget build(BuildContext context) {
+    final isHighRisk = referral.isHighRisk;
+    final color = isHighRisk ? Colors.red.shade700 : Colors.green.shade700;
+    final bgColor = isHighRisk
+        ? Colors.red.withValues(alpha: 0.08)
+        : Colors.green.withValues(alpha: 0.08);
+    final icon =
+        isHighRisk ? Icons.dangerous_outlined : Icons.check_circle_outline;
+    final label = isHighRisk ? 'High Risk' : 'Healthy';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.medical_services_outlined,
+                size: 13, color: KenwellColors.neutralGrey),
+            const SizedBox(width: 4),
+            Text(
+              'Referral Outcome',
+              style: TextStyle(
+                fontSize: 11,
+                color: KenwellColors.neutralGrey,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: color.withValues(alpha: 0.3)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 16, color: color),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+        ),
+        // Show flagged metrics only for high-risk outcomes.
+        if (isHighRisk && referral.riskFlags.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Text(
+            'Flagged metrics:',
+            style: TextStyle(
+              fontSize: 11,
+              color: Colors.grey[600],
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Wrap(
+            spacing: 4,
+            runSpacing: 4,
+            children: referral.riskFlags
+                .map((flag) => _RiskFlagChip(label: flag))
+                .toList(),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _RiskFlagChip extends StatelessWidget {
+  const _RiskFlagChip({required this.label});
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      decoration: BoxDecoration(
+        color: Colors.red.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: Colors.red.withValues(alpha: 0.25)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          color: Colors.red.shade700,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
 }
 
 class _ScreeningBadge extends StatelessWidget {

@@ -66,4 +66,21 @@ class UserEventRepository {
     }
     await batch.commit();
   }
+
+  /// Returns a real-time stream of user-event mapping documents for [userId].
+  ///
+  /// Each emission contains the raw document data maps. The stream never
+  /// completes until the caller cancels. Errors are logged and the stream
+  /// continues (yielding an empty list).
+  Stream<List<Map<String, dynamic>>> watchUserEvents(String userId) {
+    return _firestore
+        .collection('user_events')
+        .where('userId', isEqualTo: userId)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList())
+        .handleError((Object err) {
+      debugPrint('UserEventRepository.watchUserEvents: error – $err');
+      return <Map<String, dynamic>>[];
+    });
+  }
 }

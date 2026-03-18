@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/cards/kenwell_empty_state.dart';
+import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:provider/provider.dart';
 import '../../../../../domain/models/user_model.dart';
 import '../../../../../domain/constants/role_permissions.dart';
@@ -415,7 +416,9 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                         borderRadius: BorderRadius.circular(18),
                         border: Border.all(
                           color:
-                              const Color(0xFF7C3AED).withValues(alpha: 0.20),
+                              //const Color(0xFF7C3AED).withValues(alpha: 0.20),
+                              KenwellColors.primaryGreen
+                                  .withValues(alpha: 0.20),
                           width: 1.5,
                         ),
                         boxShadow: [

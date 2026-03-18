@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kenwell_health_app/ui/features/consent_form/view_model/consent_view_model.dart';
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
 import 'package:provider/provider.dart';
@@ -24,6 +25,17 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     debugPrint('Firebase initialized successfully');
+
+    // Enable Firestore offline persistence so that previously loaded data is
+    // available when the device has no network connection.  Each device that
+    // runs the app maintains its own local Firestore cache; when connectivity
+    // is restored Firestore automatically syncs queued writes back to the
+    // server, providing a seamless offline-first experience.
+    FirebaseFirestore.instance.settings = const Settings(
+      persistenceEnabled: true,
+      cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+    );
+    debugPrint('Firestore offline persistence enabled');
   } catch (e) {
     debugPrint('Firebase initialization error: $e');
     debugPrint('App will run with limited functionality (local database only)');

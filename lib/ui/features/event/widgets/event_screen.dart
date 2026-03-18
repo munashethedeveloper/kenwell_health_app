@@ -61,6 +61,9 @@ class _EventScreenState extends State<EventScreen> {
         }
       });
     } else {
+      // Always clear controllers when creating a new event so that stale data
+      // from a previous form submission never bleeds through.
+      widget.viewModel.clearControllers();
       widget.viewModel.dateController.text =
           "${widget.date.year}-${widget.date.month.toString().padLeft(2, '0')}-${widget.date.day.toString().padLeft(2, '0')}";
     }
