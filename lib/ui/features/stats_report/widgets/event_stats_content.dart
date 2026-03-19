@@ -94,12 +94,13 @@ class _EventStatsContentState extends State<EventStatsContent> {
     final isLiveTab = widget.isLiveTab;
 
     // Filter by live/past status.
-    // For the live tab we also exclude events whose date is more than one day
-    // in the past — this prevents stale "in_progress" events (e.g. from
-    // January) from polluting the live view when they were never closed.
+    // For the live tab we ONLY show events that are:
+    //   • in-progress / ongoing, AND
+    //   • dated today (event date == today).
+    // This prevents stale "in_progress" events from previous days polluting the
+    // live view when they were never explicitly closed.
     final now = DateTime.now();
-    final liveCutoff =
-        DateTime(now.year, now.month, now.day).subtract(const Duration(days: 1));
+    final today = DateTime(now.year, now.month, now.day);
     final tabFilteredEvents = isLiveTab
         ? allEvents.where((e) {
             final s = e.status.toLowerCase();
@@ -109,7 +110,7 @@ class _EventStatsContentState extends State<EventStatsContent> {
             if (!isActive) return false;
             final eventDate =
                 DateTime(e.date.year, e.date.month, e.date.day);
-            return !eventDate.isBefore(liveCutoff);
+            return eventDate == today;
           }).toList()
         : allEvents.where((e) {
             final s = e.status.toLowerCase();

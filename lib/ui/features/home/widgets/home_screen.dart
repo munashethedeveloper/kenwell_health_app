@@ -6,21 +6,17 @@ import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:provider/provider.dart';
 import 'sections/home_notifications_section.dart';
-import 'sections/home_quick_actions_section.dart';
 
-/// Home screen — shows a profile hero, quick-actions grid, and smart alerts.
+/// Home screen — modern profile hero, quick-action grid, smart alerts.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, this.onTabSwitch});
 
-  /// Optional callback to switch the bottom-nav tab programmatically.
-  /// The integer is the destination tab index in the current role's tab list.
+  /// Optional callback to switch the bottom-nav tab.
   final void Function(int tabIndex)? onTabSwitch;
 
-  // ── Tab-index constants for the privileged-role layout ────────────────────
-  // Layout: Users=0, Stats=1, Home=2, Profile=3, Events=4
-  static const int _membersTabIndex = 0;
+  // ── Tab-index constants (privileged role: Users=0, Stats=1, Home=2, Profile=3, Events=4)
   static const int _statsTabIndex = 1;
-  static const int _eventsTabIndex = 4;
+  static const int _profileTabIndex = 3;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -55,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
         final initials = _initials(firstName, lastName);
 
         return Scaffold(
-          backgroundColor: KenwellColors.neutralBackground,
+          backgroundColor: const Color(0xFFF0F4F8),
           appBar: KenwellAppBar(
             title: 'KenWell365',
             titleStyle: const TextStyle(
@@ -82,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
             color: KenwellColors.primaryGreen,
             child: CustomScrollView(
               slivers: [
-                // ── Profile hero ───────────────────────────────────────────
+                // ── Profile hero ────────────────────────────────────────
                 SliverToBoxAdapter(
                   child: _ProfileHero(
                     initials: initials,
@@ -92,27 +88,22 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
-                // ── Quick actions ──────────────────────────────────────────
+                // ── Quick actions ────────────────────────────────────────
                 SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 24),
-                    child: HomeQuickActionsSection(
-                      onStartEvent: () => widget.onTabSwitch
-                          ?.call(HomeScreen._eventsTabIndex),
-                      onViewStats: () => widget.onTabSwitch
-                          ?.call(HomeScreen._statsTabIndex),
-                      onViewMembers: () => widget.onTabSwitch
-                          ?.call(HomeScreen._membersTabIndex),
-                      onMyEvents: () => widget.onTabSwitch
-                          ?.call(HomeScreen._eventsTabIndex),
-                    ),
+                  child: _QuickActionsGrid(
+                    onAddEvent: () => context.pushNamed('addEditEvent'),
+                    onAllEvents: () => context.pushNamed('allEvents'),
+                    onProfile: () =>
+                        widget.onTabSwitch?.call(HomeScreen._profileTabIndex),
+                    onLiveStats: () =>
+                        widget.onTabSwitch?.call(HomeScreen._statsTabIndex),
                   ),
                 ),
 
-                // ── Notifications / alerts ─────────────────────────────────
+                // ── Notifications ─────────────────────────────────────────
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.only(top: 24),
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                     child: HomeNotificationsSection(
                       profileVM: profileVM,
                       calendarVM: calendarVM,
@@ -132,11 +123,12 @@ class _HomeScreenState extends State<HomeScreen> {
   String _initials(String first, String last) {
     final f = first.isNotEmpty ? first[0].toUpperCase() : '';
     final l = last.isNotEmpty ? last[0].toUpperCase() : '';
-    return '$f$l'.isNotEmpty ? '$f$l' : '?';
+    final combined = '$f$l';
+    return combined.isNotEmpty ? combined : '?';
   }
 }
 
-// ── Profile hero card ─────────────────────────────────────────────────────────
+// ── Profile hero ──────────────────────────────────────────────────────────────
 
 class _ProfileHero extends StatelessWidget {
   const _ProfileHero({
@@ -156,122 +148,295 @@ class _ProfileHero extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFF1A1454), Color(0xFF0D7B56)],
+          colors: [Color(0xFF1A1454), Color(0xFF0B6B49)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
       ),
-      padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 36),
+      child: Column(
         children: [
-          // Avatar
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white.withValues(alpha: 0.2),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.5),
-                width: 2,
-              ),
-            ),
-            child: Center(
-              child: Text(
-                initials,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-          // Name & role
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  greeting,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.white.withValues(alpha: 0.75),
-                    letterSpacing: 0.3,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  firstName.isNotEmpty ? firstName : 'there',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                if (role.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.18),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.3)),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.verified_rounded,
-                            size: 12,
-                            color: Colors.greenAccent.shade100),
-                        const SizedBox(width: 4),
-                        Text(
-                          role,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          // KenWell365 branding badge
-          Column(
+          // ── Top row: avatar + info + badge ──
+          Row(
             children: [
+              // Avatar circle
               Container(
-                padding: const EdgeInsets.all(8),
+                width: 64,
+                height: 64,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(12),
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      Colors.white.withValues(alpha: 0.35),
+                      Colors.white.withValues(alpha: 0.1),
+                    ],
+                  ),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.5),
+                    width: 2,
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    initials,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 14),
+              // Greeting & name
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      greeting,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.white.withValues(alpha: 0.7),
+                        letterSpacing: 0.4,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      firstName.isNotEmpty ? firstName : 'there',
+                      style: const TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        height: 1.1,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // KenWell icon badge
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.25)),
                 ),
                 child: const Icon(
                   Icons.health_and_safety_rounded,
                   color: Colors.white,
-                  size: 28,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'KenWell',
-                style: TextStyle(
-                  fontSize: 10,
-                  color: Colors.white.withValues(alpha: 0.7),
-                  fontWeight: FontWeight.w600,
+                  size: 26,
                 ),
               ),
             ],
+          ),
+
+          if (role.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.3)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.verified_rounded,
+                        size: 13, color: Colors.greenAccent),
+                    const SizedBox(width: 6),
+                    Text(
+                      role,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+// ── Quick actions grid ────────────────────────────────────────────────────────
+
+class _QuickActionsGrid extends StatelessWidget {
+  const _QuickActionsGrid({
+    required this.onAddEvent,
+    required this.onAllEvents,
+    required this.onProfile,
+    required this.onLiveStats,
+  });
+
+  final VoidCallback onAddEvent;
+  final VoidCallback onAllEvents;
+  final VoidCallback onProfile;
+  final VoidCallback onLiveStats;
+
+  @override
+  Widget build(BuildContext context) {
+    final actions = [
+      _Action(
+        icon: Icons.add_circle_rounded,
+        label: 'Add Event',
+        subtitle: 'Create new',
+        color: KenwellColors.primaryGreen,
+        onTap: onAddEvent,
+      ),
+      _Action(
+        icon: Icons.event_available_rounded,
+        label: 'All Events',
+        subtitle: 'Browse & allocate',
+        color: const Color(0xFF3B82F6),
+        onTap: onAllEvents,
+      ),
+      _Action(
+        icon: Icons.person_rounded,
+        label: 'My Profile',
+        subtitle: 'Account & role',
+        color: const Color(0xFF8B5CF6),
+        onTap: onProfile,
+      ),
+      _Action(
+        icon: Icons.bar_chart_rounded,
+        label: 'Live Stats',
+        subtitle: 'Real-time data',
+        color: const Color(0xFFEF4444),
+        onTap: onLiveStats,
+      ),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(bottom: 12),
+            child: Text(
+              'Quick Actions',
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w800,
+                color: KenwellColors.secondaryNavy,
+                letterSpacing: -0.3,
+              ),
+            ),
+          ),
+          GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: 2.0,
+            children: actions.map((a) => _ActionCard(action: a)).toList(),
           ),
         ],
       ),
     );
   }
 }
+
+class _Action {
+  const _Action({
+    required this.icon,
+    required this.label,
+    required this.subtitle,
+    required this.color,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final String subtitle;
+  final Color color;
+  final VoidCallback onTap;
+}
+
+class _ActionCard extends StatelessWidget {
+  const _ActionCard({required this.action});
+
+  final _Action action;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      elevation: 0,
+      child: InkWell(
+        onTap: action.onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: action.color.withValues(alpha: 0.18),
+              width: 1.5,
+            ),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: action.color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(action.icon, color: action.color, size: 20),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      action.label,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: KenwellColors.secondaryNavy,
+                        height: 1.2,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      action.subtitle,
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: Colors.grey.shade500,
+                        height: 1.3,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+

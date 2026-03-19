@@ -17,6 +17,7 @@ import '../ui/features/auth/widgets/login_screen.dart';
 import '../ui/features/calendar/widgets/calendar_screen.dart';
 import '../ui/features/event/view_model/event_details_view_model.dart';
 import '../ui/features/event/view_model/event_view_model.dart';
+import '../ui/features/event/widgets/all_events_screen.dart';
 import '../ui/features/event/widgets/event_details_screen.dart';
 import '../ui/features/event/widgets/event_screen.dart';
 import '../domain/models/wellness_event.dart';
@@ -152,6 +153,13 @@ class AppRouterConfig {
               onPrevious: () {}, // No-op to prevent pop on root
             );
           },
+        ),
+
+        // All Events Route (search + allocate)
+        GoRoute(
+          path: '/all-events',
+          name: 'allEvents',
+          builder: (context, state) => const AllEventsScreen(),
         ),
 
         // Calendar Route

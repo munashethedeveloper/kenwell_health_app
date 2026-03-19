@@ -233,9 +233,6 @@ class CancerScreeningViewModel extends ChangeNotifier {
   /// - Any exam finding is abnormal.
   bool get isHighRisk => _symptomYesCount > 3 || _hasAbnormalExam;
 
-  /// True when any at-risk indicator is present (kept for submit logic).
-  bool get isAtRisk => isHighRisk || isCaution;
-
   /// True when caution flags are present but the patient is not high risk.
   /// Nurse uses clinical discretion to classify as Healthy or At Risk.
   bool get isCaution =>
