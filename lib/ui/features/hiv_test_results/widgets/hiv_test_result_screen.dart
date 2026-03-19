@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:kenwell_health_app/domain/constants/enums.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/colours/kenwell_colours.dart';
@@ -155,6 +156,7 @@ class HIVTestResultScreen extends StatelessWidget {
                       title: 'Signature',
                       controller: viewModel.signatureController,
                       onClear: viewModel.clearSignature,
+                      prefilledBase64: viewModel.prefilledHpSignatureBase64,
                       navigation: KenwellFormNavigation(
                         onPrevious: onPrevious,
                         onNext: () => viewModel.submitTestResult(
@@ -312,16 +314,16 @@ class HIVTestResultScreen extends StatelessWidget {
                 ? 'Please enter Nurse Last Name'
                 : null,
           ),
-          KenwellTextField(
+          KenwellDropdownField<String>(
             label: 'Rank',
-            hintText: 'Enter nurse rank',
-            controller: viewModel.rankController,
-            decoration: KenwellFormStyles.decoration(
-              label: 'Rank',
-              hint: 'Enter nurse rank',
-            ),
+            value: viewModel.rankController.text.isEmpty
+                ? null
+                : viewModel.rankController.text,
+            items: NurseRank.values.map((e) => e.label).toList(),
+            onChanged: viewModel.setRank,
+            hintText: 'Select rank',
             validator: (val) =>
-                (val == null || val.isEmpty) ? 'Please enter Rank' : null,
+                (val == null || val.isEmpty) ? 'Please select Rank' : null,
           ),
           KenwellTextField(
             label: 'SANC No',

@@ -219,6 +219,14 @@ class TBTestingViewModel extends ChangeNotifier {
       TextEditingController();
   final TextEditingController nurseLastNameController = TextEditingController();
   final TextEditingController rankController = TextEditingController();
+
+  /// Sets the nurse rank from the dropdown and syncs to [rankController].
+  void setRank(String? value) {
+    if (rankController.text == (value ?? '')) return;
+    rankController.text = value ?? '';
+    notifyListeners();
+  }
+
   final SignatureController signatureController = SignatureController(
     penStrokeWidth: 2,
     penColor: Colors.black,

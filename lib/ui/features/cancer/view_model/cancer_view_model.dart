@@ -234,8 +234,7 @@ class CancerScreeningViewModel extends ChangeNotifier {
   bool get isHighRisk => _symptomYesCount > 3 || _hasAbnormalExam;
 
   /// True when any at-risk indicator is present (kept for submit logic).
-  ///  bool get isAtRisk => isHighRisk || isCaution
-  bool get isAtRisk => isHighRisk || isCaution || previousCancerDiagnosis == 'Yes' ||
+  bool get isAtRisk => isHighRisk || isCaution ||  previousCancerDiagnosis == 'Yes' ||
       familyHistoryOfCancer == 'Yes' ||
       breastLump == 'Yes' ||
       abnormalBleeding == 'Yes' ||
@@ -292,6 +291,13 @@ class CancerScreeningViewModel extends ChangeNotifier {
       TextEditingController();
   final TextEditingController nurseLastNameController = TextEditingController();
   final TextEditingController rankController = TextEditingController();
+
+  /// Sets the nurse rank from the dropdown and syncs to [rankController].
+  void setRank(String? value) {
+    if (rankController.text == (value ?? '')) return;
+    rankController.text = value ?? '';
+    notifyListeners();
+  }
   final TextEditingController sancNumberController = TextEditingController();
   final TextEditingController nurseDateController = TextEditingController();
   final SignatureController signatureController = SignatureController(

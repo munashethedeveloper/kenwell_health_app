@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/domain/constants/enums.dart';
 import 'package:kenwell_health_app/utils/input_formatters.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
@@ -55,6 +56,7 @@ class NurseInterventionForm extends StatelessWidget {
           title: 'Signature',
           controller: viewModel.signatureController,
           onClear: viewModel.clearSignature,
+          prefilledBase64: viewModel.prefilledHpSignatureBase64,
           navigation: KenwellFormNavigation(
             onPrevious: onPrevious,
             onNext: () => viewModel.submitIntervention(
@@ -187,12 +189,17 @@ class NurseInterventionForm extends StatelessWidget {
                 ? 'Please enter Nurse Last Name'
                 : null,
           ),
-          KenwellTextField(
+          KenwellDropdownField<String>(
             label: 'Rank',
-            hintText: 'Enter nurse rank',
-            controller: viewModel.rankController,
+            value: () {
+              final t = viewModel.rankController.text;
+              return t.isEmpty ? null : t;
+            }(),
+            items: NurseRank.values.map((e) => e.label).toList(),
+            onChanged: (val) => viewModel.setRank(val),
+            hintText: 'Select rank',
             validator: (val) =>
-                (val == null || val.isEmpty) ? 'Please enter Rank' : null,
+                (val == null || val.isEmpty) ? 'Please select Rank' : null,
           ),
           KenwellTextField(
             label: 'SANC No',

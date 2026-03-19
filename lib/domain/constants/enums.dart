@@ -106,6 +106,24 @@ enum CitizenshipStatus {
   }
 }
 
+/// Nurse / healthcare-practitioner rank options
+enum NurseRank {
+  enrolledNursingAuxiliary('Enrolled Nursing Auxiliary'),
+  enrolledNurseMidwife('Enrolled Nurse/Midwife'),
+  registeredNurseMidwife('Registered Nurse/Midwife');
+
+  final String label;
+  const NurseRank(this.label);
+
+  static NurseRank? fromString(String? value) {
+    if (value == null) return null;
+    return NurseRank.values.firstWhere(
+      (e) => e.label == value,
+      orElse: () => NurseRank.registeredNurseMidwife,
+    );
+  }
+}
+
 /// Follow-up location options
 enum FollowUpLocation {
   stateClinic('Referred to State clinic'),
@@ -184,6 +202,7 @@ extension EnumListExtension<T extends Enum> on List<T> {
       if (enumValue is MaritalStatus) return enumValue.label;
       if (enumValue is IdDocumentType) return enumValue.label;
       if (enumValue is CitizenshipStatus) return enumValue.label;
+      if (enumValue is NurseRank) return enumValue.label;
       if (enumValue is FollowUpLocation) return enumValue.label;
       if (enumValue is WellnessStep) return enumValue.value;
       if (enumValue is ScreeningType) return enumValue.value;
