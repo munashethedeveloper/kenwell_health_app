@@ -1,8 +1,15 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import '../services/audit_log_service.dart';
 
 class UserEventRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final AuditLogService _audit;
+
+  UserEventRepository({AuditLogService? auditLogService})
+      : _audit = auditLogService ?? AuditLogService();
 
   Future<List<Map<String, dynamic>>> fetchUserEvents(String userId) async {
     debugPrint('UserEventRepository: Fetching events for userId: $userId');
@@ -65,6 +72,11 @@ class UserEventRepository {
       batch.delete(doc.reference);
     }
     await batch.commit();
+    unawaited(_audit.logDelete(
+      collection: 'user_events',
+      documentId: '${eventId}_$userId',
+      summary: 'Removed user $userId from event $eventId',
+    ));
   }
 
   /// Returns a real-time stream of user-event mapping documents for [userId].

@@ -6,30 +6,34 @@ import '../../../../domain/models/wellness_event.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/cards/kenwell_empty_state.dart';
 import '../../../shared/ui/colours/kenwell_colours.dart';
+import '../../../shared/ui/headers/kenwell_gradient_header.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../user_management/viewmodel/user_management_view_model.dart';
 import '../view_model/all_events_view_model.dart';
 import 'allocate_event_screen.dart';
 
-/// Screen that shows all events with a search bar (title / address).
-/// Tapping an event card opens the [AllocateEventScreen] for that event.
+/// Screen that shows all events with:
+///   - A gradient section header
+///   - A month navigation bar
+///   - A search bar (title / address)
+///   - Event cards that open [AllocateEventScreen] on tap
 class AllEventsScreen extends StatelessWidget {
   const AllEventsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Consume the global EventViewModel so we always have the latest events.
     return Consumer<EventViewModel>(
       builder: (context, eventVM, _) {
         return ChangeNotifierProvider(
-          create: (_) =>
-              AllEventsViewModel(allEvents: eventVM.events),
+          create: (_) => AllEventsViewModel(allEvents: eventVM.events),
           child: const _AllEventsBody(),
         );
       },
     );
   }
 }
+
+// ── Body ──────────────────────────────────────────────────────────────────────
 
 class _AllEventsBody extends StatelessWidget {
   const _AllEventsBody();
@@ -38,6 +42,7 @@ class _AllEventsBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final vm = context.watch<AllEventsViewModel>();
     final events = vm.filteredEvents;
+    final isSearching = vm.searchController.text.isNotEmpty;
 
     return Scaffold(
       backgroundColor: KenwellColors.neutralBackground,
@@ -51,24 +56,41 @@ class _AllEventsBody extends StatelessWidget {
         ),
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Search bar ─────────────────────────────────────────────────
+          // ── Gradient section header ─────────────────────────────────
+          const KenwellGradientHeader(
+            label: 'EVENTS',
+            title: 'All\nEvents',
+            subtitle: 'Browse, search and allocate events.',
+          ),
+
+          const SizedBox(height: 16),
+
+          // ── Search bar ──────────────────────────────────────────────
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: _EventSearchBar(vm: vm),
           ),
 
-          // ── List / empty state ─────────────────────────────────────────
+          const SizedBox(height: 12),
+
+          // ── Month navigation (hidden while searching) ───────────────
+          if (!isSearching) _MonthNavBar(vm: vm),
+
+          if (!isSearching) const SizedBox(height: 4),
+
+          // ── Events list / empty state ───────────────────────────────
           Expanded(
             child: events.isEmpty
                 ? KenwellEmptyState(
                     icon: Icons.event_busy_rounded,
-                    title: vm.searchController.text.isNotEmpty
+                    title: isSearching
                         ? 'No events match your search'
-                        : 'No events yet',
-                    message: vm.searchController.text.isNotEmpty
+                        : 'No events this month',
+                    message: isSearching
                         ? 'Try a different title or address'
-                        : 'Events will appear here once created',
+                        : 'Navigate to another month or create an event',
                   )
                 : ListView.builder(
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
@@ -80,6 +102,73 @@ class _AllEventsBody extends StatelessWidget {
                         .fadeIn(duration: 250.ms)
                         .slideY(begin: 0.08, end: 0, duration: 250.ms),
                   ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Month navigation bar ──────────────────────────────────────────────────────
+
+class _MonthNavBar extends StatelessWidget {
+  const _MonthNavBar({required this.vm});
+
+  final AllEventsViewModel vm;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [KenwellColors.secondaryNavy, Color(0xFF2E2880)],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Previous month
+          IconButton(
+            icon: const Icon(Icons.chevron_left_rounded),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+            onPressed: vm.goToPreviousMonth,
+            style: IconButton.styleFrom(
+              backgroundColor: theme.colorScheme.surface,
+              foregroundColor: KenwellColors.secondaryNavy,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Text(
+            vm.getMonthYearTitle(),
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              letterSpacing: -0.4,
+            ),
+          ),
+          const SizedBox(width: 16),
+          // Next month
+          IconButton(
+            icon: const Icon(Icons.chevron_right_rounded),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+            onPressed: vm.goToNextMonth,
+            style: IconButton.styleFrom(
+              backgroundColor: theme.colorScheme.surface,
+              foregroundColor: KenwellColors.secondaryNavy,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+            ),
           ),
         ],
       ),
@@ -197,7 +286,6 @@ class _AllEventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final statusColor = _statusColor(event.status);
 
     return GestureDetector(
@@ -226,17 +314,14 @@ class _AllEventCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Left accent bar
-                Container(
-                  width: 5,
-                  color: KenwellColors.primaryGreen,
-                ),
+                Container(width: 5, color: KenwellColors.primaryGreen),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Title row with status chip
+                        // Title row + status chip
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -249,11 +334,8 @@ class _AllEventCard extends StatelessWidget {
                                     .withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: const Icon(
-                                Icons.event_rounded,
-                                color: KenwellColors.primaryGreen,
-                                size: 20,
-                              ),
+                              child: const Icon(Icons.event_rounded,
+                                  color: KenwellColors.primaryGreen, size: 20),
                             ),
                             const SizedBox(width: 10),
                             Expanded(
@@ -273,11 +355,9 @@ class _AllEventCard extends StatelessWidget {
                                   const SizedBox(height: 3),
                                   Row(
                                     children: [
-                                      const Icon(
-                                        Icons.location_on_outlined,
-                                        size: 12,
-                                        color: KenwellColors.neutralGrey,
-                                      ),
+                                      const Icon(Icons.location_on_outlined,
+                                          size: 12,
+                                          color: KenwellColors.neutralGrey),
                                       const SizedBox(width: 3),
                                       Expanded(
                                         child: Text(
@@ -323,7 +403,8 @@ class _AllEventCard extends StatelessWidget {
                           children: [
                             _MetaChip(
                               icon: Icons.calendar_today_outlined,
-                              label: '${event.date.day}/${event.date.month}/${event.date.year}',
+                              label:
+                                  '${event.date.day}/${event.date.month}/${event.date.year}',
                             ),
                             const SizedBox(width: 6),
                             _MetaChip(
@@ -333,7 +414,7 @@ class _AllEventCard extends StatelessWidget {
                                   : '—',
                             ),
                             const Spacer(),
-                            Text(
+                            const Text(
                               'Tap to allocate',
                               style: TextStyle(
                                 fontSize: 11,
@@ -342,11 +423,8 @@ class _AllEventCard extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 2),
-                            const Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              size: 11,
-                              color: KenwellColors.primaryGreen,
-                            ),
+                            const Icon(Icons.arrow_forward_ios_rounded,
+                                size: 11, color: KenwellColors.primaryGreen),
                           ],
                         ),
                       ],
@@ -361,6 +439,8 @@ class _AllEventCard extends StatelessWidget {
     );
   }
 }
+
+// ── Meta chip ─────────────────────────────────────────────────────────────────
 
 class _MetaChip extends StatelessWidget {
   const _MetaChip({required this.icon, required this.label});
@@ -395,3 +475,4 @@ class _MetaChip extends StatelessWidget {
     );
   }
 }
+

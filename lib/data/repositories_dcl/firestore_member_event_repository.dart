@@ -1,12 +1,20 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import '../../domain/models/member_event.dart';
+import '../services/audit_log_service.dart';
 
 /// Repository for managing member-event participation records in Firestore.
 /// Uses the `member_events` collection where each document tracks a member's
 /// registration and screening participation for a specific wellness event.
 class FirestoreMemberEventRepository {
   static const String memberEventsCollection = 'member_events';
+
+  final AuditLogService _audit;
+
+  FirestoreMemberEventRepository({AuditLogService? auditLogService})
+      : _audit = auditLogService ?? AuditLogService();
 
   /// Generates a deterministic document ID for a member-event pair.
   String _docId(String memberId, String eventId) => '${memberId}_$eventId';
@@ -27,6 +35,14 @@ class FirestoreMemberEventRepository {
           transaction.set(ref, memberEvent.toMap());
         }
       });
+
+      unawaited(_audit.logCreate(
+        collection: memberEventsCollection,
+        documentId: memberEvent.id,
+        data: memberEvent.toMap(),
+        summary:
+            'Member ${memberEvent.memberId} registered for event ${memberEvent.eventId}',
+      ));
 
       debugPrint('Added member event record: ${memberEvent.id}');
     } catch (e, stackTrace) {

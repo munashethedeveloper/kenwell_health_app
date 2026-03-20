@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import '../services/audit_log_service.dart';
 import '../services/firestore_service.dart';
 import '../local/app_database.dart';
 import '../../domain/models/member.dart';
@@ -21,14 +24,17 @@ import 'member_repository.dart';
 class FirestoreMemberRepository {
   final FirestoreService _firestore;
   final MemberRepository _localRepo;
+  final AuditLogService _audit;
   static const String membersCollection = 'members';
   final _memberEventRepository = FirestoreMemberEventRepository();
 
   FirestoreMemberRepository({
     FirestoreService? firestoreService,
     MemberRepository? localRepo,
+    AuditLogService? auditLogService,
   })  : _firestore = firestoreService ?? FirestoreService(),
-        _localRepo = localRepo ?? MemberRepository(AppDatabase.instance);
+        _localRepo = localRepo ?? MemberRepository(AppDatabase.instance),
+        _audit = auditLogService ?? AuditLogService();
 
   /// Fetch all members from Firestore and cache them locally.
   ///
@@ -142,11 +148,18 @@ class FirestoreMemberRepository {
 
   /// Add new member to Firestore and mirror to local cache.
   Future<void> addMember(Member member) async {
+    final data = _mapToFirestore(member);
     await _firestore.createDocument(
       collection: membersCollection,
       documentId: member.id,
-      data: _mapToFirestore(member),
+      data: data,
     );
+    unawaited(_audit.logCreate(
+      collection: membersCollection,
+      documentId: member.id,
+      data: data,
+      summary: 'Registered member: ${member.firstName} ${member.lastName}',
+    ));
     try {
       await _localRepo.createMember(member);
     } catch (_) {
@@ -156,11 +169,18 @@ class FirestoreMemberRepository {
 
   /// Update existing member in Firestore and mirror to local cache.
   Future<void> updateMember(Member member) async {
+    final data = _mapToFirestore(member);
     await _firestore.updateDocument(
       collection: membersCollection,
       documentId: member.id,
-      data: _mapToFirestore(member),
+      data: data,
     );
+    unawaited(_audit.logUpdate(
+      collection: membersCollection,
+      documentId: member.id,
+      newData: data,
+      summary: 'Updated member: ${member.firstName} ${member.lastName}',
+    ));
     try {
       await _localRepo.updateMember(member);
     } catch (_) {
@@ -174,6 +194,11 @@ class FirestoreMemberRepository {
       collection: membersCollection,
       documentId: id,
     );
+    unawaited(_audit.logDelete(
+      collection: membersCollection,
+      documentId: id,
+      summary: 'Deleted member: $id',
+    ));
   }
 
   /// Stream members in real-time

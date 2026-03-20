@@ -1,9 +1,14 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:kenwell_health_app/domain/models/user_model.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
+import 'audit_log_service.dart';
 
 class UserEventService {
+  static final AuditLogService _audit = AuditLogService();
+
   static Future<void> addUserEvent({
     required WellnessEvent event,
     required UserModel user,
@@ -41,9 +46,24 @@ class UserEventService {
           await FirebaseFirestore.instance.collection('user_events').add(data);
       debugPrint(
           'UserEventService: ✅ Successfully saved to Firestore with document ID: ${docRef.id}');
+
+      unawaited(_audit.logCreate(
+        collection: 'user_events',
+        documentId: docRef.id,
+        data: {
+          'eventId': event.id,
+          'eventTitle': event.title,
+          'userId': user.id,
+          'userName': '${user.firstName} ${user.lastName}',
+        },
+        summary:
+            'Allocated user ${user.firstName} ${user.lastName} to event "${event.title}"',
+      ));
     } catch (e) {
       debugPrint('UserEventService: ❌ ERROR saving to Firestore: $e');
       rethrow;
     }
   }
 }
+
+
