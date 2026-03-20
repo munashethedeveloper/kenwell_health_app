@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
-import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_modern_section_header.dart';
-import 'package:kenwell_health_app/ui/shared/ui/logo/app_logo.dart';
 import 'package:provider/provider.dart';
 import '../../../../data/repositories_dcl/auth_repository_dcl.dart';
 import '../../../shared/ui/form/custom_text_field.dart';
@@ -16,55 +13,39 @@ import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 // Login Screen Widget
 class LoginScreen extends StatelessWidget {
-  // Constructor
   const LoginScreen({super.key});
 
-  // Build method
   @override
   Widget build(BuildContext context) {
-    // Provide the LoginViewModel to the widget tree
     return ChangeNotifierProvider(
-      // Initialize LoginViewModel with AuthRepository
       create: (_) => LoginViewModel(AuthRepository()),
-      // Body of the login screen
       child: const _LoginScreenBody(),
     );
   }
 }
 
-// Private StatefulWidget for the login screen body
 class _LoginScreenBody extends StatefulWidget {
-  // Constructor
   const _LoginScreenBody();
 
-  // Create state
   @override
   State<_LoginScreenBody> createState() => _LoginScreenBodyState();
 }
 
-// State class for the login screen body
 class _LoginScreenBodyState extends State<_LoginScreenBody> {
-  // Form key and controllers
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
-  // Handle login action
   void _handleLogin() {
-    // Validate form
     if (!_formKey.currentState!.validate()) return;
-
-    // Call login on the view model
     final viewModel = context.read<LoginViewModel>();
-    // Trigger login with email and password
     viewModel.login(
       _emailController.text.trim(),
       _passwordController.text.trim(),
     );
   }
 
-  // Dispose controllers
   @override
   void dispose() {
     _emailController.dispose();
@@ -72,36 +53,21 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
     super.dispose();
   }
 
-  // Build method
   @override
   Widget build(BuildContext context) {
-    // Consume the LoginViewModel
     return Consumer<LoginViewModel>(builder: (context, viewModel, _) {
-      // Handle navigation
       if (viewModel.navigationTarget != null) {
-        // Navigate to main screen on successful login
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           if (!mounted) return;
-
-          // Load user profile data before navigation
           final profileVM = context.read<ProfileViewModel>();
           await profileVM.loadProfile();
-
-          // Update AuthViewModel login status
           final authVM = context.read<AuthViewModel>();
           await authVM.checkLoginStatus();
-
-          // Clear navigation target to prevent repeated navigation
           viewModel.clearNavigationTarget();
-
-          // Navigate to main navigation screen
-          if (mounted) {
-            context.go('/');
-          }
+          if (mounted) context.go('/');
         });
       }
 
-      // Show error message
       if (viewModel.errorMessage != null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
@@ -110,112 +76,173 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
         });
       }
 
-      // Build the login screen UI
       return Scaffold(
-        appBar: const KenwellAppBar(
-          title: 'KenWell365',
-          titleStyle: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-          // titleColor: Colors.white,
-          automaticallyImplyLeading: false,
-        ),
-        backgroundColor: KenwellColors.neutralBackground,
-        body: Column(
+        backgroundColor: const Color(0xFFF0F4F8),
+        body: Stack(
           children: [
-            const SizedBox(height: 10),
-            const AppLogo(size: 200),
-            /*   // ── Gradient section header ─────────────────────────────
-            const KenwellGradientHeader(
-              label: 'LOGIN',
-              title: 'Welcome\nBack',
-             // title: 'Login',
-              subtitle: 'Supporting wellbeing, 365 days a year.',
-            ), */
-
-            // ── Form section — white scrollable panel ───────────────
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
-                child: Form(
-                  key: _formKey,
+            // ── Gradient top-half ─────────────────────────────────────────
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              height: MediaQuery.of(context).size.height * 0.42,
+              child: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFF1A1454), Color(0xFF0B6B49)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(36),
+                    bottomRight: Radius.circular(36),
+                  ),
+                ),
+                child: SafeArea(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Section header
-                      const KenwellModernSectionHeader(
-                        title: 'Sign in',
-                        subtitle:
-                            'Access your account and manage your wellbeing.',
-                        icon: Icons.waving_hand,
+                      // App icon
+                      Container(
+                        width: 72,
+                        height: 72,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.15),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.35),
+                              width: 2),
+                        ),
+                        child: const Icon(
+                          Icons.health_and_safety_rounded,
+                          color: Colors.white,
+                          size: 36,
+                        ),
                       ),
-                      /*  const Text(
-                        'Sign in to your account',
+                      const SizedBox(height: 14),
+                      const Text(
+                        'KenWell365',
                         style: TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF6B7280),
-                        ),
-                      ), */
-                      const SizedBox(height: 40),
-                      // Email field
-                      KenwellTextField(
-                        label: "Email",
-                        controller: _emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        padding: EdgeInsets.zero,
-                        validator: Validators.validateEmail,
-                      ),
-                      const SizedBox(height: 20),
-                      // Password field
-                      KenwellTextField(
-                        label: "Password",
-                        controller: _passwordController,
-                        obscureText: _obscurePassword,
-                        padding: EdgeInsets.zero,
-                        suffixIcon: IconButton(
-                          icon: Icon(_obscurePassword
-                              ? Icons.visibility_off
-                              : Icons.visibility),
-                          onPressed: () => setState(
-                              () => _obscurePassword = !_obscurePassword),
-                        ),
-                        validator: Validators.validatePasswordPresence,
-                      ),
-                      // Forgot password link
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {
-                            context.pushNamed('forgotPassword');
-                          },
-                          child: const Text(
-                            'Forgot Password?',
-                            style: TextStyle(
-                              decoration: TextDecoration.underline,
-                              fontSize: 14,
-                              color: Color(0xFF201C58),
-                            ),
-                          ),
+                          fontSize: 28,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                          letterSpacing: -0.5,
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      // Login button
-                      CustomPrimaryButton(
-                        label: "Login",
-                        // minimumSize: 20,
-                        minHeight: 20,
-                        labelStyle: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                      const SizedBox(height: 6),
+                      Text(
+                        'Supporting wellbeing, 365 days a year',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.white.withValues(alpha: 0.75),
                         ),
-                        onPressed: _handleLogin,
-                        isBusy: viewModel.isLoading,
                       ),
-                      const SizedBox(height: 16),
                     ],
                   ),
+                ),
+              ),
+            ),
+
+            // ── Form card ─────────────────────────────────────────────────
+            Positioned.fill(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.34),
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.08),
+                            blurRadius: 24,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      padding: const EdgeInsets.fromLTRB(24, 28, 24, 28),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Sign In',
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w800,
+                                color: KenwellColors.secondaryNavy,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Welcome back — enter your credentials',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey.shade500,
+                              ),
+                            ),
+                            const SizedBox(height: 28),
+                            KenwellTextField(
+                              label: 'Email',
+                              controller: _emailController,
+                              keyboardType: TextInputType.emailAddress,
+                              padding: EdgeInsets.zero,
+                              validator: Validators.validateEmail,
+                            ),
+                            const SizedBox(height: 16),
+                            KenwellTextField(
+                              label: 'Password',
+                              controller: _passwordController,
+                              obscureText: _obscurePassword,
+                              padding: EdgeInsets.zero,
+                              suffixIcon: IconButton(
+                                icon: Icon(_obscurePassword
+                                    ? Icons.visibility_off_outlined
+                                    : Icons.visibility_outlined),
+                                onPressed: () => setState(
+                                    () => _obscurePassword = !_obscurePassword),
+                              ),
+                              validator: Validators.validatePasswordPresence,
+                            ),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: () =>
+                                    context.pushNamed('forgotPassword'),
+                                style: TextButton.styleFrom(
+                                    padding: const EdgeInsets.only(
+                                        top: 4, bottom: 4)),
+                                child: const Text(
+                                  'Forgot Password?',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: KenwellColors.secondaryNavy,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            CustomPrimaryButton(
+                              label: 'Sign In',
+                              minHeight: 20,
+                              labelStyle: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              onPressed: _handleLogin,
+                              isBusy: viewModel.isLoading,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                  ],
                 ),
               ),
             ),

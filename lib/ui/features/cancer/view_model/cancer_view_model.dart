@@ -209,10 +209,13 @@ class CancerScreeningViewModel extends ChangeNotifier {
   // --- Risk classification ---
 
   /// Number of symptom questions answered 'Yes'.
-  int get _symptomYesCount =>
-      [breastLump, abnormalBleeding, urinaryDifficulty, weightLoss, persistentPain]
-          .where((v) => v == 'Yes')
-          .length;
+  int get _symptomYesCount => [
+        breastLump,
+        abnormalBleeding,
+        urinaryDifficulty,
+        weightLoss,
+        persistentPain
+      ].where((v) => v == 'Yes').length;
 
   /// True when any medical history flag is set.
   bool get _hasMedicalHistory =>
@@ -232,18 +235,6 @@ class CancerScreeningViewModel extends ChangeNotifier {
   /// - More than 3 symptom yeses, OR
   /// - Any exam finding is abnormal.
   bool get isHighRisk => _symptomYesCount > 3 || _hasAbnormalExam;
-
-  /// True when any at-risk indicator is present (kept for submit logic).
-  bool get isAtRisk => isHighRisk || isCaution ||  previousCancerDiagnosis == 'Yes' ||
-      familyHistoryOfCancer == 'Yes' ||
-      breastLump == 'Yes' ||
-      abnormalBleeding == 'Yes' ||
-      urinaryDifficulty == 'Yes' ||
-      weightLoss == 'Yes' ||
-      persistentPain == 'Yes' ||
-      breastLightExamFindings == 'Abnormal' ||
-      papSmearResults == 'Abnormal' ||
-      psaResults == 'Abnormal';
 
   /// True when caution flags are present but the patient is not high risk.
   /// Nurse uses clinical discretion to classify as Healthy or At Risk.
@@ -298,6 +289,7 @@ class CancerScreeningViewModel extends ChangeNotifier {
     rankController.text = value ?? '';
     notifyListeners();
   }
+
   final TextEditingController sancNumberController = TextEditingController();
   final TextEditingController nurseDateController = TextEditingController();
   final SignatureController signatureController = SignatureController(
@@ -317,7 +309,7 @@ class CancerScreeningViewModel extends ChangeNotifier {
 
   /// True when any symptom, exam finding, or medical history flag indicates
   /// that the patient requires follow-up (at risk).
-/*   bool get isAtRisk =>
+  bool get isAtRisk =>
       previousCancerDiagnosis == 'Yes' ||
       familyHistoryOfCancer == 'Yes' ||
       breastLump == 'Yes' ||
@@ -327,7 +319,7 @@ class CancerScreeningViewModel extends ChangeNotifier {
       persistentPain == 'Yes' ||
       breastLightExamFindings == 'Abnormal' ||
       papSmearResults == 'Abnormal' ||
-      psaResults == 'Abnormal'; */
+      psaResults == 'Abnormal';
 
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
@@ -381,7 +373,8 @@ class CancerScreeningViewModel extends ChangeNotifier {
       String? signatureBase64;
       if (signatureController.isNotEmpty) {
         final signatureBytes = await signatureController.toPngBytes();
-        if (signatureBytes != null) signatureBase64 = base64Encode(signatureBytes);
+        if (signatureBytes != null)
+          signatureBase64 = base64Encode(signatureBytes);
       }
       signatureBase64 ??= prefilledHpSignatureBase64;
 
@@ -421,11 +414,11 @@ class CancerScreeningViewModel extends ChangeNotifier {
             ? null
             : nurseLastNameController.text,
         rank: rankController.text.isEmpty ? null : rankController.text,
-        sancNumber:
-            sancNumberController.text.isEmpty ? null : sancNumberController.text,
-        nurseDate: nurseDateController.text.isEmpty
+        sancNumber: sancNumberController.text.isEmpty
             ? null
-            : nurseDateController.text,
+            : sancNumberController.text,
+        nurseDate:
+            nurseDateController.text.isEmpty ? null : nurseDateController.text,
         signatureData: signatureBase64,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
