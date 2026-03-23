@@ -1,15 +1,24 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kenwell_health_app/data/local/screening_local_store.dart';
+import 'package:kenwell_health_app/data/services/audit_log_service.dart';
 import 'package:kenwell_health_app/data/services/firestore_service.dart';
 import 'package:kenwell_health_app/domain/models/cander_screening.dart';
 import 'package:kenwell_health_app/utils/logger.dart';
 
+/// Repository for managing cancer screening records in Firestore.
+///
+/// Every mutating operation writes a corresponding entry to the `audit_logs`
+/// collection via [AuditLogService].
 class FirestoreCancerScreeningRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final ScreeningLocalStore _local = ScreeningLocalStore.instance;
+  final AuditLogService _audit;
   static const String _collectionName =
       FirestoreService.cancerScreeningsCollection;
+
+  FirestoreCancerScreeningRepository({AuditLogService? auditLogService})
+      : _audit = auditLogService ?? AuditLogService();
 
   Future<void> addCancerScreening(CancerScreening screening) async {
     try {
@@ -19,6 +28,12 @@ class FirestoreCancerScreeningRepository {
           .set(screening.toMap());
       // Write-through: persist to local SQLite store so data is available offline.
       unawaited(_local.upsertCancerScreening(screening.toMap()));
+      unawaited(_audit.logCreate(
+        collection: _collectionName,
+        documentId: screening.id,
+        data: screening.toMap(),
+        summary: 'Cancer screening added for member ${screening.memberId}',
+      ));
       AppLogger.info('Cancer screening added successfully: ${screening.id}');
     } catch (e) {
       AppLogger.error('Failed to add cancer screening', e);

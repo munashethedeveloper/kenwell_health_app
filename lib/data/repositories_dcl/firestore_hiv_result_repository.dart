@@ -3,13 +3,22 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kenwell_health_app/data/local/screening_local_store.dart';
 import 'package:kenwell_health_app/domain/models/hiv_result.dart';
+import 'package:kenwell_health_app/data/services/audit_log_service.dart';
 import 'package:kenwell_health_app/data/services/firestore_service.dart';
 import 'package:kenwell_health_app/utils/logger.dart';
 
+/// Repository for managing HIV test result records in Firestore.
+///
+/// Every mutating operation writes a corresponding entry to the `audit_logs`
+/// collection via [AuditLogService].
 class FirestoreHivResultRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final ScreeningLocalStore _local = ScreeningLocalStore.instance;
+  final AuditLogService _audit;
   static const String _collectionName = FirestoreService.hivResultsCollection;
+
+  FirestoreHivResultRepository({AuditLogService? auditLogService})
+      : _audit = auditLogService ?? AuditLogService();
 
   Future<void> addHivResult(HivResult result) async {
     try {
@@ -19,6 +28,12 @@ class FirestoreHivResultRepository {
           .set(result.toMap());
       // Write-through: persist to local SQLite store so data is available offline.
       unawaited(_local.upsertHivResult(result.toMap()));
+      unawaited(_audit.logCreate(
+        collection: _collectionName,
+        documentId: result.id,
+        data: result.toMap(),
+        summary: 'HIV result added for member ${result.memberId}',
+      ));
       AppLogger.info('HIV result added successfully: ${result.id}');
     } catch (e) {
       AppLogger.error('Failed to add HIV result', e);

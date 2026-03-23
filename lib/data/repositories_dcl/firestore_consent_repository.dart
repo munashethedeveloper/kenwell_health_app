@@ -3,13 +3,22 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kenwell_health_app/data/local/screening_local_store.dart';
 import 'package:kenwell_health_app/domain/models/consent.dart';
+import 'package:kenwell_health_app/data/services/audit_log_service.dart';
 import 'package:kenwell_health_app/data/services/firestore_service.dart';
 import 'package:kenwell_health_app/utils/logger.dart';
 
+/// Repository for managing consent records in Firestore.
+///
+/// Every mutating operation (add / update / delete) writes a corresponding
+/// entry to the `audit_logs` collection via [AuditLogService].
 class FirestoreConsentRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final ScreeningLocalStore _local = ScreeningLocalStore.instance;
+  final AuditLogService _audit;
   static const String _collectionName = FirestoreService.consentsCollection;
+
+  FirestoreConsentRepository({AuditLogService? auditLogService})
+      : _audit = auditLogService ?? AuditLogService();
 
   /// Add a new consent
   Future<void> addConsent(Consent consent) async {
@@ -20,6 +29,12 @@ class FirestoreConsentRepository {
           .set(consent.toMap());
       // Write-through: persist to local SQLite store so data is available offline.
       unawaited(_local.upsertConsent(consent.toMap()));
+      unawaited(_audit.logCreate(
+        collection: _collectionName,
+        documentId: consent.id,
+        data: consent.toMap(),
+        summary: 'Consent added for member ${consent.memberId}',
+      ));
       AppLogger.info('Consent added successfully: ${consent.id}');
     } catch (e) {
       AppLogger.error('Failed to add consent', e);
@@ -64,6 +79,12 @@ class FirestoreConsentRepository {
           .collection(_collectionName)
           .doc(consent.id)
           .update(updatedConsent.toMap());
+      unawaited(_audit.logUpdate(
+        collection: _collectionName,
+        documentId: consent.id,
+        newData: updatedConsent.toMap(),
+        summary: 'Consent updated for member ${consent.memberId}',
+      ));
       AppLogger.info('Consent updated successfully: ${consent.id}');
     } catch (e) {
       AppLogger.error('Failed to update consent', e);
@@ -75,6 +96,11 @@ class FirestoreConsentRepository {
   Future<void> deleteConsent(String id) async {
     try {
       await _firestore.collection(_collectionName).doc(id).delete();
+      unawaited(_audit.logDelete(
+        collection: _collectionName,
+        documentId: id,
+        summary: 'Consent deleted: $id',
+      ));
       AppLogger.info('Consent deleted successfully: $id');
     } catch (e) {
       AppLogger.error('Failed to delete consent', e);

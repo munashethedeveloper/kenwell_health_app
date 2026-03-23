@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kenwell_health_app/domain/constants/role_permissions.dart';
 import 'package:kenwell_health_app/ui/features/auth/view_models/auth_view_model.dart';
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
@@ -103,6 +104,22 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
                           //badgeLabel: 'Support',
                           onTap: () => context.pushNamed('help'),
                         ),
+                        // Audit Log card (admin / top management only)
+                        if (RolePermissions.canAccessFeature(
+                            vm.role, 'view_audit_log')) ...[
+                          const SizedBox(height: 16),
+                          KenwellActionCard(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF1E3A5F), Color(0xFF2563EB)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            icon: Icons.history_rounded,
+                            title: 'Audit Log',
+                            subtitle: 'View all create, update & delete actions',
+                            onTap: () => context.pushNamed('auditLog'),
+                          ),
+                        ],
                         const SizedBox(height: 16),
                         // Destructive logout card
                         _LogoutCard(onTap: () => _logout(context)),

@@ -2,14 +2,23 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kenwell_health_app/data/local/screening_local_store.dart';
 import 'package:kenwell_health_app/domain/models/hra_screening.dart';
+import 'package:kenwell_health_app/data/services/audit_log_service.dart';
 import 'package:kenwell_health_app/data/services/firestore_service.dart';
 import 'package:kenwell_health_app/utils/logger.dart';
 
+/// Repository for managing HRA screening records in Firestore.
+///
+/// Every mutating operation (add / update / delete) writes a corresponding
+/// entry to the `audit_logs` collection via [AuditLogService].
 class FirestoreHraRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final ScreeningLocalStore _local = ScreeningLocalStore.instance;
+  final AuditLogService _audit;
   static const String _collectionName =
       FirestoreService.hraScreeningsCollection;
+
+  FirestoreHraRepository({AuditLogService? auditLogService})
+      : _audit = auditLogService ?? AuditLogService();
 
   /// Add a new HRA screening
   Future<void> addHraScreening(HraScreening screening) async {
@@ -20,6 +29,12 @@ class FirestoreHraRepository {
           .set(screening.toMap());
       // Write-through: persist to local SQLite store so data is available offline.
       unawaited(_local.upsertHraScreening(screening.toMap()));
+      unawaited(_audit.logCreate(
+        collection: _collectionName,
+        documentId: screening.id,
+        data: screening.toMap(),
+        summary: 'HRA screening added for member ${screening.memberId}',
+      ));
       AppLogger.info('HRA screening added successfully: ${screening.id}');
     } catch (e) {
       AppLogger.error('Failed to add HRA screening', e);
@@ -64,6 +79,12 @@ class FirestoreHraRepository {
           .collection(_collectionName)
           .doc(screening.id)
           .update(updatedScreening.toMap());
+      unawaited(_audit.logUpdate(
+        collection: _collectionName,
+        documentId: screening.id,
+        newData: updatedScreening.toMap(),
+        summary: 'HRA screening updated for member ${screening.memberId}',
+      ));
       AppLogger.info('HRA screening updated successfully: ${screening.id}');
     } catch (e) {
       AppLogger.error('Failed to update HRA screening', e);
@@ -75,6 +96,11 @@ class FirestoreHraRepository {
   Future<void> deleteHraScreening(String id) async {
     try {
       await _firestore.collection(_collectionName).doc(id).delete();
+      unawaited(_audit.logDelete(
+        collection: _collectionName,
+        documentId: id,
+        summary: 'HRA screening deleted: $id',
+      ));
       AppLogger.info('HRA screening deleted successfully: $id');
     } catch (e) {
       AppLogger.error('Failed to delete HRA screening', e);

@@ -2,13 +2,22 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kenwell_health_app/data/local/screening_local_store.dart';
 import 'package:kenwell_health_app/domain/models/tb_screening.dart';
+import 'package:kenwell_health_app/data/services/audit_log_service.dart';
 import 'package:kenwell_health_app/data/services/firestore_service.dart';
 import 'package:kenwell_health_app/utils/logger.dart';
 
+/// Repository for managing TB screening records in Firestore.
+///
+/// Every mutating operation writes a corresponding entry to the `audit_logs`
+/// collection via [AuditLogService].
 class FirestoreTbScreeningRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final ScreeningLocalStore _local = ScreeningLocalStore.instance;
+  final AuditLogService _audit;
   static const String _collectionName = FirestoreService.tbScreeningsCollection;
+
+  FirestoreTbScreeningRepository({AuditLogService? auditLogService})
+      : _audit = auditLogService ?? AuditLogService();
 
   Future<void> addTbScreening(TbScreening screening) async {
     try {
@@ -18,6 +27,12 @@ class FirestoreTbScreeningRepository {
           .set(screening.toMap());
       // Write-through: persist to local SQLite store so data is available offline.
       unawaited(_local.upsertTbScreening(screening.toMap()));
+      unawaited(_audit.logCreate(
+        collection: _collectionName,
+        documentId: screening.id,
+        data: screening.toMap(),
+        summary: 'TB screening added for member ${screening.memberId}',
+      ));
       AppLogger.info('TB screening added successfully: ${screening.id}');
     } catch (e) {
       AppLogger.error('Failed to add TB screening', e);
