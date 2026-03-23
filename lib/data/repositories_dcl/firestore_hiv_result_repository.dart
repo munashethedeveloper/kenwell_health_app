@@ -54,10 +54,16 @@ class FirestoreHivResultRepository {
 
   Future<List<HivResult>> getHivResultsByMember(String memberId) async {
     try {
+      // NOTE: No orderBy here — .where('memberId').orderBy('createdAt')
+      // requires a Firestore composite index.  Without it Firestore throws an
+      // error that is silently caught in loadAllCompletionFlags, leaving the
+      // hctCompleted flag permanently false.  A single equality filter uses
+      // the auto-created single-field index and needs no composite index.
+      // The composite index IS defined in firestore.indexes.json for queries
+      // (e.g., watchConsentsByMember) where ordering is required for the UI.
       final querySnapshot = await _firestore
           .collection(_collectionName)
           .where('memberId', isEqualTo: memberId)
-          .orderBy('createdAt', descending: true)
           .get();
 
       final results = querySnapshot.docs

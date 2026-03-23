@@ -102,10 +102,12 @@ class MemberEvent {
       if (value is String) return DateTime.parse(value);
       // JSON-encoded form used by ScreeningLocalStore: {'_t':'ts','ms':<epochMs>}
       if (value is Map && value['_t'] == 'ts') {
-        return DateTime.fromMillisecondsSinceEpoch(value['ms'] as int);
+        final ms = value['ms'];
+        return DateTime.fromMillisecondsSinceEpoch(ms is int ? ms : 0);
       }
       if (value is Map && value['_t'] == 'dt') {
-        return DateTime.fromMillisecondsSinceEpoch(value['ms'] as int);
+        final ms = value['ms'];
+        return DateTime.fromMillisecondsSinceEpoch(ms is int ? ms : 0);
       }
       if (value is int) return DateTime.fromMillisecondsSinceEpoch(value);
       return DateTime.now();

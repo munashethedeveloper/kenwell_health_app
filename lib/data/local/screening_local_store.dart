@@ -47,7 +47,7 @@ class ScreeningLocalStore {
     }
     if (value is Map) {
       return value
-          .map((k, v) => MapEntry(k as String, _sanitize(v)));
+          .map((k, v) => MapEntry(k.toString(), _sanitize(v)));
     }
     if (value is List) {
       return value.map(_sanitize).toList();
@@ -175,7 +175,7 @@ class ScreeningLocalStore {
   // ── Consents ───────────────────────────────────────────────────────────────
 
   Future<void> upsertConsent(Map<String, dynamic> data) =>
-      _upsert('cached_consents', data['id'] as String,
+      _upsert('cached_consents', data['id'] as String? ?? '',
           data['memberId'] as String? ?? '', data['eventId'] as String? ?? '', data);
 
   Future<Map<String, dynamic>?> getConsentById(String id) =>
@@ -206,7 +206,7 @@ class ScreeningLocalStore {
   // ── HIV Screenings ─────────────────────────────────────────────────────────
 
   Future<void> upsertHivScreening(Map<String, dynamic> data) =>
-      _upsert('cached_hiv_screenings', data['id'] as String,
+      _upsert('cached_hiv_screenings', data['id'] as String? ?? '',
           data['memberId'] as String? ?? '', data['eventId'] as String? ?? '', data);
 
   Future<Map<String, dynamic>?> getHivScreeningById(String id) =>
@@ -229,7 +229,7 @@ class ScreeningLocalStore {
   // ── HIV Results ────────────────────────────────────────────────────────────
 
   Future<void> upsertHivResult(Map<String, dynamic> data) =>
-      _upsert('cached_hiv_results', data['id'] as String,
+      _upsert('cached_hiv_results', data['id'] as String? ?? '',
           data['memberId'] as String? ?? '', data['eventId'] as String? ?? '', data);
 
   Future<Map<String, dynamic>?> getHivResultById(String id) =>
@@ -244,7 +244,7 @@ class ScreeningLocalStore {
   // ── HRA Screenings ─────────────────────────────────────────────────────────
 
   Future<void> upsertHraScreening(Map<String, dynamic> data) =>
-      _upsert('cached_hra_screenings', data['id'] as String,
+      _upsert('cached_hra_screenings', data['id'] as String? ?? '',
           data['memberId'] as String? ?? '', data['eventId'] as String? ?? '', data);
 
   Future<Map<String, dynamic>?> getHraScreeningById(String id) =>
@@ -267,7 +267,7 @@ class ScreeningLocalStore {
   // ── TB Screenings ──────────────────────────────────────────────────────────
 
   Future<void> upsertTbScreening(Map<String, dynamic> data) =>
-      _upsert('cached_tb_screenings', data['id'] as String,
+      _upsert('cached_tb_screenings', data['id'] as String? ?? '',
           data['memberId'] as String? ?? '', data['eventId'] as String? ?? '', data);
 
   Future<Map<String, dynamic>?> getTbScreeningById(String id) =>
@@ -290,7 +290,7 @@ class ScreeningLocalStore {
   // ── Cancer Screenings ──────────────────────────────────────────────────────
 
   Future<void> upsertCancerScreening(Map<String, dynamic> data) =>
-      _upsert('cached_cancer_screenings', data['id'] as String,
+      _upsert('cached_cancer_screenings', data['id'] as String? ?? '',
           data['memberId'] as String? ?? '', data['eventId'] as String? ?? '', data);
 
   Future<Map<String, dynamic>?> getCancerScreeningById(String id) =>
