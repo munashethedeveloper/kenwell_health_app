@@ -28,6 +28,14 @@ class FirestoreHivScreeningRepository {
       if (!doc.exists) return null;
       return HivScreening.fromMap(doc.data()!);
     } catch (e) {
+      // Offline fallback: serve from Firestore's local on-device cache.
+      try {
+        final cached = await _firestore
+            .collection(_collectionName)
+            .doc(id)
+            .get(const GetOptions(source: Source.cache));
+        if (cached.exists) return HivScreening.fromMap(cached.data()!);
+      } catch (_) {}
       AppLogger.error('Failed to get HIV screening', e);
       rethrow;
     }
@@ -35,11 +43,6 @@ class FirestoreHivScreeningRepository {
 
   Future<List<HivScreening>> getHivScreeningsByMember(String memberId) async {
     try {
-      // NOTE: No orderBy here — .where('memberId').orderBy('createdAt')
-      // requires a Firestore composite index.  Without it Firestore throws an
-      // error that is silently caught in loadAllCompletionFlags, leaving the
-      // hctCompleted flag permanently false.  A single equality filter uses
-      // the auto-created single-field index and needs no composite index.
       final querySnapshot = await _firestore
           .collection(_collectionName)
           .where('memberId', isEqualTo: memberId)
@@ -49,6 +52,16 @@ class FirestoreHivScreeningRepository {
           .map((doc) => HivScreening.fromMap(doc.data()))
           .toList();
     } catch (e) {
+      // Offline fallback: serve from Firestore's local on-device cache.
+      try {
+        final cached = await _firestore
+            .collection(_collectionName)
+            .where('memberId', isEqualTo: memberId)
+            .get(const GetOptions(source: Source.cache));
+        return cached.docs
+            .map((doc) => HivScreening.fromMap(doc.data()))
+            .toList();
+      } catch (_) {}
       AppLogger.error('Failed to get HIV screenings by member', e);
       rethrow;
     }

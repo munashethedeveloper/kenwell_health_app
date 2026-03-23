@@ -32,6 +32,14 @@ class FirestoreHraRepository {
       }
       return HraScreening.fromMap(doc.data()!);
     } catch (e) {
+      // Offline fallback: try reading from Firestore's local cache.
+      try {
+        final cached = await _firestore
+            .collection(_collectionName)
+            .doc(id)
+            .get(const GetOptions(source: Source.cache));
+        if (cached.exists) return HraScreening.fromMap(cached.data()!);
+      } catch (_) {}
       AppLogger.error('Failed to get HRA screening', e);
       rethrow;
     }
@@ -66,11 +74,6 @@ class FirestoreHraRepository {
   /// Get all HRA screenings for a specific member
   Future<List<HraScreening>> getHraScreeningsByMember(String memberId) async {
     try {
-      // NOTE: No orderBy here — .where('memberId').orderBy('createdAt')
-      // requires a Firestore composite index.  Without it Firestore throws an
-      // error that is silently caught in loadAllCompletionFlags, leaving the
-      // hraCompleted flag permanently false.  A single equality filter uses
-      // the auto-created single-field index and needs no composite index.
       final querySnapshot = await _firestore
           .collection(_collectionName)
           .where('memberId', isEqualTo: memberId)
@@ -80,6 +83,16 @@ class FirestoreHraRepository {
           .map((doc) => HraScreening.fromMap(doc.data()))
           .toList();
     } catch (e) {
+      // Offline fallback: serve from Firestore's local on-device cache.
+      try {
+        final cached = await _firestore
+            .collection(_collectionName)
+            .where('memberId', isEqualTo: memberId)
+            .get(const GetOptions(source: Source.cache));
+        return cached.docs
+            .map((doc) => HraScreening.fromMap(doc.data()))
+            .toList();
+      } catch (_) {}
       AppLogger.error('Failed to get HRA screenings by member', e);
       rethrow;
     }
