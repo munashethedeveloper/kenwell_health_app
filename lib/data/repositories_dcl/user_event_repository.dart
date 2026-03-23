@@ -27,12 +27,6 @@ class UserEventRepository {
       if (snapshot.docs.isEmpty) {
         debugPrint(
             'UserEventRepository: ⚠️ No documents found for userId: $userId');
-        debugPrint('UserEventRepository: - This could mean:');
-        debugPrint(
-            'UserEventRepository:   1. No events have been assigned to this user');
-        debugPrint(
-            'UserEventRepository:   2. userId mismatch between allocation and query');
-        debugPrint('UserEventRepository:   3. Firestore permission issue');
       } else {
         debugPrint('UserEventRepository: ✅ Found documents:');
         for (var doc in snapshot.docs) {
@@ -44,6 +38,16 @@ class UserEventRepository {
       return snapshot.docs.map((doc) => doc.data()).toList();
     } catch (e) {
       debugPrint('UserEventRepository: ❌ ERROR fetching events: $e');
+      // Offline fallback: serve from Firestore's local on-device cache.
+      try {
+        final cached = await _firestore
+            .collection('user_events')
+            .where('userId', isEqualTo: userId)
+            .get(const GetOptions(source: Source.cache));
+        debugPrint(
+            'UserEventRepository: Serving ${cached.docs.length} cached user-events');
+        return cached.docs.map((doc) => doc.data()).toList();
+      } catch (_) {}
       rethrow;
     }
   }

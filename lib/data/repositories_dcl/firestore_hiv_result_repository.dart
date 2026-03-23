@@ -26,6 +26,14 @@ class FirestoreHivResultRepository {
       if (!doc.exists) return null;
       return HivResult.fromMap(doc.data()!);
     } catch (e) {
+      // Offline fallback: serve from Firestore's local on-device cache.
+      try {
+        final cached = await _firestore
+            .collection(_collectionName)
+            .doc(id)
+            .get(const GetOptions(source: Source.cache));
+        if (cached.exists) return HivResult.fromMap(cached.data()!);
+      } catch (_) {}
       AppLogger.error('Failed to get HIV result', e);
       rethrow;
     }
@@ -43,6 +51,16 @@ class FirestoreHivResultRepository {
           .map((doc) => HivResult.fromMap(doc.data()))
           .toList();
     } catch (e) {
+      // Offline fallback: serve from Firestore's local on-device cache.
+      try {
+        final cached = await _firestore
+            .collection(_collectionName)
+            .where('memberId', isEqualTo: memberId)
+            .get(const GetOptions(source: Source.cache));
+        return cached.docs
+            .map((doc) => HivResult.fromMap(doc.data()))
+            .toList();
+      } catch (_) {}
       AppLogger.error('Failed to get HIV results by member', e);
       rethrow;
     }

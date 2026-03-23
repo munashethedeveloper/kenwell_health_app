@@ -6,7 +6,6 @@ import '../../../../domain/models/wellness_event.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/cards/kenwell_empty_state.dart';
 import '../../../shared/ui/colours/kenwell_colours.dart';
-import '../../../shared/ui/banners/offline_banner.dart';
 import '../../../shared/ui/headers/kenwell_gradient_header.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../user_management/viewmodel/user_management_view_model.dart';
@@ -59,9 +58,6 @@ class _AllEventsBody extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Offline indicator ────────────────────────────────────────
-          const OfflineBanner(),
-
           // ── Gradient section header ─────────────────────────────────
           const KenwellGradientHeader(
             label: 'EVENTS',
@@ -479,4 +475,3 @@ class _MetaChip extends StatelessWidget {
     );
   }
 }
-

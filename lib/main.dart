@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kenwell_health_app/data/services/connectivity_service.dart';
 import 'package:kenwell_health_app/ui/features/consent_form/view_model/consent_view_model.dart';
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
+import 'package:kenwell_health_app/ui/shared/ui/banners/offline_banner.dart';
 import 'package:provider/provider.dart';
 
 import 'firebase_options.dart';
@@ -83,6 +84,14 @@ class MyApp extends StatelessWidget {
             darkTheme: AppTheme.darkTheme,
             themeMode: themeProvider.themeMode,
             routerConfig: goRouter,
+            // Inject the offline banner above every route so it appears
+            // on every screen without modifying each screen individually.
+            builder: (context, child) => Column(
+              children: [
+                const OfflineBanner(),
+                Expanded(child: child ?? const SizedBox.shrink()),
+              ],
+            ),
           );
         },
       ),
