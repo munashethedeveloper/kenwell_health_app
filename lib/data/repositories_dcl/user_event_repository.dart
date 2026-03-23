@@ -54,14 +54,29 @@ class UserEventRepository {
 
   /// Fetch all user IDs that have been assigned to a specific event
   Future<List<String>> fetchAssignedUserIds(String eventId) async {
-    final snapshot = await _firestore
-        .collection('user_events')
-        .where('eventId', isEqualTo: eventId)
-        .get();
-    return snapshot.docs
-        .map((doc) => doc.data()['userId'] as String?)
-        .whereType<String>()
-        .toList();
+    try {
+      final snapshot = await _firestore
+          .collection('user_events')
+          .where('eventId', isEqualTo: eventId)
+          .get();
+      return snapshot.docs
+          .map((doc) => doc.data()['userId'] as String?)
+          .whereType<String>()
+          .toList();
+    } catch (e) {
+      // Offline fallback: serve from Firestore's local on-device cache.
+      try {
+        final cached = await _firestore
+            .collection('user_events')
+            .where('eventId', isEqualTo: eventId)
+            .get(const GetOptions(source: Source.cache));
+        return cached.docs
+            .map((doc) => doc.data()['userId'] as String?)
+            .whereType<String>()
+            .toList();
+      } catch (_) {}
+      rethrow;
+    }
   }
 
   /// Remove a user's assignment from a specific event

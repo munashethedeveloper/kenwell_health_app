@@ -100,6 +100,14 @@ class MemberEvent {
     DateTime parseTimestamp(dynamic value) {
       if (value is Timestamp) return value.toDate();
       if (value is String) return DateTime.parse(value);
+      // JSON-encoded form used by ScreeningLocalStore: {'_t':'ts','ms':<epochMs>}
+      if (value is Map && value['_t'] == 'ts') {
+        return DateTime.fromMillisecondsSinceEpoch(value['ms'] as int);
+      }
+      if (value is Map && value['_t'] == 'dt') {
+        return DateTime.fromMillisecondsSinceEpoch(value['ms'] as int);
+      }
+      if (value is int) return DateTime.fromMillisecondsSinceEpoch(value);
       return DateTime.now();
     }
 

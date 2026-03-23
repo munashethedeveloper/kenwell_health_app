@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import '../../domain/models/member_event.dart';
+import '../local/screening_local_store.dart';
 import '../services/audit_log_service.dart';
 
 /// Repository for managing member-event participation records in Firestore.
@@ -12,6 +13,7 @@ class FirestoreMemberEventRepository {
   static const String memberEventsCollection = 'member_events';
 
   final AuditLogService _audit;
+  final ScreeningLocalStore _local = ScreeningLocalStore.instance;
 
   FirestoreMemberEventRepository({AuditLogService? auditLogService})
       : _audit = auditLogService ?? AuditLogService();
@@ -35,6 +37,9 @@ class FirestoreMemberEventRepository {
           transaction.set(ref, memberEvent.toMap());
         }
       });
+
+      // Write-through: persist to local SQLite store so data is available offline.
+      unawaited(_local.upsertMemberEvent(memberEvent.toMap()));
 
       unawaited(_audit.logCreate(
         collection: memberEventsCollection,
@@ -60,11 +65,39 @@ class FirestoreMemberEventRepository {
           .where('memberId', isEqualTo: memberId)
           .get();
 
-      return querySnapshot.docs
+      final events = querySnapshot.docs
           .map((doc) => MemberEvent.fromMap(doc.id, doc.data()))
           .toList()
         ..sort((a, b) => b.registeredAt.compareTo(a.registeredAt));
+      // Write-through cache.
+      for (final doc in querySnapshot.docs) {
+        unawaited(_local.upsertMemberEvent(doc.data()));
+      }
+      return events;
     } catch (e) {
+      // Offline fallback 1: Firestore on-device cache.
+      try {
+        final cached = await FirebaseFirestore.instance
+            .collection(memberEventsCollection)
+            .where('memberId', isEqualTo: memberId)
+            .get(const GetOptions(source: Source.cache));
+        if (cached.docs.isNotEmpty) {
+          return cached.docs
+              .map((doc) => MemberEvent.fromMap(doc.id, doc.data()))
+              .toList()
+            ..sort((a, b) => b.registeredAt.compareTo(a.registeredAt));
+        }
+      } catch (_) {}
+      // Offline fallback 2: local SQLite store.
+      try {
+        final rows = await _local.getMemberEventsByMember(memberId);
+        if (rows.isNotEmpty) {
+          return rows
+              .map((r) => MemberEvent.fromMap(r['id'] as String? ?? '', r))
+              .toList()
+            ..sort((a, b) => b.registeredAt.compareTo(a.registeredAt));
+        }
+      } catch (_) {}
       debugPrint('Error fetching member events for $memberId: $e');
       return [];
     }
@@ -80,8 +113,32 @@ class FirestoreMemberEventRepository {
           .get();
 
       if (!doc.exists || doc.data() == null) return null;
-      return MemberEvent.fromMap(doc.id, doc.data()!);
+      final event = MemberEvent.fromMap(doc.id, doc.data()!);
+      unawaited(_local.upsertMemberEvent(doc.data()!));
+      return event;
     } catch (e) {
+      // Offline fallback 1: Firestore on-device cache.
+      try {
+        final docId = _docId(memberId, eventId);
+        final cached = await FirebaseFirestore.instance
+            .collection(memberEventsCollection)
+            .doc(docId)
+            .get(const GetOptions(source: Source.cache));
+        if (cached.exists && cached.data() != null) {
+          return MemberEvent.fromMap(cached.id, cached.data()!);
+        }
+      } catch (_) {}
+      // Offline fallback 2: local SQLite store.
+      try {
+        final rows = await _local.getMemberEventsByEvent(eventId);
+        final match = rows.firstWhere(
+          (r) => r['memberId'] == memberId,
+          orElse: () => <String, dynamic>{},
+        );
+        if (match.isNotEmpty) {
+          return MemberEvent.fromMap(match['id'] as String? ?? '', match);
+        }
+      } catch (_) {}
       debugPrint('Error fetching member event $memberId/$eventId: $e');
       return null;
     }

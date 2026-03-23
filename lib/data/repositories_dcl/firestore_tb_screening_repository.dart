@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:kenwell_health_app/data/local/screening_local_store.dart';
 import 'package:kenwell_health_app/domain/models/tb_screening.dart';
 import 'package:kenwell_health_app/data/services/firestore_service.dart';
 import 'package:kenwell_health_app/utils/logger.dart';
 
 class FirestoreTbScreeningRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final ScreeningLocalStore _local = ScreeningLocalStore.instance;
   static const String _collectionName = FirestoreService.tbScreeningsCollection;
 
   Future<void> addTbScreening(TbScreening screening) async {
@@ -14,6 +16,8 @@ class FirestoreTbScreeningRepository {
           .collection(_collectionName)
           .doc(screening.id)
           .set(screening.toMap());
+      // Write-through: persist to local SQLite store so data is available offline.
+      unawaited(_local.upsertTbScreening(screening.toMap()));
       AppLogger.info('TB screening added successfully: ${screening.id}');
     } catch (e) {
       AppLogger.error('Failed to add TB screening', e);
@@ -25,15 +29,22 @@ class FirestoreTbScreeningRepository {
     try {
       final doc = await _firestore.collection(_collectionName).doc(id).get();
       if (!doc.exists) return null;
-      return TbScreening.fromMap(doc.data()!);
+      final screening = TbScreening.fromMap(doc.data()!);
+      unawaited(_local.upsertTbScreening(doc.data()!));
+      return screening;
     } catch (e) {
-      // Offline fallback: serve from Firestore's local on-device cache.
+      // Offline fallback 1: Firestore on-device cache.
       try {
         final cached = await _firestore
             .collection(_collectionName)
             .doc(id)
             .get(const GetOptions(source: Source.cache));
         if (cached.exists) return TbScreening.fromMap(cached.data()!);
+      } catch (_) {}
+      // Offline fallback 2: local SQLite store.
+      try {
+        final row = await _local.getTbScreeningById(id);
+        if (row != null) return TbScreening.fromMap(row);
       } catch (_) {}
       AppLogger.error('Failed to get TB screening', e);
       rethrow;
@@ -47,19 +58,32 @@ class FirestoreTbScreeningRepository {
           .where('memberId', isEqualTo: memberId)
           .get();
 
-      return querySnapshot.docs
+      final screenings = querySnapshot.docs
           .map((doc) => TbScreening.fromMap(doc.data()))
           .toList();
+      for (final doc in querySnapshot.docs) {
+        unawaited(_local.upsertTbScreening(doc.data()));
+      }
+      return screenings;
     } catch (e) {
-      // Offline fallback: serve from Firestore's local on-device cache.
+      // Offline fallback 1: Firestore on-device cache.
       try {
         final cached = await _firestore
             .collection(_collectionName)
             .where('memberId', isEqualTo: memberId)
             .get(const GetOptions(source: Source.cache));
-        return cached.docs
-            .map((doc) => TbScreening.fromMap(doc.data()))
-            .toList();
+        if (cached.docs.isNotEmpty) {
+          return cached.docs
+              .map((doc) => TbScreening.fromMap(doc.data()))
+              .toList();
+        }
+      } catch (_) {}
+      // Offline fallback 2: local SQLite store.
+      try {
+        final rows = await _local.getTbScreeningsByMember(memberId);
+        if (rows.isNotEmpty) {
+          return rows.map((r) => TbScreening.fromMap(r)).toList();
+        }
       } catch (_) {}
       AppLogger.error('Failed to get TB screenings by member', e);
       rethrow;
@@ -74,10 +98,33 @@ class FirestoreTbScreeningRepository {
           .orderBy('createdAt', descending: true)
           .get();
 
-      return querySnapshot.docs
+      final screenings = querySnapshot.docs
           .map((doc) => TbScreening.fromMap(doc.data()))
           .toList();
+      for (final doc in querySnapshot.docs) {
+        unawaited(_local.upsertTbScreening(doc.data()));
+      }
+      return screenings;
     } catch (e) {
+      // Offline fallback 1: Firestore on-device cache.
+      try {
+        final cached = await _firestore
+            .collection(_collectionName)
+            .where('eventId', isEqualTo: eventId)
+            .get(const GetOptions(source: Source.cache));
+        if (cached.docs.isNotEmpty) {
+          return cached.docs
+              .map((doc) => TbScreening.fromMap(doc.data()))
+              .toList();
+        }
+      } catch (_) {}
+      // Offline fallback 2: local SQLite store.
+      try {
+        final rows = await _local.getTbScreeningsByEvent(eventId);
+        if (rows.isNotEmpty) {
+          return rows.map((r) => TbScreening.fromMap(r)).toList();
+        }
+      } catch (_) {}
       AppLogger.error('Failed to get TB screenings by event', e);
       rethrow;
     }
@@ -89,10 +136,32 @@ class FirestoreTbScreeningRepository {
           .collection(_collectionName)
           .orderBy('createdAt', descending: true)
           .get();
-      return querySnapshot.docs
+      final screenings = querySnapshot.docs
           .map((doc) => TbScreening.fromMap(doc.data()))
           .toList();
+      for (final doc in querySnapshot.docs) {
+        unawaited(_local.upsertTbScreening(doc.data()));
+      }
+      return screenings;
     } catch (e) {
+      // Offline fallback 1: Firestore on-device cache.
+      try {
+        final cached = await _firestore
+            .collection(_collectionName)
+            .get(const GetOptions(source: Source.cache));
+        if (cached.docs.isNotEmpty) {
+          return cached.docs
+              .map((doc) => TbScreening.fromMap(doc.data()))
+              .toList();
+        }
+      } catch (_) {}
+      // Offline fallback 2: local SQLite store.
+      try {
+        final rows = await _local.getAllTbScreenings();
+        if (rows.isNotEmpty) {
+          return rows.map((r) => TbScreening.fromMap(r)).toList();
+        }
+      } catch (_) {}
       AppLogger.error('Failed to get all TB screenings', e);
       rethrow;
     }
@@ -116,9 +185,35 @@ class FirestoreTbScreeningRepository {
             .get();
         results.addAll(
             querySnapshot.docs.map((doc) => TbScreening.fromMap(doc.data())));
+        for (final doc in querySnapshot.docs) {
+          unawaited(_local.upsertTbScreening(doc.data()));
+        }
       }
       return results;
     } catch (e) {
+      // Offline fallback 1: Firestore on-device cache.
+      try {
+        const chunkSize = 30;
+        final results = <TbScreening>[];
+        for (var i = 0; i < eventIds.length; i += chunkSize) {
+          final chunk =
+              eventIds.sublist(i, (i + chunkSize).clamp(0, eventIds.length));
+          final cached = await _firestore
+              .collection(_collectionName)
+              .where('eventId', whereIn: chunk)
+              .get(const GetOptions(source: Source.cache));
+          results.addAll(
+              cached.docs.map((doc) => TbScreening.fromMap(doc.data())));
+        }
+        if (results.isNotEmpty) return results;
+      } catch (_) {}
+      // Offline fallback 2: local SQLite store.
+      try {
+        final rows = await _local.getTbScreeningsByEvents(eventIds);
+        if (rows.isNotEmpty) {
+          return rows.map((r) => TbScreening.fromMap(r)).toList();
+        }
+      } catch (_) {}
       AppLogger.error('Failed to get TB screenings by events', e);
       rethrow;
     }
