@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:kenwell_health_app/data/services/connectivity_service.dart';
 import 'package:kenwell_health_app/ui/features/consent_form/view_model/consent_view_model.dart';
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
@@ -19,6 +20,22 @@ import 'ui/shared/themes/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // ── Global error handlers ─────────────────────────────────────────────────
+  // Catch unhandled Flutter framework errors (e.g. widget build exceptions).
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    debugPrint('🚨 FlutterError: ${details.exceptionAsString()}');
+    if (kDebugMode) debugPrintStack(stackTrace: details.stack);
+  };
+
+  // Catch unhandled platform/async errors that Flutter doesn't intercept.
+  PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
+    debugPrint('🚨 PlatformDispatcher error: $error');
+    if (kDebugMode) debugPrintStack(stackTrace: stack);
+    return true; // mark as handled so the app does not crash
+  };
+  // ─────────────────────────────────────────────────────────────────────────
 
   // Initialize Firebase - skip on Windows desktop for now due to build issues
   // Use web config for Windows which doesn't require C++ SDK
