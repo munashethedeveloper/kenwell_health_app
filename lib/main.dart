@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:kenwell_health_app/data/services/connectivity_service.dart';
@@ -27,12 +28,25 @@ void main() async {
     FlutterError.presentError(details);
     debugPrint('🚨 FlutterError: ${details.exceptionAsString()}');
     if (kDebugMode) debugPrintStack(stackTrace: details.stack);
+    // Forward to Crashlytics in release builds; log only in debug builds.
+    if (kDebugMode) {
+      FirebaseCrashlytics.instance.log(
+          'FlutterError: ${details.exceptionAsString()}');
+    } else {
+      FirebaseCrashlytics.instance.recordFlutterFatalError(details);
+    }
   };
 
   // Catch unhandled platform/async errors that Flutter doesn't intercept.
   PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
     debugPrint('🚨 PlatformDispatcher error: $error');
     if (kDebugMode) debugPrintStack(stackTrace: stack);
+    // Forward to Crashlytics in release builds; log only in debug builds.
+    if (kDebugMode) {
+      FirebaseCrashlytics.instance.log('PlatformDispatcher error: $error');
+    } else {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    }
     return true; // mark as handled so the app does not crash
   };
   // ─────────────────────────────────────────────────────────────────────────
