@@ -5,13 +5,39 @@ import '../../../../domain/models/wellness_event.dart';
 import '../../../../data/repositories_dcl/event_repository.dart';
 import '../../../../domain/enums/service_type.dart';
 import '../../../../domain/enums/additional_service_type.dart';
+import '../../../../domain/usecases/get_events_usecase.dart';
+import '../../../../domain/usecases/add_event_usecase.dart';
+import '../../../../domain/usecases/update_event_usecase.dart';
+import '../../../../domain/usecases/delete_event_usecase.dart';
+import '../../../../domain/usecases/upsert_event_usecase.dart';
 import '../../../../utils/extensions.dart';
 
 /// ViewModel for managing wellness events
 class EventViewModel extends ChangeNotifier {
   /// Constructor
-  EventViewModel({EventRepository? repository})
-      : _repository = repository ?? EventRepository() {
+  ///
+  /// Dependencies are injected (or defaulted) via optional named parameters,
+  /// making the ViewModel easy to test with mock use cases.
+  EventViewModel({
+    EventRepository? repository,
+    GetEventsUseCase? getEventsUseCase,
+    AddEventUseCase? addEventUseCase,
+    UpdateEventUseCase? updateEventUseCase,
+    DeleteEventUseCase? deleteEventUseCase,
+    UpsertEventUseCase? upsertEventUseCase,
+  })  : _repository = repository ?? EventRepository() {
+    // Use cases share the same resolved _repository instance so that tests
+    // can inject a single mock for the entire ViewModel.
+    _getEventsUseCase =
+        getEventsUseCase ?? GetEventsUseCase(repository: _repository);
+    _addEventUseCase =
+        addEventUseCase ?? AddEventUseCase(repository: _repository);
+    _updateEventUseCase =
+        updateEventUseCase ?? UpdateEventUseCase(repository: _repository);
+    _deleteEventUseCase =
+        deleteEventUseCase ?? DeleteEventUseCase(repository: _repository);
+    _upsertEventUseCase =
+        upsertEventUseCase ?? UpsertEventUseCase(repository: _repository);
     _initializationFuture = _loadPersistedEvents();
     // Subscribe to Firestore real-time updates so that changes made from other
     // devices (e.g. incremented screenedCount) are reflected without requiring
@@ -29,8 +55,16 @@ class EventViewModel extends ChangeNotifier {
     );
   }
 
-  // Repository
+  // Repository (kept for watchAllEvents stream)
   final EventRepository _repository;
+
+  // ── Use cases ──────────────────────────────────────────────────────────────
+  late final GetEventsUseCase _getEventsUseCase;
+  late final AddEventUseCase _addEventUseCase;
+  late final UpdateEventUseCase _updateEventUseCase;
+  late final DeleteEventUseCase _deleteEventUseCase;
+  late final UpsertEventUseCase _upsertEventUseCase;
+
   // Initialization Future
   late final Future<void> _initializationFuture;
   // Real-time subscription to the events collection.
@@ -334,7 +368,7 @@ class EventViewModel extends ChangeNotifier {
     _setError(null);
     try {
       debugPrint('EventViewModel: Adding event "${event.title}"');
-      await _repository.addEvent(event);
+      await _addEventUseCase(event);
       // The watchAllEvents() stream will update _events automatically.
       debugPrint('EventViewModel: Event added successfully');
     } catch (e, stackTrace) {
@@ -357,7 +391,7 @@ class EventViewModel extends ChangeNotifier {
       if (index != -1) {
         final deletedEvent = _events.removeAt(index);
         notifyListeners();
-        await _repository.deleteEvent(eventId);
+        await _deleteEventUseCase(eventId);
         return deletedEvent;
       }
       return null;
@@ -382,7 +416,7 @@ class EventViewModel extends ChangeNotifier {
         final previousEvent = _events[index];
         _events[index] = updatedEvent;
         notifyListeners();
-        await _repository.updateEvent(updatedEvent);
+        await _updateEventUseCase(updatedEvent);
         return previousEvent;
       }
       return null;
@@ -403,7 +437,7 @@ class EventViewModel extends ChangeNotifier {
       _events.add(event);
       notifyListeners();
     }
-    await _repository.upsertEvent(event);
+    await _upsertEventUseCase(event);
   }
 
   /// Retrieves events for a specific date
@@ -528,12 +562,12 @@ class EventViewModel extends ChangeNotifier {
     _selectedAdditionalServices.clear();
   }
 
-  /// Load persisted events from repository
+  /// Load persisted events from repository (via [GetEventsUseCase]).
   Future<void> _loadPersistedEvents() async {
     _setLoading(true);
     _setError(null);
     try {
-      final stored = await _repository.fetchAllEvents();
+      final stored = await _getEventsUseCase();
       _events
         ..clear()
         ..addAll(stored);
@@ -549,6 +583,12 @@ class EventViewModel extends ChangeNotifier {
       _setLoading(false);
     }
   }
+
+  /// Public entry point for refreshing events from the repository.
+  ///
+  /// Delegates to [_loadPersistedEvents].  Called by the Refresh buttons on
+  /// all events-aware screens (AllEventsScreen, StatsReportScreen, etc.).
+  Future<void> loadEvents() => _loadPersistedEvents();
 
   /// Reload events from repository (useful when returning to screens)
   Future<void> reloadEvents() async {

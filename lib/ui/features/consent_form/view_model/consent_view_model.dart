@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:signature/signature.dart';
 import 'package:intl/intl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/domain/models/consent.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_consent_repository.dart';
+import 'package:kenwell_health_app/data/repositories_dcl/firestore_survey_repository.dart';
 import 'package:kenwell_health_app/utils/logger.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:convert';
@@ -255,11 +255,9 @@ class ConsentScreenViewModel extends ChangeNotifier {
         'createdAt': consent.createdAt.toIso8601String(),
       };
 
-      // Save to Firestore
-      await FirebaseFirestore.instance
-          .collection('survey_results')
-          .doc(consent.id)
-          .set(surveyData);
+      // Save to survey_results via repository
+      await const FirestoreSurveyRepository()
+          .saveSurveyResult(id: consent.id, data: surveyData);
     } catch (e) {
       AppLogger.error('Failed to save consent to survey_results', e);
       // Don't rethrow - this is a secondary save operation

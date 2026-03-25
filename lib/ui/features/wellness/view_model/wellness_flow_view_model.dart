@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/features/consent_form/view_model/consent_view_model.dart';
 
@@ -20,6 +19,7 @@ import '../../../../data/repositories_dcl/firestore_hra_repository.dart';
 import '../../../../data/repositories_dcl/firestore_hiv_screening_repository.dart';
 import '../../../../data/repositories_dcl/firestore_tb_screening_repository.dart';
 import '../../../../data/repositories_dcl/firestore_cancer_screening_repository.dart';
+import '../../../../data/repositories_dcl/firestore_survey_repository.dart';
 
 class WellnessFlowViewModel extends ChangeNotifier {
   // Consent flags for screenings
@@ -185,16 +185,8 @@ class WellnessFlowViewModel extends ChangeNotifier {
 
     // Survey
     try {
-      final querySnapshot = await FirebaseFirestore.instance
-          .collection('survey_results')
-          .where('memberId', isEqualTo: memberId)
-          .where('eventId', isEqualTo: eventId)
-          .where('type', isEqualTo: 'survey')
-          .limit(1)
-          .get();
-      if (querySnapshot.docs.isNotEmpty) {
-        surveyCompleted = true;
-      }
+      surveyCompleted = await const FirestoreSurveyRepository()
+          .hasCompletedSurvey(memberId: memberId, eventId: eventId);
     } catch (e) {
       debugPrint('Error loading survey completion: $e');
     }

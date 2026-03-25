@@ -10,7 +10,6 @@ import 'package:kenwell_health_app/ui/shared/ui/banners/offline_banner.dart';
 import 'package:provider/provider.dart';
 
 import 'firebase_options.dart';
-import 'providers/app_provider.dart';
 import 'providers/theme_provider.dart';
 import 'routing/go_router_config.dart';
 import 'ui/features/auth/view_models/auth_view_model.dart';
@@ -86,7 +85,6 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider<ConnectivityService>(
             create: (_) => ConnectivityService()),
-        ChangeNotifierProvider<AppProvider>(create: (_) => AppProvider()),
         ChangeNotifierProvider<ProfileViewModel>(
             create: (_) => ProfileViewModel()),
         ChangeNotifierProvider<ConsentScreenViewModel>(

@@ -17,6 +17,8 @@ import 'sections/participation_section.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 // EventScreen allows adding or editing a wellness event
+// TODO(arch): migrate to use EventFormViewModel instead of EventViewModel for
+//             form state, keeping EventViewModel lean (list-only).
 class EventScreen extends StatefulWidget {
   // ViewModel for managing event data
   final EventViewModel viewModel;

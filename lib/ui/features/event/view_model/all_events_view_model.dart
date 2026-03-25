@@ -77,7 +77,7 @@ class AllEventsViewModel extends ChangeNotifier {
 
   /// Normalises a raw Firestore status string to one of the three canonical
   /// values used for filtering.
-  String _normaliseStatus(String raw) {
+  String _normalizeStatus(String raw) {
     switch (raw.toLowerCase()) {
       case 'in_progress':
       case 'in progress':
@@ -121,7 +121,7 @@ class AllEventsViewModel extends ChangeNotifier {
 
     // Status filter
     if (_statusFilter != null) {
-      base = base.where((e) => _normaliseStatus(e.status) == _statusFilter);
+      base = base.where((e) => _normalizeStatus(e.status) == _statusFilter);
     }
 
     // Sort
