@@ -614,15 +614,10 @@ class _AllEventCard extends StatelessWidget {
   }
 
   /// Returns true if the event is in the past or completed/finished.
-  bool get _isPastEvent {
-    final s = event.status.toLowerCase();
-    if (s == 'completed' || s == 'finished') return true;
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final eventDay =
-        DateTime(event.date.year, event.date.month, event.date.day);
-    return eventDay.isBefore(today);
-  }
+  ///
+  /// Delegates to [WellnessEvent.isPast] — the business rule lives in the
+  /// domain model, not in the UI widget.
+  bool get _isPastEvent => event.isPast;
 
   @override
   Widget build(BuildContext context) {

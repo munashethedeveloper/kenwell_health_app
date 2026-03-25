@@ -115,34 +115,34 @@ class LoadWellnessCompletionStatusUseCase {
     }
 
     // Run remaining checks in parallel for speed.
-    await Future.wait([
-      _hraRepo.getHraScreeningsByMember(memberId).then(
-            (list) => hraCompleted = list.any((h) => h.eventId == eventId),
-          ).catchError((Object e) {
-        AppLogger.error('LoadWellnessCompletionStatusUseCase: HRA query failed', e);
-      }),
-      _hivRepo.getHivScreeningsByMember(memberId).then(
-            (list) => hctCompleted = list.any((h) => h.eventId == eventId),
-          ).catchError((Object e) {
-        AppLogger.error('LoadWellnessCompletionStatusUseCase: HCT query failed', e);
-      }),
-      _tbRepo.getTbScreeningsByMember(memberId).then(
-            (list) => tbCompleted = list.any((t) => t.eventId == eventId),
-          ).catchError((Object e) {
-        AppLogger.error('LoadWellnessCompletionStatusUseCase: TB query failed', e);
-      }),
-      _cancerRepo.getCancerScreeningsByMember(memberId).then(
-            (list) => cancerCompleted = list.any((c) => c.eventId == eventId),
-          ).catchError((Object e) {
-        AppLogger.error('LoadWellnessCompletionStatusUseCase: Cancer query failed', e);
-      }),
+    // Each Future returns a bool; results are indexed in declaration order.
+    final parallel = await Future.wait<bool>([
+      _hraRepo
+          .getHraScreeningsByMember(memberId)
+          .then((list) => list.any((h) => h.eventId == eventId))
+          .catchError((Object _) => false),
+      _hivRepo
+          .getHivScreeningsByMember(memberId)
+          .then((list) => list.any((h) => h.eventId == eventId))
+          .catchError((Object _) => false),
+      _tbRepo
+          .getTbScreeningsByMember(memberId)
+          .then((list) => list.any((t) => t.eventId == eventId))
+          .catchError((Object _) => false),
+      _cancerRepo
+          .getCancerScreeningsByMember(memberId)
+          .then((list) => list.any((c) => c.eventId == eventId))
+          .catchError((Object _) => false),
       _surveyRepo
           .hasCompletedSurvey(memberId: memberId, eventId: eventId)
-          .then((v) => surveyCompleted = v)
-          .catchError((Object e) {
-        AppLogger.error('LoadWellnessCompletionStatusUseCase: Survey query failed', e);
-      }),
+          .catchError((Object _) => false),
     ]);
+
+    hraCompleted = parallel[0];
+    hctCompleted = parallel[1];
+    tbCompleted = parallel[2];
+    cancerCompleted = parallel[3];
+    surveyCompleted = parallel[4];
 
     return WellnessCompletionStatus(
       consentCompleted: consentCompleted,
