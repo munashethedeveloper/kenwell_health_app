@@ -5,6 +5,7 @@ import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/domain/models/consent.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_consent_repository.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_survey_repository.dart';
+import 'package:kenwell_health_app/domain/usecases/submit_consent_usecase.dart';
 import 'package:kenwell_health_app/utils/logger.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:convert';
@@ -12,9 +13,17 @@ import 'dart:typed_data';
 
 // ViewModel for Consent Screen
 class ConsentScreenViewModel extends ChangeNotifier {
-  // Firestore repository
-  final FirestoreConsentRepository _consentRepository =
-      FirestoreConsentRepository();
+  ConsentScreenViewModel({
+    FirestoreConsentRepository? consentRepository,
+    FirestoreSurveyRepository? surveyRepository,
+    SubmitConsentUseCase? submitConsentUseCase,
+  }) : _submitConsentUseCase = submitConsentUseCase ??
+            SubmitConsentUseCase(
+              consentRepository: consentRepository,
+              surveyRepository: surveyRepository,
+            );
+
+  final SubmitConsentUseCase _submitConsentUseCase;
 
   // Form key
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -218,49 +227,15 @@ class ConsentScreenViewModel extends ChangeNotifier {
         createdAt: DateTime.now(),
       );
 
-      // Save to Firestore consents collection
-      await _consentRepository.addConsent(consent);
-      AppLogger.info('Consent saved to consents collection');
-
-      // Also save to survey_results collection for analytics/reporting
-      await _saveToSurveyResults(consent);
-      AppLogger.info('Consent saved to survey_results collection');
+      // Delegate multi-repo persistence (consents + survey_results) to the
+      // use case so this ViewModel only owns form state.
+      await _submitConsentUseCase(consent);
     } catch (e) {
       AppLogger.error('Failed to save consent', e);
       rethrow;
     } finally {
       _isSubmitting = false;
       notifyListeners();
-    }
-  }
-
-  /// Save consent data to survey_results collection
-  Future<void> _saveToSurveyResults(Consent consent) async {
-    try {
-      final surveyData = {
-        'id': consent.id,
-        'memberId': consent.memberId,
-        'eventId': consent.eventId,
-        'type': 'consent', // Identify this as a consent survey
-        'venue': consent.venue,
-        'date': consent.date.toIso8601String(),
-        'practitioner': consent.practitioner,
-        'screenings': {
-          'hra': consent.hra,
-          'hct': consent.hct,
-          'tb': consent.tb,
-          'cancer': consent.cancer,
-        },
-        'signatureProvided': consent.signatureData != null,
-        'createdAt': consent.createdAt.toIso8601String(),
-      };
-
-      // Save to survey_results via repository
-      await const FirestoreSurveyRepository()
-          .saveSurveyResult(id: consent.id, data: surveyData);
-    } catch (e) {
-      AppLogger.error('Failed to save consent to survey_results', e);
-      // Don't rethrow - this is a secondary save operation
     }
   }
 

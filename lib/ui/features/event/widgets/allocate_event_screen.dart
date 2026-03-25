@@ -268,7 +268,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
           builder: (context, viewModel, _) {
             final filteredUsers = viewModel.filteredUsers;
             final totalUsers = viewModel.users.length;
-            final assignedCount = _allocVM.assignedUserIds.length;
+            final assignedCount = _allocVM.assignedCount;
             final notAssignedCount = totalUsers - assignedCount;
             final filterActive = viewModel.selectedFilter != 'all' ||
                 viewModel.searchQuery.isNotEmpty;
