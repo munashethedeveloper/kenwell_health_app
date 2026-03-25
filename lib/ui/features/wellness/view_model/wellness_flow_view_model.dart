@@ -20,8 +20,45 @@ import '../../../../data/repositories_dcl/firestore_hiv_screening_repository.dar
 import '../../../../data/repositories_dcl/firestore_tb_screening_repository.dart';
 import '../../../../data/repositories_dcl/firestore_cancer_screening_repository.dart';
 import '../../../../data/repositories_dcl/firestore_survey_repository.dart';
+import '../../../../domain/usecases/load_wellness_completion_status_usecase.dart';
 
 class WellnessFlowViewModel extends ChangeNotifier {
+  WellnessFlowViewModel({
+    this.activeEvent,
+    FirestoreConsentRepository? consentRepository,
+    FirestoreHraRepository? hraRepository,
+    FirestoreHivScreeningRepository? hivRepository,
+    FirestoreTbScreeningRepository? tbRepository,
+    FirestoreCancerScreeningRepository? cancerRepository,
+    FirestoreSurveyRepository? surveyRepository,
+    LoadWellnessCompletionStatusUseCase? completionStatusUseCase,
+  })  : _consentRepo = consentRepository ?? FirestoreConsentRepository(),
+        _hraRepo = hraRepository ?? FirestoreHraRepository(),
+        _hivRepo = hivRepository ?? FirestoreHivScreeningRepository(),
+        _tbRepo = tbRepository ?? FirestoreTbScreeningRepository(),
+        _cancerRepo = cancerRepository ?? FirestoreCancerScreeningRepository(),
+        _surveyRepo = surveyRepository ?? const FirestoreSurveyRepository() {
+    _flowSteps = [stepMemberRegistration];
+    _completionStatusUseCase = completionStatusUseCase ??
+        LoadWellnessCompletionStatusUseCase(
+          consentRepository: _consentRepo,
+          hraRepository: _hraRepo,
+          hivRepository: _hivRepo,
+          tbRepository: _tbRepo,
+          cancerRepository: _cancerRepo,
+          surveyRepository: _surveyRepo,
+        );
+  }
+
+  // ── Repository dependencies ────────────────────────────────────────────────
+  final FirestoreConsentRepository _consentRepo;
+  final FirestoreHraRepository _hraRepo;
+  final FirestoreHivScreeningRepository _hivRepo;
+  final FirestoreTbScreeningRepository _tbRepo;
+  final FirestoreCancerScreeningRepository _cancerRepo;
+  final FirestoreSurveyRepository _surveyRepo;
+  late final LoadWellnessCompletionStatusUseCase _completionStatusUseCase;
+
   // Consent flags for screenings
   bool hraEnabled = false;
   bool hctEnabled = false;
@@ -73,87 +110,27 @@ class WellnessFlowViewModel extends ChangeNotifier {
     consentRank = null;
     consentHpSignatureBase64 = null;
 
-    // Consent — also restore which screenings were enabled from the saved record
-    try {
-      final consentRepo = FirestoreConsentRepository();
-      final consents = await consentRepo.getConsentsByMember(memberId);
-      debugPrint(
-          'Loaded consents for $memberId: ${consents.map((c) => c.eventId).toList()}');
-      final matching = consents.where((c) => c.eventId == eventId).toList();
-      if (matching.isNotEmpty) {
-        consentCompleted = true;
-        // Restore enabled-screening flags from the persisted consent record so
-        // refresh and first-load both know which screenings were consented to.
-        final consent = matching.first;
-        hraEnabled = consent.hra;
-        hctEnabled = consent.hct;
-        tbEnabled = consent.tb;
-        cancerEnabled = consent.cancer;
-        // Restore HP practitioner details for auto-filling health screenings.
-        consentSancNumber = consent.sancNumber;
-        consentRank = consent.rank;
-        consentHpSignatureBase64 = consent.hpSignatureData;
-      }
-    } catch (e) {
-      debugPrint('Error loading consent completion: $e');
-    }
+    // Delegate all Firestore status-checking to the use case, which runs
+    // the remaining 5 collections in parallel for better performance.
+    final status = await _completionStatusUseCase(
+      memberId: memberId,
+      eventId: eventId,
+    );
 
-    // HRA
-    try {
-      final hraRepo = FirestoreHraRepository();
-      final hraList = await hraRepo.getHraScreeningsByMember(memberId);
-      debugPrint(
-          'Loaded HRA for $memberId: ${hraList.map((h) => h.eventId).toList()}');
-      final hasHra = hraList.any((hra) => hra.eventId == eventId);
-      if (hasHra) {
-        hraCompleted = true;
-      }
-    } catch (e) {
-      debugPrint('Error loading HRA completion: $e');
-    }
-
-    // HCT
-    try {
-      final hctRepo = FirestoreHivScreeningRepository();
-      final hctList = await hctRepo.getHivScreeningsByMember(memberId);
-      debugPrint(
-          'Loaded HCT for $memberId: ${hctList.map((h) => h.eventId).toList()}');
-      final hasHct = hctList.any((hct) => hct.eventId == eventId);
-      if (hasHct) {
-        hctCompleted = true;
-      }
-    } catch (e) {
-      debugPrint('Error loading HCT completion: $e');
-    }
-
-    // TB
-    try {
-      final tbRepo = FirestoreTbScreeningRepository();
-      final tbList = await tbRepo.getTbScreeningsByMember(memberId);
-      debugPrint(
-          'Loaded TB for $memberId: ${tbList.map((t) => t.eventId).toList()}');
-      final hasTb = tbList.any((tb) => tb.eventId == eventId);
-      if (hasTb) {
-        tbCompleted = true;
-      }
-    } catch (e) {
-      debugPrint('Error loading TB completion: $e');
-    }
-
-    // Cancer
-    try {
-      final cancerRepo = FirestoreCancerScreeningRepository();
-      final cancerList = await cancerRepo.getCancerScreeningsByMember(memberId);
-      debugPrint(
-          'Loaded Cancer for $memberId: ${cancerList.map((c) => c.eventId).toList()}');
-      final hasCancerScreening =
-          cancerList.any((cancer) => cancer.eventId == eventId);
-      if (hasCancerScreening) {
-        cancerCompleted = true;
-      }
-    } catch (e) {
-      debugPrint('Error loading Cancer completion: $e');
-    }
+    // Apply the result to instance state.
+    consentCompleted = status.consentCompleted;
+    hraEnabled = status.hraEnabled;
+    hctEnabled = status.hctEnabled;
+    tbEnabled = status.tbEnabled;
+    cancerEnabled = status.cancerEnabled;
+    hraCompleted = status.hraCompleted;
+    hctCompleted = status.hctCompleted;
+    tbCompleted = status.tbCompleted;
+    cancerCompleted = status.cancerCompleted;
+    surveyCompleted = status.surveyCompleted;
+    consentSancNumber = status.consentSancNumber;
+    consentRank = status.consentRank;
+    consentHpSignatureBase64 = status.consentHpSignatureBase64;
 
     // Determine screeningsCompleted / screeningsInProgress based on which
     // screenings were consented to (now correctly loaded from Firestore above).
@@ -183,14 +160,6 @@ class WellnessFlowViewModel extends ChangeNotifier {
       screeningsInProgress = false;
     }
 
-    // Survey
-    try {
-      surveyCompleted = await const FirestoreSurveyRepository()
-          .hasCompletedSurvey(memberId: memberId, eventId: eventId);
-    } catch (e) {
-      debugPrint('Error loading survey completion: $e');
-    }
-
     notifyListeners();
   }
 
@@ -216,11 +185,6 @@ class WellnessFlowViewModel extends ChangeNotifier {
   // Screening steps (used for detecting screening flows)
   // Derived from ScreeningType enum to ensure consistency with screening type definitions
   static List<String> get screeningSteps => ScreeningType.values.labels;
-
-  WellnessFlowViewModel({this.activeEvent}) {
-    // Initialize with member registration as the first step
-    _flowSteps = [stepMemberRegistration];
-  }
 
   // ViewModels for each step
   final consentVM = ConsentScreenViewModel();
@@ -631,8 +595,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
     if (memberId == null || eventId == null) return;
 
     try {
-      final consentRepo = FirestoreConsentRepository();
-      final consents = await consentRepo.getConsentsByMember(memberId);
+      final consents = await _consentRepo.getConsentsByMember(memberId);
 
       // Check if any consent exists for this event
       final hasConsent = consents.any((consent) => consent.eventId == eventId);

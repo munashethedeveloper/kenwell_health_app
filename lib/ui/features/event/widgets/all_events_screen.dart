@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/cards/kenwell_empty_state.dart';
+import '../../../shared/ui/cards/kenwell_event_day_header.dart';
 import '../../../shared/ui/colours/kenwell_colours.dart';
 import '../../../shared/ui/headers/kenwell_gradient_header.dart';
 import '../../../shared/ui/snackbars/app_snackbar.dart';
@@ -151,9 +152,11 @@ class _EventList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Build a flat sequence: for each day, one _DayItem then N _EventItems.
+    // Store day headers as MapEntry<DateTime, int> (date + event count for
+    // the KenwellEventDayHeader badge) and events as WellnessEvent.
     final items = <Object>[];
     for (final entry in grouped.entries) {
-      items.add(entry.key); // DateTime → day header
+      items.add(MapEntry(entry.key, entry.value.length)); // date + count
       items.addAll(entry.value); // WellnessEvent → event card
     }
 
@@ -162,8 +165,11 @@ class _EventList extends StatelessWidget {
       itemCount: items.length,
       itemBuilder: (context, index) {
         final item = items[index];
-        if (item is DateTime) {
-          return _DayHeader(date: item).animate().fadeIn(duration: 200.ms);
+        if (item is MapEntry<DateTime, int>) {
+          return KenwellEventDayHeader(
+            label: DateFormat('EEEE, d MMMM yyyy').format(item.key),
+            eventCount: item.value,
+          ).animate().fadeIn(duration: 200.ms);
         }
         return Consumer<CalendarViewModel>(
           builder: (context, calVM, _) => EventCard(
@@ -176,49 +182,6 @@ class _EventList extends StatelessWidget {
               .slideY(begin: 0.08, end: 0, duration: 250.ms),
         );
       },
-    );
-  }
-}
-
-// ── Day header ────────────────────────────────────────────────────────────────
-
-class _DayHeader extends StatelessWidget {
-  const _DayHeader({required this.date});
-
-  final DateTime date;
-
-  @override
-  Widget build(BuildContext context) {
-    final label = DateFormat('EEEE, d MMMM yyyy').format(date);
-    return Padding(
-      padding: const EdgeInsets.only(top: 12, bottom: 4),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: KenwellColors.secondaryNavy.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                color: KenwellColors.secondaryNavy,
-                letterSpacing: 0.2,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Divider(
-              color: KenwellColors.secondaryNavy.withValues(alpha: 0.12),
-              height: 1,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
