@@ -11,7 +11,11 @@ import 'dart:convert';
 import 'package:kenwell_health_app/domain/constants/enums.dart';
 
 class HIVTestResultViewModel extends ChangeNotifier {
-  HIVTestResultViewModel() {
+  HIVTestResultViewModel({
+    AuthService? authService,
+    FirestoreHivResultRepository? repository,
+  })  : _authService = authService ?? AuthService(),
+        _repository = repository ?? FirestoreHivResultRepository() {
     _loadCurrentUserProfile();
     // Initialize referral to Healthy since the default screening result is
     // Negative.  setScreeningResult() updates this whenever the nurse changes
@@ -19,9 +23,8 @@ class HIVTestResultViewModel extends ChangeNotifier {
     nursingReferralSelection = NursingReferralOption.patientNotReferred;
   }
 
-  final AuthService _authService = AuthService();
-  final FirestoreHivResultRepository _repository =
-      FirestoreHivResultRepository();
+  final AuthService _authService;
+  final FirestoreHivResultRepository _repository;
 
   String? _memberId;
   String? _eventId;

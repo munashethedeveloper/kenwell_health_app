@@ -5,10 +5,12 @@ import 'package:uuid/uuid.dart';
 
 // ViewModel for managing HIV Test form state and submission
 class HIVTestViewModel extends ChangeNotifier {
+  HIVTestViewModel({FirestoreHivScreeningRepository? repository})
+      : _repository = repository ?? FirestoreHivScreeningRepository();
+
   // Form key for validation
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final FirestoreHivScreeningRepository _repository =
-      FirestoreHivScreeningRepository();
+  final FirestoreHivScreeningRepository _repository;
 
   // Member and Event IDs
   String? _memberId;

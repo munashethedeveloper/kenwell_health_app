@@ -4,6 +4,11 @@ import 'package:kenwell_health_app/data/repositories_dcl/firestore_survey_reposi
 import 'package:kenwell_health_app/utils/logger.dart';
 
 class SurveyViewModel extends ChangeNotifier {
+  SurveyViewModel({FirestoreSurveyRepository? surveyRepository})
+      : _surveyRepository =
+            surveyRepository ?? const FirestoreSurveyRepository();
+
+  final FirestoreSurveyRepository _surveyRepository;
   String? _memberId;
   String? _eventId;
 
@@ -66,8 +71,7 @@ class SurveyViewModel extends ChangeNotifier {
         throw StateError('Member or event information is missing');
       }
       final id = const Uuid().v4();
-      await const FirestoreSurveyRepository()
-          .saveSurveyResult(id: id, data: toMap());
+      await _surveyRepository.saveSurveyResult(id: id, data: toMap());
       AppLogger.info('Survey saved successfully');
     } catch (e) {
       AppLogger.error('Failed to save survey', e);
