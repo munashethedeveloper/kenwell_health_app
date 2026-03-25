@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -156,8 +157,7 @@ class FirestoreMemberEventRepository {
       // Firestore whereIn limit is 30 per query.
       const chunkSize = 30;
       for (int i = 0; i < eventIds.length; i += chunkSize) {
-        final chunk = eventIds.sublist(
-            i, i + chunkSize > eventIds.length ? eventIds.length : i + chunkSize);
+        final chunk = eventIds.sublist(i, min(i + chunkSize, eventIds.length));
         final snapshot = await FirebaseFirestore.instance
             .collection(memberEventsCollection)
             .where('eventId', whereIn: chunk)
