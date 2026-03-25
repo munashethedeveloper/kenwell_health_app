@@ -334,17 +334,13 @@ class EventViewModel extends ChangeNotifier {
     _setError(null);
     try {
       debugPrint('EventViewModel: Adding event "${event.title}"');
-      _events.add(event);
-      notifyListeners();
       await _repository.addEvent(event);
+      // The watchAllEvents() stream will update _events automatically.
       debugPrint('EventViewModel: Event added successfully');
     } catch (e, stackTrace) {
       debugPrint('EventViewModel: ERROR adding event: $e');
       debugPrintStack(stackTrace: stackTrace);
       _setError('Failed to add event: ${e.toString()}');
-      // Remove from local list if save failed
-      _events.removeWhere((ev) => ev.id == event.id);
-      notifyListeners();
       rethrow;
     } finally {
       _setLoading(false);

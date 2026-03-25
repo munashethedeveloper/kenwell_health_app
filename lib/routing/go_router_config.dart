@@ -239,14 +239,17 @@ class AppRouterConfig {
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>?;
             final DateTime date = extra?['date'] as DateTime? ?? DateTime.now();
-            final Future<void> Function(WellnessEvent) onSave =
-                extra?['onSave'] as Future<void> Function(WellnessEvent)? ??
-                    (_) async {};
+            final Future<void> Function(WellnessEvent)? explicitOnSave =
+                extra?['onSave'] as Future<void> Function(WellnessEvent)?;
             final WellnessEvent? existingEvent =
                 extra?['existingEvent'] as WellnessEvent?;
 
             return Consumer<EventViewModel>(
               builder: (context, eventVM, _) {
+                final onSave = explicitOnSave ??
+                    (existingEvent != null
+                        ? eventVM.updateEvent
+                        : eventVM.addEvent);
                 return EventScreen(
                   date: date,
                   onSave: onSave,
