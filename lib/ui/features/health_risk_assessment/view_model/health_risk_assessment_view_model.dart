@@ -11,8 +11,18 @@ import 'package:uuid/uuid.dart';
 
 // ViewModel for Personal Risk Assessment
 class PersonalRiskAssessmentViewModel extends ChangeNotifier {
-  final FirestoreHraRepository _hraRepository = FirestoreHraRepository();
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>(); // Add this
+  PersonalRiskAssessmentViewModel({FirestoreHraRepository? repository})
+      : _hraRepository = repository ?? FirestoreHraRepository() {
+    heightController.addListener(_calculateBMI);
+    weightController.addListener(_calculateBMI);
+    systolicBpController.addListener(notifyListeners);
+    diastolicBpController.addListener(notifyListeners);
+    cholesterolController.addListener(notifyListeners);
+    bloodSugarController.addListener(notifyListeners);
+  }
+
+  final FirestoreHraRepository _hraRepository;
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   // Private fields to store memberId and eventId
   String? _memberId;
@@ -58,17 +68,6 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
 
   // Section 2: Exercise frequency (radio)
   String exerciseFrequency = '';
-
-  // Constructor to set up BMI calculation listener
-  PersonalRiskAssessmentViewModel() {
-    heightController.addListener(_calculateBMI);
-    weightController.addListener(_calculateBMI);
-    // Notify listeners when metric values change so UI badges update live
-    systolicBpController.addListener(notifyListeners);
-    diastolicBpController.addListener(notifyListeners);
-    cholesterolController.addListener(notifyListeners);
-    bloodSugarController.addListener(notifyListeners);
-  }
 
   // Height threshold to determine if input is in centimeters (> 3) or meters
   static const double _heightCmThreshold = 3.0;

@@ -23,9 +23,9 @@ class CurrentEventHomeScreen extends StatelessWidget {
     final viewModel = context.watch<WellnessFlowViewModel>();
 
     final sections = _buildSections(viewModel);
-    final completedCount = sections.where((s) => s.isCompleted).length;
-    final totalCount = sections.length;
-    final progressValue = totalCount > 0 ? completedCount / totalCount : 0.0;
+    final completedCount = viewModel.completedSectionsCount;
+    final totalCount = WellnessFlowViewModel.totalWellnessSections;
+    final progressValue = viewModel.wellnessProgressValue;
 
     return Column(
       children: [

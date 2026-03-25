@@ -10,10 +10,12 @@ import 'dart:convert';
 import 'package:kenwell_health_app/domain/constants/enums.dart';
 
 class TBTestingViewModel extends ChangeNotifier {
+  TBTestingViewModel({FirestoreTbScreeningRepository? repository})
+      : _repository = repository ?? FirestoreTbScreeningRepository();
+
   // Note: formKey is now defined here
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final FirestoreTbScreeningRepository _repository =
-      FirestoreTbScreeningRepository();
+  final FirestoreTbScreeningRepository _repository;
 
   String? _memberId;
   String? _eventId;

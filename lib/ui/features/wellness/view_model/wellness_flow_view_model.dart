@@ -182,6 +182,23 @@ class WellnessFlowViewModel extends ChangeNotifier {
   static const String sectionHealthScreenings = 'health_screenings';
   static const String sectionSurvey = 'survey';
 
+  // ── Wellness flow progress ─────────────────────────────────────────────────
+
+  /// Total number of sections in the wellness flow.
+  static const int totalWellnessSections = 4;
+
+  /// Number of completed sections for the current member.
+  int get completedSectionsCount => [
+        memberRegistrationCompleted,
+        consentCompleted,
+        screeningsCompleted,
+        surveyCompleted,
+      ].where((c) => c).length;
+
+  /// Progress value in [0.0, 1.0] for the current member's wellness flow.
+  double get wellnessProgressValue =>
+      completedSectionsCount / totalWellnessSections;
+
   // Screening steps (used for detecting screening flows)
   // Derived from ScreeningType enum to ensure consistency with screening type definitions
   static List<String> get screeningSteps => ScreeningType.values.labels;

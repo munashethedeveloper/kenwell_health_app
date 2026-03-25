@@ -10,20 +10,24 @@ import 'package:signature/signature.dart';
 import 'package:uuid/uuid.dart';
 
 class CancerScreeningViewModel extends ChangeNotifier {
+  CancerScreeningViewModel({
+    FirestoreCancerScreeningRepository? repository,
+    AuthService? authService,
+  })  : _repository = repository ?? FirestoreCancerScreeningRepository(),
+        _authService = authService ?? AuthService();
+
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final FirestoreCancerScreeningRepository _repository =
-      FirestoreCancerScreeningRepository();
-  final AuthService _authService = AuthService();
+  final FirestoreCancerScreeningRepository _repository;
+  final AuthService _authService;
 
   String? _memberId;
   String? _eventId;
 
-  CancerScreeningViewModel() {
-    _loadCurrentUserProfile();
-  }
-
   /// Pre-populate nurse first/last name from the authenticated user profile.
-  Future<void> _loadCurrentUserProfile() async {
+  ///
+  /// Call this explicitly after creating the ViewModel (not in the constructor)
+  /// so that initialization is visible and testable.
+  Future<void> initialize() async {
     try {
       final user = await _authService.getCurrentUser();
       if (user != null) {
