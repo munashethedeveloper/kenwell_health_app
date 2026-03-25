@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 import '../../../../data/repositories_dcl/firestore_member_repository.dart';
+import '../../../../data/repositories_dcl/firestore_member_event_repository.dart';
 
 class StatsReportViewModel extends ChangeNotifier {
-  StatsReportViewModel({FirestoreMemberRepository? memberRepository})
-      : _memberRepository = memberRepository ?? FirestoreMemberRepository() {
+  StatsReportViewModel({
+    FirestoreMemberRepository? memberRepository,
+    FirestoreMemberEventRepository? memberEventRepository,
+  })  : _memberRepository = memberRepository ?? FirestoreMemberRepository(),
+        _memberEventRepository =
+            memberEventRepository ?? FirestoreMemberEventRepository() {
     for (final controller in _allControllers) {
       controller.addListener(_onFieldChanged);
     }
   }
 
   final FirestoreMemberRepository _memberRepository;
+  final FirestoreMemberEventRepository _memberEventRepository;
 
   final formKey = GlobalKey<FormState>();
 
@@ -32,6 +38,34 @@ class StatsReportViewModel extends ChangeNotifier {
 
   int get memberCount => _memberCount;
   bool get isLoadingMemberCount => _isLoadingMemberCount;
+
+  int _registeredCount = 0;
+  bool _isLoadingRegisteredCount = false;
+
+  int get registeredCount => _registeredCount;
+  bool get isLoadingRegisteredCount => _isLoadingRegisteredCount;
+
+  /// Fetches the number of members registered (via member_events) for the
+  /// given [eventIds]. Use this on the live stats screen instead of the
+  /// global member count.
+  Future<void> loadRegisteredCountForEvents(List<String> eventIds) async {
+    if (eventIds.isEmpty) {
+      _registeredCount = 0;
+      notifyListeners();
+      return;
+    }
+    _isLoadingRegisteredCount = true;
+    notifyListeners();
+    try {
+      _registeredCount =
+          await _memberEventRepository.countRegisteredMembersForEvents(eventIds);
+    } catch (_) {
+      // Non-fatal — keep previous count.
+    } finally {
+      _isLoadingRegisteredCount = false;
+      notifyListeners();
+    }
+  }
 
   /// Fetches the total number of registered members and notifies listeners.
   Future<void> loadMemberCount() async {

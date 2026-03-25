@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/cards/kenwell_action_card.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
@@ -83,7 +84,7 @@ class HelpScreen extends StatelessWidget {
                         subtitle:
                             'Find answers to common questions and get help',
                         badgeLabel: 'FAQs',
-                        onTap: viewModel.openFAQs,
+                        onTap: () => context.push('/faq'),
                       ),
                       const SizedBox(height: 16),
                       KenwellActionCard(

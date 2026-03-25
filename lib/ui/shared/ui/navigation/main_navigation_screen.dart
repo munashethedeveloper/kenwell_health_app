@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/features/home/widgets/home_screen.dart';
-import 'package:kenwell_health_app/ui/features/profile/widgets/my_profile_menu_screen.dart';
 import 'package:kenwell_health_app/ui/features/user_management/widgets/registration_management_screen.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/responsive/responsive_breakpoints.dart';
@@ -10,6 +9,7 @@ import 'package:provider/provider.dart';
 // Feature imports
 import '../../../features/stats_report/widgets/stats_report_screen.dart';
 import '../../../features/event/widgets/my_event_screen.dart';
+import '../../../features/calendar/widgets/calendar_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -53,21 +53,20 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       //const UserManagementScreenVersionTwo(),
       const RegistrationManagementScreen(),
       const StatsReportScreen(),
-      // privileged: Users=0, Stats=1, Home=2, Profile=3, Events=4
+      // privileged: Users=0, Stats=1, Home=2, Calendar=3, Events=4
       HomeScreen(onTabSwitch: (i) => setState(() => _currentIndex = i)),
-      const MyProfileMenuScreen(),
+      const CalendarScreen(),
       const MyEventScreen(),
     ];
     final List<Widget> clientTabs = [
       const StatsReportScreen(),
-      //client should also be able to see the calendar but without the events displaying
       HomeScreen(onTabSwitch: (i) => setState(() => _currentIndex = i)),
-      const MyProfileMenuScreen(),
+      const CalendarScreen(),
     ];
     final List<Widget> restrictedTabs = [
-      // restricted: Home=0, Profile=1, Events=2
+      // restricted: Home=0, Calendar=1, Events=2
       HomeScreen(onTabSwitch: (i) => setState(() => _currentIndex = i)),
-      const MyProfileMenuScreen(),
+      const CalendarScreen(),
       const MyEventScreen(),
     ];
     final List<NavigationRailDestination> allRailDestinations = [
@@ -87,9 +86,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         label: Text('Home'),
       ),
       const NavigationRailDestination(
-        icon: Icon(Icons.person_outline_rounded),
-        selectedIcon: Icon(Icons.person_rounded),
-        label: Text('Profile'),
+        icon: Icon(Icons.calendar_month_outlined),
+        selectedIcon: Icon(Icons.calendar_month_rounded),
+        label: Text('Calendar'),
       ),
       const NavigationRailDestination(
         icon: Icon(Icons.event_note_outlined),
@@ -109,9 +108,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         label: Text('Home'),
       ),
       const NavigationRailDestination(
-        icon: Icon(Icons.person_outline_rounded),
-        selectedIcon: Icon(Icons.person_rounded),
-        label: Text('Profile'),
+        icon: Icon(Icons.calendar_month_outlined),
+        selectedIcon: Icon(Icons.calendar_month_rounded),
+        label: Text('Calendar'),
       ),
     ];
     final List<NavigationRailDestination> restrictedRailDestinations = [
@@ -121,9 +120,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         label: Text('Home'),
       ),
       const NavigationRailDestination(
-        icon: Icon(Icons.person_outline_rounded),
-        selectedIcon: Icon(Icons.person_rounded),
-        label: Text('Profile'),
+        icon: Icon(Icons.calendar_month_outlined),
+        selectedIcon: Icon(Icons.calendar_month_rounded),
+        label: Text('Calendar'),
       ),
       const NavigationRailDestination(
         icon: Icon(Icons.event_note_outlined),
@@ -148,9 +147,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         label: 'Home',
       ),
       const NavigationDestination(
-        icon: Icon(Icons.person_outline_rounded),
-        selectedIcon: Icon(Icons.person_rounded),
-        label: 'Profile',
+        icon: Icon(Icons.calendar_month_outlined),
+        selectedIcon: Icon(Icons.calendar_month_rounded),
+        label: 'Calendar',
       ),
       const NavigationDestination(
         icon: Icon(Icons.event_note_outlined),
@@ -170,9 +169,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         label: 'Home',
       ),
       const NavigationDestination(
-        icon: Icon(Icons.person_outline_rounded),
-        selectedIcon: Icon(Icons.person_rounded),
-        label: 'Profile',
+        icon: Icon(Icons.calendar_month_outlined),
+        selectedIcon: Icon(Icons.calendar_month_rounded),
+        label: 'Calendar',
       ),
     ];
     final List<NavigationDestination> restrictedNavDestinations = [
@@ -182,9 +181,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         label: 'Home',
       ),
       const NavigationDestination(
-        icon: Icon(Icons.person_outline_rounded),
-        selectedIcon: Icon(Icons.person_rounded),
-        label: 'Profile',
+        icon: Icon(Icons.calendar_month_outlined),
+        selectedIcon: Icon(Icons.calendar_month_rounded),
+        label: 'Calendar',
       ),
       const NavigationDestination(
         icon: Icon(Icons.event_note_outlined),

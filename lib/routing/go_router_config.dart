@@ -45,6 +45,7 @@ import '../ui/features/profile/widgets/profile_screen.dart';
 
 // Admin & User Management
 import '../ui/features/help/widgets/help_screen.dart';
+import '../ui/features/help/widgets/faq_screen.dart';
 import '../ui/features/user_management/widgets/user_management_screen_version_two.dart';
 import '../ui/features/wellness/widgets/member_search_screen.dart';
 
@@ -383,6 +384,13 @@ class AppRouterConfig {
           path: '/help',
           name: 'help',
           builder: (context, state) => const HelpScreen(),
+        ),
+
+        // FAQ Route
+        GoRoute(
+          path: '/faq',
+          name: 'faq',
+          builder: (context, state) => const FaqScreen(),
         ),
 
         // Audit Log Route (ADMIN / TOP MANAGEMENT only)

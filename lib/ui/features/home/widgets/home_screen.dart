@@ -14,9 +14,9 @@ class HomeScreen extends StatefulWidget {
   /// Optional callback to switch the bottom-nav tab.
   final void Function(int tabIndex)? onTabSwitch;
 
-  // ── Tab-index constants (privileged role: Users=0, Stats=1, Home=2, Profile=3, Events=4)
+  // ── Tab-index constants (privileged role: Users=0, Stats=1, Home=2, Calendar=3, Events=4)
   static const int _statsTabIndex = 1;
-  static const int _profileTabIndex = 3;
+  static const int _calendarTabIndex = 3;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -88,15 +88,20 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
+                // ── Today's summary strip ───────────────────────────────
+                SliverToBoxAdapter(
+                  child: _TodaySummaryStrip(
+                    calendarVM: calendarVM,
+                  ),
+                ),
+
                 // ── Quick actions ────────────────────────────────────────
                 SliverToBoxAdapter(
                   child: _QuickActionsGrid(
                     onAddEvent: () => context.pushNamed('addEditEvent'),
                     onAllEvents: () => context.pushNamed('allEvents'),
-                    onProfile: () =>
-                        widget.onTabSwitch?.call(HomeScreen._profileTabIndex),
-                    onLiveStats: () =>
-                        widget.onTabSwitch?.call(HomeScreen._statsTabIndex),
+                    onProfile: () => context.pushNamed('profile'),
+                    onLiveStats: () => context.pushNamed('liveEvents'),
                   ),
                 ),
 
@@ -434,6 +439,135 @@ class _ActionCard extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Today's summary strip ─────────────────────────────────────────────────
+
+class _TodaySummaryStrip extends StatelessWidget {
+  const _TodaySummaryStrip({required this.calendarVM});
+
+  final CalendarViewModel calendarVM;
+
+  @override
+  Widget build(BuildContext context) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    final todayEvents = calendarVM.events.where((e) {
+      final d = e.date.toLocal();
+      return DateTime(d.year, d.month, d.day).isAtSameMomentAs(today);
+    }).toList();
+
+    final upcomingThisWeek = calendarVM.events.where((e) {
+      final d = e.date.toLocal();
+      final eventDay = DateTime(d.year, d.month, d.day);
+      return eventDay.isAfter(today) &&
+          eventDay.isBefore(today.add(const Duration(days: 7)));
+    }).length;
+
+    final inProgress = calendarVM.events.where((e) {
+      final s = e.status.toLowerCase();
+      return s == 'in_progress' || s == 'in progress' || s == 'ongoing';
+    }).length;
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
+      child: Row(
+        children: [
+          _SummaryChip(
+            icon: Icons.today_rounded,
+            label: 'Today',
+            value: '${todayEvents.length}',
+            color: KenwellColors.primaryGreen,
+          ),
+          const SizedBox(width: 10),
+          _SummaryChip(
+            icon: Icons.date_range_rounded,
+            label: 'This Week',
+            value: '$upcomingThisWeek',
+            color: const Color(0xFF3B82F6),
+          ),
+          const SizedBox(width: 10),
+          _SummaryChip(
+            icon: Icons.play_circle_rounded,
+            label: 'Live',
+            value: '$inProgress',
+            color: const Color(0xFFEF4444),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SummaryChip extends StatelessWidget {
+  const _SummaryChip({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: color.withValues(alpha: 0.18),
+            width: 1.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, size: 16, color: color),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w900,
+                color: KenwellColors.secondaryNavy,
+                height: 1,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                color: Colors.grey.shade500,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
       ),
     );

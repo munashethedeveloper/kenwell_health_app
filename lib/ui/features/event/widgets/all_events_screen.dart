@@ -8,6 +8,8 @@ import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/cards/kenwell_empty_state.dart';
 import '../../../shared/ui/colours/kenwell_colours.dart';
 import '../../../shared/ui/headers/kenwell_gradient_header.dart';
+import '../../calendar/view_model/calendar_view_model.dart';
+import '../../calendar/widgets/event_card.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../user_management/viewmodel/user_management_view_model.dart';
 import '../view_model/all_events_view_model.dart';
@@ -144,10 +146,16 @@ class _EventList extends StatelessWidget {
         if (item is DateTime) {
           return _DayHeader(date: item).animate().fadeIn(duration: 200.ms);
         }
-        return _AllEventCard(event: item as WellnessEvent)
-            .animate()
-            .fadeIn(duration: 250.ms)
-            .slideY(begin: 0.08, end: 0, duration: 250.ms);
+        return Consumer<CalendarViewModel>(
+          builder: (context, calVM, _) => EventCard(
+            event: item as WellnessEvent,
+            viewModel: calVM,
+            showBorder: true,
+          )
+              .animate()
+              .fadeIn(duration: 250.ms)
+              .slideY(begin: 0.08, end: 0, duration: 250.ms),
+        );
       },
     );
   }

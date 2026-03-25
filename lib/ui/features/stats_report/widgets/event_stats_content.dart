@@ -39,11 +39,29 @@ class _EventStatsContentState extends State<EventStatsContent> {
   // Null means no card is selected (detail panel is hidden).
   String? _selectedScreeningType;
 
+  /// Returns the IDs of today's in-progress events.
+  List<String> _liveEventIds() {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    return context.read<EventViewModel>().events.where((e) {
+      final s = e.status.toLowerCase();
+      final isActive =
+          s == 'in_progress' || s == 'in progress' || s == 'ongoing';
+      if (!isActive) return false;
+      final d = DateTime(e.date.year, e.date.month, e.date.day);
+      return d == today;
+    }).map((e) => e.id).toList();
+  }
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<StatsReportViewModel>().loadMemberCount();
+      final statsVM = context.read<StatsReportViewModel>();
+      statsVM.loadMemberCount();
+      if (widget.isLiveTab) {
+        statsVM.loadRegisteredCountForEvents(_liveEventIds());
+      }
     });
     _searchController.addListener(() {
       if (mounted) setState(() {});
@@ -51,7 +69,11 @@ class _EventStatsContentState extends State<EventStatsContent> {
   }
 
   Future<void> _refreshData() async {
-    context.read<StatsReportViewModel>().loadMemberCount();
+    final statsVM = context.read<StatsReportViewModel>();
+    statsVM.loadMemberCount();
+    if (widget.isLiveTab) {
+      statsVM.loadRegisteredCountForEvents(_liveEventIds());
+    }
     if (mounted) {
       setState(() {});
       AppSnackbar.showSuccess(context, 'Statistics refreshed',
@@ -413,13 +435,23 @@ class _EventStatsContentState extends State<EventStatsContent> {
                 child: StatsStatCard(
                   icon: Icons.how_to_reg_outlined,
                   title: 'Registered',
-                  value:
-                      context.watch<StatsReportViewModel>().isLoadingMemberCount
+                  value: widget.isLiveTab
+                      ? (context
+                              .watch<StatsReportViewModel>()
+                              .isLoadingRegisteredCount
+                          ? '...'
+                          : context
+                              .watch<StatsReportViewModel>()
+                              .registeredCount
+                              .toString())
+                      : (context
+                              .watch<StatsReportViewModel>()
+                              .isLoadingMemberCount
                           ? '...'
                           : context
                               .watch<StatsReportViewModel>()
                               .memberCount
-                              .toString(),
+                              .toString()),
                   color: KenwellColors.primaryGreen,
                 ),
               ),
