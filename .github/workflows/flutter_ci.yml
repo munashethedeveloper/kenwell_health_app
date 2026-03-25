@@ -46,18 +46,18 @@ jobs:
           files: coverage/lcov.info
           fail_ci_if_error: false
 
+  # ── Production deploy ─────────────────────────────────────────────────────
+  # Triggered only on push to main / master.
+  # Deploys to the `live` channel → https://kenwellmobileapp.web.app
   deploy:
-    name: Build & Deploy Web
+    name: Deploy → Production (live)
     needs: test
-    # Only deploy on direct pushes to the main / master branch (not PRs).
     if: >
       github.event_name == 'push' &&
       (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      # Required by the Firebase hosting deploy action to post a preview URL
-      # comment on associated pull requests.
       pull-requests: write
 
     steps:
@@ -80,13 +80,104 @@ jobs:
       - name: Build Flutter web (release)
         run: flutter build web --release --web-renderer canvaskit
 
-      - name: Deploy to Firebase Hosting
+      - name: Deploy to Firebase Hosting — live channel
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          # Create this service-account secret in GitHub → Settings → Secrets:
+          # Create this service-account secret once:
           #   firebase init hosting:github  (follow the prompts)
-          # The CLI will create the secret automatically.
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KENWELLMOBILEAPP }}
           channelId: live
+          projectId: kenwellmobileapp
+
+  # ── Staging deploy ────────────────────────────────────────────────────────
+  # Triggered only on push to the develop branch.
+  # Deploys to the persistent `staging` channel.
+  # Staging URL: https://kenwellmobileapp--staging-<hash>.web.app
+  # (exact URL is printed in the Actions log and posted as a commit status)
+  deploy-staging:
+    name: Deploy → Staging channel
+    needs: test
+    if: >
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.32.x"
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate Drift / build_runner code
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Build Flutter web (release)
+        run: flutter build web --release --web-renderer canvaskit
+
+      - name: Deploy to Firebase Hosting — staging channel
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KENWELLMOBILEAPP }}
+          # `staging` is a persistent named channel — its URL never changes.
+          # To promote staging to production, run:
+          #   firebase hosting:clone kenwellmobileapp:staging kenwellmobileapp:live
+          channelId: staging
+          projectId: kenwellmobileapp
+
+  # ── PR preview deploy ─────────────────────────────────────────────────────
+  # Triggered on every pull-request event (opened, synchronize, reopened).
+  # Firebase creates a unique ephemeral channel per PR and posts the URL as
+  # a comment on the PR automatically.  Channels expire after 7 days and are
+  # cleaned up automatically.
+  deploy-preview:
+    name: Deploy → PR Preview
+    needs: test
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Needed so the action can post the preview URL as a PR comment.
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.32.x"
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate Drift / build_runner code
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Build Flutter web (release)
+        run: flutter build web --release --web-renderer canvaskit
+
+      - name: Deploy to Firebase Hosting — PR preview channel
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KENWELLMOBILEAPP }}
+          # No channelId → Firebase auto-creates a unique channel for this PR
+          # and posts the URL as a comment.  Channel expires after 7 days.
+          expires: 7d
           projectId: kenwellmobileapp
