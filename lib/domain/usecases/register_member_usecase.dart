@@ -4,6 +4,7 @@ import 'package:kenwell_health_app/data/local/app_database.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_member_event_repository.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_member_repository.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/member_repository.dart';
+import 'package:kenwell_health_app/data/services/app_performance.dart';
 import 'package:kenwell_health_app/data/services/pending_write_service.dart';
 import 'package:kenwell_health_app/domain/models/member.dart';
 import 'package:kenwell_health_app/domain/models/member_event.dart';
@@ -48,6 +49,27 @@ class RegisterMemberUseCase {
   /// [MemberEvent] record.  Pass them whenever the registration occurs inside
   /// a wellness flow session.
   Future<Member> call(
+    Member member, {
+    String? eventId,
+    String? eventTitle,
+    DateTime? eventDate,
+    String? eventVenue,
+    String? eventLocation,
+  }) async {
+    return AppPerformance.traceAsync(
+      AppPerformance.kRegisterMember,
+      () => _execute(
+        member,
+        eventId: eventId,
+        eventTitle: eventTitle,
+        eventDate: eventDate,
+        eventVenue: eventVenue,
+        eventLocation: eventLocation,
+      ),
+    );
+  }
+
+  Future<Member> _execute(
     Member member, {
     String? eventId,
     String? eventTitle,

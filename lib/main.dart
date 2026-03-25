@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_performance/firebase_performance.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:kenwell_health_app/di/app_providers.dart';
@@ -62,6 +63,15 @@ void main() async {
       cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
     );
     debugPrint('Firestore offline persistence enabled');
+
+    // Enable Firebase Performance Monitoring.
+    // In debug builds Firebase Performance is disabled so that local runs
+    // are not slowed by instrumentation overhead. In release builds it is
+    // enabled automatically once the google-services plugin is applied.
+    await FirebasePerformance.instance
+        .setPerformanceCollectionEnabled(!kDebugMode);
+    debugPrint(
+        'Firebase Performance: collection ${kDebugMode ? "disabled (debug)" : "enabled (release)"}');
   } catch (e) {
     debugPrint('Firebase initialization error: $e');
     debugPrint('App will run with limited functionality (local database only)');

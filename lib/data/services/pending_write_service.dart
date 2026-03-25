@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 
 import '../local/app_database.dart';
+import 'app_performance.dart';
 
 /// Lightweight write-queue for best-effort Firestore mutations that may fail
 /// in edge cases (permission errors, quota, network glitches after the SDK's
@@ -82,7 +83,14 @@ class PendingWriteService {
   /// Succeeded entries are deleted; failed entries have their attempt count
   /// incremented.  Entries that exceed [maxAttempts] are left for later retry
   /// but are not deleted — an operator can inspect them via the audit log.
-  Future<void> flushPending() async {
+  Future<void> flushPending() {
+    return AppPerformance.traceAsync(
+      AppPerformance.kFlushPendingWrites,
+      _flushPendingImpl,
+    );
+  }
+
+  Future<void> _flushPendingImpl() async {
     List<Map<String, dynamic>> rows;
     try {
       final results = await _db

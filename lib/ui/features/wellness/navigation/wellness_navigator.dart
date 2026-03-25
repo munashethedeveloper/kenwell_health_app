@@ -188,8 +188,15 @@ class WellnessNavigator {
             eventVenue: event.venue,
             eventLocation: event.address,
           )
-          .catchError(
-              (e) => debugPrint('Failed to ensure member_events record: $e')),
+          .catchError((e) {
+        debugPrint('Failed to ensure member_events record: $e');
+        if (context.mounted) {
+          AppSnackbar.showWarning(
+            context,
+            'Member link saved locally — sync will retry when online.',
+          );
+        }
+      }),
     );
 
     await Navigator.push(

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../../data/services/app_performance.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../data/repositories_dcl/event_repository.dart';
 import '../../../../domain/enums/service_type.dart';
@@ -368,7 +369,10 @@ class EventViewModel extends ChangeNotifier {
     _setError(null);
     try {
       debugPrint('EventViewModel: Adding event "${event.title}"');
-      await _addEventUseCase(event);
+      await AppPerformance.traceAsync(
+        AppPerformance.kAddEvent,
+        () => _addEventUseCase(event),
+      );
       // The watchAllEvents() stream will update _events automatically.
       debugPrint('EventViewModel: Event added successfully');
     } catch (e, stackTrace) {
@@ -391,7 +395,10 @@ class EventViewModel extends ChangeNotifier {
       if (index != -1) {
         final deletedEvent = _events.removeAt(index);
         notifyListeners();
-        await _deleteEventUseCase(eventId);
+        await AppPerformance.traceAsync(
+          AppPerformance.kDeleteEvent,
+          () => _deleteEventUseCase(eventId),
+        );
         return deletedEvent;
       }
       return null;
@@ -416,7 +423,10 @@ class EventViewModel extends ChangeNotifier {
         final previousEvent = _events[index];
         _events[index] = updatedEvent;
         notifyListeners();
-        await _updateEventUseCase(updatedEvent);
+        await AppPerformance.traceAsync(
+          AppPerformance.kUpdateEvent,
+          () => _updateEventUseCase(updatedEvent),
+        );
         return previousEvent;
       }
       return null;

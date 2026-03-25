@@ -1,5 +1,6 @@
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_consent_repository.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_survey_repository.dart';
+import 'package:kenwell_health_app/data/services/app_performance.dart';
 import 'package:kenwell_health_app/domain/models/consent.dart';
 import 'package:kenwell_health_app/utils/logger.dart';
 
@@ -27,6 +28,13 @@ class SubmitConsentUseCase {
   /// The primary `consents` write is fatal — callers should `rethrow` on
   /// failure.  The secondary `survey_results` write is best-effort.
   Future<void> call(Consent consent) async {
+    return AppPerformance.traceAsync(
+      AppPerformance.kSubmitConsent,
+      () => _execute(consent),
+    );
+  }
+
+  Future<void> _execute(Consent consent) async {
     // 1. Primary save — fatal on failure.
     await _consentRepo.addConsent(consent);
     AppLogger.info('SubmitConsentUseCase: consent saved to consents collection');
