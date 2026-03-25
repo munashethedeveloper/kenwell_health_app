@@ -45,3 +45,48 @@ jobs:
         with:
           files: coverage/lcov.info
           fail_ci_if_error: false
+
+  deploy:
+    name: Build & Deploy Web
+    needs: test
+    # Only deploy on direct pushes to the main / master branch (not PRs).
+    if: >
+      github.event_name == 'push' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Required by the Firebase hosting deploy action to post a preview URL
+      # comment on associated pull requests.
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.32.x"
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate Drift / build_runner code
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Build Flutter web (release)
+        run: flutter build web --release --web-renderer canvaskit
+
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          # Create this service-account secret in GitHub → Settings → Secrets:
+          #   firebase init hosting:github  (follow the prompts)
+          # The CLI will create the secret automatically.
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KENWELLMOBILEAPP }}
+          channelId: live
+          projectId: kenwellmobileapp

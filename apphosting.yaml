@@ -1,0 +1,48 @@
+# Firebase App Hosting configuration
+# Docs: https://firebase.google.com/docs/app-hosting/configure
+#
+# Firebase App Hosting builds and serves your Flutter web app automatically
+# whenever you push to the connected branch (default: main / master).
+#
+# ── How it works ──────────────────────────────────────────────────────────────
+#  1. Firebase App Hosting clones your repo, runs `buildCommand` below.
+#  2. The compiled static files from `outputFiles.location` are deployed to
+#     Firebase Hosting CDN (backed by the `hosting` section in firebase.json).
+#  3. Every push to the live branch creates a new immutable release; previews
+#     are created for every PR automatically.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# The build command App Hosting runs to produce the web output.
+# --web-renderer canvaskit gives pixel-perfect rendering across all browsers.
+# --release enables tree-shaking and dart2js optimisations.
+buildCommand: flutter build web --release --web-renderer canvaskit
+
+# Where the compiled output lives after `buildCommand` finishes.
+outputFiles:
+  # Declare this as a purely static app (no server-side rendering).
+  serverRendering: false
+  # Must match the flutter build output directory.
+  location: build/web
+
+# Runtime settings (used when App Hosting spins up a server to serve files).
+runConfig:
+  # nodejs22 is the current LTS runtime available on App Hosting.
+  runtime: nodejs22
+  # Tune these for your expected traffic; start small and scale up.
+  cpu: 1
+  memoryMiB: 512
+  concurrency: 80
+  minInstances: 0
+  maxInstances: 10
+
+# Environment variables made available during build and/or runtime.
+# Add any feature flags, API endpoints, or app config here.
+# NEVER put secrets here — use Secret Manager instead.
+#
+# Example:
+# env:
+#   - variable: APP_ENV
+#     value: production
+#     availability:
+#       - BUILD
+#       - RUNTIME
