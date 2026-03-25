@@ -1,0 +1,31 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "kenwellmobileapp",
+          "appId": "1:195093019449:android:80c5c09ca6b7f409e8c6e8",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "kenwellmobileapp",
+          "configurations": {
+            "android": "1:195093019449:android:80c5c09ca6b7f409e8c6e8",
+            "ios": "1:195093019449:ios:2ed9a3d5c4d8947ce8c6e8",
+            "macos": "1:195093019449:ios:2ed9a3d5c4d8947ce8c6e8",
+            "web": "1:195093019449:web:c89084426a9ef208e8c6e8",
+            "windows": "1:195093019449:web:390b28f01bc90c1ce8c6e8"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "database": "(default)",
+    "location": "africa-south1",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  }
+}

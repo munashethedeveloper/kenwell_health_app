@@ -363,11 +363,11 @@ class _ReferralOutcomeSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
+        const Row(
           children: [
             Icon(Icons.medical_services_outlined,
                 size: 13, color: KenwellColors.neutralGrey),
-            const SizedBox(width: 4),
+            SizedBox(width: 4),
             Text(
               'Referral Outcome',
               style: TextStyle(

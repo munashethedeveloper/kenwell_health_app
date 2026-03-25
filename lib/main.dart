@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+import 'package:kenwell_health_app/data/services/connectivity_service.dart';
 import 'package:kenwell_health_app/ui/features/consent_form/view_model/consent_view_model.dart';
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
+import 'package:kenwell_health_app/ui/shared/ui/banners/offline_banner.dart';
 import 'package:provider/provider.dart';
 
 import 'firebase_options.dart';
@@ -17,6 +21,35 @@ import 'ui/shared/themes/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // ── Global error handlers ─────────────────────────────────────────────────
+  // Catch unhandled Flutter framework errors (e.g. widget build exceptions).
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    debugPrint('🚨 FlutterError: ${details.exceptionAsString()}');
+    if (kDebugMode) debugPrintStack(stackTrace: details.stack);
+    // Forward to Crashlytics in release builds; log only in debug builds.
+    if (kDebugMode) {
+      FirebaseCrashlytics.instance
+          .log('FlutterError: ${details.exceptionAsString()}');
+    } else {
+      FirebaseCrashlytics.instance.recordFlutterFatalError(details);
+    }
+  };
+
+  // Catch unhandled platform/async errors that Flutter doesn't intercept.
+  PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
+    debugPrint('🚨 PlatformDispatcher error: $error');
+    if (kDebugMode) debugPrintStack(stackTrace: stack);
+    // Forward to Crashlytics in release builds; log only in debug builds.
+    if (kDebugMode) {
+      FirebaseCrashlytics.instance.log('PlatformDispatcher error: $error');
+    } else {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    }
+    return true; // mark as handled so the app does not crash
+  };
+  // ─────────────────────────────────────────────────────────────────────────
 
   // Initialize Firebase - skip on Windows desktop for now due to build issues
   // Use web config for Windows which doesn't require C++ SDK
@@ -51,6 +84,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider<ConnectivityService>(
+            create: (_) => ConnectivityService()),
         ChangeNotifierProvider<AppProvider>(create: (_) => AppProvider()),
         ChangeNotifierProvider<ProfileViewModel>(
             create: (_) => ProfileViewModel()),
@@ -80,6 +115,14 @@ class MyApp extends StatelessWidget {
             darkTheme: AppTheme.darkTheme,
             themeMode: themeProvider.themeMode,
             routerConfig: goRouter,
+            // Inject the offline banner above every route so it appears
+            // on every screen without modifying each screen individually.
+            builder: (context, child) => Column(
+              children: [
+                const OfflineBanner(),
+                Expanded(child: child ?? const SizedBox.shrink()),
+              ],
+            ),
           );
         },
       ),

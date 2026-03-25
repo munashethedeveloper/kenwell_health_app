@@ -98,11 +98,38 @@ class AppDatabase extends _$AppDatabase {
   static final AppDatabase instance = AppDatabase._internal();
 
   @override
-  int get schemaVersion => 14;
+  int get schemaVersion => 15;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (migrator) => migrator.createAll(),
+        onCreate: (migrator) async {
+          await migrator.createAll();
+          // Create the offline-cache tables (not tracked by Drift code-gen).
+          const tables = [
+            'cached_consents',
+            'cached_member_events',
+            'cached_hiv_screenings',
+            'cached_hiv_results',
+            'cached_hra_screenings',
+            'cached_tb_screenings',
+            'cached_cancer_screenings',
+          ];
+          for (final table in tables) {
+            await customStatement('''
+              CREATE TABLE IF NOT EXISTS $table (
+                id        TEXT NOT NULL PRIMARY KEY,
+                member_id TEXT NOT NULL DEFAULT '',
+                event_id  TEXT NOT NULL DEFAULT '',
+                data      TEXT NOT NULL,
+                cached_at INTEGER NOT NULL
+              );
+            ''');
+            await customStatement(
+                'CREATE INDEX IF NOT EXISTS idx_${table}_member ON $table (member_id);');
+            await customStatement(
+                'CREATE INDEX IF NOT EXISTS idx_${table}_event  ON $table (event_id);');
+          }
+        },
 
         // Migration to handle schema changes
         onUpgrade: (migrator, from, to) async {
@@ -252,6 +279,41 @@ class AppDatabase extends _$AppDatabase {
             } catch (e) {
               // Table already exists - this is expected and can be safely ignored
               debugPrint('Members table migration: $e (likely already exists)');
+            }
+          }
+
+          if (from < 15) {
+            // Add offline-cache tables for screening records.
+            // These store serialised JSON alongside indexed member_id/event_id
+            // columns so that screening data is available without a network.
+            const tables = [
+              'cached_consents',
+              'cached_member_events',
+              'cached_hiv_screenings',
+              'cached_hiv_results',
+              'cached_hra_screenings',
+              'cached_tb_screenings',
+              'cached_cancer_screenings',
+            ];
+            for (final table in tables) {
+              try {
+                await customStatement('''
+                  CREATE TABLE IF NOT EXISTS $table (
+                    id        TEXT NOT NULL PRIMARY KEY,
+                    member_id TEXT NOT NULL DEFAULT '',
+                    event_id  TEXT NOT NULL DEFAULT '',
+                    data      TEXT NOT NULL,
+                    cached_at INTEGER NOT NULL
+                  );
+                ''');
+                await customStatement(
+                    'CREATE INDEX IF NOT EXISTS idx_${table}_member ON $table (member_id);');
+                await customStatement(
+                    'CREATE INDEX IF NOT EXISTS idx_${table}_event  ON $table (event_id);');
+                debugPrint('Created offline-cache table: $table');
+              } catch (e) {
+                debugPrint('Migration v14->v15 [$table]: $e');
+              }
             }
           }
         },

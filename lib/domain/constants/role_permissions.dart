@@ -19,6 +19,7 @@ class RolePermissions {
     '/help': [...UserRoles.values],
 
     // Admin-only routes
+    '/audit-log': ['ADMIN', 'TOP MANAGEMENT'],
     '/my-user-management': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     '/user-management-version-two': [
       'ADMIN',
@@ -152,6 +153,7 @@ class RolePermissions {
     // Statistics and General Permissions
     'view_statistics': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER', 'CLIENT'],
     'export_data': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
+    'view_audit_log': ['ADMIN', 'TOP MANAGEMENT'],
     'update_own_profile': [...UserRoles.values],
     'view_help': [...UserRoles.values],
   };

@@ -297,6 +297,22 @@ service cloud.firestore {
       // Only management can delete screening results
       allow delete: if isAuthenticated() && isManagement();
     }
+
+    // Audit Logs collection - immutable write-once records
+    // Staff may write (fire-and-forget from repositories); only management may read.
+    // Update and delete are permanently forbidden to preserve tamper-evidence.
+    match /audit_logs/{logId} {
+      // Any authenticated staff member can create an audit log entry.
+      // This allows the fire-and-forget calls in every repository to succeed.
+      allow create: if isAuthenticated() && isStaff();
+
+      // Only management (admin / top management / project manager) may read
+      // the audit trail — consistent with the in-app AuditLogScreen permission.
+      allow read: if isAuthenticated() && isManagement();
+
+      // Audit log entries are immutable: no updates or deletes ever.
+      allow update, delete: if false;
+    }
     
     // Default deny all other collections
     match /{document=**} {

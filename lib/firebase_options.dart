@@ -59,12 +59,13 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyB8bEj_N6z-kqFGBS0pDHomRGO5NaGVEzU',
-    appId: '1:195093019449:web:80c5c09ca6b7f409e8c6e8',
+    apiKey: 'AIzaSyAqT0ufmplscZlbzli8OHMjIAr65mPeenw',
+    appId: '1:195093019449:web:c89084426a9ef208e8c6e8',
     messagingSenderId: '195093019449',
     projectId: 'kenwellmobileapp',
     authDomain: 'kenwellmobileapp.firebaseapp.com',
     storageBucket: 'kenwellmobileapp.firebasestorage.app',
+    measurementId: 'G-N7N7RPDECH',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
@@ -76,8 +77,8 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyB8bEj_N6z-kqFGBS0pDHomRGO5NaGVEzU',
-    appId: '1:195093019449:ios:80c5c09ca6b7f409e8c6e8',
+    apiKey: 'AIzaSyBFFD7K4angQpTSZ2cJl6ianO_Yw_19ggg',
+    appId: '1:195093019449:ios:2ed9a3d5c4d8947ce8c6e8',
     messagingSenderId: '195093019449',
     projectId: 'kenwellmobileapp',
     storageBucket: 'kenwellmobileapp.firebasestorage.app',
@@ -85,8 +86,8 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyB8bEj_N6z-kqFGBS0pDHomRGO5NaGVEzU',
-    appId: '1:195093019449:ios:80c5c09ca6b7f409e8c6e8',
+    apiKey: 'AIzaSyBFFD7K4angQpTSZ2cJl6ianO_Yw_19ggg',
+    appId: '1:195093019449:ios:2ed9a3d5c4d8947ce8c6e8',
     messagingSenderId: '195093019449',
     projectId: 'kenwellmobileapp',
     storageBucket: 'kenwellmobileapp.firebasestorage.app',
@@ -94,10 +95,13 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyB8bEj_N6z-kqFGBS0pDHomRGO5NaGVEzU',
-    appId: '1:195093019449:web:80c5c09ca6b7f409e8c6e8',
+    apiKey: 'AIzaSyAqT0ufmplscZlbzli8OHMjIAr65mPeenw',
+    appId: '1:195093019449:web:390b28f01bc90c1ce8c6e8',
     messagingSenderId: '195093019449',
     projectId: 'kenwellmobileapp',
+    authDomain: 'kenwellmobileapp.firebaseapp.com',
     storageBucket: 'kenwellmobileapp.firebasestorage.app',
+    measurementId: 'G-1CWEC7098X',
   );
+
 }

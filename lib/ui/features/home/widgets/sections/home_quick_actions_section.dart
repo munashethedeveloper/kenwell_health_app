@@ -48,8 +48,8 @@ class HomeQuickActionsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
+        const Padding(
+          padding: EdgeInsets.fromLTRB(20, 4, 20, 12),
           child: Text(
             'Quick Actions',
             style: TextStyle(
@@ -134,7 +134,7 @@ class _QuickActionCard extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 action.label,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                   color: KenwellColors.secondaryNavy,

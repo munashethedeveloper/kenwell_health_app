@@ -1,8 +1,15 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import '../services/audit_log_service.dart';
 
 class UserEventRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final AuditLogService _audit;
+
+  UserEventRepository({AuditLogService? auditLogService})
+      : _audit = auditLogService ?? AuditLogService();
 
   Future<List<Map<String, dynamic>>> fetchUserEvents(String userId) async {
     debugPrint('UserEventRepository: Fetching events for userId: $userId');
@@ -20,12 +27,6 @@ class UserEventRepository {
       if (snapshot.docs.isEmpty) {
         debugPrint(
             'UserEventRepository: ⚠️ No documents found for userId: $userId');
-        debugPrint('UserEventRepository: - This could mean:');
-        debugPrint(
-            'UserEventRepository:   1. No events have been assigned to this user');
-        debugPrint(
-            'UserEventRepository:   2. userId mismatch between allocation and query');
-        debugPrint('UserEventRepository:   3. Firestore permission issue');
       } else {
         debugPrint('UserEventRepository: ✅ Found documents:');
         for (var doc in snapshot.docs) {
@@ -37,20 +38,45 @@ class UserEventRepository {
       return snapshot.docs.map((doc) => doc.data()).toList();
     } catch (e) {
       debugPrint('UserEventRepository: ❌ ERROR fetching events: $e');
+      // Offline fallback: serve from Firestore's local on-device cache.
+      try {
+        final cached = await _firestore
+            .collection('user_events')
+            .where('userId', isEqualTo: userId)
+            .get(const GetOptions(source: Source.cache));
+        debugPrint(
+            'UserEventRepository: Serving ${cached.docs.length} cached user-events');
+        return cached.docs.map((doc) => doc.data()).toList();
+      } catch (_) {}
       rethrow;
     }
   }
 
   /// Fetch all user IDs that have been assigned to a specific event
   Future<List<String>> fetchAssignedUserIds(String eventId) async {
-    final snapshot = await _firestore
-        .collection('user_events')
-        .where('eventId', isEqualTo: eventId)
-        .get();
-    return snapshot.docs
-        .map((doc) => doc.data()['userId'] as String?)
-        .whereType<String>()
-        .toList();
+    try {
+      final snapshot = await _firestore
+          .collection('user_events')
+          .where('eventId', isEqualTo: eventId)
+          .get();
+      return snapshot.docs
+          .map((doc) => doc.data()['userId'] as String?)
+          .whereType<String>()
+          .toList();
+    } catch (e) {
+      // Offline fallback: serve from Firestore's local on-device cache.
+      try {
+        final cached = await _firestore
+            .collection('user_events')
+            .where('eventId', isEqualTo: eventId)
+            .get(const GetOptions(source: Source.cache));
+        return cached.docs
+            .map((doc) => doc.data()['userId'] as String?)
+            .whereType<String>()
+            .toList();
+      } catch (_) {}
+      rethrow;
+    }
   }
 
   /// Remove a user's assignment from a specific event
@@ -65,6 +91,11 @@ class UserEventRepository {
       batch.delete(doc.reference);
     }
     await batch.commit();
+    unawaited(_audit.logDelete(
+      collection: 'user_events',
+      documentId: '${eventId}_$userId',
+      summary: 'Removed user $userId from event $eventId',
+    ));
   }
 
   /// Returns a real-time stream of user-event mapping documents for [userId].

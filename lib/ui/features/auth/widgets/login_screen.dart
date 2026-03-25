@@ -68,7 +68,7 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
         });
       }
 
-      if (viewModel.errorMessage != null) {
+      if (viewModel.errorMessage != null && !viewModel.needsEmailVerification) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
           AppSnackbar.showError(context, viewModel.errorMessage!);
@@ -227,6 +227,103 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
                               ),
                             ),
                             const SizedBox(height: 8),
+
+                            // ── Lockout banner ─────────────────────────────
+                            if (viewModel.isLockedOut) ...[
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 14, vertical: 10),
+                                decoration: BoxDecoration(
+                                  color: Colors.orange.shade50,
+                                  border:
+                                      Border.all(color: Colors.orange.shade300),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.lock_clock_outlined,
+                                        size: 18,
+                                        color: Colors.orange.shade700),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        'Too many failed attempts. '
+                                        'Try again in '
+                                        '${viewModel.lockoutSecondsRemaining}s.',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.orange.shade800,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                            ],
+
+                            // ── Email verification banner ──────────────────
+                            if (viewModel.needsEmailVerification) ...[
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 14, vertical: 10),
+                                decoration: BoxDecoration(
+                                  color: Colors.amber.shade50,
+                                  border:
+                                      Border.all(color: Colors.amber.shade400),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(Icons.mark_email_unread_outlined,
+                                            size: 18,
+                                            color: Colors.amber.shade800),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            'Email not verified. Check your '
+                                            'inbox for a verification link.',
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: Colors.amber.shade900,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 6),
+                                    GestureDetector(
+                                      onTap: () async {
+                                        await viewModel
+                                            .resendVerificationEmail();
+                                        if (mounted) {
+                                          AppSnackbar.showSuccess(
+                                              context,
+                                              'Verification email sent — '
+                                              'please check your inbox.');
+                                        }
+                                      },
+                                      child: Text(
+                                        'Resend verification email',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.amber.shade900,
+                                          fontWeight: FontWeight.w700,
+                                          decoration: TextDecoration.underline,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                            ],
+
                             CustomPrimaryButton(
                               label: 'Sign In',
                               minHeight: 20,
@@ -234,7 +331,8 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
-                              onPressed: _handleLogin,
+                              onPressed:
+                                  viewModel.isLockedOut ? null : _handleLogin,
                               isBusy: viewModel.isLoading,
                             ),
                           ],

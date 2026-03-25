@@ -16,6 +16,7 @@ class FirestoreService {
   static const String hivResultsCollection = 'hiv_results';
   static const String tbScreeningsCollection = 'tb_screenings';
   static const String cancerScreeningsCollection = 'cancer_screenings';
+  static const String auditLogsCollection = 'audit_logs';
 
   /// Create a document in a collection
   Future<void> createDocument({

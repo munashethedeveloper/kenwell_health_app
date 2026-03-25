@@ -1,14 +1,24 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import '../services/audit_log_service.dart';
 import '../services/firestore_service.dart';
 import '../../domain/models/wellness_event.dart';
 
-/// Repository for managing events in Firestore
+/// Repository for managing events in Firestore.
+///
+/// Every mutating operation (add / update / delete) writes a corresponding
+/// entry to the `audit_logs` collection via [AuditLogService].
 class FirestoreEventRepository {
   final FirestoreService _firestore;
+  final AuditLogService _audit;
 
-  FirestoreEventRepository({FirestoreService? firestoreService})
-      : _firestore = firestoreService ?? FirestoreService();
+  FirestoreEventRepository({
+    FirestoreService? firestoreService,
+    AuditLogService? auditLogService,
+  })  : _firestore = firestoreService ?? FirestoreService(),
+        _audit = auditLogService ?? AuditLogService();
 
   /// Fetch all events from Firestore
   Future<List<WellnessEvent>> fetchAllEvents() async {
@@ -44,20 +54,34 @@ class FirestoreEventRepository {
 
   /// Add new event to Firestore
   Future<void> addEvent(WellnessEvent event) async {
+    final data = _mapToFirestore(event);
     await _firestore.createDocument(
       collection: FirestoreService.eventsCollection,
       documentId: event.id,
-      data: _mapToFirestore(event),
+      data: data,
     );
+    unawaited(_audit.logCreate(
+      collection: FirestoreService.eventsCollection,
+      documentId: event.id,
+      data: data,
+      summary: 'Created event: ${event.title}',
+    ));
   }
 
   /// Update existing event in Firestore
   Future<void> updateEvent(WellnessEvent event) async {
+    final data = _mapToFirestore(event);
     await _firestore.updateDocument(
       collection: FirestoreService.eventsCollection,
       documentId: event.id,
-      data: _mapToFirestore(event),
+      data: data,
     );
+    unawaited(_audit.logUpdate(
+      collection: FirestoreService.eventsCollection,
+      documentId: event.id,
+      newData: data,
+      summary: 'Updated event: ${event.title}',
+    ));
   }
 
   /// Delete event from Firestore
@@ -66,6 +90,11 @@ class FirestoreEventRepository {
       collection: FirestoreService.eventsCollection,
       documentId: id,
     );
+    unawaited(_audit.logDelete(
+      collection: FirestoreService.eventsCollection,
+      documentId: id,
+      summary: 'Deleted event: $id',
+    ));
   }
 
   /// Stream events in real-time
@@ -141,11 +170,8 @@ class FirestoreEventRepository {
       aeContactNumber: data['aeContactNumber'] as String? ?? '',
       aeContactEmail: data['aeContactEmail'] as String? ?? '',
       servicesRequested: data['servicesRequested'] as String? ?? '',
-      //   additionalServicesRequested:
-      //    data['additionalServicesRequested'] as String? ?? '',
       expectedParticipation: data['expectedParticipation'] as int? ?? 0,
       nurses: data['nurses'] as int? ?? 0,
-      //   coordinators: data['coordinators'] as int? ?? 0,
       setUpTime: data['setUpTime'] as String? ?? '',
       startTime: data['startTime'] as String? ?? '',
       endTime: data['endTime'] as String? ?? '',
@@ -182,10 +208,8 @@ class FirestoreEventRepository {
       'aeContactNumber': event.aeContactNumber,
       'aeContactEmail': event.aeContactEmail,
       'servicesRequested': event.servicesRequested,
-      //  'additionalServicesRequested': event.additionalServicesRequested,
       'expectedParticipation': event.expectedParticipation,
       'nurses': event.nurses,
-      // 'coordinators': event.coordinators,
       'setUpTime': event.setUpTime,
       'startTime': event.startTime,
       'endTime': event.endTime,

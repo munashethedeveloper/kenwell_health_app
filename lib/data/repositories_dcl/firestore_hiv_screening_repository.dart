@@ -1,13 +1,24 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:kenwell_health_app/data/local/screening_local_store.dart';
 import 'package:kenwell_health_app/domain/models/hiv_screening.dart';
+import 'package:kenwell_health_app/data/services/audit_log_service.dart';
 import 'package:kenwell_health_app/data/services/firestore_service.dart';
 import 'package:kenwell_health_app/utils/logger.dart';
 
+/// Repository for managing HIV screening records in Firestore.
+///
+/// Every mutating operation writes a corresponding entry to the `audit_logs`
+/// collection via [AuditLogService].
 class FirestoreHivScreeningRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final ScreeningLocalStore _local = ScreeningLocalStore.instance;
+  final AuditLogService _audit;
   static const String _collectionName =
       FirestoreService.hivScreeningsCollection;
+
+  FirestoreHivScreeningRepository({AuditLogService? auditLogService})
+      : _audit = auditLogService ?? AuditLogService();
 
   Future<void> addHivScreening(HivScreening screening) async {
     try {
@@ -15,6 +26,14 @@ class FirestoreHivScreeningRepository {
           .collection(_collectionName)
           .doc(screening.id)
           .set(screening.toMap());
+      // Write-through: persist to local SQLite store so data is available offline.
+      unawaited(_local.upsertHivScreening(screening.toMap()));
+      unawaited(_audit.logCreate(
+        collection: _collectionName,
+        documentId: screening.id,
+        data: screening.toMap(),
+        summary: 'HIV screening added for member ${screening.memberId}',
+      ));
       AppLogger.info('HIV screening added successfully: ${screening.id}');
     } catch (e) {
       AppLogger.error('Failed to add HIV screening', e);
@@ -26,8 +45,23 @@ class FirestoreHivScreeningRepository {
     try {
       final doc = await _firestore.collection(_collectionName).doc(id).get();
       if (!doc.exists) return null;
-      return HivScreening.fromMap(doc.data()!);
+      final screening = HivScreening.fromMap(doc.data()!);
+      unawaited(_local.upsertHivScreening(doc.data()!));
+      return screening;
     } catch (e) {
+      // Offline fallback 1: Firestore on-device cache.
+      try {
+        final cached = await _firestore
+            .collection(_collectionName)
+            .doc(id)
+            .get(const GetOptions(source: Source.cache));
+        if (cached.exists) return HivScreening.fromMap(cached.data()!);
+      } catch (_) {}
+      // Offline fallback 2: local SQLite store.
+      try {
+        final row = await _local.getHivScreeningById(id);
+        if (row != null) return HivScreening.fromMap(row);
+      } catch (_) {}
       AppLogger.error('Failed to get HIV screening', e);
       rethrow;
     }
@@ -35,20 +69,38 @@ class FirestoreHivScreeningRepository {
 
   Future<List<HivScreening>> getHivScreeningsByMember(String memberId) async {
     try {
-      // NOTE: No orderBy here — .where('memberId').orderBy('createdAt')
-      // requires a Firestore composite index.  Without it Firestore throws an
-      // error that is silently caught in loadAllCompletionFlags, leaving the
-      // hctCompleted flag permanently false.  A single equality filter uses
-      // the auto-created single-field index and needs no composite index.
       final querySnapshot = await _firestore
           .collection(_collectionName)
           .where('memberId', isEqualTo: memberId)
           .get();
 
-      return querySnapshot.docs
+      final screenings = querySnapshot.docs
           .map((doc) => HivScreening.fromMap(doc.data()))
           .toList();
+      for (final doc in querySnapshot.docs) {
+        unawaited(_local.upsertHivScreening(doc.data()));
+      }
+      return screenings;
     } catch (e) {
+      // Offline fallback 1: Firestore on-device cache.
+      try {
+        final cached = await _firestore
+            .collection(_collectionName)
+            .where('memberId', isEqualTo: memberId)
+            .get(const GetOptions(source: Source.cache));
+        if (cached.docs.isNotEmpty) {
+          return cached.docs
+              .map((doc) => HivScreening.fromMap(doc.data()))
+              .toList();
+        }
+      } catch (_) {}
+      // Offline fallback 2: local SQLite store.
+      try {
+        final rows = await _local.getHivScreeningsByMember(memberId);
+        if (rows.isNotEmpty) {
+          return rows.map((r) => HivScreening.fromMap(r)).toList();
+        }
+      } catch (_) {}
       AppLogger.error('Failed to get HIV screenings by member', e);
       rethrow;
     }
@@ -62,10 +114,33 @@ class FirestoreHivScreeningRepository {
           .orderBy('createdAt', descending: true)
           .get();
 
-      return querySnapshot.docs
+      final screenings = querySnapshot.docs
           .map((doc) => HivScreening.fromMap(doc.data()))
           .toList();
+      for (final doc in querySnapshot.docs) {
+        unawaited(_local.upsertHivScreening(doc.data()));
+      }
+      return screenings;
     } catch (e) {
+      // Offline fallback 1: Firestore on-device cache.
+      try {
+        final cached = await _firestore
+            .collection(_collectionName)
+            .where('eventId', isEqualTo: eventId)
+            .get(const GetOptions(source: Source.cache));
+        if (cached.docs.isNotEmpty) {
+          return cached.docs
+              .map((doc) => HivScreening.fromMap(doc.data()))
+              .toList();
+        }
+      } catch (_) {}
+      // Offline fallback 2: local SQLite store.
+      try {
+        final rows = await _local.getHivScreeningsByEvent(eventId);
+        if (rows.isNotEmpty) {
+          return rows.map((r) => HivScreening.fromMap(r)).toList();
+        }
+      } catch (_) {}
       AppLogger.error('Failed to get HIV screenings by event', e);
       rethrow;
     }
@@ -77,10 +152,32 @@ class FirestoreHivScreeningRepository {
           .collection(_collectionName)
           .orderBy('createdAt', descending: true)
           .get();
-      return querySnapshot.docs
+      final screenings = querySnapshot.docs
           .map((doc) => HivScreening.fromMap(doc.data()))
           .toList();
+      for (final doc in querySnapshot.docs) {
+        unawaited(_local.upsertHivScreening(doc.data()));
+      }
+      return screenings;
     } catch (e) {
+      // Offline fallback 1: Firestore on-device cache.
+      try {
+        final cached = await _firestore
+            .collection(_collectionName)
+            .get(const GetOptions(source: Source.cache));
+        if (cached.docs.isNotEmpty) {
+          return cached.docs
+              .map((doc) => HivScreening.fromMap(doc.data()))
+              .toList();
+        }
+      } catch (_) {}
+      // Offline fallback 2: local SQLite store.
+      try {
+        final rows = await _local.getAllHivScreenings();
+        if (rows.isNotEmpty) {
+          return rows.map((r) => HivScreening.fromMap(r)).toList();
+        }
+      } catch (_) {}
       AppLogger.error('Failed to get all HIV screenings', e);
       rethrow;
     }
@@ -104,9 +201,35 @@ class FirestoreHivScreeningRepository {
             .get();
         results.addAll(
             querySnapshot.docs.map((doc) => HivScreening.fromMap(doc.data())));
+        for (final doc in querySnapshot.docs) {
+          unawaited(_local.upsertHivScreening(doc.data()));
+        }
       }
       return results;
     } catch (e) {
+      // Offline fallback 1: Firestore on-device cache.
+      try {
+        const chunkSize = 30;
+        final results = <HivScreening>[];
+        for (var i = 0; i < eventIds.length; i += chunkSize) {
+          final chunk =
+              eventIds.sublist(i, (i + chunkSize).clamp(0, eventIds.length));
+          final cached = await _firestore
+              .collection(_collectionName)
+              .where('eventId', whereIn: chunk)
+              .get(const GetOptions(source: Source.cache));
+          results.addAll(
+              cached.docs.map((doc) => HivScreening.fromMap(doc.data())));
+        }
+        if (results.isNotEmpty) return results;
+      } catch (_) {}
+      // Offline fallback 2: local SQLite store.
+      try {
+        final rows = await _local.getHivScreeningsByEvents(eventIds);
+        if (rows.isNotEmpty) {
+          return rows.map((r) => HivScreening.fromMap(r)).toList();
+        }
+      } catch (_) {}
       AppLogger.error('Failed to get HIV screenings by events', e);
       rethrow;
     }

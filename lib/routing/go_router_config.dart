@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kenwell_health_app/ui/features/audit_log/widgets/audit_log_screen.dart';
 import 'package:kenwell_health_app/ui/features/member/widgets/member_management_screen.dart';
 import 'package:kenwell_health_app/ui/features/stats_report/widgets/live_event_screen.dart';
 import 'package:kenwell_health_app/ui/features/user_management/widgets/registration_management_screen.dart';
@@ -379,6 +380,13 @@ class AppRouterConfig {
           path: '/help',
           name: 'help',
           builder: (context, state) => const HelpScreen(),
+        ),
+
+        // Audit Log Route (ADMIN / TOP MANAGEMENT only)
+        GoRoute(
+          path: '/audit-log',
+          name: 'auditLog',
+          builder: (context, state) => const AuditLogScreen(),
         ),
 
         // User Management Routes
