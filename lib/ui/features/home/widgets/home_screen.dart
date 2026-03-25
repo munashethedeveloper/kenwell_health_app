@@ -14,9 +14,8 @@ class HomeScreen extends StatefulWidget {
   /// Optional callback to switch the bottom-nav tab.
   final void Function(int tabIndex)? onTabSwitch;
 
-  // ── Tab-index constants (privileged role: Users=0, Stats=1, Home=2, Calendar=3, Events=4)
-  static const int _statsTabIndex = 1;
-  static const int _calendarTabIndex = 3;
+  // Calendar tab index (privileged role: Users=0, Stats=1, Home=2, Calendar=3, Events=4)
+  static const int calendarTabIndex = 3;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();

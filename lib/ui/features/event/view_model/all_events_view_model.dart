@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../domain/models/wellness_event.dart';
+import '../../../../utils/logger.dart';
 
 enum EventSortField { date, title }
 
@@ -89,7 +90,7 @@ class AllEventsViewModel extends ChangeNotifier {
         return 'scheduled';
       default:
         // Log unexpected status values so they can be identified and corrected.
-        debugPrint(
+        AppLogger.warning(
             'AllEventsViewModel: unexpected status "$raw" — treating as scheduled');
         return 'scheduled';
     }
