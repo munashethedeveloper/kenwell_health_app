@@ -1,29 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:kenwell_health_app/data/repositories_dcl/member_repository.dart';
-import 'package:kenwell_health_app/data/repositories_dcl/firestore_member_repository.dart';
 import 'package:kenwell_health_app/data/local/app_database.dart';
 import 'package:kenwell_health_app/domain/models/member.dart';
 import 'package:kenwell_health_app/domain/constants/enums.dart';
 import 'package:kenwell_health_app/domain/constants/nationalities.dart';
 import 'package:kenwell_health_app/domain/usecases/register_member_usecase.dart';
+import 'package:kenwell_health_app/domain/usecases/delete_member_usecase.dart';
+import 'package:kenwell_health_app/domain/usecases/load_members_usecase.dart';
 
 class MemberDetailsViewModel extends ChangeNotifier {
   MemberDetailsViewModel({
     RegisterMemberUseCase? registerMemberUseCase,
-    MemberRepository? memberRepository,
-    FirestoreMemberRepository? firestoreMemberRepository,
+    DeleteMemberUseCase? deleteMemberUseCase,
+    LoadMembersUseCase? loadMembersUseCase,
   })  : _registerMemberUseCase =
             registerMemberUseCase ?? RegisterMemberUseCase(),
-        _memberRepository =
-            memberRepository ?? MemberRepository(AppDatabase.instance),
-        _firestoreMemberRepository =
-            firestoreMemberRepository ?? FirestoreMemberRepository();
+        _deleteMemberUseCase =
+            deleteMemberUseCase ?? DeleteMemberUseCase(),
+        _loadMembersUseCase =
+            loadMembersUseCase ?? LoadMembersUseCase();
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final RegisterMemberUseCase _registerMemberUseCase;
-  final MemberRepository _memberRepository;
-  final FirestoreMemberRepository _firestoreMemberRepository;
+  final DeleteMemberUseCase _deleteMemberUseCase;
+  final LoadMembersUseCase _loadMembersUseCase;
 
   Member? savedMember;
   String? _eventId; // Store the event ID for linking member to event
@@ -381,7 +381,7 @@ class MemberDetailsViewModel extends ChangeNotifier {
     _errorMessage = null;
 
     try {
-      final fetchedMembers = await _firestoreMemberRepository.fetchAllMembers();
+      final fetchedMembers = await _loadMembersUseCase();
       _members = fetchedMembers;
       _setLoading(false);
     } catch (e) {
@@ -394,8 +394,7 @@ class MemberDetailsViewModel extends ChangeNotifier {
   Future<bool> deleteMember(String memberId, String memberName) async {
     try {
       _setLoading(true);
-      await _firestoreMemberRepository.deleteMember(memberId);
-      await _memberRepository.deleteMember(memberId);
+      await _deleteMemberUseCase(memberId);
 
       // Remove from local list
       _members.removeWhere((m) => m.id == memberId);

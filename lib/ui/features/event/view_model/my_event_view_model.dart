@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
-import '../../../../data/repositories_dcl/event_repository.dart';
-import '../../../../data/repositories_dcl/user_event_repository.dart';
 import '../../../../data/services/auth_service.dart';
 import '../../../../domain/models/wellness_event.dart';
+import '../../../../domain/usecases/load_user_events_usecase.dart';
 import 'event_view_model.dart';
 
 /// ViewModel for [MyEventScreen].
@@ -23,17 +22,15 @@ class MyEventViewModel extends ChangeNotifier {
   MyEventViewModel({
     required EventViewModel eventViewModel,
     AuthService? authService,
-    UserEventRepository? userEventRepository,
-    EventRepository? eventRepository,
+    LoadUserEventsUseCase? loadUserEventsUseCase,
   })  : _eventViewModel = eventViewModel,
         _authService = authService ?? AuthService(),
-        _userEventRepo = userEventRepository ?? UserEventRepository(),
-        _eventRepo = eventRepository ?? EventRepository();
+        _loadUserEventsUseCase =
+            loadUserEventsUseCase ?? LoadUserEventsUseCase();
 
   final EventViewModel _eventViewModel;
   final AuthService _authService;
-  final UserEventRepository _userEventRepo;
-  final EventRepository _eventRepo;
+  final LoadUserEventsUseCase _loadUserEventsUseCase;
 
   // ── State ────────────────────────────────────────────────────────────────
 
@@ -66,43 +63,18 @@ class MyEventViewModel extends ChangeNotifier {
 
     // Perform an initial fetch so the UI populates without waiting for the
     // first stream emission.
-    await _fetchAndUpdateEvents(user.id);
+    _userEvents = await _loadUserEventsUseCase(user.id);
+    notifyListeners();
 
     // Cancel any existing subscription before setting up a new one.
     await _userEventsSubscription?.cancel();
     _userEventsSubscription =
-        _userEventRepo.watchUserEvents(user.id).listen((maps) async {
-      // Re-fetch the WellnessEvent details whenever assignments change.
-      await _fetchAndUpdateEvents(user.id);
+        _loadUserEventsUseCase.watch(user.id).listen((events) {
+      _userEvents = events;
+      notifyListeners();
     }, onError: (Object err) {
       debugPrint('MyEventViewModel.watchUserEvents: stream error – $err');
     });
-  }
-
-  /// Resolves event IDs from [userId]'s `user_events` mapping documents and
-  /// fetches the full [WellnessEvent] for each, then notifies listeners.
-  Future<void> _fetchAndUpdateEvents(String userId) async {
-    final userEventMaps = await _userEventRepo.fetchUserEvents(userId);
-
-    final eventIds = userEventMaps
-        .map((m) => m['eventId'] as String?)
-        .where((id) => id != null && id.isNotEmpty)
-        .cast<String>()
-        .toList();
-
-    final results = await Future.wait(
-      eventIds.map((id) async {
-        try {
-          return await _eventRepo.fetchEventById(id);
-        } catch (err) {
-          debugPrint('MyEventViewModel: Failed to fetch event "$id": $err');
-          return null;
-        }
-      }),
-    );
-
-    _userEvents = results.whereType<WellnessEvent>().toList();
-    notifyListeners();
   }
 
   @override
