@@ -18,18 +18,27 @@ import 'allocate_event_screen.dart';
 ///   - A month navigation bar
 ///   - A search bar + filter button (title / address / status / sort)
 ///   - Events grouped by day
+///
+/// Uses [ChangeNotifierProxyProvider] so that the [AllEventsViewModel] is
+/// updated whenever the parent [EventViewModel] emits new events — ensuring
+/// the list is always in sync with Firestore without requiring a manual reload.
 class AllEventsScreen extends StatelessWidget {
   const AllEventsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<EventViewModel>(
-      builder: (context, eventVM, _) {
-        return ChangeNotifierProvider(
-          create: (_) => AllEventsViewModel(allEvents: eventVM.events),
-          child: const _AllEventsBody(),
-        );
+    return ChangeNotifierProxyProvider<EventViewModel, AllEventsViewModel>(
+      create: (context) => AllEventsViewModel(
+        allEvents: context.read<EventViewModel>().events,
+      ),
+      update: (context, eventVM, previous) {
+        if (previous == null) {
+          return AllEventsViewModel(allEvents: eventVM.events);
+        }
+        previous.updateEvents(eventVM.events);
+        return previous;
       },
+      child: const _AllEventsBody(),
     );
   }
 }

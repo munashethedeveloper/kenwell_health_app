@@ -17,7 +17,14 @@ class AllEventsViewModel extends ChangeNotifier {
     searchController.addListener(_onSearchChanged);
   }
 
-  final List<WellnessEvent> _allEvents;
+  List<WellnessEvent> _allEvents;
+
+  /// Called by [ChangeNotifierProxyProvider] when [EventViewModel] emits new
+  /// events so that the displayed list is always up-to-date.
+  void updateEvents(List<WellnessEvent> events) {
+    _allEvents = List.unmodifiable(events);
+    notifyListeners();
+  }
   final TextEditingController searchController = TextEditingController();
 
   // ── Month navigation ──────────────────────────────────────────────────────
@@ -78,7 +85,12 @@ class AllEventsViewModel extends ChangeNotifier {
       case 'completed':
       case 'finished':
         return 'completed';
+      case 'scheduled':
+        return 'scheduled';
       default:
+        // Log unexpected status values so they can be identified and corrected.
+        debugPrint(
+            'AllEventsViewModel: unexpected status "$raw" — treating as scheduled');
         return 'scheduled';
     }
   }
