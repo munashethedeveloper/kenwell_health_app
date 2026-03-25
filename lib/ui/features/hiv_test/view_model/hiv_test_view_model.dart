@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:kenwell_health_app/data/repositories_dcl/firestore_hiv_screening_repository.dart';
 import 'package:kenwell_health_app/domain/models/hiv_screening.dart';
+import 'package:kenwell_health_app/domain/usecases/submit_hiv_screening_usecase.dart';
 import 'package:uuid/uuid.dart';
 
 // ViewModel for managing HIV Test form state and submission
 class HIVTestViewModel extends ChangeNotifier {
-  HIVTestViewModel({FirestoreHivScreeningRepository? repository})
-      : _repository = repository ?? FirestoreHivScreeningRepository();
+  HIVTestViewModel({SubmitHIVScreeningUseCase? submitHIVScreeningUseCase})
+      : _submitHIVScreeningUseCase =
+            submitHIVScreeningUseCase ?? SubmitHIVScreeningUseCase();
 
   // Form key for validation
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final FirestoreHivScreeningRepository _repository;
+  final SubmitHIVScreeningUseCase _submitHIVScreeningUseCase;
 
   // Member and Event IDs
   String? _memberId;
@@ -153,7 +154,7 @@ class HIVTestViewModel extends ChangeNotifier {
         updatedAt: DateTime.now(),
       );
 
-      await _repository.addHivScreening(screening);
+      await _submitHIVScreeningUseCase(screening);
 
       onSuccess?.call('HIV screening saved successfully');
       onNext?.call();

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:math';
 import 'package:kenwell_health_app/domain/models/hra_screening.dart';
-import 'package:kenwell_health_app/data/repositories_dcl/firestore_hra_repository.dart';
+import 'package:kenwell_health_app/domain/usecases/submit_hra_usecase.dart';
 import 'package:kenwell_health_app/utils/logger.dart';
 import 'package:kenwell_health_app/domain/constants/enums.dart';
 import 'package:kenwell_health_app/utils/health_metric_classification.dart';
@@ -11,8 +11,8 @@ import 'package:uuid/uuid.dart';
 
 // ViewModel for Personal Risk Assessment
 class PersonalRiskAssessmentViewModel extends ChangeNotifier {
-  PersonalRiskAssessmentViewModel({FirestoreHraRepository? repository})
-      : _hraRepository = repository ?? FirestoreHraRepository() {
+  PersonalRiskAssessmentViewModel({SubmitHRAUseCase? submitHRAUseCase})
+      : _submitHRAUseCase = submitHRAUseCase ?? SubmitHRAUseCase() {
     heightController.addListener(_calculateBMI);
     weightController.addListener(_calculateBMI);
     systolicBpController.addListener(notifyListeners);
@@ -21,7 +21,7 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
     bloodSugarController.addListener(notifyListeners);
   }
 
-  final FirestoreHraRepository _hraRepository;
+  final SubmitHRAUseCase _submitHRAUseCase;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   // Private fields to store memberId and eventId
@@ -439,7 +439,7 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
       );
 
       // Save to Firestore
-      await _hraRepository.addHraScreening(hraScreening);
+      await _submitHRAUseCase(hraScreening);
       AppLogger.info('HRA screening saved successfully');
       onNext();
     } catch (e) {

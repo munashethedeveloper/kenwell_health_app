@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
-import 'package:kenwell_health_app/data/repositories_dcl/firestore_survey_repository.dart';
+import 'package:kenwell_health_app/domain/usecases/submit_survey_usecase.dart';
 import 'package:kenwell_health_app/utils/logger.dart';
 
 class SurveyViewModel extends ChangeNotifier {
-  SurveyViewModel({FirestoreSurveyRepository? surveyRepository})
-      : _surveyRepository =
-            surveyRepository ?? const FirestoreSurveyRepository();
+  SurveyViewModel({SubmitSurveyUseCase? submitSurveyUseCase})
+      : _submitSurveyUseCase =
+            submitSurveyUseCase ?? SubmitSurveyUseCase();
 
-  final FirestoreSurveyRepository _surveyRepository;
+  final SubmitSurveyUseCase _submitSurveyUseCase;
   String? _memberId;
   String? _eventId;
 
@@ -71,7 +71,7 @@ class SurveyViewModel extends ChangeNotifier {
         throw StateError('Member or event information is missing');
       }
       final id = const Uuid().v4();
-      await _surveyRepository.saveSurveyResult(id: id, data: toMap());
+      await _submitSurveyUseCase(id: id, data: toMap());
       AppLogger.info('Survey saved successfully');
     } catch (e) {
       AppLogger.error('Failed to save survey', e);

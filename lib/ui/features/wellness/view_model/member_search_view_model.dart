@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:kenwell_health_app/data/repositories_dcl/firestore_member_repository.dart';
 import 'package:kenwell_health_app/domain/models/member.dart';
+import 'package:kenwell_health_app/domain/usecases/search_member_usecase.dart';
 
 /// ViewModel for the member search screen.
 ///
@@ -16,10 +16,10 @@ import 'package:kenwell_health_app/domain/models/member.dart';
 /// In both cases [FirestoreMemberRepository] is used, which already implements
 /// a **local Drift DB fallback** when Firestore is unreachable.
 class MemberSearchViewModel extends ChangeNotifier {
-  MemberSearchViewModel({FirestoreMemberRepository? repository})
-      : _repository = repository ?? FirestoreMemberRepository();
+  MemberSearchViewModel({SearchMemberUseCase? searchMemberUseCase})
+      : _searchMemberUseCase = searchMemberUseCase ?? SearchMemberUseCase();
 
-  final FirestoreMemberRepository _repository;
+  final SearchMemberUseCase _searchMemberUseCase;
 
   // ── State ────────────────────────────────────────────────────────────────
 
@@ -64,15 +64,7 @@ class MemberSearchViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      Member? member;
-
-      final isIdNumber = trimmed.length == 13 && int.tryParse(trimmed) != null;
-
-      if (isIdNumber) {
-        member = await _repository.fetchMemberByIdNumber(trimmed);
-      } else {
-        member = await _repository.fetchMemberByPassportNumber(trimmed);
-      }
+      final member = await _searchMemberUseCase(trimmed);
 
       _memberFound = member != null;
       _foundMember = member;

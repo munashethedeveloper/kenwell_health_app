@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:kenwell_health_app/data/repositories_dcl/firestore_cancer_screening_repository.dart';
 import 'package:kenwell_health_app/data/services/auth_service.dart';
+import 'package:kenwell_health_app/domain/usecases/submit_cancer_screening_usecase.dart';
 import 'package:kenwell_health_app/domain/models/cander_screening.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
@@ -11,13 +11,14 @@ import 'package:uuid/uuid.dart';
 
 class CancerScreeningViewModel extends ChangeNotifier {
   CancerScreeningViewModel({
-    FirestoreCancerScreeningRepository? repository,
+    SubmitCancerScreeningUseCase? submitCancerScreeningUseCase,
     AuthService? authService,
-  })  : _repository = repository ?? FirestoreCancerScreeningRepository(),
+  })  : _submitCancerScreeningUseCase =
+            submitCancerScreeningUseCase ?? SubmitCancerScreeningUseCase(),
         _authService = authService ?? AuthService();
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final FirestoreCancerScreeningRepository _repository;
+  final SubmitCancerScreeningUseCase _submitCancerScreeningUseCase;
   final AuthService _authService;
 
   String? _memberId;
@@ -434,7 +435,7 @@ class CancerScreeningViewModel extends ChangeNotifier {
         updatedAt: DateTime.now(),
       );
 
-      await _repository.addCancerScreening(screening);
+      await _submitCancerScreeningUseCase(screening);
 
       onSuccess?.call('Cancer screening saved successfully');
       onNext?.call();

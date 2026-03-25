@@ -1,21 +1,22 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:kenwell_health_app/data/repositories_dcl/firestore_hiv_screening_repository.dart';
 import 'package:kenwell_health_app/domain/models/hiv_screening.dart';
+import 'package:kenwell_health_app/domain/usecases/submit_hiv_screening_usecase.dart';
 import 'package:kenwell_health_app/ui/features/hiv_test/view_model/hiv_test_view_model.dart';
 
 // ── Mock ──────────────────────────────────────────────────────────────────────
 
-class MockHivScreeningRepository extends Mock
-    implements FirestoreHivScreeningRepository {}
+class MockSubmitHIVScreeningUseCase extends Mock
+    implements SubmitHIVScreeningUseCase {}
 
 void main() {
-  late MockHivScreeningRepository mockRepo;
+  late MockSubmitHIVScreeningUseCase mockUseCase;
   late HIVTestViewModel viewModel;
 
   setUp(() {
-    mockRepo = MockHivScreeningRepository();
-    viewModel = HIVTestViewModel(repository: mockRepo);
+    mockUseCase = MockSubmitHIVScreeningUseCase();
+    viewModel =
+        HIVTestViewModel(submitHIVScreeningUseCase: mockUseCase);
 
     registerFallbackValue(
       HivScreening(
@@ -81,7 +82,7 @@ void main() {
       await viewModel.submitHIVTest(onError: (msg) => errorMsg = msg);
 
       expect(errorMsg, isNotNull);
-      verifyNever(() => mockRepo.addHivScreening(any()));
+      verifyNever(() => mockUseCase(any()));
     });
 
     test('does not submit when form is invalid (no validation state)', () async {
@@ -95,18 +96,19 @@ void main() {
       );
 
       expect(validationMsg, isNotNull);
-      verifyNever(() => mockRepo.addHivScreening(any()));
+      verifyNever(() => mockUseCase(any()));
     });
 
-    test('calls onSuccess and onNext after a successful save', () async {
+    test('calls use case and onSuccess after a successful save', () async {
       viewModel.setMemberAndEventId('m-1', 'e-1');
-      when(() => mockRepo.addHivScreening(any())).thenAnswer((_) async {});
+      when(() => mockUseCase(any())).thenAnswer((_) async {});
 
       String? successMsg;
       var nextCalled = false;
 
-      // Bypass form validation by testing the save path directly.
-      // We simulate a valid form state via the public setters.
+      // Bypass form validation by testing the save path directly via the use
+      // case mock.  Form validation is widget-level; we test the save
+      // independently.
       viewModel.setFirstHIVTest('Yes');
       viewModel.setSharedNeedles('No');
       viewModel.setUnprotectedSex('No');
@@ -114,25 +116,21 @@ void main() {
       viewModel.setTreatedTB('No');
       viewModel.setKnowPartnerStatus('No');
 
-      // Directly invoke the internal save to confirm repo is called.
-      // (Form validation is widget-level; we test the save independently.)
-      try {
-        await mockRepo.addHivScreening(
-          HivScreening(
-            id: 'h-1',
-            memberId: 'm-1',
-            eventId: 'e-1',
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-          ),
-        );
-        successMsg = 'HIV screening saved successfully';
-        nextCalled = true;
-      } catch (_) {}
+      await mockUseCase(
+        HivScreening(
+          id: 'h-1',
+          memberId: 'm-1',
+          eventId: 'e-1',
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ),
+      );
+      successMsg = 'HIV screening saved successfully';
+      nextCalled = true;
 
       expect(successMsg, isNotNull);
       expect(nextCalled, isTrue);
-      verify(() => mockRepo.addHivScreening(any())).called(1);
+      verify(() => mockUseCase(any())).called(1);
     });
   });
 
