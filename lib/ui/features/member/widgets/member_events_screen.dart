@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../domain/models/member.dart';
 import '../view_model/member_events_view_model.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
@@ -53,9 +54,23 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: const KenwellAppBar(
+      appBar: KenwellAppBar(
         title: 'KenWell365',
         automaticallyImplyLeading: true,
+        actions: [
+          IconButton(
+            tooltip: 'Refresh',
+            icon: const Icon(Icons.refresh, color: Colors.white),
+            onPressed: () {
+              _vm.loadMemberEvents();
+            },
+          ),
+          TextButton.icon(
+            onPressed: () => context.pushNamed('help'),
+            icon: const Icon(Icons.help_outline, color: Colors.white),
+            label: const Text('Help', style: TextStyle(color: Colors.white)),
+          ),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: _vm.loadMemberEvents,

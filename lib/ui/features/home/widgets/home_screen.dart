@@ -4,6 +4,7 @@ import 'package:kenwell_health_app/ui/features/calendar/view_model/calendar_view
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 import 'package:provider/provider.dart';
 import 'sections/home_notifications_section.dart';
 
@@ -61,9 +62,24 @@ class _HomeScreenState extends State<HomeScreen> {
             automaticallyImplyLeading: false,
             actions: [
               IconButton(
-                tooltip: 'Help',
-                icon: const Icon(Icons.help_outline, color: Colors.white),
+                tooltip: 'Refresh',
+                icon: const Icon(Icons.refresh, color: Colors.white),
+                onPressed: () async {
+                  await Future.wait([
+                    calendarVM.loadEvents(),
+                    profileVM.loadProfile(),
+                  ]);
+                  if (context.mounted) {
+                    AppSnackbar.showSuccess(context, 'Refreshed',
+                        duration: const Duration(seconds: 1));
+                  }
+                },
+              ),
+              TextButton.icon(
                 onPressed: () => context.pushNamed('help'),
+                icon: const Icon(Icons.help_outline, color: Colors.white),
+                label:
+                    const Text('Help', style: TextStyle(color: Colors.white)),
               ),
             ],
           ),

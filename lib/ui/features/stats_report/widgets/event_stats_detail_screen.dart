@@ -47,9 +47,18 @@ class _EventStatsDetailScreenState extends State<EventStatsDetailScreen> {
         automaticallyImplyLeading: true,
         actions: [
           IconButton(
-            tooltip: 'Help',
-            icon: const Icon(Icons.help_outline, color: Colors.white),
+            tooltip: 'Refresh',
+            icon: const Icon(Icons.refresh, color: Colors.white),
+            onPressed: () {
+              setState(() {});
+              AppSnackbar.showSuccess(context, 'Refreshed',
+                  duration: const Duration(seconds: 1));
+            },
+          ),
+          TextButton.icon(
             onPressed: () => context.pushNamed('help'),
+            icon: const Icon(Icons.help_outline, color: Colors.white),
+            label: const Text('Help', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),

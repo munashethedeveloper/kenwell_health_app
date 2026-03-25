@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:provider/provider.dart';
+import '../../event/view_model/event_view_model.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 /// Statistics dashboard screen.
 ///
@@ -25,9 +28,18 @@ class StatsReportScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
-            tooltip: 'Help',
-            icon: const Icon(Icons.help_outline, color: Colors.white),
+            tooltip: 'Refresh',
+            icon: const Icon(Icons.refresh, color: Colors.white),
+            onPressed: () {
+              context.read<EventViewModel>().loadEvents();
+              AppSnackbar.showSuccess(context, 'Statistics refreshed',
+                  duration: const Duration(seconds: 1));
+            },
+          ),
+          TextButton.icon(
             onPressed: () => context.pushNamed('help'),
+            icon: const Icon(Icons.help_outline, color: Colors.white),
+            label: const Text('Help', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),

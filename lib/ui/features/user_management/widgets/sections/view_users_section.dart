@@ -407,6 +407,89 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                     ),
                     const SizedBox(height: 16), */
 
+                    // ── User count strip ─────────────────────────────────────
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 10),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [
+                              KenwellColors.secondaryNavy,
+                              Color(0xFF2E2880),
+                            ],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(7),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(Icons.manage_accounts_rounded,
+                                  color: Colors.white, size: 16),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    filterActive
+                                        ? 'Showing ${filteredUsers.length} of $totalUsers users'
+                                        : '$totalUsers registered users',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.verified_rounded,
+                                          size: 11,
+                                          color: Colors.white
+                                              .withValues(alpha: 0.8)),
+                                      const SizedBox(width: 3),
+                                      Text(
+                                        '$verifiedCount verified',
+                                        style: TextStyle(
+                                          color: Colors.white
+                                              .withValues(alpha: 0.75),
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                      if (unverifiedCount > 0) ...[
+                                        const SizedBox(width: 8),
+                                        Icon(Icons.error_outline_rounded,
+                                            size: 11,
+                                            color: Colors.amber.shade300),
+                                        const SizedBox(width: 3),
+                                        Text(
+                                          '$unverifiedCount unverified',
+                                          style: TextStyle(
+                                            color: Colors.amber.shade300,
+                                            fontSize: 11,
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
                     // ── Premium Search & Filter Card ──────────────────────
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 16),

@@ -69,10 +69,10 @@ class EventDetailsScreen extends StatelessWidget {
               tooltip: 'Delete Event',
               onPressed: () => _showDeleteConfirmation(context),
             ),
-          IconButton(
-            icon: const Icon(Icons.help_outline, color: Colors.white),
-            tooltip: 'Help',
+          TextButton.icon(
             onPressed: () => context.pushNamed('help'),
+            icon: const Icon(Icons.help_outline, color: Colors.white),
+            label: const Text('Help', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),

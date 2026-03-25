@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -8,9 +9,11 @@ import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/cards/kenwell_empty_state.dart';
 import '../../../shared/ui/colours/kenwell_colours.dart';
 import '../../../shared/ui/headers/kenwell_gradient_header.dart';
+import '../../../shared/ui/snackbars/app_snackbar.dart';
 import '../../calendar/view_model/calendar_view_model.dart';
 import '../../calendar/widgets/event_card.dart';
 import '../../event/view_model/event_view_model.dart';
+import '../../stats_report/widgets/event_stats_detail_screen.dart';
 import '../../user_management/viewmodel/user_management_view_model.dart';
 import '../view_model/all_events_view_model.dart';
 import 'allocate_event_screen.dart';
@@ -59,14 +62,30 @@ class _AllEventsBody extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: KenwellColors.neutralBackground,
-      appBar: const KenwellAppBar(
-        title: 'All Events',
+      appBar: KenwellAppBar(
+        title: 'KenWell365',
         automaticallyImplyLeading: true,
-        titleStyle: TextStyle(
+        titleStyle: const TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
+        actions: [
+          IconButton(
+            tooltip: 'Refresh',
+            icon: const Icon(Icons.refresh, color: Colors.white),
+            onPressed: () {
+              context.read<EventViewModel>().loadEvents();
+              AppSnackbar.showSuccess(context, 'Events refreshed',
+                  duration: const Duration(seconds: 1));
+            },
+          ),
+          TextButton.icon(
+            onPressed: () => context.pushNamed('help'),
+            icon: const Icon(Icons.help_outline, color: Colors.white),
+            label: const Text('Help', style: TextStyle(color: Colors.white)),
+          ),
+        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -623,12 +642,29 @@ class _AllEventCard extends StatelessWidget {
     );
   }
 
+  void _openStats(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => EventStatsDetailScreen(event: event),
+      ),
+    );
+  }
+
+  /// Returns true if the event is in the past or completed/finished.
+  bool get _isPastEvent {
+    final s = event.status.toLowerCase();
+    if (s == 'completed' || s == 'finished') return true;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final eventDay =
+        DateTime(event.date.year, event.date.month, event.date.day);
+    return eventDay.isBefore(today);
+  }
+
   @override
-  Widget build(BuildContext context) {
-    final statusColor = _statusColor(event.status);
 
     return GestureDetector(
-      onTap: () => _openAllocate(context),
+      onTap: () => _isPastEvent ? _openStats(context) : _openAllocate(context),
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 6),
         decoration: BoxDecoration(
@@ -748,18 +784,26 @@ class _AllEventCard extends StatelessWidget {
                                   : '—',
                             ),
                             const Spacer(),
-                            const Text(
-                              'Tap to allocate',
+                            Text(
+                              _isPastEvent ? 'View Stats' : 'Tap to allocate',
                               style: TextStyle(
                                 fontSize: 11,
-                                color: KenwellColors.primaryGreen,
+                                color: _isPastEvent
+                                    ? Colors.blue.shade600
+                                    : KenwellColors.primaryGreen,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                             const SizedBox(width: 2),
-                            const Icon(Icons.arrow_forward_ios_rounded,
-                                size: 11,
-                                color: KenwellColors.primaryGreen),
+                            Icon(
+                              _isPastEvent
+                                  ? Icons.bar_chart_rounded
+                                  : Icons.arrow_forward_ios_rounded,
+                              size: 11,
+                              color: _isPastEvent
+                                  ? Colors.blue.shade600
+                                  : KenwellColors.primaryGreen,
+                            ),
                           ],
                         ),
                       ],
