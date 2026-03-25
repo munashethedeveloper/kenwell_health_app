@@ -662,6 +662,8 @@ class _AllEventCard extends StatelessWidget {
   }
 
   @override
+  Widget build(BuildContext context) {
+    final statusColor = _statusColor(event.status);
 
     return GestureDetector(
       onTap: () => _isPastEvent ? _openStats(context) : _openAllocate(context),
