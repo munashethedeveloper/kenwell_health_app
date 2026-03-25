@@ -3,19 +3,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-import 'package:kenwell_health_app/data/services/connectivity_service.dart';
-import 'package:kenwell_health_app/ui/features/consent_form/view_model/consent_view_model.dart';
-import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
+import 'package:kenwell_health_app/di/app_providers.dart';
 import 'package:kenwell_health_app/ui/shared/ui/banners/offline_banner.dart';
 import 'package:provider/provider.dart';
 
 import 'firebase_options.dart';
 import 'providers/theme_provider.dart';
 import 'routing/go_router_config.dart';
-import 'ui/features/auth/view_models/auth_view_model.dart';
-import 'ui/features/calendar/view_model/calendar_view_model.dart';
-import 'ui/features/event/view_model/event_view_model.dart';
-import 'ui/features/stats_report/view_model/stats_report_view_model.dart';
 import 'ui/shared/themes/app_theme.dart';
 
 void main() async {
@@ -82,26 +76,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [
-        ChangeNotifierProvider<ConnectivityService>(
-            create: (_) => ConnectivityService()),
-        ChangeNotifierProvider<ProfileViewModel>(
-            create: (_) => ProfileViewModel()),
-        ChangeNotifierProvider<ConsentScreenViewModel>(
-            create: (_) => ConsentScreenViewModel()),
-        ChangeNotifierProvider<AuthViewModel>(create: (_) => AuthViewModel()),
-        ChangeNotifierProvider<CalendarViewModel>(
-            create: (_) => CalendarViewModel()),
-        ChangeNotifierProvider<EventViewModel>(
-          create: (_) => EventViewModel(),
-        ),
-        ChangeNotifierProvider<StatsReportViewModel>(
-          create: (_) => StatsReportViewModel(),
-        ),
-        ChangeNotifierProvider<ThemeProvider>(
-          create: (_) => ThemeProvider(),
-        ),
-      ],
+      providers: AppProviders.rootProviders,
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, _) {
           final goRouter = AppRouterConfig.createRouter();
