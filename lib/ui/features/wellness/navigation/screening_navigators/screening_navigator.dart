@@ -179,6 +179,7 @@ class ScreeningNavigator {
   /// Navigate to the Cancer screening screen.
   Future<bool?> navigateToCancer(Member member) async {
     final cancerVM = CancerScreeningViewModel();
+    cancerVM.initialize();
     cancerVM.setMemberAndEventId(member.id, event.id);
     cancerVM.initialiseWithEvent(event);
     _applyConsentHpDetails(

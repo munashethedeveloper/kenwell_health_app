@@ -188,8 +188,15 @@ class WellnessNavigator {
             eventVenue: event.venue,
             eventLocation: event.address,
           )
-          .catchError(
-              (e) => debugPrint('Failed to ensure member_events record: $e')),
+          .catchError((e) {
+        debugPrint('Failed to ensure member_events record: $e');
+        if (context.mounted) {
+          AppSnackbar.showWarning(
+            context,
+            'Member link saved locally — sync will retry when online.',
+          );
+        }
+      }),
     );
 
     await Navigator.push(
@@ -315,8 +322,15 @@ class WellnessNavigator {
                         // counted via a prior individual screening completion.
                         _memberEventRepository
                             .markSurveyCompleted(member.id, event.id)
-                            .catchError((e) => debugPrint(
-                                'Failed to record survey completion: $e'));
+                            .catchError((e) {
+                          debugPrint('Failed to record survey completion: $e');
+                          if (context.mounted) {
+                            AppSnackbar.showWarning(
+                              context,
+                              'Survey saved locally — sync will retry when online.',
+                            );
+                          }
+                        });
                       }
                       break;
                     }
@@ -433,8 +447,15 @@ class WellnessNavigator {
               _memberEventRepository
                   .updateScreeningStatus(member.id, event.id,
                       hraCompleted: true)
-                  .catchError((e) =>
-                      debugPrint('Failed to update HRA screening status: $e'));
+                  .catchError((e) {
+                debugPrint('Failed to update HRA screening status: $e');
+                if (context.mounted) {
+                  AppSnackbar.showWarning(
+                    context,
+                    'HRA progress saved locally — sync will retry when online.',
+                  );
+                }
+              });
               Navigator.of(context).pop(allDone());
             }
           },
@@ -446,8 +467,15 @@ class WellnessNavigator {
               _memberEventRepository
                   .updateScreeningStatus(member.id, event.id,
                       hctCompleted: true)
-                  .catchError((e) =>
-                      debugPrint('Failed to update HCT screening status: $e'));
+                  .catchError((e) {
+                debugPrint('Failed to update HCT screening status: $e');
+                if (context.mounted) {
+                  AppSnackbar.showWarning(
+                    context,
+                    'HCT progress saved locally — sync will retry when online.',
+                  );
+                }
+              });
               Navigator.of(context).pop(allDone());
             }
           },
@@ -458,8 +486,15 @@ class WellnessNavigator {
               wellnessVM.markTbCompleted();
               _memberEventRepository
                   .updateScreeningStatus(member.id, event.id, tbCompleted: true)
-                  .catchError((e) =>
-                      debugPrint('Failed to update TB screening status: $e'));
+                  .catchError((e) {
+                debugPrint('Failed to update TB screening status: $e');
+                if (context.mounted) {
+                  AppSnackbar.showWarning(
+                    context,
+                    'TB progress saved locally — sync will retry when online.',
+                  );
+                }
+              });
               Navigator.of(context).pop(allDone());
             }
           },
@@ -471,8 +506,15 @@ class WellnessNavigator {
               _memberEventRepository
                   .updateScreeningStatus(member.id, event.id,
                       cancerCompleted: true)
-                  .catchError((e) => debugPrint(
-                      'Failed to update Cancer screening status: $e'));
+                  .catchError((e) {
+                debugPrint('Failed to update Cancer screening status: $e');
+                if (context.mounted) {
+                  AppSnackbar.showWarning(
+                    context,
+                    'Cancer screening progress saved locally — sync will retry when online.',
+                  );
+                }
+              });
               Navigator.of(context).pop(allDone());
             }
           },

@@ -39,11 +39,29 @@ class _EventStatsContentState extends State<EventStatsContent> {
   // Null means no card is selected (detail panel is hidden).
   String? _selectedScreeningType;
 
+  /// Returns the IDs of today's in-progress events.
+  List<String> _liveEventIds() {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    return context.read<EventViewModel>().events.where((e) {
+      final s = e.status.toLowerCase();
+      final isActive =
+          s == 'in_progress' || s == 'in progress' || s == 'ongoing';
+      if (!isActive) return false;
+      final d = DateTime(e.date.year, e.date.month, e.date.day);
+      return d == today;
+    }).map((e) => e.id).toList();
+  }
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<StatsReportViewModel>().loadMemberCount();
+      final statsVM = context.read<StatsReportViewModel>();
+      statsVM.loadMemberCount();
+      if (widget.isLiveTab) {
+        statsVM.loadRegisteredCountForEvents(_liveEventIds());
+      }
     });
     _searchController.addListener(() {
       if (mounted) setState(() {});
@@ -51,7 +69,11 @@ class _EventStatsContentState extends State<EventStatsContent> {
   }
 
   Future<void> _refreshData() async {
-    context.read<StatsReportViewModel>().loadMemberCount();
+    final statsVM = context.read<StatsReportViewModel>();
+    statsVM.loadMemberCount();
+    if (widget.isLiveTab) {
+      statsVM.loadRegisteredCountForEvents(_liveEventIds());
+    }
     if (mounted) {
       setState(() {});
       AppSnackbar.showSuccess(context, 'Statistics refreshed',
@@ -93,95 +115,24 @@ class _EventStatsContentState extends State<EventStatsContent> {
     final allEvents = eventVM.events;
     final isLiveTab = widget.isLiveTab;
 
-    // Filter by live/past status.
-    // For the live tab we ONLY show events that are:
-    //   • in-progress / ongoing, AND
-    //   • dated today (event date == today).
-    // This prevents stale "in_progress" events from previous days polluting the
-    // live view when they were never explicitly closed.
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final tabFilteredEvents = isLiveTab
-        ? allEvents.where((e) {
-            final s = e.status.toLowerCase();
-            final isActive = s == WellnessEventStatus.inProgress ||
-                s == 'in progress' ||
-                s == 'ongoing';
-            if (!isActive) return false;
-            final eventDate = DateTime(e.date.year, e.date.month, e.date.day);
-            return eventDate == today;
-          }).toList()
-        : allEvents.where((e) {
-            final s = e.status.toLowerCase();
-            return s == WellnessEventStatus.completed || s == 'finished';
-          }).toList();
+    // Delegate all filtering and statistics computation to the ViewModel.
+    // This removes ~80 lines of business logic from the widget layer.
+    final statsVM = context.watch<StatsReportViewModel>();
+    final events = statsVM.applyFilters(
+      allEvents,
+      isLiveTab: isLiveTab,
+      searchQuery: _searchController.text,
+      statusFilter: _selectedStatus,
+      provinceFilter: _selectedProvince,
+      startDate: _startDate,
+      endDate: _endDate,
+    );
+    final stats = statsVM.computeStats(events);
 
-    // Search filter
+    // Keep tab-filtered events for the StatsFilterSheet (province/status options).
+    final tabFilteredEvents = statsVM.applyFilters(allEvents, isLiveTab: isLiveTab);
+
     final searchQuery = _searchController.text.toLowerCase();
-    var events = searchQuery.isEmpty
-        ? tabFilteredEvents
-        : tabFilteredEvents
-            .where((e) => e.title.toLowerCase().contains(searchQuery))
-            .toList();
-
-    // Status filter
-    if (_selectedStatus != null && _selectedStatus != 'All') {
-      events = events.where((event) {
-        final status = event.status.toLowerCase();
-        if (_selectedStatus == 'Scheduled') return status == 'scheduled';
-        if (_selectedStatus == 'In Progress') {
-          return status == 'in progress' ||
-              status == 'in_progress' ||
-              status == 'ongoing';
-        }
-        if (_selectedStatus == 'Completed') {
-          return status == 'completed' || status == 'finished';
-        }
-        return true;
-      }).toList();
-    }
-
-    // Province filter
-    if (_selectedProvince != null && _selectedProvince != 'All') {
-      events = events.where((e) => e.province == _selectedProvince).toList();
-    }
-
-    // Date range filter
-    if (_startDate != null) {
-      events = events
-          .where((e) =>
-              e.date.isAfter(_startDate!.subtract(const Duration(days: 1))))
-          .toList();
-    }
-    if (_endDate != null) {
-      events = events
-          .where((e) => e.date.isBefore(_endDate!.add(const Duration(days: 1))))
-          .toList();
-    }
-
-    // Statistics
-    final totalExpected =
-        events.fold<int>(0, (s, e) => s + e.expectedParticipation);
-    final totalScreened = events.fold<int>(0, (s, e) => s + e.screenedCount);
-    final completedEvents = events
-        .where((e) => e.status == 'Completed' || e.status == 'Finished')
-        .length;
-    final participationRate = totalExpected > 0
-        ? (totalScreened / totalExpected * 100).toStringAsFixed(1)
-        : '0.0';
-    final scheduledEvents =
-        events.where((e) => e.status.toLowerCase() == 'scheduled').length;
-    final inProgressEvents = events
-        .where((e) =>
-            e.status.toLowerCase() == 'in progress' ||
-            e.status.toLowerCase() == 'in_progress' ||
-            e.status.toLowerCase() == 'ongoing')
-        .length;
-    final Map<String, int> eventsByProvince = {};
-    for (final event in events) {
-      final p = event.province.isNotEmpty ? event.province : 'Unknown';
-      eventsByProvince[p] = (eventsByProvince[p] ?? 0) + 1;
-    }
 
     return RefreshIndicator(
       onRefresh: _refreshData,
@@ -404,7 +355,7 @@ class _EventStatsContentState extends State<EventStatsContent> {
                 child: StatsStatCard(
                   icon: Icons.flag_outlined,
                   title: 'Expected',
-                  value: totalExpected.toString(),
+                  value: stats.totalExpected.toString(),
                   color: KenwellColors.primaryGreen,
                 ),
               ),
@@ -413,13 +364,23 @@ class _EventStatsContentState extends State<EventStatsContent> {
                 child: StatsStatCard(
                   icon: Icons.how_to_reg_outlined,
                   title: 'Registered',
-                  value:
-                      context.watch<StatsReportViewModel>().isLoadingMemberCount
+                  value: widget.isLiveTab
+                      ? (context
+                              .watch<StatsReportViewModel>()
+                              .isLoadingRegisteredCount
+                          ? '...'
+                          : context
+                              .watch<StatsReportViewModel>()
+                              .registeredCount
+                              .toString())
+                      : (context
+                              .watch<StatsReportViewModel>()
+                              .isLoadingMemberCount
                           ? '...'
                           : context
                               .watch<StatsReportViewModel>()
                               .memberCount
-                              .toString(),
+                              .toString()),
                   color: KenwellColors.primaryGreen,
                 ),
               ),
@@ -430,7 +391,7 @@ class _EventStatsContentState extends State<EventStatsContent> {
                 child: StatsStatCard(
                   icon: Icons.health_and_safety_outlined,
                   title: 'Screened',
-                  value: totalScreened.toString(),
+                  value: stats.totalScreened.toString(),
                   color: KenwellColors.primaryGreen,
                 ),
               ),
@@ -439,7 +400,7 @@ class _EventStatsContentState extends State<EventStatsContent> {
                 child: StatsStatCard(
                   icon: Icons.person_off_outlined,
                   title: 'No Show',
-                  value: (totalExpected - totalScreened).toString(),
+                  value: (stats.totalExpected - stats.totalScreened).toString(),
                   color: const Color(0xFFBF360C),
                 ),
               ),
@@ -495,13 +456,13 @@ class _EventStatsContentState extends State<EventStatsContent> {
                 title: 'Events by Status',
                 child: Column(
                   children: [
-                    _buildDetailRow('Scheduled', scheduledEvents,
+                    _buildDetailRow('Scheduled', stats.scheduledCount,
                         Icons.schedule, Colors.orange, theme),
                     const Divider(height: 24),
-                    _buildDetailRow('In Progress', inProgressEvents,
+                    _buildDetailRow('In Progress', stats.inProgressCount,
                         Icons.play_circle, Colors.blue, theme),
                     const Divider(height: 24),
-                    _buildDetailRow('Completed', completedEvents,
+                    _buildDetailRow('Completed', stats.completedCount,
                         Icons.check_circle, Colors.deepPurple, theme),
                   ],
                 ),
@@ -510,12 +471,12 @@ class _EventStatsContentState extends State<EventStatsContent> {
             ],
 
             // ── Geographic distribution (filters active only) ─────────────
-            if (_hasActiveFilters && eventsByProvince.isNotEmpty) ...[
+            if (_hasActiveFilters && stats.eventsByProvince.isNotEmpty) ...[
               KenwellFormCard(
                 title: 'Geographic Distribution',
                 child: Column(
-                  children: eventsByProvince.entries.map((entry) {
-                    final isLast = entry == eventsByProvince.entries.last;
+                  children: stats.eventsByProvince.entries.map((entry) {
+                    final isLast = entry == stats.eventsByProvince.entries.last;
                     return Column(
                       children: [
                         _buildDetailRow(entry.key, entry.value,

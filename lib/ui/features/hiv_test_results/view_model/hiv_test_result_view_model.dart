@@ -4,14 +4,19 @@ import 'package:signature/signature.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
 import 'package:kenwell_health_app/data/services/auth_service.dart';
-import 'package:kenwell_health_app/data/repositories_dcl/firestore_hiv_result_repository.dart';
 import 'package:kenwell_health_app/domain/models/hiv_result.dart';
+import 'package:kenwell_health_app/domain/usecases/submit_hiv_test_result_usecase.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:convert';
 import 'package:kenwell_health_app/domain/constants/enums.dart';
 
 class HIVTestResultViewModel extends ChangeNotifier {
-  HIVTestResultViewModel() {
+  HIVTestResultViewModel({
+    AuthService? authService,
+    SubmitHIVTestResultUseCase? submitHIVTestResultUseCase,
+  })  : _authService = authService ?? AuthService(),
+        _submitHIVTestResultUseCase =
+            submitHIVTestResultUseCase ?? SubmitHIVTestResultUseCase() {
     _loadCurrentUserProfile();
     // Initialize referral to Healthy since the default screening result is
     // Negative.  setScreeningResult() updates this whenever the nurse changes
@@ -19,9 +24,8 @@ class HIVTestResultViewModel extends ChangeNotifier {
     nursingReferralSelection = NursingReferralOption.patientNotReferred;
   }
 
-  final AuthService _authService = AuthService();
-  final FirestoreHivResultRepository _repository =
-      FirestoreHivResultRepository();
+  final AuthService _authService;
+  final SubmitHIVTestResultUseCase _submitHIVTestResultUseCase;
 
   String? _memberId;
   String? _eventId;
@@ -372,7 +376,7 @@ class HIVTestResultViewModel extends ChangeNotifier {
         updatedAt: DateTime.now(),
       );
 
-      await _repository.addHivResult(result);
+      await _submitHIVTestResultUseCase(result);
 
       onSuccess?.call('HIV test result saved successfully');
       onNext?.call();

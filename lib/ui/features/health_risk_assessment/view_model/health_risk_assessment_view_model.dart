@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:math';
 import 'package:kenwell_health_app/domain/models/hra_screening.dart';
-import 'package:kenwell_health_app/data/repositories_dcl/firestore_hra_repository.dart';
+import 'package:kenwell_health_app/domain/usecases/submit_hra_usecase.dart';
 import 'package:kenwell_health_app/utils/logger.dart';
 import 'package:kenwell_health_app/domain/constants/enums.dart';
 import 'package:kenwell_health_app/utils/health_metric_classification.dart';
@@ -11,8 +11,18 @@ import 'package:uuid/uuid.dart';
 
 // ViewModel for Personal Risk Assessment
 class PersonalRiskAssessmentViewModel extends ChangeNotifier {
-  final FirestoreHraRepository _hraRepository = FirestoreHraRepository();
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>(); // Add this
+  PersonalRiskAssessmentViewModel({SubmitHRAUseCase? submitHRAUseCase})
+      : _submitHRAUseCase = submitHRAUseCase ?? SubmitHRAUseCase() {
+    heightController.addListener(_calculateBMI);
+    weightController.addListener(_calculateBMI);
+    systolicBpController.addListener(notifyListeners);
+    diastolicBpController.addListener(notifyListeners);
+    cholesterolController.addListener(notifyListeners);
+    bloodSugarController.addListener(notifyListeners);
+  }
+
+  final SubmitHRAUseCase _submitHRAUseCase;
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   // Private fields to store memberId and eventId
   String? _memberId;
@@ -58,17 +68,6 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
 
   // Section 2: Exercise frequency (radio)
   String exerciseFrequency = '';
-
-  // Constructor to set up BMI calculation listener
-  PersonalRiskAssessmentViewModel() {
-    heightController.addListener(_calculateBMI);
-    weightController.addListener(_calculateBMI);
-    // Notify listeners when metric values change so UI badges update live
-    systolicBpController.addListener(notifyListeners);
-    diastolicBpController.addListener(notifyListeners);
-    cholesterolController.addListener(notifyListeners);
-    bloodSugarController.addListener(notifyListeners);
-  }
 
   // Height threshold to determine if input is in centimeters (> 3) or meters
   static const double _heightCmThreshold = 3.0;
@@ -440,7 +439,7 @@ class PersonalRiskAssessmentViewModel extends ChangeNotifier {
       );
 
       // Save to Firestore
-      await _hraRepository.addHraScreening(hraScreening);
+      await _submitHRAUseCase(hraScreening);
       AppLogger.info('HRA screening saved successfully');
       onNext();
     } catch (e) {

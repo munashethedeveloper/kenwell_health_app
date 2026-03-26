@@ -98,7 +98,7 @@ class AppDatabase extends _$AppDatabase {
   static final AppDatabase instance = AppDatabase._internal();
 
   @override
-  int get schemaVersion => 15;
+  int get schemaVersion => 16;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -129,6 +129,17 @@ class AppDatabase extends _$AppDatabase {
             await customStatement(
                 'CREATE INDEX IF NOT EXISTS idx_${table}_event  ON $table (event_id);');
           }
+          // Write-queue for retrying failed non-fatal Firestore mutations.
+          await customStatement('''
+            CREATE TABLE IF NOT EXISTS pending_writes (
+              id            TEXT NOT NULL PRIMARY KEY,
+              collection    TEXT NOT NULL,
+              doc_id        TEXT NOT NULL,
+              data_json     TEXT NOT NULL,
+              attempt_count INTEGER NOT NULL DEFAULT 0,
+              created_at    INTEGER NOT NULL
+            );
+          ''');
         },
 
         // Migration to handle schema changes
@@ -314,6 +325,24 @@ class AppDatabase extends _$AppDatabase {
               } catch (e) {
                 debugPrint('Migration v14->v15 [$table]: $e');
               }
+            }
+          }
+          if (from < 16) {
+            // Add write-queue table for retrying failed non-fatal Firestore mutations.
+            try {
+              await customStatement('''
+                CREATE TABLE IF NOT EXISTS pending_writes (
+                  id            TEXT NOT NULL PRIMARY KEY,
+                  collection    TEXT NOT NULL,
+                  doc_id        TEXT NOT NULL,
+                  data_json     TEXT NOT NULL,
+                  attempt_count INTEGER NOT NULL DEFAULT 0,
+                  created_at    INTEGER NOT NULL
+                );
+              ''');
+              debugPrint('Migration v15->v16: created pending_writes table');
+            } catch (e) {
+              debugPrint('Migration v15->v16 [pending_writes]: $e');
             }
           }
         },

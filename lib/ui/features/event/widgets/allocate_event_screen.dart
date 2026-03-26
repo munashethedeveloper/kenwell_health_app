@@ -268,7 +268,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
           builder: (context, viewModel, _) {
             final filteredUsers = viewModel.filteredUsers;
             final totalUsers = viewModel.users.length;
-            final assignedCount = _allocVM.assignedUserIds.length;
+            final assignedCount = _allocVM.assignedCount;
             final notAssignedCount = totalUsers - assignedCount;
             final filterActive = viewModel.selectedFilter != 'all' ||
                 viewModel.searchQuery.isNotEmpty;
@@ -324,10 +324,11 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
               child: CustomScrollView(
                 slivers: [
                   SliverToBoxAdapter(
-                    child: KenwellGradientHeader(
-                      title: 'Allocate\nEvent',
-                      subtitle:
-                          'Allocate users to the ${widget.event.title} event',
+                    child: _AllocateStatsHeader(
+                      eventTitle: widget.event.title,
+                      totalUsers: totalUsers,
+                      assignedCount: assignedCount,
+                      notAssignedCount: notAssignedCount,
                     ),
                   ),
                   SliverToBoxAdapter(
@@ -441,6 +442,159 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
               ),
             );
           },
+        ),
+      ),
+    );
+  }
+}
+
+// ── Stats header with assignment counts ─────────────────────────────────────
+
+class _AllocateStatsHeader extends StatelessWidget {
+  const _AllocateStatsHeader({
+    required this.eventTitle,
+    required this.totalUsers,
+    required this.assignedCount,
+    required this.notAssignedCount,
+  });
+
+  final String eventTitle;
+  final int totalUsers;
+  final int assignedCount;
+  final int notAssignedCount;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            KenwellColors.secondaryNavy,
+            Color(0xFF2E2880),
+            KenwellColors.primaryGreenDark,
+          ],
+          stops: [0.0, 0.6, 1.0],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: KenwellColors.secondaryNavy.withValues(alpha: 0.35),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Allocate Event',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 26,
+              fontWeight: FontWeight.w800,
+              height: 1.2,
+              letterSpacing: -0.5,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            eventTitle,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.7),
+              fontSize: 14,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              _StatPill(
+                icon: Icons.people_rounded,
+                label: '$totalUsers',
+                sublabel: 'Total',
+                color: Colors.white,
+              ),
+              const SizedBox(width: 8),
+              _StatPill(
+                icon: Icons.check_circle_outline_rounded,
+                label: '$assignedCount',
+                sublabel: 'Assigned',
+                color: const Color(0xFF86EFAC),
+              ),
+              const SizedBox(width: 8),
+              _StatPill(
+                icon: Icons.pending_outlined,
+                label: '$notAssignedCount',
+                sublabel: 'Unassigned',
+                color: Colors.white70,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatPill extends StatelessWidget {
+  const _StatPill({
+    required this.icon,
+    required this.label,
+    required this.sublabel,
+    required this.color,
+  });
+
+  final IconData icon;
+  final String label;
+  final String sublabel;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.2),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 16, color: color),
+            const SizedBox(width: 6),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    height: 1,
+                  ),
+                ),
+                Text(
+                  sublabel,
+                  style: TextStyle(
+                    color: color.withValues(alpha: 0.7),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

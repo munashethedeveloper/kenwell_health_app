@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -141,6 +142,33 @@ class FirestoreMemberEventRepository {
       } catch (_) {}
       debugPrint('Error fetching member event $memberId/$eventId: $e');
       return null;
+    }
+  }
+
+  /// Returns the number of members registered for any of the given [eventIds].
+  ///
+  /// Queries `member_events` where `eventId in [eventIds]`. Uses batch
+  /// Firestore `whereIn` queries (max 30 IDs at a time) so it works for
+  /// events with many participants.
+  Future<int> countRegisteredMembersForEvents(List<String> eventIds) async {
+    if (eventIds.isEmpty) return 0;
+    try {
+      int total = 0;
+      // Firestore whereIn limit is 30 per query.
+      const chunkSize = 30;
+      for (int i = 0; i < eventIds.length; i += chunkSize) {
+        final chunk = eventIds.sublist(i, min(i + chunkSize, eventIds.length));
+        final snapshot = await FirebaseFirestore.instance
+            .collection(memberEventsCollection)
+            .where('eventId', whereIn: chunk)
+            .count()
+            .get();
+        total += snapshot.count ?? 0;
+      }
+      return total;
+    } catch (e) {
+      debugPrint('countRegisteredMembersForEvents error: $e');
+      return 0;
     }
   }
 

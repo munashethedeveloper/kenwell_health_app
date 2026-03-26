@@ -1,23 +1,29 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:kenwell_health_app/data/repositories_dcl/member_repository.dart';
-import 'package:kenwell_health_app/data/repositories_dcl/firestore_member_repository.dart';
-import 'package:kenwell_health_app/data/repositories_dcl/firestore_member_event_repository.dart';
 import 'package:kenwell_health_app/data/local/app_database.dart';
 import 'package:kenwell_health_app/domain/models/member.dart';
-import 'package:kenwell_health_app/domain/models/member_event.dart';
 import 'package:kenwell_health_app/domain/constants/enums.dart';
 import 'package:kenwell_health_app/domain/constants/nationalities.dart';
+import 'package:kenwell_health_app/domain/usecases/register_member_usecase.dart';
+import 'package:kenwell_health_app/domain/usecases/delete_member_usecase.dart';
+import 'package:kenwell_health_app/domain/usecases/load_members_usecase.dart';
 
 class MemberDetailsViewModel extends ChangeNotifier {
+  MemberDetailsViewModel({
+    RegisterMemberUseCase? registerMemberUseCase,
+    DeleteMemberUseCase? deleteMemberUseCase,
+    LoadMembersUseCase? loadMembersUseCase,
+  })  : _registerMemberUseCase =
+            registerMemberUseCase ?? RegisterMemberUseCase(),
+        _deleteMemberUseCase =
+            deleteMemberUseCase ?? DeleteMemberUseCase(),
+        _loadMembersUseCase =
+            loadMembersUseCase ?? LoadMembersUseCase();
+
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final MemberRepository _memberRepository =
-      MemberRepository(AppDatabase.instance);
-  final FirestoreMemberRepository _firestoreMemberRepository =
-      FirestoreMemberRepository();
-  final FirestoreMemberEventRepository _memberEventRepository =
-      FirestoreMemberEventRepository();
+  final RegisterMemberUseCase _registerMemberUseCase;
+  final DeleteMemberUseCase _deleteMemberUseCase;
+  final LoadMembersUseCase _loadMembersUseCase;
 
   Member? savedMember;
   String? _eventId; // Store the event ID for linking member to event
@@ -325,7 +331,6 @@ class MemberDetailsViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Create a Member object from the form data
       final member = Member(
         name: nameController.text,
         surname: surnameController.text,
@@ -348,44 +353,19 @@ class MemberDetailsViewModel extends ChangeNotifier {
             medicalAidStatus == 'Yes' ? medicalAidNameController.text : null,
         medicalAidNumber:
             medicalAidStatus == 'Yes' ? medicalAidNumberController.text : null,
-        eventId: _eventId, // Link member to the event
+        eventId: _eventId,
       );
 
-      // Save to local database
-      savedMember = await _memberRepository.createMember(member);
-      debugPrint('Member saved to local database: ${savedMember!.id}');
-
-      // Save to Firestore using the original member object (not savedMember) so
-      // that eventId is preserved — the local DB schema has no eventId column,
-      // so savedMember.eventId is always null after the local DB round-trip.
-      // Non-fatal: if Firestore is unavailable the local save still lets the
-      // flow continue; the member search screen has a local-DB fallback.
-      try {
-        await _firestoreMemberRepository.addMember(member);
-      } catch (e) {
-        debugPrint('Failed to sync member to Firestore (non-fatal): $e');
-      }
-
-      // Write to member_events collection to track event registration
-      if (_eventId != null && _eventId!.isNotEmpty) {
-        try {
-          final memberEvent = MemberEvent(
-            memberId: savedMember!.id,
-            eventId: _eventId!,
-            eventTitle: _eventTitle ?? 'Unknown Event',
-            eventDate:
-                _eventDate != null ? Timestamp.fromDate(_eventDate!) : null,
-            eventVenue: _eventVenue,
-            eventLocation: _eventLocation,
-          );
-          await _memberEventRepository.addMemberEvent(memberEvent);
-          debugPrint(
-              'Member event record created for ${savedMember!.id} / $_eventId');
-        } catch (e) {
-          // Non-fatal: log but don't fail the registration
-          debugPrint('Failed to create member_events record: $e');
-        }
-      }
+      // Delegate multi-repo orchestration (local DB + Firestore + member_events)
+      // to the use case so this ViewModel only owns form state.
+      savedMember = await _registerMemberUseCase(
+        member,
+        eventId: _eventId,
+        eventTitle: _eventTitle,
+        eventDate: _eventDate,
+        eventVenue: _eventVenue,
+        eventLocation: _eventLocation,
+      );
     } catch (e) {
       debugPrint('Error saving member: $e');
       rethrow;
@@ -401,7 +381,7 @@ class MemberDetailsViewModel extends ChangeNotifier {
     _errorMessage = null;
 
     try {
-      final fetchedMembers = await _firestoreMemberRepository.fetchAllMembers();
+      final fetchedMembers = await _loadMembersUseCase();
       _members = fetchedMembers;
       _setLoading(false);
     } catch (e) {
@@ -414,8 +394,7 @@ class MemberDetailsViewModel extends ChangeNotifier {
   Future<bool> deleteMember(String memberId, String memberName) async {
     try {
       _setLoading(true);
-      await _firestoreMemberRepository.deleteMember(memberId);
-      await _memberRepository.deleteMember(memberId);
+      await _deleteMemberUseCase(memberId);
 
       // Remove from local list
       _members.removeWhere((m) => m.id == memberId);

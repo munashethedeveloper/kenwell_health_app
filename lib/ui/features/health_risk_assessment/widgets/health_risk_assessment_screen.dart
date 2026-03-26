@@ -314,6 +314,8 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
                             title: 'Signature',
                             controller: nurseViewModel.signatureController,
                             onClear: nurseViewModel.clearSignature,
+                            prefilledBase64:
+                                nurseViewModel.prefilledHpSignatureBase64,
                             navigation: KenwellFormNavigation(
                               nextLabel: 'Submit',
                               onPrevious: vm.isSubmitting ? null : onPrevious,

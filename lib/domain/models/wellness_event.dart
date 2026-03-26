@@ -249,6 +249,21 @@ class WellnessEvent {
     return '$trimmedFirst $trimmedLast';
   }
 
+  /// Returns `true` when the event is in the past or has been completed.
+  ///
+  /// An event is considered "past" if its status is `completed`/`finished` OR
+  /// its calendar day is strictly before today (regardless of status).
+  /// This is a domain-level property so that any UI widget or ViewModel can
+  /// use it without duplicating the date/status logic.
+  bool get isPast {
+    final s = status.toLowerCase();
+    if (s == WellnessEventStatus.completed || s == 'finished') return true;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final eventDay = DateTime(date.year, date.month, date.day);
+    return eventDay.isBefore(today);
+  }
+
   DateTime? _combineDateWithTime(String rawTime) {
     final trimmed = rawTime.trim();
     if (trimmed.isEmpty) return null;
