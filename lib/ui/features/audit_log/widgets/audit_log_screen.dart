@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/domain/models/audit_log_entry.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
@@ -59,13 +60,26 @@ class _AuditLogScreenState extends State<AuditLogScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: KenwellColors.neutralBackground,
-      appBar: const KenwellAppBar(
-        title: 'Audit Log',
-        titleStyle: TextStyle(
+      appBar: KenwellAppBar(
+        title: 'KenWell365',
+        titleStyle: const TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
+        automaticallyImplyLeading: true,
+        actions: [
+          IconButton(
+            tooltip: 'Refresh',
+            icon: const Icon(Icons.refresh, color: Colors.white),
+            onPressed: () => setState(() {}),
+          ),
+          TextButton.icon(
+            onPressed: () => context.pushNamed('help'),
+            icon: const Icon(Icons.help_outline, color: Colors.white),
+            label: const Text('Help', style: TextStyle(color: Colors.white)),
+          ),
+        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

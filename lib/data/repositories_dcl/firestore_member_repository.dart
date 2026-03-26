@@ -6,6 +6,7 @@ import '../services/audit_log_service.dart';
 import '../services/firestore_service.dart';
 import '../local/app_database.dart';
 import '../../domain/models/member.dart';
+import '../../utils/field_encryption.dart';
 import 'firestore_member_event_repository.dart';
 import 'member_repository.dart';
 
@@ -100,7 +101,7 @@ class FirestoreMemberRepository {
       final docs = await _firestore.queryDocuments(
         collection: membersCollection,
         field: 'idNumber',
-        isEqualTo: idNumber,
+        isEqualTo: FieldEncryption.encrypt(idNumber),
       );
       if (docs.isEmpty) return null;
       return _mapToMember(docs.first);
@@ -119,7 +120,7 @@ class FirestoreMemberRepository {
       final docs = await _firestore.queryDocuments(
         collection: membersCollection,
         field: 'passportNumber',
-        isEqualTo: passportNumber,
+        isEqualTo: FieldEncryption.encrypt(passportNumber),
       );
       if (docs.isEmpty) return null;
       return _mapToMember(docs.first);
@@ -224,10 +225,11 @@ class FirestoreMemberRepository {
       id: data['id'] as String,
       name: data['name'] as String,
       surname: data['surname'] as String,
-      idNumber: data['idNumber'] as String?,
-      passportNumber: data['passportNumber'] as String?,
+      idNumber: FieldEncryption.decrypt(data['idNumber'] as String?),
+      passportNumber:
+          FieldEncryption.decrypt(data['passportNumber'] as String?),
       idDocumentType: data['idDocumentType'] as String,
-      dateOfBirth: data['dateOfBirth'] as String?,
+      dateOfBirth: FieldEncryption.decrypt(data['dateOfBirth'] as String?),
       gender: data['gender'] as String?,
       maritalStatus: data['maritalStatus'] as String?,
       nationality: data['nationality'] as String?,
@@ -236,7 +238,8 @@ class FirestoreMemberRepository {
       cellNumber: data['cellNumber'] as String?,
       medicalAidStatus: data['medicalAidStatus'] as String?,
       medicalAidName: data['medicalAidName'] as String?,
-      medicalAidNumber: data['medicalAidNumber'] as String?,
+      medicalAidNumber:
+          FieldEncryption.decrypt(data['medicalAidNumber'] as String?),
       eventId: data['eventId'] as String?,
       createdAt: data['createdAt'] != null
           ? (data['createdAt'] is Timestamp
@@ -257,10 +260,10 @@ class FirestoreMemberRepository {
       'id': member.id,
       'name': member.name,
       'surname': member.surname,
-      'idNumber': member.idNumber,
-      'passportNumber': member.passportNumber,
+      'idNumber': FieldEncryption.encrypt(member.idNumber),
+      'passportNumber': FieldEncryption.encrypt(member.passportNumber),
       'idDocumentType': member.idDocumentType,
-      'dateOfBirth': member.dateOfBirth,
+      'dateOfBirth': FieldEncryption.encrypt(member.dateOfBirth),
       'gender': member.gender,
       'maritalStatus': member.maritalStatus,
       'nationality': member.nationality,
@@ -269,7 +272,7 @@ class FirestoreMemberRepository {
       'cellNumber': member.cellNumber,
       'medicalAidStatus': member.medicalAidStatus,
       'medicalAidName': member.medicalAidName,
-      'medicalAidNumber': member.medicalAidNumber,
+      'medicalAidNumber': FieldEncryption.encrypt(member.medicalAidNumber),
       'eventId': member.eventId,
       'createdAt': Timestamp.fromDate(member.createdAt),
       'updatedAt': Timestamp.fromDate(member.updatedAt),

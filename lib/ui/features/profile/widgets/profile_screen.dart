@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/shared/ui/buttons/custom_primary_button.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/profile_view_model.dart';
@@ -34,15 +35,26 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
   final _lastNameController = TextEditingController();
 
   String? _selectedRole;
+  String _appVersion = '';
 
   // Store original values to detect changes
 
   @override
   void initState() {
     super.initState();
+    _loadAppVersion();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadAndPopulateProfile();
     });
+  }
+
+  Future<void> _loadAppVersion() async {
+    final info = await PackageInfo.fromPlatform();
+    if (mounted) {
+      setState(() {
+        _appVersion = 'v${info.version}+${info.buildNumber}';
+      });
+    }
   }
 
   Future<void> _loadAndPopulateProfile() async {
@@ -184,6 +196,17 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
                               isBusy: vm.isLoading,
                             ),
                             const SizedBox(height: 16),
+                            if (_appVersion.isNotEmpty)
+                              Center(
+                                child: Text(
+                                  'Kenwell Health App $_appVersion',
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.black38,
+                                  ),
+                                ),
+                              ),
+                            const SizedBox(height: 8),
                           ],
                         ),
                       ),

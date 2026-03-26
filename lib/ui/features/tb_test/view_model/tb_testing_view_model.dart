@@ -3,17 +3,20 @@ import 'package:signature/signature.dart';
 import 'package:intl/intl.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
-import 'package:kenwell_health_app/data/repositories_dcl/firestore_tb_screening_repository.dart';
 import 'package:kenwell_health_app/domain/models/tb_screening.dart';
+import 'package:kenwell_health_app/domain/usecases/submit_tb_screening_usecase.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:convert';
 import 'package:kenwell_health_app/domain/constants/enums.dart';
 
 class TBTestingViewModel extends ChangeNotifier {
+  TBTestingViewModel({SubmitTBScreeningUseCase? submitTBScreeningUseCase})
+      : _submitTBScreeningUseCase =
+            submitTBScreeningUseCase ?? SubmitTBScreeningUseCase();
+
   // Note: formKey is now defined here
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final FirestoreTbScreeningRepository _repository =
-      FirestoreTbScreeningRepository();
+  final SubmitTBScreeningUseCase _submitTBScreeningUseCase;
 
   String? _memberId;
   String? _eventId;
@@ -419,7 +422,7 @@ class TBTestingViewModel extends ChangeNotifier {
         updatedAt: DateTime.now(),
       );
 
-      await _repository.addTbScreening(screening);
+      await _submitTBScreeningUseCase(screening);
 
       onSuccess?.call('TB screening saved successfully');
       onNext?.call();

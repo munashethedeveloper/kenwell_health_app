@@ -1,0 +1,45 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Android debug",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main.dart"
+    },
+    {
+      "name": "Android debug (with PII key)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "args": ["--dart-define=PII_ENCRYPTION_KEY=KenwellHlthApp__DevKey__32chars!"]
+    },
+    {
+      "name": "Web — Chrome",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "deviceId": "chrome",
+      "args": ["--web-renderer", "canvaskit"]
+    },
+    {
+      "name": "Web — Chrome (with PII key)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "deviceId": "chrome",
+      "args": [
+        "--web-renderer",
+        "canvaskit",
+        "--dart-define=PII_ENCRYPTION_KEY=KenwellHlthApp__DevKey__32chars!"
+      ]
+    },
+    {
+      "name": "Profile (perf tracing on)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "flutterMode": "profile"
+    }
+  ]
+}

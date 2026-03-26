@@ -17,6 +17,8 @@ import 'sections/participation_section.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 // EventScreen allows adding or editing a wellness event
+// TODO(arch): migrate to use EventFormViewModel instead of EventViewModel for
+//             form state, keeping EventViewModel lean (list-only).
 class EventScreen extends StatefulWidget {
   // ViewModel for managing event data
   final EventViewModel viewModel;
@@ -102,61 +104,69 @@ class _EventScreenState extends State<EventScreen> {
     }
   }
 
+  bool _isSaving = false;
+
   // Validate form and save event
   Future<void> _validateAndSave() async {
-    final invalidFields =
-        EventFormValidator.validateEventForm(widget.viewModel);
-
-    if (invalidFields.isNotEmpty) {
-      final message = invalidFields.join(', ');
-      AppSnackbar.showWarning(context, "Please complete: $message",
-          duration: const Duration(seconds: 4));
-      return;
-    }
-
-    // All fields valid, proceed to save
-    final eventDate =
-        DateTime.tryParse(widget.viewModel.dateController.text) ?? widget.date;
-    WellnessEvent eventToSave;
-    final isEditMode = widget.existingEvent != null;
-
-    // Build event object to save
-    if (isEditMode) {
-      eventToSave = widget.viewModel
-          .buildEvent(eventDate)
-          .copyWith(id: widget.existingEvent!.id);
-    } else {
-      eventToSave = widget.viewModel.buildEvent(eventDate);
-    }
-
-    // Save event using the provided onSave callback
+    if (_isSaving) return;
+    setState(() => _isSaving = true);
     try {
-      debugPrint('EventScreen: Saving event "${eventToSave.title}"');
-      await widget.onSave(eventToSave);
-      debugPrint('EventScreen: Event saved successfully via onSave callback');
-    } catch (e, stackTrace) {
-      debugPrint('EventScreen: ERROR saving event: $e');
-      debugPrintStack(stackTrace: stackTrace);
+      final invalidFields =
+          EventFormValidator.validateEventForm(widget.viewModel);
 
+      if (invalidFields.isNotEmpty) {
+        final message = invalidFields.join(', ');
+        if (mounted) {
+          AppSnackbar.showWarning(context, "Please complete: $message",
+              duration: const Duration(seconds: 4));
+        }
+        return;
+      }
+
+      // All fields valid, proceed to save
+      final eventDate =
+          DateTime.tryParse(widget.viewModel.dateController.text) ??
+              widget.date;
+      WellnessEvent eventToSave;
+      final isEditMode = widget.existingEvent != null;
+
+      // Build event object to save
+      if (isEditMode) {
+        eventToSave = widget.viewModel
+            .buildEvent(eventDate)
+            .copyWith(id: widget.existingEvent!.id);
+      } else {
+        eventToSave = widget.viewModel.buildEvent(eventDate);
+      }
+
+      // Save event using the provided onSave callback
+      try {
+        debugPrint('EventScreen: Saving event "${eventToSave.title}"');
+        await widget.onSave(eventToSave);
+        debugPrint('EventScreen: Event saved successfully via onSave callback');
+      } catch (e, stackTrace) {
+        debugPrint('EventScreen: ERROR saving event: $e');
+        debugPrintStack(stackTrace: stackTrace);
+        if (!mounted) return;
+        AppSnackbar.showError(context, "Error saving event: $e",
+            duration: const Duration(seconds: 5));
+        return;
+      }
+
+      // Clear controllers and show success message
       if (!mounted) return;
-      AppSnackbar.showError(context, "Error saving event: $e",
-          duration: const Duration(seconds: 5));
-      return;
+      widget.viewModel.clearControllers();
+
+      AppSnackbar.showSuccess(
+          context,
+          isEditMode
+              ? "Event updated successfully"
+              : "Event created successfully");
+
+      context.pop();
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
     }
-
-    // Clear controllers and show success message
-    if (!mounted) return;
-    widget.viewModel.clearControllers();
-
-    // Show success SnackBar
-    AppSnackbar.showSuccess(
-        context,
-        isEditMode
-            ? "Event updated successfully"
-            : "Event created successfully");
-
-    // Close the screen
-    context.pop();
   }
 
   // Build method

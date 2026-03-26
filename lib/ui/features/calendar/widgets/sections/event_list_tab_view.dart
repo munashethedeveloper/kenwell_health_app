@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenwell_health_app/ui/shared/ui/cards/kenwell_event_day_header.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import '../../../../../domain/models/wellness_event.dart';
 import '../../view_model/calendar_view_model.dart';
@@ -96,7 +97,7 @@ class EventsListTabView extends StatelessWidget {
         Expanded(
           child: eventsThisMonth.isEmpty
               ? _buildEmptyState(context, theme)
-              : _buildGroupedList(context, theme, eventsThisMonth),
+              : _buildGroupedList(context, eventsThisMonth),
         ),
       ],
     );
@@ -164,7 +165,6 @@ class EventsListTabView extends StatelessWidget {
   /// day-header row with an event count badge.
   Widget _buildGroupedList(
     BuildContext context,
-    ThemeData theme,
     List<WellnessEvent> events,
   ) {
     // Sort events
@@ -188,53 +188,11 @@ class EventsListTabView extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Day header
-            Padding(
-              padding: const EdgeInsets.only(top: 16, bottom: 12, left: 4),
-              child: Row(
-                children: [
-                  // Coloured left accent bar
-                  Container(
-                    width: 4,
-                    height: 24,
-                    decoration: BoxDecoration(
-                      color: theme.primaryColor,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      viewModel.formatDateLong(day),
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: KenwellColors.secondaryNavy,
-                        letterSpacing: -0.3,
-                      ),
-                    ),
-                  ),
-                  // Event count badge
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: theme.primaryColor.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '${dayEvents.length}',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: theme.primaryColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            // Day header — uses shared KenwellEventDayHeader for consistency
+            // with AllEventsScreen (accent bar + date + divider + count badge).
+            KenwellEventDayHeader(
+              label: viewModel.formatDateLong(day),
+              eventCount: dayEvents.length,
             ),
             // Event cards for the day
             ...dayEvents.map(

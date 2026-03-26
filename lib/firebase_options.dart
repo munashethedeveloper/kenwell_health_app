@@ -82,7 +82,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '195093019449',
     projectId: 'kenwellmobileapp',
     storageBucket: 'kenwellmobileapp.firebasestorage.app',
-    iosBundleId: 'com.example.kenwellHealthApp',
+    iosBundleId: 'com.kenwell.healthapp',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -91,7 +91,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '195093019449',
     projectId: 'kenwellmobileapp',
     storageBucket: 'kenwellmobileapp.firebasestorage.app',
-    iosBundleId: 'com.example.kenwellHealthApp',
+    iosBundleId: 'com.kenwell.healthapp',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
@@ -103,5 +103,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'kenwellmobileapp.firebasestorage.app',
     measurementId: 'G-1CWEC7098X',
   );
-
 }

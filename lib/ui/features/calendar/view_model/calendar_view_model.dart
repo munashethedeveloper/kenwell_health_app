@@ -2,19 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../data/repositories_dcl/event_repository.dart';
+import '../../../../domain/usecases/add_event_usecase.dart';
+import '../../../../domain/usecases/update_event_usecase.dart';
+import '../../../../domain/usecases/delete_event_usecase.dart';
+import '../../../../domain/usecases/get_events_usecase.dart';
 import '../../../../utils/event_color_helper.dart';
 
 /// ViewModel for managing calendar state and events
 class CalendarViewModel extends ChangeNotifier {
-  /// Constructor with optional repository for dependency injection
-  CalendarViewModel({EventRepository? repository})
-      : _repository = repository ?? EventRepository() {
+  /// Constructor with optional dependencies for dependency injection.
+  CalendarViewModel({
+    EventRepository? repository,
+    GetEventsUseCase? getEventsUseCase,
+    AddEventUseCase? addEventUseCase,
+    UpdateEventUseCase? updateEventUseCase,
+    DeleteEventUseCase? deleteEventUseCase,
+  })  : _getEventsUseCase =
+            getEventsUseCase ?? GetEventsUseCase(repository: repository),
+        _addEventUseCase =
+            addEventUseCase ?? AddEventUseCase(repository: repository),
+        _updateEventUseCase =
+            updateEventUseCase ?? UpdateEventUseCase(repository: repository),
+        _deleteEventUseCase =
+            deleteEventUseCase ?? DeleteEventUseCase(repository: repository) {
     _initializationFuture = loadEvents();
   }
-
-  // Repository for data operations
-  final EventRepository _repository;
-  late final Future<void> _initializationFuture;
+  final GetEventsUseCase _getEventsUseCase;
+  final AddEventUseCase _addEventUseCase;
+  final UpdateEventUseCase _updateEventUseCase;
+  final DeleteEventUseCase _deleteEventUseCase;
 
   // Getter for initialization future
   Future<void> get initializationFuture => _initializationFuture;
@@ -51,7 +67,7 @@ class CalendarViewModel extends ChangeNotifier {
 
     // Fetch events – EventRepository handles the Firestore→local-cache fallback.
     try {
-      final fetchedEvents = await _repository.fetchAllEvents();
+      final fetchedEvents = await _getEventsUseCase();
       _events = fetchedEvents;
       // Don't set error if list is empty - that's a valid state
     } catch (e) {
@@ -121,7 +137,7 @@ class CalendarViewModel extends ChangeNotifier {
   // Add a new event
   Future<void> addEvent(WellnessEvent event) async {
     try {
-      await _repository.addEvent(event);
+      await _addEventUseCase(event);
       // Update local list instead of full reload
       _events = [..._events, event];
       _error = null; // Clear any previous errors on success
@@ -138,7 +154,7 @@ class CalendarViewModel extends ChangeNotifier {
   // Update an existing event
   Future<void> updateEvent(WellnessEvent event) async {
     try {
-      await _repository.updateEvent(event);
+      await _updateEventUseCase(event);
       // Update local list instead of full reload
       final index = _events.indexWhere((e) => e.id == event.id);
       if (index != -1) {
@@ -168,7 +184,7 @@ class CalendarViewModel extends ChangeNotifier {
         (e) => e.id == eventId,
         orElse: () => throw Exception('Event not found'),
       );
-      await _repository.deleteEvent(eventId);
+      await _deleteEventUseCase(eventId);
       // Update local list instead of full reload
       _events = _events.where((e) => e.id != eventId).toList();
       notifyListeners();

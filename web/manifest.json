@@ -1,11 +1,11 @@
 {
-    "name": "kenwell_health_app",
-    "short_name": "kenwell_health_app",
-    "start_url": ".",
+    "name": "Kenwell Health App",
+    "short_name": "Kenwell Health",
+    "start_url": "/",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#0F1724",
+    "theme_color": "#90C048",
+    "description": "Kenwell wellness-event management: register members, run health screenings, and track outcomes — all in one app.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

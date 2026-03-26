@@ -15,7 +15,8 @@ dependencies:
   provider: ^6.1.5
   firebase_core: ^4.2.0
   firebase_auth: ^6.1.1
-  firebase_crashlytics: 5.0.5
+  firebase_crashlytics: ^5.1.0
+  firebase_performance: ^0.11.2
   intl: 0.20.2
   intl_phone_field: ^3.2.0
   url_launcher: ^6.3.2
@@ -23,31 +24,37 @@ dependencies:
   signature: ^6.3.0
   path_provider: ^2.1.5
   cloud_firestore: ^6.0.3
-  connectivity_plus: ^6.1.0
-  google_fonts: ^6.2.1
+  connectivity_plus: ^7.0.0
+  google_fonts: ^8.0.2
   flutter_animate: ^4.5.2
   uuid: ^4.5.2
+  # Field-level AES-256-CBC encryption for PII (idNumber, passportNumber, dateOfBirth, HIV results).
+  # Encryption key is supplied via --dart-define=PII_ENCRYPTION_KEY=<32-char key> at build time.
+  encrypt: ^5.0.3
+  # Push notifications via Firebase Cloud Messaging.
+  firebase_messaging: ^16.1.3
   drift: ^2.21.0
-  drift_flutter: ^0.2.7
-  sqlite3_flutter_libs: ^0.5.40
+  drift_flutter: ^0.3.0
+  sqlite3_flutter_libs: ^0.6.0+eol
   path: ^1.9.0
   fl_chart: ^1.1.1
   fluttertoast: ^9.0.0
-  permission_handler: ^11.3.1
-  flutter_slidable: ^3.1.1
-  sizer: ^2.0.15
+  permission_handler: ^12.0.1
+  flutter_slidable: ^4.0.3
+  sizer: ^3.1.3
   excel: ^4.0.6
-  share_plus: ^10.1.3
-  go_router: ^14.6.2
-  geocoding: ^3.0.0
+  share_plus: ^12.0.1
+  go_router: ^17.1.0
+  geocoding: ^4.0.0
   flutter_typeahead: ^5.2.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  flutter_lints: ^6.0.0
   drift_dev: ^2.21.0
   build_runner: ^2.4.11
+  mocktail: ^1.0.4
 
 flutter:
   uses-material-design: true

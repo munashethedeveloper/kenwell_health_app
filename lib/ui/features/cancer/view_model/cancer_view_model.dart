@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:kenwell_health_app/data/repositories_dcl/firestore_cancer_screening_repository.dart';
 import 'package:kenwell_health_app/data/services/auth_service.dart';
+import 'package:kenwell_health_app/domain/usecases/submit-cancer_screening_usecase.dart';
 import 'package:kenwell_health_app/domain/models/cander_screening.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
@@ -10,20 +10,25 @@ import 'package:signature/signature.dart';
 import 'package:uuid/uuid.dart';
 
 class CancerScreeningViewModel extends ChangeNotifier {
+  CancerScreeningViewModel({
+    SubmitCancerScreeningUseCase? submitCancerScreeningUseCase,
+    AuthService? authService,
+  })  : _submitCancerScreeningUseCase =
+            submitCancerScreeningUseCase ?? SubmitCancerScreeningUseCase(),
+        _authService = authService ?? AuthService();
+
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final FirestoreCancerScreeningRepository _repository =
-      FirestoreCancerScreeningRepository();
-  final AuthService _authService = AuthService();
+  final SubmitCancerScreeningUseCase _submitCancerScreeningUseCase;
+  final AuthService _authService;
 
   String? _memberId;
   String? _eventId;
 
-  CancerScreeningViewModel() {
-    _loadCurrentUserProfile();
-  }
-
   /// Pre-populate nurse first/last name from the authenticated user profile.
-  Future<void> _loadCurrentUserProfile() async {
+  ///
+  /// Call this explicitly after creating the ViewModel (not in the constructor)
+  /// so that initialization is visible and testable.
+  Future<void> initialize() async {
     try {
       final user = await _authService.getCurrentUser();
       if (user != null) {
@@ -61,17 +66,23 @@ class CancerScreeningViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// True when Breast Screening is relevant (or no sub-types set → show all).
+  /// True when Breast Screening was specifically requested for this event,
+  /// or when no sub-type information is available at all (fallback).
   bool get showBreastScreening =>
       _cancerSubTypes.isEmpty || _cancerSubTypes.contains('Breast Screening');
 
-  /// True when Pap Smear is relevant (or no sub-types set → show all).
+  /// True when Pap Smear was specifically requested for this event,
+  /// or when no sub-type information is available at all (fallback).
   bool get showPapSmear =>
       _cancerSubTypes.isEmpty || _cancerSubTypes.contains('Pap Smear');
 
-  /// True when PSA is relevant (or no sub-types set → show all).
+  /// True when PSA was specifically requested for this event,
+  /// or when no sub-type information is available at all (fallback).
   bool get showPsa =>
       _cancerSubTypes.isEmpty || _cancerSubTypes.contains('PSA');
+
+  /// True when at least one cancer sub-type is configured for this event.
+  bool get hasSpecificSubTypes => _cancerSubTypes.isNotEmpty;
 
   // --- Medical History ---
   String? previousCancerDiagnosis;
@@ -424,7 +435,7 @@ class CancerScreeningViewModel extends ChangeNotifier {
         updatedAt: DateTime.now(),
       );
 
-      await _repository.addCancerScreening(screening);
+      await _submitCancerScreeningUseCase(screening);
 
       onSuccess?.call('Cancer screening saved successfully');
       onNext?.call();

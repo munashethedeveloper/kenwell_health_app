@@ -1,22 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_performance/firebase_performance.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-import 'package:kenwell_health_app/data/services/connectivity_service.dart';
-import 'package:kenwell_health_app/ui/features/consent_form/view_model/consent_view_model.dart';
-import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
+import 'package:kenwell_health_app/di/app_providers.dart';
 import 'package:kenwell_health_app/ui/shared/ui/banners/offline_banner.dart';
+import 'package:kenwell_health_app/ui/shared/ui/error/kenwell_error_widget.dart';
+import 'data/services/push_notification_service.dart';
 import 'package:provider/provider.dart';
 
 import 'firebase_options.dart';
-import 'providers/app_provider.dart';
 import 'providers/theme_provider.dart';
 import 'routing/go_router_config.dart';
-import 'ui/features/auth/view_models/auth_view_model.dart';
-import 'ui/features/calendar/view_model/calendar_view_model.dart';
-import 'ui/features/event/view_model/event_view_model.dart';
-import 'ui/features/stats_report/view_model/stats_report_view_model.dart';
 import 'ui/shared/themes/app_theme.dart';
 
 void main() async {
@@ -69,10 +65,30 @@ void main() async {
       cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
     );
     debugPrint('Firestore offline persistence enabled');
+
+    // Enable Firebase Performance Monitoring.
+    // In debug builds Firebase Performance is disabled so that local runs
+    // are not slowed by instrumentation overhead. In release builds it is
+    // enabled automatically once the google-services plugin is applied.
+    await FirebasePerformance.instance
+        .setPerformanceCollectionEnabled(!kDebugMode);
+    debugPrint(
+        'Firebase Performance: collection ${kDebugMode ? "disabled (debug)" : "enabled (release)"}');
   } catch (e) {
     debugPrint('Firebase initialization error: $e');
     debugPrint('App will run with limited functionality (local database only)');
   }
+
+  // Initialise FCM push notifications (token registration + handlers).
+  // Runs after Firebase init; errors are non-fatal so the app still starts.
+  try {
+    await PushNotificationService.instance.initialize();
+  } catch (e) {
+    debugPrint('PushNotificationService initialisation error: $e');
+  }
+
+  // Register branded error widget so users never see the raw Flutter red screen.
+  KenwellErrorWidget.register();
 
   runApp(const MyApp());
 }
@@ -83,27 +99,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [
-        ChangeNotifierProvider<ConnectivityService>(
-            create: (_) => ConnectivityService()),
-        ChangeNotifierProvider<AppProvider>(create: (_) => AppProvider()),
-        ChangeNotifierProvider<ProfileViewModel>(
-            create: (_) => ProfileViewModel()),
-        ChangeNotifierProvider<ConsentScreenViewModel>(
-            create: (_) => ConsentScreenViewModel()),
-        ChangeNotifierProvider<AuthViewModel>(create: (_) => AuthViewModel()),
-        ChangeNotifierProvider<CalendarViewModel>(
-            create: (_) => CalendarViewModel()),
-        ChangeNotifierProvider<EventViewModel>(
-          create: (_) => EventViewModel(),
-        ),
-        ChangeNotifierProvider<StatsReportViewModel>(
-          create: (_) => StatsReportViewModel(),
-        ),
-        ChangeNotifierProvider<ThemeProvider>(
-          create: (_) => ThemeProvider(),
-        ),
-      ],
+      providers: AppProviders.rootProviders,
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, _) {
           final goRouter = AppRouterConfig.createRouter();
