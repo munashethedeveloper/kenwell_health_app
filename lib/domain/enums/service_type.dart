@@ -27,7 +27,7 @@ extension ServiceTypeExtension on ServiceType {
       case ServiceType.hct:
         return 'HCT';
       //case ServiceType.hctTest:
-      //return 'HIV Test';
+      //return 'HCT Test';
       case ServiceType.hra:
         return 'HRA';
       case ServiceType.papSmear:

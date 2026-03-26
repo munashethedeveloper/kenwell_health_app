@@ -5,6 +5,7 @@ import 'package:kenwell_health_app/data/local/screening_local_store.dart';
 import 'package:kenwell_health_app/domain/models/hct_result.dart';
 import 'package:kenwell_health_app/data/services/audit_log_service.dart';
 import 'package:kenwell_health_app/data/services/firestore_service.dart';
+import 'package:kenwell_health_app/data/services/pending_write_service.dart';
 import 'package:kenwell_health_app/utils/field_encryption.dart';
 import 'package:kenwell_health_app/utils/logger.dart';
 
@@ -12,14 +13,25 @@ import 'package:kenwell_health_app/utils/logger.dart';
 ///
 /// Every mutating operation writes a corresponding entry to the `audit_logs`
 /// collection via [AuditLogService].
+///
+/// Offline-first write strategy:
+/// 1. Persist the encrypted record to local SQLite immediately.
+/// 2. Attempt the Firestore write.  On failure the write is enqueued in
+///    [PendingWriteService] for automatic retry when connectivity is restored.
+///    Encrypted values are stored in the queue so PII is never written in plain
+///    text.
 class FirestoreHctResultRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final ScreeningLocalStore _local = ScreeningLocalStore.instance;
   final AuditLogService _audit;
+  final PendingWriteService _pendingWrites;
   static const String _collectionName = FirestoreService.hctResultsCollection;
 
-  FirestoreHctResultRepository({AuditLogService? auditLogService})
-      : _audit = auditLogService ?? AuditLogService();
+  FirestoreHctResultRepository({
+    AuditLogService? auditLogService,
+    PendingWriteService? pendingWriteService,
+  })  : _audit = auditLogService ?? AuditLogService(),
+        _pendingWrites = pendingWriteService ?? PendingWriteService.instance;
 
   // ── Encryption helpers ──────────────────────────────────────────────────
 
@@ -49,13 +61,14 @@ class FirestoreHctResultRepository {
 
   Future<void> addHctResult(HctResult result) async {
     final encryptedMap = _toEncryptedMap(result);
+    // 1. Persist locally first (encrypted) — guaranteed local copy.
+    await _local.upsertHctResult(encryptedMap);
+    // 2. Write to Firestore (non-fatal: failure is queued for automatic retry).
     try {
       await _firestore
           .collection(_collectionName)
           .doc(result.id)
           .set(encryptedMap);
-      // Write-through: persist to local SQLite store so data is available offline.
-      unawaited(_local.upsertHctResult(encryptedMap));
       unawaited(_audit.logCreate(
         collection: _collectionName,
         documentId: result.id,
@@ -64,8 +77,13 @@ class FirestoreHctResultRepository {
       ));
       AppLogger.info('HCT result added successfully: ${result.id}');
     } catch (e) {
-      AppLogger.error('Failed to add HCT result', e);
-      rethrow;
+      AppLogger.error(
+          'HCT result Firestore write failed, queued for retry', e);
+      unawaited(_pendingWrites.enqueue(
+        collection: _collectionName,
+        docId: result.id,
+        data: encryptedMap,
+      ));
     }
   }
 

@@ -4,12 +4,12 @@ import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.
 
 class HealthScreeningsScreen extends StatelessWidget {
   final bool hraEnabled;
-  //final bool hivEnabled;
+  //final bool hctEnabled;
   final bool hctEnabled;
   final bool tbEnabled;
   final bool cancerEnabled;
   final bool hraCompleted;
-  //final bool hivCompleted;
+  //final bool hctCompleted;
   final bool hctCompleted;
   final bool tbCompleted;
   final bool cancerCompleted;
@@ -23,12 +23,12 @@ class HealthScreeningsScreen extends StatelessWidget {
   const HealthScreeningsScreen({
     super.key,
     required this.hraEnabled,
-    //required this.hivEnabled,
+    //required this.hctEnabled,
     required this.hctEnabled,
     required this.tbEnabled,
     this.cancerEnabled = false,
     this.hraCompleted = false,
-    //this.hivCompleted = false,
+    //this.hctCompleted = false,
     this.hctCompleted = false,
     this.tbCompleted = false,
     this.cancerCompleted = false,
