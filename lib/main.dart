@@ -6,6 +6,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:kenwell_health_app/di/app_providers.dart';
 import 'package:kenwell_health_app/ui/shared/ui/banners/offline_banner.dart';
+import 'package:kenwell_health_app/ui/shared/ui/error/kenwell_error_widget.dart';
+import 'data/services/push_notification_service.dart';
 import 'package:provider/provider.dart';
 
 import 'firebase_options.dart';
@@ -76,6 +78,17 @@ void main() async {
     debugPrint('Firebase initialization error: $e');
     debugPrint('App will run with limited functionality (local database only)');
   }
+
+  // Initialise FCM push notifications (token registration + handlers).
+  // Runs after Firebase init; errors are non-fatal so the app still starts.
+  try {
+    await PushNotificationService.instance.initialize();
+  } catch (e) {
+    debugPrint('PushNotificationService initialisation error: $e');
+  }
+
+  // Register branded error widget so users never see the raw Flutter red screen.
+  KenwellErrorWidget.register();
 
   runApp(const MyApp());
 }

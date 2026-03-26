@@ -28,6 +28,11 @@ dependencies:
   google_fonts: ^6.2.1
   flutter_animate: ^4.5.2
   uuid: ^4.5.2
+  # Field-level AES-256-CBC encryption for PII (idNumber, passportNumber, dateOfBirth, HIV results).
+  # Encryption key is supplied via --dart-define=PII_ENCRYPTION_KEY=<32-char key> at build time.
+  encrypt: ^5.0.3
+  # Push notifications via Firebase Cloud Messaging.
+  firebase_messaging: ^15.1.5
   drift: ^2.21.0
   drift_flutter: ^0.2.7
   sqlite3_flutter_libs: ^0.5.40

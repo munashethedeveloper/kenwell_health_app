@@ -5,6 +5,7 @@ import 'package:kenwell_health_app/data/local/screening_local_store.dart';
 import 'package:kenwell_health_app/domain/models/hiv_result.dart';
 import 'package:kenwell_health_app/data/services/audit_log_service.dart';
 import 'package:kenwell_health_app/data/services/firestore_service.dart';
+import 'package:kenwell_health_app/utils/field_encryption.dart';
 import 'package:kenwell_health_app/utils/logger.dart';
 
 /// Repository for managing HIV test result records in Firestore.
@@ -20,18 +21,45 @@ class FirestoreHivResultRepository {
   FirestoreHivResultRepository({AuditLogService? auditLogService})
       : _audit = auditLogService ?? AuditLogService();
 
+  // ── Encryption helpers ──────────────────────────────────────────────────
+
+  /// Returns a copy of the serialised [HivResult] map with the sensitive
+  /// [screeningResult] and [expectedResult] fields AES-256-CBC encrypted.
+  Map<String, dynamic> _toEncryptedMap(HivResult result) {
+    final map = Map<String, dynamic>.from(result.toMap());
+    map['screeningResult'] =
+        FieldEncryption.encrypt(map['screeningResult'] as String?);
+    map['expectedResult'] =
+        FieldEncryption.encrypt(map['expectedResult'] as String?);
+    return map;
+  }
+
+  /// Decrypts the sensitive fields in a raw Firestore/local [map] before
+  /// constructing an [HivResult] via [HivResult.fromMap].
+  HivResult _fromMap(Map<String, dynamic> map) {
+    final decrypted = Map<String, dynamic>.from(map);
+    decrypted['screeningResult'] =
+        FieldEncryption.decrypt(decrypted['screeningResult'] as String?);
+    decrypted['expectedResult'] =
+        FieldEncryption.decrypt(decrypted['expectedResult'] as String?);
+    return HivResult.fromMap(decrypted);
+  }
+
+  // ── Public API ──────────────────────────────────────────────────────────
+
   Future<void> addHivResult(HivResult result) async {
+    final encryptedMap = _toEncryptedMap(result);
     try {
       await _firestore
           .collection(_collectionName)
           .doc(result.id)
-          .set(result.toMap());
+          .set(encryptedMap);
       // Write-through: persist to local SQLite store so data is available offline.
-      unawaited(_local.upsertHivResult(result.toMap()));
+      unawaited(_local.upsertHivResult(encryptedMap));
       unawaited(_audit.logCreate(
         collection: _collectionName,
         documentId: result.id,
-        data: result.toMap(),
+        data: encryptedMap,
         summary: 'HIV result added for member ${result.memberId}',
       ));
       AppLogger.info('HIV result added successfully: ${result.id}');
@@ -45,7 +73,7 @@ class FirestoreHivResultRepository {
     try {
       final doc = await _firestore.collection(_collectionName).doc(id).get();
       if (!doc.exists) return null;
-      final result = HivResult.fromMap(doc.data()!);
+      final result = _fromMap(doc.data()!);
       unawaited(_local.upsertHivResult(doc.data()!));
       return result;
     } catch (e) {
@@ -55,12 +83,12 @@ class FirestoreHivResultRepository {
             .collection(_collectionName)
             .doc(id)
             .get(const GetOptions(source: Source.cache));
-        if (cached.exists) return HivResult.fromMap(cached.data()!);
+        if (cached.exists) return _fromMap(cached.data()!);
       } catch (_) {}
       // Offline fallback 2: local SQLite store.
       try {
         final row = await _local.getHivResultById(id);
-        if (row != null) return HivResult.fromMap(row);
+        if (row != null) return _fromMap(row);
       } catch (_) {}
       AppLogger.error('Failed to get HIV result', e);
       rethrow;
@@ -82,7 +110,7 @@ class FirestoreHivResultRepository {
           .get();
 
       final results = querySnapshot.docs
-          .map((doc) => HivResult.fromMap(doc.data()))
+          .map((doc) => _fromMap(doc.data()))
           .toList();
       for (final doc in querySnapshot.docs) {
         unawaited(_local.upsertHivResult(doc.data()));
@@ -97,7 +125,7 @@ class FirestoreHivResultRepository {
             .get(const GetOptions(source: Source.cache));
         if (cached.docs.isNotEmpty) {
           return cached.docs
-              .map((doc) => HivResult.fromMap(doc.data()))
+              .map((doc) => _fromMap(doc.data()))
               .toList();
         }
       } catch (_) {}
@@ -105,7 +133,7 @@ class FirestoreHivResultRepository {
       try {
         final rows = await _local.getHivResultsByMember(memberId);
         if (rows.isNotEmpty) {
-          return rows.map((r) => HivResult.fromMap(r)).toList();
+          return rows.map((r) => _fromMap(r)).toList();
         }
       } catch (_) {}
       AppLogger.error('Failed to get HIV results by member', e);
@@ -122,7 +150,7 @@ class FirestoreHivResultRepository {
           .get();
 
       final results = querySnapshot.docs
-          .map((doc) => HivResult.fromMap(doc.data()))
+          .map((doc) => _fromMap(doc.data()))
           .toList();
       for (final doc in querySnapshot.docs) {
         unawaited(_local.upsertHivResult(doc.data()));
@@ -137,7 +165,7 @@ class FirestoreHivResultRepository {
             .get(const GetOptions(source: Source.cache));
         if (cached.docs.isNotEmpty) {
           return cached.docs
-              .map((doc) => HivResult.fromMap(doc.data()))
+              .map((doc) => _fromMap(doc.data()))
               .toList();
         }
       } catch (_) {}
@@ -145,7 +173,7 @@ class FirestoreHivResultRepository {
       try {
         final rows = await _local.getHivResultsByEvent(eventId);
         if (rows.isNotEmpty) {
-          return rows.map((r) => HivResult.fromMap(r)).toList();
+          return rows.map((r) => _fromMap(r)).toList();
         }
       } catch (_) {}
       AppLogger.error('Failed to get HIV results by event', e);
