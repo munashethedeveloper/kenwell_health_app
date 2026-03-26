@@ -174,8 +174,6 @@ enum ScreeningType {
   riskAssessment('risk_assessment'),
   hctTest('hct_test'),
   hctResults('hct_results'),
-  hctTest('hct_test'),
-  hctResults('hct_results'),
   tbTest('tb_test'),
   cancerScreening('cancer_screening');
 
