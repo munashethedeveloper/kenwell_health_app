@@ -19,10 +19,16 @@ This directory contains the full technical and business documentation for the **
 | Document | Description |
 |---|---|
 | [technical/architecture.md](technical/architecture.md) | Clean Architecture, MVVM pattern, layer boundaries |
-| [technical/use_cases.md](technical/use_cases.md) | All 14 domain use cases — purpose, inputs, outputs |
+| [technical/use_cases.md](technical/use_cases.md) | All 19 domain use cases — purpose, inputs, outputs |
 | [technical/data_layer.md](technical/data_layer.md) | Repositories, Firestore schema, SQLite offline queue |
 | [technical/testing.md](technical/testing.md) | Test strategy, coverage areas, how to run tests |
 | [technical/deployment.md](technical/deployment.md) | CI/CD pipeline, Firebase Hosting, App Hosting, release process |
+
+### Production Readiness
+
+| Document | Description |
+|---|---|
+| [production_readiness.md](production_readiness.md) | Production readiness score card, gaps, future roadmap |
 
 ---
 

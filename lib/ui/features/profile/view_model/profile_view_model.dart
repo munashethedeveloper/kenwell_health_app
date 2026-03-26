@@ -4,9 +4,10 @@ import 'package:kenwell_health_app/domain/constants/user_roles.dart';
 import '../../../../domain/models/user_model.dart';
 
 class ProfileViewModel extends ChangeNotifier {
-  ProfileViewModel();
+  ProfileViewModel({AuthRepository? authRepository})
+      : _authRepository = authRepository ?? AuthRepository();
 
-  final AuthRepository _authRepository = AuthRepository();
+  final AuthRepository _authRepository;
 
   // Private user fields
   String _email = '';
