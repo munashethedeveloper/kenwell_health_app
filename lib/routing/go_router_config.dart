@@ -24,15 +24,15 @@ import '../ui/features/event/widgets/event_screen.dart';
 import '../domain/models/wellness_event.dart';
 
 // Reports
-import '../ui/features/hiv_test_results/view_model/hiv_test_result_view_model.dart';
-import '../ui/features/hiv_test_results/widgets/hiv_test_result_screen.dart';
+import '../ui/features/hct_test_results/view_model/hct_test_result_view_model.dart';
+import '../ui/features/hct_test_results/widgets/hct_test_result_screen.dart';
 import '../ui/features/stats_report/view_model/stats_report_view_model.dart';
 import '../ui/features/stats_report/widgets/stats_report_screen.dart';
 import '../ui/features/stats_report/widgets/past_events_screen.dart';
 
-// HIV & TB Tests
-import '../ui/features/hiv_test/view_model/hiv_test_view_model.dart';
-import '../ui/features/hiv_test/widgets/hiv_test_screen.dart';
+// HCT & TB Tests
+import '../ui/features/hct_test/view_model/hct_test_view_model.dart';
+import '../ui/features/hct_test/widgets/hct_test_screen.dart';
 import '../ui/features/tb_test/view_model/tb_testing_view_model.dart';
 import '../ui/features/tb_test/widgets/tb_testing_screen.dart';
 
@@ -304,22 +304,22 @@ class AppRouterConfig {
           builder: (context, state) => const PastEventsScreen(),
         ),
 
-        // HIV Testing Routes
+        // HCT Testing Routes
         GoRoute(
-          path: '/hiv-test',
-          name: 'hivTest',
+          path: '/hct-test',
+          name: 'hctTest',
           builder: (context, state) => ChangeNotifierProvider(
-            create: (_) => HIVTestViewModel(),
-            child: const HIVTestScreen(),
+            create: (_) => HCTTestViewModel(),
+            child: const HCTTestScreen(),
           ),
         ),
         GoRoute(
-          path: '/hiv-result',
-          name: 'hivResults',
+          path: '/hct-result',
+          name: 'hctResults',
           builder: (context, state) {
             return ChangeNotifierProvider(
-              create: (_) => HIVTestResultViewModel(),
-              child: HIVTestResultScreen(
+              create: (_) => HCTTestResultViewModel(),
+              child: HCTTestResultScreen(
                 onPrevious: () {
                   context.pop();
                 },

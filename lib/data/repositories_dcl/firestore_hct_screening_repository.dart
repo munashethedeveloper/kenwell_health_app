@@ -1,52 +1,52 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kenwell_health_app/data/local/screening_local_store.dart';
-import 'package:kenwell_health_app/domain/models/hiv_screening.dart';
+import 'package:kenwell_health_app/domain/models/hct_screening.dart';
 import 'package:kenwell_health_app/data/services/audit_log_service.dart';
 import 'package:kenwell_health_app/data/services/firestore_service.dart';
 import 'package:kenwell_health_app/utils/logger.dart';
 
-/// Repository for managing HIV screening records in Firestore.
+/// Repository for managing HCT screening records in Firestore.
 ///
 /// Every mutating operation writes a corresponding entry to the `audit_logs`
 /// collection via [AuditLogService].
-class FirestoreHivScreeningRepository {
+class FirestoreHctScreeningRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final ScreeningLocalStore _local = ScreeningLocalStore.instance;
   final AuditLogService _audit;
   static const String _collectionName =
-      FirestoreService.hivScreeningsCollection;
+      FirestoreService.hctScreeningsCollection;
 
-  FirestoreHivScreeningRepository({AuditLogService? auditLogService})
+  FirestoreHctScreeningRepository({AuditLogService? auditLogService})
       : _audit = auditLogService ?? AuditLogService();
 
-  Future<void> addHivScreening(HivScreening screening) async {
+  Future<void> addHctScreening(HctScreening screening) async {
     try {
       await _firestore
           .collection(_collectionName)
           .doc(screening.id)
           .set(screening.toMap());
       // Write-through: persist to local SQLite store so data is available offline.
-      unawaited(_local.upsertHivScreening(screening.toMap()));
+      unawaited(_local.upsertHctScreening(screening.toMap()));
       unawaited(_audit.logCreate(
         collection: _collectionName,
         documentId: screening.id,
         data: screening.toMap(),
-        summary: 'HIV screening added for member ${screening.memberId}',
+        summary: 'HCT screening added for member ${screening.memberId}',
       ));
-      AppLogger.info('HIV screening added successfully: ${screening.id}');
+      AppLogger.info('HCT screening added successfully: ${screening.id}');
     } catch (e) {
-      AppLogger.error('Failed to add HIV screening', e);
+      AppLogger.error('Failed to add HCT screening', e);
       rethrow;
     }
   }
 
-  Future<HivScreening?> getHivScreening(String id) async {
+  Future<HctScreening?> getHctScreening(String id) async {
     try {
       final doc = await _firestore.collection(_collectionName).doc(id).get();
       if (!doc.exists) return null;
-      final screening = HivScreening.fromMap(doc.data()!);
-      unawaited(_local.upsertHivScreening(doc.data()!));
+      final screening = HctScreening.fromMap(doc.data()!);
+      unawaited(_local.upsertHctScreening(doc.data()!));
       return screening;
     } catch (e) {
       // Offline fallback 1: Firestore on-device cache.
@@ -55,19 +55,19 @@ class FirestoreHivScreeningRepository {
             .collection(_collectionName)
             .doc(id)
             .get(const GetOptions(source: Source.cache));
-        if (cached.exists) return HivScreening.fromMap(cached.data()!);
+        if (cached.exists) return HctScreening.fromMap(cached.data()!);
       } catch (_) {}
       // Offline fallback 2: local SQLite store.
       try {
-        final row = await _local.getHivScreeningById(id);
-        if (row != null) return HivScreening.fromMap(row);
+        final row = await _local.getHctScreeningById(id);
+        if (row != null) return HctScreening.fromMap(row);
       } catch (_) {}
-      AppLogger.error('Failed to get HIV screening', e);
+      AppLogger.error('Failed to get HCT screening', e);
       rethrow;
     }
   }
 
-  Future<List<HivScreening>> getHivScreeningsByMember(String memberId) async {
+  Future<List<HctScreening>> getHctScreeningsByMember(String memberId) async {
     try {
       final querySnapshot = await _firestore
           .collection(_collectionName)
@@ -75,10 +75,10 @@ class FirestoreHivScreeningRepository {
           .get();
 
       final screenings = querySnapshot.docs
-          .map((doc) => HivScreening.fromMap(doc.data()))
+          .map((doc) => HctScreening.fromMap(doc.data()))
           .toList();
       for (final doc in querySnapshot.docs) {
-        unawaited(_local.upsertHivScreening(doc.data()));
+        unawaited(_local.upsertHctScreening(doc.data()));
       }
       return screenings;
     } catch (e) {
@@ -90,23 +90,23 @@ class FirestoreHivScreeningRepository {
             .get(const GetOptions(source: Source.cache));
         if (cached.docs.isNotEmpty) {
           return cached.docs
-              .map((doc) => HivScreening.fromMap(doc.data()))
+              .map((doc) => HctScreening.fromMap(doc.data()))
               .toList();
         }
       } catch (_) {}
       // Offline fallback 2: local SQLite store.
       try {
-        final rows = await _local.getHivScreeningsByMember(memberId);
+        final rows = await _local.getHctScreeningsByMember(memberId);
         if (rows.isNotEmpty) {
-          return rows.map((r) => HivScreening.fromMap(r)).toList();
+          return rows.map((r) => HctScreening.fromMap(r)).toList();
         }
       } catch (_) {}
-      AppLogger.error('Failed to get HIV screenings by member', e);
+      AppLogger.error('Failed to get HCT screenings by member', e);
       rethrow;
     }
   }
 
-  Future<List<HivScreening>> getHivScreeningsByEvent(String eventId) async {
+  Future<List<HctScreening>> getHctScreeningsByEvent(String eventId) async {
     try {
       final querySnapshot = await _firestore
           .collection(_collectionName)
@@ -115,10 +115,10 @@ class FirestoreHivScreeningRepository {
           .get();
 
       final screenings = querySnapshot.docs
-          .map((doc) => HivScreening.fromMap(doc.data()))
+          .map((doc) => HctScreening.fromMap(doc.data()))
           .toList();
       for (final doc in querySnapshot.docs) {
-        unawaited(_local.upsertHivScreening(doc.data()));
+        unawaited(_local.upsertHctScreening(doc.data()));
       }
       return screenings;
     } catch (e) {
@@ -130,33 +130,33 @@ class FirestoreHivScreeningRepository {
             .get(const GetOptions(source: Source.cache));
         if (cached.docs.isNotEmpty) {
           return cached.docs
-              .map((doc) => HivScreening.fromMap(doc.data()))
+              .map((doc) => HctScreening.fromMap(doc.data()))
               .toList();
         }
       } catch (_) {}
       // Offline fallback 2: local SQLite store.
       try {
-        final rows = await _local.getHivScreeningsByEvent(eventId);
+        final rows = await _local.getHctScreeningsByEvent(eventId);
         if (rows.isNotEmpty) {
-          return rows.map((r) => HivScreening.fromMap(r)).toList();
+          return rows.map((r) => HctScreening.fromMap(r)).toList();
         }
       } catch (_) {}
-      AppLogger.error('Failed to get HIV screenings by event', e);
+      AppLogger.error('Failed to get HCT screenings by event', e);
       rethrow;
     }
   }
 
-  Future<List<HivScreening>> getAllHivScreenings() async {
+  Future<List<HctScreening>> getAllHctScreenings() async {
     try {
       final querySnapshot = await _firestore
           .collection(_collectionName)
           .orderBy('createdAt', descending: true)
           .get();
       final screenings = querySnapshot.docs
-          .map((doc) => HivScreening.fromMap(doc.data()))
+          .map((doc) => HctScreening.fromMap(doc.data()))
           .toList();
       for (final doc in querySnapshot.docs) {
-        unawaited(_local.upsertHivScreening(doc.data()));
+        unawaited(_local.upsertHctScreening(doc.data()));
       }
       return screenings;
     } catch (e) {
@@ -167,31 +167,31 @@ class FirestoreHivScreeningRepository {
             .get(const GetOptions(source: Source.cache));
         if (cached.docs.isNotEmpty) {
           return cached.docs
-              .map((doc) => HivScreening.fromMap(doc.data()))
+              .map((doc) => HctScreening.fromMap(doc.data()))
               .toList();
         }
       } catch (_) {}
       // Offline fallback 2: local SQLite store.
       try {
-        final rows = await _local.getAllHivScreenings();
+        final rows = await _local.getAllHctScreenings();
         if (rows.isNotEmpty) {
-          return rows.map((r) => HivScreening.fromMap(r)).toList();
+          return rows.map((r) => HctScreening.fromMap(r)).toList();
         }
       } catch (_) {}
-      AppLogger.error('Failed to get all HIV screenings', e);
+      AppLogger.error('Failed to get all HCT screenings', e);
       rethrow;
     }
   }
 
-  /// Get HIV screenings for a specific set of events.
+  /// Get HCT screenings for a specific set of events.
   /// Splits the event ID list into chunks of 30 to satisfy the Firestore
   /// `whereIn` limit of 30 elements.
-  Future<List<HivScreening>> getHivScreeningsByEvents(
+  Future<List<HctScreening>> getHctScreeningsByEvents(
       List<String> eventIds) async {
     if (eventIds.isEmpty) return [];
     try {
       const chunkSize = 30;
-      final results = <HivScreening>[];
+      final results = <HctScreening>[];
       for (var i = 0; i < eventIds.length; i += chunkSize) {
         final chunk =
             eventIds.sublist(i, (i + chunkSize).clamp(0, eventIds.length));
@@ -200,9 +200,9 @@ class FirestoreHivScreeningRepository {
             .where('eventId', whereIn: chunk)
             .get();
         results.addAll(
-            querySnapshot.docs.map((doc) => HivScreening.fromMap(doc.data())));
+            querySnapshot.docs.map((doc) => HctScreening.fromMap(doc.data())));
         for (final doc in querySnapshot.docs) {
-          unawaited(_local.upsertHivScreening(doc.data()));
+          unawaited(_local.upsertHctScreening(doc.data()));
         }
       }
       return results;
@@ -210,7 +210,7 @@ class FirestoreHivScreeningRepository {
       // Offline fallback 1: Firestore on-device cache.
       try {
         const chunkSize = 30;
-        final results = <HivScreening>[];
+        final results = <HctScreening>[];
         for (var i = 0; i < eventIds.length; i += chunkSize) {
           final chunk =
               eventIds.sublist(i, (i + chunkSize).clamp(0, eventIds.length));
@@ -219,24 +219,24 @@ class FirestoreHivScreeningRepository {
               .where('eventId', whereIn: chunk)
               .get(const GetOptions(source: Source.cache));
           results.addAll(
-              cached.docs.map((doc) => HivScreening.fromMap(doc.data())));
+              cached.docs.map((doc) => HctScreening.fromMap(doc.data())));
         }
         if (results.isNotEmpty) return results;
       } catch (_) {}
       // Offline fallback 2: local SQLite store.
       try {
-        final rows = await _local.getHivScreeningsByEvents(eventIds);
+        final rows = await _local.getHctScreeningsByEvents(eventIds);
         if (rows.isNotEmpty) {
-          return rows.map((r) => HivScreening.fromMap(r)).toList();
+          return rows.map((r) => HctScreening.fromMap(r)).toList();
         }
       } catch (_) {}
-      AppLogger.error('Failed to get HIV screenings by events', e);
+      AppLogger.error('Failed to get HCT screenings by events', e);
       rethrow;
     }
   }
 
-  /// Real-time stream of HIV screenings for a specific set of events.
-  Stream<List<HivScreening>> watchHivScreeningsByEvents(List<String> eventIds) {
+  /// Real-time stream of HCT screenings for a specific set of events.
+  Stream<List<HctScreening>> watchHctScreeningsByEvents(List<String> eventIds) {
     if (eventIds.isEmpty) return Stream.value([]);
     const chunkSize = 30;
     final chunks = <List<String>>[];
@@ -250,15 +250,15 @@ class FirestoreHivScreeningRepository {
           .where('eventId', whereIn: chunks[0])
           .snapshots()
           .map((s) =>
-              s.docs.map((d) => HivScreening.fromMap(d.data())).toList());
+              s.docs.map((d) => HctScreening.fromMap(d.data())).toList());
     }
     return _mergeChunkStreams(chunks);
   }
 
-  Stream<List<HivScreening>> _mergeChunkStreams(
+  Stream<List<HctScreening>> _mergeChunkStreams(
       List<List<String>> chunks) async* {
-    final latest = List<List<HivScreening>>.filled(chunks.length, []);
-    final controller = StreamController<List<HivScreening>>();
+    final latest = List<List<HctScreening>>.filled(chunks.length, []);
+    final controller = StreamController<List<HctScreening>>();
     var active = chunks.length;
     for (var i = 0; i < chunks.length; i++) {
       final idx = i;
@@ -269,7 +269,7 @@ class FirestoreHivScreeningRepository {
           .listen(
             (s) {
               latest[idx] =
-                  s.docs.map((d) => HivScreening.fromMap(d.data())).toList();
+                  s.docs.map((d) => HctScreening.fromMap(d.data())).toList();
               if (!controller.isClosed) {
                 controller.add(latest.expand((l) => l).toList());
               }

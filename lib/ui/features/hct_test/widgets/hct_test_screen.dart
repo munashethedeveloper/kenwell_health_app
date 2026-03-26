@@ -10,21 +10,21 @@ import '../../../shared/ui/form/kenwell_form_page.dart';
 import '../../../shared/ui/form/kenwell_form_styles.dart';
 import '../../../shared/ui/form/kenwell_yes_no_list.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
-import '../view_model/hiv_test_view_model.dart';
+import '../view_model/hct_test_view_model.dart';
 
-// HIVTestScreen displays the HIV test screening form
-class HIVTestScreen extends StatelessWidget {
+// HCTTestScreen displays the HCT test screening form
+class HCTTestScreen extends StatelessWidget {
   // Constructor
   final VoidCallback? onNext;
   final VoidCallback? onPrevious;
   final PreferredSizeWidget? appBar;
 
-  const HIVTestScreen({super.key, this.onNext, this.onPrevious, this.appBar});
+  const HCTTestScreen({super.key, this.onNext, this.onPrevious, this.appBar});
 
   // Build method
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<HIVTestViewModel>();
+    final viewModel = context.watch<HCTTestViewModel>();
 
     // Build the form page
     return KenwellFormPage(
@@ -39,17 +39,17 @@ class HIVTestScreen extends StatelessWidget {
         const SizedBox(height: 16),
         // HCT Testing History Card
         KenwellFormCard(
-          title: 'HIV Testing History',
+          title: 'HCT Testing History',
           child: Column(
             children: [
               KenwellYesNoQuestion<String>(
-                question: 'Is this your first HIV test?',
-                value: viewModel.firstHIVTest,
-                onChanged: viewModel.setFirstHIVTest,
+                question: 'Is this your first HCT test?',
+                value: viewModel.firstHctTest,
+                onChanged: viewModel.setFirstHctTest,
                 yesValue: 'Yes',
                 noValue: 'No',
               ),
-              if (viewModel.firstHIVTest == 'No') ...[
+              if (viewModel.firstHctTest == 'No') ...[
                 KenwellTextField(
                   label: 'Month of last test',
                   hintText: 'MM',
@@ -151,7 +151,7 @@ class HIVTestScreen extends StatelessWidget {
         // Navigation Buttons
         KenwellFormNavigation(
           onPrevious: onPrevious,
-          onNext: () => viewModel.submitHIVTest(
+          onNext: () => viewModel.submitHctTest(
             onNext: onNext,
             onValidationFailed: (msg) => AppSnackbar.showWarning(context, msg),
             onSuccess: (msg) => AppSnackbar.showSuccess(context, msg),

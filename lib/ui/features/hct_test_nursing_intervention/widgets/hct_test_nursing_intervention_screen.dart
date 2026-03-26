@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../nurse_interventions/widgets/nurse_intervention_form.dart';
-import '../view_model/hiv_test_nursing_intervention_view_model.dart';
+import '../view_model/hct_test_nursing_intervention_view_model.dart';
 import '../../../../domain/models/wellness_event.dart';
 
-class HIVTestNursingInterventionScreen extends StatelessWidget {
+class HCTTestNursingInterventionScreen extends StatelessWidget {
   final VoidCallback onNext;
   final VoidCallback onPrevious;
   final WellnessEvent? event;
 
-  const HIVTestNursingInterventionScreen({
+  const HCTTestNursingInterventionScreen({
     super.key,
     required this.onNext,
     required this.onPrevious,
@@ -18,7 +18,7 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<HIVTestNursingInterventionViewModel>();
+    final viewModel = context.watch<HCTTestNursingInterventionViewModel>();
 
     // Initialise date from event if available
     if (event != null) {
@@ -29,8 +29,8 @@ class HIVTestNursingInterventionScreen extends StatelessWidget {
 
     return NurseInterventionForm(
       viewModel: viewModel,
-      title: 'HIV Test Nurse Intervention Form',
-      sectionTitle: 'Section H: HIV - Nurse Intervention',
+      title: 'HCT Test Nurse Intervention Form',
+      sectionTitle: 'Section H: HCT - Nurse Intervention',
       onNext: onNext,
       onPrevious: onPrevious,
     );

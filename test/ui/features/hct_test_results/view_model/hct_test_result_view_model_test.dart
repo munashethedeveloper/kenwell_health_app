@@ -1,42 +1,42 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:kenwell_health_app/data/services/auth_service.dart';
-import 'package:kenwell_health_app/domain/models/hiv_result.dart';
-import 'package:kenwell_health_app/domain/usecases/submit_hiv_test_result_usecase.dart';
-import 'package:kenwell_health_app/ui/features/hiv_test_results/view_model/hiv_test_result_view_model.dart';
+import 'package:kenwell_health_app/domain/models/hct_result.dart';
+import 'package:kenwell_health_app/domain/usecases/submit_hct_test_result_usecase.dart';
+import 'package:kenwell_health_app/ui/features/hct_test_results/view_model/hct_test_result_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
 
-class MockSubmitHIVTestResultUseCase extends Mock
-    implements SubmitHIVTestResultUseCase {}
+class MockSubmitHCTTestResultUseCase extends Mock
+    implements SubmitHCTTestResultUseCase {}
 
 class MockAuthService extends Mock implements AuthService {}
 
 void main() {
-  late MockSubmitHIVTestResultUseCase mockUseCase;
+  late MockSubmitHCTTestResultUseCase mockUseCase;
   late MockAuthService mockAuthService;
-  late HIVTestResultViewModel viewModel;
+  late HCTTestResultViewModel viewModel;
 
   setUp(() {
-    mockUseCase = MockSubmitHIVTestResultUseCase();
+    mockUseCase = MockSubmitHCTTestResultUseCase();
     mockAuthService = MockAuthService();
     when(() => mockAuthService.getCurrentUser()).thenAnswer((_) async => null);
 
     registerFallbackValue(
-      HivResult(
+      HctResult(
         id: 'hr-1',
         createdAt: DateTime(2025, 1, 1),
       ),
     );
 
-    viewModel = HIVTestResultViewModel(
+    viewModel = HCTTestResultViewModel(
       authService: mockAuthService,
-      submitHIVTestResultUseCase: mockUseCase,
+      submitHctTestResultUseCase: mockUseCase,
     );
   });
 
   tearDown(() => viewModel.dispose());
 
-  group('HIVTestResultViewModel – initial state', () {
+  group('HCTTestResultViewModel – initial state', () {
     test('screeningResult defaults to Negative',
         () => expect(viewModel.screeningResult, 'Negative'));
     test('initial assessment questions are null', () {
@@ -50,7 +50,7 @@ void main() {
     });
   });
 
-  group('HIVTestResultViewModel – setters', () {
+  group('HCTTestResultViewModel – setters', () {
     test('setWindowPeriod updates value', () {
       viewModel.setWindowPeriod('Yes');
       expect(viewModel.windowPeriod, 'Yes');
@@ -77,14 +77,14 @@ void main() {
     });
   });
 
-  group('HIVTestResultViewModel – setMemberAndEventId', () {
+  group('HCTTestResultViewModel – setMemberAndEventId', () {
     test('stores ids without error', () {
       expect(
           () => viewModel.setMemberAndEventId('m-1', 'e-1'), returnsNormally);
     });
   });
 
-  group('HIVTestResultViewModel – options lists', () {
+  group('HCTTestResultViewModel – options lists', () {
     test('windowPeriodOptions is non-empty',
         () => expect(viewModel.windowPeriodOptions, isNotEmpty));
   });

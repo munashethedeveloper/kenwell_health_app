@@ -4,7 +4,7 @@ import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/domain/usecases/load_wellness_completion_status_usecase.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_consent_repository.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_hra_repository.dart';
-import 'package:kenwell_health_app/data/repositories_dcl/firestore_hiv_screening_repository.dart';
+import 'package:kenwell_health_app/data/repositories_dcl/firestore_hct_screening_repository.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_tb_screening_repository.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_cancer_screening_repository.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_survey_repository.dart';
@@ -17,7 +17,7 @@ class MockConsentRepo extends Mock implements FirestoreConsentRepository {}
 
 class MockHraRepo extends Mock implements FirestoreHraRepository {}
 
-class MockHivRepo extends Mock implements FirestoreHivScreeningRepository {}
+class MockHctRepo extends Mock implements FirestoreHctScreeningRepository {}
 
 class MockTbRepo extends Mock implements FirestoreTbScreeningRepository {}
 
@@ -61,7 +61,7 @@ WellnessFlowViewModel _buildVM({
     activeEvent: _buildEvent(),
     consentRepository: MockConsentRepo(),
     hraRepository: MockHraRepo(),
-    hivRepository: MockHivRepo(),
+    hctRepository: MockHctRepo(),
     tbRepository: MockTbRepo(),
     cancerRepository: MockCancerRepo(),
     surveyRepository: MockSurveyRepo(),

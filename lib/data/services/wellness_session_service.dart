@@ -4,7 +4,7 @@ import 'firestore_service.dart';
 
 /// Service for managing wellness session data in Firestore
 /// A wellness session tracks a participant's journey through the wellness flow:
-/// Consent -> Member Registration -> Screenings (HIV/TB/HRA) -> Survey
+/// Consent -> Member Registration -> Screenings (HCT/TB/HRA) -> Survey
 class WellnessSessionService {
   final FirestoreService _firestore;
   final FirebaseFirestore _firestoreInstance;
@@ -165,53 +165,53 @@ class WellnessSessionService {
     }
   }
 
-  /// Save HIV test data
-  Future<void> saveHIVTest({
+  /// Save HCT test data
+  Future<void> saveHCTTest({
     required String sessionId,
-    required Map<String, dynamic> hivTestData,
+    required Map<String, dynamic> hctTestData,
   }) async {
     try {
       await _firestoreInstance
           .collection(sessionsCollection)
           .doc(sessionId)
           .update({
-        'hivTest': {
-          ...hivTestData,
+        'hctTest': {
+          ...hctTestData,
           'timestamp': FieldValue.serverTimestamp(),
         },
         'updatedAt': FieldValue.serverTimestamp(),
-        'completedSteps': FieldValue.arrayUnion(['hiv_test']),
+        'completedSteps': FieldValue.arrayUnion(['hct_test']),
       });
 
-      debugPrint('Saved HIV test for session: $sessionId');
+      debugPrint('Saved HCT test for session: $sessionId');
     } catch (e, stackTrace) {
-      debugPrint('Error saving HIV test: $e');
+      debugPrint('Error saving HCT test: $e');
       debugPrintStack(stackTrace: stackTrace);
       rethrow;
     }
   }
 
-  /// Save HIV test results
-  Future<void> saveHIVResults({
+  /// Save HCT test results
+  Future<void> saveHCTResults({
     required String sessionId,
-    required Map<String, dynamic> hivResultsData,
+    required Map<String, dynamic> hctResultsData,
   }) async {
     try {
       await _firestoreInstance
           .collection(sessionsCollection)
           .doc(sessionId)
           .update({
-        'hivResults': {
-          ...hivResultsData,
+        'hctResults': {
+          ...hctResultsData,
           'timestamp': FieldValue.serverTimestamp(),
         },
         'updatedAt': FieldValue.serverTimestamp(),
-        'completedSteps': FieldValue.arrayUnion(['hiv_results']),
+        'completedSteps': FieldValue.arrayUnion(['hct_results']),
       });
 
-      debugPrint('Saved HIV results for session: $sessionId');
+      debugPrint('Saved HCT results for session: $sessionId');
     } catch (e, stackTrace) {
-      debugPrint('Error saving HIV results: $e');
+      debugPrint('Error saving HCT results: $e');
       debugPrintStack(stackTrace: stackTrace);
       rethrow;
     }
@@ -415,8 +415,8 @@ class WellnessSessionService {
           sessions.where((s) => s['status'] == 'in_progress').length;
 
       // Count screenings
-      int hivTests = sessions
-          .where((s) => s['hivTest'] != null || s['hivResults'] != null)
+      int hctTests = sessions
+          .where((s) => s['hctTest'] != null || s['hctResults'] != null)
           .length;
       int tbTests = sessions.where((s) => s['tbTest'] != null).length;
       int riskAssessments =
@@ -427,7 +427,7 @@ class WellnessSessionService {
         'totalSessions': totalSessions,
         'completedSessions': completedSessions,
         'inProgressSessions': inProgressSessions,
-        'hivTests': hivTests,
+        'hctTests': hctTests,
         'tbTests': tbTests,
         'riskAssessments': riskAssessments,
         'surveysCompleted': surveysCompleted,

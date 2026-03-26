@@ -12,8 +12,8 @@ class FirestoreService {
   static const String membersCollection = 'members';
   static const String consentsCollection = 'consents';
   static const String hraScreeningsCollection = 'hra_screenings';
-  static const String hivScreeningsCollection = 'hiv_screenings';
-  static const String hivResultsCollection = 'hiv_results';
+  static const String hctScreeningsCollection = 'hct_screenings';
+  static const String hctResultsCollection = 'hct_results';
   static const String tbScreeningsCollection = 'tb_screenings';
   static const String cancerScreeningsCollection = 'cancer_screenings';
   static const String auditLogsCollection = 'audit_logs';

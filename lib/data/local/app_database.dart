@@ -98,7 +98,7 @@ class AppDatabase extends _$AppDatabase {
   static final AppDatabase instance = AppDatabase._internal();
 
   @override
-  int get schemaVersion => 16;
+  int get schemaVersion => 17;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -108,8 +108,8 @@ class AppDatabase extends _$AppDatabase {
           const tables = [
             'cached_consents',
             'cached_member_events',
-            'cached_hiv_screenings',
-            'cached_hiv_results',
+            'cached_hct_screenings',
+            'cached_hct_results',
             'cached_hra_screenings',
             'cached_tb_screenings',
             'cached_cancer_screenings',
@@ -300,8 +300,8 @@ class AppDatabase extends _$AppDatabase {
             const tables = [
               'cached_consents',
               'cached_member_events',
-              'cached_hiv_screenings',
-              'cached_hiv_results',
+              'cached_hct_screenings',
+              'cached_hct_results',
               'cached_hra_screenings',
               'cached_tb_screenings',
               'cached_cancer_screenings',
@@ -343,6 +343,21 @@ class AppDatabase extends _$AppDatabase {
               debugPrint('Migration v15->v16: created pending_writes table');
             } catch (e) {
               debugPrint('Migration v15->v16 [pending_writes]: $e');
+            }
+          }
+          if (from < 17) {
+            // Rename HIV cache tables to HCT to match the service rename.
+            for (final pair in const [
+              ('cached_hiv_screenings', 'cached_hct_screenings'),
+              ('cached_hiv_results', 'cached_hct_results'),
+            ]) {
+              try {
+                await customStatement(
+                    'ALTER TABLE ${pair.$1} RENAME TO ${pair.$2};');
+                debugPrint('Migration v16->v17: renamed ${pair.$1} to ${pair.$2}');
+              } catch (e) {
+                debugPrint('Migration v16->v17 [${pair.$1}]: $e');
+              }
             }
           }
         },

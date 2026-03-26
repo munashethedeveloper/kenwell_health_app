@@ -14,8 +14,8 @@ import 'app_database.dart';
 /// Seven tables are created by [AppDatabase.migration] (schema version 15):
 ///   - `cached_consents`
 ///   - `cached_member_events`
-///   - `cached_hiv_screenings`
-///   - `cached_hiv_results`
+///   - `cached_hct_screenings`
+///   - `cached_hct_results`
 ///   - `cached_hra_screenings`
 ///   - `cached_tb_screenings`
 ///   - `cached_cancer_screenings`
@@ -197,49 +197,49 @@ class ScreeningLocalStore {
   Future<List<Map<String, dynamic>>> getMemberEventsByEvent(String eventId) =>
       _getByEvent('cached_member_events', eventId);
 
-  // ── HIV Screenings ─────────────────────────────────────────────────────────
+  // ── HCT Screenings ─────────────────────────────────────────────────────────
 
-  Future<void> upsertHivScreening(Map<String, dynamic> data) => _upsert(
-      'cached_hiv_screenings',
+  Future<void> upsertHctScreening(Map<String, dynamic> data) => _upsert(
+      'cached_hct_screenings',
       data['id'] as String? ?? '',
       data['memberId'] as String? ?? '',
       data['eventId'] as String? ?? '',
       data);
 
-  Future<Map<String, dynamic>?> getHivScreeningById(String id) =>
-      _getById('cached_hiv_screenings', id);
+  Future<Map<String, dynamic>?> getHctScreeningById(String id) =>
+      _getById('cached_hct_screenings', id);
 
-  Future<List<Map<String, dynamic>>> getHivScreeningsByMember(
+  Future<List<Map<String, dynamic>>> getHctScreeningsByMember(
           String memberId) =>
-      _getByMember('cached_hiv_screenings', memberId);
+      _getByMember('cached_hct_screenings', memberId);
 
-  Future<List<Map<String, dynamic>>> getHivScreeningsByEvent(String eventId) =>
-      _getByEvent('cached_hiv_screenings', eventId);
+  Future<List<Map<String, dynamic>>> getHctScreeningsByEvent(String eventId) =>
+      _getByEvent('cached_hct_screenings', eventId);
 
-  Future<List<Map<String, dynamic>>> getHivScreeningsByEvents(
+  Future<List<Map<String, dynamic>>> getHctScreeningsByEvents(
           List<String> eventIds) =>
-      _getByEvents('cached_hiv_screenings', eventIds);
+      _getByEvents('cached_hct_screenings', eventIds);
 
-  Future<List<Map<String, dynamic>>> getAllHivScreenings() =>
-      _getAll('cached_hiv_screenings');
+  Future<List<Map<String, dynamic>>> getAllHctScreenings() =>
+      _getAll('cached_hct_screenings');
 
-  // ── HIV Results ────────────────────────────────────────────────────────────
+  // ── HCT Results ────────────────────────────────────────────────────────────
 
-  Future<void> upsertHivResult(Map<String, dynamic> data) => _upsert(
-      'cached_hiv_results',
+  Future<void> upsertHctResult(Map<String, dynamic> data) => _upsert(
+      'cached_hct_results',
       data['id'] as String? ?? '',
       data['memberId'] as String? ?? '',
       data['eventId'] as String? ?? '',
       data);
 
-  Future<Map<String, dynamic>?> getHivResultById(String id) =>
-      _getById('cached_hiv_results', id);
+  Future<Map<String, dynamic>?> getHctResultById(String id) =>
+      _getById('cached_hct_results', id);
 
-  Future<List<Map<String, dynamic>>> getHivResultsByMember(String memberId) =>
-      _getByMember('cached_hiv_results', memberId);
+  Future<List<Map<String, dynamic>>> getHctResultsByMember(String memberId) =>
+      _getByMember('cached_hct_results', memberId);
 
-  Future<List<Map<String, dynamic>>> getHivResultsByEvent(String eventId) =>
-      _getByEvent('cached_hiv_results', eventId);
+  Future<List<Map<String, dynamic>>> getHctResultsByEvent(String eventId) =>
+      _getByEvent('cached_hct_results', eventId);
 
   // ── HRA Screenings ─────────────────────────────────────────────────────────
 

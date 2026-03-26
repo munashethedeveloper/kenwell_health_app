@@ -87,11 +87,11 @@ class NurseInterventionForm extends StatelessWidget {
             validator: _requireSelection('Window period risk assessment'),
           ),
           KenwellDropdownField<String>(
-            label: 'Did patient expect HIV (+) result?',
+            label: 'Did patient expect HCT (+) result?',
             value: viewModel.expectedResult,
             items: viewModel.expectedResultOptions,
             onChanged: viewModel.setExpectedResult,
-            validator: _requireSelection('Did patient expect HIV (+) result?'),
+            validator: _requireSelection('Did patient expect HCT (+) result?'),
           ),
           KenwellDropdownField<String>(
             label: 'Difficulty in dealing with result?',

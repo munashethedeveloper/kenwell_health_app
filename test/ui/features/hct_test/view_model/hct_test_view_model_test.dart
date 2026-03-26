@@ -1,24 +1,24 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:kenwell_health_app/domain/models/hiv_screening.dart';
-import 'package:kenwell_health_app/domain/usecases/submit_hiv_screening_usecase.dart';
-import 'package:kenwell_health_app/ui/features/hiv_test/view_model/hiv_test_view_model.dart';
+import 'package:kenwell_health_app/domain/models/hct_screening.dart';
+import 'package:kenwell_health_app/domain/usecases/submit_hct_screening_usecase.dart';
+import 'package:kenwell_health_app/ui/features/hct_test/view_model/hct_test_view_model.dart';
 
 // ── Mock ──────────────────────────────────────────────────────────────────────
 
-class MockSubmitHIVScreeningUseCase extends Mock
-    implements SubmitHIVScreeningUseCase {}
+class MockSubmitHCTScreeningUseCase extends Mock
+    implements SubmitHCTScreeningUseCase {}
 
 void main() {
-  late MockSubmitHIVScreeningUseCase mockUseCase;
-  late HIVTestViewModel viewModel;
+  late MockSubmitHCTScreeningUseCase mockUseCase;
+  late HCTTestViewModel viewModel;
 
   setUp(() {
-    mockUseCase = MockSubmitHIVScreeningUseCase();
-    viewModel = HIVTestViewModel(submitHIVScreeningUseCase: mockUseCase);
+    mockUseCase = MockSubmitHCTScreeningUseCase();
+    viewModel = HCTTestViewModel(submitHctScreeningUseCase: mockUseCase);
 
     registerFallbackValue(
-      HivScreening(
+      HctScreening(
         id: 'h-1',
         memberId: 'm-1',
         eventId: 'e-1',
@@ -30,30 +30,30 @@ void main() {
 
   tearDown(() => viewModel.dispose());
 
-  group('HIVTestViewModel – form state', () {
+  group('HCTTestViewModel – form state', () {
     test('initial state has all fields null', () {
-      expect(viewModel.firstHIVTest, isNull);
+      expect(viewModel.firstHctTest, isNull);
       expect(viewModel.sharedNeedles, isNull);
       expect(viewModel.unprotectedSex, isNull);
       expect(viewModel.isSubmitting, isFalse);
     });
 
-    test('setFirstHIVTest updates state and notifies', () {
+    test('setFirstHctTest updates state and notifies', () {
       var notified = false;
       viewModel.addListener(() => notified = true);
 
-      viewModel.setFirstHIVTest('Yes');
+      viewModel.setFirstHctTest('Yes');
 
-      expect(viewModel.firstHIVTest, 'Yes');
+      expect(viewModel.firstHctTest, 'Yes');
       expect(notified, isTrue);
     });
 
-    test('setFirstHIVTest with same value does NOT notify', () {
-      viewModel.setFirstHIVTest('No');
+    test('setFirstHctTest with same value does NOT notify', () {
+      viewModel.setFirstHctTest('No');
       var notified = false;
       viewModel.addListener(() => notified = true);
 
-      viewModel.setFirstHIVTest('No');
+      viewModel.setFirstHctTest('No');
 
       expect(notified, isFalse);
     });
@@ -73,12 +73,12 @@ void main() {
     });
   });
 
-  group('HIVTestViewModel – submitHIVTest', () {
+  group('HCTTestViewModel – submitHctTest', () {
     test('calls onError when memberId or eventId is not set', () async {
       String? errorMsg;
       // Do not call setMemberAndEventId — IDs remain null.
 
-      await viewModel.submitHIVTest(onError: (msg) => errorMsg = msg);
+      await viewModel.submitHctTest(onError: (msg) => errorMsg = msg);
 
       expect(errorMsg, isNotNull);
       verifyNever(() => mockUseCase(any()));
@@ -91,7 +91,7 @@ void main() {
 
       // Form key has no state yet (no BuildContext), so validate() returns null
       // which the ViewModel treats as invalid.
-      await viewModel.submitHIVTest(
+      await viewModel.submitHctTest(
         onValidationFailed: (msg) => validationMsg = msg,
       );
 
@@ -109,7 +109,7 @@ void main() {
       // Bypass form validation by testing the save path directly via the use
       // case mock.  Form validation is widget-level; we test the save
       // independently.
-      viewModel.setFirstHIVTest('Yes');
+      viewModel.setFirstHctTest('Yes');
       viewModel.setSharedNeedles('No');
       viewModel.setUnprotectedSex('No');
       viewModel.setTreatedSTI('No');
@@ -117,7 +117,7 @@ void main() {
       viewModel.setKnowPartnerStatus('No');
 
       await mockUseCase(
-        HivScreening(
+        HctScreening(
           id: 'h-1',
           memberId: 'm-1',
           eventId: 'e-1',
@@ -125,7 +125,7 @@ void main() {
           updatedAt: DateTime.now(),
         ),
       );
-      successMsg = 'HIV screening saved successfully';
+      successMsg = 'HCT screening saved successfully';
       nextCalled = true;
 
       expect(successMsg, isNotNull);
@@ -134,18 +134,18 @@ void main() {
     });
   });
 
-  group('HIVTestViewModel – toMap', () {
+  group('HCTTestViewModel – toMap', () {
     test('returns map with all expected keys', () {
-      viewModel.setFirstHIVTest('No');
+      viewModel.setFirstHctTest('No');
       viewModel.setSharedNeedles('Yes');
       viewModel.lastTestYearController.text = '2020';
 
       final map = viewModel.toMap();
 
-      expect(map.containsKey('firstHIVTest'), isTrue);
+      expect(map.containsKey('firstHctTest'), isTrue);
       expect(map.containsKey('sharedNeedles'), isTrue);
       expect(map.containsKey('lastTestYear'), isTrue);
-      expect(map['firstHIVTest'], 'No');
+      expect(map['firstHctTest'], 'No');
       expect(map['sharedNeedles'], 'Yes');
       expect(map['lastTestYear'], '2020');
     });

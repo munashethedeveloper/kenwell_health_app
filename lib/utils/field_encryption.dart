@@ -9,7 +9,7 @@ import 'package:flutter/foundation.dart';
 ///
 /// ### Encrypted fields
 /// - `Member`: `idNumber`, `passportNumber`, `dateOfBirth`, `medicalAidNumber`
-/// - `HivResult`: `screeningResult`, `expectedResult`
+/// - `HctResult`: `screeningResult`, `expectedResult`
 ///
 /// ### Key management
 /// The 32-byte (256-bit) encryption key is supplied at build time via the
