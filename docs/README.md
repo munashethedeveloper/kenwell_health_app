@@ -24,6 +24,12 @@ This directory contains the full technical and business documentation for the **
 | [technical/testing.md](technical/testing.md) | Test strategy, coverage areas, how to run tests |
 | [technical/deployment.md](technical/deployment.md) | CI/CD pipeline, Firebase Hosting, App Hosting, release process |
 
+### Developer Runbook
+
+| Document | Description |
+|---|---|
+| [DEVELOPER_RUNBOOK.md](DEVELOPER_RUNBOOK.md) | **Start here** — VS Code setup, running on Android & Web, Firebase Emulator, Performance, Crashlytics, database reset, build modes, deployment |
+
 ### Production Readiness
 
 | Document | Description |
