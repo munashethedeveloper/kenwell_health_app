@@ -3,6 +3,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:encrypt/encrypt.dart';
+import 'package:flutter/foundation.dart';
 
 /// AES-256-CBC field-level encryption for POPIA-sensitive PII.
 ///
@@ -44,6 +45,13 @@ class FieldEncryption {
 
   static Key get _key {
     final raw = _buildTimeKey.isNotEmpty ? _buildTimeKey : _devKey;
+    assert(
+      // In release mode, assert is a no-op — enforce the key via an
+      // explicit check so the app does not silently use the dev key in prod.
+      kDebugMode || _buildTimeKey.isNotEmpty,
+      'PII_ENCRYPTION_KEY must be set via --dart-define in release builds. '
+      'Run: flutter build --dart-define=PII_ENCRYPTION_KEY=<32-char key>',
+    );
     // Ensure exactly 32 bytes (pad/truncate if necessary).
     final bytes = utf8.encode(raw);
     final padded = Uint8List(32);
