@@ -141,9 +141,9 @@ class TBNursingInterventionViewModel extends ChangeNotifier {
       'committedToChange': committedToChange,
       'nursingReferralSelection': nursingReferralSelection?.name,
       'notReferredReason': notReferredReasonController.text,
-      'hivTestingNurseFirstName': nurseFirstNameController.text,
-      'hivTestingNurseLastName': nurseLastNameController.text,
-      'hivTestingNurse':
+      'hctTestingNurseFirstName': nurseFirstNameController.text,
+      'hctTestingNurseLastName': nurseLastNameController.text,
+      'hctTestingNurse':
           '${nurseFirstNameController.text} ${nurseLastNameController.text}'
               .trim(),
       'rank': rankController.text,

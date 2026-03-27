@@ -60,8 +60,8 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           if (!mounted) return;
           final profileVM = context.read<ProfileViewModel>();
-          await profileVM.loadProfile();
           final authVM = context.read<AuthViewModel>();
+          await profileVM.loadProfile();
           await authVM.checkLoginStatus();
           viewModel.clearNavigationTarget();
           if (mounted) context.go('/');

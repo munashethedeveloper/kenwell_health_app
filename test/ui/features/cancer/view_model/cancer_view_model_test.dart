@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kenwell_health_app/domain/usecases/submit-cancer_screening_usecase.dart';
+import 'package:kenwell_health_app/domain/usecases/submit_cancer_screening_usecase.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:kenwell_health_app/data/services/auth_service.dart';
 import 'package:kenwell_health_app/domain/models/cander_screening.dart';

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:kenwell_health_app/data/local/app_database.dart';
 import 'package:kenwell_health_app/domain/models/member.dart';
 import 'package:kenwell_health_app/domain/constants/enums.dart';
 import 'package:kenwell_health_app/domain/constants/nationalities.dart';

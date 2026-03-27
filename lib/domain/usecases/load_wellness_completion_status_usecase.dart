@@ -1,7 +1,7 @@
 import 'package:kenwell_health_app/utils/logger.dart';
 import '../../data/repositories_dcl/firestore_cancer_screening_repository.dart';
 import '../../data/repositories_dcl/firestore_consent_repository.dart';
-import '../../data/repositories_dcl/firestore_hiv_screening_repository.dart';
+import '../../data/repositories_dcl/firestore_hct_screening_repository.dart';
 import '../../data/repositories_dcl/firestore_hra_repository.dart';
 import '../../data/repositories_dcl/firestore_survey_repository.dart';
 import '../../data/repositories_dcl/firestore_tb_screening_repository.dart';
@@ -54,20 +54,20 @@ class LoadWellnessCompletionStatusUseCase {
   LoadWellnessCompletionStatusUseCase({
     FirestoreConsentRepository? consentRepository,
     FirestoreHraRepository? hraRepository,
-    FirestoreHivScreeningRepository? hivRepository,
+    FirestoreHctScreeningRepository? hctRepository,
     FirestoreTbScreeningRepository? tbRepository,
     FirestoreCancerScreeningRepository? cancerRepository,
     FirestoreSurveyRepository? surveyRepository,
   })  : _consentRepo = consentRepository ?? FirestoreConsentRepository(),
         _hraRepo = hraRepository ?? FirestoreHraRepository(),
-        _hivRepo = hivRepository ?? FirestoreHivScreeningRepository(),
+        _hctRepo = hctRepository ?? FirestoreHctScreeningRepository(),
         _tbRepo = tbRepository ?? FirestoreTbScreeningRepository(),
         _cancerRepo = cancerRepository ?? FirestoreCancerScreeningRepository(),
         _surveyRepo = surveyRepository ?? const FirestoreSurveyRepository();
 
   final FirestoreConsentRepository _consentRepo;
   final FirestoreHraRepository _hraRepo;
-  final FirestoreHivScreeningRepository _hivRepo;
+  final FirestoreHctScreeningRepository _hctRepo;
   final FirestoreTbScreeningRepository _tbRepo;
   final FirestoreCancerScreeningRepository _cancerRepo;
   final FirestoreSurveyRepository _surveyRepo;
@@ -122,8 +122,8 @@ class LoadWellnessCompletionStatusUseCase {
           .getHraScreeningsByMember(memberId)
           .then((list) => list.any((h) => h.eventId == eventId))
           .catchError((Object _) => false),
-      _hivRepo
-          .getHivScreeningsByMember(memberId)
+      _hctRepo
+          .getHctScreeningsByMember(memberId)
           .then((list) => list.any((h) => h.eventId == eventId))
           .catchError((Object _) => false),
       _tbRepo

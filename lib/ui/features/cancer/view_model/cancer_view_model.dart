@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kenwell_health_app/data/services/auth_service.dart';
-import 'package:kenwell_health_app/domain/usecases/submit-cancer_screening_usecase.dart';
+import 'package:kenwell_health_app/domain/usecases/submit_cancer_screening_usecase.dart';
 import 'package:kenwell_health_app/domain/models/cander_screening.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
@@ -384,8 +384,9 @@ class CancerScreeningViewModel extends ChangeNotifier {
       String? signatureBase64;
       if (signatureController.isNotEmpty) {
         final signatureBytes = await signatureController.toPngBytes();
-        if (signatureBytes != null)
+        if (signatureBytes != null) {
           signatureBase64 = base64Encode(signatureBytes);
+        }
       }
       signatureBase64 ??= prefilledHpSignatureBase64;
 

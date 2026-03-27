@@ -461,7 +461,7 @@ class _EventStatsDetailScreenState extends State<EventStatsDetailScreen> {
     );
   }
 
-  Color _getStatusColor(String status) {
+  /* Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'completed':
       case 'finished':
@@ -478,5 +478,5 @@ class _EventStatsDetailScreenState extends State<EventStatsDetailScreen> {
       default:
         return Colors.grey;
     }
-  }
+  } */
 }

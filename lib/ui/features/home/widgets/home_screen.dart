@@ -47,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context, profileVM, calendarVM, _) {
         final firstName = profileVM.firstName;
         final lastName = profileVM.lastName;
-        final role = profileVM.role ?? '';
+        final role = profileVM.role;
         final initials = _initials(firstName, lastName);
 
         return Scaffold(

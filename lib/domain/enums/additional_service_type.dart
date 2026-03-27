@@ -43,13 +43,13 @@ extension AdditionalServiceTypeExtension on AdditionalServiceType {
 
 /// Helper to convert between enum sets and comma-separated strings
 class AdditionalServiceTypeConverter {
-  /// Convert Set<AdditionalServiceType> to comma-separated string
+  /// Convert `Set<AdditionalServiceType>` to comma-separated string
   static String toStorageString(Set<AdditionalServiceType> services) {
     if (services.isEmpty) return '';
     return services.map((s) => s.displayName).join(', ');
   }
 
-  /// Convert comma-separated string to Set<AdditionalServiceType>
+  // Convert comma-separated string to Set<AdditionalServiceType>
   static Set<AdditionalServiceType> fromStorageString(String value) {
     if (value.isEmpty) return {};
 

@@ -2,13 +2,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_cancer_screening_repository.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_consent_repository.dart';
-import 'package:kenwell_health_app/data/repositories_dcl/firestore_hiv_screening_repository.dart';
+import 'package:kenwell_health_app/data/repositories_dcl/firestore_hct_screening_repository.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_hra_repository.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_survey_repository.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_tb_screening_repository.dart';
 import 'package:kenwell_health_app/domain/models/cander_screening.dart';
 import 'package:kenwell_health_app/domain/models/consent.dart';
-import 'package:kenwell_health_app/domain/models/hiv_screening.dart';
+import 'package:kenwell_health_app/domain/models/hct_screening.dart';
 import 'package:kenwell_health_app/domain/models/hra_screening.dart';
 import 'package:kenwell_health_app/domain/models/tb_screening.dart';
 import 'package:kenwell_health_app/domain/usecases/load_wellness_completion_status_usecase.dart';
@@ -19,7 +19,7 @@ class MockConsentRepo extends Mock implements FirestoreConsentRepository {}
 
 class MockHraRepo extends Mock implements FirestoreHraRepository {}
 
-class MockHivRepo extends Mock implements FirestoreHivScreeningRepository {}
+class MockHctRepo extends Mock implements FirestoreHctScreeningRepository {}
 
 class MockTbRepo extends Mock implements FirestoreTbScreeningRepository {}
 
@@ -60,9 +60,10 @@ HraScreening _buildHraScreening({String? eventId = _eventId}) => HraScreening(
       memberId: _memberId,
       eventId: eventId,
       chronicConditions: const {},
+      createdAt: DateTime(2025, 6, 1),
     );
 
-HivScreening _buildHivScreening({String? eventId = _eventId}) => HivScreening(
+HctScreening _buildHctScreening({String? eventId = _eventId}) => HctScreening(
       id: 'hiv-1',
       memberId: _memberId,
       eventId: eventId,
@@ -79,6 +80,8 @@ TbScreening _buildTbScreening({String eventId = _eventId}) => TbScreening(
       rank: 'RN',
       sancNumber: '12345',
       nurseDate: '2025-06-01',
+      createdAt: DateTime(2025, 6, 1),
+      updatedAt: DateTime(2025, 6, 1),
     );
 
 CancerScreening _buildCancerScreening({String eventId = _eventId}) =>
@@ -86,12 +89,14 @@ CancerScreening _buildCancerScreening({String eventId = _eventId}) =>
       id: 'cancer-1',
       memberId: _memberId,
       eventId: eventId,
+      createdAt: DateTime(2025, 6, 1),
+      updatedAt: DateTime(2025, 6, 1),
     );
 
 LoadWellnessCompletionStatusUseCase _buildUseCase({
   required MockConsentRepo consent,
   required MockHraRepo hra,
-  required MockHivRepo hiv,
+  required MockHctRepo hct,
   required MockTbRepo tb,
   required MockCancerRepo cancer,
   required MockSurveyRepo survey,
@@ -99,7 +104,7 @@ LoadWellnessCompletionStatusUseCase _buildUseCase({
     LoadWellnessCompletionStatusUseCase(
       consentRepository: consent,
       hraRepository: hra,
-      hivRepository: hiv,
+      hctRepository: hct,
       tbRepository: tb,
       cancerRepository: cancer,
       surveyRepository: survey,
@@ -108,7 +113,7 @@ LoadWellnessCompletionStatusUseCase _buildUseCase({
 void main() {
   late MockConsentRepo mockConsent;
   late MockHraRepo mockHra;
-  late MockHivRepo mockHiv;
+  late MockHctRepo mockHct;
   late MockTbRepo mockTb;
   late MockCancerRepo mockCancer;
   late MockSurveyRepo mockSurvey;
@@ -116,7 +121,7 @@ void main() {
   setUp(() {
     mockConsent = MockConsentRepo();
     mockHra = MockHraRepo();
-    mockHiv = MockHivRepo();
+    mockHct = MockHctRepo();
     mockTb = MockTbRepo();
     mockCancer = MockCancerRepo();
     mockSurvey = MockSurveyRepo();
@@ -128,7 +133,7 @@ void main() {
           .thenAnswer((_) async => []);
       when(() => mockHra.getHraScreeningsByMember(any()))
           .thenAnswer((_) async => []);
-      when(() => mockHiv.getHivScreeningsByMember(any()))
+      when(() => mockHct.getHctScreeningsByMember(any()))
           .thenAnswer((_) async => []);
       when(() => mockTb.getTbScreeningsByMember(any()))
           .thenAnswer((_) async => []);
@@ -142,7 +147,7 @@ void main() {
       final uc = _buildUseCase(
         consent: mockConsent,
         hra: mockHra,
-        hiv: mockHiv,
+        hct: mockHct,
         tb: mockTb,
         cancer: mockCancer,
         survey: mockSurvey,
@@ -170,7 +175,7 @@ void main() {
           .thenAnswer((_) async => [consent]);
       when(() => mockHra.getHraScreeningsByMember(any()))
           .thenAnswer((_) async => []);
-      when(() => mockHiv.getHivScreeningsByMember(any()))
+      when(() => mockHct.getHctScreeningsByMember(any()))
           .thenAnswer((_) async => []);
       when(() => mockTb.getTbScreeningsByMember(any()))
           .thenAnswer((_) async => []);
@@ -184,7 +189,7 @@ void main() {
       final uc = _buildUseCase(
         consent: mockConsent,
         hra: mockHra,
-        hiv: mockHiv,
+        hct: mockHct,
         tb: mockTb,
         cancer: mockCancer,
         survey: mockSurvey,
@@ -205,7 +210,7 @@ void main() {
           .thenAnswer((_) async => [otherConsent]);
       when(() => mockHra.getHraScreeningsByMember(any()))
           .thenAnswer((_) async => []);
-      when(() => mockHiv.getHivScreeningsByMember(any()))
+      when(() => mockHct.getHctScreeningsByMember(any()))
           .thenAnswer((_) async => []);
       when(() => mockTb.getTbScreeningsByMember(any()))
           .thenAnswer((_) async => []);
@@ -219,7 +224,7 @@ void main() {
       final uc = _buildUseCase(
         consent: mockConsent,
         hra: mockHra,
-        hiv: mockHiv,
+        hct: mockHct,
         tb: mockTb,
         cancer: mockCancer,
         survey: mockSurvey,
@@ -237,8 +242,8 @@ void main() {
           [_buildConsent(hra: true, hct: true, tb: true, cancer: true)]);
       when(() => mockHra.getHraScreeningsByMember(any()))
           .thenAnswer((_) async => [_buildHraScreening()]);
-      when(() => mockHiv.getHivScreeningsByMember(any()))
-          .thenAnswer((_) async => [_buildHivScreening()]);
+      when(() => mockHct.getHctScreeningsByMember(any()))
+          .thenAnswer((_) async => [_buildHctScreening()]);
       when(() => mockTb.getTbScreeningsByMember(any()))
           .thenAnswer((_) async => [_buildTbScreening()]);
       when(() => mockCancer.getCancerScreeningsByMember(any()))
@@ -251,7 +256,7 @@ void main() {
       final uc = _buildUseCase(
         consent: mockConsent,
         hra: mockHra,
-        hiv: mockHiv,
+        hct: mockHct,
         tb: mockTb,
         cancer: mockCancer,
         survey: mockSurvey,
@@ -271,7 +276,7 @@ void main() {
       // HRA record exists but for a DIFFERENT event.
       when(() => mockHra.getHraScreeningsByMember(any())).thenAnswer(
           (_) async => [_buildHraScreening(eventId: _otherEventId)]);
-      when(() => mockHiv.getHivScreeningsByMember(any()))
+      when(() => mockHct.getHctScreeningsByMember(any()))
           .thenAnswer((_) async => []);
       when(() => mockTb.getTbScreeningsByMember(any()))
           .thenAnswer((_) async => []);
@@ -285,7 +290,7 @@ void main() {
       final uc = _buildUseCase(
         consent: mockConsent,
         hra: mockHra,
-        hiv: mockHiv,
+        hct: mockHct,
         tb: mockTb,
         cancer: mockCancer,
         survey: mockSurvey,
@@ -305,7 +310,7 @@ void main() {
       // HRA throws — should default to false.
       when(() => mockHra.getHraScreeningsByMember(any()))
           .thenThrow(Exception('Firestore unavailable'));
-      when(() => mockHiv.getHivScreeningsByMember(any()))
+      when(() => mockHct.getHctScreeningsByMember(any()))
           .thenAnswer((_) async => []);
       when(() => mockTb.getTbScreeningsByMember(any()))
           .thenAnswer((_) async => []);
@@ -319,7 +324,7 @@ void main() {
       final uc = _buildUseCase(
         consent: mockConsent,
         hra: mockHra,
-        hiv: mockHiv,
+        hct: mockHct,
         tb: mockTb,
         cancer: mockCancer,
         survey: mockSurvey,
@@ -337,7 +342,7 @@ void main() {
           .thenThrow(Exception('network timeout'));
       when(() => mockHra.getHraScreeningsByMember(any()))
           .thenAnswer((_) async => []);
-      when(() => mockHiv.getHivScreeningsByMember(any()))
+      when(() => mockHct.getHctScreeningsByMember(any()))
           .thenAnswer((_) async => []);
       when(() => mockTb.getTbScreeningsByMember(any()))
           .thenAnswer((_) async => []);
@@ -351,7 +356,7 @@ void main() {
       final uc = _buildUseCase(
         consent: mockConsent,
         hra: mockHra,
-        hiv: mockHiv,
+        hct: mockHct,
         tb: mockTb,
         cancer: mockCancer,
         survey: mockSurvey,
@@ -384,7 +389,7 @@ void main() {
           .thenAnswer((_) async => [consent]);
       when(() => mockHra.getHraScreeningsByMember(any()))
           .thenAnswer((_) async => []);
-      when(() => mockHiv.getHivScreeningsByMember(any()))
+      when(() => mockHct.getHctScreeningsByMember(any()))
           .thenAnswer((_) async => []);
       when(() => mockTb.getTbScreeningsByMember(any()))
           .thenAnswer((_) async => []);
@@ -398,7 +403,7 @@ void main() {
       final uc = _buildUseCase(
         consent: mockConsent,
         hra: mockHra,
-        hiv: mockHiv,
+        hct: mockHct,
         tb: mockTb,
         cancer: mockCancer,
         survey: mockSurvey,

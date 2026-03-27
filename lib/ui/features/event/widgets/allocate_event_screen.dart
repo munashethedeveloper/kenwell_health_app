@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/cards/kenwell_empty_state.dart';
-import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 import 'package:provider/provider.dart';
 import '../../user_management/viewmodel/user_management_view_model.dart';
 import '../../user_management/widgets/sections/user_filter_chips.dart';
@@ -47,7 +46,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
     super.dispose();
   }
 
-  void _showUserOptions(UserModel user) {
+  /*  void _showUserOptions(UserModel user) {
     final theme = Theme.of(context);
     final isAssigned = _allocVM.isAssigned(user.id);
 
@@ -154,7 +153,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
         ),
       ),
     );
-  }
+  } */
 
   Future<void> _assignUser(UserModel user) async {
     if (!mounted) return;
@@ -270,8 +269,6 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
             final totalUsers = viewModel.users.length;
             final assignedCount = _allocVM.assignedCount;
             final notAssignedCount = totalUsers - assignedCount;
-            final filterActive = viewModel.selectedFilter != 'all' ||
-                viewModel.searchQuery.isNotEmpty;
 
             if (viewModel.isLoading && viewModel.users.isEmpty) {
               return const Center(child: CircularProgressIndicator());

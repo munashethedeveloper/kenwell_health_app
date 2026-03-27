@@ -48,7 +48,7 @@ class _CreateMemberSectionState extends State<CreateMemberSection> {
   Widget build(BuildContext context) {
     return Consumer<MemberDetailsViewModel>(
       builder: (context, vm, _) {
-        final theme = Theme.of(context);
+        //final theme = Theme.of(context);
         return SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 16),

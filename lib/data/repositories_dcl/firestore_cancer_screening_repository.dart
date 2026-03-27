@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kenwell_health_app/data/local/screening_local_store.dart';
 import 'package:kenwell_health_app/data/services/audit_log_service.dart';
 import 'package:kenwell_health_app/data/services/firestore_service.dart';
+import 'package:kenwell_health_app/data/services/pending_write_service.dart';
 import 'package:kenwell_health_app/domain/models/cander_screening.dart';
 import 'package:kenwell_health_app/utils/logger.dart';
 
@@ -10,34 +11,47 @@ import 'package:kenwell_health_app/utils/logger.dart';
 ///
 /// Every mutating operation writes a corresponding entry to the `audit_logs`
 /// collection via [AuditLogService].
+///
+/// Offline-first write strategy:
+/// 1. Persist to local SQLite immediately so the record survives any network failure.
+/// 2. Attempt the Firestore write.  On failure the write is enqueued in
+///    [PendingWriteService] for automatic retry when connectivity is restored.
 class FirestoreCancerScreeningRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final ScreeningLocalStore _local = ScreeningLocalStore.instance;
   final AuditLogService _audit;
+  final PendingWriteService _pendingWrites;
   static const String _collectionName =
       FirestoreService.cancerScreeningsCollection;
 
-  FirestoreCancerScreeningRepository({AuditLogService? auditLogService})
-      : _audit = auditLogService ?? AuditLogService();
+  FirestoreCancerScreeningRepository({
+    AuditLogService? auditLogService,
+    PendingWriteService? pendingWriteService,
+  })  : _audit = auditLogService ?? AuditLogService(),
+        _pendingWrites = pendingWriteService ?? PendingWriteService.instance;
 
   Future<void> addCancerScreening(CancerScreening screening) async {
+    final data = screening.toMap();
+    // 1. Persist locally first — guaranteed local copy regardless of connectivity.
+    await _local.upsertCancerScreening(data);
+    // 2. Write to Firestore (non-fatal: failure is queued for automatic retry).
     try {
-      await _firestore
-          .collection(_collectionName)
-          .doc(screening.id)
-          .set(screening.toMap());
-      // Write-through: persist to local SQLite store so data is available offline.
-      unawaited(_local.upsertCancerScreening(screening.toMap()));
+      await _firestore.collection(_collectionName).doc(screening.id).set(data);
       unawaited(_audit.logCreate(
         collection: _collectionName,
         documentId: screening.id,
-        data: screening.toMap(),
+        data: data,
         summary: 'Cancer screening added for member ${screening.memberId}',
       ));
       AppLogger.info('Cancer screening added successfully: ${screening.id}');
     } catch (e) {
-      AppLogger.error('Failed to add cancer screening', e);
-      rethrow;
+      AppLogger.error(
+          'Cancer screening Firestore write failed, queued for retry', e);
+      unawaited(_pendingWrites.enqueue(
+        collection: _collectionName,
+        docId: screening.id,
+        data: data,
+      ));
     }
   }
 

@@ -7,12 +7,12 @@ import 'package:kenwell_health_app/ui/features/wellness/widgets/health_screening
 import 'package:provider/provider.dart';
 import '../../cancer/widgets/cancer_screen.dart';
 import '../../event/view_model/event_view_model.dart';
-import '../../hiv_test_results/widgets/hiv_test_result_screen.dart';
+import '../../hct_test_results/widgets/hct_test_result_screen.dart';
 import '../view_model/wellness_flow_view_model.dart';
 import '../../survey/widgets/survey_screen.dart';
 import '../../consent_form/widgets/consent_screen.dart';
 import '../../health_risk_assessment/widgets/health_risk_assessment_screen.dart';
-import '../../hiv_test/widgets/hiv_test_screen.dart';
+import '../../hct_test/widgets/hct_test_screen.dart';
 import '../../tb_test/widgets/tb_testing_screen.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
@@ -181,7 +181,7 @@ class WellnessFlowScreen extends StatelessWidget {
         });
         return ChangeNotifierProvider.value(
           value: flowVM.hctTestVM,
-          child: HIVTestScreen(
+          child: HCTTestScreen(
             onNext: flowVM.nextStep,
             onPrevious: () {
               // Return to health screenings menu
@@ -203,7 +203,7 @@ class WellnessFlowScreen extends StatelessWidget {
         }
         return ChangeNotifierProvider.value(
           value: flowVM.hctResultsVM,
-          child: HIVTestResultScreen(
+          child: HCTTestResultScreen(
             onNext: () {
               // Immediate update: mark HCT as completed in the parent ViewModel
               flowVM.markHctCompleted();

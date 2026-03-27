@@ -40,7 +40,7 @@ class MyEventViewModel extends ChangeNotifier {
 
   /// Stream subscription that watches the current user's `user_events`
   /// documents in Firestore and reloads the event list on any change.
-  StreamSubscription<List<Map<String, dynamic>>>? _userEventsSubscription;
+  StreamSubscription<List<WellnessEvent>>? _userEventsSubscription;
 
   // ── Getters ───────────────────────────────────────────────────────────────
 

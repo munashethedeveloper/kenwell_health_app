@@ -4,7 +4,7 @@ enum ServiceType {
   //dentalScreening,
   //eyeTest,
   hct,
-  //hivTest,
+  //hctTest,
   hra,
   papSmear,
   //psychologicalAssessment,
@@ -26,8 +26,8 @@ extension ServiceTypeExtension on ServiceType {
       // return 'Eye Test';
       case ServiceType.hct:
         return 'HCT';
-      //case ServiceType.hivTest:
-      //return 'HIV Test';
+      //case ServiceType.hctTest:
+      //return 'HCT Test';
       case ServiceType.hra:
         return 'HRA';
       case ServiceType.papSmear:
@@ -64,13 +64,13 @@ extension ServiceTypeExtension on ServiceType {
 
 /// Helper to convert between enum sets and comma-separated strings
 class ServiceTypeConverter {
-  /// Convert Set<ServiceType> to comma-separated string
+  // Convert Set<ServiceType> to comma-separated string
   static String toStorageString(Set<ServiceType> services) {
     if (services.isEmpty) return '';
     return services.map((s) => s.displayName).join(', ');
   }
 
-  /// Convert comma-separated string to Set<ServiceType>
+  // Convert comma-separated string to Set<ServiceType>
   static Set<ServiceType> fromStorageString(String value) {
     if (value.isEmpty) return {};
 

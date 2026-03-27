@@ -200,14 +200,12 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
                           ),
                         )
                       else
-                        ..._vm.events
-                            .map((event) => _EventCard(
-                                  event: event,
-                                  formatDate: _vm.formatDate,
-                                  referral: _vm.referralFor(
-                                      event['eventId'] as String? ?? ''),
-                                ))
-                            .toList(),
+                        ..._vm.events.map((event) => _EventCard(
+                              event: event,
+                              formatDate: _vm.formatDate,
+                              referral: _vm.referralFor(
+                                  event['eventId'] as String? ?? ''),
+                            )),
                     ],
                   ),
                 ),

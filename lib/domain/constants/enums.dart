@@ -1,4 +1,5 @@
 /// Common enums used throughout the application
+library;
 
 /// Yes/No/N/A options for assessment questions
 enum YesNoNA {
@@ -151,8 +152,8 @@ enum WellnessStep {
   healthScreeningsMenu('health_screenings_menu'),
   personalDetails('personal_details'),
   riskAssessment('risk_assessment'),
-  hivTest('hiv_test'),
-  hivResults('hiv_results'),
+  hctTest('hct_test'),
+  hctResults('hct_results'),
   tbTest('tb_test'),
   survey('survey');
 
@@ -172,8 +173,6 @@ enum WellnessStep {
 enum ScreeningType {
   consent('consent'),
   riskAssessment('risk_assessment'),
-  hivTest('hiv_test'),
-  hivResults('hiv_results'),
   hctTest('hct_test'),
   hctResults('hct_results'),
   tbTest('tb_test'),

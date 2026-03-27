@@ -54,7 +54,7 @@ class TBTestingScreen extends StatelessWidget {
       sectionTitle: 'Section C: TB Screening',
       sectionLabel: 'TB TEST',
       subtitle:
-          'Please complete the form below to provide your HIV testing history and risk behaviors.',
+          'Please complete the form below to provide your HCT testing history and risk behaviors.',
       appBar: appBar,
       children: [
         const SizedBox(height: 16),

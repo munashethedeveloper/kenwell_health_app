@@ -193,33 +193,33 @@ service cloud.firestore {
       allow delete: if isAuthenticated() && isManagement();
     }
     
-    // HIV Screenings collection - Staff can manage
-    match /hiv_screenings/{screeningId} {
-      // Staff can read all HIV screenings
+    // HCT Screenings collection - Staff can manage
+    match /hct_screenings/{screeningId} {
+      // Staff can read all HCT screenings
       allow read: if isAuthenticated() && isStaff();
       
-      // Staff can create HIV screenings
+      // Staff can create HCT screenings
       allow create: if isAuthenticated() && isStaff();
       
-      // HIV can update HIV screenings
+      // Staff can update HCT screenings
       allow update: if isAuthenticated() && isStaff();
       
-      // Only management can delete HIV screenings
+      // Only management can delete HCT screenings
       allow delete: if isAuthenticated() && isManagement();
     }
     
-    // HIV Results collection - Staff can manage
-    match /hiv_results/{resultId} {
-      // Staff can read all HIV results
+    // HCT Results collection - Staff can manage
+    match /hct_results/{resultId} {
+      // Staff can read all HCT results
       allow read: if isAuthenticated() && isStaff();
       
-      // Staff can create HIV results
+      // Staff can create HCT results
       allow create: if isAuthenticated() && isStaff();
       
-      // Staff can update HIV results
+      // Staff can update HCT results
       allow update: if isAuthenticated() && isStaff();
       
-      // Only management can delete HIV results
+      // Only management can delete HCT results
       allow delete: if isAuthenticated() && isManagement();
     }
     
@@ -283,7 +283,7 @@ service cloud.firestore {
       allow delete: if isAuthenticated() && isManagement();
     }
     
-    // Screening results (HIV, TB, HRA) - Staff only
+    // Screening results (HCT, TB, HRA) - Staff only
     match /screening_results/{resultId} {
       // Only staff can access screening results (sensitive health data)
       allow read: if isAuthenticated() && isStaff();

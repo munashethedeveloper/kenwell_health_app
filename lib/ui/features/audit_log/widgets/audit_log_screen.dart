@@ -28,7 +28,7 @@ class _AuditLogScreenState extends State<AuditLogScreen> {
 
   // ── Colours per action ──────────────────────────────────────────────────────
 
-  Color _actionColor(String action) {
+  /* Color _actionColor(String action) {
     switch (action.toLowerCase()) {
       case 'create':
         return const Color(0xFF16A34A); // green
@@ -39,9 +39,9 @@ class _AuditLogScreenState extends State<AuditLogScreen> {
       default:
         return KenwellColors.neutralGrey;
     }
-  }
+  } */
 
-  IconData _actionIcon(String action) {
+/*   IconData _actionIcon(String action) {
     switch (action.toLowerCase()) {
       case 'create':
         return Icons.add_circle_outline_rounded;
@@ -52,7 +52,7 @@ class _AuditLogScreenState extends State<AuditLogScreen> {
       default:
         return Icons.info_outline_rounded;
     }
-  }
+  } */
 
   // ── Build ───────────────────────────────────────────────────────────────────
 

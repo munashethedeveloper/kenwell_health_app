@@ -339,9 +339,9 @@ class TBTestingViewModel extends ChangeNotifier {
       'committedToChange': committedToChange,
       'nursingReferralSelection': nursingReferralSelection?.name,
       'notReferredReason': notReferredReasonController.text,
-      'hivTestingNurseFirstName': nurseFirstNameController.text,
-      'hivTestingNurseLastName': nurseLastNameController.text,
-      'hivTestingNurse':
+      'hctTestingNurseFirstName': nurseFirstNameController.text,
+      'hctTestingNurseLastName': nurseLastNameController.text,
+      'hctTestingNurse':
           '${nurseFirstNameController.text} ${nurseLastNameController.text}'
               .trim(),
       'rank': rankController.text,
@@ -376,8 +376,9 @@ class TBTestingViewModel extends ChangeNotifier {
       String? signatureBase64;
       if (signatureController.isNotEmpty) {
         final signatureBytes = await signatureController.toPngBytes();
-        if (signatureBytes != null)
+        if (signatureBytes != null) {
           signatureBase64 = base64Encode(signatureBytes);
+        }
       }
       signatureBase64 ??= prefilledHpSignatureBase64;
 

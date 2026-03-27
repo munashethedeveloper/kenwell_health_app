@@ -77,8 +77,6 @@ class _InternationalPhoneFieldState extends State<InternationalPhoneField> {
         // Show country code selector
         showCountryFlag: true,
         showDropdownIcon: true,
-        // Enable search
-        searchText: 'Search country',
         // Styling
         dropdownIconPosition: IconPosition.trailing,
         flagsButtonPadding: const EdgeInsets.only(left: 12),

@@ -14,10 +14,7 @@ import '../../../shared/ui/snackbars/app_snackbar.dart';
 import '../../calendar/view_model/calendar_view_model.dart';
 import '../../calendar/widgets/event_card.dart';
 import '../../event/view_model/event_view_model.dart';
-import '../../stats_report/widgets/event_stats_detail_screen.dart';
-import '../../user_management/viewmodel/user_management_view_model.dart';
 import '../view_model/all_events_view_model.dart';
-import 'allocate_event_screen.dart';
 
 /// Screen that shows all events with:
 ///   - A gradient section header
@@ -538,7 +535,7 @@ class _EventSearchBar extends StatelessWidget {
 
 // ── Event card ────────────────────────────────────────────────────────────────
 
-class _AllEventCard extends StatelessWidget {
+/* class _AllEventCard extends StatelessWidget {
   const _AllEventCard({required this.event});
 
   final WellnessEvent event;
@@ -765,11 +762,11 @@ class _AllEventCard extends StatelessWidget {
       ),
     );
   }
-}
+} */
 
 // ── Meta chip ─────────────────────────────────────────────────────────────────
 
-class _MetaChip extends StatelessWidget {
+/* class _MetaChip extends StatelessWidget {
   const _MetaChip({required this.icon, required this.label});
 
   final IconData icon;
@@ -802,3 +799,4 @@ class _MetaChip extends StatelessWidget {
     );
   }
 }
+ */

@@ -79,14 +79,14 @@ class RolePermissions {
       'ADMIN',
       'TOP MANAGEMENT'
     ],
-    '/hiv-test': [
+    '/hct-test': [
       'PROJECT COORDINATOR',
       'PROJECT MANAGER',
       'HEALTH PRACTITIONER',
       'ADMIN',
       'TOP MANAGEMENT'
     ],
-    '/hiv-result': [
+    '/hct-result': [
       'PROJECT COORDINATOR',
       'PROJECT MANAGER',
       'HEALTH PRACTITIONER',

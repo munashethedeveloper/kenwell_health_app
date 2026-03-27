@@ -6,7 +6,7 @@ import '../../../shared/ui/buttons/form_action_buttons.dart';
 import '../../../shared/ui/dialogs/confirmation_dialog.dart';
 import '../../../shared/ui/headers/kenwell_gradient_header.dart';
 import '../utils/event_form_validator.dart';
-import '../view_model/event_view_model.dart';
+import '../view_model/event_form_view_model.dart';
 import 'sections/event_basic_info_section.dart';
 import 'sections/contact_person_section.dart';
 import 'sections/event_time_section.dart';
@@ -17,11 +17,9 @@ import 'sections/participation_section.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
 // EventScreen allows adding or editing a wellness event
-// TODO(arch): migrate to use EventFormViewModel instead of EventViewModel for
-//             form state, keeping EventViewModel lean (list-only).
 class EventScreen extends StatefulWidget {
-  // ViewModel for managing event data
-  final EventViewModel viewModel;
+  // ViewModel that owns all form state (controllers, dropdowns, services).
+  final EventFormViewModel viewModel;
   final DateTime date;
   final WellnessEvent? existingEvent;
   final Future<void> Function(WellnessEvent) onSave;
@@ -65,24 +63,15 @@ class _EventScreenState extends State<EventScreen> {
     } else {
       // Always clear controllers when creating a new event so that stale data
       // from a previous form submission never bleeds through.
-      widget.viewModel.clearControllers();
+      widget.viewModel.clearForm();
       widget.viewModel.dateController.text =
           "${widget.date.year}-${widget.date.month.toString().padLeft(2, '0')}-${widget.date.day.toString().padLeft(2, '0')}";
     }
   }
 
-  /// Check if the form has any data entered
-  bool _hasUnsavedChanges() {
-    return widget.viewModel.titleController.text.isNotEmpty ||
-        widget.viewModel.venueController.text.isNotEmpty ||
-        widget.viewModel.addressController.text.isNotEmpty ||
-        widget.viewModel.onsiteContactFirstNameController.text.isNotEmpty ||
-        widget.viewModel.aeContactFirstNameController.text.isNotEmpty;
-  }
-
   /// Handle cancel with unsaved changes confirmation
   Future<void> _handleCancel() async {
-    if (!_hasUnsavedChanges()) {
+    if (!widget.viewModel.hasUnsavedChanges) {
       context.pop();
       return;
     }
@@ -153,9 +142,9 @@ class _EventScreenState extends State<EventScreen> {
         return;
       }
 
-      // Clear controllers and show success message
+      // Clear form and show success message
       if (!mounted) return;
-      widget.viewModel.clearControllers();
+      widget.viewModel.clearForm();
 
       AppSnackbar.showSuccess(
           context,
