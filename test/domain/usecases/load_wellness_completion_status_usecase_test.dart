@@ -60,6 +60,7 @@ HraScreening _buildHraScreening({String? eventId = _eventId}) => HraScreening(
       memberId: _memberId,
       eventId: eventId,
       chronicConditions: const {},
+      createdAt: DateTime(2025, 6, 1),
     );
 
 HctScreening _buildHctScreening({String? eventId = _eventId}) => HctScreening(
@@ -79,6 +80,8 @@ TbScreening _buildTbScreening({String eventId = _eventId}) => TbScreening(
       rank: 'RN',
       sancNumber: '12345',
       nurseDate: '2025-06-01',
+      createdAt: DateTime(2025, 6, 1),
+      updatedAt: DateTime(2025, 6, 1),
     );
 
 CancerScreening _buildCancerScreening({String eventId = _eventId}) =>

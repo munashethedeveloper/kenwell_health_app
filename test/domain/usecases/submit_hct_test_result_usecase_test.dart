@@ -12,6 +12,7 @@ HctResult _buildResult({String id = 'result-1'}) => HctResult(
       memberId: 'member-1',
       eventId: 'event-1',
       screeningResult: 'Negative',
+      createdAt: DateTime(2025, 1, 1),
     );
 
 void main() {
