@@ -206,8 +206,7 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
                                   formatDate: _vm.formatDate,
                                   referral: _vm.referralFor(
                                       event['eventId'] as String? ?? ''),
-                                ))
-                            .toList(),
+                                )),
                     ],
                   ),
                 ),
