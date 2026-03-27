@@ -31,6 +31,9 @@ class AllocateEventViewModel extends ChangeNotifier {
 
   bool isAssigned(String userId) => _assignedUserIds.contains(userId);
 
+  /// Number of users currently assigned to the event.
+  int get assignedCount => _assignedUserIds.length;
+
   // ── Load ──────────────────────────────────────────────────────────────────
 
   /// Loads the set of user IDs already assigned to [event].

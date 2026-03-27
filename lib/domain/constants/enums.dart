@@ -1,4 +1,5 @@
 /// Common enums used throughout the application
+library;
 
 /// Yes/No/N/A options for assessment questions
 enum YesNoNA {

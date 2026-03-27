@@ -93,7 +93,7 @@ class Events extends Table {
 class AppDatabase extends _$AppDatabase {
   AppDatabase._internal() : super(_openConnection());
 
-  AppDatabase.forTesting(QueryExecutor executor) : super(executor);
+  AppDatabase.forTesting(super.executor);
 
   static final AppDatabase instance = AppDatabase._internal();
 
