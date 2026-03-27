@@ -32,6 +32,8 @@ class CalendarViewModel extends ChangeNotifier {
   final UpdateEventUseCase _updateEventUseCase;
   final DeleteEventUseCase _deleteEventUseCase;
 
+  late final Future<void> _initializationFuture;
+
   // Getter for initialization future
   Future<void> get initializationFuture => _initializationFuture;
 
