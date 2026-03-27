@@ -6,11 +6,11 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_cancer_screening_repository.dart';
-import 'package:kenwell_health_app/data/repositories_dcl/firestore_hiv_screening_repository.dart';
+import 'package:kenwell_health_app/data/repositories_dcl/firestore_hct_screening_repository.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_hra_repository.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_tb_screening_repository.dart';
 import 'package:kenwell_health_app/domain/models/cander_screening.dart';
-import 'package:kenwell_health_app/domain/models/hiv_screening.dart';
+import 'package:kenwell_health_app/domain/models/hct_screening.dart';
 import 'package:kenwell_health_app/domain/models/hra_screening.dart';
 import 'package:kenwell_health_app/domain/models/tb_screening.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
@@ -29,16 +29,16 @@ class EventReportExporter {
     FirestoreHraRepository? hraRepo,
     FirestoreCancerScreeningRepository? cancerRepo,
     FirestoreTbScreeningRepository? tbRepo,
-    FirestoreHivScreeningRepository? hivRepo,
+    FirestoreHctScreeningRepository? hctRepo,
   }) : _hraRepo = hraRepo ?? FirestoreHraRepository(),
        _cancerRepo = cancerRepo ?? FirestoreCancerScreeningRepository(),
        _tbRepo = tbRepo ?? FirestoreTbScreeningRepository(),
-       _hivRepo = hivRepo ?? FirestoreHivScreeningRepository();
+       _hctRepo = hctRepo ?? FirestoreHctScreeningRepository();
 
   final FirestoreHraRepository _hraRepo;
   final FirestoreCancerScreeningRepository _cancerRepo;
   final FirestoreTbScreeningRepository _tbRepo;
-  final FirestoreHivScreeningRepository _hivRepo;
+  final FirestoreHctScreeningRepository _hctRepo;
 
   /// Exports the report and returns the file path on success.
   Future<String> export(WellnessEvent event) async {
@@ -47,13 +47,13 @@ class EventReportExporter {
       _hraRepo.getHraScreeningsByEvents([event.id]),
       _cancerRepo.getCancerScreeningsByEvents([event.id]),
       _tbRepo.getTbScreeningsByEvents([event.id]),
-      _hivRepo.getHivScreeningsByEvents([event.id]),
+      _hctRepo.getHctScreeningsByEvents([event.id]),
     ]);
 
     final hraScreenings = List<HraScreening>.from(results[0] as List);
     final cancerScreenings = List<CancerScreening>.from(results[1] as List);
     final tbScreenings = List<TbScreening>.from(results[2] as List);
-    final hivScreenings = List<HivScreening>.from(results[3] as List);
+    final hctScreenings = List<HctScreening>.from(results[3] as List);
 
     // 2. Build the workbook.
     final excel = Excel.createExcel();
@@ -67,7 +67,7 @@ class EventReportExporter {
       hraScreenings.length,
       cancerScreenings.length,
       tbScreenings.length,
-      hivScreenings.length,
+      hctScreenings.length,
     );
 
     _buildScreeningStatsSheet(
@@ -75,7 +75,7 @@ class EventReportExporter {
       _computeHraStats(hraScreenings),
       _computeCancerStats(cancerScreenings),
       _computeTbStats(tbScreenings),
-      _computeHctStats(hivScreenings),
+      _computeHctStats(hctScreenings),
     );
 
     // 3. Save to documents directory.
@@ -105,7 +105,7 @@ class EventReportExporter {
     int hraCount,
     int cancerCount,
     int tbCount,
-    int hivCount,
+    int hctCount,
   ) {
     _appendTitle(sheet, 'Event Report – ${event.title}');
     _appendBlank(sheet);
@@ -186,7 +186,7 @@ class EventReportExporter {
     _appendRow(sheet, 'HRA Screenings', hraCount.toString());
     _appendRow(sheet, 'Cancer Screenings', cancerCount.toString());
     _appendRow(sheet, 'TB Screenings', tbCount.toString());
-    _appendRow(sheet, 'HCT Screenings', hivCount.toString());
+    _appendRow(sheet, 'HCT Screenings', hctCount.toString());
 
     sheet.setColumnWidth(0, 30);
     sheet.setColumnWidth(1, 45);
@@ -456,11 +456,11 @@ class EventReportExporter {
     );
   }
 
-  HctStats _computeHctStats(List<HivScreening> list) {
+  HctStats _computeHctStats(List<HctScreening> list) {
     int firstTimeTesters = 0, highRisk = 0, knownPositive = 0;
 
     for (final s in list) {
-      if (s.firstHivTest?.toLowerCase() == 'yes') firstTimeTesters++;
+      if (s.firstHctTest?.toLowerCase() == 'yes') firstTimeTesters++;
       if (s.sharedNeedles?.toLowerCase() == 'yes' ||
           s.unprotectedSex?.toLowerCase() == 'yes')
         highRisk++;

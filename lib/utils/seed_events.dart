@@ -150,7 +150,7 @@ class EventSeeder {
         aeContactLastName: 'Anderson',
         aeContactNumber: '0852109876',
         aeContactEmail: 'chris.a@example.com',
-        servicesRequested: 'HIV Testing, TB Screening, Blood Pressure',
+        servicesRequested: 'HCT Testing, TB Screening, Blood Pressure',
         // additionalServicesRequested: 'Family Planning',
         expectedParticipation: 250,
         nurses: 6,

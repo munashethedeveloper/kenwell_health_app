@@ -14,17 +14,17 @@ import '../../../shared/ui/headers/kenwell_gradient_header.dart';
 import '../../../shared/ui/form/kenwell_signature_actions.dart';
 import '../../../shared/ui/navigation/form_navigation.dart';
 import '../../../shared/models/nursing_referral_option.dart';
-import '../view_model/hiv_test_result_view_model.dart';
+import '../view_model/hct_test_result_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 
-// HIVTestResultScreen displays the HIV test results form
-class HIVTestResultScreen extends StatelessWidget {
+// HCTTestResultScreen displays the HCT test results form
+class HCTTestResultScreen extends StatelessWidget {
   final VoidCallback onNext;
   final VoidCallback onPrevious;
   final PreferredSizeWidget? appBar;
 
   // Constructor
-  const HIVTestResultScreen({
+  const HCTTestResultScreen({
     super.key,
     required this.onNext,
     required this.onPrevious,
@@ -34,7 +34,7 @@ class HIVTestResultScreen extends StatelessWidget {
   // Build method
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<HIVTestResultViewModel>();
+    final viewModel = context.watch<HCTTestResultViewModel>();
 
     // Auto-refer based on the screening result and initial-assessment risk flags.
     // isAtRisk covers: positive result, window period + urgent follow-up, not committed.
@@ -70,10 +70,10 @@ class HIVTestResultScreen extends StatelessWidget {
         children: [
           // ── Gradient section header ─────────────────────────────
           const KenwellGradientHeader(
-            label: 'HIV RESULTS',
-            title: 'HIV Test\nResults',
+            label: 'HCT RESULTS',
+            title: 'HCT Test\nResults',
             subtitle:
-                'Section C: Record HIV testing history and risk behaviors',
+                'Section C: Record HCT testing history and risk behaviors',
           ),
           // ── Scrollable form ─────────────────────────────────────
           Expanded(
@@ -227,7 +227,7 @@ class HIVTestResultScreen extends StatelessWidget {
   }
 
   // Build Initial Assessment section
-  Widget _buildInitialAssessment(HIVTestResultViewModel viewModel) {
+  Widget _buildInitialAssessment(HCTTestResultViewModel viewModel) {
     return KenwellFormCard(
       title: 'Initial Assessment',
       child: Column(
@@ -277,7 +277,7 @@ class HIVTestResultScreen extends StatelessWidget {
   }
 
   // Build Nurse Details section
-  Widget _buildNurseDetails(HIVTestResultViewModel viewModel) {
+  Widget _buildNurseDetails(HCTTestResultViewModel viewModel) {
     return KenwellFormCard(
       title: 'Nurse Details',
       child: Column(

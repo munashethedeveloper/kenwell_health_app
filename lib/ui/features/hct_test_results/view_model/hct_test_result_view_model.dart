@@ -4,19 +4,19 @@ import 'package:signature/signature.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
 import 'package:kenwell_health_app/data/services/auth_service.dart';
-import 'package:kenwell_health_app/domain/models/hiv_result.dart';
-import 'package:kenwell_health_app/domain/usecases/submit_hiv_test_result_usecase.dart';
+import 'package:kenwell_health_app/domain/models/hct_result.dart';
+import 'package:kenwell_health_app/domain/usecases/submit_hct_test_result_usecase.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:convert';
 import 'package:kenwell_health_app/domain/constants/enums.dart';
 
-class HIVTestResultViewModel extends ChangeNotifier {
-  HIVTestResultViewModel({
+class HCTTestResultViewModel extends ChangeNotifier {
+  HCTTestResultViewModel({
     AuthService? authService,
-    SubmitHIVTestResultUseCase? submitHIVTestResultUseCase,
+    SubmitHCTTestResultUseCase? submitHctTestResultUseCase,
   })  : _authService = authService ?? AuthService(),
-        _submitHIVTestResultUseCase =
-            submitHIVTestResultUseCase ?? SubmitHIVTestResultUseCase() {
+        _submitHctTestResultUseCase =
+            submitHctTestResultUseCase ?? SubmitHCTTestResultUseCase() {
     _loadCurrentUserProfile();
     // Initialize referral to Healthy since the default screening result is
     // Negative.  setScreeningResult() updates this whenever the nurse changes
@@ -25,7 +25,7 @@ class HIVTestResultViewModel extends ChangeNotifier {
   }
 
   final AuthService _authService;
-  final SubmitHIVTestResultUseCase _submitHIVTestResultUseCase;
+  final SubmitHCTTestResultUseCase _submitHctTestResultUseCase;
 
   String? _memberId;
   String? _eventId;
@@ -281,7 +281,7 @@ class HIVTestResultViewModel extends ChangeNotifier {
     return true;
   }
 
-  /// Converts all HIV test result data to a Map
+  /// Converts all HCT test result data to a Map
   Future<Map<String, dynamic>> toMap() async {
     final signatureBytes = await signatureController.toPngBytes();
     return {
@@ -300,9 +300,9 @@ class HIVTestResultViewModel extends ChangeNotifier {
       'committedToChange': committedToChange,
       'nursingReferralSelection': nursingReferralSelection?.name,
       'notReferredReason': notReferredReasonController.text,
-      'hivTestingNurseFirstName': nurseFirstNameController.text,
-      'hivTestingNurseLastName': nurseLastNameController.text,
-      'hivTestingNurse':
+      'hctTestingNurseFirstName': nurseFirstNameController.text,
+      'hctTestingNurseLastName': nurseLastNameController.text,
+      'hctTestingNurse':
           '${nurseFirstNameController.text} ${nurseLastNameController.text}'
               .trim(),
       'rank': rankController.text,
@@ -342,7 +342,7 @@ class HIVTestResultViewModel extends ChangeNotifier {
       }
       signatureBase64 ??= prefilledHpSignatureBase64;
 
-      final result = HivResult(
+      final result = HctResult(
         id: const Uuid().v4(),
         memberId: _memberId!,
         eventId: _eventId!,
@@ -376,12 +376,12 @@ class HIVTestResultViewModel extends ChangeNotifier {
         updatedAt: DateTime.now(),
       );
 
-      await _submitHIVTestResultUseCase(result);
+      await _submitHctTestResultUseCase(result);
 
-      onSuccess?.call('HIV test result saved successfully');
+      onSuccess?.call('HCT test result saved successfully');
       onNext?.call();
     } catch (e) {
-      onError?.call('Error saving HIV test result: $e');
+      onError?.call('Error saving HCT test result: $e');
     } finally {
       _isSubmitting = false;
       notifyListeners();

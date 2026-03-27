@@ -1,11 +1,11 @@
 import '../../../../utils/validators.dart';
-import '../view_model/event_view_model.dart';
+import '../view_model/event_form_view_model.dart';
 
 /// Validator for Event form fields
 class EventFormValidator {
   /// Validates all required fields in the event form
   /// Returns a list of invalid field names, or empty list if all valid
-  static List<String> validateEventForm(EventViewModel viewModel) {
+  static List<String> validateEventForm(EventFormViewModel viewModel) {
     final invalidFields = <String>[];
 
     // Basic Info

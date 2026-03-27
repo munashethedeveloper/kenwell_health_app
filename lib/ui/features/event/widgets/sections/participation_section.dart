@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../view_model/event_view_model.dart';
+import '../../view_model/event_form_view_model.dart';
 import '../../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../../shared/ui/form/kenwell_spinbox_field.dart';
 
 /// Event participation numbers form section
 class ParticipationSection extends StatelessWidget {
-  final EventViewModel viewModel;
+  final EventFormViewModel viewModel;
 
   // Constructor for ParticipationSection
   const ParticipationSection({

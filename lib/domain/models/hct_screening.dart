@@ -1,8 +1,8 @@
-class HivScreening {
+class HctScreening {
   final String id;
   final String? memberId;
   final String? eventId;
-  final String? firstHivTest;
+  final String? firstHctTest;
   final String? lastTestMonth;
   final String? lastTestYear;
   final String? lastTestResult;
@@ -13,11 +13,11 @@ class HivScreening {
   final DateTime createdAt;
   final DateTime? updatedAt;
 
-  HivScreening({
+  HctScreening({
     required this.id,
     this.memberId,
     this.eventId,
-    this.firstHivTest,
+    this.firstHctTest,
     this.lastTestMonth,
     this.lastTestYear,
     this.lastTestResult,
@@ -34,7 +34,7 @@ class HivScreening {
       'id': id,
       'memberId': memberId,
       'eventId': eventId,
-      'firstHivTest': firstHivTest,
+      'firstHctTest': firstHctTest,
       'lastTestMonth': lastTestMonth,
       'lastTestYear': lastTestYear,
       'lastTestResult': lastTestResult,
@@ -47,12 +47,12 @@ class HivScreening {
     };
   }
 
-  factory HivScreening.fromMap(Map<String, dynamic> map) {
-    return HivScreening(
+  factory HctScreening.fromMap(Map<String, dynamic> map) {
+    return HctScreening(
       id: map['id'] as String,
       memberId: map['memberId'] as String?,
       eventId: map['eventId'] as String?,
-      firstHivTest: map['firstHivTest'] as String?,
+      firstHctTest: map['firstHctTest'] as String?,
       lastTestMonth: map['lastTestMonth'] as String?,
       lastTestYear: map['lastTestYear'] as String?,
       lastTestResult: map['lastTestResult'] as String?,
@@ -67,11 +67,11 @@ class HivScreening {
     );
   }
 
-  HivScreening copyWith({
+  HctScreening copyWith({
     String? id,
     String? memberId,
     String? eventId,
-    String? firstHivTest,
+    String? firstHctTest,
     String? lastTestMonth,
     String? lastTestYear,
     String? lastTestResult,
@@ -82,11 +82,11 @@ class HivScreening {
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
-    return HivScreening(
+    return HctScreening(
       id: id ?? this.id,
       memberId: memberId ?? this.memberId,
       eventId: eventId ?? this.eventId,
-      firstHivTest: firstHivTest ?? this.firstHivTest,
+      firstHctTest: firstHctTest ?? this.firstHctTest,
       lastTestMonth: lastTestMonth ?? this.lastTestMonth,
       lastTestYear: lastTestYear ?? this.lastTestYear,
       lastTestResult: lastTestResult ?? this.lastTestResult,

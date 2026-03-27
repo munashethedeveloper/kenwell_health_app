@@ -1,4 +1,4 @@
-class HivResult {
+class HctResult {
   final String id;
   final String? memberId;
   final String? eventId;
@@ -25,7 +25,7 @@ class HivResult {
   final DateTime createdAt;
   final DateTime? updatedAt;
 
-  HivResult({
+  HctResult({
     required this.id,
     this.memberId,
     this.eventId,
@@ -83,8 +83,8 @@ class HivResult {
     };
   }
 
-  factory HivResult.fromMap(Map<String, dynamic> map) {
-    return HivResult(
+  factory HctResult.fromMap(Map<String, dynamic> map) {
+    return HctResult(
       id: map['id'] as String,
       memberId: map['memberId'] as String?,
       eventId: map['eventId'] as String?,
@@ -115,7 +115,7 @@ class HivResult {
     );
   }
 
-  HivResult copyWith({
+  HctResult copyWith({
     String? id,
     String? memberId,
     String? eventId,
@@ -142,7 +142,7 @@ class HivResult {
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
-    return HivResult(
+    return HctResult(
       id: id ?? this.id,
       memberId: memberId ?? this.memberId,
       eventId: eventId ?? this.eventId,

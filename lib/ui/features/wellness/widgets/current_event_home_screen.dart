@@ -561,26 +561,22 @@ class _SectionCard extends StatelessWidget {
     final Color iconBg;
     final Color iconColor;
     final Color statusColor;
-    final String statusText;
     final Color borderColor;
 
     if (section.isCompleted) {
       iconBg = const Color(0xFF90C048).withValues(alpha: 0.15);
       iconColor = const Color(0xFF90C048);
       statusColor = const Color(0xFF90C048);
-      statusText = 'Completed';
       borderColor = const Color(0xFF90C048).withValues(alpha: 0.3);
     } else if (section.isInProgress) {
       iconBg = Colors.orange.withValues(alpha: 0.12);
       iconColor = Colors.orange[700]!;
       statusColor = Colors.orange[700]!;
-      statusText = 'In Progress';
       borderColor = Colors.orange.withValues(alpha: 0.3);
     } else {
       iconBg = Colors.grey.shade100;
       iconColor = Colors.grey[500]!;
       statusColor = Colors.grey.shade500;
-      statusText = 'Not Started';
       borderColor = Colors.grey.shade200;
     }
 

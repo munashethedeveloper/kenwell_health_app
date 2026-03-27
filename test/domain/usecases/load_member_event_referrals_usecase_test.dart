@@ -83,6 +83,7 @@ HraScreening _buildHraScreening({
       bloodSugar: bloodSugar,
       cholesterol: cholesterol,
       chronicConditions: {},
+      createdAt: DateTime(2025, 6, 1),
     );
 
 // ── Test suite ───────────────────────────────────────────────────────────────

@@ -270,8 +270,6 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
             final totalUsers = viewModel.users.length;
             final assignedCount = _allocVM.assignedCount;
             final notAssignedCount = totalUsers - assignedCount;
-            final filterActive = viewModel.selectedFilter != 'all' ||
-                viewModel.searchQuery.isNotEmpty;
 
             if (viewModel.isLoading && viewModel.users.isEmpty) {
               return const Center(child: CircularProgressIndicator());

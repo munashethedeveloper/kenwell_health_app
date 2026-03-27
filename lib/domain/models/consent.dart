@@ -6,7 +6,7 @@ class Consent {
   final DateTime date;
   final String practitioner;
   final bool hra; // Health Risk Assessment
-  //final bool hiv; // HIV screening
+  //final bool hct; // HCT screening
   final bool hct; // HCT screening
   final bool tb; // TB screening
   final bool cancer; // Cancer screening
@@ -28,7 +28,7 @@ class Consent {
     required this.date,
     required this.practitioner,
     required this.hra,
-    //required this.hiv,
+    //required this.hct,
     required this.hct,
     required this.tb,
     this.cancer = false,
@@ -50,7 +50,7 @@ class Consent {
       'date': date.toIso8601String(),
       'practitioner': practitioner,
       'hra': hra,
-      //'hiv': hiv,
+      //'hct': hct,
       'hct': hct,
       'tb': tb,
       'cancer': cancer,
@@ -73,7 +73,7 @@ class Consent {
       date: DateTime.parse(map['date'] as String),
       practitioner: map['practitioner'] as String,
       hra: map['hra'] as bool,
-      //hiv: map['hiv'] as bool,
+      //hct: map['hct'] as bool,
       hct: map['hct'] as bool,
       tb: map['tb'] as bool,
       cancer: (map['cancer'] as bool?) ?? false,
@@ -97,7 +97,7 @@ class Consent {
     DateTime? date,
     String? practitioner,
     bool? hra,
-    //bool? hiv,
+    //bool? hct,
     bool? hct,
     bool? tb,
     bool? cancer,
@@ -116,7 +116,7 @@ class Consent {
       date: date ?? this.date,
       practitioner: practitioner ?? this.practitioner,
       hra: hra ?? this.hra,
-      //hiv: hiv ?? this.hiv,
+      //hct: hct ?? this.hct,
       hct: hct ?? this.hct,
       tb: tb ?? this.tb,
       cancer: cancer ?? this.cancer,

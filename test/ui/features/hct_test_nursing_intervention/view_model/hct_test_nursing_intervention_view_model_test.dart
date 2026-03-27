@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
-import 'package:kenwell_health_app/ui/features/hiv_test_nursing_intervention/view_model/hiv_test_nursing_intervention_view_model.dart';
+import 'package:kenwell_health_app/ui/features/hct_test_nursing_intervention/view_model/hct_test_nursing_intervention_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
 
 WellnessEvent _buildEvent() => WellnessEvent(
@@ -31,15 +31,15 @@ WellnessEvent _buildEvent() => WellnessEvent(
     );
 
 void main() {
-  late HIVTestNursingInterventionViewModel viewModel;
+  late HCTTestNursingInterventionViewModel viewModel;
 
   setUp(() {
-    viewModel = HIVTestNursingInterventionViewModel();
+    viewModel = HCTTestNursingInterventionViewModel();
   });
 
   tearDown(() => viewModel.dispose());
 
-  group('HIVTestNursingInterventionViewModel – initial state', () {
+  group('HCTTestNursingInterventionViewModel – initial state', () {
     test('all assessment questions are null', () {
       expect(viewModel.windowPeriod, isNull);
       expect(viewModel.expectedResult, isNull);
@@ -57,7 +57,7 @@ void main() {
     });
   });
 
-  group('HIVTestNursingInterventionViewModel – setters', () {
+  group('HCTTestNursingInterventionViewModel – setters', () {
     test('setWindowPeriod updates value and notifies', () {
       var notified = false;
       viewModel.addListener(() => notified = true);
@@ -89,7 +89,7 @@ void main() {
     });
   });
 
-  group('HIVTestNursingInterventionViewModel – setFollowUpLocation', () {
+  group('HCTTestNursingInterventionViewModel – setFollowUpLocation', () {
     test('updates location', () {
       viewModel.setFollowUpLocation('Private doctor');
       expect(viewModel.followUpLocation, 'Private doctor');
@@ -111,7 +111,7 @@ void main() {
     });
   });
 
-  group('HIVTestNursingInterventionViewModel – setNursingReferralSelection',
+  group('HCTTestNursingInterventionViewModel – setNursingReferralSelection',
       () {
     test('updates selection', () {
       viewModel.setNursingReferralSelection(
@@ -128,7 +128,7 @@ void main() {
     });
   });
 
-  group('HIVTestNursingInterventionViewModel – initialiseWithEvent', () {
+  group('HCTTestNursingInterventionViewModel – initialiseWithEvent', () {
     test('pre-fills nurseDateController on first call', () {
       viewModel.initialiseWithEvent(_buildEvent());
       expect(viewModel.nurseDateController.text, '2025-06-01');

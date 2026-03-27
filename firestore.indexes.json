@@ -43,7 +43,7 @@
       ]
     },
     {
-      "collectionGroup": "hiv_results",
+      "collectionGroup": "hct_results",
       "queryScope": "COLLECTION",
       "fields": [
         {
@@ -57,7 +57,7 @@
       ]
     },
     {
-      "collectionGroup": "hiv_results",
+      "collectionGroup": "hct_results",
       "queryScope": "COLLECTION",
       "fields": [
         {
@@ -71,7 +71,7 @@
       ]
     },
     {
-      "collectionGroup": "hiv_screenings",
+      "collectionGroup": "hct_screenings",
       "queryScope": "COLLECTION",
       "fields": [
         {
@@ -85,7 +85,7 @@
       ]
     },
     {
-      "collectionGroup": "hiv_screenings",
+      "collectionGroup": "hct_screenings",
       "queryScope": "COLLECTION",
       "fields": [
         {

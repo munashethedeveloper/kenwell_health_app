@@ -4,7 +4,7 @@ enum ServiceType {
   //dentalScreening,
   //eyeTest,
   hct,
-  //hivTest,
+  //hctTest,
   hra,
   papSmear,
   //psychologicalAssessment,
@@ -26,8 +26,8 @@ extension ServiceTypeExtension on ServiceType {
       // return 'Eye Test';
       case ServiceType.hct:
         return 'HCT';
-      //case ServiceType.hivTest:
-      //return 'HIV Test';
+      //case ServiceType.hctTest:
+      //return 'HCT Test';
       case ServiceType.hra:
         return 'HRA';
       case ServiceType.papSmear:

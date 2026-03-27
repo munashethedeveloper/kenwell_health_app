@@ -3,13 +3,13 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:encrypt/encrypt.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' hide Key;
 
 /// AES-256-CBC field-level encryption for POPIA-sensitive PII.
 ///
 /// ### Encrypted fields
 /// - `Member`: `idNumber`, `passportNumber`, `dateOfBirth`, `medicalAidNumber`
-/// - `HivResult`: `screeningResult`, `expectedResult`
+/// - `HctResult`: `screeningResult`, `expectedResult`
 ///
 /// ### Key management
 /// The 32-byte (256-bit) encryption key is supplied at build time via the

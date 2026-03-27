@@ -5,7 +5,7 @@ import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/shared/models/nursing_referral_option.dart';
 import 'package:kenwell_health_app/domain/constants/enums.dart';
 
-class HIVTestNursingInterventionViewModel extends ChangeNotifier {
+class HCTTestNursingInterventionViewModel extends ChangeNotifier {
   /// Controls whether the Initial Assessment card (and related validations) show.
   bool get showInitialAssessment => true;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -141,9 +141,9 @@ class HIVTestNursingInterventionViewModel extends ChangeNotifier {
       'committedToChange': committedToChange,
       'nursingReferralSelection': nursingReferralSelection?.name,
       'notReferredReason': notReferredReasonController.text,
-      'hivTestingNurseFirstName': nurseFirstNameController.text,
-      'hivTestingNurseLastName': nurseLastNameController.text,
-      'hivTestingNurse':
+      'hctTestingNurseFirstName': nurseFirstNameController.text,
+      'hctTestingNurseLastName': nurseLastNameController.text,
+      'hctTestingNurse':
           '${nurseFirstNameController.text} ${nurseLastNameController.text}'
               .trim(),
       'rank': rankController.text,

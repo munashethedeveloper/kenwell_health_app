@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/form/kenwell_form_card.dart';
 import '../../../../../data/repositories_dcl/firestore_cancer_screening_repository.dart';
-import '../../../../../data/repositories_dcl/firestore_hiv_screening_repository.dart';
+import '../../../../../data/repositories_dcl/firestore_hct_screening_repository.dart';
 import '../../../../../data/repositories_dcl/firestore_hra_repository.dart';
 import '../../../../../data/repositories_dcl/firestore_tb_screening_repository.dart';
 import '../../../../../domain/models/cander_screening.dart';
@@ -60,13 +60,13 @@ class _LiveScreeningCountsSectionState
   final _hraRepo = FirestoreHraRepository();
   final _cancerRepo = FirestoreCancerScreeningRepository();
   final _tbRepo = FirestoreTbScreeningRepository();
-  final _hivRepo = FirestoreHivScreeningRepository();
+  final _hctRepo = FirestoreHctScreeningRepository();
 
   // Holds the latest list from each Firestore stream.
   List<dynamic> _hraList = [];
   List<CancerScreening> _cancerList = [];
   List<dynamic> _tbList = [];
-  List<dynamic> _hivList = [];
+  List<dynamic> _hctList = [];
 
   bool _isLoading = true;
 
@@ -74,7 +74,7 @@ class _LiveScreeningCountsSectionState
   StreamSubscription<dynamic>? _hraSub;
   StreamSubscription<dynamic>? _cancerSub;
   StreamSubscription<dynamic>? _tbSub;
-  StreamSubscription<dynamic>? _hivSub;
+  StreamSubscription<dynamic>? _hctSub;
 
   Set<ServiceType> get _activeServices {
     final services = <ServiceType>{};
@@ -87,7 +87,7 @@ class _LiveScreeningCountsSectionState
 
   // Derived counts from the current list snapshots.
   int get _hraCount => _hraList.length;
-  int get _hctCount => _hivList.length;
+  int get _hctCount => _hctList.length;
   int get _tbCount => _tbList.length;
   int get _papSmearCount => _cancerList
       .where((s) => s.papSmearSpecimenCollected?.toLowerCase() == 'yes')
@@ -128,8 +128,8 @@ class _LiveScreeningCountsSectionState
     _hraSub?.cancel();
     _cancerSub?.cancel();
     _tbSub?.cancel();
-    _hivSub?.cancel();
-    _hraSub = _cancerSub = _tbSub = _hivSub = null;
+    _hctSub?.cancel();
+    _hraSub = _cancerSub = _tbSub = _hctSub = null;
   }
 
   void _subscribeToStreams(List<String> ids) {
@@ -141,7 +141,7 @@ class _LiveScreeningCountsSectionState
         _hraList = [];
         _cancerList = [];
         _tbList = [];
-        _hivList = [];
+        _hctList = [];
         _isLoading = false;
       });
       return;
@@ -193,14 +193,14 @@ class _LiveScreeningCountsSectionState
       },
     );
 
-    _hivSub = _hivRepo.watchHivScreeningsByEvents(ids).listen(
+    _hctSub = _hctRepo.watchHctScreeningsByEvents(ids).listen(
       (list) {
         if (!mounted) return;
-        setState(() => _hivList = list);
+        setState(() => _hctList = list);
         markReady();
       },
       onError: (Object e) {
-        debugPrint('LiveScreeningCounts HIV stream error: $e');
+        debugPrint('LiveScreeningCounts HCT stream error: $e');
         markReady();
       },
     );

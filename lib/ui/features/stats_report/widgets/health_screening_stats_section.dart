@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_hra_repository.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_cancer_screening_repository.dart';
 import 'package:kenwell_health_app/data/repositories_dcl/firestore_tb_screening_repository.dart';
-import 'package:kenwell_health_app/data/repositories_dcl/firestore_hiv_screening_repository.dart';
+import 'package:kenwell_health_app/data/repositories_dcl/firestore_hct_screening_repository.dart';
 import 'package:kenwell_health_app/domain/models/hra_screening.dart';
 import 'package:kenwell_health_app/domain/models/cander_screening.dart';
 import 'package:kenwell_health_app/domain/models/tb_screening.dart';
-import 'package:kenwell_health_app/domain/models/hiv_screening.dart';
+import 'package:kenwell_health_app/domain/models/hct_screening.dart';
 import 'sections/screening_stats_helpers.dart';
 import 'sections/hra_stats_card.dart';
 import 'sections/cancer_stats_card.dart';
@@ -53,12 +53,12 @@ class _HealthScreeningStatsSectionState
   final _hraRepo = FirestoreHraRepository();
   final _cancerRepo = FirestoreCancerScreeningRepository();
   final _tbRepo = FirestoreTbScreeningRepository();
-  final _hivRepo = FirestoreHivScreeningRepository();
+  final _hctRepo = FirestoreHctScreeningRepository();
 
   List<HraScreening> _hraScreenings = [];
   List<CancerScreening> _cancerScreenings = [];
   List<TbScreening> _tbScreenings = [];
-  List<HivScreening> _hivScreenings = [];
+  List<HctScreening> _hctScreenings = [];
   bool _isLoading = true;
   String? _error;
 
@@ -88,7 +88,7 @@ class _HealthScreeningStatsSectionState
         _hraScreenings = [];
         _cancerScreenings = [];
         _tbScreenings = [];
-        _hivScreenings = [];
+        _hctScreenings = [];
         _isLoading = false;
         _error = null;
       });
@@ -106,14 +106,14 @@ class _HealthScreeningStatsSectionState
           _hraRepo.getHraScreeningsByEvents(eventIds),
           _cancerRepo.getCancerScreeningsByEvents(eventIds),
           _tbRepo.getTbScreeningsByEvents(eventIds),
-          _hivRepo.getHivScreeningsByEvents(eventIds),
+          _hctRepo.getHctScreeningsByEvents(eventIds),
         ];
       } else {
         futures = [
           _hraRepo.getAllHraScreenings(),
           _cancerRepo.getAllCancerScreenings(),
           _tbRepo.getAllTbScreenings(),
-          _hivRepo.getAllHivScreenings(),
+          _hctRepo.getAllHctScreenings(),
         ];
       }
       final results = await Future.wait(futures);
@@ -122,7 +122,7 @@ class _HealthScreeningStatsSectionState
           _hraScreenings = List<HraScreening>.from(results[0] as List);
           _cancerScreenings = List<CancerScreening>.from(results[1] as List);
           _tbScreenings = List<TbScreening>.from(results[2] as List);
-          _hivScreenings = List<HivScreening>.from(results[3] as List);
+          _hctScreenings = List<HctScreening>.from(results[3] as List);
           _isLoading = false;
         });
       }
@@ -270,11 +270,11 @@ class _HealthScreeningStatsSectionState
   }
 
   HctStats get _hctStats {
-    final list = _hivScreenings;
+    final list = _hctScreenings;
     int firstTimeTesters = 0, highRisk = 0, knownPositive = 0;
 
     for (final s in list) {
-      if (s.firstHivTest?.toLowerCase() == 'yes') firstTimeTesters++;
+      if (s.firstHctTest?.toLowerCase() == 'yes') firstTimeTesters++;
       if (s.sharedNeedles?.toLowerCase() == 'yes' ||
           s.unprotectedSex?.toLowerCase() == 'yes') highRisk++;
       if (s.lastTestResult?.toLowerCase() == 'positive') knownPositive++;

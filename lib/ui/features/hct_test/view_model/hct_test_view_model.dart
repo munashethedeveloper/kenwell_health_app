@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:kenwell_health_app/domain/models/hiv_screening.dart';
-import 'package:kenwell_health_app/domain/usecases/submit_hiv_screening_usecase.dart';
+import 'package:kenwell_health_app/domain/models/hct_screening.dart';
+import 'package:kenwell_health_app/domain/usecases/submit_hct_screening_usecase.dart';
 import 'package:uuid/uuid.dart';
 
-// ViewModel for managing HIV Test form state and submission
-class HIVTestViewModel extends ChangeNotifier {
-  HIVTestViewModel({SubmitHIVScreeningUseCase? submitHIVScreeningUseCase})
-      : _submitHIVScreeningUseCase =
-            submitHIVScreeningUseCase ?? SubmitHIVScreeningUseCase();
+// ViewModel for managing HCT Test form state and submission
+class HCTTestViewModel extends ChangeNotifier {
+  HCTTestViewModel({SubmitHCTScreeningUseCase? submitHctScreeningUseCase})
+      : _submitHctScreeningUseCase =
+            submitHctScreeningUseCase ?? SubmitHCTScreeningUseCase();
 
   // Form key for validation
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final SubmitHIVScreeningUseCase _submitHIVScreeningUseCase;
+  final SubmitHCTScreeningUseCase _submitHctScreeningUseCase;
 
   // Member and Event IDs
   String? _memberId;
@@ -24,7 +24,7 @@ class HIVTestViewModel extends ChangeNotifier {
   }
 
   // --- 1. Questions ---
-  String? firstHIVTest; // Yes/No
+  String? firstHctTest; // Yes/No
   TextEditingController lastTestMonthController = TextEditingController();
   TextEditingController lastTestYearController = TextEditingController();
   String? lastTestResult; // Positive/Negative
@@ -42,9 +42,9 @@ class HIVTestViewModel extends ChangeNotifier {
   bool get isSubmitting => _isSubmitting;
 
   // --- Setters ---
-  void setFirstHIVTest(String? value) {
-    if (firstHIVTest == value) return;
-    firstHIVTest = value;
+  void setFirstHctTest(String? value) {
+    if (firstHctTest == value) return;
+    firstHctTest = value;
     notifyListeners();
   }
 
@@ -99,7 +99,7 @@ class HIVTestViewModel extends ChangeNotifier {
   // Convert form data to map
   Map<String, dynamic> toMap() {
     return {
-      'firstHIVTest': firstHIVTest,
+      'firstHctTest': firstHctTest,
       'lastTestMonth': lastTestMonthController.text,
       'lastTestYear': lastTestYearController.text,
       'lastTestResult': lastTestResult,
@@ -113,8 +113,8 @@ class HIVTestViewModel extends ChangeNotifier {
     };
   }
 
-  // Submit HIV Test form
-  Future<void> submitHIVTest({
+  // Submit HCT Test form
+  Future<void> submitHctTest({
     VoidCallback? onNext,
     void Function(String)? onValidationFailed,
     void Function(String)? onSuccess,
@@ -134,11 +134,11 @@ class HIVTestViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final screening = HivScreening(
+      final screening = HctScreening(
         id: const Uuid().v4(),
         memberId: _memberId!,
         eventId: _eventId!,
-        firstHivTest: firstHIVTest,
+        firstHctTest: firstHctTest,
         lastTestMonth: lastTestMonthController.text.isEmpty
             ? null
             : lastTestMonthController.text,
@@ -154,12 +154,12 @@ class HIVTestViewModel extends ChangeNotifier {
         updatedAt: DateTime.now(),
       );
 
-      await _submitHIVScreeningUseCase(screening);
+      await _submitHctScreeningUseCase(screening);
 
-      onSuccess?.call('HIV screening saved successfully');
+      onSuccess?.call('HCT screening saved successfully');
       onNext?.call();
     } catch (e) {
-      onError?.call('Error saving HIV screening: $e');
+      onError?.call('Error saving HCT screening: $e');
     } finally {
       _isSubmitting = false;
       notifyListeners();

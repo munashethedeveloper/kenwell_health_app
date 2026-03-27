@@ -17,6 +17,7 @@ import '../ui/features/auth/widgets/login_screen.dart';
 // Calendar & Events
 import '../ui/features/calendar/widgets/calendar_screen.dart';
 import '../ui/features/event/view_model/event_details_view_model.dart';
+import '../ui/features/event/view_model/event_form_view_model.dart';
 import '../ui/features/event/view_model/event_view_model.dart';
 import '../ui/features/event/widgets/all_events_screen.dart';
 import '../ui/features/event/widgets/event_details_screen.dart';
@@ -24,15 +25,15 @@ import '../ui/features/event/widgets/event_screen.dart';
 import '../domain/models/wellness_event.dart';
 
 // Reports
-import '../ui/features/hiv_test_results/view_model/hiv_test_result_view_model.dart';
-import '../ui/features/hiv_test_results/widgets/hiv_test_result_screen.dart';
+import '../ui/features/hct_test_results/view_model/hct_test_result_view_model.dart';
+import '../ui/features/hct_test_results/widgets/hct_test_result_screen.dart';
 import '../ui/features/stats_report/view_model/stats_report_view_model.dart';
 import '../ui/features/stats_report/widgets/stats_report_screen.dart';
 import '../ui/features/stats_report/widgets/past_events_screen.dart';
 
-// HIV & TB Tests
-import '../ui/features/hiv_test/view_model/hiv_test_view_model.dart';
-import '../ui/features/hiv_test/widgets/hiv_test_screen.dart';
+// HCT & TB Tests
+import '../ui/features/hct_test/view_model/hct_test_view_model.dart';
+import '../ui/features/hct_test/widgets/hct_test_screen.dart';
 import '../ui/features/tb_test/view_model/tb_testing_view_model.dart';
 import '../ui/features/tb_test/widgets/tb_testing_screen.dart';
 
@@ -57,7 +58,13 @@ import '../ui/features/wellness/widgets/member_search_screen.dart';
 /// - Deep linking support for web and mobile
 /// - Path parameters for dynamic routes
 class AppRouterConfig {
-  static final GlobalKey<NavigatorState> _rootNavigatorKey =
+  /// The root [NavigatorState] key shared with [MaterialApp.router].
+  ///
+  /// Exposed publicly so that service-layer singletons (e.g.
+  /// [PushNotificationService]) can reach the active [BuildContext] for
+  /// in-app banners and imperative navigation without requiring a
+  /// widget-tree reference.
+  static final GlobalKey<NavigatorState> navigatorKey =
       GlobalKey<NavigatorState>(debugLabel: 'root');
 
   /// Check if a user is authenticated
@@ -88,7 +95,7 @@ class AppRouterConfig {
 
   static GoRouter createRouter() {
     return GoRouter(
-      navigatorKey: _rootNavigatorKey,
+      navigatorKey: navigatorKey,
       debugLogDiagnostics: true,
       initialLocation: '/login',
 
@@ -245,19 +252,25 @@ class AppRouterConfig {
             final WellnessEvent? existingEvent =
                 extra?['existingEvent'] as WellnessEvent?;
 
-            return Consumer<EventViewModel>(
-              builder: (context, eventVM, _) {
-                final onSave = explicitOnSave ??
-                    (existingEvent != null
-                        ? eventVM.updateEvent
-                        : eventVM.addEvent);
-                return EventScreen(
-                  date: date,
-                  onSave: onSave,
-                  existingEvent: existingEvent,
-                  viewModel: eventVM,
-                );
-              },
+            // EventFormViewModel owns all form state (controllers, selections).
+            // EventViewModel is accessed only for its CRUD callbacks (addEvent /
+            // updateEvent), keeping it lean as the list-only ViewModel.
+            return ChangeNotifierProvider(
+              create: (_) => EventFormViewModel(),
+              child: Consumer2<EventViewModel, EventFormViewModel>(
+                builder: (context, eventVM, formVM, _) {
+                  final onSave = explicitOnSave ??
+                      (existingEvent != null
+                          ? eventVM.updateEvent
+                          : eventVM.addEvent);
+                  return EventScreen(
+                    date: date,
+                    onSave: onSave,
+                    existingEvent: existingEvent,
+                    viewModel: formVM,
+                  );
+                },
+              ),
             );
           },
         ),
@@ -304,22 +317,22 @@ class AppRouterConfig {
           builder: (context, state) => const PastEventsScreen(),
         ),
 
-        // HIV Testing Routes
+        // HCT Testing Routes
         GoRoute(
-          path: '/hiv-test',
-          name: 'hivTest',
+          path: '/hct-test',
+          name: 'hctTest',
           builder: (context, state) => ChangeNotifierProvider(
-            create: (_) => HIVTestViewModel(),
-            child: const HIVTestScreen(),
+            create: (_) => HCTTestViewModel(),
+            child: const HCTTestScreen(),
           ),
         ),
         GoRoute(
-          path: '/hiv-result',
-          name: 'hivResults',
+          path: '/hct-result',
+          name: 'hctResults',
           builder: (context, state) {
             return ChangeNotifierProvider(
-              create: (_) => HIVTestResultViewModel(),
-              child: HIVTestResultScreen(
+              create: (_) => HCTTestResultViewModel(),
+              child: HCTTestResultScreen(
                 onPrevious: () {
                   context.pop();
                 },

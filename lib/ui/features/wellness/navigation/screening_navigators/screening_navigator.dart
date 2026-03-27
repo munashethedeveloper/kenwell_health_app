@@ -7,10 +7,10 @@ import '../../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../health_risk_assessment/widgets/health_risk_assessment_screen.dart';
 import '../../../health_risk_assessment/view_model/health_risk_assessment_view_model.dart';
 import '../../../nurse_interventions/view_model/nurse_intervention_view_model.dart';
-import '../../../hiv_test/widgets/hiv_test_screen.dart';
-import '../../../hiv_test/view_model/hiv_test_view_model.dart';
-import '../../../hiv_test_results/widgets/hiv_test_result_screen.dart';
-import '../../../hiv_test_results/view_model/hiv_test_result_view_model.dart';
+import '../../../hct_test/widgets/hct_test_screen.dart';
+import '../../../hct_test/view_model/hct_test_view_model.dart';
+import '../../../hct_test_results/widgets/hct_test_result_screen.dart';
+import '../../../hct_test_results/view_model/hct_test_result_view_model.dart';
 import '../../../tb_test/widgets/tb_testing_screen.dart';
 import '../../../tb_test/view_model/tb_testing_view_model.dart';
 import '../../../cancer/widgets/cancer_screen.dart';
@@ -100,15 +100,15 @@ class ScreeningNavigator {
 
   /// Navigate to the HCT (HIV Counselling & Testing) two-step flow.
   Future<bool?> navigateToHctFlow(Member member) async {
-    final hivTestVM = HIVTestViewModel();
-    hivTestVM.setMemberAndEventId(member.id, event.id);
+    final hctTestVM = HCTTestViewModel();
+    hctTestVM.setMemberAndEventId(member.id, event.id);
 
     final testCompleted = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
         builder: (_) => ChangeNotifierProvider.value(
-          value: hivTestVM,
-          child: HIVTestScreen(
+          value: hctTestVM,
+          child: HCTTestScreen(
             onNext: () => Navigator.of(context).pop(true),
             onPrevious: () => Navigator.of(context).pop(),
             appBar: _buildAppBar('HCT Form'),
@@ -118,22 +118,22 @@ class ScreeningNavigator {
     );
 
     if (testCompleted == true && context.mounted) {
-      final hivResultsVM = HIVTestResultViewModel();
-      hivResultsVM.initialiseWithEvent(event);
-      hivResultsVM.setMemberAndEventId(member.id, event.id);
+      final hctResultsVM = HCTTestResultViewModel();
+      hctResultsVM.initialiseWithEvent(event);
+      hctResultsVM.setMemberAndEventId(member.id, event.id);
       _applyConsentHpDetails(
-        sancController: hivResultsVM.sancNumberController,
-        rankController: hivResultsVM.rankController,
+        sancController: hctResultsVM.sancNumberController,
+        rankController: hctResultsVM.rankController,
         setPrefilledSignature: (v) =>
-            hivResultsVM.prefilledHpSignatureBase64 = v,
+            hctResultsVM.prefilledHpSignatureBase64 = v,
       );
 
       await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (_) => ChangeNotifierProvider.value(
-            value: hivResultsVM,
-            child: HIVTestResultScreen(
+            value: hctResultsVM,
+            child: HCTTestResultScreen(
               onNext: () => Navigator.of(context).pop(true),
               onPrevious: () => Navigator.of(context).pop(),
               appBar: _buildAppBar('HCT Results Form'),

@@ -17,7 +17,7 @@
       ]
     },
     {
-      "collectionGroup": "hiv_results",
+      "collectionGroup": "hct_results",
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "eventId", "order": "ASCENDING" },
@@ -25,7 +25,7 @@
       ]
     },
     {
-      "collectionGroup": "hiv_screenings",
+      "collectionGroup": "hct_screenings",
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "eventId", "order": "ASCENDING" },

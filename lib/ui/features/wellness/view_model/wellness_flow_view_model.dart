@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/ui/features/consent_form/view_model/consent_view_model.dart';
 
 // Import all view models
-import '../../hiv_test_results/view_model/hiv_test_result_view_model.dart';
+import '../../hct_test_results/view_model/hct_test_result_view_model.dart';
 import '../../nurse_interventions/view_model/nurse_intervention_view_model.dart';
 import '../../member/view_model/member_registration_view_model.dart';
 import '../../health_risk_assessment/view_model/health_risk_assessment_view_model.dart';
 import '../../health_metrics/view_model/health_metrics_view_model.dart';
-import '../../hiv_test/view_model/hiv_test_view_model.dart';
+import '../../hct_test/view_model/hct_test_view_model.dart';
 import '../../survey/view_model/survey_view_model.dart';
 import '../../tb_test/view_model/tb_testing_view_model.dart';
 import '../../cancer/view_model/cancer_view_model.dart';
@@ -16,7 +16,7 @@ import '../../../../domain/models/member.dart';
 import '../../../../domain/constants/enums.dart';
 import '../../../../data/repositories_dcl/firestore_consent_repository.dart';
 import '../../../../data/repositories_dcl/firestore_hra_repository.dart';
-import '../../../../data/repositories_dcl/firestore_hiv_screening_repository.dart';
+import '../../../../data/repositories_dcl/firestore_hct_screening_repository.dart';
 import '../../../../data/repositories_dcl/firestore_tb_screening_repository.dart';
 import '../../../../data/repositories_dcl/firestore_cancer_screening_repository.dart';
 import '../../../../data/repositories_dcl/firestore_survey_repository.dart';
@@ -27,14 +27,14 @@ class WellnessFlowViewModel extends ChangeNotifier {
     this.activeEvent,
     FirestoreConsentRepository? consentRepository,
     FirestoreHraRepository? hraRepository,
-    FirestoreHivScreeningRepository? hivRepository,
+    FirestoreHctScreeningRepository? hctRepository,
     FirestoreTbScreeningRepository? tbRepository,
     FirestoreCancerScreeningRepository? cancerRepository,
     FirestoreSurveyRepository? surveyRepository,
     LoadWellnessCompletionStatusUseCase? completionStatusUseCase,
   })  : _consentRepo = consentRepository ?? FirestoreConsentRepository(),
         _hraRepo = hraRepository ?? FirestoreHraRepository(),
-        _hivRepo = hivRepository ?? FirestoreHivScreeningRepository(),
+        _hctRepo = hctRepository ?? FirestoreHctScreeningRepository(),
         _tbRepo = tbRepository ?? FirestoreTbScreeningRepository(),
         _cancerRepo = cancerRepository ?? FirestoreCancerScreeningRepository(),
         _surveyRepo = surveyRepository ?? const FirestoreSurveyRepository() {
@@ -43,7 +43,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
         LoadWellnessCompletionStatusUseCase(
           consentRepository: _consentRepo,
           hraRepository: _hraRepo,
-          hivRepository: _hivRepo,
+          hctRepository: _hctRepo,
           tbRepository: _tbRepo,
           cancerRepository: _cancerRepo,
           surveyRepository: _surveyRepo,
@@ -53,7 +53,7 @@ class WellnessFlowViewModel extends ChangeNotifier {
   // ── Repository dependencies ────────────────────────────────────────────────
   final FirestoreConsentRepository _consentRepo;
   final FirestoreHraRepository _hraRepo;
-  final FirestoreHivScreeningRepository _hivRepo;
+  final FirestoreHctScreeningRepository _hctRepo;
   final FirestoreTbScreeningRepository _tbRepo;
   final FirestoreCancerScreeningRepository _cancerRepo;
   final FirestoreSurveyRepository _surveyRepo;
@@ -209,8 +209,8 @@ class WellnessFlowViewModel extends ChangeNotifier {
   final riskVM = PersonalRiskAssessmentViewModel();
   final healthMetricsVM = HealthMetricsViewModel();
   final nurseVM = NurseInterventionViewModel();
-  final hctTestVM = HIVTestViewModel();
-  final hctResultsVM = HIVTestResultViewModel();
+  final hctTestVM = HCTTestViewModel();
+  final hctResultsVM = HCTTestResultViewModel();
   final tbTestVM = TBTestingViewModel();
   final cancerVM = CancerScreeningViewModel();
   final surveyVM = SurveyViewModel();

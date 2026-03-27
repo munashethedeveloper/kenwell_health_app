@@ -1,3 +1,4 @@
+import '../../data/local/app_database.dart';
 import '../../data/repositories_dcl/firestore_member_repository.dart';
 import '../../data/repositories_dcl/member_repository.dart';
 
@@ -15,7 +16,7 @@ class DeleteMemberUseCase {
     MemberRepository? localRepository,
   })  : _firestoreRepository =
             firestoreRepository ?? FirestoreMemberRepository(),
-        _localRepository = localRepository ?? MemberRepository();
+        _localRepository = localRepository ?? MemberRepository(AppDatabase.instance);
 
   final FirestoreMemberRepository _firestoreRepository;
   final MemberRepository _localRepository;

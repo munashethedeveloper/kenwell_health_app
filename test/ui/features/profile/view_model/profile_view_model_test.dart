@@ -119,7 +119,7 @@ void main() {
             phoneNumber: any(named: 'phoneNumber'),
             firstName: any(named: 'firstName'),
             lastName: any(named: 'lastName'),
-          )).thenAnswer((_) async {});
+          )).thenAnswer((_) async { return; });
 
       await viewModel.loadProfile();
       final result = await viewModel.updateProfile(
