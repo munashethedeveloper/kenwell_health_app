@@ -89,6 +89,8 @@ CancerScreening _buildCancerScreening({String eventId = _eventId}) =>
       id: 'cancer-1',
       memberId: _memberId,
       eventId: eventId,
+      createdAt: DateTime(2025, 6, 1),
+      updatedAt: DateTime(2025, 6, 1),
     );
 
 LoadWellnessCompletionStatusUseCase _buildUseCase({
