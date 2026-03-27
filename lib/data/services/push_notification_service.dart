@@ -4,6 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../routing/go_router_config.dart';
 
 /// Handles Firebase Cloud Messaging initialisation, FCM token management,
 /// and foreground/background notification callbacks.
@@ -21,8 +24,9 @@ import 'package:flutter/foundation.dart';
 /// 2. Retrieves the FCM token and stores it in the current user's Firestore
 ///    document under the `fcmTokens` array.
 /// 3. Refreshes the token when it rotates.
-/// 4. Logs foreground messages via [debugPrint] (extend to show in-app
-///    banners as needed).
+/// 4. Shows an in-app banner (SnackBar) when a message arrives in the
+///    foreground.
+/// 5. Navigates to the relevant screen when the user taps a notification.
 class PushNotificationService {
   PushNotificationService._();
 
@@ -96,19 +100,81 @@ class PushNotificationService {
     }
   }
 
+  /// Shows an in-app banner (SnackBar) when a message arrives while the app
+  /// is in the foreground.  Uses the root navigator key so no [BuildContext]
+  /// needs to be threaded through to this service.
   void _handleForegroundMessage(RemoteMessage message) {
+    final title = message.notification?.title ?? 'New notification';
+    final body = message.notification?.body;
+    final text = body != null ? '$title\n$body' : title;
+
     debugPrint(
       'PushNotifications: foreground message received — '
-      '${message.notification?.title}: ${message.notification?.body}',
+      '$title: $body',
     );
-    // TODO(future): show an in-app banner using a SnackBar or overlay.
+
+    final context = AppRouterConfig.navigatorKey.currentContext;
+    if (context == null) return;
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.notifications, color: Colors.white),
+              const SizedBox(width: 8),
+              Expanded(child: Text(text)),
+            ],
+          ),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 5),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+          ),
+          action: SnackBarAction(
+            label: 'View',
+            textColor: Colors.white,
+            onPressed: () => _handleNotificationTap(message),
+          ),
+        ),
+      );
   }
 
+  /// Navigates to the relevant screen when the user taps a notification.
+  ///
+  /// Supported [RemoteMessage.data] keys:
+  /// - `eventId`  → navigates to `/event/<eventId>` (event details by ID).
+  /// - `screen`   → navigates to the named route matching the value, e.g.
+  ///                `'all-events'` → `/all-events`.
+  ///
+  /// Falls back to the home screen (`/`) if no matching key is found.
   void _handleNotificationTap(RemoteMessage message) {
     debugPrint(
       'PushNotifications: notification tapped — '
       '${message.notification?.title}: ${message.data}',
     );
-    // TODO(future): navigate to the relevant event/screen based on message.data.
+
+    final context = AppRouterConfig.navigatorKey.currentContext;
+    if (context == null) return;
+
+    final data = message.data;
+
+    // Navigate to a specific event when eventId is provided.
+    final eventId = data['eventId'] as String?;
+    if (eventId != null && eventId.isNotEmpty) {
+      GoRouter.of(context).go('/event/$eventId');
+      return;
+    }
+
+    // Navigate to a named screen when a screen key is provided.
+    final screen = data['screen'] as String?;
+    if (screen != null && screen.isNotEmpty) {
+      GoRouter.of(context).go('/$screen');
+      return;
+    }
+
+    // Default: navigate to the home/events overview screen.
+    GoRouter.of(context).go('/all-events');
   }
 }

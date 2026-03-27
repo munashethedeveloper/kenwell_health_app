@@ -4,11 +4,11 @@ import 'package:kenwell_health_app/utils/input_formatters.dart';
 import 'package:kenwell_health_app/utils/validators.dart';
 import '../../../../shared/ui/form/custom_text_field.dart';
 import '../../../../shared/ui/form/kenwell_form_card.dart';
-import '../../view_model/event_view_model.dart';
+import '../../view_model/event_form_view_model.dart';
 
 /// Contact person information form section
 class ContactPersonSection extends StatelessWidget {
-  final EventViewModel viewModel;
+  final EventFormViewModel viewModel;
   final String title;
   final bool isOnsite;
   final String? Function(String?, String?) requiredField;

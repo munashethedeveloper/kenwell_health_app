@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../view_model/event_view_model.dart';
+import '../../view_model/event_form_view_model.dart';
 import '../../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../../shared/ui/form/custom_dropdown_field.dart';
 
 /// Medical aid information form section
 class MedicalAidSection extends StatefulWidget {
-  final EventViewModel viewModel;
+  final EventFormViewModel viewModel;
   final String? Function(String?, String?) requiredSelection;
 
   // Constructor

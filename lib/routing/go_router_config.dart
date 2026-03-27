@@ -17,6 +17,7 @@ import '../ui/features/auth/widgets/login_screen.dart';
 // Calendar & Events
 import '../ui/features/calendar/widgets/calendar_screen.dart';
 import '../ui/features/event/view_model/event_details_view_model.dart';
+import '../ui/features/event/view_model/event_form_view_model.dart';
 import '../ui/features/event/view_model/event_view_model.dart';
 import '../ui/features/event/widgets/all_events_screen.dart';
 import '../ui/features/event/widgets/event_details_screen.dart';
@@ -57,7 +58,13 @@ import '../ui/features/wellness/widgets/member_search_screen.dart';
 /// - Deep linking support for web and mobile
 /// - Path parameters for dynamic routes
 class AppRouterConfig {
-  static final GlobalKey<NavigatorState> _rootNavigatorKey =
+  /// The root [NavigatorState] key shared with [MaterialApp.router].
+  ///
+  /// Exposed publicly so that service-layer singletons (e.g.
+  /// [PushNotificationService]) can reach the active [BuildContext] for
+  /// in-app banners and imperative navigation without requiring a
+  /// widget-tree reference.
+  static final GlobalKey<NavigatorState> navigatorKey =
       GlobalKey<NavigatorState>(debugLabel: 'root');
 
   /// Check if a user is authenticated
@@ -88,7 +95,7 @@ class AppRouterConfig {
 
   static GoRouter createRouter() {
     return GoRouter(
-      navigatorKey: _rootNavigatorKey,
+      navigatorKey: navigatorKey,
       debugLogDiagnostics: true,
       initialLocation: '/login',
 
@@ -245,19 +252,25 @@ class AppRouterConfig {
             final WellnessEvent? existingEvent =
                 extra?['existingEvent'] as WellnessEvent?;
 
-            return Consumer<EventViewModel>(
-              builder: (context, eventVM, _) {
-                final onSave = explicitOnSave ??
-                    (existingEvent != null
-                        ? eventVM.updateEvent
-                        : eventVM.addEvent);
-                return EventScreen(
-                  date: date,
-                  onSave: onSave,
-                  existingEvent: existingEvent,
-                  viewModel: eventVM,
-                );
-              },
+            // EventFormViewModel owns all form state (controllers, selections).
+            // EventViewModel is accessed only for its CRUD callbacks (addEvent /
+            // updateEvent), keeping it lean as the list-only ViewModel.
+            return ChangeNotifierProvider(
+              create: (_) => EventFormViewModel(),
+              child: Consumer2<EventViewModel, EventFormViewModel>(
+                builder: (context, eventVM, formVM, _) {
+                  final onSave = explicitOnSave ??
+                      (existingEvent != null
+                          ? eventVM.updateEvent
+                          : eventVM.addEvent);
+                  return EventScreen(
+                    date: date,
+                    onSave: onSave,
+                    existingEvent: existingEvent,
+                    viewModel: formVM,
+                  );
+                },
+              ),
             );
           },
         ),

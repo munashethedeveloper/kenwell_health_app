@@ -3,7 +3,7 @@ import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import '../../../../shared/ui/form/custom_text_field.dart';
 import '../../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../../shared/ui/form/kenwell_form_styles.dart';
-import '../../view_model/event_view_model.dart';
+import '../../view_model/event_form_view_model.dart';
 
 /// Event time details form section.
 ///
@@ -11,7 +11,7 @@ import '../../view_model/event_view_model.dart';
 /// Each field is read-only and opens a 24-hour [showTimePicker] when tapped.
 ///
 /// The picker is shown here (UI layer) and the selected value is forwarded to
-/// [EventViewModel.setTime] which handles formatting.  This keeps all
+/// [EventFormViewModel.setTime] which handles formatting.  This keeps all
 /// [BuildContext]-dependent UI calls out of the ViewModel.
 class EventTimeSection extends StatelessWidget {
   const EventTimeSection({
@@ -20,7 +20,7 @@ class EventTimeSection extends StatelessWidget {
     required this.requiredField,
   });
 
-  final EventViewModel viewModel;
+  final EventFormViewModel viewModel;
   final String? Function(String?, String?) requiredField;
 
   @override
@@ -89,7 +89,7 @@ class EventTimeSection extends StatelessWidget {
   }
 
   /// Shows a 24-hour [showTimePicker] dialog and forwards the result to
-  /// [EventViewModel.setTime].  Does nothing when the user cancels.
+  /// [EventFormViewModel.setTime].  Does nothing when the user cancels.
   Future<void> _showTimePicker(
     BuildContext context,
     TextEditingController controller,

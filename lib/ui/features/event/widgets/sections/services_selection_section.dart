@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../view_model/event_view_model.dart';
+import '../../view_model/event_form_view_model.dart';
 import '../../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../../shared/ui/form/kenwell_checkbox_group.dart';
 
 // Section for selecting services
 class ServicesSelectionSection extends StatefulWidget {
-  final EventViewModel viewModel;
+  final EventFormViewModel viewModel;
   final bool
       isAdditionalServices; // true for additional, false for main services
   final bool isRequired; // Whether this section is required

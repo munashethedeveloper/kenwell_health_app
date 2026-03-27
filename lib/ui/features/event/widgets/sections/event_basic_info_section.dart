@@ -4,11 +4,11 @@ import '../../../../shared/ui/form/custom_text_field.dart';
 import '../../../../shared/ui/form/kenwell_date_field.dart';
 import '../../../../shared/ui/form/kenwell_form_card.dart';
 import '../../../../shared/ui/form/kenwell_form_styles.dart';
-import '../../view_model/event_view_model.dart';
+import '../../view_model/event_form_view_model.dart';
 
 /// Event basic information form section
 class EventBasicInfoSection extends StatelessWidget {
-  final EventViewModel viewModel;
+  final EventFormViewModel viewModel;
   final DateTime date;
   final String? Function(String?, String?) requiredField;
 

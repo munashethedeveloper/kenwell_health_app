@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../view_model/event_view_model.dart';
+import '../../view_model/event_form_view_model.dart';
 import '../../../../shared/ui/form/kenwell_form_card.dart';
 import 'yes_no_count_widget.dart';
 
 /// Event options form section
 class EventOptionsSection extends StatefulWidget {
-  final EventViewModel viewModel;
+  final EventFormViewModel viewModel;
   final String? Function(String?, String?) requiredSelection;
 
   // Constructor
