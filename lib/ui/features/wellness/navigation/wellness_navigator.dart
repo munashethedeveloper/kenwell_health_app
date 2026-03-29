@@ -199,6 +199,7 @@ class WellnessNavigator {
       }),
     );
 
+    if (!context.mounted) return;
     await Navigator.push(
       context,
       MaterialPageRoute(
@@ -225,6 +226,7 @@ class WellnessNavigator {
                     if (memberId != null) {
                       await wellnessVM.loadAllCompletionFlags(
                           memberId, eventId);
+                      if (!context.mounted) return;
                       AppSnackbar.showInfo(context, 'Status refreshed.');
                     }
                   },

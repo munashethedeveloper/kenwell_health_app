@@ -266,7 +266,7 @@ class _EventStatsDetailScreenState extends State<EventStatsDetailScreen> {
                       width: double.infinity,
                       child: ElevatedButton.icon(
                         onPressed:
-                            _isExporting ? null : () => _exportToExcel(context),
+                            _isExporting ? null : _exportToExcel,
                         icon: _isExporting
                             ? const SizedBox(
                                 width: 18,
@@ -299,13 +299,13 @@ class _EventStatsDetailScreenState extends State<EventStatsDetailScreen> {
     );
   }
 
-  Future<void> _exportToExcel(BuildContext context) async {
+  Future<void> _exportToExcel() async {
     setState(() => _isExporting = true);
     try {
       final exporter = EventReportExporter();
       final filePath = await exporter.export(event);
       if (!mounted) return;
-      _showExportSuccessSheet(context, filePath);
+      _showExportSuccessSheet(filePath);
     } catch (e) {
       if (!mounted) return;
       AppSnackbar.showError(context, 'Export failed: $e');
@@ -314,7 +314,7 @@ class _EventStatsDetailScreenState extends State<EventStatsDetailScreen> {
     }
   }
 
-  void _showExportSuccessSheet(BuildContext context, String filePath) {
+  void _showExportSuccessSheet(String filePath) {
     final theme = Theme.of(context);
     final fileName = filePath.split('/').last;
 

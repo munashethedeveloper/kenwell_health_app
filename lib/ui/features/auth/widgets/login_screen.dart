@@ -64,7 +64,7 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
           await profileVM.loadProfile();
           await authVM.checkLoginStatus();
           viewModel.clearNavigationTarget();
-          if (mounted) context.go('/');
+          if (mounted) this.context.go('/');
         });
       }
 
@@ -303,7 +303,7 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
                                             .resendVerificationEmail();
                                         if (mounted) {
                                           AppSnackbar.showSuccess(
-                                              context,
+                                              this.context,
                                               'Verification email sent — '
                                               'please check your inbox.');
                                         }
