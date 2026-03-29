@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/ui/features/audit_log/widgets/audit_log_screen.dart';
@@ -96,7 +97,7 @@ class AppRouterConfig {
   static GoRouter createRouter() {
     return GoRouter(
       navigatorKey: navigatorKey,
-      debugLogDiagnostics: true,
+      debugLogDiagnostics: kDebugMode,
       initialLocation: '/login',
 
       // Global redirect logic for authentication and authorization

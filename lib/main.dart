@@ -93,8 +93,23 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  // Create the router exactly once for the lifetime of this widget.
+  //
+  // Previously this was created inside Consumer<ThemeProvider>.builder, which
+  // caused a brand-new GoRouter (and therefore a new navigation stack) to be
+  // constructed on every theme change. That wiped all navigation history and
+  // was responsible for the "Skipped 30 frames" warning because the full
+  // route-parsing and initial redirect logic ran synchronously on the main
+  // thread during every rebuild.
+  late final _router = AppRouterConfig.createRouter();
 
   @override
   Widget build(BuildContext context) {
@@ -102,15 +117,13 @@ class MyApp extends StatelessWidget {
       providers: AppProviders.rootProviders,
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, _) {
-          final goRouter = AppRouterConfig.createRouter();
-
           return MaterialApp.router(
             debugShowCheckedModeBanner: false,
             title: 'Wellness Planner',
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: themeProvider.themeMode,
-            routerConfig: goRouter,
+            routerConfig: _router,
             // Inject the offline banner above every route so it appears
             // on every screen without modifying each screen individually.
             builder: (context, child) => Column(
