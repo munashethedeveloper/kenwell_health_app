@@ -131,30 +131,28 @@ class MemberDetailsScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        Column(
-          children: [
-            RadioListTile<String>(
-              value: 'SA Citizen',
-              groupValue: vm.citizenshipStatus,
-              onChanged: (value) => vm.setCitizenshipStatus(value),
-              title: const Text('SA Citizen'),
-              contentPadding: EdgeInsets.zero,
-            ),
-            RadioListTile<String>(
-              value: 'Permanent Resident',
-              groupValue: vm.citizenshipStatus,
-              onChanged: (value) => vm.setCitizenshipStatus(value),
-              title: const Text('Permanent Resident'),
-              contentPadding: EdgeInsets.zero,
-            ),
-            RadioListTile<String>(
-              value: 'Other Nationality',
-              groupValue: vm.citizenshipStatus,
-              onChanged: (value) => vm.setCitizenshipStatus(value),
-              title: const Text('Other Nationality'),
-              contentPadding: EdgeInsets.zero,
-            ),
-          ],
+        RadioGroup<String>(
+          groupValue: vm.citizenshipStatus,
+          onChanged: (value) => vm.setCitizenshipStatus(value),
+          child: Column(
+            children: [
+              RadioListTile<String>(
+                value: 'SA Citizen',
+                title: const Text('SA Citizen'),
+                contentPadding: EdgeInsets.zero,
+              ),
+              RadioListTile<String>(
+                value: 'Permanent Resident',
+                title: const Text('Permanent Resident'),
+                contentPadding: EdgeInsets.zero,
+              ),
+              RadioListTile<String>(
+                value: 'Other Nationality',
+                title: const Text('Other Nationality'),
+                contentPadding: EdgeInsets.zero,
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 16),
 

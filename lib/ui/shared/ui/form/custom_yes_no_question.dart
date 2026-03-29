@@ -32,6 +32,11 @@ class KenwellYesNoQuestion<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final effectiveOnChanged = enabled ? onChanged : null;
 
+    final tiles = [
+      _KenwellRadioTile<T>(label: yesLabel, value: yesValue),
+      _KenwellRadioTile<T>(label: noLabel, value: noValue),
+    ];
+
     return Padding(
       padding: padding,
       child: Column(
@@ -41,30 +46,13 @@ class KenwellYesNoQuestion<T> extends StatelessWidget {
           RadioGroup<T>(
             groupValue: value,
             onChanged: effectiveOnChanged,
-            builder: (groupValue, handler) {
-              final tiles = [
-                _KenwellRadioTile<T>(
-                  label: yesLabel,
-                  value: yesValue,
-                  groupValue: groupValue,
-                  onChanged: handler,
-                ),
-                _KenwellRadioTile<T>(
-                  label: noLabel,
-                  value: noValue,
-                  groupValue: groupValue,
-                  onChanged: handler,
-                ),
-              ];
-
-              return axis == Axis.horizontal
-                  ? Row(
-                      children: tiles
-                          .map((tile) => Expanded(child: tile))
-                          .toList(growable: false),
-                    )
-                  : Column(children: tiles);
-            },
+            child: axis == Axis.horizontal
+                ? Row(
+                    children: tiles
+                        .map((tile) => Expanded(child: tile))
+                        .toList(growable: false),
+                  )
+                : Column(children: tiles),
           ),
         ],
       ),
@@ -76,40 +64,18 @@ class _KenwellRadioTile<T> extends StatelessWidget {
   const _KenwellRadioTile({
     required this.label,
     required this.value,
-    required this.groupValue,
-    required this.onChanged,
   });
 
   final String label;
   final T value;
-  final T? groupValue;
-  final ValueChanged<T?>? onChanged;
 
   @override
   Widget build(BuildContext context) {
     return RadioListTile<T>(
       title: Text(label),
       value: value,
-      groupValue: groupValue,
-      onChanged: (val) => onChanged?.call(val),
       dense: true,
       toggleable: false,
     );
   }
-}
-
-class RadioGroup<T> extends StatelessWidget {
-  const RadioGroup({
-    super.key,
-    required this.groupValue,
-    required this.onChanged,
-    required this.builder,
-  });
-
-  final T? groupValue;
-  final ValueChanged<T?>? onChanged;
-  final Widget Function(T? groupValue, ValueChanged<T?>? onChanged) builder;
-
-  @override
-  Widget build(BuildContext context) => builder(groupValue, onChanged);
 }
