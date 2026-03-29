@@ -31,10 +31,10 @@ class RegistrationManagementScreenBody extends StatelessWidget {
           ),
           automaticallyImplyLeading: false,
           actions: [
-            IconButton(
-              tooltip: 'Help',
-              icon: const Icon(Icons.help_outline, color: Colors.white),
+            TextButton.icon(
               onPressed: () => context.pushNamed('help'),
+              icon: const Icon(Icons.help_outline, color: Colors.white),
+              label: const Text('Help', style: TextStyle(color: Colors.white)),
             ),
           ],
         ),

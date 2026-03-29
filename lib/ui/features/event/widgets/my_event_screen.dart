@@ -163,12 +163,10 @@ class MyEventScreenState extends State<MyEventScreen> {
                   duration: const Duration(seconds: 2));
             },
           ),
-          IconButton(
-            tooltip: 'Help',
+          TextButton.icon(
+            onPressed: () => context.pushNamed('help'),
             icon: const Icon(Icons.help_outline, color: Colors.white),
-            onPressed: () {
-              if (mounted) context.pushNamed('help');
-            },
+            label: const Text('Help', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
