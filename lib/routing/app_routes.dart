@@ -41,6 +41,7 @@ abstract final class AppRoutes {
   static const String allocateEvent = 'allocateEvent';
   static const String help = 'help';
   static const String faq = 'faq';
+  static const String legal = 'legal';
   static const String auditLog = 'auditLog';
   static const String userManagement = 'userManagement';
   static const String userManagementVersionTwo = 'userManagementVersionTwo';

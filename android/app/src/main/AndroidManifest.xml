@@ -33,6 +33,31 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
+            <!-- ── Android App Links (HTTPS deep links) ──────────────────────
+                 Allows the app to handle HTTPS URLs for kenwellhealth.co.za
+                 so that links from emails, push notifications, and external
+                 apps open directly in the app without a chooser dialog.
+                 The associated Digital Asset Links JSON file must be hosted at:
+                   https://kenwellhealth.co.za/.well-known/assetlinks.json
+                 with the correct package name and SHA-256 certificate fingerprint.
+            ──────────────────────────────────────────────────────────────── -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:scheme="https"
+                    android:host="kenwellhealth.co.za"/>
+            </intent-filter>
+
+            <!-- Custom URI scheme for fallback (e.g. QR codes, email links) -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="kenwell365"/>
+            </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->

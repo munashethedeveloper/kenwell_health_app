@@ -49,5 +49,25 @@
 	<string>We need permission to send you event reminders and wellness updates</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We need location access to help auto-fill address details when creating events</string>
+	<!-- ── Custom URL scheme for deep links / fallback ──────────────────────
+	     Allows the app to open kenwell365:// URIs from emails, QR codes,
+	     and push notification payloads.  HTTPS Universal Links (associated
+	     domains) require an Apple Developer account; add the entitlement
+	     "applinks:kenwellhealth.co.za" in Runner.entitlements once the
+	     apple-app-site-association file is hosted at that domain.
+	─────────────────────────────────────────────────────────────────────── -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.kenwell.healthapp</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>kenwell365</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

@@ -50,10 +50,14 @@ class KenwellAppBarActions {
             }
           },
         ),
-      TextButton.icon(
-        onPressed: () => context.pushNamed(AppRoutes.help),
-        icon: const Icon(Icons.help_outline, color: Colors.white),
-        label: const Text('Help', style: TextStyle(color: Colors.white)),
+      Semantics(
+        button: true,
+        label: 'Help',
+        child: TextButton.icon(
+          onPressed: () => context.pushNamed(AppRoutes.help),
+          icon: const Icon(Icons.help_outline, color: Colors.white),
+          label: const Text('Help', style: TextStyle(color: Colors.white)),
+        ),
       ),
     ];
   }

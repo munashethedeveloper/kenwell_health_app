@@ -74,6 +74,14 @@ void main() async {
         .setPerformanceCollectionEnabled(!kDebugMode);
     debugPrint(
         'Firebase Performance: collection ${kDebugMode ? "disabled (debug)" : "enabled (release)"}');
+
+    // Explicitly enable Crashlytics crash reporting in release builds.
+    // This ensures that the collection flag matches the intended production
+    // behaviour regardless of any cached setting from a previous build.
+    await FirebaseCrashlytics.instance
+        .setCrashlyticsCollectionEnabled(!kDebugMode);
+    debugPrint(
+        'Firebase Crashlytics: collection ${kDebugMode ? "disabled (debug)" : "enabled (release)"}');
   } catch (e) {
     debugPrint('Firebase initialization error: $e');
     debugPrint('App will run with limited functionality (local database only)');
