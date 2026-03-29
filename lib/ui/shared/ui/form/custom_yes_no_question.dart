@@ -18,7 +18,7 @@ class KenwellYesNoQuestion<T> extends StatelessWidget {
 
   final String question;
   final T? value;
-  final ValueChanged<T?> onChanged;
+  final ValueChanged<T> onChanged;
   final T yesValue;
   final T noValue;
   final EdgeInsetsGeometry padding;
