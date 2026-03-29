@@ -1,4 +1,4 @@
-package com.example.kenwell_health_app
+package com.kenwell.healthapp
 
 import io.flutter.embedding.android.FlutterActivity
 

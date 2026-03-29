@@ -46,7 +46,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
     super.dispose();
   }
 
-  /*  void _showUserOptions(UserModel user) {
+  void _showUserOptions(UserModel user) {
     final theme = Theme.of(context);
     final isAssigned = _allocVM.isAssigned(user.id);
 
@@ -153,7 +153,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
         ),
       ),
     );
-  } */
+  }
 
   Future<void> _assignUser(UserModel user) async {
     if (!mounted) return;
