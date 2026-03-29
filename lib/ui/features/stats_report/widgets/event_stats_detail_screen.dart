@@ -14,6 +14,7 @@ import 'sections/stats_metric_card.dart';
 import 'health_screening_stats_section.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 import '../services/event_report_exporter.dart';
+import 'package:kenwell_health_app/routing/app_routes.dart';
 
 class EventStatsDetailScreen extends StatefulWidget {
   final WellnessEvent event;
@@ -56,7 +57,7 @@ class _EventStatsDetailScreenState extends State<EventStatsDetailScreen> {
             },
           ),
           TextButton.icon(
-            onPressed: () => context.pushNamed('help'),
+            onPressed: () => context.pushNamed(AppRoutes.help),
             icon: const Icon(Icons.help_outline, color: Colors.white),
             label: const Text('Help', style: TextStyle(color: Colors.white)),
           ),

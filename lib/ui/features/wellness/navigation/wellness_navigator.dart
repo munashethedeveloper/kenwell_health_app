@@ -18,6 +18,7 @@ import '../../member/widgets/member_registration_screen.dart';
 import '../../member/view_model/member_registration_view_model.dart';
 import 'screening_navigators/screening_navigator.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
+import 'package:kenwell_health_app/routing/app_routes.dart';
 
 /// Central navigation coordinator for the wellness flow
 /// Manages screen-to-screen navigation with proper data passing
@@ -62,7 +63,7 @@ class WellnessNavigator {
               TextButton.icon(
                 onPressed: () {
                   if (context.mounted) {
-                    context.pushNamed('help');
+                    context.pushNamed(AppRoutes.help);
                   }
                 },
                 icon: const Icon(Icons.help_outline, color: Colors.white),

@@ -4,6 +4,7 @@ import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_m
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:provider/provider.dart';
+import 'package:kenwell_health_app/routing/app_routes.dart';
 
 class RegistrationManagementScreen extends StatelessWidget {
   const RegistrationManagementScreen({super.key});
@@ -32,7 +33,7 @@ class RegistrationManagementScreenBody extends StatelessWidget {
           automaticallyImplyLeading: false,
           actions: [
             TextButton.icon(
-              onPressed: () => context.pushNamed('help'),
+              onPressed: () => context.pushNamed(AppRoutes.help),
               icon: const Icon(Icons.help_outline, color: Colors.white),
               label: const Text('Help', style: TextStyle(color: Colors.white)),
             ),
@@ -80,7 +81,7 @@ class RegistrationManagementScreenBody extends StatelessWidget {
                                       'Manage staff who oversee wellness events.',
                                   //badgeLabel: 'Staff',
                                   onTap: () => context
-                                      .pushNamed('userManagementVersionTwo'),
+                                      .pushNamed(AppRoutes.userManagementVersionTwo),
                                 ),
                               ),
                               const SizedBox(width: 14),
@@ -104,7 +105,7 @@ class RegistrationManagementScreenBody extends StatelessWidget {
                                       'Manage individuals who participate in wellness events.',
                                   // badgeLabel: 'Members',
                                   onTap: () =>
-                                      context.pushNamed('memberManagement'),
+                                      context.pushNamed(AppRoutes.memberManagement),
                                 ),
                               ),
                             ],
@@ -130,7 +131,7 @@ class RegistrationManagementScreenBody extends StatelessWidget {
                             subtitle:
                                 'Manage wellness event schedules and allocations.',
                             // badgeLabel: 'Events',
-                            onTap: () => context.pushNamed('calendar'),
+                            onTap: () => context.pushNamed(AppRoutes.calendar),
                           ),
                         ],
                       ),

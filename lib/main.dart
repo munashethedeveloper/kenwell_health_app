@@ -11,7 +11,7 @@ import 'data/services/push_notification_service.dart';
 import 'package:provider/provider.dart';
 
 import 'firebase_options.dart';
-import 'providers/theme_provider.dart';
+import 'ui/shared/themes/theme_provider.dart';
 import 'routing/go_router_config.dart';
 import 'ui/shared/themes/app_theme.dart';
 

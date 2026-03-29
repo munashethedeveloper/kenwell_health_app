@@ -5,6 +5,7 @@ import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:provider/provider.dart';
 import '../view_model/help_screen_view_model.dart';
+import 'package:kenwell_health_app/routing/app_routes.dart';
 
 // HelpScreen provides help and support information to users
 class HelpScreen extends StatelessWidget {
@@ -84,7 +85,7 @@ class HelpScreen extends StatelessWidget {
                         subtitle:
                             'Find answers to common questions and get help',
                         badgeLabel: 'FAQs',
-                        onTap: () => context.push('/faq'),
+                        onTap: () => context.pushNamed(AppRoutes.faq),
                       ),
                       const SizedBox(height: 16),
                       KenwellActionCard(

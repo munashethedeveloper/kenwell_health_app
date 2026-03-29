@@ -7,6 +7,7 @@ import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 import 'package:provider/provider.dart';
 import 'sections/home_notifications_section.dart';
+import 'package:kenwell_health_app/routing/app_routes.dart';
 
 /// Home screen — modern profile hero, quick-action grid, smart alerts.
 class HomeScreen extends StatefulWidget {
@@ -76,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
               TextButton.icon(
-                onPressed: () => context.pushNamed('help'),
+                onPressed: () => context.pushNamed(AppRoutes.help),
                 icon: const Icon(Icons.help_outline, color: Colors.white),
                 label:
                     const Text('Help', style: TextStyle(color: Colors.white)),
@@ -113,10 +114,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 // ── Quick actions ────────────────────────────────────────
                 SliverToBoxAdapter(
                   child: _QuickActionsGrid(
-                    onAddEvent: () => context.pushNamed('addEditEvent'),
-                    onAllEvents: () => context.pushNamed('allEvents'),
-                    onProfile: () => context.pushNamed('profile'),
-                    onLiveStats: () => context.pushNamed('liveEvents'),
+                    onAddEvent: () => context.pushNamed(AppRoutes.addEditEvent),
+                    onAllEvents: () => context.pushNamed(AppRoutes.allEvents),
+                    onProfile: () => context.pushNamed(AppRoutes.profile),
+                    onLiveStats: () => context.pushNamed(AppRoutes.liveEvents),
                   ),
                 ),
 

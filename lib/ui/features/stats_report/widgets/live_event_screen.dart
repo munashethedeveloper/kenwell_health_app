@@ -7,6 +7,7 @@ import '../../../shared/ui/headers/kenwell_gradient_header.dart';
 import '../../../shared/ui/snackbars/app_snackbar.dart';
 import '../../event/view_model/event_view_model.dart';
 import 'event_stats_content.dart';
+import 'package:kenwell_health_app/routing/app_routes.dart';
 
 /// Displays statistics and a breakdown of events that are currently in-progress.
 class LiveEventsScreen extends StatelessWidget {
@@ -35,7 +36,7 @@ class LiveEventsScreen extends StatelessWidget {
             },
           ),
           TextButton.icon(
-            onPressed: () => context.pushNamed('help'),
+            onPressed: () => context.pushNamed(AppRoutes.help),
             icon: const Icon(Icons.help_outline, color: Colors.white),
             label: const Text('Help', style: TextStyle(color: Colors.white)),
           ),
