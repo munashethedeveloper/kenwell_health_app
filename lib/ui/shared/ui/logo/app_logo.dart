@@ -16,13 +16,13 @@ class AppLogo extends StatelessWidget {
               BorderRadius.circular(size * 0.28), // Modern, very rounded
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.10),
+              color: Colors.black.withValues(alpha: 0.10),
               blurRadius: 24,
               offset: const Offset(0, 8),
             ),
           ],
           border: Border.all(
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
             width: 4,
           ),
         ),
