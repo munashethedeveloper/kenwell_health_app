@@ -1,3 +1,5 @@
+import 'dart:async' show unawaited;
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../domain/models/wellness_event.dart';
@@ -33,9 +35,9 @@ class AllEventsViewModel extends ChangeNotifier {
   /// are asked to rebuild.
   void updateEvents(List<WellnessEvent> events) {
     _allEvents = List.unmodifiable(events);
-    Future.microtask(() {
+    unawaited(Future.microtask(() {
       if (!_disposed) notifyListeners();
-    });
+    }));
   }
 
   final TextEditingController searchController = TextEditingController();
