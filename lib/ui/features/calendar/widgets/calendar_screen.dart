@@ -5,6 +5,7 @@ import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.
 import 'package:provider/provider.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../domain/constants/role_permissions.dart';
+import '../../event/view_model/event_form_view_model.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../../event/widgets/event_screen.dart';
 import '../../profile/view_model/profile_view_model.dart';
@@ -217,17 +218,22 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => EventScreen(
-          date: date,
-          existingEvent: existingEvent,
-          onSave: (event) async {
-            if (existingEvent == null) {
-              await eventViewModel.addEvent(event);
-            } else {
-              await eventViewModel.updateEvent(event);
-            }
-          },
-          viewModel: eventViewModel,
+        builder: (_) => ChangeNotifierProvider(
+          create: (_) => EventFormViewModel(),
+          child: Builder(
+            builder: (ctx) => EventScreen(
+              date: date,
+              existingEvent: existingEvent,
+              onSave: (event) async {
+                if (existingEvent == null) {
+                  await eventViewModel.addEvent(event);
+                } else {
+                  await eventViewModel.updateEvent(event);
+                }
+              },
+              viewModel: ctx.read<EventFormViewModel>(),
+            ),
+          ),
         ),
       ),
     );
