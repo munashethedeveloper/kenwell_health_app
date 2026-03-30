@@ -428,3 +428,226 @@ Use these messages when testing FCM delivery in a development environment.
 | Audit Log | `screen: audit-log` |
 | Help / FAQ | `screen: faq` |
 | Specific event | `eventId: <firestoreDocumentId>` |
+
+---
+
+## 10. Reconfiguring Firebase After Renaming the Package
+
+This section walks you through every file that must change when you rename the app's package/bundle ID.
+The current package ID in this repository is **`com.kenwell.healthapp`** (Android) and **`com.example.kenwellHealthApp`** (iOS).
+Replace both with your new IDs in the steps below.
+
+---
+
+### Step 1 – Update the Firebase Console (Android)
+
+Firebase ties each Android app to an exact `package_name`. You cannot change it in place; you must re-register.
+
+1. Open [Firebase Console](https://console.firebase.google.com/) → your project → **Project settings**.
+2. Under **Your apps**, find the Android app (`com.kenwell.healthapp`).
+3. Click the three-dot menu → **Delete this app** (existing data is NOT deleted from Firestore/Auth/etc.).
+4. Click **Add app → Android**.
+5. Enter your new package name (e.g. `com.yourcompany.newapp`).
+6. Enter the app nickname and, if you have a release keystore, the **SHA-1** certificate fingerprint.
+7. Download the freshly generated **`google-services.json`** and replace:
+   ```
+   android/app/google-services.json
+   ```
+8. Repeat for any SHA-1 variants (debug, release, CI) under **Project settings → Your apps → Add fingerprint**.
+
+---
+
+### Step 2 – Update the Firebase Console (iOS)
+
+1. In Firebase Console → **Project settings → Your apps**, find the iOS app.
+2. Click the three-dot menu → **Delete this app**.
+3. Click **Add app → Apple**.
+4. Enter your new bundle ID (e.g. `com.yourcompany.newapp`).
+5. Download the freshly generated **`GoogleService-Info.plist`** and replace:
+   ```
+   ios/Runner/GoogleService-Info.plist
+   ```
+   (This file is not present in the repo by default if it was gitignored — place it in that path.)
+
+---
+
+### Step 3 – Update `android/app/build.gradle.kts`
+
+Open `android/app/build.gradle.kts` and change **two** values:
+
+```kotlin
+// Before
+namespace = "com.kenwell.healthapp"
+// ...
+applicationId = "com.kenwell.healthapp"
+
+// After
+namespace = "com.yourcompany.newapp"
+// ...
+applicationId = "com.yourcompany.newapp"
+```
+
+Both `namespace` (line 12) and `applicationId` (inside `defaultConfig`, line 60) must match your new package name.
+
+---
+
+### Step 4 – Rename the Kotlin source directory
+
+Flutter generates the Kotlin entry point in a directory that mirrors the package name.
+The current file is:
+
+```
+android/app/src/main/kotlin/com/kenwell/healthapp/MainActivity.kt
+```
+
+1. Create the new directory tree:
+   ```
+   android/app/src/main/kotlin/com/yourcompany/newapp/
+   ```
+2. Move `MainActivity.kt` into it.
+3. Update the `package` declaration at the top of `MainActivity.kt`:
+   ```kotlin
+   // Before
+   package com.kenwell.healthapp
+
+   // After
+   package com.yourcompany.newapp
+   ```
+4. Delete the now-empty old directory tree (`com/kenwell/healthapp/`).
+
+---
+
+### Step 5 – Update `android/app/src/main/AndroidManifest.xml`
+
+If `AndroidManifest.xml` contains an explicit `package=` attribute, update it:
+
+```xml
+<!-- Before -->
+<manifest xmlns:android="..." package="com.kenwell.healthapp">
+
+<!-- After -->
+<manifest xmlns:android="..." package="com.yourcompany.newapp">
+```
+
+> **Note:** In modern Android Gradle Plugin (AGP ≥ 7.3), the `package` attribute in the manifest is replaced by `namespace` in `build.gradle.kts`. Check whether your manifest still has it and remove or update it accordingly.
+
+---
+
+### Step 6 – Update the iOS bundle identifier in Xcode
+
+The iOS bundle ID is stored in the Xcode project file and used at build time via `$(PRODUCT_BUNDLE_IDENTIFIER)`.
+
+**Option A — Xcode GUI (recommended)**
+1. Open `ios/Runner.xcworkspace` in Xcode.
+2. Select the **Runner** project → **Runner** target → **Signing & Capabilities** tab.
+3. Change **Bundle Identifier** from `com.example.kenwellHealthApp` to your new ID.
+4. Xcode updates `ios/Runner.xcodeproj/project.pbxproj` automatically.
+
+**Option B — sed (fast for CI/scripting)**
+```bash
+# Replace all occurrences of the old iOS bundle ID
+sed -i '' \
+  's/com\.example\.kenwellHealthApp/com.yourcompany.newapp/g' \
+  ios/Runner.xcodeproj/project.pbxproj
+```
+
+There are currently **6 occurrences** of `com.example.kenwellHealthApp` in `project.pbxproj` (3 for the app target, 3 for the RunnerTests target).
+
+---
+
+### Step 7 – Update `pubspec.yaml`
+
+If you are also changing the Dart package name (the `name:` field), update `pubspec.yaml`:
+
+```yaml
+# Before
+name: kenwell_health_app
+
+# After
+name: your_new_app_name
+```
+
+Then run a project-wide find-and-replace for every Dart `import` that references the old name:
+
+```bash
+# Find all affected imports
+grep -r "package:kenwell_health_app/" lib/ test/
+
+# Replace (macOS)
+find lib test -name "*.dart" \
+  -exec sed -i '' \
+    's|package:kenwell_health_app/|package:your_new_app_name/|g' {} +
+```
+
+---
+
+### Step 8 – Flush dependency caches and rebuild
+
+```bash
+flutter clean
+flutter pub get
+flutter pub run build_runner build --delete-conflicting-outputs
+```
+
+Then do a full build to confirm no breakage:
+
+```bash
+# Android
+flutter build apk --debug
+
+# iOS (requires a Mac with Xcode)
+flutter build ios --debug --no-codesign
+```
+
+---
+
+### Step 9 – Update Firebase CLI project association (optional)
+
+If you use the Firebase CLI for Hosting, Functions, or Firestore rules deployment, check `.firebaserc`:
+
+```json
+{
+  "projects": {
+    "default": "kenwellmobileapp"
+  }
+}
+```
+
+This is a **Firebase project ID** (not the app package name) so it does not need to change unless you also moved to a different Firebase project.
+
+---
+
+### Step 10 – Re-run `flutterfire configure` (recommended)
+
+The easiest way to regenerate all config files at once is to re-run the FlutterFire CLI:
+
+```bash
+# Install/update the CLI if needed
+dart pub global activate flutterfire_cli
+
+# Re-configure — this regenerates google-services.json,
+# GoogleService-Info.plist, and lib/firebase_options.dart
+flutterfire configure --project=kenwellmobileapp
+```
+
+When prompted, enter your new package name / bundle ID. The CLI will update:
+- `android/app/google-services.json`
+- `ios/Runner/GoogleService-Info.plist`
+- `lib/firebase_options.dart` (if you have one)
+
+---
+
+### Quick checklist
+
+| # | File / location | What changes |
+|---|---|---|
+| 1 | Firebase Console (Android) | Re-register with new `package_name`; download new `google-services.json` |
+| 2 | Firebase Console (iOS) | Re-register with new bundle ID; download new `GoogleService-Info.plist` |
+| 3 | `android/app/build.gradle.kts` | `namespace` + `applicationId` |
+| 4 | `android/app/src/main/kotlin/…/MainActivity.kt` | Directory path + `package` declaration |
+| 5 | `android/app/src/main/AndroidManifest.xml` | `package=` attribute (if present) |
+| 6 | `ios/Runner.xcodeproj/project.pbxproj` | All 6 `PRODUCT_BUNDLE_IDENTIFIER` values |
+| 7 | `pubspec.yaml` | `name:` field + all `import 'package:…'` statements |
+| 8 | Build | `flutter clean && flutter pub get && build_runner` |
+| 9 | `.firebaserc` | Only if moving to a different Firebase project |
+| 10 | *(optional)* `flutterfire configure` | Regenerates all Firebase config files in one step |
