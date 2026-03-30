@@ -25,9 +25,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   // Rebuilt only when the user's role changes so the IndexedStack never
   // discards live screen states due to role-unrelated ProfileViewModel updates.
   String _cachedRole = '';
-  List<Widget> _tabs = const [];
-  List<NavigationRailDestination> _railDestinations = const [];
-  List<NavigationDestination> _navDestinations = const [];
+  List<Widget> _tabs = [];
+  List<NavigationRailDestination> _railDestinations = [];
+  List<NavigationDestination> _navDestinations = [];
 
   @override
   void initState() {
@@ -208,10 +208,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     if (role != _cachedRole) {
       _cachedRole = role;
       _rebuildTabsForRole(role);
-      // Clamp the current index in-place so the IndexedStack never receives
-      // an out-of-range index.  A postFrameCallback is used so that we do not
-      // call setState() while Flutter is executing buildScope(), which would
-      // throw "setState() called during build".
+      // Schedule a clamp after the current frame completes so we do not call
+      // setState() while Flutter is executing buildScope(), which would throw
+      // "setState() called during build".
       if (_currentIndex >= _tabs.length) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) setState(() => _currentIndex = _tabs.length - 1);
@@ -219,6 +218,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       }
     }
 
+    // Use clamp as a same-frame guard in case the postFrameCallback fires
+    // after this frame but before the next one renders.
     final int currentIndex =
         _currentIndex.clamp(0, _tabs.length - 1);
 

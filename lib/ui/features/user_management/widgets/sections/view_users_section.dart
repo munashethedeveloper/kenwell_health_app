@@ -284,8 +284,6 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
   Widget build(BuildContext context) {
     return Consumer<UserManagementViewModel>(
       builder: (context, viewModel, child) {
-
-
         if (viewModel.isLoading && viewModel.users.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }

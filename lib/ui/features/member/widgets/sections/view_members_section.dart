@@ -216,8 +216,6 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
   Widget build(BuildContext context) {
     return Consumer<MemberDetailsViewModel>(
       builder: (context, viewModel, child) {
-
-
         if (viewModel.isLoading && viewModel.members.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
