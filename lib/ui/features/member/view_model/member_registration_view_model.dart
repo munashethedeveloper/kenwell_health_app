@@ -466,7 +466,12 @@ class MemberDetailsViewModel extends ChangeNotifier {
       filtered = filtered.where((member) {
         final fullName = '${member.name} ${member.surname}'.toLowerCase();
         final email = member.email?.toLowerCase() ?? '';
-        return fullName.contains(query) || email.contains(query);
+        final idNum = member.idNumber?.toLowerCase() ?? '';
+        final passport = member.passportNumber?.toLowerCase() ?? '';
+        return fullName.contains(query) ||
+            email.contains(query) ||
+            idNum.contains(query) ||
+            passport.contains(query);
       }).toList();
     }
 

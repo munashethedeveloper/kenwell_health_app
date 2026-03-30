@@ -96,15 +96,19 @@ class FirestoreMemberRepository {
   /// Fetch member by SA ID number.
   ///
   /// Tries Firestore first; falls back to the local Drift cache if offline.
+  ///
+  /// Note: because [FieldEncryption] uses a random IV, the stored ciphertext
+  /// differs from a freshly-encrypted value, so Firestore equality queries on
+  /// encrypted fields are unreliable.  We therefore fetch all members (which
+  /// are cached locally after the first call) and compare the already-decrypted
+  /// [Member.idNumber] values in memory.
   Future<Member?> fetchMemberByIdNumber(String idNumber) async {
     try {
-      final docs = await _firestore.queryDocuments(
-        collection: membersCollection,
-        field: 'idNumber',
-        isEqualTo: FieldEncryption.encrypt(idNumber),
-      );
-      if (docs.isEmpty) return null;
-      return _mapToMember(docs.first);
+      final allMembers = await fetchAllMembers();
+      for (final m in allMembers) {
+        if (m.idNumber == idNumber) return m;
+      }
+      return null;
     } catch (e) {
       debugPrint(
           'FirestoreMemberRepository: Firestore ID-number search failed ($e) — using local cache');
@@ -115,15 +119,16 @@ class FirestoreMemberRepository {
   /// Fetch member by passport number.
   ///
   /// Tries Firestore first; falls back to the local Drift cache if offline.
+  ///
+  /// See [fetchMemberByIdNumber] for why we compare decrypted values locally
+  /// instead of running a Firestore equality query on the encrypted field.
   Future<Member?> fetchMemberByPassportNumber(String passportNumber) async {
     try {
-      final docs = await _firestore.queryDocuments(
-        collection: membersCollection,
-        field: 'passportNumber',
-        isEqualTo: FieldEncryption.encrypt(passportNumber),
-      );
-      if (docs.isEmpty) return null;
-      return _mapToMember(docs.first);
+      final allMembers = await fetchAllMembers();
+      for (final m in allMembers) {
+        if (m.passportNumber == passportNumber) return m;
+      }
+      return null;
     } catch (e) {
       debugPrint(
           'FirestoreMemberRepository: Firestore passport search failed ($e) — using local cache');
