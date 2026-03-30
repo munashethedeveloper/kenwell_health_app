@@ -30,7 +30,8 @@ class KenwellYesNoQuestion<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveOnChanged = enabled ? onChanged : null;
+    final ValueChanged<T?>? effectiveOnChanged =
+        enabled ? (T? val) { if (val != null) onChanged(val); } : null;
 
     final tiles = [
       _KenwellRadioTile<T>(label: yesLabel, value: yesValue),
