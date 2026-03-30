@@ -30,8 +30,6 @@ class KenwellYesNoQuestion<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveOnChanged = enabled ? onChanged : null;
-
     return Padding(
       padding: padding,
       child: Column(
@@ -40,7 +38,7 @@ class KenwellYesNoQuestion<T> extends StatelessWidget {
           Text(question, style: textStyle),
           RadioGroup<T>(
             groupValue: value,
-            onChanged: effectiveOnChanged,
+            onChanged: enabled ? onChanged : null,
             builder: (groupValue, handler) {
               final tiles = [
                 _KenwellRadioTile<T>(
