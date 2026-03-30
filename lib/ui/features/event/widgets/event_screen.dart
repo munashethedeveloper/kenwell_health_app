@@ -61,11 +61,22 @@ class _EventScreenState extends State<EventScreen> {
         }
       });
     } else {
-      // Always clear controllers when creating a new event so that stale data
-      // from a previous form submission never bleeds through.
-      widget.viewModel.clearForm();
-      widget.viewModel.dateController.text =
+      // Helper that formats the route date as yyyy-MM-dd for the form field.
+      String formattedDate() =>
           "${widget.date.year}-${widget.date.month.toString().padLeft(2, '0')}-${widget.date.day.toString().padLeft(2, '0')}";
+
+      // Set the date synchronously so it is available on first build.
+      widget.viewModel.dateController.text = formattedDate();
+      // Defer clearForm() to after the first frame.  Calling it synchronously
+      // in initState() triggers notifyListeners() while the widget tree is still
+      // being built (inside buildScope()), which causes the
+      // "setState() called during build" error on _InheritedProviderScope.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        widget.viewModel.clearForm();
+        // Re-apply the date because clearForm() resets dateController.
+        widget.viewModel.dateController.text = formattedDate();
+      });
     }
   }
 
