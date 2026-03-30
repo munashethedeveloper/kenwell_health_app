@@ -29,6 +29,7 @@ class _CreateUserSectionState extends State<CreateUserSection> {
   Future<void> _checkEmailVerified() async {
     final viewModel = context.read<UserManagementViewModel>();
     final verified = await viewModel.isEmailVerified();
+    if (!mounted) return;
     setState(() {
       _isVerified = verified;
     });
@@ -47,6 +48,7 @@ class _CreateUserSectionState extends State<CreateUserSection> {
   Future<void> _resendVerification() async {
     final viewModel = context.read<UserManagementViewModel>();
     await viewModel.sendEmailVerification();
+    if (!mounted) return;
     AppSnackbar.showSuccess(context, 'Verification email resent.');
   }
 

@@ -15,6 +15,7 @@ import '../../calendar/view_model/calendar_view_model.dart';
 import '../../calendar/widgets/event_card.dart';
 import '../../event/view_model/event_view_model.dart';
 import '../view_model/all_events_view_model.dart';
+import 'package:kenwell_health_app/routing/app_routes.dart';
 
 /// Screen that shows all events with:
 ///   - A gradient section header
@@ -79,7 +80,7 @@ class _AllEventsBody extends StatelessWidget {
             },
           ),
           TextButton.icon(
-            onPressed: () => context.pushNamed('help'),
+            onPressed: () => context.pushNamed(AppRoutes.help),
             icon: const Icon(Icons.help_outline, color: Colors.white),
             label: const Text('Help', style: TextStyle(color: Colors.white)),
           ),

@@ -11,7 +11,7 @@ import 'data/services/push_notification_service.dart';
 import 'package:provider/provider.dart';
 
 import 'firebase_options.dart';
-import 'providers/theme_provider.dart';
+import 'ui/shared/themes/theme_provider.dart';
 import 'routing/go_router_config.dart';
 import 'ui/shared/themes/app_theme.dart';
 
@@ -74,6 +74,14 @@ void main() async {
         .setPerformanceCollectionEnabled(!kDebugMode);
     debugPrint(
         'Firebase Performance: collection ${kDebugMode ? "disabled (debug)" : "enabled (release)"}');
+
+    // Explicitly enable Crashlytics crash reporting in release builds.
+    // This ensures that the collection flag matches the intended production
+    // behaviour regardless of any cached setting from a previous build.
+    await FirebaseCrashlytics.instance
+        .setCrashlyticsCollectionEnabled(!kDebugMode);
+    debugPrint(
+        'Firebase Crashlytics: collection ${kDebugMode ? "disabled (debug)" : "enabled (release)"}');
   } catch (e) {
     debugPrint('Firebase initialization error: $e');
     debugPrint('App will run with limited functionality (local database only)');
@@ -93,8 +101,23 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  // Create the router exactly once for the lifetime of this widget.
+  //
+  // Previously this was created inside Consumer<ThemeProvider>.builder, which
+  // caused a brand-new GoRouter (and therefore a new navigation stack) to be
+  // constructed on every theme change. That wiped all navigation history and
+  // was responsible for the "Skipped 30 frames" warning because the full
+  // route-parsing and initial redirect logic ran synchronously on the main
+  // thread during every rebuild.
+  late final _router = AppRouterConfig.createRouter();
 
   @override
   Widget build(BuildContext context) {
@@ -102,15 +125,13 @@ class MyApp extends StatelessWidget {
       providers: AppProviders.rootProviders,
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, _) {
-          final goRouter = AppRouterConfig.createRouter();
-
           return MaterialApp.router(
             debugShowCheckedModeBanner: false,
             title: 'Wellness Planner',
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: themeProvider.themeMode,
-            routerConfig: goRouter,
+            routerConfig: _router,
             // Inject the offline banner above every route so it appears
             // on every screen without modifying each screen individually.
             builder: (context, child) => Column(

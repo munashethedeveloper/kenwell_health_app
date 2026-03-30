@@ -9,6 +9,7 @@ import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/profile_view_model.dart';
 import 'sections/profile_form_section.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
+import 'package:kenwell_health_app/routing/app_routes.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -148,7 +149,7 @@ class _ProfileScreenBodyState extends State<_ProfileScreenBody> {
             TextButton.icon(
               onPressed: () {
                 if (mounted) {
-                  context.pushNamed('help');
+                  context.pushNamed(AppRoutes.help);
                 }
               },
               icon: const Icon(Icons.help_outline, color: Colors.white),

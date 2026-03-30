@@ -1,3 +1,5 @@
+import 'dart:async' show unawaited;
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../domain/models/wellness_event.dart';
@@ -20,11 +22,22 @@ class AllEventsViewModel extends ChangeNotifier {
 
   List<WellnessEvent> _allEvents;
 
+  bool _disposed = false;
+
   /// Called by [ChangeNotifierProxyProvider] when [EventViewModel] emits new
   /// events so that the displayed list is always up-to-date.
+  ///
+  /// [ChangeNotifierProxyProvider.update] is invoked during the widget build
+  /// phase.  Calling [notifyListeners] synchronously from there would trigger a
+  /// "setState() or markNeedsBuild() called during build" assertion on the
+  /// [_InheritedProviderScope] that wraps this ViewModel.  Deferring via
+  /// [Future.microtask] ensures the build is complete before dependent widgets
+  /// are asked to rebuild.
   void updateEvents(List<WellnessEvent> events) {
     _allEvents = List.unmodifiable(events);
-    notifyListeners();
+    unawaited(Future.microtask(() {
+      if (!_disposed) notifyListeners();
+    }));
   }
 
   final TextEditingController searchController = TextEditingController();
@@ -161,6 +174,7 @@ class AllEventsViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
+    _disposed = true;
     searchController.removeListener(_onSearchChanged);
     searchController.dispose();
     super.dispose();

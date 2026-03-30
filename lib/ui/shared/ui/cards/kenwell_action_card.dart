@@ -44,13 +44,17 @@ class KenwellActionCard extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(20),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(20),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              children: [
+        child: Semantics(
+          button: true,
+          label: title,
+          hint: subtitle,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(20),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
                 // Gradient icon container
                 Container(
                   width: 60,
@@ -124,11 +128,12 @@ class KenwellActionCard extends StatelessWidget {
                   color: Colors.grey.shade300,
                   size: 24,
                 ),
-              ],
+                ],
             ),
           ),
         ),
       ),
+    ),
     );
   }
 }

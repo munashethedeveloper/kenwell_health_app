@@ -6,6 +6,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../routing/app_routes.dart';
 import '../../routing/go_router_config.dart';
 
 /// Handles Firebase Cloud Messaging initialisation, FCM token management,
@@ -175,6 +176,6 @@ class PushNotificationService {
     }
 
     // Default: navigate to the home/events overview screen.
-    GoRouter.of(context).go('/all-events');
+    GoRouter.of(context).go(AppRoutes.allEventsPath);
   }
 }

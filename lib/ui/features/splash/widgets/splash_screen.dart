@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../shared/ui/logo/app_logo.dart';
 import '../../auth/view_models/auth_view_model.dart';
 import '../view_model/splash_view_model.dart';
+import 'package:kenwell_health_app/routing/app_routes.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -69,10 +70,10 @@ class _SplashScreenBodyState extends State<_SplashScreenBody>
 
             switch (target) {
               case SplashNavigationTarget.mainNavigation:
-                context.go('/');
+                context.go(AppRoutes.homePath);
                 break;
               case SplashNavigationTarget.authWrapper:
-                context.go('/login');
+                context.go(AppRoutes.loginPath);
                 break;
             }
           });

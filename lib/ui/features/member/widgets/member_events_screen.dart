@@ -8,6 +8,7 @@ import '../../../shared/ui/headers/kenwell_gradient_header.dart';
 import '../../../shared/ui/cards/kenwell_detail_row.dart';
 import '../../../shared/ui/cards/kenwell_section_card.dart';
 import '../../../shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/routing/app_routes.dart';
 
 /// Displays a member's personal details and their event-attendance history.
 ///
@@ -67,7 +68,7 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
             },
           ),
           TextButton.icon(
-            onPressed: () => context.pushNamed('help'),
+            onPressed: () => context.pushNamed(AppRoutes.help),
             icon: const Icon(Icons.help_outline, color: Colors.white),
             label: const Text('Help', style: TextStyle(color: Colors.white)),
           ),

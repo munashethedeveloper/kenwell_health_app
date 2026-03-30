@@ -11,6 +11,7 @@ import '../view_model/allocate_event_view_model.dart';
 import '../../../../domain/models/wellness_event.dart';
 import '../../../../domain/models/user_model.dart';
 import 'sections/allocate_user_card.dart';
+import 'package:kenwell_health_app/routing/app_routes.dart';
 
 class AllocateEventScreen extends StatefulWidget {
   final void Function(List<String> assignedUserIds) onAllocate;
@@ -254,7 +255,7 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
             onPressed: _allocVM.loadAssignedUsers,
           ),
           TextButton.icon(
-            onPressed: () => context.pushNamed('help'),
+            onPressed: () => context.pushNamed(AppRoutes.help),
             icon: const Icon(Icons.help_outline, color: Colors.white),
             label: const Text('Help', style: TextStyle(color: Colors.white)),
           ),

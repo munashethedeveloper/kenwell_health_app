@@ -1,63 +1,30 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/domain/models/audit_log_entry.dart';
+import 'package:kenwell_health_app/ui/features/audit_log/view_model/audit_log_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
-import 'package:kenwell_health_app/data/services/firestore_service.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:kenwell_health_app/routing/app_routes.dart';
 
 /// A read-only screen that displays the full audit / transaction log.
 ///
 /// Restricted to ADMIN and TOP MANAGEMENT roles (enforced via
 /// [RolePermissions.routeAccess] and [RolePermissions.featureAccess]).
 ///
-/// The log is fetched live from the `audit_logs` Firestore collection,
-/// ordered by `performedAt` descending.  A filter chip row lets the user
+/// Data is streamed via [AuditLogViewModel] which delegates to
+/// [FirestoreAuditLogRepository].  A filter chip row lets the user
 /// narrow down by action type (all / create / update / delete).
-class AuditLogScreen extends StatefulWidget {
+class AuditLogScreen extends StatelessWidget {
   const AuditLogScreen({super.key});
-
-  @override
-  State<AuditLogScreen> createState() => _AuditLogScreenState();
-}
-
-class _AuditLogScreenState extends State<AuditLogScreen> {
-  // 'all' | 'create' | 'update' | 'delete'
-  String _filter = 'all';
-
-  // ── Colours per action ──────────────────────────────────────────────────────
-
-  /* Color _actionColor(String action) {
-    switch (action.toLowerCase()) {
-      case 'create':
-        return const Color(0xFF16A34A); // green
-      case 'update':
-        return const Color(0xFF2563EB); // blue
-      case 'delete':
-        return const Color(0xFFDC2626); // red
-      default:
-        return KenwellColors.neutralGrey;
-    }
-  } */
-
-/*   IconData _actionIcon(String action) {
-    switch (action.toLowerCase()) {
-      case 'create':
-        return Icons.add_circle_outline_rounded;
-      case 'update':
-        return Icons.edit_outlined;
-      case 'delete':
-        return Icons.delete_outline_rounded;
-      default:
-        return Icons.info_outline_rounded;
-    }
-  } */
 
   // ── Build ───────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
+    final vm = context.watch<AuditLogViewModel>();
+
     return Scaffold(
       backgroundColor: KenwellColors.neutralBackground,
       appBar: KenwellAppBar(
@@ -69,13 +36,8 @@ class _AuditLogScreenState extends State<AuditLogScreen> {
         ),
         automaticallyImplyLeading: true,
         actions: [
-          IconButton(
-            tooltip: 'Refresh',
-            icon: const Icon(Icons.refresh, color: Colors.white),
-            onPressed: () => setState(() {}),
-          ),
           TextButton.icon(
-            onPressed: () => context.pushNamed('help'),
+            onPressed: () => context.pushNamed(AppRoutes.help),
             icon: const Icon(Icons.help_outline, color: Colors.white),
             label: const Text('Help', style: TextStyle(color: Colors.white)),
           ),
@@ -85,25 +47,24 @@ class _AuditLogScreenState extends State<AuditLogScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _FilterChipRow(
-            selected: _filter,
-            onSelected: (f) => setState(() => _filter = f),
+            selected: vm.filter,
+            onSelected: vm.setFilter,
           ),
           Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection(FirestoreService.auditLogsCollection)
-                  .orderBy('performedAt', descending: true)
-                  .limit(200)
-                  .snapshots(),
+            child: StreamBuilder<List<AuditLogEntry>>(
+              stream: vm.auditLogStream,
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
                   return Center(
                     child: Padding(
                       padding: const EdgeInsets.all(32),
                       child: Text(
-                        'Error loading audit log:\n${snapshot.error}',
+                        'Error loading audit log. Please try again later.',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.red),
+                        style: TextStyle(
+                          color: KenwellColors.neutralGrey,
+                          fontSize: 15,
+                        ),
                       ),
                     ),
                   );
@@ -112,13 +73,7 @@ class _AuditLogScreenState extends State<AuditLogScreen> {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                final docs = snapshot.data!.docs;
-                final entries = docs
-                    .map((d) => AuditLogEntry.fromFirestore(
-                        d.data() as Map<String, dynamic>))
-                    .where((e) =>
-                        _filter == 'all' || e.action.toLowerCase() == _filter)
-                    .toList();
+                final entries = snapshot.data!;
 
                 if (entries.isEmpty) {
                   return Center(
@@ -131,9 +86,9 @@ class _AuditLogScreenState extends State<AuditLogScreen> {
                                 .withValues(alpha: 0.4)),
                         const SizedBox(height: 16),
                         Text(
-                          _filter == 'all'
+                          vm.filter == 'all'
                               ? 'No audit log entries yet.'
-                              : 'No "$_filter" entries found.',
+                              : 'No "${vm.filter}" entries found.',
                           style: TextStyle(
                             color: KenwellColors.neutralGrey
                                 .withValues(alpha: 0.7),

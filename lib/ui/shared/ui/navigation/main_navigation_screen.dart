@@ -19,207 +19,222 @@ class MainNavigationScreen extends StatefulWidget {
 }
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
-  int _lastTabCount = 0;
   int _currentIndex = 2;
+
+  // ── Cached tab state ──────────────────────────────────────────────────────
+  // Tab widget lists and their navigation destinations are built once per role.
+  // They are only recreated when the user's role actually changes (e.g. after
+  // logging out and back in with a different account). Keeping the same widget
+  // instances across builds ensures IndexedStack can preserve per-tab state
+  // without unnecessary re-initialisation — rebuilding all tabs simultaneously
+  // on every ProfileViewModel.notifyListeners() was what caused "Skipped 156
+  // frames" on first load.
+  String? _cachedRole;
+  List<Widget> _tabs = const [];
+  List<NavigationDestination> _navDestinations = const [];
+  List<NavigationRailDestination> _railDestinations = const [];
+
+  static bool _isPrivilegedRole(String role) =>
+      role == 'ADMIN' ||
+      role == 'TOP MANAGEMENT' ||
+      role == 'PROJECT MANAGER';
+
+  /// Rebuilds the cached tab / destination lists for [role].
+  ///
+  /// Called only when the role changes, so the widgets inside the IndexedStack
+  /// remain stable across unrelated ProfileViewModel notifications.
+  void _rebuildTabsForRole(String role) {
+    _cachedRole = role;
+    final bool privileged = _isPrivilegedRole(role);
+    final bool isClient = role == 'CLIENT';
+
+    _tabs = privileged
+        ? [
+            const RegistrationManagementScreen(),
+            const StatsReportScreen(),
+            // privileged: Users=0, Stats=1, Home=2, Calendar=3, Events=4
+            HomeScreen(onTabSwitch: (i) => setState(() => _currentIndex = i)),
+            const CalendarScreen(),
+            const MyEventScreen(),
+          ]
+        : isClient
+            ? [
+                const StatsReportScreen(),
+                HomeScreen(
+                    onTabSwitch: (i) => setState(() => _currentIndex = i)),
+                const CalendarScreen(),
+              ]
+            : [
+                // restricted: Home=0, Calendar=1, Events=2
+                HomeScreen(
+                    onTabSwitch: (i) => setState(() => _currentIndex = i)),
+                const CalendarScreen(),
+                const MyEventScreen(),
+              ];
+
+    _navDestinations = privileged
+        ? const [
+            NavigationDestination(
+              icon: Icon(Icons.people_outline_rounded),
+              selectedIcon: Icon(Icons.people_rounded),
+              label: 'Users',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.bar_chart_rounded),
+              selectedIcon: Icon(Icons.bar_chart_rounded),
+              label: 'Statistics',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.home_outlined),
+              selectedIcon: Icon(Icons.home_rounded),
+              label: 'Home',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.calendar_month_outlined),
+              selectedIcon: Icon(Icons.calendar_month_rounded),
+              label: 'Calendar',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.event_note_outlined),
+              selectedIcon: Icon(Icons.event_note_rounded),
+              label: 'Events',
+            ),
+          ]
+        : isClient
+            ? const [
+                NavigationDestination(
+                  icon: Icon(Icons.bar_chart_rounded),
+                  selectedIcon: Icon(Icons.bar_chart_rounded),
+                  label: 'Statistics',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.home_outlined),
+                  selectedIcon: Icon(Icons.home_rounded),
+                  label: 'Home',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.calendar_month_outlined),
+                  selectedIcon: Icon(Icons.calendar_month_rounded),
+                  label: 'Calendar',
+                ),
+              ]
+            : const [
+                NavigationDestination(
+                  icon: Icon(Icons.home_outlined),
+                  selectedIcon: Icon(Icons.home_rounded),
+                  label: 'Home',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.calendar_month_outlined),
+                  selectedIcon: Icon(Icons.calendar_month_rounded),
+                  label: 'Calendar',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.event_note_outlined),
+                  selectedIcon: Icon(Icons.event_note_rounded),
+                  label: 'Events',
+                ),
+              ];
+
+    _railDestinations = privileged
+        ? const [
+            NavigationRailDestination(
+              icon: Icon(Icons.people_outline_rounded),
+              selectedIcon: Icon(Icons.people_rounded),
+              label: Text('Users'),
+            ),
+            NavigationRailDestination(
+              icon: Icon(Icons.bar_chart_rounded),
+              selectedIcon: Icon(Icons.bar_chart_rounded),
+              label: Text('Statistics'),
+            ),
+            NavigationRailDestination(
+              icon: Icon(Icons.home_outlined),
+              selectedIcon: Icon(Icons.home_rounded),
+              label: Text('Home'),
+            ),
+            NavigationRailDestination(
+              icon: Icon(Icons.calendar_month_outlined),
+              selectedIcon: Icon(Icons.calendar_month_rounded),
+              label: Text('Calendar'),
+            ),
+            NavigationRailDestination(
+              icon: Icon(Icons.event_note_outlined),
+              selectedIcon: Icon(Icons.event_note_rounded),
+              label: Text('Events'),
+            ),
+          ]
+        : isClient
+            ? const [
+                NavigationRailDestination(
+                  icon: Icon(Icons.bar_chart_rounded),
+                  selectedIcon: Icon(Icons.bar_chart_rounded),
+                  label: Text('Statistics'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.home_outlined),
+                  selectedIcon: Icon(Icons.home_rounded),
+                  label: Text('Home'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.calendar_month_outlined),
+                  selectedIcon: Icon(Icons.calendar_month_rounded),
+                  label: Text('Calendar'),
+                ),
+              ]
+            : const [
+                NavigationRailDestination(
+                  icon: Icon(Icons.home_outlined),
+                  selectedIcon: Icon(Icons.home_rounded),
+                  label: Text('Home'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.calendar_month_outlined),
+                  selectedIcon: Icon(Icons.calendar_month_rounded),
+                  label: Text('Calendar'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.event_note_outlined),
+                  selectedIcon: Icon(Icons.event_note_rounded),
+                  label: Text('Events'),
+                ),
+              ];
+
+    // Clamp selected index when the tab count changes (e.g. role promotion).
+    if (_currentIndex >= _tabs.length) {
+      _currentIndex = _tabs.length - 1;
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+    // Eagerly populate the tab lists so they are never in an uninitialised
+    // state when build() runs for the first time.  The role is unknown here
+    // (ProfileViewModel loads it asynchronously), so we use an empty string
+    // which maps to the "restricted" tab set.  build() will call
+    // _rebuildTabsForRole again with the real role as soon as the provider
+    // delivers it.
+    _rebuildTabsForRole('');
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDesktop = ResponsiveBreakpoints.isDesktop(context);
-    final profileVM = context.watch<ProfileViewModel>();
-    final String role = profileVM.role.toUpperCase();
 
-    bool isPrivilegedRole(String role) {
-      return role == 'ADMIN' ||
-          role == 'TOP MANAGEMENT' ||
-          role == 'PROJECT MANAGER';
+    // Listen only to role changes — not every name/email update — so this
+    // widget only rebuilds when the set of available tabs must change.
+    final String role = context
+        .select<ProfileViewModel, String>((vm) => vm.role)
+        .toUpperCase();
+
+    // Rebuild cached tab/destination lists only when the role changes.
+    if (role != _cachedRole) {
+      _rebuildTabsForRole(role);
     }
 
-    /*   bool isStaffRole(String role) {
-      return role == 'ADMIN' ||
-          role == 'TOP MANAGEMENT' ||
-          role == 'PROJECT MANAGER' ||
-          role == 'PROJECT COORDINATOR' ||
-          role == 'HEALTH PRACTITIONER';
-    } */
-
-    // Define tabs and destinations based on role
-    final List<Widget> allTabs = [
-      //const UserManagementScreenVersionTwo(),
-      const RegistrationManagementScreen(),
-      const StatsReportScreen(),
-      // privileged: Users=0, Stats=1, Home=2, Calendar=3, Events=4
-      HomeScreen(onTabSwitch: (i) => setState(() => _currentIndex = i)),
-      const CalendarScreen(),
-      const MyEventScreen(),
-    ];
-    final List<Widget> clientTabs = [
-      const StatsReportScreen(),
-      HomeScreen(onTabSwitch: (i) => setState(() => _currentIndex = i)),
-      const CalendarScreen(),
-    ];
-    final List<Widget> restrictedTabs = [
-      // restricted: Home=0, Calendar=1, Events=2
-      HomeScreen(onTabSwitch: (i) => setState(() => _currentIndex = i)),
-      const CalendarScreen(),
-      const MyEventScreen(),
-    ];
-    final List<NavigationRailDestination> allRailDestinations = [
-      const NavigationRailDestination(
-        icon: Icon(Icons.people_outline_rounded),
-        selectedIcon: Icon(Icons.people_rounded),
-        label: Text('Users'),
-      ),
-      const NavigationRailDestination(
-        icon: Icon(Icons.bar_chart_rounded),
-        selectedIcon: Icon(Icons.bar_chart_rounded),
-        label: Text('Statistics'),
-      ),
-      const NavigationRailDestination(
-        icon: Icon(Icons.home_outlined),
-        selectedIcon: Icon(Icons.home_rounded),
-        label: Text('Home'),
-      ),
-      const NavigationRailDestination(
-        icon: Icon(Icons.calendar_month_outlined),
-        selectedIcon: Icon(Icons.calendar_month_rounded),
-        label: Text('Calendar'),
-      ),
-      const NavigationRailDestination(
-        icon: Icon(Icons.event_note_outlined),
-        selectedIcon: Icon(Icons.event_note_rounded),
-        label: Text('Events'),
-      ),
-    ];
-    final List<NavigationRailDestination> clientRailDestinations = [
-      const NavigationRailDestination(
-        icon: Icon(Icons.bar_chart_rounded),
-        selectedIcon: Icon(Icons.bar_chart_rounded),
-        label: Text('Statistics'),
-      ),
-      const NavigationRailDestination(
-        icon: Icon(Icons.home_outlined),
-        selectedIcon: Icon(Icons.home_rounded),
-        label: Text('Home'),
-      ),
-      const NavigationRailDestination(
-        icon: Icon(Icons.calendar_month_outlined),
-        selectedIcon: Icon(Icons.calendar_month_rounded),
-        label: Text('Calendar'),
-      ),
-    ];
-    final List<NavigationRailDestination> restrictedRailDestinations = [
-      const NavigationRailDestination(
-        icon: Icon(Icons.home_outlined),
-        selectedIcon: Icon(Icons.home_rounded),
-        label: Text('Home'),
-      ),
-      const NavigationRailDestination(
-        icon: Icon(Icons.calendar_month_outlined),
-        selectedIcon: Icon(Icons.calendar_month_rounded),
-        label: Text('Calendar'),
-      ),
-      const NavigationRailDestination(
-        icon: Icon(Icons.event_note_outlined),
-        selectedIcon: Icon(Icons.event_note_rounded),
-        label: Text('Events'),
-      ),
-    ];
-    final List<NavigationDestination> allNavDestinations = [
-      const NavigationDestination(
-        icon: Icon(Icons.people_outline_rounded),
-        selectedIcon: Icon(Icons.people_rounded),
-        label: 'Users',
-      ),
-      const NavigationDestination(
-        icon: Icon(Icons.bar_chart_rounded),
-        selectedIcon: Icon(Icons.bar_chart_rounded),
-        label: 'Statistics',
-      ),
-      const NavigationDestination(
-        icon: Icon(Icons.home_outlined),
-        selectedIcon: Icon(Icons.home_rounded),
-        label: 'Home',
-      ),
-      const NavigationDestination(
-        icon: Icon(Icons.calendar_month_outlined),
-        selectedIcon: Icon(Icons.calendar_month_rounded),
-        label: 'Calendar',
-      ),
-      const NavigationDestination(
-        icon: Icon(Icons.event_note_outlined),
-        selectedIcon: Icon(Icons.event_note_rounded),
-        label: 'Events',
-      ),
-    ];
-    final List<NavigationDestination> clientNavDestinations = [
-      const NavigationDestination(
-        icon: Icon(Icons.bar_chart_rounded),
-        selectedIcon: Icon(Icons.bar_chart_rounded),
-        label: 'Statistics',
-      ),
-      const NavigationDestination(
-        icon: Icon(Icons.home_outlined),
-        selectedIcon: Icon(Icons.home_rounded),
-        label: 'Home',
-      ),
-      const NavigationDestination(
-        icon: Icon(Icons.calendar_month_outlined),
-        selectedIcon: Icon(Icons.calendar_month_rounded),
-        label: 'Calendar',
-      ),
-    ];
-    final List<NavigationDestination> restrictedNavDestinations = [
-      const NavigationDestination(
-        icon: Icon(Icons.home_outlined),
-        selectedIcon: Icon(Icons.home_rounded),
-        label: 'Home',
-      ),
-      const NavigationDestination(
-        icon: Icon(Icons.calendar_month_outlined),
-        selectedIcon: Icon(Icons.calendar_month_rounded),
-        label: 'Calendar',
-      ),
-      const NavigationDestination(
-        icon: Icon(Icons.event_note_outlined),
-        selectedIcon: Icon(Icons.event_note_rounded),
-        label: 'Events',
-      ),
-    ];
-
-    final bool privileged = isPrivilegedRole(role);
-    final bool isClient = role == 'CLIENT';
-    final List<Widget> tabs = privileged
-        ? allTabs
-        : isClient
-            ? clientTabs
-            : restrictedTabs;
-    final List<NavigationRailDestination> railDestinations = privileged
-        ? allRailDestinations
-        : isClient
-            ? clientRailDestinations
-            : restrictedRailDestinations;
-    final List<NavigationDestination> navDestinations = privileged
-        ? allNavDestinations
-        : isClient
-            ? clientNavDestinations
-            : restrictedNavDestinations;
-
-    // Adjust _currentIndex if needed (fixes out-of-range errors on role change)
-    if (_lastTabCount != tabs.length) {
-      if (_currentIndex >= tabs.length) {
-        setState(() {
-          _currentIndex = tabs.length - 1;
-        });
-      }
-      _lastTabCount = tabs.length;
-    }
-    int currentIndex = _currentIndex;
+    final int currentIndex = _currentIndex;
 
     // For desktop/tablet, use NavigationRail + content side-by-side
     if (isDesktop) {
@@ -260,13 +275,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               labelType: ResponsiveBreakpoints.isExpanded(context)
                   ? NavigationRailLabelType.none
                   : NavigationRailLabelType.all,
-              destinations: railDestinations,
+              destinations: _railDestinations,
             ),
             const VerticalDivider(thickness: 1, width: 1),
             Expanded(
               child: IndexedStack(
                 index: currentIndex,
-                children: tabs,
+                children: _tabs,
               ),
             ),
           ],
@@ -278,7 +293,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     return Scaffold(
       body: IndexedStack(
         index: currentIndex,
-        children: tabs,
+        children: _tabs,
       ),
       bottomNavigationBar: NavigationBarTheme(
         data: NavigationBarThemeData(
@@ -327,7 +342,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               _currentIndex = index;
             });
           },
-          destinations: navDestinations,
+          destinations: _navDestinations,
         ),
       ),
     );

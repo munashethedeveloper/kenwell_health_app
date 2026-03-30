@@ -9,6 +9,7 @@ import '../view_model/member_registration_view_model.dart';
 import 'sections/create_member_section.dart';
 import 'sections/view_members_section.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
+import 'package:kenwell_health_app/routing/app_routes.dart';
 
 /// Member registration screen with create and view members functionality
 ///
@@ -175,7 +176,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
                   TextButton.icon(
                     onPressed: () {
                       if (mounted) {
-                        context.pushNamed('help');
+                        context.pushNamed(AppRoutes.help);
                       }
                     },
                     icon: const Icon(Icons.help_outline, color: Colors.white),

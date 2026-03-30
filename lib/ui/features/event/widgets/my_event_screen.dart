@@ -14,6 +14,7 @@ import 'sections/my_event_tab_bar.dart';
 import 'sections/my_event_empty_state.dart';
 import 'sections/premium_event_card.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
+import 'package:kenwell_health_app/routing/app_routes.dart';
 
 /// Screen that lists the wellness events assigned to the currently logged-in
 /// user.  Events are split into two tabs:
@@ -164,7 +165,7 @@ class MyEventScreenState extends State<MyEventScreen> {
             },
           ),
           TextButton.icon(
-            onPressed: () => context.pushNamed('help'),
+            onPressed: () => context.pushNamed(AppRoutes.help),
             icon: const Icon(Icons.help_outline, color: Colors.white),
             label: const Text('Help', style: TextStyle(color: Colors.white)),
           ),

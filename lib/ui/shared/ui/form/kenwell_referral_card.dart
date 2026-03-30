@@ -43,39 +43,41 @@ class KenwellReferralCard<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     return KenwellFormCard(
       title: title,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ...options.map((option) => Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  RadioListTile<T>(
-                    title: Text(option.label),
-                    value: option.value,
-                    dense: true,
-                    contentPadding: EdgeInsets.zero,
-                    groupValue: selectedValue,
-                    onChanged: (val) => onChanged(val),
-                    toggleable: false,
-                  ),
-                  if (option.requiresReason &&
-                      selectedValue == option.value &&
-                      option.reasonController != null)
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
-                      child: KenwellTextField(
-                        label: option.reasonLabel ?? 'Reason',
-                        controller: option.reasonController!,
-                        maxLines: option.reasonMaxLines,
-                        decoration: KenwellFormStyles.decoration(
-                          label: option.reasonLabel ?? 'Reason',
-                        ),
-                        validator: reasonValidator,
-                      ),
+      child: RadioGroup<T>(
+        groupValue: selectedValue,
+        onChanged: onChanged,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ...options.map((option) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    RadioListTile<T>(
+                      title: Text(option.label),
+                      value: option.value,
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                      toggleable: false,
                     ),
-                ],
-              )),
-        ],
+                    if (option.requiresReason &&
+                        selectedValue == option.value &&
+                        option.reasonController != null)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
+                        child: KenwellTextField(
+                          label: option.reasonLabel ?? 'Reason',
+                          controller: option.reasonController!,
+                          maxLines: option.reasonMaxLines,
+                          decoration: KenwellFormStyles.decoration(
+                            label: option.reasonLabel ?? 'Reason',
+                          ),
+                          validator: reasonValidator,
+                        ),
+                      ),
+                  ],
+                )),
+          ],
+        ),
       ),
     );
   }

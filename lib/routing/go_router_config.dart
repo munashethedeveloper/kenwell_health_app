@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kenwell_health_app/ui/features/audit_log/view_model/audit_log_view_model.dart';
 import 'package:kenwell_health_app/ui/features/audit_log/widgets/audit_log_screen.dart';
 import 'package:kenwell_health_app/ui/features/member/widgets/member_management_screen.dart';
 import 'package:kenwell_health_app/ui/features/stats_report/widgets/live_event_screen.dart';
@@ -47,8 +49,10 @@ import '../ui/features/profile/widgets/profile_screen.dart';
 // Admin & User Management
 import '../ui/features/help/widgets/help_screen.dart';
 import '../ui/features/help/widgets/faq_screen.dart';
+import '../ui/features/help/widgets/legal_screen.dart';
 import '../ui/features/user_management/widgets/user_management_screen_version_two.dart';
 import '../ui/features/wellness/widgets/member_search_screen.dart';
+import 'app_routes.dart';
 
 /// GoRouter configuration for the Kenwell Health App
 ///
@@ -96,7 +100,7 @@ class AppRouterConfig {
   static GoRouter createRouter() {
     return GoRouter(
       navigatorKey: navigatorKey,
-      debugLogDiagnostics: true,
+      debugLogDiagnostics: kDebugMode,
       initialLocation: '/login',
 
       // Global redirect logic for authentication and authorization
@@ -221,7 +225,7 @@ class AppRouterConfig {
                       Text('Event ID: $eventId'),
                       const SizedBox(height: 24),
                       ElevatedButton(
-                        onPressed: () => context.go('/'),
+                        onPressed: () => context.go(AppRoutes.homePath),
                         child: const Text('Go to Home'),
                       ),
                     ],
@@ -337,7 +341,7 @@ class AppRouterConfig {
                   context.pop();
                 },
                 onNext: () {
-                  context.pushNamed('tbTesting');
+                  context.pushNamed(AppRoutes.tbTesting);
                 },
               ),
             );
@@ -355,7 +359,7 @@ class AppRouterConfig {
                 context.pop();
               },
               onNext: () {
-                context.pushNamed('survey');
+                context.pushNamed(AppRoutes.survey);
               },
             ),
           ),
@@ -372,7 +376,7 @@ class AppRouterConfig {
                 context.pop();
               },
               onSubmit: () {
-                context.go('/');
+                context.go(AppRoutes.homePath);
               },
             ),
           ),
@@ -388,7 +392,7 @@ class AppRouterConfig {
         // Allocate Event Routes - FIX THIS ERROR
         GoRoute(
           path: '/allocate-event',
-          name: 'alocateEvent',
+          name: 'allocateEvent',
           builder: (context, state) => const ProfileScreen(),
         ),
 
@@ -406,11 +410,21 @@ class AppRouterConfig {
           builder: (context, state) => const FaqScreen(),
         ),
 
+        // Legal (Privacy Policy & Terms of Service) Route
+        GoRoute(
+          path: '/legal',
+          name: 'legal',
+          builder: (context, state) => const LegalScreen(),
+        ),
+
         // Audit Log Route (ADMIN / TOP MANAGEMENT only)
         GoRoute(
           path: '/audit-log',
           name: 'auditLog',
-          builder: (context, state) => const AuditLogScreen(),
+          builder: (context, state) => ChangeNotifierProvider(
+            create: (_) => AuditLogViewModel(),
+            child: const AuditLogScreen(),
+          ),
         ),
 
         // User Management Routes
@@ -443,7 +457,7 @@ class AppRouterConfig {
               ),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: () => context.go('/'),
+                onPressed: () => context.go(AppRoutes.homePath),
                 child: const Text('Go to Home'),
               ),
             ],

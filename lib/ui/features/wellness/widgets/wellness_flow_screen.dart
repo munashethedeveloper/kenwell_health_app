@@ -1,3 +1,5 @@
+import 'dart:async' show unawaited;
+
 import 'package:flutter/material.dart';
 import 'package:kenwell_health_app/domain/models/wellness_event.dart';
 import 'package:kenwell_health_app/ui/features/member/widgets/member_registration_screen.dart';
@@ -313,7 +315,7 @@ class WellnessFlowScreen extends StatelessWidget {
                   // We do it in an unawaited microtask so any heavy persistence won't block the pop.
                   final eventVM =
                       Provider.of<EventViewModel>(context, listen: false);
-                  Future.microtask(() async {
+                  unawaited(Future.microtask(() async {
                     try {
                       debugPrint(
                           'WellnessFlow: incrementScreened (background) for ${active.id}');
@@ -324,7 +326,7 @@ class WellnessFlowScreen extends StatelessWidget {
                       debugPrint(
                           'WellnessFlow: incrementScreened failed: $e\n$st');
                     }
-                  });
+                  }));
                 } catch (e, st) {
                   debugPrint(
                       'WellnessFlow: Failed triggering incrementScreened: $e\n$st');

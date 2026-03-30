@@ -9,6 +9,7 @@ import '../viewmodel/user_management_view_model.dart';
 import 'sections/create_user_section.dart';
 import 'sections/view_users_section.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
+import 'package:kenwell_health_app/routing/app_routes.dart';
 
 /// User management screen with create and view users functionality
 class UserManagementScreenVersionTwo extends StatefulWidget {
@@ -188,7 +189,7 @@ class _UserManagementScreenVersionTwoState
                   TextButton.icon(
                     onPressed: () {
                       if (mounted) {
-                        context.pushNamed('help');
+                        context.pushNamed(AppRoutes.help);
                       }
                     },
                     icon: const Icon(Icons.help_outline, color: Colors.white),

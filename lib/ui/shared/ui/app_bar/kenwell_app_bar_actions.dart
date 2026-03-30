@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../snackbars/app_snackbar.dart';
+import 'package:kenwell_health_app/routing/app_routes.dart';
 
 /// Standard app bar actions widget used across all main screens.
 ///
@@ -49,10 +50,14 @@ class KenwellAppBarActions {
             }
           },
         ),
-      TextButton.icon(
-        onPressed: () => context.pushNamed('help'),
-        icon: const Icon(Icons.help_outline, color: Colors.white),
-        label: const Text('Help', style: TextStyle(color: Colors.white)),
+      Semantics(
+        button: true,
+        label: 'Help',
+        child: TextButton.icon(
+          onPressed: () => context.pushNamed(AppRoutes.help),
+          icon: const Icon(Icons.help_outline, color: Colors.white),
+          label: const Text('Help', style: TextStyle(color: Colors.white)),
+        ),
       ),
     ];
   }
