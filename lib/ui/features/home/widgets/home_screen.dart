@@ -103,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: _QuickActionsGrid(
                     onAddEvent: () => context.pushNamed('addEditEvent'),
                     onAllEvents: () => context.pushNamed('allEvents'),
-                    onProfile: () => context.pushNamed('profile'),
+                    onProfile: () => context.pushNamed('myProfileMenu'),
                     onLiveStats: () => context.pushNamed('liveEvents'),
                   ),
                 ),

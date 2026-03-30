@@ -43,6 +43,7 @@ import '../ui/features/survey/widgets/survey_screen.dart';
 
 // Profile & Settings
 import '../ui/features/profile/widgets/profile_screen.dart';
+import '../ui/features/profile/widgets/my_profile_menu_screen.dart';
 
 // Admin & User Management
 import '../ui/features/help/widgets/help_screen.dart';
@@ -383,6 +384,13 @@ class AppRouterConfig {
           path: '/profile',
           name: 'profile',
           builder: (context, state) => const ProfileScreen(),
+        ),
+
+        // My Profile Menu Route
+        GoRoute(
+          path: '/my-profile-menu',
+          name: 'myProfileMenu',
+          builder: (context, state) => const MyProfileMenuScreen(),
         ),
 
         // Allocate Event Routes - FIX THIS ERROR
