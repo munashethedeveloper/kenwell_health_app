@@ -35,6 +35,22 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  String _greeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+  }
+
+  String _greetingLine(ProfileViewModel profileVM) {
+    final firstName = profileVM.firstName;
+    final lastName = profileVM.lastName;
+    final name = [firstName, lastName]
+        .where((s) => s.isNotEmpty)
+        .join(' ');
+    return name.isNotEmpty ? '${_greeting()}, $name' : _greeting();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer2<ProfileViewModel, CalendarViewModel>(
@@ -83,11 +99,11 @@ class _HomeScreenState extends State<HomeScreen> {
             child: CustomScrollView(
               slivers: [
                 // ── Gradient header ─────────────────────────────────────
-                const SliverToBoxAdapter(
+                SliverToBoxAdapter(
                   child: KenwellGradientHeader(
                     label: 'HOME',
                     title: 'My\nDashboard',
-                    subtitle: 'Your health overview at a glance.',
+                    subtitle: _greetingLine(profileVM),
                   ),
                 ),
 

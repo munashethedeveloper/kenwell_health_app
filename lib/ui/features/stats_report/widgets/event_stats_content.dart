@@ -79,6 +79,8 @@ class _EventStatsContentState extends State<EventStatsContent> {
   }
 
   Future<void> _refreshData() async {
+    // Reload events so the screening counts pick up any new data.
+    await context.read<EventViewModel>().loadEvents();
     final statsVM = context.read<StatsReportViewModel>();
     statsVM.loadMemberCount();
     if (widget.isLiveTab) {

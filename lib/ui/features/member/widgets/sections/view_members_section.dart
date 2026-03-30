@@ -161,9 +161,13 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
   }
 
   void _navigateToMemberEvents(Member member) {
+    final viewModel = context.read<MemberDetailsViewModel>();
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => MemberEventsScreen(member: member),
+        builder: (context) => MemberEventsScreen(
+          member: member,
+          viewModel: viewModel,
+        ),
       ),
     );
   }
