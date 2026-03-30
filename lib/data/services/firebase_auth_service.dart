@@ -516,6 +516,7 @@ class FirebaseAuthService {
                     firstName: u.firstName,
                     lastName: u.lastName,
                     phoneNumber: u.phoneNumber,
+                    emailVerified: false,
                   ))
               .toList();
         }
