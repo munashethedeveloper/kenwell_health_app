@@ -332,73 +332,31 @@ class _AllocateEventScreenState extends State<AllocateEventScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 16),
-                        Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 16),
-                          padding: const EdgeInsets.all(14),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: KenwellColors.secondaryNavy
-                                  .withValues(alpha: 0.08),
-                              width: 2.5,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.04),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+
+                        // ── Search bar + inline filter button ─────────────────
+                        Padding(
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: 16),
+                          child: Row(
                             children: [
-                              Text(
-                                'Search users:',
-                                style: theme.textTheme.labelMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: const Color(0xFF201C58),
+                              Expanded(
+                                child: UserSearchBar(
+                                  controller: _searchController,
+                                  searchQuery: viewModel.searchQuery,
+                                  onChanged: (value) =>
+                                      viewModel.setSearchQuery(value),
+                                  onClear: () {
+                                    _searchController.clear();
+                                    viewModel.clearSearch();
+                                  },
                                 ),
                               ),
-                              const SizedBox(height: 8),
-                              UserSearchBar(
-                                controller: _searchController,
-                                searchQuery: viewModel.searchQuery,
-                                onChanged: (value) =>
-                                    viewModel.setSearchQuery(value),
-                                onClear: () {
-                                  _searchController.clear();
-                                  viewModel.clearSearch();
-                                },
-                              ),
-                              const SizedBox(height: 12),
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.tune_rounded,
-                                    size: 15,
-                                    color: KenwellColors.primaryGreen,
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    'Filter by role:',
-                                    style:
-                                        theme.textTheme.labelMedium?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                      color: const Color(0xFF201C58),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              UserFilterChips(
-                                selectedFilter: viewModel.selectedFilter,
-                                onFilterChanged: viewModel.setFilter,
-                              ),
+                              const SizedBox(width: 8),
+                              _AllocateFilterButton(viewModel: viewModel),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 32),
+
                         const SizedBox(height: 16),
                       ],
                     ),
@@ -592,6 +550,150 @@ class _StatPill extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ── Inline filter button ──────────────────────────────────────────────────────
+
+class _AllocateFilterButton extends StatelessWidget {
+  const _AllocateFilterButton({required this.viewModel});
+
+  final UserManagementViewModel viewModel;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasFilter = viewModel.selectedFilter != 'all';
+    return GestureDetector(
+      onTap: () => _showFilterSheet(context),
+      child: Container(
+        width: 46,
+        height: 46,
+        decoration: BoxDecoration(
+          color: hasFilter ? KenwellColors.primaryGreen : Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color:
+                hasFilter ? KenwellColors.primaryGreen : Colors.grey.shade200,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Icon(
+          Icons.tune_rounded,
+          size: 20,
+          color: hasFilter ? Colors.white : KenwellColors.secondaryNavy,
+        ),
+      ),
+    );
+  }
+
+  void _showFilterSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => ChangeNotifierProvider.value(
+        value: viewModel,
+        child: const _AllocateFilterSheet(),
+      ),
+    );
+  }
+}
+
+class _AllocateFilterSheet extends StatelessWidget {
+  const _AllocateFilterSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    final vm = context.watch<UserManagementViewModel>();
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          Row(
+            children: [
+              const Text(
+                'Filter Users',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: KenwellColors.secondaryNavy,
+                ),
+              ),
+              const Spacer(),
+              if (vm.selectedFilter != 'all')
+                TextButton(
+                  onPressed: () {
+                    vm.setFilter('all');
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text(
+                    'Clear',
+                    style: TextStyle(color: KenwellColors.primaryGreen),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Filter by role:',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: KenwellColors.secondaryNavy,
+            ),
+          ),
+          const SizedBox(height: 8),
+          UserFilterChips(
+            selectedFilter: vm.selectedFilter,
+            onFilterChanged: (value) {
+              vm.setFilter(value);
+              Navigator.of(context).pop();
+            },
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: KenwellColors.primaryGreen,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14)),
+              ),
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text(
+                'Apply',
+                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
