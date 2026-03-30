@@ -4,6 +4,7 @@ import 'package:kenwell_health_app/ui/features/calendar/view_model/calendar_view
 import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
+import 'package:kenwell_health_app/ui/shared/ui/headers/kenwell_gradient_header.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 import 'package:provider/provider.dart';
 import 'sections/home_notifications_section.dart';
@@ -34,22 +35,10 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  String _greeting() {
-    final hour = DateTime.now().hour;
-    if (hour < 12) return 'Good morning';
-    if (hour < 17) return 'Good afternoon';
-    return 'Good evening';
-  }
-
   @override
   Widget build(BuildContext context) {
     return Consumer2<ProfileViewModel, CalendarViewModel>(
       builder: (context, profileVM, calendarVM, _) {
-        final firstName = profileVM.firstName;
-        final lastName = profileVM.lastName;
-        final role = profileVM.role;
-        final initials = _initials(firstName, lastName);
-
         return Scaffold(
           backgroundColor: const Color(0xFFF0F4F8),
           appBar: KenwellAppBar(
@@ -93,13 +82,12 @@ class _HomeScreenState extends State<HomeScreen> {
             color: KenwellColors.primaryGreen,
             child: CustomScrollView(
               slivers: [
-                // ── Profile hero ────────────────────────────────────────
-                SliverToBoxAdapter(
-                  child: _ProfileHero(
-                    initials: initials,
-                    greeting: _greeting(),
-                    firstName: firstName,
-                    role: role,
+                // ── Gradient header ─────────────────────────────────────
+                const SliverToBoxAdapter(
+                  child: KenwellGradientHeader(
+                    label: 'HOME',
+                    title: 'My\nDashboard',
+                    subtitle: 'Your health overview at a glance.',
                   ),
                 ),
 
@@ -137,157 +125,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         );
       },
-    );
-  }
-
-  String _initials(String first, String last) {
-    final f = first.isNotEmpty ? first[0].toUpperCase() : '';
-    final l = last.isNotEmpty ? last[0].toUpperCase() : '';
-    final combined = '$f$l';
-    return combined.isNotEmpty ? combined : '?';
-  }
-}
-
-// ── Profile hero ──────────────────────────────────────────────────────────────
-
-class _ProfileHero extends StatelessWidget {
-  const _ProfileHero({
-    required this.initials,
-    required this.greeting,
-    required this.firstName,
-    required this.role,
-  });
-
-  final String initials;
-  final String greeting;
-  final String firstName;
-  final String role;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF1A1454), Color(0xFF0B6B49)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
-      ),
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 36),
-      child: Column(
-        children: [
-          // ── Top row: avatar + info + badge ──
-          Row(
-            children: [
-              // Avatar circle
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      Colors.white.withValues(alpha: 0.35),
-                      Colors.white.withValues(alpha: 0.1),
-                    ],
-                  ),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.5),
-                    width: 2,
-                  ),
-                ),
-                child: Center(
-                  child: Text(
-                    initials,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 14),
-              // Greeting & name
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      greeting,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.white.withValues(alpha: 0.7),
-                        letterSpacing: 0.4,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      firstName.isNotEmpty ? firstName : 'there',
-                      style: const TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        height: 1.1,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // KenWell icon badge
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.12),
-                  shape: BoxShape.circle,
-                  border:
-                      Border.all(color: Colors.white.withValues(alpha: 0.25)),
-                ),
-                child: const Icon(
-                  Icons.health_and_safety_rounded,
-                  color: Colors.white,
-                  size: 26,
-                ),
-              ),
-            ],
-          ),
-
-          if (role.isNotEmpty) ...[
-            const SizedBox(height: 14),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(20),
-                  border:
-                      Border.all(color: Colors.white.withValues(alpha: 0.3)),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.verified_rounded,
-                        size: 13, color: Colors.greenAccent),
-                    const SizedBox(width: 6),
-                    Text(
-                      role,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.3,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
     );
   }
 }
