@@ -37,6 +37,23 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
     super.dispose();
   }
 
+  String _buildUsersFilterText(
+      String selectedFilter, String searchQuery, int count) {
+    final parts = <String>[];
+    if (selectedFilter != 'all') {
+      parts.add('${_capitalizeRole(selectedFilter)} users');
+    }
+    if (searchQuery.isNotEmpty) parts.add('matching "$searchQuery"');
+    final scope =
+        parts.isEmpty ? 'all users' : parts.join(' ');
+    return 'Showing $count ${count == 1 ? "user" : "users"} · $scope';
+  }
+
+  String _capitalizeRole(String role) {
+    if (role.isEmpty) return role;
+    return role[0].toUpperCase() + role.substring(1).toLowerCase();
+  }
+
   void _showUserOptions(UserModel user) {
     final theme = Theme.of(context);
     final viewModel = context.read<UserManagementViewModel>();
@@ -332,6 +349,48 @@ class _ViewUsersSectionState extends State<ViewUsersSection> {
                         ],
                       ),
                     ),
+
+                    // ── Active filter indicator ──────────────────────────
+                    if (viewModel.selectedFilter != 'all' ||
+                        viewModel.searchQuery.isNotEmpty)
+                      Padding(
+                        padding:
+                            const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: KenwellColors.secondaryNavy
+                                .withValues(alpha: 0.07),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: KenwellColors.secondaryNavy
+                                  .withValues(alpha: 0.2),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.info_outline_rounded,
+                                  color: KenwellColors.secondaryNavy,
+                                  size: 16),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  _buildUsersFilterText(
+                                      viewModel.selectedFilter,
+                                      viewModel.searchQuery,
+                                      filteredUsers.length),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: KenwellColors.secondaryNavy,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
 
                     const SizedBox(height: 8),
                   ],

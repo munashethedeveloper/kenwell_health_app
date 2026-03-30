@@ -38,6 +38,16 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
     super.dispose();
   }
 
+  String _buildMembersFilterText(
+      String selectedFilter, String searchQuery, int count) {
+    final parts = <String>[];
+    if (selectedFilter != 'All') parts.add('$selectedFilter members');
+    if (searchQuery.isNotEmpty) parts.add('matching "$searchQuery"');
+    final scope =
+        parts.isEmpty ? 'all members' : parts.join(' ');
+    return 'Showing $count ${count == 1 ? "member" : "members"} · $scope';
+  }
+
   void _showMemberOptions(Member member) {
     final theme = Theme.of(context);
     final viewModel = context.read<MemberDetailsViewModel>();
@@ -265,6 +275,48 @@ class _ViewMembersSectionState extends State<ViewMembersSection> {
                         ],
                       ),
                     ),
+
+                    // ── Active filter indicator ──────────────────────────
+                    if (viewModel.selectedFilter != 'All' ||
+                        viewModel.searchQuery.isNotEmpty)
+                      Padding(
+                        padding:
+                            const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: KenwellColors.primaryGreen
+                                .withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: KenwellColors.primaryGreen
+                                  .withValues(alpha: 0.25),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.info_outline_rounded,
+                                  color: KenwellColors.primaryGreen,
+                                  size: 16),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  _buildMembersFilterText(
+                                      viewModel.selectedFilter,
+                                      viewModel.searchQuery,
+                                      filteredMembers.length),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: KenwellColors.primaryGreenDark,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
 
                     const SizedBox(height: 8),
                   ],

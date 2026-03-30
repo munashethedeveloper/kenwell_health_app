@@ -107,12 +107,24 @@ class _StatsFilterSheetState extends State<StatsFilterSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final provinces = widget.allEvents
+
+    // Always list all 9 South African provinces; highlight those that appear
+    // in the current event data with a count badge.
+    const allProvinces = [
+      'Eastern Cape',
+      'Free State',
+      'Gauteng',
+      'KwaZulu-Natal',
+      'Limpopo',
+      'Mpumalanga',
+      'Northern Cape',
+      'North West',
+      'Western Cape',
+    ];
+    final eventProvinces = widget.allEvents
         .map((e) => e.province)
         .where((p) => p.isNotEmpty)
-        .toSet()
-        .toList()
-      ..sort();
+        .toSet();
 
     return Container(
       decoration: const BoxDecoration(
@@ -121,7 +133,8 @@ class _StatsFilterSheetState extends State<StatsFilterSheet> {
       ),
       padding: EdgeInsets.fromLTRB(
           20, 12, 20, MediaQuery.of(context).viewInsets.bottom + 32),
-      child: Column(
+      child: SingleChildScrollView(
+        child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -196,40 +209,48 @@ class _StatsFilterSheetState extends State<StatsFilterSheet> {
           const SizedBox(height: 16),
 
           // ── Province chips ────────────────────────────────────────────
-          if (provinces.isNotEmpty) ...[
-            Text(
-              'Province',
-              style: theme.textTheme.labelLarge?.copyWith(
-                  fontWeight: FontWeight.w600, color: Colors.grey[700]),
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: provinces.map((p) {
-                final selected = _province == p;
-                return FilterChip(
-                  label: Text(p),
-                  selected: selected,
-                  onSelected: (on) {
-                    setState(() => _province = on ? p : null);
-                    widget.onProvinceChanged(on ? p : null);
-                  },
-                  backgroundColor: Colors.white,
-                  selectedColor: theme.primaryColor.withValues(alpha: 0.2),
-                  checkmarkColor: theme.primaryColor,
-                  labelStyle: TextStyle(
-                    color: selected ? theme.primaryColor : Colors.grey[700],
-                    fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
-                  ),
-                  side: BorderSide(
-                    color: selected ? theme.primaryColor : Colors.grey.shade300,
-                  ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 16),
-          ],
+          Text(
+            'Province',
+            style: theme.textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w600, color: Colors.grey[700]),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: allProvinces.map((p) {
+              final selected = _province == p;
+              final hasData = eventProvinces.contains(p);
+              return FilterChip(
+                label: Text(p),
+                selected: selected,
+                onSelected: (on) {
+                  setState(() => _province = on ? p : null);
+                  widget.onProvinceChanged(on ? p : null);
+                },
+                backgroundColor:
+                    hasData ? Colors.white : Colors.grey.shade50,
+                selectedColor: theme.primaryColor.withValues(alpha: 0.2),
+                checkmarkColor: theme.primaryColor,
+                labelStyle: TextStyle(
+                  color: selected
+                      ? theme.primaryColor
+                      : (hasData
+                          ? Colors.grey[700]
+                          : Colors.grey[400]),
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+                ),
+                side: BorderSide(
+                  color: selected
+                      ? theme.primaryColor
+                      : (hasData
+                          ? Colors.grey.shade300
+                          : Colors.grey.shade200),
+                ),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 16),
 
           // ── Date range ────────────────────────────────────────────────
           Text(
@@ -318,6 +339,7 @@ class _StatsFilterSheetState extends State<StatsFilterSheet> {
             ),
           ),
         ],
+      ),
       ),
     );
   }
