@@ -651,3 +651,147 @@ When prompted, enter your new package name / bundle ID. The CLI will update:
 | 8 | Build | `flutter clean && flutter pub get && build_runner` |
 | 9 | `.firebaserc` | Only if moving to a different Firebase project |
 | 10 | *(optional)* `flutterfire configure` | Regenerates all Firebase config files in one step |
+
+---
+
+## 11. Release Keystore & SHA-1 Certificate
+
+### Current state of this project
+
+| Item | Status |
+|---|---|
+| Release keystore file (`.jks`) | ❌ **Not present** in the repository |
+| `key.properties` file | ❌ **Not present** |
+| SHA-1 fingerprint in `google-services.json` | ❌ **Not registered** (the `oauth_client` array is empty) |
+| Release signing config in `build.gradle.kts` | ✅ **Configured** — reads `KEYSTORE_PATH`, `KEY_ALIAS`, `KEY_PASSWORD`, `STORE_PASSWORD` env vars; falls back to the debug keystore if any are absent |
+
+**In practice today:** every release build (local and CI) is signed with the **debug keystore** because the four release env vars are not set. This is fine for development but **must** be resolved before publishing to Google Play.
+
+---
+
+### Step 1 – Generate a release keystore
+
+Run this command once on your machine. Keep the resulting `.jks` file **outside the repository** and **never commit it**.
+
+```bash
+keytool -genkey -v \
+  -keystore ~/keystores/kenwell_release.jks \
+  -alias kenwell \
+  -keyalg RSA \
+  -keysize 2048 \
+  -validity 10000
+```
+
+You will be prompted for:
+- **First and last name**, organisation, city, country (used in the certificate's Distinguished Name)
+- **Keystore password** (`STORE_PASSWORD`)
+- **Key password** (`KEY_PASSWORD`) — can be the same as the store password
+
+Write down (or store in a password manager) the alias (`kenwell`), the keystore password, and the key password. **If you lose them you cannot re-sign a published app.**
+
+---
+
+### Step 2 – Extract the SHA-1 fingerprint
+
+**From the release keystore you just created:**
+
+```bash
+keytool -list -v \
+  -keystore ~/keystores/kenwell_release.jks \
+  -alias kenwell \
+  | grep "SHA1:"
+```
+
+**From the debug keystore** (useful for development / Firebase auth testing):
+
+```bash
+# macOS / Linux
+keytool -list -v \
+  -keystore ~/.android/debug.keystore \
+  -alias androiddebugkey \
+  -storepass android \
+  -keypass android \
+  | grep "SHA1:"
+
+# Windows
+keytool -list -v \
+  -keystore "%USERPROFILE%\.android\debug.keystore" \
+  -alias androiddebugkey \
+  -storepass android \
+  -keypass android
+```
+
+The output looks like:
+```
+SHA1: AA:BB:CC:DD:EE:FF:...
+```
+
+---
+
+### Step 3 – Register the SHA-1 in Firebase Console
+
+1. Open [Firebase Console](https://console.firebase.google.com/) → your project → **Project settings**.
+2. Under **Your apps**, select the Android app (`com.kenwell.healthapp`).
+3. Scroll to **SHA certificate fingerprints** → click **Add fingerprint**.
+4. Paste the SHA-1 from your **release** keystore.
+5. Repeat for the **debug** SHA-1 (required for Auth features like Google Sign-In during development).
+6. Download the updated `google-services.json` and replace `android/app/google-services.json`.
+
+> **Why does this matter?**  Google Sign-In, Phone Auth, and App Check all verify the SHA-1 of the APK/AAB at runtime.  If the fingerprint is not registered, those services will be blocked.
+
+---
+
+### Step 4 – Set the signing environment variables
+
+**Local development** — create a file like `~/.kenwell_signing_env` and source it:
+
+```bash
+export KEYSTORE_PATH="$HOME/keystores/kenwell_release.jks"
+export KEY_ALIAS="kenwell"
+export KEY_PASSWORD="<your-key-password>"
+export STORE_PASSWORD="<your-store-password>"
+```
+
+Then add to your shell profile (`~/.zshrc` / `~/.bashrc`):
+
+```bash
+source ~/.kenwell_signing_env
+```
+
+Run `flutter build apk --release` and the build will use the release keystore.
+
+**CI (GitHub Actions)** — add four repository secrets in **Settings → Secrets and variables → Actions**:
+
+| Secret name | Value |
+|---|---|
+| `KEYSTORE_BASE64` | Base64-encoded content of the `.jks` file (`base64 -i kenwell_release.jks`) |
+| `KEY_ALIAS` | `kenwell` |
+| `KEY_PASSWORD` | your key password |
+| `STORE_PASSWORD` | your store password |
+
+Then add a decode step to `.github/workflows/flutter_ci.yml` before the build step:
+
+```yaml
+- name: Decode release keystore
+  run: |
+    echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > /tmp/kenwell_release.jks
+    echo "KEYSTORE_PATH=/tmp/kenwell_release.jks" >> $GITHUB_ENV
+    echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
+    echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
+    echo "STORE_PASSWORD=${{ secrets.STORE_PASSWORD }}" >> $GITHUB_ENV
+```
+
+> The `build.gradle.kts` in this project already reads those four env vars and signs the release build automatically — no Gradle changes are needed.
+
+---
+
+### Quick checklist
+
+- [ ] Keystore `.jks` file generated and stored **outside** the repo
+- [ ] Keystore password, key alias, and key password saved securely
+- [ ] Debug SHA-1 extracted and registered in Firebase Console
+- [ ] Release SHA-1 extracted and registered in Firebase Console
+- [ ] Updated `google-services.json` downloaded and committed
+- [ ] Signing env vars set locally (`~/.kenwell_signing_env` or shell profile)
+- [ ] `KEYSTORE_BASE64`, `KEY_ALIAS`, `KEY_PASSWORD`, `STORE_PASSWORD` added as GitHub Actions secrets
+- [ ] Keystore decode step added to `.github/workflows/flutter_ci.yml`
