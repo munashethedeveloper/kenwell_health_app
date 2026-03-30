@@ -107,9 +107,7 @@ class SurveyScreen extends StatelessWidget {
             question:
                 'Would you like Kenwell Consulting to contact you regarding your experience?',
             value: vm.contactConsent,
-            onChanged: (value) {
-              if (value != null) vm.updateContactConsent(value);
-            },
+            onChanged: vm.updateContactConsent,
             yesValue: 'Yes',
             noValue: 'No',
           ),
