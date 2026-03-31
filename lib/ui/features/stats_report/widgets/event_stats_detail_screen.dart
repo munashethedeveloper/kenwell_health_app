@@ -402,12 +402,18 @@ class _EventStatsDetailScreenState extends State<EventStatsDetailScreen> {
                 child: ElevatedButton.icon(
                   onPressed: () async {
                     Navigator.of(ctx).pop();
-                    await SharePlus.instance.share(
-                      ShareParams(
-                        files: [XFile(filePath)],
-                        subject: '${event.title} – Event Report',
-                      ),
-                    );
+                    try {
+                      await SharePlus.instance.share(
+                        ShareParams(
+                          files: [XFile(filePath)],
+                          subject: '${event.title} – Event Report',
+                        ),
+                      );
+                    } catch (e) {
+                      if (mounted) {
+                        AppSnackbar.showError(context, 'Share failed: $e');
+                      }
+                    }
                   },
                   icon: const Icon(Icons.share),
                   label: const Text('Share File'),

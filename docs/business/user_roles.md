@@ -73,8 +73,8 @@ Firestore Security Rules enforce these boundaries at the server side (`firestore
 - Access the wellness flow for assigned events
 - Record informed consent
 - Conduct and submit:
-  - HIV test
-  - HIV test result
+  - HCT test (HIV Combined Test)
+  - HCT test result
   - TB screening
   - Cancer screening
   - Health Risk Assessment (HRA)
@@ -121,8 +121,8 @@ The **Wellness Flow** (the guided multi-step screening wizard) is only accessibl
 
 1. Member Registration
 2. Consent Form
-3. HIV Test
-4. HIV Test Results
+3. HCT Test (HIV Combined Test)
+4. HCT Test Results
 5. TB Screening
 6. Cancer Screening
 7. Health Risk Assessment

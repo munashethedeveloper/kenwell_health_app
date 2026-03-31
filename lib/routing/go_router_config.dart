@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kenwell_health_app/ui/features/audit_log/view_model/audit_log_view_model.dart';
 import 'package:kenwell_health_app/ui/features/audit_log/widgets/audit_log_screen.dart';
 import 'package:kenwell_health_app/ui/features/member/widgets/member_management_screen.dart';
 import 'package:kenwell_health_app/ui/features/stats_report/widgets/live_event_screen.dart';
@@ -27,7 +28,6 @@ import '../domain/models/wellness_event.dart';
 // Reports
 import '../ui/features/hct_test_results/view_model/hct_test_result_view_model.dart';
 import '../ui/features/hct_test_results/widgets/hct_test_result_screen.dart';
-import '../ui/features/stats_report/view_model/stats_report_view_model.dart';
 import '../ui/features/stats_report/widgets/stats_report_screen.dart';
 import '../ui/features/stats_report/widgets/past_events_screen.dart';
 
@@ -299,10 +299,7 @@ class AppRouterConfig {
         GoRoute(
           path: '/stats',
           name: 'stats',
-          builder: (context, state) => ChangeNotifierProvider(
-            create: (_) => StatsReportViewModel(),
-            child: const StatsReportScreen(),
-          ),
+          builder: (context, state) => const StatsReportScreen(),
         ),
 
         // Live Events Route
@@ -426,7 +423,10 @@ class AppRouterConfig {
         GoRoute(
           path: '/audit-log',
           name: 'auditLog',
-          builder: (context, state) => const AuditLogScreen(),
+          builder: (context, state) => ChangeNotifierProvider(
+            create: (_) => AuditLogViewModel(),
+            child: const AuditLogScreen(),
+          ),
         ),
 
         // User Management Routes

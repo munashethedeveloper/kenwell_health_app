@@ -32,15 +32,14 @@ The domain layer contains no Flutter or Firebase imports — only pure Dart. It 
 | `WellnessEvent` | Core event entity. `isPast` computed getter (completed/finished or date < today) |
 | `Member` | Community member. Supports ID number and passport number identification |
 | `Consent` | Informed consent record |
-| `HivResult` | Clinical HIV rapid test result |
-| `HivScreening` | HIV screening questionnaire answers |
+| `HctResult` | Clinical HCT (HIV Combined Test) rapid test result including nurse and counselling details |
+| `HctScreening` | HCT screening questionnaire answers |
 | `TbScreening` | TB symptom screening with nursing referral flag |
 | `CancerScreening` | Pap smear, breast exam, PSA screening |
 | `HraScreening` | Health Risk Assessment — BMI, blood pressure, glucose, cholesterol |
 | `MemberEvent` | Attendance record linking a Member to a WellnessEvent |
 | `AuditLogEntry` | Immutable audit trail entry |
 | `UserModel` | Platform user (staff/client) |
-| `User` | Firebase Auth user wrapper |
 
 ### Use Cases (`lib/domain/usecases/`)
 
@@ -69,12 +68,13 @@ Repositories are the single access point for a data source. Each repository:
 | `FirestoreMemberRepository` | `members`, SQLite `members` |
 | `FirestoreMemberEventRepository` | `member_events` |
 | `FirestoreConsentRepository` | `consents` |
-| `FirestoreHivScreeningRepository` | `hiv_screenings` |
-| `FirestoreHivResultRepository` | `hiv_results` |
+| `FirestoreHctScreeningRepository` | `hct_screenings` |
+| `FirestoreHctResultRepository` | `hct_results` |
 | `FirestoreTbScreeningRepository` | `tb_screenings` |
 | `FirestoreCancerScreeningRepository` | `cancer_screenings` |
 | `FirestoreHraRepository` | `hra_screenings` |
 | `FirestoreSurveyRepository` | `survey_results` |
+| `FirestoreAuditLogRepository` | `audit_logs` |
 | `EventRepository` | `events` |
 | `UserEventRepository` | `user_events` |
 | `MemberRepository` | SQLite `members` (local-only) |
@@ -86,15 +86,20 @@ Repositories are the single access point for a data source. Each repository:
 |---|---|
 | `AuthService` | Firebase Auth current user, sign in / out |
 | `FirebaseAuthService` | User CRUD (admin — list, create, delete) |
-| `PendingWriteService` | SQLite offline write queue (schema v16) |
+| `FirestoreService` | Generic Firestore CRUD wrapper (used by repositories and session service) |
+| `AuditLogService` | Fire-and-forget audit log writes; used by all mutating repositories |
+| `PendingWriteService` | SQLite offline write queue (schema v17) |
 | `ConnectivityService` | Network state stream; triggers `flushPending()` |
 | `AppPerformance` | Firebase Performance trace wrapper; disabled in debug |
 | `UserEventService` | Static helper for adding a user to an event |
+| `WellnessSessionService` | Manages wellness session lifecycle in Firestore (`wellness_sessions` + `participants`) |
+| `DataMigrationService` | Migrates data from local Drift database to Firestore |
 
 ### Local Database (`lib/data/local/`)
 
-SQLite via **Drift** ORM. Schema version: 16.  
-Tables: `members`, `tb_screenings`, `cancer_screenings`, `hra_screenings`, `hiv_screenings`, `consents`, `pending_writes`.
+SQLite via **Drift** ORM. Schema version: 17.  
+Tables: `members`, `tb_screenings`, `cancer_screenings`, `hra_screenings`, `hct_screenings`, `consents`, `pending_writes`.  
+Offline-cache tables (raw SQL, not Drift-managed): `cached_hct_screenings`, `cached_hct_results`.
 
 `AppDatabase` is a singleton (`AppDatabase.instance`). `build_runner` generates the Drift DAO code.
 
@@ -118,7 +123,7 @@ Screen (Widget)  →  ChangeNotifier (ViewModel)  →  UseCase / Repository
 
 ### Dependency Injection
 
-`AppProviders.rootProviders` in `lib/di/app_providers.dart` is the single registration point for all 8 app-lifetime `ChangeNotifierProvider` entries. `main.dart` passes this list to a `MultiProvider`.
+`AppProviders.rootProviders` in `lib/di/app_providers.dart` is the single registration point for all 8 app-lifetime `ChangeNotifierProvider` entries: `ConnectivityService`, `ProfileViewModel`, `ConsentScreenViewModel`, `AuthViewModel`, `CalendarViewModel`, `EventViewModel`, `StatsReportViewModel`, and `ThemeProvider`. `main.dart` passes this list to a `MultiProvider`.
 
 Per-screen ViewModels that require route arguments (e.g., `MemberEventsViewModel`, `MyEventViewModel`) are created locally with `ChangeNotifierProvider(create: ...)` at the screen level.
 
