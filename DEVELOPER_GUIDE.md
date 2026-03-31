@@ -671,9 +671,17 @@ When prompted, enter your new package name / bundle ID. The CLI will update:
 
 ### Step 1 – Generate a release keystore
 
-Run this command once on your machine. Keep the resulting `.jks` file **outside the repository** and **never commit it**.
+Run this command **once** on your machine. Keep the resulting `.jks` file **outside the repository** and **never commit it**.
+
+> **Windows users:** `keytool` ships with the JDK but is **not** added to PATH automatically.  
+> You must either run the commands below via the **full path** to `keytool.exe`, or add the JDK `bin` folder to your system PATH first.  
+> PowerShell also uses a **backtick (`` ` ``)** for line continuation — not a backslash (`\`).  
+> See the [Windows PowerShell](#windows-powershell) section below.
+
+**macOS / Linux (bash / zsh)**
 
 ```bash
+mkdir -p ~/keystores
 keytool -genkey -v \
   -keystore ~/keystores/kenwell_release.jks \
   -alias kenwell \
@@ -681,6 +689,55 @@ keytool -genkey -v \
   -keysize 2048 \
   -validity 10000
 ```
+
+**Windows PowerShell** <a name="windows-powershell"></a>
+
+First, find your JDK installation path. The quickest way:
+
+```powershell
+# Find keytool path via Flutter's bundled JDK (works if Flutter is installed)
+flutter doctor -v 2>&1 | Select-String "Java"
+
+# Or locate it manually — common paths:
+#   C:\Program Files\Java\jdk-<version>\bin\keytool.exe
+#   C:\Program Files\Android\Android Studio\jbr\bin\keytool.exe
+```
+
+Then create the keystores folder and generate the keystore (replace `<keytool-path>` with the actual path found above, e.g. `"C:\Program Files\Android\Android Studio\jbr\bin\keytool.exe"`):
+
+```powershell
+# Create the keystores directory
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\keystores"
+
+# Generate the release keystore (all on one line, or use backtick ` for line continuation)
+& "<keytool-path>" -genkey -v -keystore "$env:USERPROFILE\keystores\kenwell_release.jks" -alias kenwell -keyalg RSA -keysize 2048 -validity 10000
+```
+
+With backtick line continuation for readability:
+
+```powershell
+& "<keytool-path>" -genkey -v `
+  -keystore "$env:USERPROFILE\keystores\kenwell_release.jks" `
+  -alias kenwell `
+  -keyalg RSA `
+  -keysize 2048 `
+  -validity 10000
+```
+
+**Tip:** To avoid typing the full path every session, add the JDK `bin` folder to your user PATH:
+
+```powershell
+# Permanent PATH update (run once, then restart your terminal)
+[Environment]::SetEnvironmentVariable(
+  "Path",
+  [Environment]::GetEnvironmentVariable("Path","User") + ";C:\Program Files\Android\Android Studio\jbr\bin",
+  "User"
+)
+```
+
+After that, `keytool` will work without a full path in any new PowerShell window.
+
+---
 
 You will be prompted for:
 - **First and last name**, organisation, city, country (used in the certificate's Distinguished Name)
@@ -695,11 +752,19 @@ Write down (or store in a password manager) the alias (`kenwell`), the keystore 
 
 **From the release keystore you just created:**
 
+*macOS / Linux*
 ```bash
 keytool -list -v \
   -keystore ~/keystores/kenwell_release.jks \
   -alias kenwell \
   | grep "SHA1:"
+```
+
+*Windows PowerShell*
+```powershell
+keytool -list -v `
+  -keystore "$env:USERPROFILE\keystores\kenwell_release.jks" `
+  -alias kenwell
 ```
 
 **From the debug keystore** (useful for development / Firebase auth testing):
@@ -712,12 +777,14 @@ keytool -list -v \
   -storepass android \
   -keypass android \
   | grep "SHA1:"
+```
 
-# Windows
-keytool -list -v \
-  -keystore "%USERPROFILE%\.android\debug.keystore" \
-  -alias androiddebugkey \
-  -storepass android \
+```powershell
+# Windows PowerShell
+keytool -list -v `
+  -keystore "$env:USERPROFILE\.android\debug.keystore" `
+  -alias androiddebugkey `
+  -storepass android `
   -keypass android
 ```
 
@@ -743,7 +810,7 @@ SHA1: AA:BB:CC:DD:EE:FF:...
 
 ### Step 4 – Set the signing environment variables
 
-**Local development** — create a file like `~/.kenwell_signing_env` and source it:
+**Local development (macOS / Linux)** — create a file like `~/.kenwell_signing_env` and source it:
 
 ```bash
 export KEYSTORE_PATH="$HOME/keystores/kenwell_release.jks"
@@ -756,6 +823,23 @@ Then add to your shell profile (`~/.zshrc` / `~/.bashrc`):
 
 ```bash
 source ~/.kenwell_signing_env
+```
+
+**Local development (Windows PowerShell)** — set the variables for your current session:
+
+```powershell
+$env:KEYSTORE_PATH = "$env:USERPROFILE\keystores\kenwell_release.jks"
+$env:KEY_ALIAS     = "kenwell"
+$env:KEY_PASSWORD  = "<your-key-password>"
+$env:STORE_PASSWORD = "<your-store-password>"
+```
+
+To persist across sessions, add those four lines to your PowerShell profile (`$PROFILE`):
+
+```powershell
+# Open (or create) your profile file
+notepad $PROFILE
+# Paste the four $env: lines above, save, and restart PowerShell
 ```
 
 Run `flutter build apk --release` and the build will use the release keystore.
