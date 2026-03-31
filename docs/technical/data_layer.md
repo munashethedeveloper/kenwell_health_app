@@ -74,23 +74,39 @@ Services ──────────→ Firebase Auth / Performance / Crashly
 | `consentGiven` | `bool` | Whether consent was given |
 | `createdAt` | `timestamp` | Submission time |
 
-### `hiv_screenings`
+### `hct_screenings`
 
 | Field | Type | Description |
 |---|---|---|
 | `memberId` / `eventId` | `string` | References |
-| `hivStatus` | `string` | Known HIV status |
-| `onArt` / `adherent` | `string` | ART status |
-| `nursingReferral` | `string` | `referredToStateClinic` / `patientNotReferred` |
+| `firstHctTest` | `string` | First-ever HCT test flag (`yes` / `no`) |
+| `lastTestMonth` / `lastTestYear` | `string` | Month/year of most recent previous test |
+| `lastTestResult` | `string` | Result of most recent previous test |
+| `sharedNeedles` | `string` | Risk behaviour: shared needles |
+| `unprotectedSex` | `string` | Risk behaviour: unprotected sex |
+| `treatedSTI` | `string` | Risk behaviour: treated STI |
+| `knowPartnerStatus` | `string` | Awareness of partner HIV status |
+| `createdAt` / `updatedAt` | `string` | Lifecycle timestamps (ISO-8601) |
 
-### `hiv_results`
+### `hct_results`
 
 | Field | Type | Description |
 |---|---|---|
 | `memberId` / `eventId` | `string` | References |
+| `screeningTestName` | `string` | Test kit name |
+| `screeningBatchNo` | `string` | Test kit batch number |
+| `screeningExpiryDate` | `string` | Test kit expiry date |
 | `screeningResult` | `string` | `Negative` / `Positive` / `Indeterminate` |
+| `expectedResult` | `string` | Pre-test expected result |
 | `windowPeriod` | `string` | Window period counselling flag |
+| `difficultyDealingResult` | `string` | Psychosocial: difficulty dealing with result |
+| `urgentPsychosocial` | `string` | Urgent psychosocial support needed |
+| `committedToChange` | `string` | Committed to behaviour change |
+| `followUpLocation` / `followUpOther` / `followUpDate` | `string` | Follow-up details |
 | `nursingReferral` | `string` | Referral outcome |
+| `notReferredReason` | `string` | Reason not referred |
+| `nurseFirstName` / `nurseLastName` | `string` | Nurse identity |
+| `rank` / `sancNumber` / `nurseDate` | `string` | Nurse registration details |
 | `signatureData` | `string` | Nurse signature |
 
 ### `tb_screenings`
@@ -139,21 +155,46 @@ Services ──────────→ Firebase Auth / Performance / Crashly
 | `email` | `string` | User email |
 | `displayName` | `string` | Display name |
 | `role` | `string` | RBAC role (case-insensitive) |
+| `fcmTokens` | `array<string>` | FCM push notification tokens |
 
-### `audit_log`
+### `audit_logs`
 
 | Field | Type | Description |
 |---|---|---|
-| `action` | `string` | Action performed |
+| `action` | `string` | `create` / `update` / `delete` |
+| `collection` | `string` | Firestore collection affected |
+| `documentId` | `string` | Affected document ID |
 | `performedBy` | `string` | UID of actor |
-| `targetId` | `string` | Affected document ID |
+| `summary` | `string` | Human-readable description |
+| `newData` / `previousData` | `map` | Before/after field snapshot |
 | `timestamp` | `timestamp` | When the action occurred |
+
+### `wellness_sessions`
+
+| Field | Type | Description |
+|---|---|---|
+| `eventId` | `string` | Reference to `events.id` |
+| `nurseUserId` | `string` | UID of the nurse conducting the session |
+| `participantId` | `string` | Reference to `participants.id` |
+| `status` | `string` | `in_progress` / `completed` |
+| `completedSteps` | `array<string>` | Steps completed (e.g. `consent`, `hct_test`, `survey`) |
+| `consent` / `hctTest` / `hctResults` / `tbTest` / `riskAssessment` / `survey` | `map` | Step data snapshots |
+| `memberDetails` / `personalDetails` | `map` | Participant identity data |
+| `createdAt` / `updatedAt` / `completedAt` | `timestamp` | Lifecycle timestamps |
+
+### `participants`
+
+| Field | Type | Description |
+|---|---|---|
+| `sessionId` | `string` | Reference to `wellness_sessions.id` |
+| Various identity fields | `string` | Name, ID number, contact, etc. |
+| `createdAt` / `updatedAt` | `timestamp` | Record timestamps |
 
 ---
 
 ## SQLite Schema (Drift)
 
-**File:** `lib/data/local/app_database.dart` — schema version **16**
+**File:** `lib/data/local/app_database.dart` — schema version **17**
 
 | Table | Columns | Purpose |
 |---|---|---|
@@ -161,11 +202,18 @@ Services ──────────→ Firebase Auth / Performance / Crashly
 | `tb_screenings` | id, memberId, eventId, + all clinical fields | Offline TB data |
 | `cancer_screenings` | id, memberId, eventId, + all clinical fields | Offline cancer data |
 | `hra_screenings` | id, memberId, eventId, + all clinical fields | Offline HRA data |
-| `hiv_screenings` | id, memberId, eventId, + all clinical fields | Offline HIV data |
+| `hct_screenings` | id, memberId, eventId, + all clinical fields | Offline HCT data |
 | `consents` | id, memberId, eventId, signatureData, consentGiven, createdAt | Offline consent data |
 | `pending_writes` | id, collection, documentId, data (JSON), createdAt, retryCount | Offline write queue |
 
-Code is generated by `build_runner` (`dart run build_runner build`).
+**Raw SQL offline-cache tables** (not Drift-managed):
+
+| Table | Purpose |
+|---|---|
+| `cached_hct_screenings` | Local cache of HCT screening records keyed by member and event |
+| `cached_hct_results` | Local cache of HCT result records keyed by member and event |
+
+> **Migration note:** Schema v17 renamed `cached_hiv_screenings` → `cached_hct_screenings` and `cached_hiv_results` → `cached_hct_results` to match the HCT service rename.
 
 ---
 
@@ -180,6 +228,26 @@ On reconnect, `ConnectivityService` emits a connected event and calls `PendingWr
 **Affected operations:**
 - `RegisterMemberUseCase` — both Firestore writes (members + member_events)
 - `SubmitConsentUseCase` — survey_results write
+
+---
+
+## Audit Logging
+
+**Service:** `lib/data/services/audit_log_service.dart`
+
+`AuditLogService` writes immutable entries to the `audit_logs` Firestore collection. Every mutating repository method (create, update, delete) calls one of the convenience helpers (`logCreate`, `logUpdate`, `logDelete`). Logging is fire-and-forget — failures are silently swallowed so they never block the primary operation.
+
+Audit entries include the collection, document ID, actor UID, a human-readable summary, and optional before/after data snapshots.
+
+---
+
+## Wellness Sessions
+
+**Service:** `lib/data/services/wellness_session_service.dart`
+
+`WellnessSessionService` manages the lifecycle of a wellness session — the container that links a nurse, an event, and a participant for a single screening encounter. Sessions are stored in the `wellness_sessions` Firestore collection with participant details in a separate `participants` collection.
+
+Session steps tracked: `consent`, `member_registration`, `personal_details`, `risk_assessment`, `hct_test`, `hct_results`, `tb_test`, `survey`.
 
 ---
 

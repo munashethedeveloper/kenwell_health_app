@@ -106,8 +106,8 @@ The wellness flow is a configurable multi-step guided wizard that walks a health
 |---|---|---|
 | Member Registration | `RegisterMemberUseCase` | Register or select existing member |
 | Consent Form | `SubmitConsentUseCase` | Capture signed informed consent |
-| HIV Test | `SubmitHIVScreeningUseCase` | Record HIV screening questionnaire |
-| HIV Test Result | `SubmitHIVTestResultUseCase` | Record rapid HIV test result |
+| HCT Test | `SubmitHCTScreeningUseCase` | Record HCT (HIV Combined Test) screening questionnaire |
+| HCT Test Result | `SubmitHCTTestResultUseCase` | Record rapid HCT test result and counselling notes |
 | TB Screening | `SubmitTBScreeningUseCase` | Record TB symptom screening |
 | Cancer Screening | `SubmitCancerScreeningUseCase` | Pap smear, breast exam, PSA |
 | HRA | `SubmitHRAUseCase` | Blood pressure, BMI, glucose, cholesterol |
@@ -181,7 +181,7 @@ The wellness flow is a configurable multi-step guided wizard that walks a health
 - Date range filter
 
 ### Live screening counts
-- Per-event counts from HIV, TB, Cancer, HRA Firestore collections
+- Per-event counts from HCT, TB, Cancer, HRA Firestore collections
 
 ### Export
 - PDF report with event summary, screening breakdown, and referral outcomes
@@ -241,3 +241,15 @@ The wellness flow is a configurable multi-step guided wizard that walks a health
 - Failed Firestore writes (non-fatal) are queued in the local SQLite `pending_writes` table
 - `ConnectivityService` listens for network restoration and automatically calls `PendingWriteService.flushPending()`
 - Affected operations: member creation (both Firestore collections), consent submission (survey_results), and any use case that uses a non-fatal write pattern
+
+---
+
+## 16. Wellness Sessions
+
+**Service:** `WellnessSessionService`
+
+- Each screening encounter is represented as a `wellness_session` document in Firestore
+- A session links a nurse, an event, and a participant and tracks which steps have been completed
+- Steps included: `consent`, `member_registration`, `personal_details`, `hct_test`, `hct_results`, `tb_test`, `risk_assessment`, `survey`
+- Session integrity validation via `validateSessionIntegrity()` detects missing data and consistency issues
+- Per-event statistics (`getEventStatistics()`) aggregate session counts and screening counts across all participants

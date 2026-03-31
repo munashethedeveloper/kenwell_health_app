@@ -2,6 +2,8 @@
 
 The Kenwell Health App has **19 use cases** in `lib/domain/usecases/`. All are callable classes with a `call()` method (or named methods for complex cases).
 
+> **Note:** The HIV-related use cases and terminology were renamed to **HCT** (HIV Combined Test) throughout the codebase to align with clinical workflows.
+
 ---
 
 ## Member Management
@@ -113,21 +115,21 @@ Saves consent to Firestore (**fatal**) and writes the survey-data snapshot to `s
 
 ---
 
-### `SubmitHIVScreeningUseCase`
-**File:** `submit_hiv_screening_usecase.dart`  
-**Repositories:** `FirestoreHivScreeningRepository`  
+### `SubmitHCTScreeningUseCase`
+**File:** `submit_hct_screening_usecase.dart`  
+**Repositories:** `FirestoreHctScreeningRepository`  
 **Returns:** `void`
 
-Saves the HIV screening questionnaire answers.
+Saves the HCT (HIV Combined Test) screening questionnaire answers.
 
 ---
 
-### `SubmitHIVTestResultUseCase`
-**File:** `submit_hiv_test_result_usecase.dart`  
-**Repositories:** `FirestoreHivResultRepository`  
+### `SubmitHCTTestResultUseCase`
+**File:** `submit_hct_test_result_usecase.dart`  
+**Repositories:** `FirestoreHctResultRepository`  
 **Returns:** `void`
 
-Saves the clinical HIV rapid test result.
+Saves the clinical HCT (HIV Combined Test) rapid test result, including nurse details, counselling notes, and follow-up information.
 
 ---
 
@@ -169,10 +171,10 @@ Saves post-screening survey results.
 
 ### `LoadWellnessCompletionStatusUseCase`
 **File:** `load_wellness_completion_status_usecase.dart`  
-**Repositories:** `FirestoreConsentRepository`, `FirestoreHivScreeningRepository`, `FirestoreHivResultRepository`, `FirestoreTbScreeningRepository`, `FirestoreCancerScreeningRepository`, `FirestoreHraRepository`, `FirestoreSurveyRepository`  
+**Repositories:** `FirestoreConsentRepository`, `FirestoreHctScreeningRepository`, `FirestoreTbScreeningRepository`, `FirestoreCancerScreeningRepository`, `FirestoreHraRepository`, `FirestoreSurveyRepository`  
 **Returns:** `WellnessCompletionStatus`
 
-Loads all 6 wellness completion flags in parallel via `Future.wait<bool>`. Returns a `WellnessCompletionStatus` value object. Used by `WellnessFlowViewModel` at startup to restore progress.
+Loads all wellness completion flags in parallel via `Future.wait<bool>`. Returns a `WellnessCompletionStatus` value object containing `hctEnabled`/`hctCompleted`, `tbEnabled`/`tbCompleted`, `cancerEnabled`/`cancerCompleted`, `hraEnabled`/`hraCompleted`, and `surveyCompleted`. Used by `WellnessFlowViewModel` at startup to restore progress.
 
 ---
 
@@ -200,9 +202,9 @@ Loads all 6 wellness completion flags in parallel via `Future.wait<bool>`. Retur
 | `MemberDetailsViewModel` | `RegisterMemberUseCase`, `DeleteMemberUseCase`, `LoadMembersUseCase` |
 | `MemberSearchViewModel` | `SearchMemberUseCase` |
 | `MemberEventsViewModel` | `LoadMemberEventReferralsUseCase` |
-| `ConsentViewModel` | `SubmitConsentUseCase` |
-| `HIVTestViewModel` | `SubmitHIVScreeningUseCase` |
-| `HIVTestResultViewModel` | `SubmitHIVTestResultUseCase` |
+| `ConsentScreenViewModel` | `SubmitConsentUseCase` |
+| `HCTTestViewModel` | `SubmitHCTScreeningUseCase` |
+| `HCTTestResultViewModel` | `SubmitHCTTestResultUseCase` |
 | `TBTestingViewModel` | `SubmitTBScreeningUseCase` |
 | `CancerScreeningViewModel` | `SubmitCancerScreeningUseCase` |
 | `PersonalRiskAssessmentViewModel` | `SubmitHRAUseCase` |
