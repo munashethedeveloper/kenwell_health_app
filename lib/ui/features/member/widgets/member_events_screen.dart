@@ -438,7 +438,7 @@ class _EditMemberSheetState extends State<_EditMemberSheet> {
   }
 }
 
-
+class _EventCard extends StatelessWidget {
   const _EventCard({
     required this.event,
     required this.formatDate,
