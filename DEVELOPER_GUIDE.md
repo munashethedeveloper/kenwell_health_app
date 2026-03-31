@@ -795,3 +795,75 @@ Then add a decode step to `.github/workflows/flutter_ci.yml` before the build st
 - [ ] Signing env vars set locally (`~/.kenwell_signing_env` or shell profile)
 - [ ] `KEYSTORE_BASE64`, `KEY_ALIAS`, `KEY_PASSWORD`, `STORE_PASSWORD` added as GitHub Actions secrets
 - [ ] Keystore decode step added to `.github/workflows/flutter_ci.yml`
+
+---
+
+## 12. Where to Find `google-services.json` on Firebase
+
+`google-services.json` is the Android configuration file that tells the app how to connect to your Firebase project.  It contains the API keys, project IDs, and (once registered) the SHA-1 fingerprints for your app.
+
+### Your Firebase project details
+
+| Field | Value |
+|---|---|
+| **Project ID** | `kenwellmobileapp` |
+| **Project number** | `195093019449` |
+| **Android package name** | `com.kenwell.healthapp` |
+| **App ID** | `1:195093019449:android:80c5c09ca6b7f409e8c6e8` |
+| **Console URL** | https://console.firebase.google.com/project/kenwellmobileapp |
+
+---
+
+### Step-by-step: Download `google-services.json`
+
+1. **Open the Firebase Console**
+   Go to → [https://console.firebase.google.com/project/kenwellmobileapp/settings/general](https://console.firebase.google.com/project/kenwellmobileapp/settings/general)
+   *(or navigate manually: Firebase Console → select **kenwellmobileapp** → gear icon ⚙️ → **Project settings**)*
+
+2. **Scroll down to "Your apps"**
+   On the **General** tab you will see a list of registered apps.  Look for the Android app with package name **`com.kenwell.healthapp`**.
+
+3. **Click "google-services.json"**
+   Under that Android app card there is a **`google-services.json`** download button.  Click it.
+
+   > If you cannot see the button, make sure you are on the **General** tab (not Authentication, Firestore, etc.).
+
+4. **Replace the file in the repo**
+   Copy the downloaded file into the repository at exactly this path:
+   ```
+   android/app/google-services.json
+   ```
+   Replace the existing file. Do **not** rename it.
+
+5. **Commit the updated file**
+   ```bash
+   git add android/app/google-services.json
+   git commit -m "chore: update google-services.json"
+   ```
+
+---
+
+### When do you need to re-download it?
+
+| Situation | Action required |
+|---|---|
+| First-time project setup | Download once and commit |
+| Added a new SHA-1 fingerprint (debug, release, CI) | Download again after adding fingerprint in Firebase Console |
+| Changed the Android package name | Re-register the app; download a new file |
+| Added a new Firebase product (e.g. App Check, Dynamic Links) | May need a fresh download to pick up new config keys |
+| Rotated API keys in Firebase Console | Download again |
+
+---
+
+### Can't see the app in "Your apps"?
+
+If the `com.kenwell.healthapp` app is **not listed** under Your apps:
+
+1. Click **"Add app"** → choose the **Android** icon.
+2. Enter package name: `com.kenwell.healthapp`
+3. (Optional but recommended) Enter your debug SHA-1 now — see **Section 11** for how to extract it.
+4. Click **"Register app"**.
+5. Download the `google-services.json` file that is shown in the next step.
+6. Place it at `android/app/google-services.json` and commit.
+
+> **Note:** The iOS equivalent is `GoogleService-Info.plist`, which lives at `ios/Runner/GoogleService-Info.plist` and is downloaded from the same **Project settings → Your apps** page, under the iOS app card.
