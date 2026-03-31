@@ -765,7 +765,7 @@ Write down (or store in a password manager) the alias (`kenwell`), the keystore 
 keytool -list -v \
   -keystore ~/keystores/kenwell_release.jks \
   -alias kenwell \
-  | grep "SHA1:"
+  | grep -E "SHA1:|SHA256:"
 ```
 
 *Windows PowerShell — interactive password prompt*
@@ -787,18 +787,34 @@ Replace `YOUR_STORE_PASSWORD` with the store password you set when running `keyt
 
 **From the debug keystore** (useful for development / Firebase auth testing):
 
+> The Android SDK creates the debug keystore automatically the first time you build.  
+> Its fixed credentials are:  alias = `androiddebugkey`, password = `android`.
+
+**macOS / Linux (bash / zsh)**
+
 ```bash
-# macOS / Linux
 keytool -list -v \
   -keystore ~/.android/debug.keystore \
   -alias androiddebugkey \
   -storepass android \
   -keypass android \
-  | grep "SHA1:"
+  | grep -E "SHA1:|SHA256:"
 ```
 
+**Windows PowerShell**
+
 ```powershell
-# Windows PowerShell
+& "C:\Program Files\Android\Android Studio\jbr\bin\keytool.exe" -list -v `
+  -keystore "$env:USERPROFILE\.android\debug.keystore" `
+  -alias androiddebugkey `
+  -storepass android `
+  -keypass android `
+  | Select-String -Pattern "SHA1:|SHA256:"
+```
+
+Or without filtering (to see the full certificate):
+
+```powershell
 & "C:\Program Files\Android\Android Studio\jbr\bin\keytool.exe" -list -v `
   -keystore "$env:USERPROFILE\.android\debug.keystore" `
   -alias androiddebugkey `
@@ -807,10 +823,13 @@ keytool -list -v \
 ```
 
 The output looks like:
+
 ```
-SHA1: 71:04:24:FC:FA:63:98:16:E2:96:E6:6C:EB:CF:85:40:B9:14:E5:9D
-SHA256: 65:6F:EF:2A:C6:6D:C0:BB:F4:E9:57:1C:71:27:1B:24:10:B4:CB:F7:25:E1:36:65:F3:1A:20:1F:3F:B7:85:48
+SHA1: AA:BB:CC:DD:EE:FF:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE
+SHA256: AA:BB:CC:DD:EE:FF:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:11:22:33:44:55:66:77:88:99:AA:BB
 ```
+
+> **Note:** The debug keystore is unique to each machine — the fingerprints above are placeholders. Every developer and every CI runner that needs Firebase Auth features (Google Sign-In, Phone Auth, App Check) must register their own debug SHA-1 and SHA-256 in Firebase Console.
 
 **Confirmed fingerprints for this project's release keystore** (generated 31 Mar 2026):
 
@@ -1064,9 +1083,11 @@ You only need to add a new SHA-1 fingerprint to the existing app registration.  
 | Release / Play Store builds | Your release `.jks` keystore | ✅ Yes (required for production Auth) |
 | CI / GitHub Actions builds | Same release keystore (base64-encoded secret) | ✅ Yes (same as release if using same keystore) |
 
-Each developer machine has its own debug keystore, so every developer who needs Google Sign-In locally must add **their** debug SHA-1 to Firebase.
+Each developer machine has its own debug keystore, so every developer who needs Google Sign-In locally must add **their** debug SHA-1 (and SHA-256) to Firebase.
 
-### Quick reference — extract SHA-1 for debug keystore
+### Quick reference — extract SHA-1 and SHA-256 for the debug keystore
+
+**macOS / Linux**
 
 ```bash
 keytool -list -v \
@@ -1074,7 +1095,18 @@ keytool -list -v \
   -alias androiddebugkey \
   -storepass android \
   -keypass android \
-  | grep "SHA1:"
+  | grep -E "SHA1:|SHA256:"
 ```
 
-Then add the printed SHA-1 in Firebase Console as described in step 3 above.
+**Windows PowerShell**
+
+```powershell
+& "C:\Program Files\Android\Android Studio\jbr\bin\keytool.exe" -list -v `
+  -keystore "$env:USERPROFILE\.android\debug.keystore" `
+  -alias androiddebugkey `
+  -storepass android `
+  -keypass android `
+  | Select-String -Pattern "SHA1:|SHA256:"
+```
+
+Then add **both** the SHA-1 and SHA-256 values in Firebase Console as described in Step 3 above.
