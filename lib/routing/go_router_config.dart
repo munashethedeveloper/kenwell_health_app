@@ -28,7 +28,6 @@ import '../domain/models/wellness_event.dart';
 // Reports
 import '../ui/features/hct_test_results/view_model/hct_test_result_view_model.dart';
 import '../ui/features/hct_test_results/widgets/hct_test_result_screen.dart';
-import '../ui/features/stats_report/view_model/stats_report_view_model.dart';
 import '../ui/features/stats_report/widgets/stats_report_screen.dart';
 import '../ui/features/stats_report/widgets/past_events_screen.dart';
 
@@ -300,10 +299,7 @@ class AppRouterConfig {
         GoRoute(
           path: '/stats',
           name: 'stats',
-          builder: (context, state) => ChangeNotifierProvider(
-            create: (_) => StatsReportViewModel(),
-            child: const StatsReportScreen(),
-          ),
+          builder: (context, state) => const StatsReportScreen(),
         ),
 
         // Live Events Route

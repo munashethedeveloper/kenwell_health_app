@@ -32,6 +32,8 @@ class RolePermissions {
     '/add-edit-event': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     '/allocate-event': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     '/stats': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
+    '/live-events': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
+    '/past-events': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     '/detailed-stats': [
       'ADMIN',
       'TOP MANAGEMENT',
