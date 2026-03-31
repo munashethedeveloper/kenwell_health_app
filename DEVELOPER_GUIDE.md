@@ -660,9 +660,9 @@ When prompted, enter your new package name / bundle ID. The CLI will update:
 
 | Item | Status |
 |---|---|
-| Release keystore file (`.jks`) | ❌ **Not present** in the repository |
+| Release keystore file (`.jks`) | ✅ **Generated** — `%USERPROFILE%\keystores\kenwell_release.jks` (kept outside the repo) |
 | `key.properties` file | ❌ **Not present** |
-| SHA-1 fingerprint in `google-services.json` | ❌ **Not registered** (the `oauth_client` array is empty) |
+| SHA-1 fingerprint in `google-services.json` | ⚠️ **Must be registered** — see Step 3 below |
 | Release signing config in `build.gradle.kts` | ✅ **Configured** — reads `KEYSTORE_PATH`, `KEY_ALIAS`, `KEY_PASSWORD`, `STORE_PASSWORD` env vars; falls back to the debug keystore if any are absent |
 
 **In practice today:** every release build (local and CI) is signed with the **debug keystore** because the four release env vars are not set. This is fine for development but **must** be resolved before publishing to Google Play.
@@ -808,8 +808,21 @@ keytool -list -v \
 
 The output looks like:
 ```
-SHA1: AA:BB:CC:DD:EE:FF:...
+SHA1: 71:04:24:FC:FA:63:98:16:E2:96:E6:6C:EB:CF:85:40:B9:14:E5:9D
+SHA256: 65:6F:EF:2A:C6:6D:C0:BB:F4:E9:57:1C:71:27:1B:24:10:B4:CB:F7:25:E1:36:65:F3:1A:20:1F:3F:B7:85:48
 ```
+
+**Confirmed fingerprints for this project's release keystore** (generated 31 Mar 2026):
+
+| Field | Value |
+|---|---|
+| **Alias** | `kenwell` |
+| **Owner** | CN=MunasheMapiye, OU=KenWellnessConsulting, O=KenWellnessConsulting, L=Pretoria, ST=Gauteng, C=ZA |
+| **Valid** | 31 Mar 2026 → 16 Aug 2053 |
+| **SHA-1** | `71:04:24:FC:FA:63:98:16:E2:96:E6:6C:EB:CF:85:40:B9:14:E5:9D` |
+| **SHA-256** | `65:6F:EF:2A:C6:6D:C0:BB:F4:E9:57:1C:71:27:1B:24:10:B4:CB:F7:25:E1:36:65:F3:1A:20:1F:3F:B7:85:48` |
+
+> ⚠️ Keep the keystore file and passwords in a password manager. The SHA-1 and SHA-256 above must both be registered in Firebase Console (see Step 3).
 
 ---
 
@@ -850,14 +863,21 @@ Then repeat Step 1 to generate a new keystore, choosing a password you will stor
 
 ---
 
-### Step 3 – Register the SHA-1 in Firebase Console
+### Step 3 – Register the SHA fingerprints in Firebase Console
 
 1. Open [Firebase Console](https://console.firebase.google.com/) → your project → **Project settings**.
 2. Under **Your apps**, select the Android app (`com.kenwell.healthapp`).
 3. Scroll to **SHA certificate fingerprints** → click **Add fingerprint**.
-4. Paste the SHA-1 from your **release** keystore.
-5. Repeat for the **debug** SHA-1 (required for Auth features like Google Sign-In during development).
-6. Download the updated `google-services.json` and replace `android/app/google-services.json`.
+4. Paste the **SHA-1** from your **release** keystore:
+   ```
+   71:04:24:FC:FA:63:98:16:E2:96:E6:6C:EB:CF:85:40:B9:14:E5:9D
+   ```
+5. Click **Add fingerprint** again and paste the **SHA-256**:
+   ```
+   65:6F:EF:2A:C6:6D:C0:BB:F4:E9:57:1C:71:27:1B:24:10:B4:CB:F7:25:E1:36:65:F3:1A:20:1F:3F:B7:85:48
+   ```
+6. Repeat for the **debug** SHA-1 and SHA-256 (required for Auth features like Google Sign-In during development).
+7. Download the updated `google-services.json` and replace `android/app/google-services.json`.
 
 > **Why does this matter?**  Google Sign-In, Phone Auth, and App Check all verify the SHA-1 of the APK/AAB at runtime.  If the fingerprint is not registered, those services will be blocked.
 
@@ -926,10 +946,12 @@ Then add a decode step to `.github/workflows/flutter_ci.yml` before the build st
 
 ### Quick checklist
 
-- [ ] Keystore `.jks` file generated and stored **outside** the repo
-- [ ] Keystore password, key alias, and key password saved securely
+- [x] Keystore `.jks` file generated and stored **outside** the repo (`%USERPROFILE%\keystores\kenwell_release.jks`)
+- [x] Keystore password, key alias, and key password saved securely
+- [x] Release SHA-1 and SHA-256 extracted (see fingerprint table in Step 2 above)
+- [ ] Release SHA-1 registered in Firebase Console
+- [ ] Release SHA-256 registered in Firebase Console
 - [ ] Debug SHA-1 extracted and registered in Firebase Console
-- [ ] Release SHA-1 extracted and registered in Firebase Console
 - [ ] Updated `google-services.json` downloaded and committed
 - [ ] Signing env vars set locally (`~/.kenwell_signing_env` or shell profile)
 - [ ] `KEYSTORE_BASE64`, `KEY_ALIAS`, `KEY_PASSWORD`, `STORE_PASSWORD` added as GitHub Actions secrets
