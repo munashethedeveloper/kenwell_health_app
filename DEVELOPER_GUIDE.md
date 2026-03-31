@@ -867,3 +867,53 @@ If the `com.kenwell.healthapp` app is **not listed** under Your apps:
 6. Place it at `android/app/google-services.json` and commit.
 
 > **Note:** The iOS equivalent is `GoogleService-Info.plist`, which lives at `ios/Runner/GoogleService-Info.plist` and is downloaded from the same **Project settings → Your apps** page, under the iOS app card.
+
+---
+
+## 13. Firebase Warning: "An app with this package name already exists"
+
+### What the warning means
+
+When you open **Firebase Console → Project settings → Add app** and type in the package name `com.kenwell.healthapp`, Firebase shows:
+
+> ⚠️ **An app with this package name already exists in your project. You can register additional SHA1s for the app in Settings.**
+
+This is **not an error** — it is an informational warning.  It means the Android app (`com.kenwell.healthapp`) is **already registered** in the `kenwellmobileapp` Firebase project.  You do **not** need to create a new registration.
+
+### What to do instead
+
+You only need to add a new SHA-1 fingerprint to the existing app registration.  Follow these steps:
+
+1. **Close the "Add app" dialog** — do not complete a new registration.
+
+2. **Navigate to the existing app's settings:**
+   Firebase Console → [Project settings](https://console.firebase.google.com/project/kenwellmobileapp/settings/general) → **General** tab → scroll to **Your apps** → click the `com.kenwell.healthapp` card.
+
+3. **Scroll to "SHA certificate fingerprints"** and click **Add fingerprint**.
+
+4. **Paste the SHA-1** you want to register (debug, release, or CI — see **Section 11** for extraction commands).
+
+5. **Click Save**, then click the **`google-services.json`** download button on the same card and replace `android/app/google-services.json` in the repo.
+
+### Why multiple SHA-1s are needed
+
+| Environment | Keystore used | SHA-1 must be registered? |
+|---|---|---|
+| Local debug builds | Android debug keystore (`~/.android/debug.keystore`) | ✅ Yes (for Google Sign-In, Phone Auth in dev) |
+| Release / Play Store builds | Your release `.jks` keystore | ✅ Yes (required for production Auth) |
+| CI / GitHub Actions builds | Same release keystore (base64-encoded secret) | ✅ Yes (same as release if using same keystore) |
+
+Each developer machine has its own debug keystore, so every developer who needs Google Sign-In locally must add **their** debug SHA-1 to Firebase.
+
+### Quick reference — extract SHA-1 for debug keystore
+
+```bash
+keytool -list -v \
+  -keystore ~/.android/debug.keystore \
+  -alias androiddebugkey \
+  -storepass android \
+  -keypass android \
+  | grep "SHA1:"
+```
+
+Then add the printed SHA-1 in Firebase Console as described in step 3 above.
