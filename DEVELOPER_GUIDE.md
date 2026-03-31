@@ -768,19 +768,22 @@ keytool -list -v \
   | grep "SHA1:"
 ```
 
-*Windows PowerShell (keytool on PATH)*
-```powershell
-keytool -list -v `
-  -keystore "$env:USERPROFILE\keystores\kenwell_release.jks" `
-  -alias kenwell
-```
-
-*Windows PowerShell (full path — use until PATH is updated)*
+*Windows PowerShell — interactive password prompt*
 ```powershell
 & "C:\Program Files\Android\Android Studio\jbr\bin\keytool.exe" -list -v `
   -keystore "$env:USERPROFILE\keystores\kenwell_release.jks" `
   -alias kenwell
 ```
+
+*Windows PowerShell — inline password (recommended to avoid prompt typos)*
+```powershell
+& "C:\Program Files\Android\Android Studio\jbr\bin\keytool.exe" -list -v `
+  -keystore "$env:USERPROFILE\keystores\kenwell_release.jks" `
+  -alias kenwell `
+  -storepass YOUR_STORE_PASSWORD
+```
+
+Replace `YOUR_STORE_PASSWORD` with the store password you set when running `keytool -genkey` in Step 1.
 
 **From the debug keystore** (useful for development / Firebase auth testing):
 
@@ -807,6 +810,43 @@ The output looks like:
 ```
 SHA1: AA:BB:CC:DD:EE:FF:...
 ```
+
+---
+
+#### Troubleshooting: "keystore password was incorrect"
+
+If you see this error:
+
+```
+keytool error: java.io.IOException: keystore password was incorrect
+```
+
+**Common causes:**
+
+1. **Typo at the interactive prompt** — the password field in the terminal does not echo characters, making it easy to mistype. Use the `-storepass` inline flag instead (shown above) so you can see what you are typing.
+
+2. **Copy-paste encoding issue** — smart quotes (`"`) or invisible characters copied from a document can silently corrupt the password you type. Type the password manually rather than pasting.
+
+3. **Wrong `.jks` file** — double-check that `$env:USERPROFILE\keystores\kenwell_release.jks` points to the file you just created.
+
+**If you remember the password**, use the inline `-storepass` form:
+
+```powershell
+& "C:\Program Files\Android\Android Studio\jbr\bin\keytool.exe" -list -v `
+  -keystore "$env:USERPROFILE\keystores\kenwell_release.jks" `
+  -alias kenwell `
+  -storepass YOUR_STORE_PASSWORD
+```
+
+**If you have forgotten the password** (and the app has NOT yet been published to Google Play), delete the keystore and start over:
+
+```powershell
+Remove-Item "$env:USERPROFILE\keystores\kenwell_release.jks"
+```
+
+Then repeat Step 1 to generate a new keystore, choosing a password you will store safely (e.g. in a password manager).
+
+> ⚠️ **Already published to Google Play?**  The signing key for a Play Store app is permanently bound to the first release — it cannot be replaced. If you published even one version with a keystore and have now lost its password, you will need to contact [Google Play support](https://support.google.com/googleplay/android-developer/) about key recovery or use [Play App Signing](https://developer.android.com/studio/publish/app-signing#enroll) to let Google manage your key going forward.
 
 ---
 
