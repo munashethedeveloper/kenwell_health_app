@@ -7,14 +7,18 @@ service cloud.firestore {
       return request.auth != null;
     }
     
-    // Helper function to get user document
+    // Helper function to get user document snapshot (returns null if document missing)
     function getUserData() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+      return get(/databases/$(database)/documents/users/$(request.auth.uid));
     }
     
-    // Helper function to get user role in lowercase for case-insensitive comparison
+    // Helper function to get user role in lowercase for case-insensitive comparison.
+    // Returns an empty string when the user document is missing or the role field is
+    // absent, preventing a null-dereference rule error that would otherwise deny
+    // every collection read for that user (including the export queries).
     function getUserRole() {
-      return getUserData().role.lower();
+      let doc = getUserData();
+      return doc == null ? '' : doc.data.get('role', '').lower();
     }
     
     // Helper function to check if user has a specific role (case-insensitive)
@@ -52,14 +56,24 @@ service cloud.firestore {
       return hasRole('client');
     }
     
-    // Helper function to check if user has staff role (admin, management, coordinator or healthcare practitioner)
-    function isStaff() {
-      return isAdmin() || isTopManager() || isProjectManager() || isCoordinator() || isPractitioner();
+    // Helper function to check if user has management role (admin, top manager, or
+    // project manager). Resolves the role once via getUserRole() so that only a
+    // single external document read is made per rule evaluation.
+    function isManagement() {
+      let role = getUserRole();
+      return role == 'admin' || role == 'top management' || role == 'project manager';
     }
 
-      // Helper function to check if user has management role (admin, top manager, or project manager)
-    function isManagement() {
-      return isAdmin() || isTopManager() || isProjectManager();
+    // Helper function to check if user has staff role (admin, management, coordinator,
+    // or healthcare practitioner). Resolves the role once via getUserRole() so that
+    // only a single external document read is made per rule evaluation.
+    function isStaff() {
+      let role = getUserRole();
+      return role == 'admin'
+          || role == 'top management'
+          || role == 'project manager'
+          || role == 'project coordinator'
+          || role == 'health practitioner';
     }
 
     // Users collection - Role-based access
