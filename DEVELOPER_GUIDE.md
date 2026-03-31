@@ -1110,3 +1110,40 @@ keytool -list -v \
 ```
 
 Then add **both** the SHA-1 and SHA-256 values in Firebase Console as described in Step 3 above.
+
+---
+
+## 14. Troubleshooting: `flutter build apk --release` Fails With "Crashlytics Gradle plugin 3 requires Google-Services 4.4.1 and above"
+
+### Error message
+
+```
+> Could not create task ':app:uploadCrashlyticsMappingFileRelease'.
+   > Failed to query the value of task ':app:uploadCrashlyticsMappingFileRelease' property 'appIdFile'.
+      > The Crashlytics Gradle plugin 3 requires Google-Services 4.4.1 and above.
+```
+
+### Root cause
+
+The Crashlytics Gradle plugin v3.x has a hard dependency on `com.google.gms:google-services` **≥ 4.4.1**.
+If `google-services` is pinned to an older version (e.g. `4.4.0`), the build fails immediately.
+
+### Fix
+
+Open `android/settings.gradle.kts` and bump the `google-services` version to at least `4.4.1`.
+This project uses `4.4.2`:
+
+```kotlin
+// android/settings.gradle.kts — plugins block
+id("com.google.gms.google-services") version "4.4.2" apply false   // was 4.4.0
+id("com.google.firebase.crashlytics") version "3.0.2" apply false
+```
+
+### Version compatibility table
+
+| Plugin | Minimum peer requirement |
+|---|---|
+| `com.google.firebase.crashlytics` 3.x | `com.google.gms:google-services` ≥ **4.4.1** |
+| `com.google.firebase.crashlytics` 2.x | `com.google.gms:google-services` ≥ 4.3.x |
+
+> Always check the [Crashlytics release notes](https://firebase.google.com/support/release-notes/android) when upgrading the Crashlytics plugin to verify the minimum `google-services` version required.
