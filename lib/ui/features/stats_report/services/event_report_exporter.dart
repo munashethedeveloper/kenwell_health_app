@@ -78,8 +78,12 @@ class EventReportExporter {
       _computeHctStats(hctScreenings),
     );
 
-    // 3. Save to documents directory.
-    final dir = await getApplicationDocumentsDirectory();
+    // 3. Save to the temporary (cache) directory so share_plus can serve the
+    //    file via its FileProvider content URI without a permission error.
+    //    getTemporaryDirectory() maps to getCacheDir() on Android — always
+    //    covered by share_plus's provider_paths.xml — and to NSTemporaryDirectory
+    //    on iOS, both of which are fully within the app sandbox.
+    final dir = await getTemporaryDirectory();
     final safeTitle = event.title
         .replaceAll(RegExp(r'[^\w\s-]'), '')
         .trim()
