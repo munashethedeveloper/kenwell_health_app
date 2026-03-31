@@ -692,37 +692,42 @@ keytool -genkey -v \
 
 **Windows PowerShell** <a name="windows-powershell"></a>
 
-First, find your JDK installation path. The quickest way:
+First, confirm where `keytool` lives on your machine (run once):
 
 ```powershell
-# Find keytool path via Flutter's bundled JDK (works if Flutter is installed)
 flutter doctor -v 2>&1 | Select-String "Java"
-
-# Or locate it manually — common paths:
-#   C:\Program Files\Java\jdk-<version>\bin\keytool.exe
-#   C:\Program Files\Android\Android Studio\jbr\bin\keytool.exe
+# Expected output (example):
+#   • Java binary at: C:\Program Files\Android\Android Studio\jbr\bin\java
 ```
 
-Then create the keystores folder and generate the keystore (replace `<keytool-path>` with the actual path found above, e.g. `"C:\Program Files\Android\Android Studio\jbr\bin\keytool.exe"`):
+`keytool.exe` is in the **same folder** as `java.exe`. For a typical Android Studio installation the path is:
+
+```
+C:\Program Files\Android\Android Studio\jbr\bin\keytool.exe
+```
+
+Create the keystores folder and generate the keystore:
 
 ```powershell
 # Create the keystores directory
 New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\keystores"
 
-# Generate the release keystore (all on one line, or use backtick ` for line continuation)
-& "<keytool-path>" -genkey -v -keystore "$env:USERPROFILE\keystores\kenwell_release.jks" -alias kenwell -keyalg RSA -keysize 2048 -validity 10000
+# Generate the release keystore (single line)
+& "C:\Program Files\Android\Android Studio\jbr\bin\keytool.exe" -genkey -v -keystore "$env:USERPROFILE\keystores\kenwell_release.jks" -alias kenwell -keyalg RSA -keysize 2048 -validity 10000
 ```
 
-With backtick line continuation for readability:
+With backtick (`` ` ``) line continuation for readability:
 
 ```powershell
-& "<keytool-path>" -genkey -v `
+& "C:\Program Files\Android\Android Studio\jbr\bin\keytool.exe" -genkey -v `
   -keystore "$env:USERPROFILE\keystores\kenwell_release.jks" `
   -alias kenwell `
   -keyalg RSA `
   -keysize 2048 `
   -validity 10000
 ```
+
+> **Note:** If your Android Studio is installed in a different location, adjust the path above to match the `Java binary at:` line from `flutter doctor -v`.
 
 **Tip:** To avoid typing the full path every session, add the JDK `bin` folder to your user PATH:
 
@@ -750,6 +755,9 @@ Write down (or store in a password manager) the alias (`kenwell`), the keystore 
 
 ### Step 2 – Extract the SHA-1 fingerprint
 
+> **Windows users:** If you have not yet added the JDK `bin` folder to your PATH (see the Tip in Step 1), replace `keytool` in the commands below with the full path:  
+> `& "C:\Program Files\Android\Android Studio\jbr\bin\keytool.exe"`
+
 **From the release keystore you just created:**
 
 *macOS / Linux*
@@ -760,9 +768,16 @@ keytool -list -v \
   | grep "SHA1:"
 ```
 
-*Windows PowerShell*
+*Windows PowerShell (keytool on PATH)*
 ```powershell
 keytool -list -v `
+  -keystore "$env:USERPROFILE\keystores\kenwell_release.jks" `
+  -alias kenwell
+```
+
+*Windows PowerShell (full path — use until PATH is updated)*
+```powershell
+& "C:\Program Files\Android\Android Studio\jbr\bin\keytool.exe" -list -v `
   -keystore "$env:USERPROFILE\keystores\kenwell_release.jks" `
   -alias kenwell
 ```
@@ -781,7 +796,7 @@ keytool -list -v \
 
 ```powershell
 # Windows PowerShell
-keytool -list -v `
+& "C:\Program Files\Android\Android Studio\jbr\bin\keytool.exe" -list -v `
   -keystore "$env:USERPROFILE\.android\debug.keystore" `
   -alias androiddebugkey `
   -storepass android `
