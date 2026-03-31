@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:kenwell_health_app/routing/app_routes.dart';
 import 'package:provider/provider.dart';
 import '../../../../../domain/models/member.dart';
 import '../../../../../domain/models/wellness_event.dart';
@@ -248,6 +250,20 @@ class ScreeningNavigator {
         fontSize: 18,
       ),
       backgroundColor: const Color(0xFF201C58),
+      actions: [
+        TextButton.icon(
+          onPressed: () {
+            if (context.mounted) {
+              context.pushNamed(AppRoutes.help);
+            }
+          },
+          icon: const Icon(Icons.help_outline, color: Colors.white),
+          label: const Text(
+            'Help',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      ],
     );
   }
 

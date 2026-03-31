@@ -18,6 +18,7 @@ import '../../member/widgets/member_registration_screen.dart';
 import '../../member/view_model/member_registration_view_model.dart';
 import 'screening_navigators/screening_navigator.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
+import 'package:kenwell_health_app/routing/app_routes.dart';
 
 /// Central navigation coordinator for the wellness flow
 /// Manages screen-to-screen navigation with proper data passing
@@ -62,7 +63,7 @@ class WellnessNavigator {
               TextButton.icon(
                 onPressed: () {
                   if (context.mounted) {
-                    context.pushNamed('help');
+                    context.pushNamed(AppRoutes.help);
                   }
                 },
                 icon: const Icon(Icons.help_outline, color: Colors.white),
@@ -158,6 +159,20 @@ class WellnessNavigator {
                 fontSize: 18,
               ),
               backgroundColor: const Color(0xFF201C58),
+              actions: [
+                TextButton.icon(
+                  onPressed: () {
+                    if (context.mounted) {
+                      context.pushNamed(AppRoutes.help);
+                    }
+                  },
+                  icon: const Icon(Icons.help_outline, color: Colors.white),
+                  label: const Text(
+                    'Help',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -199,6 +214,7 @@ class WellnessNavigator {
       }),
     );
 
+    if (!context.mounted) return;
     await Navigator.push(
       context,
       MaterialPageRoute(
@@ -225,30 +241,22 @@ class WellnessNavigator {
                     if (memberId != null) {
                       await wellnessVM.loadAllCompletionFlags(
                           memberId, eventId);
+                      if (!context.mounted) return;
                       AppSnackbar.showInfo(context, 'Status refreshed.');
                     }
                   },
                 ),
-                IconButton(
-                  icon: const Icon(Icons.help_outline),
-                  tooltip: 'Help',
+                TextButton.icon(
                   onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Help'),
-                        content: const Text(
-                            'This screen shows the current event details and your progress through the wellness process.\n\n'
-                            'Use the refresh button to reload your completion status. Tap any card to continue or review that section.'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            child: const Text('Close'),
-                          ),
-                        ],
-                      ),
-                    );
+                    if (context.mounted) {
+                      context.pushNamed(AppRoutes.help);
+                    }
                   },
+                  icon: const Icon(Icons.help_outline, color: Colors.white),
+                  label: const Text(
+                    'Help',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ],
             ),
@@ -380,6 +388,20 @@ class WellnessNavigator {
                 fontSize: 18,
               ),
               backgroundColor: const Color(0xFF201C58),
+              actions: [
+                TextButton.icon(
+                  onPressed: () {
+                    if (context.mounted) {
+                      context.pushNamed(AppRoutes.help);
+                    }
+                  },
+                  icon: const Icon(Icons.help_outline, color: Colors.white),
+                  label: const Text(
+                    'Help',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -528,6 +550,20 @@ class WellnessNavigator {
               fontSize: 18,
             ),
             backgroundColor: const Color(0xFF201C58),
+            actions: [
+              TextButton.icon(
+                onPressed: () {
+                  if (context.mounted) {
+                    context.pushNamed(AppRoutes.help);
+                  }
+                },
+                icon: const Icon(Icons.help_outline, color: Colors.white),
+                label: const Text(
+                  'Help',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
           ),
         ),
       ),

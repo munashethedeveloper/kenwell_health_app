@@ -11,15 +11,18 @@ class RolePermissions {
     '/register': [...UserRoles.values],
     '/forgot-password': [...UserRoles.values],
     '/': [...UserRoles.values],
+
     // Calendar is accessible to ALL users regardless of role
     '/calendar': [...UserRoles.values],
     '/event-details': [...UserRoles.values],
     '/profile': [...UserRoles.values],
     '/my-profile-menu': [...UserRoles.values],
     '/help': [...UserRoles.values],
+    '/faq': [...UserRoles.values],
+    '/legal': [...UserRoles.values],
 
     // Admin-only routes
-    '/audit-log': ['ADMIN', 'TOP MANAGEMENT'],
+    '/audit-log': ['ADMIN'],
     '/my-user-management': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     '/user-management-version-two': [
       'ADMIN',
@@ -28,12 +31,11 @@ class RolePermissions {
     ],
     '/add-edit-event': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     '/allocate-event': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
-    '/stats': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER', 'CLIENT'],
+    '/stats': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     '/detailed-stats': [
       'ADMIN',
       'TOP MANAGEMENT',
-      'PROJECT COORDINATOR',
-      'CLIENT'
+      'PROJECT MANAGER',
     ],
 
     //Staff Route Permissions
@@ -121,9 +123,8 @@ class RolePermissions {
       'PROJECT MANAGER',
       'PROJECT COORDINATOR',
       'HEALTH PRACTITIONER',
-      'CLIENT',
     ],
-    'allocate_events': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT COORDINATOR'],
+    'allocate_events': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
 
     //Member Management Permissions
     'create_member': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
@@ -137,9 +138,9 @@ class RolePermissions {
     // User Management Permissions
     'create_user': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     'edit_user': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
-    'delete_user': ['ADMIN'],
+    'delete_user': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     'view_users': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
-    'reset_user_credentials': ['ADMIN', 'TOP MANAGEMENT'],
+    'reset_user_credentials': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
 
     // Event Workflow Permissions
     'conduct_wellness_flow': [
@@ -151,9 +152,9 @@ class RolePermissions {
     ],
 
     // Statistics and General Permissions
-    'view_statistics': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER', 'CLIENT'],
+    'view_statistics': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
     'export_data': ['ADMIN', 'TOP MANAGEMENT', 'PROJECT MANAGER'],
-    'view_audit_log': ['ADMIN', 'TOP MANAGEMENT'],
+    'view_audit_log': ['ADMIN'],
     'update_own_profile': [...UserRoles.values],
     'view_help': [...UserRoles.values],
   };

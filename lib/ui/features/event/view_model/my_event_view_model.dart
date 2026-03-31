@@ -37,6 +37,7 @@ class MyEventViewModel extends ChangeNotifier {
   List<WellnessEvent> _userEvents = [];
   String? _startingEventId;
   bool _isTransitioning = false;
+  bool _disposed = false;
 
   /// Stream subscription that watches the current user's `user_events`
   /// documents in Firestore and reloads the event list on any change.
@@ -55,6 +56,7 @@ class MyEventViewModel extends ChangeNotifier {
   /// Safe to call multiple times — only the most recent subscription is kept.
   Future<void> loadUserEvents() async {
     final user = await _authService.getCurrentUser();
+    if (_disposed) return;
     if (user == null) {
       _userEvents = [];
       notifyListeners();
@@ -64,12 +66,15 @@ class MyEventViewModel extends ChangeNotifier {
     // Perform an initial fetch so the UI populates without waiting for the
     // first stream emission.
     _userEvents = await _loadUserEventsUseCase(user.id);
+    if (_disposed) return;
     notifyListeners();
 
     // Cancel any existing subscription before setting up a new one.
     await _userEventsSubscription?.cancel();
+    if (_disposed) return;
     _userEventsSubscription =
         _loadUserEventsUseCase.watch(user.id).listen((events) {
+      if (_disposed) return;
       _userEvents = events;
       notifyListeners();
     }, onError: (Object err) {
@@ -79,7 +84,11 @@ class MyEventViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
+    // Cancel the subscription first so no further stream events can be
+    // delivered, then set the flag as a secondary safety net for any
+    // in-flight async operations that have already read past the subscription.
     _userEventsSubscription?.cancel();
+    _disposed = true;
     super.dispose();
   }
 
@@ -91,7 +100,7 @@ class MyEventViewModel extends ChangeNotifier {
   /// Safe to call from a periodic timer — a guard flag prevents concurrent
   /// executions if a previous Firestore call is still in flight.
   Future<void> autoTransitionEvents() async {
-    if (_isTransitioning) return;
+    if (_disposed || _isTransitioning) return;
     _isTransitioning = true;
 
     try {
@@ -107,9 +116,10 @@ class MyEventViewModel extends ChangeNotifier {
       if (toTransition.isEmpty) {
         // Still notify so the button states rebuild as the clock advances.
         final today = DateTime(now.year, now.month, now.day);
-        if (snapshot.any((e) =>
-            e.status == WellnessEventStatus.scheduled &&
-            eventDay(e).isAtSameMomentAs(today))) {
+        if (!_disposed &&
+            snapshot.any((e) =>
+                e.status == WellnessEventStatus.scheduled &&
+                eventDay(e).isAtSameMomentAs(today))) {
           notifyListeners();
         }
         return;
@@ -128,7 +138,7 @@ class MyEventViewModel extends ChangeNotifier {
             })),
       );
 
-      await loadUserEvents();
+      if (!_disposed) await loadUserEvents();
     } finally {
       _isTransitioning = false;
     }
@@ -186,12 +196,12 @@ class MyEventViewModel extends ChangeNotifier {
   /// show a per-card loading indicator.
   Future<WellnessEvent?> startEvent(WellnessEvent event) async {
     _startingEventId = event.id;
-    notifyListeners();
+    if (!_disposed) notifyListeners();
     try {
       return await _eventViewModel.markEventInProgress(event.id) ?? event;
     } finally {
       _startingEventId = null;
-      notifyListeners();
+      if (!_disposed) notifyListeners();
     }
   }
 

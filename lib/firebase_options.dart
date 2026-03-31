@@ -70,7 +70,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyB8bEj_N6z-kqFGBS0pDHomRGO5NaGVEzU',
-    appId: '1:195093019449:android:80c5c09ca6b7f409e8c6e8',
+    appId: '1:195093019449:android:6354c30a4e3c8063e8c6e8',
     messagingSenderId: '195093019449',
     projectId: 'kenwellmobileapp',
     storageBucket: 'kenwellmobileapp.firebasestorage.app',
@@ -78,7 +78,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBFFD7K4angQpTSZ2cJl6ianO_Yw_19ggg',
-    appId: '1:195093019449:ios:2ed9a3d5c4d8947ce8c6e8',
+    appId: '1:195093019449:ios:67a7499c889549ece8c6e8',
     messagingSenderId: '195093019449',
     projectId: 'kenwellmobileapp',
     storageBucket: 'kenwellmobileapp.firebasestorage.app',
@@ -87,7 +87,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyBFFD7K4angQpTSZ2cJl6ianO_Yw_19ggg',
-    appId: '1:195093019449:ios:2ed9a3d5c4d8947ce8c6e8',
+    appId: '1:195093019449:ios:67a7499c889549ece8c6e8',
     messagingSenderId: '195093019449',
     projectId: 'kenwellmobileapp',
     storageBucket: 'kenwellmobileapp.firebasestorage.app',
@@ -103,4 +103,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'kenwellmobileapp.firebasestorage.app',
     measurementId: 'G-1CWEC7098X',
   );
+
 }

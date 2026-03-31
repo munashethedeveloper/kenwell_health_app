@@ -77,28 +77,28 @@ void main() {
   group('CalendarViewModel – initial state', () {
     test('isLoading starts true then becomes false', () async {
       final vm = _buildVM();
-      await vm.initializationFuture;
+      await vm.loadEvents();
       expect(vm.isLoading, isFalse);
       vm.dispose();
     });
 
     test('events list starts empty', () async {
       final vm = _buildVM();
-      await vm.initializationFuture;
+      await vm.loadEvents();
       expect(vm.events, isEmpty);
       vm.dispose();
     });
 
     test('selectedDay is null initially', () async {
       final vm = _buildVM();
-      await vm.initializationFuture;
+      await vm.loadEvents();
       expect(vm.selectedDay, isNull);
       vm.dispose();
     });
 
     test('error is null when events load successfully', () async {
       final vm = _buildVM();
-      await vm.initializationFuture;
+      await vm.loadEvents();
       expect(vm.error, isNull);
       vm.dispose();
     });
@@ -111,7 +111,7 @@ void main() {
       when(() => getUC()).thenAnswer((_) async => events);
 
       final vm = _buildVM(get: getUC, preload: events);
-      await vm.initializationFuture;
+      await vm.loadEvents();
 
       expect(vm.events.length, 2);
       vm.dispose();
@@ -127,7 +127,7 @@ void main() {
         updateEventUseCase: MockUpdateEventUseCase(),
         deleteEventUseCase: MockDeleteEventUseCase(),
       );
-      await vm.initializationFuture;
+      await vm.loadEvents();
 
       expect(vm.error, isNotNull);
       expect(vm.isOffline, isTrue);
@@ -139,7 +139,7 @@ void main() {
   group('CalendarViewModel – day navigation', () {
     test('setFocusedDay updates focusedDay', () async {
       final vm = _buildVM();
-      await vm.initializationFuture;
+      await vm.loadEvents();
       final day = DateTime(2025, 9, 1);
 
       vm.setFocusedDay(day);
@@ -149,7 +149,7 @@ void main() {
 
     test('setSelectedDay updates selectedDay', () async {
       final vm = _buildVM();
-      await vm.initializationFuture;
+      await vm.loadEvents();
       final day = DateTime(2025, 6, 15);
 
       vm.setSelectedDay(day);
@@ -159,7 +159,7 @@ void main() {
 
     test('clearSelectedDay sets selectedDay to null', () async {
       final vm = _buildVM();
-      await vm.initializationFuture;
+      await vm.loadEvents();
       vm.setSelectedDay(DateTime(2025, 6, 15));
 
       vm.clearSelectedDay();
@@ -169,7 +169,7 @@ void main() {
 
     test('goToNextMonth advances month by one', () async {
       final vm = _buildVM();
-      await vm.initializationFuture;
+      await vm.loadEvents();
       final before = vm.focusedDay;
 
       vm.goToNextMonth();
@@ -179,7 +179,7 @@ void main() {
 
     test('goToPreviousMonth decrements month by one', () async {
       final vm = _buildVM();
-      await vm.initializationFuture;
+      await vm.loadEvents();
       final before = vm.focusedDay;
 
       vm.goToPreviousMonth();
@@ -193,7 +193,7 @@ void main() {
       final day = DateTime(2025, 6, 15);
       final event = _buildEvent(date: day);
       final vm = _buildVM(preload: [event]);
-      await vm.initializationFuture;
+      await vm.loadEvents();
 
       final result = vm.getEventsForDay(day);
       expect(result.length, 1);
@@ -204,7 +204,7 @@ void main() {
     test('excludes events on different days', () async {
       final event = _buildEvent(date: DateTime(2025, 6, 15));
       final vm = _buildVM(preload: [event]);
-      await vm.initializationFuture;
+      await vm.loadEvents();
 
       final result = vm.getEventsForDay(DateTime(2025, 6, 16));
       expect(result, isEmpty);
@@ -218,7 +218,7 @@ void main() {
       final e2 = _buildEvent(id: 'b', date: DateTime(2025, 6, 30));
       final e3 = _buildEvent(id: 'c', date: DateTime(2025, 7, 1));
       final vm = _buildVM(preload: [e1, e2, e3]);
-      await vm.initializationFuture;
+      await vm.loadEvents();
 
       final result = vm.getEventsForMonth(DateTime(2025, 6));
       expect(result.length, 2);
@@ -232,7 +232,7 @@ void main() {
       when(() => addUC(any())).thenAnswer((_) async {});
 
       final vm = _buildVM(add: addUC);
-      await vm.initializationFuture;
+      await vm.loadEvents();
       final event = _buildEvent();
 
       await vm.addEvent(event);
@@ -246,7 +246,7 @@ void main() {
       when(() => addUC(any())).thenThrow(Exception('add error'));
 
       final vm = _buildVM(add: addUC);
-      await vm.initializationFuture;
+      await vm.loadEvents();
 
       await expectLater(vm.addEvent(_buildEvent()), throwsException);
       expect(vm.error, isNotNull);
@@ -261,7 +261,7 @@ void main() {
 
       final original = _buildEvent(id: 'e-1', title: 'Original');
       final vm = _buildVM(update: updateUC, preload: [original]);
-      await vm.initializationFuture;
+      await vm.loadEvents();
 
       final updated = _buildEvent(id: 'e-1', title: 'Updated');
       await vm.updateEvent(updated);
@@ -278,7 +278,7 @@ void main() {
 
       final event = _buildEvent(id: 'e-del');
       final vm = _buildVM(delete: deleteUC, preload: [event]);
-      await vm.initializationFuture;
+      await vm.loadEvents();
 
       final returned = await vm.deleteEvent('e-del');
 
@@ -291,7 +291,7 @@ void main() {
   group('CalendarViewModel – compareEvents', () {
     test('orders earlier date before later date', () async {
       final vm = _buildVM();
-      await vm.initializationFuture;
+      await vm.loadEvents();
       final a = _buildEvent(id: 'a', date: DateTime(2025, 1, 1));
       final b = _buildEvent(id: 'b', date: DateTime(2025, 6, 1));
 
@@ -301,7 +301,7 @@ void main() {
 
     test('orders by start time when dates are equal', () async {
       final vm = _buildVM();
-      await vm.initializationFuture;
+      await vm.loadEvents();
       final a =
           _buildEvent(id: 'a', date: DateTime(2025, 6, 15), startTime: '08:00');
       final b =
@@ -315,14 +315,14 @@ void main() {
   group('CalendarViewModel – formatting helpers', () {
     test('formatDateShort returns a non-empty string', () async {
       final vm = _buildVM();
-      await vm.initializationFuture;
+      await vm.loadEvents();
       expect(vm.formatDateShort(DateTime(2025, 6, 15)), isNotEmpty);
       vm.dispose();
     });
 
     test('getNoEventsMessage contains the date', () async {
       final vm = _buildVM();
-      await vm.initializationFuture;
+      await vm.loadEvents();
       final msg = vm.getNoEventsMessage(DateTime(2025, 6, 15));
       expect(msg, contains('Jun'));
       vm.dispose();

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import '../services/audit_log_service.dart';
 import '../services/firestore_service.dart';
+import '../services/pending_write_service.dart';
 import '../local/app_database.dart';
 import '../../domain/models/member.dart';
 import '../../utils/field_encryption.dart';
@@ -17,11 +18,11 @@ import 'member_repository.dart';
 /// | Operation              | Online                                  | Offline                          |
 /// |------------------------|-----------------------------------------|----------------------------------|
 /// | `fetchAllMembers`      | Fetches Firestore, caches to local DB   | Returns cached local rows        |
-/// | `fetchMemberByIdNumber`| Firestore first, falls back to local    | Returns cached row               |
-/// | `fetchMemberByPassport`| Firestore first, falls back to local    | Returns cached row               |
+/// | `fetchMemberByIdNumber`| In-memory search over fetchAllMembers   | Returns cached row               |
+/// | `fetchMemberByPassport`| In-memory search over fetchAllMembers   | Returns cached row               |
 /// | `fetchMemberById`      | Firestore first, falls back to local    | Returns cached row               |
-/// | `addMember`            | Writes to Firestore, mirrors to local   | Throws                           |
-/// | `updateMember`         | Writes to Firestore, mirrors to local   | Throws                           |
+/// | `addMember`            | Writes local first, then Firestore      | Saves locally + queues Firestore |
+/// | `updateMember`         | Writes local first, then Firestore      | Saves locally + queues Firestore |
 class FirestoreMemberRepository {
   final FirestoreService _firestore;
   final MemberRepository _localRepo;
@@ -95,39 +96,68 @@ class FirestoreMemberRepository {
 
   /// Fetch member by SA ID number.
   ///
-  /// Tries Firestore first; falls back to the local Drift cache if offline.
+  /// Uses a two-step strategy:
+  /// 1. **Local cache first** — the SQLite `members` table stores plain-text
+  ///    idNumbers, so `WHERE id_number = ?` is fast and index-backed.  If the
+  ///    member is found locally the result is returned immediately without a
+  ///    network round-trip.
+  /// 2. **Firestore full-scan fallback** — if the member is not yet cached
+  ///    locally (e.g. first run or cache miss), all members are fetched from
+  ///    Firestore, decrypted, and searched in memory.  Firestore equality
+  ///    queries on the encrypted field are not usable because [FieldEncryption]
+  ///    uses a random IV so the same plaintext produces a different ciphertext
+  ///    on every call.
   Future<Member?> fetchMemberByIdNumber(String idNumber) async {
+    // 1. Fast path: check the local SQLite cache first.
     try {
-      final docs = await _firestore.queryDocuments(
-        collection: membersCollection,
-        field: 'idNumber',
-        isEqualTo: FieldEncryption.encrypt(idNumber),
-      );
-      if (docs.isEmpty) return null;
-      return _mapToMember(docs.first);
+      final cached = await _localRepo.getMemberByIdNumber(idNumber);
+      if (cached != null) return cached;
+    } catch (localErr) {
+      debugPrint(
+          'FirestoreMemberRepository: local ID-number lookup failed ($localErr)');
+    }
+
+    // 2. Slow path: fetch all from Firestore (decrypts in _mapToMember) and
+    //    search in memory.  This also refreshes the local cache as a side-effect.
+    try {
+      final allMembers = await fetchAllMembers();
+      for (final m in allMembers) {
+        if (m.idNumber == idNumber) return m;
+      }
+      return null;
     } catch (e) {
       debugPrint(
-          'FirestoreMemberRepository: Firestore ID-number search failed ($e) — using local cache');
-      return _localRepo.getMemberByIdNumber(idNumber);
+          'FirestoreMemberRepository: Firestore ID-number search failed ($e)');
+      return null;
     }
   }
 
   /// Fetch member by passport number.
   ///
-  /// Tries Firestore first; falls back to the local Drift cache if offline.
+  /// Uses the same two-step strategy as [fetchMemberByIdNumber]:
+  /// 1. Local SQLite indexed query (fast, no network).
+  /// 2. Firestore full-scan with in-memory comparison on decrypted values.
   Future<Member?> fetchMemberByPassportNumber(String passportNumber) async {
+    // 1. Fast path: check the local SQLite cache first.
     try {
-      final docs = await _firestore.queryDocuments(
-        collection: membersCollection,
-        field: 'passportNumber',
-        isEqualTo: FieldEncryption.encrypt(passportNumber),
-      );
-      if (docs.isEmpty) return null;
-      return _mapToMember(docs.first);
+      final cached = await _localRepo.getMemberByPassportNumber(passportNumber);
+      if (cached != null) return cached;
+    } catch (localErr) {
+      debugPrint(
+          'FirestoreMemberRepository: local passport lookup failed ($localErr)');
+    }
+
+    // 2. Slow path: fetch all from Firestore and search in memory.
+    try {
+      final allMembers = await fetchAllMembers();
+      for (final m in allMembers) {
+        if (m.passportNumber == passportNumber) return m;
+      }
+      return null;
     } catch (e) {
       debugPrint(
-          'FirestoreMemberRepository: Firestore passport search failed ($e) — using local cache');
-      return _localRepo.getMemberByPassportNumber(passportNumber);
+          'FirestoreMemberRepository: Firestore passport search failed ($e)');
+      return null;
     }
   }
 
@@ -147,45 +177,81 @@ class FirestoreMemberRepository {
     }
   }
 
-  /// Add new member to Firestore and mirror to local cache.
+  /// Add new member — local-first, then Firestore with offline queue fallback.
+  ///
+  /// 1. Persists to local SQLite immediately so the member is available offline.
+  /// 2. Attempts the Firestore write.  On failure the write is enqueued in
+  ///    [PendingWriteService] for automatic retry when connectivity is restored.
   Future<void> addMember(Member member) async {
-    final data = _mapToFirestore(member);
-    await _firestore.createDocument(
-      collection: membersCollection,
-      documentId: member.id,
-      data: data,
-    );
-    unawaited(_audit.logCreate(
-      collection: membersCollection,
-      documentId: member.id,
-      data: data,
-      summary: 'Registered member: ${member.name} ${member.surname}',
-    ));
+    // 1. Local write is always attempted first.
     try {
       await _localRepo.createMember(member);
-    } catch (_) {
-      // Non-fatal — Firestore write succeeded.
+    } catch (localErr) {
+      debugPrint(
+          'FirestoreMemberRepository: local cache write failed for addMember: $localErr');
+    }
+
+    // 2. Attempt Firestore; fall back to the pending queue on failure.
+    final data = _mapToFirestore(member);
+    try {
+      await _firestore.createDocument(
+        collection: membersCollection,
+        documentId: member.id,
+        data: data,
+      );
+      unawaited(_audit.logCreate(
+        collection: membersCollection,
+        documentId: member.id,
+        data: data,
+        summary: 'Registered member: ${member.name} ${member.surname}',
+      ));
+    } catch (e) {
+      debugPrint(
+          'FirestoreMemberRepository: Firestore addMember failed ($e) — queuing for retry');
+      unawaited(PendingWriteService.instance.enqueue(
+        collection: membersCollection,
+        docId: member.id,
+        data: data,
+      ));
     }
   }
 
-  /// Update existing member in Firestore and mirror to local cache.
+  /// Update existing member — local-first, then Firestore with offline queue fallback.
+  ///
+  /// 1. Persists to local SQLite immediately.
+  /// 2. Attempts the Firestore write.  On failure the write is enqueued in
+  ///    [PendingWriteService] for automatic retry when connectivity is restored.
   Future<void> updateMember(Member member) async {
-    final data = _mapToFirestore(member);
-    await _firestore.updateDocument(
-      collection: membersCollection,
-      documentId: member.id,
-      data: data,
-    );
-    unawaited(_audit.logUpdate(
-      collection: membersCollection,
-      documentId: member.id,
-      newData: data,
-      summary: 'Updated member: ${member.name} ${member.surname}',
-    ));
+    // 1. Local write is always attempted first.
     try {
       await _localRepo.updateMember(member);
-    } catch (_) {
-      // Non-fatal — Firestore write succeeded.
+    } catch (localErr) {
+      debugPrint(
+          'FirestoreMemberRepository: local cache write failed for updateMember: $localErr');
+    }
+
+    // 2. Attempt Firestore; fall back to the pending queue on failure.
+    final data = _mapToFirestore(member);
+    try {
+      await _firestore.updateDocument(
+        collection: membersCollection,
+        documentId: member.id,
+        data: data,
+      );
+      unawaited(_audit.logUpdate(
+        collection: membersCollection,
+        documentId: member.id,
+        newData: data,
+        summary: 'Updated member: ${member.name} ${member.surname}',
+      ));
+    } catch (e) {
+      debugPrint(
+          'FirestoreMemberRepository: Firestore updateMember failed ($e) — queuing for retry');
+      unawaited(PendingWriteService.instance.enqueue(
+        collection: membersCollection,
+        docId: member.id,
+        data: data,
+      ));
     }
   }
 

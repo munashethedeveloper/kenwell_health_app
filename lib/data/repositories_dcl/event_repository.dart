@@ -1,20 +1,23 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/foundation.dart';
 import '../../domain/models/wellness_event.dart';
 import '../local/app_database.dart';
+import '../services/pending_write_service.dart';
 
 /// Repository that provides a **local-first, offline-capable** data layer for
 /// wellness events.
 ///
 /// ## Sync strategy
 ///
-/// | Operation   | Online behaviour                         | Offline behaviour                  |
-/// |-------------|------------------------------------------|------------------------------------|
-/// | `fetchAll`  | Fetches from Firestore, caches to local  | Returns cached local rows          |
-/// | `upsert`    | Writes to Firestore, mirrors to local    | **Throws** – caller should surface an offline error |
-/// | `delete`    | Deletes from Firestore + local cache     | **Throws**                         |
-/// | `fetchById` | Firestore first, falls back to local     | Returns cached local row           |
+/// | Operation   | Online behaviour                         | Offline behaviour                      |
+/// |-------------|------------------------------------------|----------------------------------------|
+/// | `fetchAll`  | Fetches from Firestore, caches to local  | Returns cached local rows              |
+/// | `upsert`    | Saves locally first, then Firestore      | Saves locally + queues Firestore write |
+/// | `delete`    | Deletes locally first, then Firestore    | Deletes locally + queues Firestore del |
+/// | `fetchById` | Firestore first, falls back to local     | Returns cached local row               |
 ///
 /// > The local Drift database acts as a read-through **cache**.  The source of
 /// > truth is always Firestore; the local cache ensures the app can show
@@ -162,30 +165,61 @@ class EventRepository {
   Future<void> updateEvent(WellnessEvent updatedEvent) =>
       upsertEvent(updatedEvent);
 
-  /// Saves an event to Firestore **and** mirrors it in the local cache.
+  /// Saves an event locally first, then attempts Firestore.
+  ///
+  /// **Online**: Writes to Firestore and ensures the local cache is in sync.
+  /// **Offline**: Saves to the local Drift DB immediately so the event is
+  ///              available right away, then queues the Firestore write in
+  ///              [PendingWriteService] for automatic retry on reconnect.
   Future<void> upsertEvent(WellnessEvent event) async {
+    debugPrint('EventRepository: Saving event "${event.title}" id=${event.id}');
+
+    // 1. Always persist locally first so the event is immediately visible.
     try {
-      debugPrint(
-          'EventRepository: Saving event "${event.title}" id=${event.id}');
+      await _localDb.upsertEvent(_mapDomainToEntity(event));
+    } catch (localErr) {
+      debugPrint('EventRepository: local cache write failed – $localErr');
+    }
+
+    // 2. Attempt Firestore write; queue on failure.
+    try {
       await _firestore
           .collection(_collectionName)
           .doc(event.id)
           .set(_mapDomainToFirestore(event));
       debugPrint('EventRepository: Event saved to Firestore');
-
-      // Mirror into local cache so it is immediately available offline.
-      await _localDb.upsertEvent(_mapDomainToEntity(event));
     } catch (e, stackTrace) {
-      debugPrint('EventRepository: ERROR saving event – $e');
+      debugPrint(
+          'EventRepository: Firestore write failed – $e; queuing for retry');
       debugPrintStack(stackTrace: stackTrace);
-      rethrow;
+      unawaited(PendingWriteService.instance.enqueue(
+        collection: _collectionName,
+        docId: event.id,
+        data: _mapDomainToFirestore(event),
+      ));
     }
   }
 
-  /// Deletes an event from Firestore **and** removes it from the local cache.
+  /// Deletes an event locally first, then attempts Firestore.
+  ///
+  /// **Online**: Removes from Firestore and local cache.
+  /// **Offline**: Removes from the local Drift DB immediately, then queues the
+  ///              Firestore delete in [PendingWriteService] for retry.
   Future<void> deleteEvent(String id) async {
-    await _firestore.collection(_collectionName).doc(id).delete();
+    // 1. Always remove from local cache first.
     await _localDb.deleteEventById(id);
+
+    // 2. Attempt Firestore delete; queue on failure.
+    try {
+      await _firestore.collection(_collectionName).doc(id).delete();
+    } catch (e) {
+      debugPrint(
+          'EventRepository: Firestore delete failed – $e; queuing for retry');
+      unawaited(PendingWriteService.instance.enqueueDelete(
+        collection: _collectionName,
+        docId: id,
+      ));
+    }
   }
 
   // ── Helpers ────────────────────────────────────────────────────────────────

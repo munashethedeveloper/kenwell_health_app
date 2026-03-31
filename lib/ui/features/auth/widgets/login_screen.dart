@@ -10,6 +10,7 @@ import '../../profile/view_model/profile_view_model.dart';
 import '../view_models/auth_view_model.dart';
 import '../view_models/login_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
+import 'package:kenwell_health_app/routing/app_routes.dart';
 
 // Login Screen Widget
 class LoginScreen extends StatelessWidget {
@@ -64,7 +65,7 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
           await profileVM.loadProfile();
           await authVM.checkLoginStatus();
           viewModel.clearNavigationTarget();
-          if (mounted) context.go('/');
+          if (mounted) this.context.go(AppRoutes.homePath);
         });
       }
 
@@ -89,7 +90,11 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
               child: Container(
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Color(0xFF1A1454), Color(0xFF0B6B49)],
+                    colors: [
+                      KenwellColors.secondaryNavy,
+                      Color(0xFF2E2880),
+                      KenwellColors.primaryGreenDark,
+                    ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -212,7 +217,7 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
                               alignment: Alignment.centerRight,
                               child: TextButton(
                                 onPressed: () =>
-                                    context.pushNamed('forgotPassword'),
+                                    context.pushNamed(AppRoutes.forgotPassword),
                                 style: TextButton.styleFrom(
                                     padding: const EdgeInsets.only(
                                         top: 4, bottom: 4)),
@@ -303,7 +308,7 @@ class _LoginScreenBodyState extends State<_LoginScreenBody> {
                                             .resendVerificationEmail();
                                         if (mounted) {
                                           AppSnackbar.showSuccess(
-                                              context,
+                                              this.context,
                                               'Verification email sent — '
                                               'please check your inbox.');
                                         }

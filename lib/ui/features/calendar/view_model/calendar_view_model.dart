@@ -24,18 +24,12 @@ class CalendarViewModel extends ChangeNotifier {
         _updateEventUseCase =
             updateEventUseCase ?? UpdateEventUseCase(repository: repository),
         _deleteEventUseCase =
-            deleteEventUseCase ?? DeleteEventUseCase(repository: repository) {
-    _initializationFuture = loadEvents();
-  }
+            deleteEventUseCase ?? DeleteEventUseCase(repository: repository);
+
   final GetEventsUseCase _getEventsUseCase;
   final AddEventUseCase _addEventUseCase;
   final UpdateEventUseCase _updateEventUseCase;
   final DeleteEventUseCase _deleteEventUseCase;
-
-  late final Future<void> _initializationFuture;
-
-  // Getter for initialization future
-  Future<void> get initializationFuture => _initializationFuture;
 
   // Internal state
   DateTime _focusedDay = DateTime.now();
@@ -58,13 +52,21 @@ class CalendarViewModel extends ChangeNotifier {
   bool get isOffline => _isOffline;
   String get role => _role;
 
-  /// Load events from the repository
+  /// Load events from the repository.
+  ///
+  /// Returns early if a load is already in progress, preventing concurrent
+  /// Firestore requests (e.g. when HomeScreen and CalendarScreen both call
+  /// this from their initState addPostFrameCallbacks within the same frame).
+  ///
+  /// Dart is single-threaded: the guard check and the `_isLoading = true`
+  /// assignment below execute atomically (no `await` between them), so there
+  /// is no re-entrancy window even when multiple callers invoke this method
+  /// in the same microtask batch.
   Future<void> loadEvents() async {
-    // Set loading state
+    if (_isLoading) return;
     _isLoading = true;
     _error = null;
     _isOffline = false;
-    // Notify listeners about state changes
     notifyListeners();
 
     // Fetch events – EventRepository handles the Firestore→local-cache fallback.

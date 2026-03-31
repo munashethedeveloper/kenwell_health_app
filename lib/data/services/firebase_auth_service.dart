@@ -5,6 +5,7 @@ import 'package:kenwell_health_app/domain/models/member.dart';
 import '../../domain/models/user_model.dart';
 import 'package:flutter/foundation.dart';
 import '../../firebase_options.dart';
+import '../local/app_database.dart';
 
 class FirebaseAuthService {
   /// Real-time stream of all users (admin function)
@@ -486,17 +487,43 @@ class FirebaseAuthService {
   }
 
   /// Get all users (admin function)
+  ///
+  /// **Online**: Fetches from Firestore and refreshes the local SQLite cache.
+  /// **Offline**: Falls back to the locally cached users table.
   Future<List<UserModel>> getAllUsers() async {
     try {
       final querySnapshot = await _firestore.collection('users').get();
-      return querySnapshot.docs.map((doc) {
+      final users = querySnapshot.docs.map((doc) {
         final userData = Map<String, dynamic>.from(doc.data());
         userData['id'] = doc.id;
         return UserModel.fromMap(userData);
       }).toList();
+      return users;
     } catch (e, stackTrace) {
       debugPrint('Get all users error: $e');
       debugPrintStack(stackTrace: stackTrace);
+      // Offline fallback: serve from local SQLite cache.
+      try {
+        final localEntities = await AppDatabase.instance.getAllUsers();
+        if (localEntities.isNotEmpty) {
+          debugPrint(
+              'FirebaseAuthService: serving ${localEntities.length} cached users from local DB');
+          return localEntities
+              .map((u) => UserModel(
+                    id: u.id,
+                    email: u.email,
+                    role: u.role,
+                    firstName: u.firstName,
+                    lastName: u.lastName,
+                    phoneNumber: u.phoneNumber,
+                    emailVerified: false,
+                  ))
+              .toList();
+        }
+      } catch (localErr) {
+        debugPrint(
+            'FirebaseAuthService: local user cache read failed: $localErr');
+      }
       return [];
     }
   }

@@ -77,9 +77,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             child: Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Color(0xFF1A1454), Color(0xFF0B6B49)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
+                  colors: [
+                    KenwellColors.secondaryNavy,
+                    Color(0xFF2E2880),
+                    KenwellColors.primaryGreenDark,
+                  ],
+                  stops: [0.0, 0.6, 1.0],
                 ),
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(36),

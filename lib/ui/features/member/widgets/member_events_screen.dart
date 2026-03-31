@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenwell_health_app/domain/usecases/load_member_event_referrals_usecase.dart';
+import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 import '../../../../domain/models/member.dart';
 import '../view_model/member_events_view_model.dart';
+import '../view_model/member_registration_view_model.dart';
 import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../../../shared/ui/headers/kenwell_gradient_header.dart';
 import '../../../shared/ui/cards/kenwell_detail_row.dart';
@@ -13,12 +15,20 @@ import '../../../shared/ui/colours/kenwell_colours.dart';
 ///
 /// All data loading is handled by [MemberEventsViewModel]; this widget is
 /// pure UI.
+///
+/// When an optional [viewModel] is provided, an edit button is shown in the
+/// app bar that opens a bottom sheet to update member details.
 class MemberEventsScreen extends StatefulWidget {
   final Member member;
+
+  /// If provided, enables the edit-member FAB.  The [MemberDetailsViewModel]
+  /// is used to persist changes and refresh the member list.
+  final MemberDetailsViewModel? viewModel;
 
   const MemberEventsScreen({
     super.key,
     required this.member,
+    this.viewModel,
   });
 
   @override
@@ -28,9 +38,13 @@ class MemberEventsScreen extends StatefulWidget {
 class _MemberEventsScreenState extends State<MemberEventsScreen> {
   late final MemberEventsViewModel _vm;
 
+  // Tracks the latest member data; updated after a successful edit.
+  late Member _currentMember;
+
   @override
   void initState() {
     super.initState();
+    _currentMember = widget.member;
     _vm = MemberEventsViewModel(member: widget.member);
     _vm.addListener(_onVmChanged);
     _vm.loadMemberEvents();
@@ -48,7 +62,21 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
     if (mounted) setState(() {});
   }
 
-  // ── Build ─────────────────────────────────────────────────────────────────
+  /// Opens the edit-member bottom sheet.
+  void _showEditSheet() {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _EditMemberSheet(
+        member: _currentMember,
+        viewModel: widget.viewModel!,
+        onSaved: (updated) {
+          setState(() => _currentMember = updated);
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +87,12 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
         title: 'KenWell365',
         automaticallyImplyLeading: true,
         actions: [
+          if (widget.viewModel != null)
+            IconButton(
+              tooltip: 'Edit Member',
+              icon: const Icon(Icons.edit_outlined, color: Colors.white),
+              onPressed: _showEditSheet,
+            ),
           IconButton(
             tooltip: 'Refresh',
             icon: const Icon(Icons.refresh, color: Colors.white),
@@ -101,38 +135,39 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
                           KenwellDetailRow(
                               label: 'Name and Surname',
                               value:
-                                  '${widget.member.name} ${widget.member.surname}'),
+                                  '${_currentMember.name} ${_currentMember.surname}'),
                           const Divider(height: 1),
                           KenwellDetailRow(
                               label: 'Gender',
-                              value: widget.member.gender ?? ''),
+                              value: _currentMember.gender ?? ''),
                           const Divider(height: 1),
                           KenwellDetailRow(
-                              label: 'Email', value: widget.member.email ?? ''),
+                              label: 'Email',
+                              value: _currentMember.email ?? ''),
                           const Divider(height: 1),
                           KenwellDetailRow(
                               label: 'Phone Number',
-                              value: widget.member.cellNumber ?? ''),
+                              value: _currentMember.cellNumber ?? ''),
                           const Divider(height: 1),
                           KenwellDetailRow(
                               label: 'Citizenship Status',
-                              value: widget.member.citizenshipStatus ?? ''),
+                              value: _currentMember.citizenshipStatus ?? ''),
                           const Divider(height: 1),
                           KenwellDetailRow(
                               label: 'Nationality',
-                              value: widget.member.nationality ?? ''),
+                              value: _currentMember.nationality ?? ''),
                           const Divider(height: 1),
                           KenwellDetailRow(
                               label: 'ID Number',
-                              value: widget.member.idNumber ?? ''),
+                              value: _currentMember.idNumber ?? ''),
                           const Divider(height: 1),
                           KenwellDetailRow(
                               label: 'Passport Number',
-                              value: widget.member.passportNumber ?? ''),
+                              value: _currentMember.passportNumber ?? ''),
                           const Divider(height: 1),
                           KenwellDetailRow(
                               label: 'Medical Aid',
-                              value: widget.member.medicalAidName ?? ''),
+                              value: _currentMember.medicalAidName ?? ''),
                         ],
                       ),
                       const SizedBox(height: 24),
@@ -221,6 +256,187 @@ class _MemberEventsScreenState extends State<MemberEventsScreen> {
 // ─────────────────────────────────────────────────────────────────────────────
 // Private section widgets
 // ─────────────────────────────────────────────────────────────────────────────
+
+// ── Edit member bottom sheet ──────────────────────────────────────────────────
+
+class _EditMemberSheet extends StatefulWidget {
+  const _EditMemberSheet({
+    required this.member,
+    required this.viewModel,
+    required this.onSaved,
+  });
+
+  final Member member;
+  final MemberDetailsViewModel viewModel;
+  final void Function(Member updated) onSaved;
+
+  @override
+  State<_EditMemberSheet> createState() => _EditMemberSheetState();
+}
+
+class _EditMemberSheetState extends State<_EditMemberSheet> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _nameCtrl;
+  late final TextEditingController _surnameCtrl;
+  late final TextEditingController _emailCtrl;
+  late final TextEditingController _cellCtrl;
+  late final TextEditingController _medAidCtrl;
+  bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final m = widget.member;
+    _nameCtrl = TextEditingController(text: m.name);
+    _surnameCtrl = TextEditingController(text: m.surname);
+    _emailCtrl = TextEditingController(text: m.email ?? '');
+    _cellCtrl = TextEditingController(text: m.cellNumber ?? '');
+    _medAidCtrl = TextEditingController(text: m.medicalAidName ?? '');
+  }
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    _surnameCtrl.dispose();
+    _emailCtrl.dispose();
+    _cellCtrl.dispose();
+    _medAidCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _saving = true);
+
+    final updated = widget.member.copyWith(
+      name: _nameCtrl.text.trim(),
+      surname: _surnameCtrl.text.trim(),
+      email: _emailCtrl.text.trim().isEmpty ? null : _emailCtrl.text.trim(),
+      cellNumber: _cellCtrl.text.trim().isEmpty ? null : _cellCtrl.text.trim(),
+      medicalAidName:
+          _medAidCtrl.text.trim().isEmpty ? null : _medAidCtrl.text.trim(),
+      updatedAt: DateTime.now(),
+    );
+
+    final ok = await widget.viewModel.updateMember(updated);
+    if (!mounted) return;
+
+    if (ok) {
+      widget.onSaved(updated);
+      Navigator.pop(context);
+      AppSnackbar.showSuccess(
+          context, '${updated.name} ${updated.surname} updated successfully');
+    } else {
+      AppSnackbar.showError(
+          context, widget.viewModel.errorMessage ?? 'Update failed');
+    }
+    setState(() => _saving = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      padding: EdgeInsets.fromLTRB(
+          20, 12, 20, MediaQuery.of(context).viewInsets.bottom + 32),
+      child: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Drag handle
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Edit Member Details',
+                style: theme.textTheme.titleLarge
+                    ?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              _field(
+                  controller: _nameCtrl, label: 'First Name', required: true),
+              const SizedBox(height: 12),
+              _field(
+                  controller: _surnameCtrl, label: 'Last Name', required: true),
+              const SizedBox(height: 12),
+              _field(
+                  controller: _emailCtrl,
+                  label: 'Email',
+                  keyboardType: TextInputType.emailAddress),
+              const SizedBox(height: 12),
+              _field(
+                  controller: _cellCtrl,
+                  label: 'Phone Number',
+                  keyboardType: TextInputType.phone),
+              const SizedBox(height: 12),
+              _field(controller: _medAidCtrl, label: 'Medical Aid Name'),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _saving ? null : _save,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.primaryColor,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: _saving
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white),
+                        )
+                      : const Text('Save Changes',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600, fontSize: 15)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _field({
+    required TextEditingController controller,
+    required String label,
+    bool required = false,
+    TextInputType? keyboardType,
+  }) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      ),
+      validator: required
+          ? (v) => (v == null || v.trim().isEmpty) ? '$label is required' : null
+          : null,
+    );
+  }
+}
 
 class _EventCard extends StatelessWidget {
   const _EventCard({

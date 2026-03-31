@@ -1,8 +1,8 @@
+import 'package:kenwell_health_app/ui/shared/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
 import '../data/services/connectivity_service.dart';
-import '../providers/theme_provider.dart';
 import '../ui/features/auth/view_models/auth_view_model.dart';
 import '../ui/features/calendar/view_model/calendar_view_model.dart';
 import '../ui/features/consent_form/view_model/consent_view_model.dart';

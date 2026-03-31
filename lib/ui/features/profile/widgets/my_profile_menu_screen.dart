@@ -8,6 +8,7 @@ import 'package:kenwell_health_app/ui/shared/ui/cards/kenwell_action_card.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:kenwell_health_app/ui/shared/ui/dialogs/confirmation_dialog.dart';
 import 'package:provider/provider.dart';
+import 'package:kenwell_health_app/routing/app_routes.dart';
 
 class MyProfileMenuScreen extends StatelessWidget {
   const MyProfileMenuScreen({super.key});
@@ -47,7 +48,7 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
 
     if (!context.mounted) return;
 
-    context.go('/login');
+    context.go(AppRoutes.loginPath);
   }
 
   @override
@@ -62,7 +63,7 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
-          automaticallyImplyLeading: false,
+          automaticallyImplyLeading: true,
         ),
         body: vm.isLoadingProfile
             ? const Center(child: CircularProgressIndicator())
@@ -88,7 +89,7 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
                           title: 'Edit Profile',
                           subtitle: 'Update your personal information',
                           // badgeLabel: 'Account',
-                          onTap: () => context.pushNamed('profile'),
+                          onTap: () => context.pushNamed(AppRoutes.profile),
                         ),
                         const SizedBox(height: 16),
                         KenwellActionCard(
@@ -102,7 +103,7 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
                           title: 'Help & Support',
                           subtitle: 'Get assistance and FAQs',
                           //badgeLabel: 'Support',
-                          onTap: () => context.pushNamed('help'),
+                          onTap: () => context.pushNamed(AppRoutes.help),
                         ),
                         // Audit Log card (admin / top management only)
                         if (RolePermissions.canAccessFeature(
@@ -118,7 +119,7 @@ class _MyProfileMenuScreenBody extends StatelessWidget {
                             title: 'Audit Log',
                             subtitle:
                                 'View all create, update & delete actions',
-                            onTap: () => context.pushNamed('auditLog'),
+                            onTap: () => context.pushNamed(AppRoutes.auditLog),
                           ),
                         ],
                         const SizedBox(height: 16),
@@ -184,14 +185,14 @@ class _ProfileHeader extends StatelessWidget {
                 letterSpacing: -0.5,
               ),
             ),
-            // SizedBox(height: 8),
-            /*  Text(
+            SizedBox(height: 8),
+            Text(
               'Manage your personal details and preferences.',
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.7),
+                color: Colors.white,
                 fontSize: 14,
               ),
-            ), */
+            ),
             // const SizedBox(height: 20),
             /*    // Avatar row
             Row(

@@ -102,16 +102,11 @@ class PersonalRiskAssessmentScreen extends StatelessWidget {
               }
             });
           } else if (vm.isCaution) {
-            // CAUTION ZONE: clear a previous red-zone auto-set only.
-            // Do NOT force a value here — the nurse must use their discretion.
-            // Intentionally leave "not referred" selections so we don't erase
-            // a deliberate nurse choice made while in the caution zone.
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (nurseViewModel.nursingReferralSelection ==
-                  NursingReferralOption.referredToStateClinic) {
-                nurseViewModel.setNursingReferralSelection(null);
-              }
-            });
+            // CAUTION ZONE: leave the selection unchanged — the nurse must use
+            // their clinical discretion to pick Healthy or At Risk.
+            // We intentionally do NOT auto-clear here.  If we did, any manual
+            // "At Risk" tap by the nurse would be erased on the very next
+            // rebuild, making manual referral impossible in caution zone.
           } else if (vm.isHealthy) {
             // HEALTHY ZONE: auto-clear to "not referred".
             WidgetsBinding.instance.addPostFrameCallback((_) {

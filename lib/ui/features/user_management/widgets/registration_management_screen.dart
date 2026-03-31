@@ -4,6 +4,7 @@ import 'package:kenwell_health_app/ui/features/profile/view_model/profile_view_m
 import 'package:kenwell_health_app/ui/shared/ui/app_bar/kenwell_app_bar.dart';
 import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:provider/provider.dart';
+import 'package:kenwell_health_app/routing/app_routes.dart';
 
 class RegistrationManagementScreen extends StatelessWidget {
   const RegistrationManagementScreen({super.key});
@@ -32,7 +33,7 @@ class RegistrationManagementScreenBody extends StatelessWidget {
           automaticallyImplyLeading: false,
           actions: [
             TextButton.icon(
-              onPressed: () => context.pushNamed('help'),
+              onPressed: () => context.pushNamed(AppRoutes.help),
               icon: const Icon(Icons.help_outline, color: Colors.white),
               label: const Text('Help', style: TextStyle(color: Colors.white)),
             ),
@@ -79,8 +80,8 @@ class RegistrationManagementScreenBody extends StatelessWidget {
                                   subtitle:
                                       'Manage staff who oversee wellness events.',
                                   //badgeLabel: 'Staff',
-                                  onTap: () => context
-                                      .pushNamed('userManagementVersionTwo'),
+                                  onTap: () => context.pushNamed(
+                                      AppRoutes.userManagementVersionTwo),
                                 ),
                               ),
                               const SizedBox(width: 14),
@@ -103,15 +104,15 @@ class RegistrationManagementScreenBody extends StatelessWidget {
                                   subtitle:
                                       'Manage individuals who participate in wellness events.',
                                   // badgeLabel: 'Members',
-                                  onTap: () =>
-                                      context.pushNamed('memberManagement'),
+                                  onTap: () => context
+                                      .pushNamed(AppRoutes.memberManagement),
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 14),
                           // Row 2: Event Registration (full-width)
-                          _RegistrationCard(
+                          /*   _RegistrationCard(
                             gradient: const LinearGradient(
                               /*  colors: [
                                 Color(0xFF90C048),
@@ -130,8 +131,8 @@ class RegistrationManagementScreenBody extends StatelessWidget {
                             subtitle:
                                 'Manage wellness event schedules and allocations.',
                             // badgeLabel: 'Events',
-                            onTap: () => context.pushNamed('calendar'),
-                          ),
+                            onTap: () => context.pushNamed(AppRoutes.calendar),
+                          ), */
                         ],
                       ),
                     ),
@@ -185,14 +186,14 @@ class _RegistrationHeader extends StatelessWidget {
                 letterSpacing: -0.5,
               ),
             ),
-            // SizedBox(height: 8),
-            /*   Text(
-              'Manage and setup.',
+            SizedBox(height: 8),
+            Text(
+              'Manage and setup users and members.',
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.7),
+                color: Colors.white,
                 fontSize: 14,
               ),
-            ), */
+            ),
           ],
         ),
       ),
@@ -200,7 +201,7 @@ class _RegistrationHeader extends StatelessWidget {
   }
 }
 
-class _RegistrationCard extends StatelessWidget {
+/* class _RegistrationCard extends StatelessWidget {
   const _RegistrationCard({
     required this.gradient,
     required this.icon,
@@ -319,7 +320,7 @@ class _RegistrationCard extends StatelessWidget {
       ),
     );
   }
-}
+} */
 
 // ── Compact card for 2-column grid ───────────────────────────────────────────
 

@@ -43,10 +43,12 @@ import '../ui/features/survey/widgets/survey_screen.dart';
 
 // Profile & Settings
 import '../ui/features/profile/widgets/profile_screen.dart';
+import '../ui/features/profile/widgets/my_profile_menu_screen.dart';
 
 // Admin & User Management
 import '../ui/features/help/widgets/help_screen.dart';
 import '../ui/features/help/widgets/faq_screen.dart';
+import '../ui/features/help/widgets/legal_screen.dart';
 import '../ui/features/user_management/widgets/user_management_screen_version_two.dart';
 import '../ui/features/wellness/widgets/member_search_screen.dart';
 
@@ -385,6 +387,13 @@ class AppRouterConfig {
           builder: (context, state) => const ProfileScreen(),
         ),
 
+        // My Profile Menu Route
+        GoRoute(
+          path: '/my-profile-menu',
+          name: 'myProfileMenu',
+          builder: (context, state) => const MyProfileMenuScreen(),
+        ),
+
         // Allocate Event Routes - FIX THIS ERROR
         GoRoute(
           path: '/allocate-event',
@@ -404,6 +413,13 @@ class AppRouterConfig {
           path: '/faq',
           name: 'faq',
           builder: (context, state) => const FaqScreen(),
+        ),
+
+        // Legal Route
+        GoRoute(
+          path: '/legal',
+          name: 'legal',
+          builder: (context, state) => const LegalScreen(),
         ),
 
         // Audit Log Route (ADMIN / TOP MANAGEMENT only)

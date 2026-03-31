@@ -15,6 +15,7 @@ import '../view_model/event_view_model.dart';
 import 'allocate_event_screen.dart';
 import 'my_event_screen.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
+import 'package:kenwell_health_app/routing/app_routes.dart';
 
 // EventDetailsScreen displays detailed information about a wellness event
 class EventDetailsScreen extends StatelessWidget {
@@ -70,7 +71,7 @@ class EventDetailsScreen extends StatelessWidget {
               onPressed: () => _showDeleteConfirmation(context),
             ),
           TextButton.icon(
-            onPressed: () => context.pushNamed('help'),
+            onPressed: () => context.pushNamed(AppRoutes.help),
             icon: const Icon(Icons.help_outline, color: Colors.white),
             label: const Text('Help', style: TextStyle(color: Colors.white)),
           ),
@@ -388,7 +389,7 @@ class EventDetailsScreen extends StatelessWidget {
   // Navigate to edit event screen
   void _navigateToEditEvent(BuildContext context) {
     context.pushNamed(
-      'addEditEvent',
+      AppRoutes.addEditEvent,
       extra: {
         'date': event.date,
         'existingEvent': event,

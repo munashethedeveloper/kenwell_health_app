@@ -14,6 +14,7 @@ import 'sections/stats_metric_card.dart';
 import 'health_screening_stats_section.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
 import '../services/event_report_exporter.dart';
+import 'package:kenwell_health_app/routing/app_routes.dart';
 
 class EventStatsDetailScreen extends StatefulWidget {
   final WellnessEvent event;
@@ -56,7 +57,7 @@ class _EventStatsDetailScreenState extends State<EventStatsDetailScreen> {
             },
           ),
           TextButton.icon(
-            onPressed: () => context.pushNamed('help'),
+            onPressed: () => context.pushNamed(AppRoutes.help),
             icon: const Icon(Icons.help_outline, color: Colors.white),
             label: const Text('Help', style: TextStyle(color: Colors.white)),
           ),
@@ -265,8 +266,7 @@ class _EventStatsDetailScreenState extends State<EventStatsDetailScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
-                        onPressed:
-                            _isExporting ? null : () => _exportToExcel(context),
+                        onPressed: _isExporting ? null : _exportToExcel,
                         icon: _isExporting
                             ? const SizedBox(
                                 width: 18,
@@ -299,13 +299,13 @@ class _EventStatsDetailScreenState extends State<EventStatsDetailScreen> {
     );
   }
 
-  Future<void> _exportToExcel(BuildContext context) async {
+  Future<void> _exportToExcel() async {
     setState(() => _isExporting = true);
     try {
       final exporter = EventReportExporter();
       final filePath = await exporter.export(event);
       if (!mounted) return;
-      _showExportSuccessSheet(context, filePath);
+      _showExportSuccessSheet(filePath);
     } catch (e) {
       if (!mounted) return;
       AppSnackbar.showError(context, 'Export failed: $e');
@@ -314,7 +314,7 @@ class _EventStatsDetailScreenState extends State<EventStatsDetailScreen> {
     }
   }
 
-  void _showExportSuccessSheet(BuildContext context, String filePath) {
+  void _showExportSuccessSheet(String filePath) {
     final theme = Theme.of(context);
     final fileName = filePath.split('/').last;
 
@@ -402,9 +402,11 @@ class _EventStatsDetailScreenState extends State<EventStatsDetailScreen> {
                 child: ElevatedButton.icon(
                   onPressed: () async {
                     Navigator.of(ctx).pop();
-                    await Share.shareXFiles(
-                      [XFile(filePath)],
-                      subject: '${event.title} – Event Report',
+                    await SharePlus.instance.share(
+                      ShareParams(
+                        files: [XFile(filePath)],
+                        subject: '${event.title} – Event Report',
+                      ),
                     );
                   },
                   icon: const Icon(Icons.share),

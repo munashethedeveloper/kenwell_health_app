@@ -9,6 +9,7 @@ import '../../event/view_model/event_view_model.dart';
 import '../../profile/view_model/profile_view_model.dart';
 import '../view_model/calendar_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
+import 'package:kenwell_health_app/routing/app_routes.dart';
 
 // Widget representing a single event card in the calendar
 class EventCard extends StatelessWidget {
@@ -38,7 +39,7 @@ class EventCard extends StatelessWidget {
       child: InkWell(
         onTap: () {
           context.pushNamed(
-            'eventDetails',
+            AppRoutes.eventDetails,
             extra: {'event': event},
           );
         },

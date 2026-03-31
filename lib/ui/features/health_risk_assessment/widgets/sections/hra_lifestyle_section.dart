@@ -190,26 +190,27 @@ class HraLifestyleSection extends StatelessWidget {
     );
   }
 
-  /// Shared helper: radio button group for a list of string [options].
   Widget _buildStringRadioGroup({
     required String? selected,
     required List<String> options,
     required ValueChanged<String> onChanged,
   }) {
-    return Column(
-      children: options
-          .map(
-            (option) => RadioListTile<String>(
-              title: Text(option),
-              value: option,
-              groupValue: selected,
-              onChanged: (value) {
-                if (value != null) onChanged(value);
-              },
-              toggleable: false,
-            ),
-          )
-          .toList(),
+    return RadioGroup<String>(
+      groupValue: selected,
+      onChanged: (value) {
+        if (value != null) onChanged(value);
+      },
+      child: Column(
+        children: options
+            .map(
+              (option) => RadioListTile<String>(
+                title: Text(option),
+                value: option,
+                toggleable: false,
+              ),
+            )
+            .toList(),
+      ),
     );
   }
 }

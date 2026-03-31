@@ -5,7 +5,7 @@ import 'custom_yes_no_question.dart';
 class KenwellYesNoItem<T> {
   final String question;
   final T? value;
-  final ValueChanged<T?> onChanged;
+  final ValueChanged<T> onChanged;
   final T yesValue;
   final T noValue;
 

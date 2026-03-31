@@ -5,6 +5,7 @@ import 'package:kenwell_health_app/ui/shared/ui/colours/kenwell_colours.dart';
 import 'package:provider/provider.dart';
 import '../../event/view_model/event_view_model.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
+import 'package:kenwell_health_app/routing/app_routes.dart';
 
 /// Statistics dashboard screen.
 ///
@@ -37,7 +38,7 @@ class StatsReportScreen extends StatelessWidget {
             },
           ),
           TextButton.icon(
-            onPressed: () => context.pushNamed('help'),
+            onPressed: () => context.pushNamed(AppRoutes.help),
             icon: const Icon(Icons.help_outline, color: Colors.white),
             label: const Text('Help', style: TextStyle(color: Colors.white)),
           ),
@@ -66,7 +67,7 @@ class StatsReportScreen extends StatelessWidget {
                       title: 'Live Wellness Stats',
                       subtitle: 'Real-time stats for in-progress events.',
                       badgeLabel: 'Live',
-                      onTap: () => context.pushNamed('liveEvents'),
+                      onTap: () => context.pushNamed(AppRoutes.liveEvents),
                     ),
                   ),
                   const SizedBox(width: 14),
@@ -81,7 +82,7 @@ class StatsReportScreen extends StatelessWidget {
                       title: 'Past Wellness Stats',
                       subtitle: 'Outcomes from completed events.',
                       badgeLabel: 'History',
-                      onTap: () => context.pushNamed('pastEvents'),
+                      onTap: () => context.pushNamed(AppRoutes.pastEvents),
                     ),
                   ),
                 ],
@@ -143,14 +144,14 @@ class _StatsHeader extends StatelessWidget {
                 letterSpacing: -0.5,
               ),
             ),
-            //SizedBox(height: 8),
-            /*   Text(
+            SizedBox(height: 8),
+            Text(
               'Select a category to explore wellness event data.',
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.7),
+                color: Colors.white,
                 fontSize: 14,
               ),
-            ), */
+            ),
           ],
         ),
       ),

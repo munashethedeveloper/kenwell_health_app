@@ -13,6 +13,7 @@ import '../../../shared/ui/app_bar/kenwell_app_bar.dart';
 import '../view_model/calendar_view_model.dart';
 import 'sections/calendar_tab_view.dart';
 import 'package:kenwell_health_app/ui/shared/ui/snackbars/app_snackbar.dart';
+import 'package:kenwell_health_app/routing/app_routes.dart';
 
 /// The main calendar screen.
 ///
@@ -80,7 +81,7 @@ class _CalendarScreenBodyState extends State<_CalendarScreenBody> {
                 ),
                 TextButton.icon(
                   onPressed: () {
-                    if (mounted) context.pushNamed('help');
+                    if (mounted) context.pushNamed(AppRoutes.help);
                   },
                   icon: const Icon(Icons.help_outline, color: Colors.white),
                   label:

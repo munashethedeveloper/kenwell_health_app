@@ -235,6 +235,7 @@ class _MemberManagementScreenState extends State<MemberManagementScreen> {
                                 subtitle = 'Search and manage your members';
                               }
                               return KenwellGradientHeader(
+                                label: 'MEMBER MANAGEMENT',
                                 title: title,
                                 subtitle: subtitle,
                               );
