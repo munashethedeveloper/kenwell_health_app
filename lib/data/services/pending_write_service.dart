@@ -21,6 +21,12 @@ import 'app_performance.dart';
 ///   data: member.toMap(),
 /// );
 ///
+/// // Enqueue a failed delete for later retry.
+/// await PendingWriteService.instance.enqueueDelete(
+///   collection: 'events',
+///   docId: eventId,
+/// );
+///
 /// // Flush when connectivity is restored.
 /// await PendingWriteService.instance.flushPending();
 /// ```
@@ -28,6 +34,12 @@ import 'app_performance.dart';
 /// The service uses a raw SQLite table (`pending_writes`) that is created in
 /// [AppDatabase] schema v16.  Documents are retried up to [maxAttempts] times
 /// before being abandoned (left in the table for manual inspection).
+///
+/// ## Operation types
+///
+/// The `data_json` column encodes the operation type using a sentinel key
+/// (`__delete: true`) to distinguish set-with-merge writes from document
+/// deletes.  No DB schema migration is required.
 class PendingWriteService {
   PendingWriteService._({AppDatabase? database, FirebaseFirestore? firestore})
       : _db = database ?? AppDatabase.instance,
@@ -47,6 +59,11 @@ class PendingWriteService {
 
   final AppDatabase _db;
   final FirebaseFirestore _firestore;
+
+  // ── Sentinel ───────────────────────────────────────────────────────────────
+
+  /// Sentinel key placed in `data_json` to identify delete operations.
+  static const String _deleteKey = '__delete';
 
   // ── Write ─────────────────────────────────────────────────────────────────
 
@@ -72,6 +89,33 @@ class PendingWriteService {
       debugPrint('PendingWriteService: queued $collection/$docId');
     } catch (e) {
       debugPrint('PendingWriteService.enqueue failed: $e');
+    }
+  }
+
+  /// Adds a Firestore document-delete operation to the pending queue.
+  ///
+  /// The delete is encoded as `{"__delete": true}` in the `data_json` column so
+  /// that no additional schema column is required.
+  Future<void> enqueueDelete({
+    required String collection,
+    required String docId,
+  }) async {
+    try {
+      await _db.customStatement(
+        '''INSERT OR IGNORE INTO pending_writes
+             (id, collection, doc_id, data_json, attempt_count, created_at)
+           VALUES (?, ?, ?, ?, 0, ?)''',
+        [
+          const Uuid().v4(),
+          collection,
+          docId,
+          jsonEncode({_deleteKey: true}),
+          DateTime.now().millisecondsSinceEpoch,
+        ],
+      );
+      debugPrint('PendingWriteService: queued delete $collection/$docId');
+    } catch (e) {
+      debugPrint('PendingWriteService.enqueueDelete failed: $e');
     }
   }
 
@@ -119,10 +163,20 @@ class PendingWriteService {
       try {
         final data =
             jsonDecode(row['data_json'] as String) as Map<String, dynamic>;
-        await _firestore
-            .collection(row['collection'] as String)
-            .doc(row['doc_id'] as String)
-            .set(data, SetOptions(merge: true));
+
+        // Dispatch based on operation type encoded in data_json.
+        final isDelete = data[_deleteKey] == true;
+        if (isDelete) {
+          await _firestore
+              .collection(row['collection'] as String)
+              .doc(row['doc_id'] as String)
+              .delete();
+        } else {
+          await _firestore
+              .collection(row['collection'] as String)
+              .doc(row['doc_id'] as String)
+              .set(data, SetOptions(merge: true));
+        }
 
         await _db.customStatement(
           'DELETE FROM pending_writes WHERE id = ?',

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kenwell_health_app/data/repositories_dcl/firestore_member_repository.dart';
 import 'package:kenwell_health_app/domain/models/member.dart';
 import 'package:kenwell_health_app/domain/constants/enums.dart';
 import 'package:kenwell_health_app/domain/constants/nationalities.dart';
@@ -12,15 +13,18 @@ class MemberDetailsViewModel extends ChangeNotifier {
     RegisterMemberUseCase? registerMemberUseCase,
     DeleteMemberUseCase? deleteMemberUseCase,
     LoadMembersUseCase? loadMembersUseCase,
+    FirestoreMemberRepository? memberRepository,
   })  : _registerMemberUseCase =
             registerMemberUseCase ?? RegisterMemberUseCase(),
         _deleteMemberUseCase = deleteMemberUseCase ?? DeleteMemberUseCase(),
-        _loadMembersUseCase = loadMembersUseCase ?? LoadMembersUseCase();
+        _loadMembersUseCase = loadMembersUseCase ?? LoadMembersUseCase(),
+        _memberRepository = memberRepository ?? FirestoreMemberRepository();
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final RegisterMemberUseCase _registerMemberUseCase;
   final DeleteMemberUseCase _deleteMemberUseCase;
   final LoadMembersUseCase _loadMembersUseCase;
+  final FirestoreMemberRepository _memberRepository;
 
   Member? savedMember;
   String? _eventId; // Store the event ID for linking member to event
@@ -406,6 +410,26 @@ class MemberDetailsViewModel extends ChangeNotifier {
     }
   }
 
+  // Update member details
+  Future<bool> updateMember(Member updatedMember) async {
+    try {
+      _setLoading(true);
+      await _memberRepository.updateMember(updatedMember);
+
+      // Reflect change in the in-memory list.
+      final idx = _members.indexWhere((m) => m.id == updatedMember.id);
+      if (idx != -1) _members[idx] = updatedMember;
+
+      _setSuccess(
+          '${updatedMember.name} ${updatedMember.surname} updated successfully');
+      return true;
+    } catch (e) {
+      _setError('Failed to update member');
+      debugPrint('Update member error: $e');
+      return false;
+    }
+  }
+
   // Save member (used by create member section)
   Future<bool> saveMember() async {
     try {
@@ -466,7 +490,12 @@ class MemberDetailsViewModel extends ChangeNotifier {
       filtered = filtered.where((member) {
         final fullName = '${member.name} ${member.surname}'.toLowerCase();
         final email = member.email?.toLowerCase() ?? '';
-        return fullName.contains(query) || email.contains(query);
+        final idNum = member.idNumber?.toLowerCase() ?? '';
+        final passport = member.passportNumber?.toLowerCase() ?? '';
+        return fullName.contains(query) ||
+            email.contains(query) ||
+            idNum.contains(query) ||
+            passport.contains(query);
       }).toList();
     }
 

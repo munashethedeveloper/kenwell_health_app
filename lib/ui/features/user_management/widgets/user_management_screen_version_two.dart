@@ -246,6 +246,7 @@ class _UserManagementScreenVersionTwoState
                                 subtitle = 'Search and manage your users';
                               }
                               return KenwellGradientHeader(
+                                label: 'USER MANAGEMENT',
                                 title: title,
                                 subtitle: subtitle,
                               );

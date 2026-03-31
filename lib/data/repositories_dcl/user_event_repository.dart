@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import '../services/audit_log_service.dart';
+import '../services/pending_write_service.dart';
 
 class UserEventRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -79,23 +80,46 @@ class UserEventRepository {
     }
   }
 
-  /// Remove a user's assignment from a specific event
+  /// Remove a user's assignment from a specific event.
+  ///
+  /// Uses the deterministic composite document ID (`{eventId}_{userId}`) that
+  /// [UserEventService.addUserEvent] now creates, avoiding a round-trip query.
+  ///
+  /// **Offline**: Queues the delete in [PendingWriteService] for retry on
+  /// reconnect so the un-assignment is not lost.
   Future<void> removeUserEvent(String eventId, String userId) async {
-    final snapshot = await _firestore
-        .collection('user_events')
-        .where('eventId', isEqualTo: eventId)
-        .where('userId', isEqualTo: userId)
-        .get();
-    final batch = _firestore.batch();
-    for (final doc in snapshot.docs) {
-      batch.delete(doc.reference);
+    final docId = '${eventId}_$userId';
+    try {
+      await _firestore.collection('user_events').doc(docId).delete();
+      unawaited(_audit.logDelete(
+        collection: 'user_events',
+        documentId: docId,
+        summary: 'Removed user $userId from event $eventId',
+      ));
+    } catch (e) {
+      debugPrint(
+          'UserEventRepository: Firestore removeUserEvent failed ($e) — queuing delete for retry');
+      unawaited(PendingWriteService.instance.enqueueDelete(
+        collection: 'user_events',
+        docId: docId,
+      ));
+      // Also attempt to remove legacy auto-ID documents (created before the
+      // deterministic-ID change) by falling back to a query-based batch delete.
+      try {
+        final snapshot = await _firestore
+            .collection('user_events')
+            .where('eventId', isEqualTo: eventId)
+            .where('userId', isEqualTo: userId)
+            .get(const GetOptions(source: Source.cache));
+        final batch = _firestore.batch();
+        for (final doc in snapshot.docs) {
+          if (doc.id != docId) batch.delete(doc.reference);
+        }
+        await batch.commit();
+      } catch (_) {
+        // Best-effort legacy cleanup; the deterministic doc is already queued.
+      }
     }
-    await batch.commit();
-    unawaited(_audit.logDelete(
-      collection: 'user_events',
-      documentId: '${eventId}_$userId',
-      summary: 'Removed user $userId from event $eventId',
-    ));
   }
 
   /// Returns a real-time stream of user-event mapping documents for [userId].

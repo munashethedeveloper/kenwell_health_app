@@ -17,6 +17,8 @@ class RolePermissions {
     '/profile': [...UserRoles.values],
     '/my-profile-menu': [...UserRoles.values],
     '/help': [...UserRoles.values],
+    '/faq': [...UserRoles.values],
+    '/legal': [...UserRoles.values],
 
     // Admin-only routes
     '/audit-log': ['ADMIN', 'TOP MANAGEMENT'],

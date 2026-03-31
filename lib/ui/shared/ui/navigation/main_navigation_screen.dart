@@ -19,38 +19,29 @@ class MainNavigationScreen extends StatefulWidget {
 }
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
-  int _lastTabCount = 0;
   int _currentIndex = 2;
+
+  // ── Cached per-role tab data ───────────────────────────────────────────────
+  // Rebuilt only when the user's role changes so the IndexedStack never
+  // discards live screen states due to role-unrelated ProfileViewModel updates.
+  String _cachedRole = '';
+  List<Widget> _tabs = [];
+  List<NavigationRailDestination> _railDestinations = [];
+  List<NavigationDestination> _navDestinations = [];
 
   @override
   void initState() {
     super.initState();
+    _rebuildTabsForRole('');
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDesktop = ResponsiveBreakpoints.isDesktop(context);
-    final profileVM = context.watch<ProfileViewModel>();
-    final String role = profileVM.role.toUpperCase();
+  void _rebuildTabsForRole(String role) {
+    final upperRole = role.toUpperCase();
 
-    bool isPrivilegedRole(String role) {
-      return role == 'ADMIN' ||
-          role == 'TOP MANAGEMENT' ||
-          role == 'PROJECT MANAGER';
-    }
+    bool isPrivilegedRole(String r) =>
+        r == 'ADMIN' || r == 'TOP MANAGEMENT' || r == 'PROJECT MANAGER';
 
-    /*   bool isStaffRole(String role) {
-      return role == 'ADMIN' ||
-          role == 'TOP MANAGEMENT' ||
-          role == 'PROJECT MANAGER' ||
-          role == 'PROJECT COORDINATOR' ||
-          role == 'HEALTH PRACTITIONER';
-    } */
-
-    // Define tabs and destinations based on role
     final List<Widget> allTabs = [
-      //const UserManagementScreenVersionTwo(),
       const RegistrationManagementScreen(),
       const StatsReportScreen(),
       // privileged: Users=0, Stats=1, Home=2, Calendar=3, Events=4
@@ -69,157 +60,168 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       const CalendarScreen(),
       const MyEventScreen(),
     ];
-    final List<NavigationRailDestination> allRailDestinations = [
-      const NavigationRailDestination(
-        icon: Icon(Icons.people_outline_rounded),
-        selectedIcon: Icon(Icons.people_rounded),
-        label: Text('Users'),
-      ),
-      const NavigationRailDestination(
-        icon: Icon(Icons.bar_chart_rounded),
-        selectedIcon: Icon(Icons.bar_chart_rounded),
-        label: Text('Statistics'),
-      ),
-      const NavigationRailDestination(
-        icon: Icon(Icons.home_outlined),
-        selectedIcon: Icon(Icons.home_rounded),
-        label: Text('Home'),
-      ),
-      const NavigationRailDestination(
-        icon: Icon(Icons.calendar_month_outlined),
-        selectedIcon: Icon(Icons.calendar_month_rounded),
-        label: Text('Calendar'),
-      ),
-      const NavigationRailDestination(
-        icon: Icon(Icons.event_note_outlined),
-        selectedIcon: Icon(Icons.event_note_rounded),
-        label: Text('Events'),
-      ),
-    ];
-    final List<NavigationRailDestination> clientRailDestinations = [
-      const NavigationRailDestination(
-        icon: Icon(Icons.bar_chart_rounded),
-        selectedIcon: Icon(Icons.bar_chart_rounded),
-        label: Text('Statistics'),
-      ),
-      const NavigationRailDestination(
-        icon: Icon(Icons.home_outlined),
-        selectedIcon: Icon(Icons.home_rounded),
-        label: Text('Home'),
-      ),
-      const NavigationRailDestination(
-        icon: Icon(Icons.calendar_month_outlined),
-        selectedIcon: Icon(Icons.calendar_month_rounded),
-        label: Text('Calendar'),
-      ),
-    ];
-    final List<NavigationRailDestination> restrictedRailDestinations = [
-      const NavigationRailDestination(
-        icon: Icon(Icons.home_outlined),
-        selectedIcon: Icon(Icons.home_rounded),
-        label: Text('Home'),
-      ),
-      const NavigationRailDestination(
-        icon: Icon(Icons.calendar_month_outlined),
-        selectedIcon: Icon(Icons.calendar_month_rounded),
-        label: Text('Calendar'),
-      ),
-      const NavigationRailDestination(
-        icon: Icon(Icons.event_note_outlined),
-        selectedIcon: Icon(Icons.event_note_rounded),
-        label: Text('Events'),
-      ),
-    ];
-    final List<NavigationDestination> allNavDestinations = [
-      const NavigationDestination(
-        icon: Icon(Icons.people_outline_rounded),
-        selectedIcon: Icon(Icons.people_rounded),
-        label: 'Users',
-      ),
-      const NavigationDestination(
-        icon: Icon(Icons.bar_chart_rounded),
-        selectedIcon: Icon(Icons.bar_chart_rounded),
-        label: 'Statistics',
-      ),
-      const NavigationDestination(
-        icon: Icon(Icons.home_outlined),
-        selectedIcon: Icon(Icons.home_rounded),
-        label: 'Home',
-      ),
-      const NavigationDestination(
-        icon: Icon(Icons.calendar_month_outlined),
-        selectedIcon: Icon(Icons.calendar_month_rounded),
-        label: 'Calendar',
-      ),
-      const NavigationDestination(
-        icon: Icon(Icons.event_note_outlined),
-        selectedIcon: Icon(Icons.event_note_rounded),
-        label: 'Events',
-      ),
-    ];
-    final List<NavigationDestination> clientNavDestinations = [
-      const NavigationDestination(
-        icon: Icon(Icons.bar_chart_rounded),
-        selectedIcon: Icon(Icons.bar_chart_rounded),
-        label: 'Statistics',
-      ),
-      const NavigationDestination(
-        icon: Icon(Icons.home_outlined),
-        selectedIcon: Icon(Icons.home_rounded),
-        label: 'Home',
-      ),
-      const NavigationDestination(
-        icon: Icon(Icons.calendar_month_outlined),
-        selectedIcon: Icon(Icons.calendar_month_rounded),
-        label: 'Calendar',
-      ),
-    ];
-    final List<NavigationDestination> restrictedNavDestinations = [
-      const NavigationDestination(
-        icon: Icon(Icons.home_outlined),
-        selectedIcon: Icon(Icons.home_rounded),
-        label: 'Home',
-      ),
-      const NavigationDestination(
-        icon: Icon(Icons.calendar_month_outlined),
-        selectedIcon: Icon(Icons.calendar_month_rounded),
-        label: 'Calendar',
-      ),
-      const NavigationDestination(
-        icon: Icon(Icons.event_note_outlined),
-        selectedIcon: Icon(Icons.event_note_rounded),
-        label: 'Events',
-      ),
-    ];
 
-    final bool privileged = isPrivilegedRole(role);
-    final bool isClient = role == 'CLIENT';
-    final List<Widget> tabs = privileged
-        ? allTabs
-        : isClient
-            ? clientTabs
-            : restrictedTabs;
-    final List<NavigationRailDestination> railDestinations = privileged
-        ? allRailDestinations
-        : isClient
-            ? clientRailDestinations
-            : restrictedRailDestinations;
-    final List<NavigationDestination> navDestinations = privileged
-        ? allNavDestinations
-        : isClient
-            ? clientNavDestinations
-            : restrictedNavDestinations;
+    if (isPrivilegedRole(upperRole)) {
+      _tabs = allTabs;
+      _railDestinations = const [
+        NavigationRailDestination(
+          icon: Icon(Icons.people_outline_rounded),
+          selectedIcon: Icon(Icons.people_rounded),
+          label: Text('Users'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.bar_chart_rounded),
+          selectedIcon: Icon(Icons.bar_chart_rounded),
+          label: Text('Statistics'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.home_outlined),
+          selectedIcon: Icon(Icons.home_rounded),
+          label: Text('Home'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.calendar_month_outlined),
+          selectedIcon: Icon(Icons.calendar_month_rounded),
+          label: Text('Calendar'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.event_note_outlined),
+          selectedIcon: Icon(Icons.event_note_rounded),
+          label: Text('Events'),
+        ),
+      ];
+      _navDestinations = const [
+        NavigationDestination(
+          icon: Icon(Icons.people_outline_rounded),
+          selectedIcon: Icon(Icons.people_rounded),
+          label: 'Users',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.bar_chart_rounded),
+          selectedIcon: Icon(Icons.bar_chart_rounded),
+          label: 'Statistics',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.home_outlined),
+          selectedIcon: Icon(Icons.home_rounded),
+          label: 'Home',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.calendar_month_outlined),
+          selectedIcon: Icon(Icons.calendar_month_rounded),
+          label: 'Calendar',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.event_note_outlined),
+          selectedIcon: Icon(Icons.event_note_rounded),
+          label: 'Events',
+        ),
+      ];
+    } else if (upperRole == 'CLIENT') {
+      _tabs = clientTabs;
+      _railDestinations = const [
+        NavigationRailDestination(
+          icon: Icon(Icons.bar_chart_rounded),
+          selectedIcon: Icon(Icons.bar_chart_rounded),
+          label: Text('Statistics'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.home_outlined),
+          selectedIcon: Icon(Icons.home_rounded),
+          label: Text('Home'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.calendar_month_outlined),
+          selectedIcon: Icon(Icons.calendar_month_rounded),
+          label: Text('Calendar'),
+        ),
+      ];
+      _navDestinations = const [
+        NavigationDestination(
+          icon: Icon(Icons.bar_chart_rounded),
+          selectedIcon: Icon(Icons.bar_chart_rounded),
+          label: 'Statistics',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.home_outlined),
+          selectedIcon: Icon(Icons.home_rounded),
+          label: 'Home',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.calendar_month_outlined),
+          selectedIcon: Icon(Icons.calendar_month_rounded),
+          label: 'Calendar',
+        ),
+      ];
+    } else {
+      _tabs = restrictedTabs;
+      _railDestinations = const [
+        NavigationRailDestination(
+          icon: Icon(Icons.home_outlined),
+          selectedIcon: Icon(Icons.home_rounded),
+          label: Text('Home'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.calendar_month_outlined),
+          selectedIcon: Icon(Icons.calendar_month_rounded),
+          label: Text('Calendar'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.event_note_outlined),
+          selectedIcon: Icon(Icons.event_note_rounded),
+          label: Text('Events'),
+        ),
+      ];
+      _navDestinations = const [
+        NavigationDestination(
+          icon: Icon(Icons.home_outlined),
+          selectedIcon: Icon(Icons.home_rounded),
+          label: 'Home',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.calendar_month_outlined),
+          selectedIcon: Icon(Icons.calendar_month_rounded),
+          label: 'Calendar',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.event_note_outlined),
+          selectedIcon: Icon(Icons.event_note_rounded),
+          label: 'Events',
+        ),
+      ];
+    }
+  }
 
-    // Adjust _currentIndex if needed (fixes out-of-range errors on role change)
-    if (_lastTabCount != tabs.length) {
-      if (_currentIndex >= tabs.length) {
-        setState(() {
-          _currentIndex = tabs.length - 1;
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDesktop = ResponsiveBreakpoints.isDesktop(context);
+
+    // Subscribe only to role changes to avoid rebuilding on unrelated
+    // ProfileViewModel updates (e.g. firstName/lastName changes).
+    final String role =
+        context.select<ProfileViewModel, String>((vm) => vm.role);
+
+    // Rebuild cached tab data only when the role changes.  This is a direct
+    // mutation inside build (no setState) — safe because it is idempotent and
+    // does not schedule an additional frame.
+    if (role != _cachedRole) {
+      _cachedRole = role;
+      _rebuildTabsForRole(role);
+      // Schedule a clamp after the current frame completes so we do not call
+      // setState() while Flutter is executing buildScope(), which would throw
+      // "setState() called during build".
+      if (_currentIndex >= _tabs.length) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) setState(() => _currentIndex = _tabs.length - 1);
         });
       }
-      _lastTabCount = tabs.length;
     }
-    int currentIndex = _currentIndex;
+
+    // Use clamp as a same-frame guard in case the postFrameCallback fires
+    // after this frame but before the next one renders.
+    final int currentIndex =
+        _currentIndex.clamp(0, _tabs.length - 1);
 
     // For desktop/tablet, use NavigationRail + content side-by-side
     if (isDesktop) {
@@ -260,13 +262,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               labelType: ResponsiveBreakpoints.isExpanded(context)
                   ? NavigationRailLabelType.none
                   : NavigationRailLabelType.all,
-              destinations: railDestinations,
+              destinations: _railDestinations,
             ),
             const VerticalDivider(thickness: 1, width: 1),
             Expanded(
               child: IndexedStack(
                 index: currentIndex,
-                children: tabs,
+                children: _tabs,
               ),
             ),
           ],
@@ -278,7 +280,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     return Scaffold(
       body: IndexedStack(
         index: currentIndex,
-        children: tabs,
+        children: _tabs,
       ),
       bottomNavigationBar: NavigationBarTheme(
         data: NavigationBarThemeData(
@@ -327,7 +329,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               _currentIndex = index;
             });
           },
-          destinations: navDestinations,
+          destinations: _navDestinations,
         ),
       ),
     );

@@ -62,6 +62,11 @@ class _EventStatsContentState extends State<EventStatsContent> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Ensure events are loaded when this screen opens.
+      final eventVM = context.read<EventViewModel>();
+      if (eventVM.events.isEmpty) {
+        eventVM.loadEvents();
+      }
       final statsVM = context.read<StatsReportViewModel>();
       statsVM.loadMemberCount();
       if (widget.isLiveTab) {
@@ -74,6 +79,8 @@ class _EventStatsContentState extends State<EventStatsContent> {
   }
 
   Future<void> _refreshData() async {
+    // Reload events so the screening counts pick up any new data.
+    await context.read<EventViewModel>().loadEvents();
     final statsVM = context.read<StatsReportViewModel>();
     statsVM.loadMemberCount();
     if (widget.isLiveTab) {
@@ -341,11 +348,13 @@ class _EventStatsContentState extends State<EventStatsContent> {
                     Icon(Icons.filter_list_alt,
                         color: theme.primaryColor, size: 18),
                     const SizedBox(width: 8),
-                    Text(
-                      '${events.length} event${events.length != 1 ? "s" : ""} found',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.primaryColor,
-                        fontWeight: FontWeight.w600,
+                    Expanded(
+                      child: Text(
+                        _buildFilterDescription(events.length),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.primaryColor,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],
@@ -354,6 +363,10 @@ class _EventStatsContentState extends State<EventStatsContent> {
             ],
 
             const SizedBox(height: 20),
+
+            // ── Total events card ─────────────────────────────────────────
+            _buildTotalEventsCard(events, isLiveTab, theme),
+            const SizedBox(height: 12),
 
             // ── Stat cards ────────────────────────────────────────────────
             Row(children: [
@@ -526,6 +539,105 @@ class _EventStatsContentState extends State<EventStatsContent> {
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         padding: const EdgeInsets.symmetric(horizontal: 4),
         visualDensity: VisualDensity.compact,
+      ),
+    );
+  }
+
+  /// Builds a human-readable description of the currently active filters.
+  String _buildFilterDescription(int eventCount) {
+    final parts = <String>[];
+    if (_selectedStatus != null) parts.add('status: $_selectedStatus');
+    if (_selectedProvince != null) parts.add('province: $_selectedProvince');
+    if (_startDate != null) {
+      parts.add(
+          'from: ${_startDate!.day}/${_startDate!.month}/${_startDate!.year}');
+    }
+    if (_endDate != null) {
+      parts.add('to: ${_endDate!.day}/${_endDate!.month}/${_endDate!.year}');
+    }
+    if (_searchController.text.isNotEmpty) {
+      parts.add('search: "${_searchController.text}"');
+    }
+    final filterText =
+        parts.isEmpty ? '' : ' · Filtered by ${parts.join(', ')}';
+    return '$eventCount event${eventCount != 1 ? "s" : ""} found$filterText';
+  }
+
+  /// Builds the total events summary card shown at the top of the stats screen.
+  Widget _buildTotalEventsCard(
+      List<WellnessEvent> events, bool isLiveTab, ThemeData theme) {
+    final List<Color> gradientColors = isLiveTab
+        ? [KenwellColors.primaryGreen, const Color(0xFF065F46)]
+        : [KenwellColors.secondaryNavy, const Color(0xFF3B3F86)];
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: gradientColors,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: gradientColors.first.withValues(alpha: 0.35),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              isLiveTab
+                  ? Icons.play_circle_outline_rounded
+                  : Icons.history_rounded,
+              color: Colors.white,
+              size: 22,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isLiveTab ? 'Total Live Events' : 'Total Past Events',
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  events.length.toString(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
+                    height: 1.1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            isLiveTab ? 'In Progress' : 'Completed',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.8),
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
     );
   }

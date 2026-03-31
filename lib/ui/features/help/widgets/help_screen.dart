@@ -101,7 +101,7 @@ class HelpScreen extends StatelessWidget {
                         title: 'Terms & Privacy Policy',
                         subtitle: 'Read our terms and privacy policy',
                         badgeLabel: 'Legal',
-                        onTap: viewModel.openTermsAndPrivacy,
+                        onTap: () => context.pushNamed('legal'),
                       ),
                       const SizedBox(height: 16),
                       const _WelcomeBanner(),
